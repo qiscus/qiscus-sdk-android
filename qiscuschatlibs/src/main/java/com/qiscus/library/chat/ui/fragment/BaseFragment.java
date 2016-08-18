@@ -13,7 +13,6 @@ import com.trello.rxlifecycle.components.support.RxFragment;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import timber.log.Timber;
 
 /**
  * Created on : August 18, 2016
@@ -29,7 +28,6 @@ public abstract class BaseFragment extends RxFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Timber.tag(getClass().getSimpleName());
     }
 
     @Nullable

@@ -7,7 +7,6 @@ import com.qiscus.library.chat.ui.adapter.BaseRecyclerAdapter.OnItemClickListene
 import com.qiscus.library.chat.ui.adapter.BaseRecyclerAdapter.OnLongItemClickListener;
 
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * Created on : August 18, 2016
@@ -27,7 +26,6 @@ public abstract class BaseItemViewHolder<Data> extends RecyclerView.ViewHolder i
     public BaseItemViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView);
         ButterKnife.bind(this, itemView);
-        Timber.tag(getClass().getSimpleName());
         this.itemClickListener = itemClickListener;
         this.longItemClickListener = longItemClickListener;
         itemView.setOnClickListener(this);

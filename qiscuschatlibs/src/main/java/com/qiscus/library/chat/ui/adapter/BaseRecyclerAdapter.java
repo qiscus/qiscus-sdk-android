@@ -11,8 +11,6 @@ import com.qiscus.library.chat.ui.adapter.viewholder.BaseItemViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -31,13 +29,11 @@ public abstract class BaseRecyclerAdapter<Data, Holder extends BaseItemViewHolde
     public BaseRecyclerAdapter(Context context) {
         this.context = context;
         data = new ArrayList<>();
-        Timber.tag(getClass().getSimpleName());
     }
 
     public BaseRecyclerAdapter(Context context, List<Data> data) {
         this.context = context;
         this.data = data;
-        Timber.tag(getClass().getSimpleName());
     }
 
     protected View getView(ViewGroup parent, int viewType) {

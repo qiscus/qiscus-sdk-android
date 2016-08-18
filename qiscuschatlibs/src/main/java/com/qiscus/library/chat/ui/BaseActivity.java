@@ -51,7 +51,6 @@ public abstract class BaseActivity extends RxAppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(getResourceLayout());
         ButterKnife.bind(this);
-        Timber.tag(getClass().getSimpleName());
         onViewReady(savedInstanceState);
     }
 

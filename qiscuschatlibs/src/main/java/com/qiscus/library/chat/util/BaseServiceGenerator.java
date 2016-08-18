@@ -3,7 +3,6 @@ package com.qiscus.library.chat.util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import retrofit.ErrorHandler;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.converter.GsonConverter;
@@ -22,22 +21,19 @@ public class BaseServiceGenerator {
         RestAdapter.Builder builder = new RestAdapter.Builder()
                 .setLogLevel(logLevel)
                 .setConverter(new GsonConverter(Qson.pluck().getParser()))
-                .setErrorHandler(new ErrorHandler() {
-                    @Override
-                    public Throwable handleError(RetrofitError cause) {
-                        if (cause.getKind().equals(RetrofitError.Kind.HTTP)) {
-                            String json = new String(((TypedByteArray) cause.getResponse().getBody()).getBytes());
-                            try {
-                                JSONObject object = new JSONObject(json);
-                                return new Throwable(object.getString("message"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } else if (cause.getKind().equals(RetrofitError.Kind.NETWORK)) {
-                            return new Throwable("Please check your internet connection!");
+                .setErrorHandler(cause -> {
+                    if (cause.getKind().equals(RetrofitError.Kind.HTTP)) {
+                        String json = new String(((TypedByteArray) cause.getResponse().getBody()).getBytes());
+                        try {
+                            JSONObject object = new JSONObject(json);
+                            return new Throwable(object.getString("message"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        return cause;
+                    } else if (cause.getKind().equals(RetrofitError.Kind.NETWORK)) {
+                        return new Throwable("Please check your internet connection!");
                     }
+                    return cause;
                 })
                 .setEndpoint(baseUrl);
 

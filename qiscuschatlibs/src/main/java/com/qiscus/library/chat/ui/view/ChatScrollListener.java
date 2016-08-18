@@ -3,8 +3,6 @@ package com.qiscus.library.chat.ui.view;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import timber.log.Timber;
-
 /**
  * Created on : June 01, 2016
  * Author     : zetbaitsu
@@ -23,7 +21,6 @@ public class ChatScrollListener extends RecyclerView.OnScrollListener {
     public ChatScrollListener(LinearLayoutManager linearLayoutManager, Listener listener) {
         this.linearLayoutManager = linearLayoutManager;
         this.listener = listener;
-        Timber.tag(ChatScrollListener.class.getSimpleName());
     }
 
 

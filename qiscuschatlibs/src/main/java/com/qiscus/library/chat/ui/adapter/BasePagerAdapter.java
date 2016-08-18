@@ -7,8 +7,6 @@ import com.qiscus.library.chat.ui.fragment.BaseFragment;
 
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -25,14 +23,12 @@ public abstract class BasePagerAdapter<Fragment extends BaseFragment> extends
     public BasePagerAdapter(FragmentManager fm, List<Fragment> fragments) {
         super(fm);
         this.fragments = fragments;
-        Timber.tag(getClass().getSimpleName());
     }
 
     public BasePagerAdapter(FragmentManager fm, List<Fragment> fragments, List<String> titles) {
         super(fm);
         this.fragments = fragments;
         this.titles = titles;
-        Timber.tag(getClass().getSimpleName());
     }
 
     @Override

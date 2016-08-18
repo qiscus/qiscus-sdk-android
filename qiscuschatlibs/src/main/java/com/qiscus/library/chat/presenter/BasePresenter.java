@@ -7,7 +7,6 @@ import com.trello.rxlifecycle.LifecycleTransformer;
 import com.trello.rxlifecycle.RxLifecycle;
 
 import rx.subjects.BehaviorSubject;
-import timber.log.Timber;
 
 /**
  * Created on : August 18, 2016
@@ -24,7 +23,6 @@ public abstract class BasePresenter<V extends BasePresenter.View> {
 
     public BasePresenter(V view) {
         this.view = view;
-        Timber.tag(getClass().getSimpleName());
         lifecycleSubject.onNext(PresenterEvent.CREATE);
     }
 
