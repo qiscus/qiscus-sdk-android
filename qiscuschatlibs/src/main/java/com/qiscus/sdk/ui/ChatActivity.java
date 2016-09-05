@@ -23,9 +23,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.R2;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.CacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -55,22 +55,14 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
     private static final int PICK_IMAGE_REQUEST = 2;
     private static final int PICK_FILE_REQUEST = 3;
 
-    @BindView(R2.id.tv_name)
-    TextView tvName;
-    @BindView(R2.id.empty_chat)
-    LinearLayout emptyChat;
-    @BindView(R2.id.swipe_layout)
-    SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R2.id.list_message)
-    BaseRecyclerView listMessage;
-    @BindView(R2.id.field_message)
-    EditText fieldMessage;
-    @BindView(R2.id.button_send)
-    ImageView buttonSend;
-    @BindView(R2.id.button_new_message)
-    View buttonNewMessage;
-    @BindView(R2.id.progressBar)
-    ProgressBar progressBar;
+    @BindView(R2.id.tv_name) TextView tvName;
+    @BindView(R2.id.empty_chat) LinearLayout emptyChat;
+    @BindView(R2.id.swipe_layout) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R2.id.list_message) BaseRecyclerView listMessage;
+    @BindView(R2.id.field_message) EditText fieldMessage;
+    @BindView(R2.id.button_send) ImageView buttonSend;
+    @BindView(R2.id.button_new_message) View buttonNewMessage;
+    @BindView(R2.id.progressBar) ProgressBar progressBar;
 
     private QiscusChatRoom qiscusChatRoom;
     private ChatAdapter adapter;
