@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.qiscus.library.chat.Qiscus;
 import com.qiscus.library.chat.data.remote.QiscusApi;
 import com.qiscus.library.chat.sample.R;
 import com.qiscus.library.chat.sample.data.local.LocalDataManager;
@@ -35,7 +36,7 @@ public class MainActivity extends BaseActivity {
     public void loginOrLogout(View view) {
         if (LocalDataManager.getInstance().isLogged()) {
             LocalDataManager.getInstance().clearData();
-            com.qiscus.library.chat.data.local.LocalDataManager.getInstance().clearData();
+            Qiscus.logout();
             loginButton.setText("Login");
         } else {
             showLoading();
@@ -44,7 +45,7 @@ public class MainActivity extends BaseActivity {
                     .compose(bindToLifecycle())
                     .subscribe(accountInfo -> {
                         LocalDataManager.getInstance().saveAccountInfo(accountInfo);
-                        com.qiscus.library.chat.data.local.LocalDataManager.getInstance().saveAccountInfo(accountInfo);
+                        Qiscus.setQiscusAccount(accountInfo.getEmail(), accountInfo.getAuthenticationToken(), accountInfo.getFullname());
                         loginButton.setText("Logout");
                         dismissLoading();
                     }, throwable -> {
