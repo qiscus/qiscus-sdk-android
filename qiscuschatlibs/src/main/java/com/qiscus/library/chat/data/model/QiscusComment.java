@@ -27,20 +27,20 @@ public class QiscusComment implements Parcelable {
     public static final int STATE_ON_PUSHER = 3;
     public static final int STATE_FAILED = 4;
 
-    private int id;
-    private int roomId;
-    private int topicId;
-    private String uniqueId;
-    private int commentBeforeId;
-    private String message;
-    private String sender;
-    private String senderEmail;
-    private Date time;
-    private int state;
-    private boolean downloading;
-    private int progress;
-    private ProgressListener progressListener;
-    private DownloadingListener downloadingListener;
+    protected int id;
+    protected int roomId;
+    protected int topicId;
+    protected String uniqueId;
+    protected int commentBeforeId;
+    protected String message;
+    protected String sender;
+    protected String senderEmail;
+    protected Date time;
+    protected int state;
+    protected boolean downloading;
+    protected int progress;
+    protected ProgressListener progressListener;
+    protected DownloadingListener downloadingListener;
 
     public static QiscusComment generateMessage(String content, int roomId, int topicId) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
