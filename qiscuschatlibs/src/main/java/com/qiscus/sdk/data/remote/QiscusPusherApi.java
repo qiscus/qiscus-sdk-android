@@ -15,8 +15,7 @@ import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.model.QiscusConfig;
-import com.qiscus.sdk.util.DateUtil;
+import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,9 +29,9 @@ import rx.functions.Action2;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
-public enum PusherApi implements ConnectionEventListener {
+public enum QiscusPusherApi implements ConnectionEventListener {
     INSTANCE;
-    private static final String TAG = PusherApi.class.getSimpleName();
+    private static final String TAG = QiscusPusherApi.class.getSimpleName();
 
     private final Pusher pusher;
     private final Gson gson;
@@ -68,8 +67,8 @@ public enum PusherApi implements ConnectionEventListener {
         CHANNEL_EVENTS.put("call_reject", ChannelEvent.CALLEE_REJECTED);
     }
 
-    PusherApi() {
-        pusher = new Pusher(QiscusConfig.PUSHER_KEY);
+    QiscusPusherApi() {
+        pusher = new Pusher(Qiscus.getPusherKey());
         gson = new GsonBuilder().create();
 
         roomPublishSubjects = new HashMap<>();
@@ -94,7 +93,7 @@ public enum PusherApi implements ConnectionEventListener {
                 }, Throwable::printStackTrace);
     }
 
-    public static PusherApi getInstance() {
+    public static QiscusPusherApi getInstance() {
         return INSTANCE;
     }
 
@@ -247,7 +246,7 @@ public enum PusherApi implements ConnectionEventListener {
             qiscusComment.setMessage(jsonObject.get("qiscusComment").getAsString());
             qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
             qiscusComment.setSenderEmail(jsonObject.get("username_real").getAsString());
-            qiscusComment.setTime(DateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
+            qiscusComment.setTime(QiscusDateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
             return qiscusComment;
         } catch (Exception e) {
             e.printStackTrace();

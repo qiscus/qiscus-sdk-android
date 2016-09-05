@@ -13,7 +13,7 @@ import com.qiscus.sdk.Qiscus;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class AndroidUtilities {
+public class QiscusAndroidUtil {
 
     public static void runOnUIThread(Runnable runnable) {
         runOnUIThread(runnable, 0);

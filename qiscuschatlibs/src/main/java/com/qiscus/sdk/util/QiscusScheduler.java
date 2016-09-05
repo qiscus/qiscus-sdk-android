@@ -12,13 +12,14 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public enum BaseScheduler {
-    HARVEST;
+public enum QiscusScheduler {
+    INSTANCE;
+
     private final Observable.Transformer newThread;
     private final Observable.Transformer io;
     private final Observable.Transformer computation;
 
-    BaseScheduler() {
+    QiscusScheduler() {
         newThread = new Observable.Transformer() {
             @Override
             public Observable call(Object o) {
@@ -44,8 +45,8 @@ public enum BaseScheduler {
         };
     }
 
-    public static BaseScheduler pluck() {
-        return HARVEST;
+    public static QiscusScheduler get() {
+        return INSTANCE;
     }
 
     @SuppressWarnings("unchecked")

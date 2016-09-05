@@ -3,15 +3,15 @@ package com.qiscus.sdk.presenter;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 
-import com.qiscus.sdk.data.local.DataBaseHelper;
+import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.PusherApi;
+import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.event.CommentReceivedEvent;
-import com.qiscus.sdk.util.BaseScheduler;
-import com.qiscus.sdk.util.FileUtil;
-import com.qiscus.sdk.util.ImageUtil;
+import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.util.QiscusScheduler;
+import com.qiscus.sdk.util.QiscusFileUtil;
+import com.qiscus.sdk.util.QiscusImageUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -41,16 +41,16 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
 
     private void commentSuccess(QiscusComment qiscusComment) {
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-        QiscusComment savedQiscusComment = DataBaseHelper.getInstance().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        QiscusComment savedQiscusComment = QiscusDataBaseHelper.getInstance().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
             if (savedQiscusComment.getState() != QiscusComment.STATE_ON_PUSHER) {
-                DataBaseHelper.getInstance().addOrUpdate(qiscusComment);
+                QiscusDataBaseHelper.getInstance().addOrUpdate(qiscusComment);
                 if (qiscusComment.getTopicId() == currentTopicId) {
                     view.onSuccessSendComment(qiscusComment);
                 }
             }
         } else {
-            DataBaseHelper.getInstance().addOrUpdate(qiscusComment);
+            QiscusDataBaseHelper.getInstance().addOrUpdate(qiscusComment);
             if (qiscusComment.getTopicId() == currentTopicId) {
                 view.onSuccessSendComment(qiscusComment);
             }
@@ -58,7 +58,7 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
     }
 
     private void commentFail(QiscusComment qiscusComment) {
-        QiscusComment savedQiscusComment = DataBaseHelper.getInstance().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        QiscusComment savedQiscusComment = QiscusDataBaseHelper.getInstance().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
             if (savedQiscusComment.getState() != QiscusComment.STATE_ON_PUSHER) {
                 qiscusComment.setState(QiscusComment.STATE_FAILED);
@@ -78,7 +78,7 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
         final QiscusComment qiscusComment = QiscusComment.generateMessage(content, room.getId(), currentTopicId);
         view.onSendingComment(qiscusComment);
         QiscusApi.getInstance().postComment(qiscusComment)
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .subscribe(this::commentSuccess, throwable -> commentFail(qiscusComment));
     }
@@ -86,11 +86,11 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
     public void sendFile(File file) {
         File compressedFile = file;
         if (file.getName().endsWith(".gif")) {
-            compressedFile = FileUtil.saveFile(compressedFile, currentTopicId);
-        } else if (ImageUtil.isImage(file)) {
-            compressedFile = ImageUtil.compressImage(Uri.fromFile(file), currentTopicId);
+            compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
+        } else if (QiscusImageUtil.isImage(file)) {
+            compressedFile = QiscusImageUtil.compressImage(Uri.fromFile(file), currentTopicId);
         } else {
-            compressedFile = FileUtil.saveFile(compressedFile, currentTopicId);
+            compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
         }
 
         final QiscusComment qiscusComment = QiscusComment.generateMessage(String.format("[file] %s [/file]", compressedFile.getPath()),
@@ -104,11 +104,11 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
                     qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .subscribe(commentSend -> {
                     qiscusComment.setDownloading(false);
-                    DataBaseHelper.getInstance()
+                    QiscusDataBaseHelper.getInstance()
                             .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), finalCompressedFile.getAbsolutePath());
                     commentSuccess(commentSend);
                     view.refreshComment(qiscusComment);
@@ -125,7 +125,7 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
             qiscusComment.setState(QiscusComment.STATE_SENDING);
             view.onNewComment(qiscusComment);
             QiscusApi.getInstance().postComment(qiscusComment)
-                    .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                     .compose(bindToLifecycle())
                     .subscribe(this::commentSuccess, throwable -> commentFail(qiscusComment));
         }
@@ -139,11 +139,11 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
         if (!file.exists()) {
             qiscusComment.setProgress(100);
             QiscusApi.getInstance().postComment(qiscusComment)
-                    .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                     .compose(bindToLifecycle())
                     .subscribe(commentSend -> {
                         qiscusComment.setDownloading(false);
-                        DataBaseHelper.getInstance()
+                        QiscusDataBaseHelper.getInstance()
                                 .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
                         commentSuccess(commentSend);
                     }, throwable -> {
@@ -157,11 +157,11 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
                         qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
                         return QiscusApi.getInstance().postComment(qiscusComment);
                     })
-                    .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                     .compose(bindToLifecycle())
                     .subscribe(commentSend -> {
                         qiscusComment.setDownloading(false);
-                        DataBaseHelper.getInstance()
+                        QiscusDataBaseHelper.getInstance()
                                 .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
                         commentSuccess(commentSend);
                     }, throwable -> {
@@ -173,20 +173,20 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
 
     private Observable<List<QiscusComment>> getCommentsFromNetwork(int lastCommentId) {
         return QiscusApi.getInstance().getComments(currentTopicId, lastCommentId)
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .doOnNext(comment -> {
                     comment.setRoomId(room.getId());
                     comment.setState(QiscusComment.STATE_ON_PUSHER);
-                    DataBaseHelper.getInstance().addOrUpdate(comment);
+                    QiscusDataBaseHelper.getInstance().addOrUpdate(comment);
                 })
                 .toList();
     }
 
     public void loadComments(int count) {
         view.showLoading();
-        DataBaseHelper.getInstance().getObservableComments(currentTopicId, count)
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+        QiscusDataBaseHelper.getInstance().getObservableComments(currentTopicId, count)
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .flatMap(comments -> isValidComments(comments) ? Observable.from(comments).toList() : getCommentsFromNetwork(0))
                 .subscribe(comments -> {
@@ -206,7 +206,7 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
 
     private void markAsRead() {
         QiscusApi.getInstance().markTopicAsRead(room.getLastTopicId())
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .subscribe(aVoid -> Timber.i("mark topic as read"), Throwable::printStackTrace);
     }
 
@@ -252,8 +252,8 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
 
     public void loadOlderCommentThan(QiscusComment qiscusComment) {
         view.showLoadMoreLoading();
-        DataBaseHelper.getInstance().getObservableOlderCommentsThan(qiscusComment, currentTopicId, 20)
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+        QiscusDataBaseHelper.getInstance().getObservableOlderCommentsThan(qiscusComment, currentTopicId, 20)
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .flatMap(comments -> isValidOlderComments(comments, qiscusComment) ?
                         Observable.from(comments).toList() : getCommentsFromNetwork(qiscusComment.getId()))
@@ -272,12 +272,12 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
     }
 
     private void listenRoomEvent() {
-        subscription = PusherApi.getInstance().getRoomEvents(room.getCodeEn())
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+        subscription = QiscusPusherApi.getInstance().getRoomEvents(room.getCodeEn())
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .subscribe(roomEventJsonObjectPair -> {
-                    if (roomEventJsonObjectPair.first == PusherApi.RoomEvent.COMMENT_POSTED) {
-                        QiscusComment qiscusComment = PusherApi.jsonToComment(roomEventJsonObjectPair.second);
+                    if (roomEventJsonObjectPair.first == QiscusPusherApi.RoomEvent.COMMENT_POSTED) {
+                        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(roomEventJsonObjectPair.second);
                         onGotNewComment(qiscusComment);
                     }
                 }, Throwable::printStackTrace);
@@ -285,13 +285,13 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
 
     private void onGotNewComment(QiscusComment qiscusComment) {
         qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
-        DataBaseHelper.getInstance().addOrUpdate(qiscusComment);
+        QiscusDataBaseHelper.getInstance().addOrUpdate(qiscusComment);
 
         if (qiscusComment.isAttachment()) {
-            if (FileUtil.isContains(qiscusComment.getTopicId(), qiscusComment.getAttachmentName())) {
-                DataBaseHelper.getInstance()
+            if (QiscusFileUtil.isContains(qiscusComment.getTopicId(), qiscusComment.getAttachmentName())) {
+                QiscusDataBaseHelper.getInstance()
                         .addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
-                                              FileUtil.generateFilePath(qiscusComment.getAttachmentName(),
+                                              QiscusFileUtil.generateFilePath(qiscusComment.getAttachmentName(),
                                                                         qiscusComment.getTopicId()));
             }
         }
@@ -302,7 +302,7 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
     }
 
     @Subscribe
-    public void onCommentReceivedEvent(CommentReceivedEvent event) {
+    public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
         onGotNewComment(event.getQiscusComment());
     }
 
@@ -311,22 +311,22 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
             return;
         }
 
-        File file = DataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
+        File file = QiscusDataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
         if (file == null) {
             qiscusComment.setDownloading(true);
             QiscusApi.getInstance()
                     .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
                                   percentage -> qiscusComment.setProgress((int) percentage))
-                    .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                     .compose(bindToLifecycle())
                     .doOnNext(file1 -> {
-                        if (ImageUtil.isImage(file1)) {
-                            ImageUtil.addImageToGallery(file1);
+                        if (QiscusImageUtil.isImage(file1)) {
+                            QiscusImageUtil.addImageToGallery(file1);
                         }
                     })
                     .subscribe(file1 -> {
                         qiscusComment.setDownloading(false);
-                        DataBaseHelper.getInstance().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
+                        QiscusDataBaseHelper.getInstance().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
                                                                           file1.getAbsolutePath());
                         view.refreshComment(qiscusComment);
                     }, throwable -> {

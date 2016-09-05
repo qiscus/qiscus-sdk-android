@@ -17,6 +17,8 @@ public class SampleApps extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Qiscus.init(this);
+        Qiscus.init(this,
+                "https://qvc-engine-staging.herokuapp.com",
+                "3f27dc397124364ecc0f");
     }
 }

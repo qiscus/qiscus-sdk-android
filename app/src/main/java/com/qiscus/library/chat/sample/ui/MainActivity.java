@@ -11,13 +11,13 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.library.chat.sample.R;
 import com.qiscus.library.chat.sample.data.local.LocalDataManager;
 import com.qiscus.library.chat.sample.data.remote.SampleApi;
-import com.qiscus.sdk.ui.BaseActivity;
-import com.qiscus.sdk.ui.ChatActivity;
-import com.qiscus.sdk.util.BaseScheduler;
+import com.qiscus.sdk.ui.QiscusBaseActivity;
+import com.qiscus.sdk.ui.QiscusChatActivity;
+import com.qiscus.sdk.util.QiscusScheduler;
 
 import butterknife.BindView;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends QiscusBaseActivity {
 
     @BindView(R.id.bt_login) Button loginButton;
 
@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity {
         } else {
             showLoading();
             SampleApi.getInstance().login("mas@zetra.com", "12345678")
-                    .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                     .compose(bindToLifecycle())
                     .subscribe(accountInfo -> {
                         LocalDataManager.getInstance().saveAccountInfo(accountInfo);
@@ -59,10 +59,10 @@ public class MainActivity extends BaseActivity {
     public void openChat(View view) {
         showLoading();
         QiscusApi.getInstance().getChatRoom(131)
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .subscribe(chatRoom -> {
-                    startActivity(ChatActivity.generateIntent(this, chatRoom));
+                    startActivity(QiscusChatActivity.generateIntent(this, chatRoom));
                     dismissLoading();
                 }, throwable -> {
                     throwable.printStackTrace();

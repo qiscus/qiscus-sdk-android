@@ -21,12 +21,12 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.sdk.data.local.CacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.PusherApi;
+import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.event.CommentReceivedEvent;
-import com.qiscus.sdk.ui.ChatActivity;
-import com.qiscus.sdk.util.BaseScheduler;
-import com.qiscus.sdk.util.Qson;
+import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.ui.QiscusChatActivity;
+import com.qiscus.sdk.util.QiscusScheduler;
+import com.qiscus.sdk.util.QiscusParser;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -35,7 +35,7 @@ import java.util.Random;
 
 import timber.log.Timber;
 
-public class ParseReceiver extends ParsePushBroadcastReceiver {
+public class QiscusParseReceiver extends ParsePushBroadcastReceiver {
 
     private static SpannableStringBuilder fileMessage;
 
@@ -56,13 +56,13 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
 
         String data = intent.getStringExtra(KEY_PUSH_DATA);
         if (data != null) {
-            JsonObject dataJson = Qson.pluck().getParser().fromJson(data, JsonObject.class);
+            JsonObject dataJson = QiscusParser.get().parser().fromJson(data, JsonObject.class);
             String action = dataJson.get("action").getAsString();
             try {
                 switch (action) {
                     case "com.qiscus.COMMENT_RECEIVED":
                         JsonObject messageJson = dataJson.get("extra").getAsJsonObject();
-                        QiscusComment qiscusComment = PusherApi.jsonToComment(messageJson);
+                        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(messageJson);
                         if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
                             showPushNotification(context, intent, qiscusComment.getRoomId());
                         }
@@ -85,13 +85,13 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
     private void openChatRoom(final Context context, int roomId) {
         QiscusApi.getInstance()
                 .getChatRoom(roomId)
-                .compose(BaseScheduler.pluck().applySchedulers(BaseScheduler.Type.IO))
+                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .subscribe(chatRoom -> {
-                    Intent parentIntent = new Intent(context, ChatActivity.class);
+                    Intent parentIntent = new Intent(context, QiscusChatActivity.class);
                     parentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                     stackBuilder.addNextIntent(parentIntent);
-                    stackBuilder.addNextIntent(ChatActivity.generateIntent(context, chatRoom));
+                    stackBuilder.addNextIntent(QiscusChatActivity.generateIntent(context, chatRoom));
                     stackBuilder.startActivities();
                 }, throwable -> {
                     throwable.printStackTrace();
@@ -141,12 +141,12 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
 
         String data = intent.getStringExtra(KEY_PUSH_DATA);
         if (data != null) {
-            JsonObject dataJson = Qson.pluck().getParser().fromJson(data, JsonObject.class);
+            JsonObject dataJson = QiscusParser.get().parser().fromJson(data, JsonObject.class);
             String action = dataJson.get("action").getAsString();
             switch (action) {
                 case "com.qiscus.COMMENT_RECEIVED":
                     JsonObject messageJson = dataJson.get("extra").getAsJsonObject();
-                    QiscusComment qiscusComment = PusherApi.jsonToComment(messageJson);
+                    QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(messageJson);
                     if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
                         return generateCommentNotification(context, intent, pOpenIntent, pDeleteIntent, qiscusComment);
                     }
@@ -170,7 +170,7 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
 
         String data = intent.getStringExtra(KEY_PUSH_DATA);
         if (data != null) {
-            JsonObject dataJson = Qson.pluck().getParser().fromJson(data, JsonObject.class);
+            JsonObject dataJson = QiscusParser.get().parser().fromJson(data, JsonObject.class);
             String action = dataJson.get("action").getAsString();
             try {
                 switch (action) {
@@ -190,7 +190,7 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
     public Notification generateCommentNotification(Context context, Intent intent, PendingIntent openIntent,
                                                     PendingIntent deleteIntent, QiscusComment qiscusComment) {
 
-        EventBus.getDefault().post(new CommentReceivedEvent(qiscusComment));
+        EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
         CacheManager.getInstance().addMessageNotifItem(qiscusComment.getMessage(), qiscusComment.getRoomId());
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);

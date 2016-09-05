@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qiscus.sdk.ui.BaseActivity;
+import com.qiscus.sdk.ui.QiscusBaseActivity;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import butterknife.ButterKnife;
@@ -22,7 +22,7 @@ import butterknife.Unbinder;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public abstract class BaseFragment extends RxFragment {
+public abstract class QiscusBaseFragment extends RxFragment {
 
     private Unbinder unbinder;
     @Override
@@ -55,10 +55,10 @@ public abstract class BaseFragment extends RxFragment {
     }
 
     protected ActionBar getSupportActionBar() {
-        return ((BaseActivity) getActivity()).getSupportActionBar();
+        return ((QiscusBaseActivity) getActivity()).getSupportActionBar();
     }
 
     protected void setSupportActionBar(Toolbar toolbar) {
-        ((BaseActivity) getActivity()).setSupportActionBar(toolbar);
+        ((QiscusBaseActivity) getActivity()).setSupportActionBar(toolbar);
     }
 }

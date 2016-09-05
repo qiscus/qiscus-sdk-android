@@ -15,11 +15,11 @@ import com.github.lzyzsd.circleprogress.CircleProgress;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.R2;
-import com.qiscus.sdk.data.local.DataBaseHelper;
+import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.BaseRecyclerAdapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.BaseRecyclerAdapter.OnLongItemClickListener;
-import com.qiscus.sdk.util.DateUtil;
+import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.io.File;
 
@@ -34,7 +34,7 @@ import butterknife.OnLongClick;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> implements
+public class QiscusMessageViewHolder extends BaseItemViewHolder<QiscusComment> implements
         QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
 
     @Nullable @BindView(R2.id.date) TextView date;
@@ -54,7 +54,7 @@ public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> impleme
     private boolean fromMe;
     private boolean showBubble;
 
-    public MessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageBubble.setOnClickListener(this);
     }
@@ -131,7 +131,7 @@ public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> impleme
                 time.setText(R.string.sending_failed);
                 time.setTextColor(ContextCompat.getColor(Qiscus.getApps(), R.color.red));
             } else {
-                time.setText(DateUtil.toHour(qiscusComment.getTime()));
+                time.setText(QiscusDateUtil.toHour(qiscusComment.getTime()));
                 time.setTextColor(ContextCompat.getColor(Qiscus.getApps(),
                                                          fromMe ? R.color.secondary_text : R.color.primary_light));
             }
@@ -139,7 +139,7 @@ public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> impleme
     }
 
     private void showFileMessage(QiscusComment qiscusComment) {
-        File localPath = DataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
+        File localPath = QiscusDataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
         if (downloadIcon != null) {
             downloadIcon.setVisibility(localPath == null ? View.VISIBLE : View.GONE);
         }
@@ -172,7 +172,7 @@ public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> impleme
     }
 
     private void showOthersImage(final QiscusComment qiscusComment) {
-        File localPath = DataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
+        File localPath = QiscusDataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
         if (localPath == null) {
             if (holder != null) {
                 holder.setVisibility(View.VISIBLE);
@@ -204,7 +204,7 @@ public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> impleme
                         .into(thumbnail);
             }
         } else {
-            File localPath = DataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
+            File localPath = QiscusDataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
             if (localPath == null) {
                 if (holder != null) {
                     holder.setVisibility(View.VISIBLE);
@@ -276,7 +276,7 @@ public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> impleme
     private void showDateOrNot(QiscusComment qiscusComment) {
         if (date != null) {
             if (showDate) {
-                date.setText(DateUtil.toTodayOrDate(qiscusComment.getTime()));
+                date.setText(QiscusDateUtil.toTodayOrDate(qiscusComment.getTime()));
                 date.setVisibility(View.VISIBLE);
             } else {
                 date.setVisibility(View.GONE);

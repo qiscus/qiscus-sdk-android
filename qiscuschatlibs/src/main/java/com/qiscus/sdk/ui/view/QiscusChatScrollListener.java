@@ -11,14 +11,14 @@ import android.support.v7.widget.RecyclerView;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class ChatScrollListener extends RecyclerView.OnScrollListener {
+public class QiscusChatScrollListener extends RecyclerView.OnScrollListener {
     private LinearLayoutManager linearLayoutManager;
     private Listener listener;
     private boolean onTop;
     private boolean onBottom = true;
     private boolean onMiddle;
 
-    public ChatScrollListener(LinearLayoutManager linearLayoutManager, Listener listener) {
+    public QiscusChatScrollListener(LinearLayoutManager linearLayoutManager, Listener listener) {
         this.linearLayoutManager = linearLayoutManager;
         this.listener = listener;
     }

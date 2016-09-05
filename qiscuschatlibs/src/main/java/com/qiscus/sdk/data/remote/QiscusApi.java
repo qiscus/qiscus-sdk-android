@@ -6,10 +6,9 @@ import com.qiscus.library.chat.BuildConfig;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.model.QiscusConfig;
 import com.qiscus.sdk.data.remote.response.ChatRoomResponse;
-import com.qiscus.sdk.util.BaseServiceGenerator;
-import com.qiscus.sdk.util.FileUtil;
+import com.qiscus.sdk.util.QiscusServiceGenerator;
+import com.qiscus.sdk.util.QiscusFileUtil;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.MultipartBuilder;
@@ -68,7 +67,7 @@ public enum QiscusApi {
     private final Api api;
 
     QiscusApi() {
-        api = BaseServiceGenerator.createService(Api.class, QiscusConfig.API_URL,
+        api = QiscusServiceGenerator.createService(Api.class, Qiscus.getApiUrl(),
                                                  BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE);
         httpClient = QiscusHttpClient.getInstance().getHttpClient();
     }
@@ -167,7 +166,7 @@ public enum QiscusApi {
                     .build();
 
             Request request = new Request.Builder()
-                    .url(QiscusConfig.API_URL + "/files/upload")
+                    .url(Qiscus.getApiUrl() + "/files/upload")
                     .addHeader("Authorization", generateToken())
                     .post(requestBody).build();
 
@@ -200,7 +199,7 @@ public enum QiscusApi {
 
                 com.squareup.okhttp.Response response = httpClient.newCall(request).execute();
 
-                File output = new File(FileUtil.generateFilePath(fileName, topicId));
+                File output = new File(QiscusFileUtil.generateFilePath(fileName, topicId));
                 fos = new FileOutputStream(output.getPath());
                 if (!response.isSuccessful()) {
                     throw new IOException();

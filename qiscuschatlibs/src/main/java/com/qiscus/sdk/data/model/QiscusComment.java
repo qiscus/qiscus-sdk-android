@@ -7,7 +7,7 @@ import android.provider.Settings;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.util.AndroidUtilities;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -250,7 +250,7 @@ public class QiscusComment implements Parcelable {
     public void setDownloading(boolean downloading) {
         this.downloading = downloading;
         if (downloadingListener != null) {
-            AndroidUtilities.runOnUIThread(() -> downloadingListener.onDownloading(this, downloading));
+            QiscusAndroidUtil.runOnUIThread(() -> downloadingListener.onDownloading(this, downloading));
         }
     }
 
@@ -261,7 +261,7 @@ public class QiscusComment implements Parcelable {
     public void setProgress(int percentage) {
         this.progress = percentage;
         if (progressListener != null) {
-            AndroidUtilities.runOnUIThread(() -> progressListener.onProgress(this, progress));
+            QiscusAndroidUtil.runOnUIThread(() -> progressListener.onProgress(this, progress));
         }
     }
 

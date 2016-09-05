@@ -19,18 +19,18 @@ import com.bumptech.glide.request.target.Target;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class BaseImageView extends ImageView {
+public class QiscusImageView extends ImageView {
     private String imageUrl;
 
-    public BaseImageView(Context context) {
+    public QiscusImageView(Context context) {
         super(context);
     }
 
-    public BaseImageView(Context context, AttributeSet attrs) {
+    public QiscusImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public BaseImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public QiscusImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

@@ -26,7 +26,7 @@ import timber.log.Timber;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public abstract class BaseActivity extends RxAppCompatActivity implements
+public abstract class QiscusBaseActivity extends RxAppCompatActivity implements
         EasyPermissions.PermissionCallbacks {
 
     protected static final int RC_CAMERA_PERMISSION = 1;

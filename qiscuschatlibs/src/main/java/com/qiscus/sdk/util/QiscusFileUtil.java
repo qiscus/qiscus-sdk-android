@@ -9,7 +9,6 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.library.chat.R;
 
 import org.apache.commons.io.IOUtils;
 
@@ -20,8 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileUtil {
-    public static final String FILES_PATH = AndroidUtilities.getString(R.string.app_name) + File.separator + "Files";
+public class QiscusFileUtil {
+    public static final String FILES_PATH = Qiscus.getAppsName() + File.separator + "Files";
 
     public static File from(Uri uri) throws IOException {
         InputStream inputStream = Qiscus.getApps().getContentResolver().openInputStream(uri);
@@ -131,7 +130,7 @@ public class FileUtil {
 
     private static String generateFilePath(Uri uri, int topicId) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
-                ImageUtil.isImage(uri.getPath()) ? ImageUtil.IMAGE_PATH : FILES_PATH);
+                QiscusImageUtil.isImage(uri.getPath()) ? QiscusImageUtil.IMAGE_PATH : FILES_PATH);
 
         if (!file.exists()) {
             file.mkdirs();
@@ -142,7 +141,7 @@ public class FileUtil {
 
     public static String generateFilePath(String fileName, int topicId) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
-                ImageUtil.isImage(fileName) ? ImageUtil.IMAGE_PATH : FILES_PATH);
+                QiscusImageUtil.isImage(fileName) ? QiscusImageUtil.IMAGE_PATH : FILES_PATH);
 
         if (!file.exists()) {
             file.mkdirs();
@@ -187,11 +186,11 @@ public class FileUtil {
         if (!newFile.equals(file)) {
             if (newFile.exists()) {
                 if (newFile.delete()) {
-                    Log.d("FileUtil", "Delete old " + newName + " file");
+                    Log.d("QiscusFileUtil", "Delete old " + newName + " file");
                 }
             }
             if (file.renameTo(newFile)) {
-                Log.d("FileUtil", "Rename file to " + newName);
+                Log.d("QiscusFileUtil", "Rename file to " + newName);
             }
         }
         return newFile;

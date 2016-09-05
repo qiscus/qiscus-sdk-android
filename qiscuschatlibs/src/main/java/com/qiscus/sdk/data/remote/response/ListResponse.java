@@ -1,7 +1,7 @@
 package com.qiscus.sdk.data.remote.response;
 
 import com.google.gson.JsonArray;
-import com.qiscus.sdk.util.Qson;
+import com.qiscus.sdk.util.QiscusParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class ListResponse<T> extends GenericResponse {
         }
 
         for (int i = 0; i < data.size(); i++) {
-            results.add(Qson.pluck().getParser().fromJson(data.get(i), tClass));
+            results.add(QiscusParser.get().parser().fromJson(data.get(i), tClass));
         }
 
         return results;

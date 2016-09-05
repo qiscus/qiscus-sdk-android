@@ -12,17 +12,17 @@ import java.util.List;
 
 import rx.Observable;
 
-public enum DataBaseHelper {
+public enum QiscusDataBaseHelper {
     INSTANCE;
 
     private final SQLiteDatabase sqLiteDatabase;
 
-    DataBaseHelper() {
-        DbOpenHelper dbOpenHelper = new DbOpenHelper(Qiscus.getApps());
-        sqLiteDatabase = dbOpenHelper.getReadableDatabase();
+    QiscusDataBaseHelper() {
+        QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(Qiscus.getApps());
+        sqLiteDatabase = qiscusDbOpenHelper.getReadableDatabase();
     }
 
-    public static DataBaseHelper getInstance() {
+    public static QiscusDataBaseHelper getInstance() {
         return INSTANCE;
     }
 
@@ -30,7 +30,7 @@ public enum DataBaseHelper {
         if (!isContains(qiscusComment)) {
             sqLiteDatabase.beginTransaction();
             try {
-                sqLiteDatabase.insert(Db.CommentTable.TABLE_NAME, null, Db.CommentTable.toContentValues(qiscusComment));
+                sqLiteDatabase.insert(QiscusDb.CommentTable.TABLE_NAME, null, QiscusDb.CommentTable.toContentValues(qiscusComment));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -44,8 +44,8 @@ public enum DataBaseHelper {
         if (!isContainFileOfComment(commentId)) {
             sqLiteDatabase.beginTransaction();
             try {
-                sqLiteDatabase.insert(Db.FilesTable.TABLE_NAME, null,
-                                      Db.FilesTable.toContentValues(topicId, commentId, localPath));
+                sqLiteDatabase.insert(QiscusDb.FilesTable.TABLE_NAME, null,
+                                      QiscusDb.FilesTable.toContentValues(topicId, commentId, localPath));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -59,13 +59,13 @@ public enum DataBaseHelper {
         String query;
         if (qiscusComment.getId() == -1) {
             query = "SELECT * FROM "
-                    + Db.CommentTable.TABLE_NAME + " WHERE "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
+                    + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
             query = "SELECT * FROM "
-                    + Db.CommentTable.TABLE_NAME + " WHERE "
-                    + Db.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
+                    + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                    + QiscusDb.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
+                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         }
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
@@ -75,8 +75,8 @@ public enum DataBaseHelper {
 
     public boolean isContainFileOfComment(int commentId) {
         String query = "SELECT * FROM "
-                + Db.FilesTable.TABLE_NAME + " WHERE "
-                + Db.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
+                + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
+                + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
         cursor.close();
@@ -86,15 +86,15 @@ public enum DataBaseHelper {
     public void update(QiscusComment qiscusComment) {
         String where;
         if (qiscusComment.getId() == -1) {
-            where = Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
+            where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
-            where = Db.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
+            where = QiscusDb.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
+                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         }
 
         sqLiteDatabase.beginTransaction();
         try {
-            sqLiteDatabase.update(Db.CommentTable.TABLE_NAME, Db.CommentTable.toContentValues(qiscusComment), where, null);
+            sqLiteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,10 +104,10 @@ public enum DataBaseHelper {
     }
 
     public void updateLocalPath(int topicId, int commentId, String localPath) {
-        String where = Db.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
+        String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
         sqLiteDatabase.beginTransaction();
         try {
-            sqLiteDatabase.update(Db.FilesTable.TABLE_NAME, Db.FilesTable.toContentValues(topicId, commentId, localPath), where, null);
+            sqLiteDatabase.update(QiscusDb.FilesTable.TABLE_NAME, QiscusDb.FilesTable.toContentValues(topicId, commentId, localPath), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,15 +135,15 @@ public enum DataBaseHelper {
     public void delete(QiscusComment qiscusComment) {
         String where;
         if (qiscusComment.getId() == -1) {
-            where = Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
+            where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
-            where = Db.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
+            where = QiscusDb.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
+                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         }
 
         sqLiteDatabase.beginTransaction();
         try {
-            sqLiteDatabase.delete(Db.CommentTable.TABLE_NAME, where, null);
+            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,12 +154,12 @@ public enum DataBaseHelper {
 
     public File getLocalPath(int commentId) {
         String query = "SELECT * FROM "
-                + Db.FilesTable.TABLE_NAME + " WHERE "
-                + Db.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
+                + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
+                + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 
         if (cursor.moveToNext()) {
-            File file = new File(Db.FilesTable.parseCursor(cursor));
+            File file = new File(QiscusDb.FilesTable.parseCursor(cursor));
             cursor.close();
             if (file.exists()) {
                 return file;
@@ -175,18 +175,18 @@ public enum DataBaseHelper {
         String query;
         if (id == -1) {
             query = "SELECT * FROM "
-                    + Db.CommentTable.TABLE_NAME + " WHERE "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + id + "'";
+                    + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + id + "'";
         } else {
             query = "SELECT * FROM "
-                    + Db.CommentTable.TABLE_NAME + " WHERE "
-                    + Db.CommentTable.COLUMN_ID + " = " + id + " OR "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + uniqueId + "'";
+                    + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                    + QiscusDb.CommentTable.COLUMN_ID + " = " + id + " OR "
+                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + uniqueId + "'";
         }
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 
         if (cursor.moveToNext()) {
-            QiscusComment qiscusComment = Db.CommentTable.parseCursor(cursor);
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
             cursor.close();
             return qiscusComment;
         } else {
@@ -197,14 +197,14 @@ public enum DataBaseHelper {
 
     public List<QiscusComment> getComments(int topicId, int count) {
         String query = "SELECT * FROM "
-                + Db.CommentTable.TABLE_NAME + " WHERE "
-                + Db.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
-                + "ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
-            qiscusComments.add(Db.CommentTable.parseCursor(cursor));
+            qiscusComments.add(QiscusDb.CommentTable.parseCursor(cursor));
         }
         cursor.close();
         return qiscusComments;
@@ -219,15 +219,15 @@ public enum DataBaseHelper {
 
     public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
         String query = "SELECT * FROM "
-                + Db.CommentTable.TABLE_NAME + " WHERE "
-                + Db.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
-                + Db.CommentTable.COLUMN_TIME + " < " + qiscusComment.getTime().getTime() + " "
-                + "ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
+                + QiscusDb.CommentTable.COLUMN_TIME + " < " + qiscusComment.getTime().getTime() + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
-            qiscusComments.add(Db.CommentTable.parseCursor(cursor));
+            qiscusComments.add(QiscusDb.CommentTable.parseCursor(cursor));
         }
         cursor.close();
         return qiscusComments;
@@ -243,8 +243,8 @@ public enum DataBaseHelper {
     public void clear() {
         sqLiteDatabase.beginTransaction();
         try {
-            sqLiteDatabase.delete(Db.FilesTable.TABLE_NAME, null, null);
-            sqLiteDatabase.delete(Db.CommentTable.TABLE_NAME, null, null);
+            sqLiteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, null, null);
+            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,9 +7,10 @@ import android.os.Handler;
 
 import com.google.gson.Gson;
 import com.parse.Parse;
+import com.qiscus.sdk.data.local.CacheManager;
+import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
-import com.qiscus.sdk.data.model.QiscusConfig;
-import com.qiscus.sdk.util.Qson;
+import com.qiscus.sdk.util.QiscusParser;
 
 /**
  * Created on : August 18, 2016
@@ -24,20 +25,39 @@ public class Qiscus {
     private static volatile Handler APP_HANDLER;
     private static LocalDataManager LOCAL_DATA_MANAGER;
 
-    public static void init(Application application) {
+    private static String API_URL;
+    private static String PUSHER_KEY;
+    private static String PARSE_APP_ID = "w19bEjxkdmUKWfYNe5H3x8paGqTwzKl9dcwWG1Ap";
+    private static String PARSE_CLIENT_KEY = "qLtml9adJ01QEEIlEpEyjKYjp4G4dXwOhBZg7mfX";
+
+    public static void init(Application application, String qiscusApiUrl, String pusherKey) {
         APP_INSTANCE = application;
+        API_URL = qiscusApiUrl;
+        PUSHER_KEY = pusherKey;
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
 
-        Parse.initialize(APP_INSTANCE, QiscusConfig.PARSE_APP_ID, QiscusConfig.PARSE_CLIENT_KEY);
+        Parse.initialize(APP_INSTANCE, PARSE_APP_ID, PARSE_CLIENT_KEY);
     }
 
     public static Application getApps() {
         return APP_INSTANCE;
     }
 
+    public static String getAppsName() {
+        return APP_INSTANCE.getApplicationInfo().loadLabel(APP_INSTANCE.getPackageManager()).toString();
+    }
+
     public static Handler getAppsHandler() {
         return APP_HANDLER;
+    }
+
+    public static String getApiUrl() {
+        return API_URL;
+    }
+
+    public static String getPusherKey() {
+        return PUSHER_KEY;
     }
 
     public static boolean isLogged() {
@@ -62,6 +82,8 @@ public class Qiscus {
 
     public static void logout() {
         LOCAL_DATA_MANAGER.clearData();
+        QiscusDataBaseHelper.getInstance().clear();
+        CacheManager.getInstance().clearData();
     }
 
     private static class LocalDataManager {
@@ -71,7 +93,7 @@ public class Qiscus {
 
         LocalDataManager() {
             sharedPreferences = Qiscus.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
-            gson = Qson.pluck().getParser();
+            gson = QiscusParser.get().parser();
             token = isLogged() ? getAccountInfo().getAuthenticationToken() : "";
         }
 

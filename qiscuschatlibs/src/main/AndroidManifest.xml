@@ -22,14 +22,14 @@
         android:supportsRtl="true">
 
         <activity
-            android:name="com.qiscus.sdk.ui.ChatActivity"
+            android:name="com.qiscus.sdk.ui.QiscusChatActivity"
             android:screenOrientation="portrait"/>
 
         <!-- Parse Declarations -->
         <service android:name="com.parse.PushService"/>
 
         <receiver
-            android:name="com.qiscus.sdk.service.ParseReceiver"
+            android:name="com.qiscus.sdk.service.QiscusParseReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE"/>

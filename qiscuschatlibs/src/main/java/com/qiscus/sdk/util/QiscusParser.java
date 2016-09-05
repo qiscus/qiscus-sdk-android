@@ -12,22 +12,22 @@ import com.google.gson.GsonBuilder;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public enum Qson {
-    HARVEST;
+public enum QiscusParser {
+    INSTANCE;
     private final Gson parser;
 
-    Qson() {
+    QiscusParser() {
         parser = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")
                 .create();
     }
 
-    public static Qson pluck() {
-        return HARVEST;
+    public static QiscusParser get() {
+        return INSTANCE;
     }
 
-    public Gson getParser() {
+    public Gson parser() {
         return parser;
     }
 }

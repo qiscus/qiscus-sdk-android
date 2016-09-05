@@ -3,7 +3,7 @@ package com.qiscus.library.chat.sample.data.remote;
 import com.qiscus.library.chat.sample.BuildConfig;
 import com.qiscus.library.chat.sample.data.model.AccountInfo;
 import com.qiscus.library.chat.sample.data.remote.response.Response;
-import com.qiscus.sdk.util.BaseServiceGenerator;
+import com.qiscus.sdk.util.QiscusServiceGenerator;
 
 import retrofit.RestAdapter;
 import retrofit.http.Field;
@@ -25,7 +25,7 @@ public enum SampleApi {
     private final Api api;
 
     SampleApi() {
-        api = BaseServiceGenerator.createService(Api.class, "https://qvc-engine-staging.herokuapp.com",
+        api = QiscusServiceGenerator.createService(Api.class, "https://qvc-engine-staging.herokuapp.com",
                                                  BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE);
     }
 

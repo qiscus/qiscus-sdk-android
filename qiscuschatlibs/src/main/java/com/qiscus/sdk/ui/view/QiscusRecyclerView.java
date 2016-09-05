@@ -14,16 +14,16 @@ import android.util.AttributeSet;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class BaseRecyclerView extends RecyclerView {
-    public BaseRecyclerView(Context context) {
+public class QiscusRecyclerView extends RecyclerView {
+    public QiscusRecyclerView(Context context) {
         super(context);
     }
 
-    public BaseRecyclerView(Context context, AttributeSet attrs) {
+    public QiscusRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public BaseRecyclerView(Context context, AttributeSet attrs, int defStyle) {
+    public QiscusRecyclerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

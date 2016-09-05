@@ -7,8 +7,8 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.ui.adapter.viewholder.MessageViewHolder;
-import com.qiscus.sdk.util.DateUtil;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusMessageViewHolder;
+import com.qiscus.sdk.util.QiscusDateUtil;
 
 /**
  * Created on : May 30, 2016
@@ -18,7 +18,7 @@ import com.qiscus.sdk.util.DateUtil;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class ChatAdapter extends SortedRecyclerAdapter<QiscusComment, MessageViewHolder> {
+public class QiscusChatAdapter extends SortedRecyclerAdapter<QiscusComment, QiscusMessageViewHolder> {
     private static final int TYPE_MESSAGE_ME = 1;
     private static final int TYPE_MESSAGE_OTHER = 2;
     private static final int TYPE_PICTURE_ME = 3;
@@ -28,7 +28,7 @@ public class ChatAdapter extends SortedRecyclerAdapter<QiscusComment, MessageVie
 
     private QiscusAccount qiscusAccount;
 
-    public ChatAdapter(Context context) {
+    public QiscusChatAdapter(Context context) {
         super(context);
         qiscusAccount = Qiscus.getQiscusAccount();
     }
@@ -92,16 +92,16 @@ public class ChatAdapter extends SortedRecyclerAdapter<QiscusComment, MessageVie
     }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+    public QiscusMessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new QiscusMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
     }
 
     @Override
-    public void onBindViewHolder(MessageViewHolder holder, int position) {
+    public void onBindViewHolder(QiscusMessageViewHolder holder, int position) {
         if (position == getItemCount() - 1) {
             holder.setShowDate(true);
         } else {
-            holder.setShowDate(!DateUtil.isDateEqualIgnoreTime(data.get(position).getTime(), data.get(position + 1).getTime()));
+            holder.setShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTime(), data.get(position + 1).getTime()));
         }
 
         if (!qiscusAccount.getEmail().equals(data.get(position).getSenderEmail())) {

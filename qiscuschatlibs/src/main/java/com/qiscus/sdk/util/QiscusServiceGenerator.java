@@ -16,11 +16,11 @@ import retrofit.mime.TypedByteArray;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class BaseServiceGenerator {
+public class QiscusServiceGenerator {
     public static <S> S createService(Class<S> serviceClass, String baseUrl, RestAdapter.LogLevel logLevel) {
         RestAdapter.Builder builder = new RestAdapter.Builder()
                 .setLogLevel(logLevel)
-                .setConverter(new GsonConverter(Qson.pluck().getParser()))
+                .setConverter(new GsonConverter(QiscusParser.get().parser()))
                 .setErrorHandler(cause -> {
                     if (cause.getKind().equals(RetrofitError.Kind.HTTP)) {
                         String json = new String(((TypedByteArray) cause.getResponse().getBody()).getBytes());

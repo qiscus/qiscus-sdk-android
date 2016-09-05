@@ -1,6 +1,6 @@
 package com.qiscus.sdk.data.remote.response;
 
-import com.qiscus.sdk.util.Qson;
+import com.qiscus.sdk.util.QiscusParser;
 
 /**
  * Created on : August 18, 2016
@@ -16,7 +16,7 @@ public class Response extends GenericResponse {
             throw new RuntimeException(data.get("message").getAsString());
         }
 
-        T result = Qson.pluck().getParser().fromJson(data.get(key), tClass);
+        T result = QiscusParser.get().parser().fromJson(data.get(key), tClass);
         if (result == null) {
             throw new RuntimeException("Server error: unexpected response!");
         }

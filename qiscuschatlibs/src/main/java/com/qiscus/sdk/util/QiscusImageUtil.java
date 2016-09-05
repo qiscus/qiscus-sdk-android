@@ -13,7 +13,6 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.library.chat.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,13 +20,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ImageUtil {
+public class QiscusImageUtil {
 
-    public static final String IMAGE_PATH = AndroidUtilities.getString(R.string.app_name) + File.separator +
-            AndroidUtilities.getString(R.string.app_name) + " Images";
+    public static final String IMAGE_PATH = Qiscus.getAppsName() + File.separator +
+           Qiscus.getAppsName() + " Images";
 
     public static Bitmap getScaledBitmap(Uri imageUri) {
-        String filePath = FileUtil.getRealPathFromURI(imageUri);
+        String filePath = QiscusFileUtil.getRealPathFromURI(imageUri);
         Bitmap scaledBitmap = null;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -134,7 +133,7 @@ public class ImageUtil {
             out = new FileOutputStream(filename);
 
             //write the compressed bitmap at the destination specified by filename.
-            ImageUtil.getScaledBitmap(imageUri).compress(Bitmap.CompressFormat.JPEG, 80, out);
+            QiscusImageUtil.getScaledBitmap(imageUri).compress(Bitmap.CompressFormat.JPEG, 80, out);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -158,7 +157,7 @@ public class ImageUtil {
             out = new FileOutputStream(filename);
 
             //write the compressed bitmap at the destination specified by filename.
-            ImageUtil.getScaledBitmap(imageUri).compress(Bitmap.CompressFormat.JPEG, 80, out);
+            QiscusImageUtil.getScaledBitmap(imageUri).compress(Bitmap.CompressFormat.JPEG, 80, out);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -172,29 +171,29 @@ public class ImageUtil {
         }
 
         File imageFile = new File(filename);
-        ImageUtil.addImageToGallery(imageFile);
+        QiscusImageUtil.addImageToGallery(imageFile);
 
         return imageFile;
     }
 
     private static String generateFilePath(Uri uri, int topicId) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
-                ImageUtil.isImage(uri.getPath()) ? IMAGE_PATH : FileUtil.FILES_PATH);
+                QiscusImageUtil.isImage(uri.getPath()) ? IMAGE_PATH : QiscusFileUtil.FILES_PATH);
 
         if (!file.exists()) {
             file.mkdirs();
         }
 
         return file.getAbsolutePath() + File.separator
-                + FileUtil.addTopicToFileName(FileUtil.splitFileName(FileUtil.getFileName(uri))[0] + ".jpg", topicId);
+                + QiscusFileUtil.addTopicToFileName(QiscusFileUtil.splitFileName(QiscusFileUtil.getFileName(uri))[0] + ".jpg", topicId);
     }
 
     private static String generateFilePath(Uri uri) {
-        File file = new File(Environment.getExternalStorageDirectory().getPath(), FileUtil.FILES_PATH + "images");
+        File file = new File(Environment.getExternalStorageDirectory().getPath(), QiscusFileUtil.FILES_PATH + "images");
         if (!file.exists()) {
             file.mkdirs();
         }
-        return file.getAbsolutePath() + File.separator + FileUtil.splitFileName(FileUtil.getFileName(uri))[0] + ".jpg";
+        return file.getAbsolutePath() + File.separator + QiscusFileUtil.splitFileName(QiscusFileUtil.getFileName(uri))[0] + ".jpg";
 
     }
 
@@ -224,7 +223,7 @@ public class ImageUtil {
     }
 
     public static boolean isImage(String fileName) {
-        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(FileUtil.getExtension(fileName));
+        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(QiscusFileUtil.getExtension(fileName));
         if (type == null) {
             return false;
         } else if (type.contains("image")) {

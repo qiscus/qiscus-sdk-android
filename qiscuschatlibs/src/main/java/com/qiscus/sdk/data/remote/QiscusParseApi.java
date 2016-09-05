@@ -8,15 +8,15 @@ import com.parse.ParsePush;
 import rx.Observable;
 import rx.Subscriber;
 
-public enum ParseApi {
+public enum QiscusParseApi {
     INSTANCE;
-    private static final String TAG = ParseApi.class.getSimpleName();
+    private static final String TAG = QiscusParseApi.class.getSimpleName();
 
-    ParseApi() {
+    QiscusParseApi() {
         ParseInstallation.getCurrentInstallation().saveInBackground();
     }
 
-    public static ParseApi getInstance() {
+    public static QiscusParseApi getInstance() {
         return INSTANCE;
     }
 

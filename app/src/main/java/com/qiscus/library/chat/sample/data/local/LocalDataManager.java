@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.sample.data.model.AccountInfo;
-import com.qiscus.sdk.util.Qson;
+import com.qiscus.sdk.util.QiscusParser;
 
 /**
  * Created on : August 18, 2016
@@ -25,7 +25,7 @@ public enum LocalDataManager {
 
     LocalDataManager() {
         sharedPreferences = Qiscus.getApps().getSharedPreferences("app.cfg", Context.MODE_PRIVATE);
-        gson = Qson.pluck().getParser();
+        gson = QiscusParser.get().parser();
         token = isLogged() ? getAccountInfo().getAuthenticationToken() : "";
     }
 
