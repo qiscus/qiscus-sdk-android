@@ -2,7 +2,7 @@ package com.qiscus.library.chat.sample;
 
 import android.app.Application;
 
-import com.qiscus.library.chat.Qiscus;
+import com.qiscus.sdk.Qiscus;
 
 /**
  * Created on : August 18, 2016

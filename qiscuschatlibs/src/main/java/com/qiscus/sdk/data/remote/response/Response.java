@@ -1,4 +1,4 @@
-package com.qiscus.library.chat.sample.data.remote.response;
+package com.qiscus.sdk.data.remote.response;
 
 import com.qiscus.sdk.util.Qson;
 

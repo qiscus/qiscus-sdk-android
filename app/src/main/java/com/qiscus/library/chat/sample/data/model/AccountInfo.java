@@ -2,7 +2,7 @@ package com.qiscus.library.chat.sample.data.model;
 
 import android.os.Parcel;
 
-import com.qiscus.library.chat.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusAccount;
 
 /**
  * Created on : August 18, 2016

@@ -1,13 +1,9 @@
 package com.qiscus.library.chat.sample.data.remote;
 
 import com.qiscus.library.chat.sample.BuildConfig;
-import com.qiscus.library.chat.sample.data.local.LocalDataManager;
 import com.qiscus.library.chat.sample.data.model.AccountInfo;
 import com.qiscus.library.chat.sample.data.remote.response.Response;
-import com.qiscus.library.chat.util.BaseServiceGenerator;
-import com.squareup.okhttp.OkHttpClient;
-
-import java.util.Date;
+import com.qiscus.sdk.util.BaseServiceGenerator;
 
 import retrofit.RestAdapter;
 import retrofit.http.Field;

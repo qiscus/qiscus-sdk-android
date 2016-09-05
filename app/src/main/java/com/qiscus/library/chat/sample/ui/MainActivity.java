@@ -6,14 +6,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.qiscus.library.chat.Qiscus;
-import com.qiscus.library.chat.data.remote.QiscusApi;
+import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.library.chat.sample.R;
 import com.qiscus.library.chat.sample.data.local.LocalDataManager;
 import com.qiscus.library.chat.sample.data.remote.SampleApi;
-import com.qiscus.library.chat.ui.BaseActivity;
-import com.qiscus.library.chat.ui.ChatActivity;
-import com.qiscus.library.chat.util.BaseScheduler;
+import com.qiscus.sdk.ui.BaseActivity;
+import com.qiscus.sdk.ui.ChatActivity;
+import com.qiscus.sdk.util.BaseScheduler;
 
 import butterknife.BindView;
 

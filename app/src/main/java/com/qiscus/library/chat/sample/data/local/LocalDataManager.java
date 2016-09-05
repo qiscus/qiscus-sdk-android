@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.qiscus.library.chat.Qiscus;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.sample.data.model.AccountInfo;
-import com.qiscus.library.chat.util.Qson;
+import com.qiscus.sdk.util.Qson;
 
 /**
  * Created on : August 18, 2016
