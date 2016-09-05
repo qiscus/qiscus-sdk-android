@@ -2,6 +2,8 @@ package com.qiscus.library.chat.sample.data.model;
 
 import android.os.Parcel;
 
+import com.qiscus.library.chat.data.model.QiscusAccount;
+
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -10,7 +12,7 @@ import android.os.Parcel;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class AccountInfo extends com.qiscus.library.chat.data.model.AccountInfo {
+public class AccountInfo extends QiscusAccount {
 
     protected AccountInfo(Parcel in) {
         super(in);

@@ -3,10 +3,10 @@ package com.qiscus.library.chat.ui.adapter;
 import android.content.Context;
 import android.view.ViewGroup;
 
+import com.qiscus.library.chat.Qiscus;
 import com.qiscus.library.chat.R;
-import com.qiscus.library.chat.data.local.LocalDataManager;
-import com.qiscus.library.chat.data.model.AccountInfo;
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusAccount;
+import com.qiscus.library.chat.data.model.QiscusComment;
 import com.qiscus.library.chat.ui.adapter.viewholder.MessageViewHolder;
 import com.qiscus.library.chat.util.DateUtil;
 
@@ -18,7 +18,7 @@ import com.qiscus.library.chat.util.DateUtil;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class ChatAdapter extends SortedRecyclerAdapter<Comment, MessageViewHolder> {
+public class ChatAdapter extends SortedRecyclerAdapter<QiscusComment, MessageViewHolder> {
     private static final int TYPE_MESSAGE_ME = 1;
     private static final int TYPE_MESSAGE_OTHER = 2;
     private static final int TYPE_PICTURE_ME = 3;
@@ -26,28 +26,28 @@ public class ChatAdapter extends SortedRecyclerAdapter<Comment, MessageViewHolde
     private static final int TYPE_FILE_ME = 5;
     private static final int TYPE_FILE_OTHER = 6;
 
-    private AccountInfo accountInfo;
+    private QiscusAccount qiscusAccount;
 
     public ChatAdapter(Context context) {
         super(context);
-        accountInfo = LocalDataManager.getInstance().getAccountInfo();
+        qiscusAccount = Qiscus.getQiscusAccount();
     }
 
     @Override
-    protected Class<Comment> getItemClass() {
-        return Comment.class;
+    protected Class<QiscusComment> getItemClass() {
+        return QiscusComment.class;
     }
 
     @Override
-    protected int compare(Comment lhs, Comment rhs) {
+    protected int compare(QiscusComment lhs, QiscusComment rhs) {
         return rhs.getTime().compareTo(lhs.getTime());
     }
 
     @Override
     public int getItemViewType(int position) {
-        Comment comment = data.get(position);
-        if (comment.getSenderEmail().equals(accountInfo.getEmail())) {
-            switch (comment.getType()) {
+        QiscusComment qiscusComment = data.get(position);
+        if (qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+            switch (qiscusComment.getType()) {
                 case TEXT:
                     return TYPE_MESSAGE_ME;
                 case IMAGE:
@@ -58,7 +58,7 @@ public class ChatAdapter extends SortedRecyclerAdapter<Comment, MessageViewHolde
                     return TYPE_MESSAGE_ME;
             }
         } else {
-            switch (comment.getType()) {
+            switch (qiscusComment.getType()) {
                 case TEXT:
                     return TYPE_MESSAGE_OTHER;
                 case IMAGE:
@@ -104,7 +104,7 @@ public class ChatAdapter extends SortedRecyclerAdapter<Comment, MessageViewHolde
             holder.setShowDate(!DateUtil.isDateEqualIgnoreTime(data.get(position).getTime(), data.get(position + 1).getTime()));
         }
 
-        if (!accountInfo.getEmail().equals(data.get(position).getSenderEmail())) {
+        if (!qiscusAccount.getEmail().equals(data.get(position).getSenderEmail())) {
             holder.setFromMe(false);
         } else {
             holder.setFromMe(true);
@@ -122,7 +122,7 @@ public class ChatAdapter extends SortedRecyclerAdapter<Comment, MessageViewHolde
     }
 
     @Override
-    public int findPosition(Comment item) {
+    public int findPosition(QiscusComment item) {
         if (data == null) {
             return -1;
         }

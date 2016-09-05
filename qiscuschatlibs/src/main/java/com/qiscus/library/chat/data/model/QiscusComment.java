@@ -7,7 +7,6 @@ import android.provider.Settings;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.library.chat.Qiscus;
-import com.qiscus.library.chat.data.local.LocalDataManager;
 import com.qiscus.library.chat.util.AndroidUtilities;
 
 import java.io.UnsupportedEncodingException;
@@ -22,7 +21,7 @@ import java.util.Date;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class Comment implements Parcelable {
+public class QiscusComment implements Parcelable {
     public static final int STATE_SENDING = 1;
     public static final int STATE_ON_QISCUS = 2;
     public static final int STATE_ON_PUSHER = 3;
@@ -43,30 +42,30 @@ public class Comment implements Parcelable {
     private ProgressListener progressListener;
     private DownloadingListener downloadingListener;
 
-    public static Comment generateMessage(String content, int roomId, int topicId) {
-        AccountInfo accountInfo = LocalDataManager.getInstance().getAccountInfo();
-        Comment comment = new Comment();
-        comment.setId(-1);
-        comment.setRoomId(roomId);
-        comment.setTopicId(topicId);
-        comment.setUniqueId("android_"
+    public static QiscusComment generateMessage(String content, int roomId, int topicId) {
+        QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
+        QiscusComment qiscusComment = new QiscusComment();
+        qiscusComment.setId(-1);
+        qiscusComment.setRoomId(roomId);
+        qiscusComment.setTopicId(topicId);
+        qiscusComment.setUniqueId("android_"
                                     + System.currentTimeMillis()
                                     + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
                                                                 Settings.Secure.ANDROID_ID));
-        comment.setMessage(content);
-        comment.setTime(new Date());
-        comment.setSenderEmail(accountInfo.getEmail());
-        comment.setSender(accountInfo.getFullname());
-        comment.setState(STATE_SENDING);
+        qiscusComment.setMessage(content);
+        qiscusComment.setTime(new Date());
+        qiscusComment.setSenderEmail(qiscusAccount.getEmail());
+        qiscusComment.setSender(qiscusAccount.getFullname());
+        qiscusComment.setState(STATE_SENDING);
 
-        return comment;
+        return qiscusComment;
     }
 
-    public Comment() {
+    public QiscusComment() {
 
     }
 
-    protected Comment(Parcel in) {
+    protected QiscusComment(Parcel in) {
         id = in.readInt();
         roomId = in.readInt();
         topicId = in.readInt();
@@ -79,15 +78,15 @@ public class Comment implements Parcelable {
         state = in.readInt();
     }
 
-    public static final Creator<Comment> CREATOR = new Creator<Comment>() {
+    public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
         @Override
-        public Comment createFromParcel(Parcel in) {
-            return new Comment(in);
+        public QiscusComment createFromParcel(Parcel in) {
+            return new QiscusComment(in);
         }
 
         @Override
-        public Comment[] newArray(int size) {
-            return new Comment[size];
+        public QiscusComment[] newArray(int size) {
+            return new QiscusComment[size];
         }
     };
 
@@ -276,12 +275,12 @@ public class Comment implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Comment) {
-            Comment comment = (Comment) o;
+        if (o instanceof QiscusComment) {
+            QiscusComment qiscusComment = (QiscusComment) o;
             if (id == -1) {
-                return comment.uniqueId.equals(uniqueId);
+                return qiscusComment.uniqueId.equals(uniqueId);
             } else {
-                return comment.id == id || comment.uniqueId.equals(uniqueId);
+                return qiscusComment.id == id || qiscusComment.uniqueId.equals(uniqueId);
             }
         }
         return false;
@@ -289,7 +288,7 @@ public class Comment implements Parcelable {
 
     @Override
     public String toString() {
-        return "Comment{" +
+        return "QiscusComment{" +
                 "id=" + id +
                 ", roomId=" + roomId +
                 ", topicId=" + topicId +
@@ -327,10 +326,10 @@ public class Comment implements Parcelable {
     }
 
     public interface ProgressListener {
-        void onProgress(Comment comment, int percentage);
+        void onProgress(QiscusComment qiscusComment, int percentage);
     }
 
     public interface DownloadingListener {
-        void onDownloading(Comment comment, boolean downloading);
+        void onDownloading(QiscusComment qiscusComment, boolean downloading);
     }
 }

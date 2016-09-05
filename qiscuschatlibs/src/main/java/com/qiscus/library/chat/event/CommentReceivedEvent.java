@@ -1,15 +1,15 @@
 package com.qiscus.library.chat.event;
 
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusComment;
 
 public class CommentReceivedEvent {
-    private Comment comment;
+    private QiscusComment qiscusComment;
 
-    public CommentReceivedEvent(Comment comment) {
-        this.comment = comment;
+    public CommentReceivedEvent(QiscusComment qiscusComment) {
+        this.qiscusComment = qiscusComment;
     }
 
-    public Comment getComment() {
-        return comment;
+    public QiscusComment getQiscusComment() {
+        return qiscusComment;
     }
 }

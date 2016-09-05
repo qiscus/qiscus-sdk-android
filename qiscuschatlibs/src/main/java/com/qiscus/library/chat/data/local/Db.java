@@ -3,7 +3,7 @@ package com.qiscus.library.chat.data.local;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusComment;
 
 import java.util.Date;
 
@@ -38,34 +38,34 @@ public class Db {
                         COLUMN_STATE + " INTEGER NOT NULL" +
                         " ); ";
 
-        public static ContentValues toContentValues(Comment comment) {
+        public static ContentValues toContentValues(QiscusComment qiscusComment) {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_ID, comment.getId());
-            values.put(COLUMN_ROOM_ID, comment.getRoomId());
-            values.put(COLUMN_TOPIC_ID, comment.getTopicId());
-            values.put(COLUMN_UNIQUE_ID, comment.getUniqueId());
-            values.put(COLUMN_COMMENT_BEFORE_ID, comment.getCommentBeforeId());
-            values.put(COLUMN_MESSAGE, comment.getMessage());
-            values.put(COLUMN_SENDER, comment.getSender());
-            values.put(COLUMN_SENDER_EMAIL, comment.getSenderEmail());
-            values.put(COLUMN_TIME, comment.getTime().getTime());
-            values.put(COLUMN_STATE, comment.getState());
+            values.put(COLUMN_ID, qiscusComment.getId());
+            values.put(COLUMN_ROOM_ID, qiscusComment.getRoomId());
+            values.put(COLUMN_TOPIC_ID, qiscusComment.getTopicId());
+            values.put(COLUMN_UNIQUE_ID, qiscusComment.getUniqueId());
+            values.put(COLUMN_COMMENT_BEFORE_ID, qiscusComment.getCommentBeforeId());
+            values.put(COLUMN_MESSAGE, qiscusComment.getMessage());
+            values.put(COLUMN_SENDER, qiscusComment.getSender());
+            values.put(COLUMN_SENDER_EMAIL, qiscusComment.getSenderEmail());
+            values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
+            values.put(COLUMN_STATE, qiscusComment.getState());
             return values;
         }
 
-        public static Comment parseCursor(Cursor cursor) {
-            Comment comment = new Comment();
-            comment.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-            comment.setRoomId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
-            comment.setTopicId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
-            comment.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
-            comment.setCommentBeforeId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
-            comment.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
-            comment.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
-            comment.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
-            comment.setTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
-            comment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
-            return comment;
+        public static QiscusComment parseCursor(Cursor cursor) {
+            QiscusComment qiscusComment = new QiscusComment();
+            qiscusComment.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qiscusComment.setRoomId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
+            qiscusComment.setTopicId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
+            qiscusComment.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
+            qiscusComment.setCommentBeforeId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
+            qiscusComment.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
+            qiscusComment.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
+            qiscusComment.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
+            qiscusComment.setTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
+            qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
+            return qiscusComment;
         }
     }
 

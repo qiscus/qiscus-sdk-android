@@ -23,13 +23,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qiscus.library.chat.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.R2;
 import com.qiscus.library.chat.data.local.CacheManager;
-import com.qiscus.library.chat.data.local.LocalDataManager;
-import com.qiscus.library.chat.data.model.AccountInfo;
-import com.qiscus.library.chat.data.model.ChatRoom;
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusAccount;
+import com.qiscus.library.chat.data.model.QiscusChatRoom;
+import com.qiscus.library.chat.data.model.QiscusComment;
 import com.qiscus.library.chat.presenter.ChatPresenter;
 import com.qiscus.library.chat.ui.adapter.ChatAdapter;
 import com.qiscus.library.chat.ui.view.BaseRecyclerView;
@@ -55,26 +55,34 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
     private static final int PICK_IMAGE_REQUEST = 2;
     private static final int PICK_FILE_REQUEST = 3;
 
-    @BindView(R2.id.tv_name) TextView tvName;
-    @BindView(R2.id.empty_chat) LinearLayout emptyChat;
-    @BindView(R2.id.swipe_layout) SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R2.id.list_message) BaseRecyclerView listMessage;
-    @BindView(R2.id.field_message) EditText fieldMessage;
-    @BindView(R2.id.button_send) ImageView buttonSend;
-    @BindView(R2.id.button_new_message) View buttonNewMessage;
-    @BindView(R2.id.progressBar) ProgressBar progressBar;
+    @BindView(R2.id.tv_name)
+    TextView tvName;
+    @BindView(R2.id.empty_chat)
+    LinearLayout emptyChat;
+    @BindView(R2.id.swipe_layout)
+    SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R2.id.list_message)
+    BaseRecyclerView listMessage;
+    @BindView(R2.id.field_message)
+    EditText fieldMessage;
+    @BindView(R2.id.button_send)
+    ImageView buttonSend;
+    @BindView(R2.id.button_new_message)
+    View buttonNewMessage;
+    @BindView(R2.id.progressBar)
+    ProgressBar progressBar;
 
-    private ChatRoom chatRoom;
+    private QiscusChatRoom qiscusChatRoom;
     private ChatAdapter adapter;
     private ChatPresenter chatPresenter;
     private LinearLayoutManager chatLayoutManager;
-    private AccountInfo accountInfo;
+    private QiscusAccount qiscusAccount;
     private Animation animation;
     private boolean fieldMessageEmpty = true;
 
-    public static Intent generateIntent(Context context, ChatRoom chatRoom) {
+    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
         Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra(CHAT_ROOM_DATA, chatRoom);
+        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         return intent;
     }
 
@@ -94,12 +102,12 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
 
         animation = AnimationUtils.loadAnimation(this, R.anim.simple_grow);
 
-        CacheManager.getInstance().clearMessageNotifItems(chatRoom.getId());
-        NotificationManagerCompat.from(this).cancel(chatRoom.getId());
+        CacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
+        NotificationManagerCompat.from(this).cancel(qiscusChatRoom.getId());
 
-        accountInfo = LocalDataManager.getInstance().getAccountInfo();
+        qiscusAccount = Qiscus.getQiscusAccount();
 
-        tvName.setText(chatRoom.getName());
+        tvName.setText(qiscusChatRoom.getName());
 
         adapter = new ChatAdapter(this);
         adapter.setOnItemClickListener((view, position) -> onItemCommentClick(adapter.getData().get(position)));
@@ -109,36 +117,36 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
         listMessage.setAdapter(adapter);
         listMessage.addOnScrollListener(new ChatScrollListener(chatLayoutManager, this));
 
-        chatPresenter = new ChatPresenter(this, chatRoom);
+        chatPresenter = new ChatPresenter(this, qiscusChatRoom);
         new Handler().postDelayed(() -> chatPresenter.loadComments(20), 400);
     }
 
     private void resolveChatRoom(Bundle savedInstanceState) {
-        chatRoom = getIntent().getParcelableExtra(CHAT_ROOM_DATA);
-        if (chatRoom == null && savedInstanceState != null) {
-            chatRoom = savedInstanceState.getParcelable(CHAT_ROOM_DATA);
+        qiscusChatRoom = getIntent().getParcelableExtra(CHAT_ROOM_DATA);
+        if (qiscusChatRoom == null && savedInstanceState != null) {
+            qiscusChatRoom = savedInstanceState.getParcelable(CHAT_ROOM_DATA);
         }
 
-        if (chatRoom == null) {
+        if (qiscusChatRoom == null) {
             finish();
             return;
         }
     }
 
-    private void onItemCommentClick(Comment comment) {
-        if (comment.getState() == Comment.STATE_ON_QISCUS || comment.getState() == Comment.STATE_ON_PUSHER) {
-            if (comment.getType() == Comment.Type.FILE || comment.getType() == Comment.Type.IMAGE) {
-                chatPresenter.downloadFile(comment);
+    private void onItemCommentClick(QiscusComment qiscusComment) {
+        if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
+            if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
+                chatPresenter.downloadFile(qiscusComment);
             }
-        } else if (comment.getState() == Comment.STATE_FAILED) {
-            chatPresenter.resendComment(comment);
+        } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+            chatPresenter.resendComment(qiscusComment);
         }
     }
 
-    private void onItemCommentLongClick(Comment comment) {
-        if (comment.getType() == Comment.Type.TEXT) {
+    private void onItemCommentLongClick(QiscusComment qiscusComment) {
+        if (qiscusComment.getType() == QiscusComment.Type.TEXT) {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(AndroidUtilities.getString(R.string.chat_activity_label_clipboard), comment.getMessage());
+            ClipData clip = ClipData.newPlainText(AndroidUtilities.getString(R.string.chat_activity_label_clipboard), qiscusComment.getMessage());
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, AndroidUtilities.getString(R.string.chat_activity_copied_message), Toast.LENGTH_SHORT).show();
         }
@@ -212,39 +220,39 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
     }
 
     @Override
-    public void showComments(List<Comment> comments) {
-        adapter.refreshWithData(comments);
-        if (adapter.isEmpty() && comments.isEmpty()) {
+    public void showComments(List<QiscusComment> qiscusComments) {
+        adapter.refreshWithData(qiscusComments);
+        if (adapter.isEmpty() && qiscusComments.isEmpty()) {
             emptyChat.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void onLoadMore(List<Comment> comments) {
-        adapter.addOrUpdate(comments);
+    public void onLoadMore(List<QiscusComment> qiscusComments) {
+        adapter.addOrUpdate(qiscusComments);
     }
 
     @Override
-    public void onSendingComment(Comment comment) {
-        adapter.addOrUpdate(comment);
+    public void onSendingComment(QiscusComment qiscusComment) {
+        adapter.addOrUpdate(qiscusComment);
         scrollToBottom();
         emptyChat.setVisibility(View.GONE);
     }
 
     @Override
-    public void onSuccessSendComment(Comment comment) {
-        adapter.addOrUpdate(comment);
+    public void onSuccessSendComment(QiscusComment qiscusComment) {
+        adapter.addOrUpdate(qiscusComment);
     }
 
     @Override
-    public void onFailedSendComment(Comment comment) {
-        adapter.addOrUpdate(comment);
+    public void onFailedSendComment(QiscusComment qiscusComment) {
+        adapter.addOrUpdate(qiscusComment);
     }
 
     @Override
-    public void onNewComment(Comment comment) {
-        adapter.addOrUpdate(comment);
-        if (!comment.getSenderEmail().equalsIgnoreCase(accountInfo.getEmail()) && shouldShowNewMessageButton()) {
+    public void onNewComment(QiscusComment qiscusComment) {
+        adapter.addOrUpdate(qiscusComment);
+        if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail()) && shouldShowNewMessageButton()) {
             if (buttonNewMessage.getVisibility() == View.GONE) {
                 buttonNewMessage.setVisibility(View.VISIBLE);
                 buttonNewMessage.startAnimation(animation);
@@ -256,8 +264,8 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
     }
 
     @Override
-    public void refreshComment(Comment comment) {
-        adapter.addOrUpdate(comment);
+    public void refreshComment(QiscusComment qiscusComment) {
+        adapter.addOrUpdate(qiscusComment);
     }
 
     private boolean shouldShowNewMessageButton() {
@@ -266,9 +274,9 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
 
     private void loadMoreComments() {
         if (progressBar.getVisibility() == View.GONE && adapter.getItemCount() > 0) {
-            Comment comment = adapter.getData().get(adapter.getItemCount() - 1);
-            if (comment.getCommentBeforeId() > 0) {
-                chatPresenter.loadOlderCommentThan(comment);
+            QiscusComment qiscusComment = adapter.getData().get(adapter.getItemCount() - 1);
+            if (qiscusComment.getCommentBeforeId() > 0) {
+                chatPresenter.loadOlderCommentThan(qiscusComment);
             }
         }
     }
@@ -387,7 +395,7 @@ public class ChatActivity extends BaseActivity implements ChatPresenter.View,
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(CHAT_ROOM_DATA, chatRoom);
+        outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
     }
 
     @Override

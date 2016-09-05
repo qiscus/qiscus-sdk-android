@@ -16,7 +16,7 @@ import com.qiscus.library.chat.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.R2;
 import com.qiscus.library.chat.data.local.DataBaseHelper;
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusComment;
 import com.qiscus.library.chat.ui.adapter.BaseRecyclerAdapter.OnItemClickListener;
 import com.qiscus.library.chat.ui.adapter.BaseRecyclerAdapter.OnLongItemClickListener;
 import com.qiscus.library.chat.util.DateUtil;
@@ -34,8 +34,8 @@ import butterknife.OnLongClick;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class MessageViewHolder extends BaseItemViewHolder<Comment> implements
-        Comment.ProgressListener, Comment.DownloadingListener {
+public class MessageViewHolder extends BaseItemViewHolder<QiscusComment> implements
+        QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
 
     @Nullable @BindView(R2.id.date) TextView date;
     @Nullable @BindView(R2.id.time) TextView time;
@@ -76,40 +76,40 @@ public class MessageViewHolder extends BaseItemViewHolder<Comment> implements
     }
 
     @Override
-    public void bind(Comment comment) {
+    public void bind(QiscusComment qiscusComment) {
         bubble.setVisibility(showBubble ? View.VISIBLE : View.GONE);
-        comment.setProgressListener(this);
-        comment.setDownloadingListener(this);
-        showProgressOrNot(comment);
-        showDateOrNot(comment);
-        showTime(comment);
-        showIconReadOrNot(comment);
-        setUpDownloadIcon(comment);
+        qiscusComment.setProgressListener(this);
+        qiscusComment.setDownloadingListener(this);
+        showProgressOrNot(qiscusComment);
+        showDateOrNot(qiscusComment);
+        showTime(qiscusComment);
+        showIconReadOrNot(qiscusComment);
+        setUpDownloadIcon(qiscusComment);
 
-        switch (comment.getType()) {
+        switch (qiscusComment.getType()) {
             case TEXT:
-                showTextMessage(comment);
+                showTextMessage(qiscusComment);
                 break;
             case IMAGE:
-                showThumbnail(comment);
+                showThumbnail(qiscusComment);
                 break;
             case FILE:
-                showExtension(comment);
-                showFileMessage(comment);
+                showExtension(qiscusComment);
+                showFileMessage(qiscusComment);
                 break;
         }
     }
 
-    private void setUpDownloadIcon(Comment comment) {
+    private void setUpDownloadIcon(QiscusComment qiscusComment) {
         if (downloadIcon != null) {
-            if (comment.isImage()) {
-                if (comment.getState() == Comment.STATE_FAILED || comment.getState() == Comment.STATE_SENDING) {
+            if (qiscusComment.isImage()) {
+                if (qiscusComment.getState() == QiscusComment.STATE_FAILED || qiscusComment.getState() == QiscusComment.STATE_SENDING) {
                     downloadIcon.setImageResource(R.drawable.ic_upload_big);
                 } else {
                     downloadIcon.setImageResource(R.drawable.ic_download_big);
                 }
             } else {
-                if (comment.getState() == Comment.STATE_FAILED || comment.getState() == Comment.STATE_SENDING) {
+                if (qiscusComment.getState() == QiscusComment.STATE_FAILED || qiscusComment.getState() == QiscusComment.STATE_SENDING) {
                     downloadIcon.setImageResource(R.drawable.ic_upload);
                 } else {
                     downloadIcon.setImageResource(R.drawable.ic_download);
@@ -118,61 +118,61 @@ public class MessageViewHolder extends BaseItemViewHolder<Comment> implements
         }
     }
 
-    private void showProgressOrNot(Comment comment) {
+    private void showProgressOrNot(QiscusComment qiscusComment) {
         if (progress != null) {
-            progress.setProgress(comment.getProgress());
-            progress.setVisibility(comment.isDownloading() ? View.VISIBLE : View.GONE);
+            progress.setProgress(qiscusComment.getProgress());
+            progress.setVisibility(qiscusComment.isDownloading() ? View.VISIBLE : View.GONE);
         }
     }
 
-    private void showTime(Comment comment) {
+    private void showTime(QiscusComment qiscusComment) {
         if (time != null) {
-            if (comment.getState() == Comment.STATE_FAILED) {
+            if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 time.setText(R.string.sending_failed);
                 time.setTextColor(ContextCompat.getColor(Qiscus.getApps(), R.color.red));
             } else {
-                time.setText(DateUtil.toHour(comment.getTime()));
+                time.setText(DateUtil.toHour(qiscusComment.getTime()));
                 time.setTextColor(ContextCompat.getColor(Qiscus.getApps(),
                                                          fromMe ? R.color.secondary_text : R.color.primary_light));
             }
         }
     }
 
-    private void showFileMessage(Comment comment) {
-        File localPath = DataBaseHelper.getInstance().getLocalPath(comment.getId());
+    private void showFileMessage(QiscusComment qiscusComment) {
+        File localPath = DataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
         if (downloadIcon != null) {
             downloadIcon.setVisibility(localPath == null ? View.VISIBLE : View.GONE);
         }
         if (fileName != null) {
-            fileName.setText(comment.getAttachmentName());
+            fileName.setText(qiscusComment.getAttachmentName());
         }
     }
 
-    private void showExtension(final Comment comment) {
+    private void showExtension(final QiscusComment qiscusComment) {
         if (fileType != null) {
-            if (comment.getExtension().isEmpty()) {
+            if (qiscusComment.getExtension().isEmpty()) {
                 fileType.setText(R.string.unkown_type);
             } else {
-                fileType.setText(String.format("%s File", comment.getExtension().toUpperCase()));
+                fileType.setText(String.format("%s File", qiscusComment.getExtension().toUpperCase()));
             }
         }
     }
 
-    private void showThumbnail(final Comment comment) {
+    private void showThumbnail(final QiscusComment qiscusComment) {
         if (thumbnail != null) {
             if (fromMe) {
-                showMyImage(comment);
+                showMyImage(qiscusComment);
             } else {
-                showOthersImage(comment);
+                showOthersImage(qiscusComment);
             }
         }
         if (fileName != null) {
-            fileName.setText(comment.getAttachmentName());
+            fileName.setText(qiscusComment.getAttachmentName());
         }
     }
 
-    private void showOthersImage(final Comment comment) {
-        File localPath = DataBaseHelper.getInstance().getLocalPath(comment.getId());
+    private void showOthersImage(final QiscusComment qiscusComment) {
+        File localPath = DataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
         if (localPath == null) {
             if (holder != null) {
                 holder.setVisibility(View.VISIBLE);
@@ -191,20 +191,20 @@ public class MessageViewHolder extends BaseItemViewHolder<Comment> implements
         }
     }
 
-    private void showMyImage(final Comment comment) {
-        if (comment.getState() == Comment.STATE_SENDING) {
+    private void showMyImage(final QiscusComment qiscusComment) {
+        if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
             if (holder != null) {
                 holder.setVisibility(View.INVISIBLE);
             }
             if (thumbnail != null) {
                 thumbnail.setVisibility(View.VISIBLE);
                 Glide.with(thumbnail.getContext())
-                        .load(new File(comment.getAttachmentUri().toString()))
+                        .load(new File(qiscusComment.getAttachmentUri().toString()))
                         .error(R.drawable.ic_img)
                         .into(thumbnail);
             }
         } else {
-            File localPath = DataBaseHelper.getInstance().getLocalPath(comment.getId());
+            File localPath = DataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
             if (localPath == null) {
                 if (holder != null) {
                     holder.setVisibility(View.VISIBLE);
@@ -248,35 +248,35 @@ public class MessageViewHolder extends BaseItemViewHolder<Comment> implements
         }
     }
 
-    private void showTextMessage(Comment comment) {
+    private void showTextMessage(QiscusComment qiscusComment) {
         if (message != null) {
-            message.setText(comment.getMessage());
+            message.setText(qiscusComment.getMessage());
         }
     }
 
-    private void showIconReadOrNot(Comment comment) {
+    private void showIconReadOrNot(QiscusComment qiscusComment) {
         if (iconRead != null) {
-            switch (comment.getState()) {
-                case Comment.STATE_SENDING:
+            switch (qiscusComment.getState()) {
+                case QiscusComment.STATE_SENDING:
                     iconRead.setImageResource(R.drawable.ic_info_time);
                     break;
-                case Comment.STATE_ON_QISCUS:
+                case QiscusComment.STATE_ON_QISCUS:
                     iconRead.setImageResource(R.drawable.ic_sending);
                     break;
-                case Comment.STATE_ON_PUSHER:
+                case QiscusComment.STATE_ON_PUSHER:
                     iconRead.setImageResource(R.drawable.ic_read);
                     break;
-                case Comment.STATE_FAILED:
+                case QiscusComment.STATE_FAILED:
                     iconRead.setImageResource(R.drawable.ic_sending_failed);
                     break;
             }
         }
     }
 
-    private void showDateOrNot(Comment comment) {
+    private void showDateOrNot(QiscusComment qiscusComment) {
         if (date != null) {
             if (showDate) {
-                date.setText(DateUtil.toTodayOrDate(comment.getTime()));
+                date.setText(DateUtil.toTodayOrDate(qiscusComment.getTime()));
                 date.setVisibility(View.VISIBLE);
             } else {
                 date.setVisibility(View.GONE);
@@ -302,14 +302,14 @@ public class MessageViewHolder extends BaseItemViewHolder<Comment> implements
     }
 
     @Override
-    public void onProgress(Comment comment, int percentage) {
+    public void onProgress(QiscusComment qiscusComment, int percentage) {
         if (progress != null) {
             progress.setProgress(percentage);
         }
     }
 
     @Override
-    public void onDownloading(Comment comment, boolean downloading) {
+    public void onDownloading(QiscusComment qiscusComment, boolean downloading) {
         if (progress != null) {
             progress.setVisibility(downloading ? View.VISIBLE : View.GONE);
         }

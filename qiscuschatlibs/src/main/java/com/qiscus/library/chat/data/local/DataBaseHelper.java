@@ -4,7 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.qiscus.library.chat.Qiscus;
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusComment;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ public enum DataBaseHelper {
         return INSTANCE;
     }
 
-    public void add(Comment comment) {
-        if (!isContains(comment)) {
+    public void add(QiscusComment qiscusComment) {
+        if (!isContains(qiscusComment)) {
             sqLiteDatabase.beginTransaction();
             try {
-                sqLiteDatabase.insert(Db.CommentTable.TABLE_NAME, null, Db.CommentTable.toContentValues(comment));
+                sqLiteDatabase.insert(Db.CommentTable.TABLE_NAME, null, Db.CommentTable.toContentValues(qiscusComment));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -55,17 +55,17 @@ public enum DataBaseHelper {
         }
     }
 
-    public boolean isContains(Comment comment) {
+    public boolean isContains(QiscusComment qiscusComment) {
         String query;
-        if (comment.getId() == -1) {
+        if (qiscusComment.getId() == -1) {
             query = "SELECT * FROM "
                     + Db.CommentTable.TABLE_NAME + " WHERE "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + comment.getUniqueId() + "'";
+                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
             query = "SELECT * FROM "
                     + Db.CommentTable.TABLE_NAME + " WHERE "
-                    + Db.CommentTable.COLUMN_ID + " = " + comment.getId() + " OR "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + comment.getUniqueId() + "'";
+                    + Db.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
+                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         }
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
@@ -83,18 +83,18 @@ public enum DataBaseHelper {
         return contains;
     }
 
-    public void update(Comment comment) {
+    public void update(QiscusComment qiscusComment) {
         String where;
-        if (comment.getId() == -1) {
-            where = Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + comment.getUniqueId() + "'";
+        if (qiscusComment.getId() == -1) {
+            where = Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
-            where = Db.CommentTable.COLUMN_ID + " = " + comment.getId() + " OR "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + comment.getUniqueId() + "'";
+            where = Db.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
+                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         }
 
         sqLiteDatabase.beginTransaction();
         try {
-            sqLiteDatabase.update(Db.CommentTable.TABLE_NAME, Db.CommentTable.toContentValues(comment), where, null);
+            sqLiteDatabase.update(Db.CommentTable.TABLE_NAME, Db.CommentTable.toContentValues(qiscusComment), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,11 +116,11 @@ public enum DataBaseHelper {
         }
     }
 
-    public void addOrUpdate(Comment comment) {
-        if (!isContains(comment)) {
-            add(comment);
+    public void addOrUpdate(QiscusComment qiscusComment) {
+        if (!isContains(qiscusComment)) {
+            add(qiscusComment);
         } else {
-            update(comment);
+            update(qiscusComment);
         }
     }
 
@@ -132,13 +132,13 @@ public enum DataBaseHelper {
         }
     }
 
-    public void delete(Comment comment) {
+    public void delete(QiscusComment qiscusComment) {
         String where;
-        if (comment.getId() == -1) {
-            where = Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + comment.getUniqueId() + "'";
+        if (qiscusComment.getId() == -1) {
+            where = Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
-            where = Db.CommentTable.COLUMN_ID + " = " + comment.getId() + " OR "
-                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + comment.getUniqueId() + "'";
+            where = Db.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
+                    + Db.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         }
 
         sqLiteDatabase.beginTransaction();
@@ -171,7 +171,7 @@ public enum DataBaseHelper {
         }
     }
 
-    public Comment getComment(int id, String uniqueId) {
+    public QiscusComment getComment(int id, String uniqueId) {
         String query;
         if (id == -1) {
             query = "SELECT * FROM "
@@ -186,56 +186,56 @@ public enum DataBaseHelper {
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 
         if (cursor.moveToNext()) {
-            Comment comment = Db.CommentTable.parseCursor(cursor);
+            QiscusComment qiscusComment = Db.CommentTable.parseCursor(cursor);
             cursor.close();
-            return comment;
+            return qiscusComment;
         } else {
             cursor.close();
             return null;
         }
     }
 
-    public List<Comment> getComments(int topicId, int count) {
+    public List<QiscusComment> getComments(int topicId, int count) {
         String query = "SELECT * FROM "
                 + Db.CommentTable.TABLE_NAME + " WHERE "
                 + Db.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
                 + "ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-        List<Comment> comments = new ArrayList<>();
+        List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
-            comments.add(Db.CommentTable.parseCursor(cursor));
+            qiscusComments.add(Db.CommentTable.parseCursor(cursor));
         }
         cursor.close();
-        return comments;
+        return qiscusComments;
     }
 
-    public Observable<List<Comment>> getObservableComments(final int topicId, final int count) {
-        return Observable.create((Observable.OnSubscribe<List<Comment>>) subscriber -> {
+    public Observable<List<QiscusComment>> getObservableComments(final int topicId, final int count) {
+        return Observable.create((Observable.OnSubscribe<List<QiscusComment>>) subscriber -> {
             subscriber.onNext(getComments(topicId, count));
             subscriber.onCompleted();
         });
     }
 
-    public List<Comment> getOlderCommentsThan(Comment comment, int topicId, int count) {
+    public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
         String query = "SELECT * FROM "
                 + Db.CommentTable.TABLE_NAME + " WHERE "
                 + Db.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
-                + Db.CommentTable.COLUMN_TIME + " < " + comment.getTime().getTime() + " "
+                + Db.CommentTable.COLUMN_TIME + " < " + qiscusComment.getTime().getTime() + " "
                 + "ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-        List<Comment> comments = new ArrayList<>();
+        List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
-            comments.add(Db.CommentTable.parseCursor(cursor));
+            qiscusComments.add(Db.CommentTable.parseCursor(cursor));
         }
         cursor.close();
-        return comments;
+        return qiscusComments;
     }
 
-    public Observable<List<Comment>> getObservableOlderCommentsThan(final Comment comment, final int topicId, final int count) {
-        return Observable.create((Observable.OnSubscribe<List<Comment>>) subscriber -> {
-            subscriber.onNext(getOlderCommentsThan(comment, topicId, count));
+    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(final QiscusComment qiscusComment, final int topicId, final int count) {
+        return Observable.create((Observable.OnSubscribe<List<QiscusComment>>) subscriber -> {
+            subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
             subscriber.onCompleted();
         });
     }

@@ -14,7 +14,7 @@ import com.pusher.client.connection.ConnectionEventListener;
 import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 import com.qiscus.library.chat.Qiscus;
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusComment;
 import com.qiscus.library.chat.data.model.QiscusConfig;
 import com.qiscus.library.chat.util.DateUtil;
 
@@ -235,24 +235,24 @@ public enum PusherApi implements ConnectionEventListener {
         }
     }
 
-    public static Comment jsonToComment(JsonObject jsonObject) {
+    public static QiscusComment jsonToComment(JsonObject jsonObject) {
         Log.d(TAG, "Got comment: " + jsonObject);
         try {
-            Comment comment = new Comment();
-            comment.setId(jsonObject.get("comment_id").getAsInt());
-            comment.setTopicId(jsonObject.get("topic_id").getAsInt());
-            comment.setRoomId(jsonObject.get("room_id").getAsInt());
-            comment.setUniqueId(jsonObject.get("unique_id").getAsString());
-            comment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsInt());
-            comment.setMessage(jsonObject.get("comment").getAsString());
-            comment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
-            comment.setSenderEmail(jsonObject.get("username_real").getAsString());
-            comment.setTime(DateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
-            return comment;
+            QiscusComment qiscusComment = new QiscusComment();
+            qiscusComment.setId(jsonObject.get("comment_id").getAsInt());
+            qiscusComment.setTopicId(jsonObject.get("topic_id").getAsInt());
+            qiscusComment.setRoomId(jsonObject.get("room_id").getAsInt());
+            qiscusComment.setUniqueId(jsonObject.get("unique_id").getAsString());
+            qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsInt());
+            qiscusComment.setMessage(jsonObject.get("qiscusComment").getAsString());
+            qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
+            qiscusComment.setSenderEmail(jsonObject.get("username_real").getAsString());
+            qiscusComment.setTime(DateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
+            return qiscusComment;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        throw new RuntimeException("Unable to parse the JSON Comment");
+        throw new RuntimeException("Unable to parse the JSON QiscusComment");
     }
 
     public enum RoomEvent {

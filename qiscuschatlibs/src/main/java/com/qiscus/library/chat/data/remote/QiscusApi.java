@@ -3,9 +3,9 @@ package com.qiscus.library.chat.data.remote;
 import android.net.Uri;
 
 import com.qiscus.library.chat.BuildConfig;
-import com.qiscus.library.chat.data.local.LocalDataManager;
-import com.qiscus.library.chat.data.model.ChatRoom;
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.Qiscus;
+import com.qiscus.library.chat.data.model.QiscusChatRoom;
+import com.qiscus.library.chat.data.model.QiscusComment;
 import com.qiscus.library.chat.data.model.QiscusConfig;
 import com.qiscus.library.chat.data.remote.response.ChatRoomResponse;
 import com.qiscus.library.chat.util.BaseServiceGenerator;
@@ -78,10 +78,10 @@ public enum QiscusApi {
     }
 
     private String generateToken() {
-        return "Token token=" + LocalDataManager.getInstance().getToken();
+        return "Token token=" + Qiscus.getToken();
     }
 
-    public Observable<Comment> getComments(int topicId, int lastCommentId) {
+    public Observable<QiscusComment> getComments(int topicId, int lastCommentId) {
         return api.getComments(generateToken(), topicId, lastCommentId)
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
@@ -111,21 +111,21 @@ public enum QiscusApi {
                 String createdAt;
                 boolean deleted;
 
-                private Comment toComment() {
-                    Comment comment = new Comment();
-                    comment.setId(id);
-                    comment.setUniqueId(String.valueOf(id));
-                    comment.setCommentBeforeId(commentBeforeId);
-                    comment.setMessage(message);
-                    comment.setSender(usernameAs);
-                    comment.setSenderEmail(usernameReal);
+                private QiscusComment toComment() {
+                    QiscusComment qiscusComment = new QiscusComment();
+                    qiscusComment.setId(id);
+                    qiscusComment.setUniqueId(String.valueOf(id));
+                    qiscusComment.setCommentBeforeId(commentBeforeId);
+                    qiscusComment.setMessage(message);
+                    qiscusComment.setSender(usernameAs);
+                    qiscusComment.setSenderEmail(usernameReal);
                     try {
-                        comment.setTime(dateFormat.parse(createdAt));
+                        qiscusComment.setTime(dateFormat.parse(createdAt));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
 
-                    return comment;
+                    return qiscusComment;
                 }
             }
         }
@@ -138,13 +138,13 @@ public enum QiscusApi {
         public int commentBeforeId;
     }
 
-    public Observable<Comment> postComment(Comment comment) {
-        return api.postComment(generateToken(), comment.getMessage(), comment.getRoomId(),
-                               comment.getTopicId(), comment.getUniqueId())
+    public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
+        return api.postComment(generateToken(), qiscusComment.getMessage(), qiscusComment.getRoomId(),
+                               qiscusComment.getTopicId(), qiscusComment.getUniqueId())
                 .map(postCommentResponse -> {
-                    comment.setId(postCommentResponse.commentId);
-                    comment.setCommentBeforeId(postCommentResponse.commentBeforeId);
-                    return comment;
+                    qiscusComment.setId(postCommentResponse.commentId);
+                    qiscusComment.setCommentBeforeId(postCommentResponse.commentBeforeId);
+                    return qiscusComment;
                 });
     }
 
@@ -243,7 +243,7 @@ public enum QiscusApi {
         });
     }
 
-    public Observable<ChatRoom> getChatRoom(int chatRoomId) {
+    public Observable<QiscusChatRoom> getChatRoom(int chatRoomId) {
         return api.getChatRoom(generateToken(), chatRoomId).map(ChatRoomResponse::getResult);
     }
 

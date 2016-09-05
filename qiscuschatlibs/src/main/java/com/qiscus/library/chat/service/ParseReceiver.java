@@ -17,10 +17,10 @@ import android.widget.Toast;
 import com.google.gson.JsonObject;
 import com.parse.ParseAnalytics;
 import com.parse.ParsePushBroadcastReceiver;
+import com.qiscus.library.chat.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.data.local.CacheManager;
-import com.qiscus.library.chat.data.local.LocalDataManager;
-import com.qiscus.library.chat.data.model.Comment;
+import com.qiscus.library.chat.data.model.QiscusComment;
 import com.qiscus.library.chat.data.remote.PusherApi;
 import com.qiscus.library.chat.data.remote.QiscusApi;
 import com.qiscus.library.chat.event.CommentReceivedEvent;
@@ -50,7 +50,7 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
         printPushData(intent);
 
         // Don't try to continue if not authorized
-        if (!LocalDataManager.getInstance().isLogged()) {
+        if (!Qiscus.isLogged()) {
             return;
         }
 
@@ -62,9 +62,9 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
                 switch (action) {
                     case "com.qiscus.COMMENT_RECEIVED":
                         JsonObject messageJson = dataJson.get("extra").getAsJsonObject();
-                        Comment comment = PusherApi.jsonToComment(messageJson);
-                        if (!comment.getSenderEmail().equals(LocalDataManager.getInstance().getAccountInfo().getEmail())) {
-                            showPushNotification(context, intent, comment.getRoomId());
+                        QiscusComment qiscusComment = PusherApi.jsonToComment(messageJson);
+                        if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                            showPushNotification(context, intent, qiscusComment.getRoomId());
                         }
                         break;
 
@@ -146,9 +146,9 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
             switch (action) {
                 case "com.qiscus.COMMENT_RECEIVED":
                     JsonObject messageJson = dataJson.get("extra").getAsJsonObject();
-                    Comment comment = PusherApi.jsonToComment(messageJson);
-                    if (!comment.getSenderEmail().equals(LocalDataManager.getInstance().getAccountInfo().getEmail())) {
-                        return generateCommentNotification(context, intent, pOpenIntent, pDeleteIntent, comment);
+                    QiscusComment qiscusComment = PusherApi.jsonToComment(messageJson);
+                    if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                        return generateCommentNotification(context, intent, pOpenIntent, pDeleteIntent, qiscusComment);
                     }
                     break;
             }
@@ -188,26 +188,26 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
     }
 
     public Notification generateCommentNotification(Context context, Intent intent, PendingIntent openIntent,
-                                                    PendingIntent deleteIntent, Comment comment) {
+                                                    PendingIntent deleteIntent, QiscusComment qiscusComment) {
 
-        EventBus.getDefault().post(new CommentReceivedEvent(comment));
-        CacheManager.getInstance().addMessageNotifItem(comment.getMessage(), comment.getRoomId());
+        EventBus.getDefault().post(new CommentReceivedEvent(qiscusComment));
+        CacheManager.getInstance().addMessageNotifItem(qiscusComment.getMessage(), qiscusComment.getRoomId());
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
-        notificationBuilder.setContentTitle(comment.getSender())
-                .setContentText(isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage())
-                .setTicker(isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage())
+        notificationBuilder.setContentTitle(qiscusComment.getSender())
+                .setContentText(isAttachment(qiscusComment.getMessage()) ? fileMessage : qiscusComment.getMessage())
+                .setTicker(isAttachment(qiscusComment.getMessage()) ? fileMessage : qiscusComment.getMessage())
                 .setSmallIcon(getSmallIconId(context, intent))
                 .setLargeIcon(getLargeIcon(context, intent))
                 .setContentIntent(openIntent)
                 .setDeleteIntent(deleteIntent)
                 .setGroupSummary(true)
-                .setGroup("CHAT_NOTIF_" + comment.getRoomId())
+                .setGroup("CHAT_NOTIF_" + qiscusComment.getRoomId())
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        List<String> notifItems = CacheManager.getInstance().getMessageNotifItems(comment.getRoomId());
+        List<String> notifItems = CacheManager.getInstance().getMessageNotifItems(qiscusComment.getRoomId());
         for (String message : notifItems) {
             if (isAttachment(message)) {
                 inboxStyle.addLine(fileMessage);
