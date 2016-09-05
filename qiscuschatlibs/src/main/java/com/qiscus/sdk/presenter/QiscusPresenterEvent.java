@@ -8,6 +8,6 @@ package com.qiscus.sdk.presenter;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public enum PresenterEvent {
+public enum QiscusPresenterEvent {
     CREATE, DETACH
 }

@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qiscus.sdk.ui.adapter.viewholder.BaseItemViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusItemViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +19,19 @@ import java.util.List;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public abstract class BaseRecyclerAdapter<Data, Holder extends BaseItemViewHolder> extends
+public abstract class QiscusRecyclerAdapter<Data, Holder extends QiscusItemViewHolder> extends
         RecyclerView.Adapter<Holder> {
     protected Context context;
     protected List<Data> data;
     protected OnItemClickListener itemClickListener;
     protected OnLongItemClickListener longItemClickListener;
 
-    public BaseRecyclerAdapter(Context context) {
+    public QiscusRecyclerAdapter(Context context) {
         this.context = context;
         data = new ArrayList<>();
     }
 
-    public BaseRecyclerAdapter(Context context, List<Data> data) {
+    public QiscusRecyclerAdapter(Context context, List<Data> data) {
         this.context = context;
         this.data = data;
     }

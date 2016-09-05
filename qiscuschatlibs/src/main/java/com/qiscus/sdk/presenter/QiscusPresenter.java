@@ -16,31 +16,31 @@ import rx.subjects.BehaviorSubject;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public abstract class BasePresenter<V extends BasePresenter.View> {
-    private final BehaviorSubject<PresenterEvent> lifecycleSubject = BehaviorSubject.create();
+public abstract class QiscusPresenter<V extends QiscusPresenter.View> {
+    private final BehaviorSubject<QiscusPresenterEvent> lifecycleSubject = BehaviorSubject.create();
 
     protected V view;
 
-    public BasePresenter(V view) {
+    public QiscusPresenter(V view) {
         this.view = view;
-        lifecycleSubject.onNext(PresenterEvent.CREATE);
+        lifecycleSubject.onNext(QiscusPresenterEvent.CREATE);
     }
 
     @NonNull
     @CheckResult
     public final <T> LifecycleTransformer<T> bindToLifecycle() {
-        return RxLifecycle.bindUntilEvent(lifecycleSubject, PresenterEvent.DETACH);
+        return RxLifecycle.bindUntilEvent(lifecycleSubject, QiscusPresenterEvent.DETACH);
     }
 
     @NonNull
     @CheckResult
-    public final <T> LifecycleTransformer<T> bindUntilEvent(PresenterEvent presenterEvent) {
-        return RxLifecycle.bindUntilEvent(lifecycleSubject, presenterEvent);
+    public final <T> LifecycleTransformer<T> bindUntilEvent(QiscusPresenterEvent qiscusPresenterEvent) {
+        return RxLifecycle.bindUntilEvent(lifecycleSubject, qiscusPresenterEvent);
     }
 
     public void detachView() {
         view = null;
-        lifecycleSubject.onNext(PresenterEvent.DETACH);
+        lifecycleSubject.onNext(QiscusPresenterEvent.DETACH);
     }
 
     public interface View {

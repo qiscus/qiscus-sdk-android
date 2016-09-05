@@ -11,13 +11,13 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.library.chat.sample.R;
 import com.qiscus.library.chat.sample.data.local.LocalDataManager;
 import com.qiscus.library.chat.sample.data.remote.SampleApi;
-import com.qiscus.sdk.ui.QiscusBaseActivity;
+import com.qiscus.sdk.ui.QiscusActivity;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.util.QiscusScheduler;
 
 import butterknife.BindView;
 
-public class MainActivity extends QiscusBaseActivity {
+public class MainActivity extends QiscusActivity {
 
     @BindView(R.id.bt_login) Button loginButton;
 

@@ -7,24 +7,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qiscus.sdk.ui.adapter.viewholder.BaseItemViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusItemViewHolder;
 
 import java.util.List;
 
 
-public abstract class SortedRecyclerAdapter<Item, Holder extends BaseItemViewHolder> extends
+public abstract class QiscusSortedRecyclerAdapter<Item, Holder extends QiscusItemViewHolder> extends
         RecyclerView.Adapter<Holder> {
     protected Context context;
     protected SortedList<Item> data;
-    protected BaseRecyclerAdapter.OnItemClickListener itemClickListener;
-    protected BaseRecyclerAdapter.OnLongItemClickListener longItemClickListener;
+    protected QiscusRecyclerAdapter.OnItemClickListener itemClickListener;
+    protected QiscusRecyclerAdapter.OnLongItemClickListener longItemClickListener;
 
-    public SortedRecyclerAdapter(Context context) {
+    public QiscusSortedRecyclerAdapter(Context context) {
         this.context = context;
         data = new SortedList<>(getItemClass(), new SortedList.Callback<Item>() {
             @Override
             public int compare(Item lhs, Item rhs) {
-                return SortedRecyclerAdapter.this.compare(lhs, rhs);
+                return QiscusSortedRecyclerAdapter.this.compare(lhs, rhs);
             }
 
             @Override
@@ -89,11 +89,11 @@ public abstract class SortedRecyclerAdapter<Item, Holder extends BaseItemViewHol
         return position;
     }
 
-    public void setOnItemClickListener(BaseRecyclerAdapter.OnItemClickListener itemClickListener) {
+    public void setOnItemClickListener(QiscusRecyclerAdapter.OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
 
-    public void setOnLongItemClickListener(BaseRecyclerAdapter.OnLongItemClickListener longItemClickListener) {
+    public void setOnLongItemClickListener(QiscusRecyclerAdapter.OnLongItemClickListener longItemClickListener) {
         this.longItemClickListener = longItemClickListener;
     }
 

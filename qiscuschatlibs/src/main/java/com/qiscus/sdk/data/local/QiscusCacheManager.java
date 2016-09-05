@@ -23,17 +23,17 @@ import java.util.List;
 /**
  * Cache response from API here, so we can use it to speed up load data to the UI component
  */
-public enum CacheManager {
+public enum QiscusCacheManager {
     INSTANCE;
     private final SharedPreferences sharedPreferences;
     private final Gson gson;
 
-    CacheManager() {
+    QiscusCacheManager() {
         sharedPreferences = Qiscus.getApps().getSharedPreferences("qiscus.cache", Context.MODE_PRIVATE);
         gson = QiscusParser.get().parser();
     }
 
-    public static CacheManager getInstance() {
+    public static QiscusCacheManager getInstance() {
         return INSTANCE;
     }
 

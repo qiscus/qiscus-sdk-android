@@ -7,7 +7,7 @@ import android.os.Handler;
 
 import com.google.gson.Gson;
 import com.parse.Parse;
-import com.qiscus.sdk.data.local.CacheManager;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.util.QiscusParser;
@@ -83,7 +83,7 @@ public class Qiscus {
     public static void logout() {
         LOCAL_DATA_MANAGER.clearData();
         QiscusDataBaseHelper.getInstance().clear();
-        CacheManager.getInstance().clearData();
+        QiscusCacheManager.getInstance().clearData();
     }
 
     private static class LocalDataManager {

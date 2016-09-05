@@ -23,13 +23,13 @@ import rx.Observable;
 import rx.Subscription;
 import timber.log.Timber;
 
-public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
+public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.View> {
 
     private QiscusChatRoom room;
     private Subscription subscription;
     private int currentTopicId;
 
-    public ChatPresenter(View view, QiscusChatRoom room) {
+    public QiscusChatPresenter(View view, QiscusChatRoom room) {
         super(view);
         this.room = room;
         this.currentTopicId = room.getLastTopicId();
@@ -351,7 +351,7 @@ public class ChatPresenter extends BasePresenter<ChatPresenter.View> {
         EventBus.getDefault().unregister(this);
     }
 
-    public interface View extends BasePresenter.View {
+    public interface View extends QiscusPresenter.View {
 
         void showLoadMoreLoading();
 

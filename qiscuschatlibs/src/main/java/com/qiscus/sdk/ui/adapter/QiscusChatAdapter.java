@@ -18,7 +18,7 @@ import com.qiscus.sdk.util.QiscusDateUtil;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class QiscusChatAdapter extends SortedRecyclerAdapter<QiscusComment, QiscusMessageViewHolder> {
+public class QiscusChatAdapter extends QiscusSortedRecyclerAdapter<QiscusComment, QiscusMessageViewHolder> {
     private static final int TYPE_MESSAGE_ME = 1;
     private static final int TYPE_MESSAGE_OTHER = 2;
     private static final int TYPE_PICTURE_ME = 3;

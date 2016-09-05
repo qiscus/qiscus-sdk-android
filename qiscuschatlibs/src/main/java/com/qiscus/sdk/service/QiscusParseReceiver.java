@@ -19,7 +19,7 @@ import com.parse.ParseAnalytics;
 import com.parse.ParsePushBroadcastReceiver;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.R;
-import com.qiscus.sdk.data.local.CacheManager;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.data.remote.QiscusApi;
@@ -177,7 +177,7 @@ public class QiscusParseReceiver extends ParsePushBroadcastReceiver {
                     case "com.qiscus.COMMENT_RECEIVED":
                         JsonObject messageJson = dataJson.get("extra").getAsJsonObject();
                         int roomId = messageJson.get("room_id").getAsInt();
-                        CacheManager.getInstance().clearMessageNotifItems(roomId);
+                        QiscusCacheManager.getInstance().clearMessageNotifItems(roomId);
                         openChatRoom(context, roomId);
                         break;
                 }
@@ -191,7 +191,7 @@ public class QiscusParseReceiver extends ParsePushBroadcastReceiver {
                                                     PendingIntent deleteIntent, QiscusComment qiscusComment) {
 
         EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-        CacheManager.getInstance().addMessageNotifItem(qiscusComment.getMessage(), qiscusComment.getRoomId());
+        QiscusCacheManager.getInstance().addMessageNotifItem(qiscusComment.getMessage(), qiscusComment.getRoomId());
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
         notificationBuilder.setContentTitle(qiscusComment.getSender())
@@ -207,7 +207,7 @@ public class QiscusParseReceiver extends ParsePushBroadcastReceiver {
                 .setDefaults(Notification.DEFAULT_ALL);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        List<String> notifItems = CacheManager.getInstance().getMessageNotifItems(qiscusComment.getRoomId());
+        List<String> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(qiscusComment.getRoomId());
         for (String message : notifItems) {
             if (isAttachment(message)) {
                 inboxStyle.addLine(fileMessage);

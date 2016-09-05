@@ -26,11 +26,11 @@ import android.widget.Toast;
 import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.R2;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.local.CacheManager;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.presenter.ChatPresenter;
+import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
@@ -48,7 +48,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
-public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresenter.View,
+public class QiscusChatActivity extends QiscusActivity implements QiscusChatPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener {
     private static final String CHAT_ROOM_DATA = "chat_room_data";
     private static final int TAKE_PICTURE_REQUEST = 1;
@@ -66,7 +66,7 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
 
     private QiscusChatRoom qiscusChatRoom;
     private QiscusChatAdapter adapter;
-    private ChatPresenter chatPresenter;
+    private QiscusChatPresenter qiscusChatPresenter;
     private LinearLayoutManager chatLayoutManager;
     private QiscusAccount qiscusAccount;
     private Animation animation;
@@ -94,7 +94,7 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
 
         animation = AnimationUtils.loadAnimation(this, R.anim.simple_grow);
 
-        CacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
+        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
         NotificationManagerCompat.from(this).cancel(qiscusChatRoom.getId());
 
         qiscusAccount = Qiscus.getQiscusAccount();
@@ -109,8 +109,8 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
         listMessage.setAdapter(adapter);
         listMessage.addOnScrollListener(new QiscusChatScrollListener(chatLayoutManager, this));
 
-        chatPresenter = new ChatPresenter(this, qiscusChatRoom);
-        new Handler().postDelayed(() -> chatPresenter.loadComments(20), 400);
+        qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
+        new Handler().postDelayed(() -> qiscusChatPresenter.loadComments(20), 400);
     }
 
     private void resolveChatRoom(Bundle savedInstanceState) {
@@ -128,10 +128,10 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
     private void onItemCommentClick(QiscusComment qiscusComment) {
         if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
             if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
-                chatPresenter.downloadFile(qiscusComment);
+                qiscusChatPresenter.downloadFile(qiscusComment);
             }
         } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
-            chatPresenter.resendComment(qiscusComment);
+            qiscusChatPresenter.resendComment(qiscusComment);
         }
     }
 
@@ -165,7 +165,7 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
     public void sendMessage() {
         String message = fieldMessage.getText().toString().trim();
         if (!message.isEmpty()) {
-            chatPresenter.sendComment(message);
+            qiscusChatPresenter.sendComment(message);
             fieldMessage.setText("");
         }
     }
@@ -200,7 +200,7 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-        CacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());
+        QiscusCacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());
         return image;
     }
 
@@ -268,7 +268,7 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
         if (progressBar.getVisibility() == View.GONE && adapter.getItemCount() > 0) {
             QiscusComment qiscusComment = adapter.getData().get(adapter.getItemCount() - 1);
             if (qiscusComment.getCommentBeforeId() > 0) {
-                chatPresenter.loadOlderCommentThan(qiscusComment);
+                qiscusChatPresenter.loadOlderCommentThan(qiscusComment);
             }
         }
     }
@@ -345,7 +345,7 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
             loadMoreComments();
             swipeRefreshLayout.setRefreshing(false);
         } else {
-            chatPresenter.loadComments(20);
+            qiscusChatPresenter.loadComments(20);
         }
     }
 
@@ -358,7 +358,7 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
                 return;
             }
             try {
-                chatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
+                qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
                 showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
@@ -369,14 +369,14 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
                 return;
             }
             try {
-                chatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
+                qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
                 showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_read_file));
                 e.printStackTrace();
             }
         } else if (requestCode == TAKE_PICTURE_REQUEST && resultCode == RESULT_OK) {
             try {
-                chatPresenter.sendFile(QiscusFileUtil.from(Uri.parse(CacheManager.getInstance().getLastImagePath())));
+                qiscusChatPresenter.sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
             } catch (Exception e) {
                 showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
@@ -393,6 +393,6 @@ public class QiscusChatActivity extends QiscusBaseActivity implements ChatPresen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        chatPresenter.detachView();
+        qiscusChatPresenter.detachView();
     }
 }

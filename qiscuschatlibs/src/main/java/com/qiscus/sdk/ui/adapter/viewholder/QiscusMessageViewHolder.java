@@ -17,8 +17,8 @@ import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.R2;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.ui.adapter.BaseRecyclerAdapter.OnItemClickListener;
-import com.qiscus.sdk.ui.adapter.BaseRecyclerAdapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnItemClickListener;
+import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnLongItemClickListener;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import butterknife.OnLongClick;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class QiscusMessageViewHolder extends BaseItemViewHolder<QiscusComment> implements
+public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment> implements
         QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
 
     @Nullable @BindView(R2.id.date) TextView date;

@@ -3,8 +3,8 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.qiscus.sdk.ui.adapter.BaseRecyclerAdapter.OnItemClickListener;
-import com.qiscus.sdk.ui.adapter.BaseRecyclerAdapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnItemClickListener;
+import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnLongItemClickListener;
 
 import butterknife.ButterKnife;
 
@@ -16,14 +16,14 @@ import butterknife.ButterKnife;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public abstract class BaseItemViewHolder<Data> extends RecyclerView.ViewHolder implements
+public abstract class QiscusItemViewHolder<Data> extends RecyclerView.ViewHolder implements
         View.OnClickListener,
         View.OnLongClickListener {
     private OnItemClickListener itemClickListener;
     private OnLongItemClickListener longItemClickListener;
     private boolean hasHeader = false;
 
-    public BaseItemViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusItemViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         this.itemClickListener = itemClickListener;
