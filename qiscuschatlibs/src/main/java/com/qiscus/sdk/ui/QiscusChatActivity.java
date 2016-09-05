@@ -89,7 +89,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
 
         requestStoragePermission();
 
-        swipeRefreshLayout.setColorSchemeResources(R.color.primary, R.color.accent);
+        swipeRefreshLayout.setColorSchemeResources(R.color.qiscus_primary, R.color.qiscus_accent);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         animation = AnimationUtils.loadAnimation(this, R.anim.simple_grow);

@@ -1,5 +1,7 @@
 package com.qiscus.sdk.ui.adapter.viewholder;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -12,9 +14,9 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.lzyzsd.circleprogress.CircleProgress;
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.library.chat.R;
 import com.qiscus.library.chat.R2;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnItemClickListener;
@@ -47,6 +49,7 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
     @Nullable @BindView(R2.id.holder) RelativeLayout holder;
     @Nullable @BindView(R2.id.progress) CircleProgress progress;
     @Nullable @BindView(R2.id.iv_download) ImageView downloadIcon;
+    @Nullable @BindView(R2.id.frame) ImageView frame;
     @BindView(R2.id.bubble) ImageView bubble;
     @BindView(R2.id.message) View messageBubble;
 
@@ -54,9 +57,35 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
     private boolean fromMe;
     private boolean showBubble;
 
+    private Drawable rightBubbleDrawable;
+    private Drawable leftBubbleDrawable;
+    private int rightBubbleColor;
+    private int leftBubbleColor;
+    private int rightBubbleTextColor;
+    private int leftBubbleTextColor;
+    private int rightBubbleTimeColor;
+    private int leftBubbleTimeColor;
+    private int failedToSendMessageColor;
+    private int dateColor;
+
     public QiscusMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageBubble.setOnClickListener(this);
+
+        rightBubbleColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightBubbleColor());
+        rightBubbleTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightBubbleTextColor());
+        rightBubbleTimeColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightBubbleTimeColor());
+        rightBubbleDrawable = ContextCompat.getDrawable(Qiscus.getApps(), R2.drawable.rounded_primary_light_chat_bg);
+        rightBubbleDrawable.setColorFilter(rightBubbleColor, PorterDuff.Mode.SRC_ATOP);
+
+        leftBubbleColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftBubbleColor());
+        leftBubbleTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftBubbleTextColor());
+        leftBubbleTimeColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftBubbleTimeColor());
+        leftBubbleDrawable = ContextCompat.getDrawable(Qiscus.getApps(), R2.drawable.rounded_primary_chat_bg);
+        leftBubbleDrawable.setColorFilter(leftBubbleColor, PorterDuff.Mode.SRC_ATOP);
+
+        failedToSendMessageColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getFailedToSendMessageColor());
+        dateColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getDateColor());
     }
 
     public void setShowDate(boolean showDate) {
@@ -77,6 +106,9 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
 
     @Override
     public void bind(QiscusComment qiscusComment) {
+
+        setUpColor();
+
         bubble.setVisibility(showBubble ? View.VISIBLE : View.GONE);
         qiscusComment.setProgressListener(this);
         qiscusComment.setDownloadingListener(this);
@@ -97,6 +129,48 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
                 showExtension(qiscusComment);
                 showFileMessage(qiscusComment);
                 break;
+        }
+    }
+
+    private void setUpColor() {
+        if (fromMe) {
+            messageBubble.setBackground(rightBubbleDrawable);
+            bubble.setColorFilter(rightBubbleColor);
+
+            if (message != null) {
+                message.setTextColor(rightBubbleTextColor);
+            }
+
+            if (iconRead != null) {
+                iconRead.setColorFilter(rightBubbleTimeColor);
+            }
+
+            if (frame != null) {
+                frame.setColorFilter(rightBubbleColor);
+            }
+
+            if (progress != null) {
+                progress.setFinishedColor(rightBubbleColor);
+            }
+        } else {
+            messageBubble.setBackground(leftBubbleDrawable);
+            bubble.setColorFilter(leftBubbleColor);
+
+            if (message != null) {
+                message.setTextColor(leftBubbleTextColor);
+            }
+
+            if (frame != null) {
+                frame.setColorFilter(leftBubbleColor);
+            }
+
+            if (progress != null) {
+                progress.setFinishedColor(leftBubbleColor);
+            }
+        }
+
+        if (date != null) {
+            date.setTextColor(dateColor);
         }
     }
 
@@ -129,11 +203,10 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
         if (time != null) {
             if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 time.setText(R.string.sending_failed);
-                time.setTextColor(ContextCompat.getColor(Qiscus.getApps(), R.color.red));
+                time.setTextColor(failedToSendMessageColor);
             } else {
                 time.setText(QiscusDateUtil.toHour(qiscusComment.getTime()));
-                time.setTextColor(ContextCompat.getColor(Qiscus.getApps(),
-                                                         fromMe ? R.color.secondary_text : R.color.primary_light));
+                time.setTextColor(fromMe ? rightBubbleTimeColor : leftBubbleTimeColor);
             }
         }
     }

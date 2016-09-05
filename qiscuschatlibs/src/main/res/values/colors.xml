@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#009688</color>
-    <color name="primary_dark">#00796B</color>
-    <color name="primary_light">#B2DFDB</color>
-    <color name="accent">#FF5722</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#727272</color>
-    <color name="white">#FFFFFF</color>
-    <color name="divider">#B6B6B6</color>
-    <color name="light_grey">#D8D8D8</color>
-    <color name="green">#4caf50</color>
-    <color name="red">#d32f2f</color>
-    <color name="dark_white">#f6f6f6</color>
+    <color name="qiscus_primary">#009688</color>
+    <color name="qiscus_primary_dark">#00796B</color>
+    <color name="qiscus_primary_light">#B2DFDB</color>
+    <color name="qiscus_accent">#FF5722</color>
+    <color name="qiscus_primary_text">#212121</color>
+    <color name="qiscus_secondary_text">#727272</color>
+    <color name="qiscus_white">#FFFFFF</color>
+    <color name="qiscus_divider">#B6B6B6</color>
+    <color name="qiscus_light_grey">#D8D8D8</color>
+    <color name="qiscus_green">#4caf50</color>
+    <color name="qiscus_red">#d32f2f</color>
+    <color name="qiscus_dark_white">#f6f6f6</color>
 </resources>

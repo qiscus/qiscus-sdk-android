@@ -20,5 +20,11 @@ public class SampleApps extends Application {
         Qiscus.init(this,
                 "https://qvc-engine-staging.herokuapp.com",
                 "3f27dc397124364ecc0f");
+
+        Qiscus.getChatConfig()
+                .setLeftBubbleColor(R.color.accent)
+                .setRightBubbleColor(R.color.primary)
+                .setRightBubbleTextColor(R.color.qiscus_white)
+                .setRightBubbleTimeColor(R.color.primary_light);
     }
 }

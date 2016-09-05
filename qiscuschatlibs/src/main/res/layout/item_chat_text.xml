@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/dark_white">
+    android:background="@color/qiscus_dark_white">
 
     <TextView
         android:id="@+id/date"
@@ -12,7 +12,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="4dp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
         android:visibility="gone"/>
 
@@ -24,7 +24,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:src="@drawable/ic_arrow_bubble_primary"
-        android:tint="@color/primary"/>
+        android:tint="@color/qiscus_primary"/>
 
     <org.apmem.tools.layouts.FlowLayout
         android:id="@+id/message"
@@ -48,8 +48,8 @@
             android:layout_marginBottom="4dp"
             android:autoLink="web"
             android:linksClickable="true"
-            android:textColor="@color/white"
-            android:textColorLink="@color/white"
+            android:textColor="@color/qiscus_white"
+            android:textColorLink="@color/qiscus_white"
             android:textSize="16sp"/>
 
         <TextView
@@ -59,7 +59,7 @@
             android:layout_gravity="bottom"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:textColor="@color/primary_light"
+            android:textColor="@color/qiscus_primary_light"
             android:textSize="12sp"/>
 
     </org.apmem.tools.layouts.FlowLayout>

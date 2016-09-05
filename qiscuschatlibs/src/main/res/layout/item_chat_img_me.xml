@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/dark_white">
+    android:background="@color/qiscus_dark_white">
 
     <TextView
         android:id="@+id/date"
@@ -13,7 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="4dp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
         android:visibility="visible"/>
 
@@ -28,7 +28,7 @@
         android:layout_marginRight="8dp"
         android:scaleType="fitStart"
         android:src="@drawable/ic_arrow_bubble_primary_light"
-        android:tint="@color/primary_light"/>
+        android:tint="@color/qiscus_primary_light"/>
 
     <RelativeLayout
         android:id="@+id/message"
@@ -63,6 +63,7 @@
             android:visibility="visible"/>
 
         <ImageView
+            android:id="@+id/frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignBottom="@+id/holder"
@@ -73,7 +74,7 @@
             android:layout_alignTop="@+id/holder"
             android:layout_centerHorizontal="true"
             android:src="@drawable/bg_frame_primary_light"
-            android:tint="@color/primary_light"
+            android:tint="@color/qiscus_primary_light"
             android:visibility="visible"/>
 
         <RelativeLayout
@@ -90,7 +91,7 @@
                 android:layout_height="24dp"
                 android:layout_margin="4dp"
                 android:src="@drawable/ic_img"
-                android:tint="@color/divider"/>
+                android:tint="@color/qiscus_divider"/>
 
             <TextView
                 android:id="@+id/file_name"
@@ -103,7 +104,7 @@
                 android:layout_toRightOf="@+id/ic_img"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="@color/divider"
+                android:textColor="@color/qiscus_divider"
                 android:textSize="17sp"/>
 
             <ImageView
@@ -116,7 +117,7 @@
                 android:background="@drawable/circle_divider"
                 android:padding="48dp"
                 android:src="@drawable/ic_download_big"
-                android:tint="@color/secondary_text"/>
+                android:tint="@color/qiscus_secondary_text"/>
 
         </RelativeLayout>
 
@@ -128,7 +129,7 @@
             android:layout_marginBottom="12dp"
             android:layout_marginTop="49dp"
             android:visibility="gone"
-            app:circle_finished_color="@color/primary_light"/>
+            app:circle_finished_color="@color/qiscus_primary_light"/>
 
         <TextView
             android:id="@+id/time"
@@ -139,7 +140,7 @@
             android:layout_marginTop="8dp"
             android:layout_toLeftOf="@+id/icon_read"
             android:layout_toStartOf="@+id/icon_read"
-            android:textColor="@color/secondary_text"
+            android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"/>
 
         <ImageView

@@ -10,6 +10,7 @@ import com.parse.Parse;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.util.QiscusParser;
 
 /**
@@ -24,6 +25,7 @@ public class Qiscus {
     private static Application APP_INSTANCE;
     private static volatile Handler APP_HANDLER;
     private static LocalDataManager LOCAL_DATA_MANAGER;
+    private static QiscusChatConfig CHAT_CONFIG;
 
     private static String API_URL;
     private static String PUSHER_KEY;
@@ -36,6 +38,7 @@ public class Qiscus {
         PUSHER_KEY = pusherKey;
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
+        CHAT_CONFIG = new QiscusChatConfig();
 
         Parse.initialize(APP_INSTANCE, PARSE_APP_ID, PARSE_CLIENT_KEY);
     }
@@ -78,6 +81,10 @@ public class Qiscus {
 
     public static String getToken() {
         return LOCAL_DATA_MANAGER.getToken();
+    }
+
+    public static QiscusChatConfig getChatConfig() {
+        return CHAT_CONFIG;
     }
 
     public static void logout() {

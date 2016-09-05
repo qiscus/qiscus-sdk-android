@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_white">
+    android:background="@color/qiscus_dark_white">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/primary"
+            android:background="@color/qiscus_primary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
@@ -40,7 +40,7 @@
                         android:ellipsize="end"
                         android:singleLine="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/qiscus_white"/>
 
                     <TextView
                         android:id="@+id/tv_rate"
@@ -49,7 +49,7 @@
                         android:layout_marginTop="2dp"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:textColor="@color/primary_light"
+                        android:textColor="@color/qiscus_primary_light"
                         android:textSize="14sp"
                         android:visibility="gone"/>
                 </LinearLayout>
@@ -82,7 +82,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:text="@string/welcome"
-            android:textColor="@color/divider"
+            android:textColor="@color/qiscus_divider"
             android:textSize="24sp"
             android:textStyle="bold"/>
 
@@ -92,7 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/desc_empty_chat"
-            android:textColor="@color/divider"/>
+            android:textColor="@color/qiscus_divider"/>
     </LinearLayout>
 
     <LinearLayout
@@ -127,7 +127,7 @@
                 android:elevation="1dp"
                 android:padding="8dp"
                 android:text="@string/new_message"
-                android:textColor="@color/white"
+                android:textColor="@color/qiscus_white"
                 android:textSize="14sp"
                 android:visibility="gone"/>
         </FrameLayout>
@@ -136,14 +136,14 @@
             android:id="@+id/box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@color/qiscus_white"
             android:orientation="vertical">
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:alpha="0.5"
-                android:background="@color/light_grey"/>
+                android:background="@color/qiscus_light_grey"/>
 
             <EditText
                 android:id="@+id/field_message"
@@ -155,7 +155,7 @@
                 android:inputType="textLongMessage|textMultiLine|textCapSentences"
                 android:maxLines="5"
                 android:padding="8dp"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/qiscus_primary_text"
                 android:textSize="16sp"/>
 
             <LinearLayout
