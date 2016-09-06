@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.qiscus.sdk.Qiscus;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -25,6 +27,7 @@ public class SampleApps extends Application {
                 .setLeftBubbleColor(R.color.accent)
                 .setRightBubbleColor(R.color.primary)
                 .setRightBubbleTextColor(R.color.qiscus_white)
-                .setRightBubbleTimeColor(R.color.primary_light);
+                .setRightBubbleTimeColor(R.color.primary_light)
+                .setTimeFormat(date -> new SimpleDateFormat("HH:mm").format(date));
     }
 }

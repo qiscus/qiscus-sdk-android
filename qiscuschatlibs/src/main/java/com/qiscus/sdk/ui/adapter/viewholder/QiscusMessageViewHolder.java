@@ -21,7 +21,6 @@ import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnLongItemClickListener;
-import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.io.File;
 
@@ -205,7 +204,7 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
                 time.setText(R.string.sending_failed);
                 time.setTextColor(failedToSendMessageColor);
             } else {
-                time.setText(QiscusDateUtil.toHour(qiscusComment.getTime()));
+                time.setText(Qiscus.getChatConfig().getTimeFormat().format(qiscusComment.getTime()));
                 time.setTextColor(fromMe ? rightBubbleTimeColor : leftBubbleTimeColor);
             }
         }
@@ -349,7 +348,7 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
     private void showDateOrNot(QiscusComment qiscusComment) {
         if (date != null) {
             if (showDate) {
-                date.setText(QiscusDateUtil.toTodayOrDate(qiscusComment.getTime()));
+                date.setText(Qiscus.getChatConfig().getDateFormat().format(qiscusComment.getTime()));
                 date.setVisibility(View.VISIBLE);
             } else {
                 date.setVisibility(View.GONE);

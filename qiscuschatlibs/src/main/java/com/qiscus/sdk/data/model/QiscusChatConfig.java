@@ -3,6 +3,7 @@ package com.qiscus.sdk.data.model;
 import android.support.annotation.ColorRes;
 
 import com.qiscus.library.chat.R;
+import com.qiscus.sdk.util.QiscusDateUtil;
 
 /**
  * Created by zetra. on 9/5/16.
@@ -18,6 +19,8 @@ public class QiscusChatConfig {
     private int leftBubbleTimeColor = R.color.qiscus_primary_light;
     private int failedToSendMessageColor = R.color.qiscus_red;
     private int dateColor = R.color.qiscus_secondary_text;
+    private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
+    private DateFormatter timeFormat = QiscusDateUtil::toHour;
 
     public QiscusChatConfig setAppBarColor(@ColorRes int appBarColor) {
         this.appBarColor = appBarColor;
@@ -69,6 +72,16 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setDateFormat(DateFormatter dateFormat) {
+        this.dateFormat = dateFormat;
+        return this;
+    }
+
+    public QiscusChatConfig setTimeFormat(DateFormatter timeFormat) {
+        this.timeFormat = timeFormat;
+        return this;
+    }
+
     @ColorRes
     public int getAppBarColor() {
         return appBarColor;
@@ -117,5 +130,13 @@ public class QiscusChatConfig {
     @ColorRes
     public int getDateColor() {
         return dateColor;
+    }
+
+    public DateFormatter getDateFormat() {
+        return dateFormat;
+    }
+
+    public DateFormatter getTimeFormat() {
+        return timeFormat;
     }
 }
