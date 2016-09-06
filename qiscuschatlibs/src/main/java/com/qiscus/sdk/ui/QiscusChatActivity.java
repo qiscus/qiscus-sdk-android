@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -16,6 +17,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
@@ -34,8 +37,8 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
-import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
+import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 
@@ -47,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
@@ -82,8 +86,16 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
     }
 
     @Override
-    protected int getResourceLayout() {
-        return R.layout.activity_chat;
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(ContextCompat.getColor(this, Qiscus.getChatConfig().getStatusBarColor()));
+        }
+        setContentView(R.layout.activity_chat);
+        ButterKnife.bind(this);
+        onViewReady(savedInstanceState);
     }
 
     @Override
@@ -93,7 +105,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
         requestStoragePermission();
 
         toolbar.setBackgroundResource(Qiscus.getChatConfig().getAppBarColor());
-        tvName.setTextColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getTitleColor()));
+        tvName.setTextColor(ContextCompat.getColor(this, Qiscus.getChatConfig().getTitleColor()));
 
         swipeRefreshLayout.setColorSchemeResources(R.color.qiscus_primary, R.color.qiscus_accent);
         swipeRefreshLayout.setOnRefreshListener(this);

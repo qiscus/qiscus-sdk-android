@@ -14,7 +14,6 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
@@ -45,16 +44,6 @@ public abstract class QiscusActivity extends RxAppCompatActivity implements
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE"
     };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(getResourceLayout());
-        ButterKnife.bind(this);
-        onViewReady(savedInstanceState);
-    }
-
-    protected abstract int getResourceLayout();
 
     protected abstract void onViewReady(Bundle savedInstanceState);
 

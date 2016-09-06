@@ -6,16 +6,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.library.chat.sample.R;
 import com.qiscus.library.chat.sample.data.local.LocalDataManager;
 import com.qiscus.library.chat.sample.data.remote.SampleApi;
+import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusActivity;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.util.QiscusScheduler;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends QiscusActivity {
 
@@ -24,8 +25,11 @@ public class MainActivity extends QiscusActivity {
     private ProgressDialog progressDialog;
 
     @Override
-    protected int getResourceLayout() {
-        return R.layout.activity_main;
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        onViewReady(savedInstanceState);
     }
 
     @Override

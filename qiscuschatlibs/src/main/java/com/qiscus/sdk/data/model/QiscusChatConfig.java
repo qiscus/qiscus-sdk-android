@@ -9,6 +9,7 @@ import com.qiscus.sdk.util.QiscusDateUtil;
  * Created by zetra. on 9/5/16.
  */
 public class QiscusChatConfig {
+    private int statusBarColor = R.color.qiscus_primary_dark;
     private int appBarColor = R.color.qiscus_primary;
     private int titleColor = R.color.qiscus_white;
     private int rightBubbleColor = R.color.qiscus_primary_light;
@@ -21,6 +22,11 @@ public class QiscusChatConfig {
     private int dateColor = R.color.qiscus_secondary_text;
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
+
+    public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
+        this.statusBarColor = statusBarColor;
+        return this;
+    }
 
     public QiscusChatConfig setAppBarColor(@ColorRes int appBarColor) {
         this.appBarColor = appBarColor;
@@ -80,6 +86,11 @@ public class QiscusChatConfig {
     public QiscusChatConfig setTimeFormat(DateFormatter timeFormat) {
         this.timeFormat = timeFormat;
         return this;
+    }
+
+    @ColorRes
+    public int getStatusBarColor() {
+        return statusBarColor;
     }
 
     @ColorRes
