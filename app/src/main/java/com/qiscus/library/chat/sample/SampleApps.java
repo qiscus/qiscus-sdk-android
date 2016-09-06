@@ -24,6 +24,8 @@ public class SampleApps extends Application {
                 "3f27dc397124364ecc0f");
 
         Qiscus.getChatConfig()
+                .setAppBarColor(R.color.accent)
+                .setTitleColor(R.color.qiscus_dark_white)
                 .setLeftBubbleColor(R.color.accent)
                 .setRightBubbleColor(R.color.primary)
                 .setRightBubbleTextColor(R.color.qiscus_white)

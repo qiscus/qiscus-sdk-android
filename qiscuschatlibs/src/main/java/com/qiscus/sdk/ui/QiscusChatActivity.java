@@ -11,8 +11,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -55,6 +57,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
     private static final int PICK_IMAGE_REQUEST = 2;
     private static final int PICK_FILE_REQUEST = 3;
 
+    @BindView(R2.id.toolbar) Toolbar toolbar;
     @BindView(R2.id.tv_name) TextView tvName;
     @BindView(R2.id.empty_chat) LinearLayout emptyChat;
     @BindView(R2.id.swipe_layout) SwipeRefreshLayout swipeRefreshLayout;
@@ -88,6 +91,9 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
         resolveChatRoom(savedInstanceState);
 
         requestStoragePermission();
+
+        toolbar.setBackgroundResource(Qiscus.getChatConfig().getAppBarColor());
+        tvName.setTextColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getTitleColor()));
 
         swipeRefreshLayout.setColorSchemeResources(R.color.qiscus_primary, R.color.qiscus_accent);
         swipeRefreshLayout.setOnRefreshListener(this);
