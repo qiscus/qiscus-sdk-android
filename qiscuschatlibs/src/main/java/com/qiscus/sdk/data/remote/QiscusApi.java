@@ -70,7 +70,7 @@ public enum QiscusApi {
 
     QiscusApi() {
         api = QiscusServiceGenerator.createService(Api.class, Qiscus.getApiUrl(),
-                BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.FULL);
+                BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE);
         httpClient = QiscusHttpClient.getInstance().getHttpClient();
     }
 
