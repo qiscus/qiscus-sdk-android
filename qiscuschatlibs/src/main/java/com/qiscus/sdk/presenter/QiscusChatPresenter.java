@@ -266,11 +266,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void listenRoomEvent() {
-        subscription = QiscusPusherApi.getInstance().getTokenEvents(Qiscus.getToken())
+        subscription = QiscusPusherApi.getInstance().getRoomEvents(Qiscus.getToken())
                 .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .subscribe(roomEventJsonObjectPair -> {
-                    if (roomEventJsonObjectPair.first == QiscusPusherApi.TokenEvent.COMMENT_POSTED) {
+                    if (roomEventJsonObjectPair.first == QiscusPusherApi.RoomEvent.INCOMING_COMMENT) {
                         QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(roomEventJsonObjectPair.second);
                         onGotNewComment(qiscusComment);
                     }

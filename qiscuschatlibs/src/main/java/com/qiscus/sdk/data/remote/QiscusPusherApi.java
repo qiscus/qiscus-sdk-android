@@ -28,6 +28,7 @@ import rx.functions.Action1;
 import rx.functions.Action2;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
+import timber.log.Timber;
 
 public enum QiscusPusherApi implements ConnectionEventListener {
     INSTANCE;
@@ -55,6 +56,7 @@ public enum QiscusPusherApi implements ConnectionEventListener {
         ROOM_EVENTS.put("newtopic", RoomEvent.TOPIC_CREATED);
         ROOM_EVENTS.put("deleteTopic", RoomEvent.TOPIC_DELETED);
         ROOM_EVENTS.put("newPeople", RoomEvent.PARTICIPANT_JOINED);
+        ROOM_EVENTS.put("newmessage", RoomEvent.INCOMING_COMMENT);
 
         USER_EVENTS.put("newRoom", UserEvent.ROOM_JOINED);
         USER_EVENTS.put("deleteRoom", UserEvent.ROOM_DELETED);
@@ -244,7 +246,7 @@ public enum QiscusPusherApi implements ConnectionEventListener {
             qiscusComment.setRoomId(jsonObject.get("room_id").getAsInt());
             qiscusComment.setUniqueId(jsonObject.get("unique_id").getAsString());
             qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsInt());
-            qiscusComment.setMessage(jsonObject.get("qiscusComment").getAsString());
+            qiscusComment.setMessage(jsonObject.get("comment").getAsString());
             qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
             qiscusComment.setSenderEmail(jsonObject.get("username_real").getAsString());
             qiscusComment.setTime(QiscusDateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
@@ -256,7 +258,7 @@ public enum QiscusPusherApi implements ConnectionEventListener {
     }
 
     public enum RoomEvent {
-        COMMENT_POSTED, COMMENT_DELETED, TOPIC_CREATED, TOPIC_DELETED, PARTICIPANT_JOINED
+        COMMENT_POSTED, COMMENT_DELETED, TOPIC_CREATED, TOPIC_DELETED, INCOMING_COMMENT, PARTICIPANT_JOINED
     }
 
     public enum UserEvent {
