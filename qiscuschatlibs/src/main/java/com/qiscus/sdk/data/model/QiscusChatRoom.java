@@ -14,18 +14,12 @@ import android.os.Parcelable;
 public class QiscusChatRoom implements Parcelable {
     protected int id;
     protected String name;
-    protected String codeEn;
     protected int lastCommentId;
     protected int lastTopicId;
-
-    public QiscusChatRoom() {
-
-    }
 
     protected QiscusChatRoom(Parcel in) {
         id = in.readInt();
         name = in.readString();
-        codeEn = in.readString();
         lastCommentId = in.readInt();
         lastTopicId = in.readInt();
     }
@@ -58,14 +52,6 @@ public class QiscusChatRoom implements Parcelable {
         this.name = name;
     }
 
-    public String getCodeEn() {
-        return codeEn;
-    }
-
-    public void setCodeEn(String codeEn) {
-        this.codeEn = codeEn;
-    }
-
     public int getLastCommentId() {
         return lastCommentId;
     }
@@ -92,7 +78,6 @@ public class QiscusChatRoom implements Parcelable {
         return "QiscusChatRoom{" +
                 ", id=" + id +
                 ", name='" + name + '\'' +
-                ", codeEn='" + codeEn + '\'' +
                 ", lastCommentId=" + lastCommentId +
                 ", lastTopicId=" + lastTopicId +
                 '}';
@@ -107,7 +92,6 @@ public class QiscusChatRoom implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(name);
-        dest.writeString(codeEn);
         dest.writeInt(lastCommentId);
         dest.writeInt(lastTopicId);
     }
