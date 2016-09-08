@@ -17,7 +17,7 @@ allprojects {
 Then add to your app module build.gradle
 ```groovy
 dependencies {
-    compile 'com.github.qiscus:qiscus-sdk-android:master-SNAPSHOT'
+    compile 'com.github.qiscus:qiscus-sdk-android:1.0'
 }
 ```
 # Let's make cools chatting apps!
