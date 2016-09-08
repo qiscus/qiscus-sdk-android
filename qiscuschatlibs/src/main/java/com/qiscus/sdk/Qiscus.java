@@ -2,6 +2,7 @@ package com.qiscus.sdk;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 
@@ -11,8 +12,13 @@ import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.util.QiscusParser;
 import com.qiscus.sdk.util.QiscusScheduler;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import rx.Observable;
 
@@ -74,6 +80,10 @@ public class Qiscus {
 
     public static QiscusChatConfig getChatConfig() {
         return CHAT_CONFIG;
+    }
+
+    public static ChatActivityBuilder buildChatWith(String email) {
+        return new ChatActivityBuilder(email);
     }
 
     public static void logout() {
@@ -156,6 +166,51 @@ public class Qiscus {
 
     public interface LoginListener {
         void onSuccess(QiscusAccount qiscusAccount);
+
+        void onError(Throwable throwable);
+    }
+
+    public static class ChatActivityBuilder {
+        private Set<String> emails;
+        private String title;
+        private QiscusChatConfig chatConfig;
+
+        private ChatActivityBuilder(String email) {
+            emails = new HashSet<>();
+            title = "Chat";
+            emails.add(email);
+        }
+
+        public ChatActivityBuilder addEmail(String email) {
+            emails.add(email);
+            return this;
+        }
+
+        public ChatActivityBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public ChatActivityBuilder withChatConfig(QiscusChatConfig qiscusChatConfig) {
+            this.chatConfig = qiscusChatConfig;
+            return this;
+        }
+
+        public void build(Context context, ChatActivityBuilderListener listener) {
+            build(context).compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                    .subscribe(listener::onSuccess, listener::onError);
+        }
+
+        public Observable<Intent> build(Context context) {
+            return QiscusApi.getInstance()
+                    .getChatRoom(new ArrayList<>(emails))
+                    .doOnNext(qiscusChatRoom -> qiscusChatRoom.setName(title))
+                    .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(context, qiscusChatRoom));
+        }
+    }
+
+    public interface ChatActivityBuilderListener {
+        void onSuccess(Intent intent);
 
         void onError(Throwable throwable);
     }

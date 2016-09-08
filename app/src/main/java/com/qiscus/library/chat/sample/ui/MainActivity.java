@@ -9,11 +9,7 @@ import android.widget.Toast;
 
 import com.qiscus.library.chat.sample.R;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusActivity;
-import com.qiscus.sdk.ui.QiscusChatActivity;
-
-import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,12 +61,14 @@ public class MainActivity extends QiscusActivity {
 
     public void openChat(View view) {
         showLoading();
-        QiscusApi.getInstance().getChatRoom(Collections.singletonList("rya.meyvriska1@gmail.com"))
+        Qiscus.buildChatWith("rya.meyvriska1@gmail.com")
+                .withTitle("Rya Meyvriska")
+                .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(chatRoom -> {
-                    startActivity(QiscusChatActivity.generateIntent(this, chatRoom));
+                .subscribe(intent -> {
+                    startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
                     throwable.printStackTrace();
