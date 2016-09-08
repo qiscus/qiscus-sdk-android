@@ -55,7 +55,7 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setMessage(content);
         qiscusComment.setTime(new Date());
         qiscusComment.setSenderEmail(qiscusAccount.getEmail());
-        qiscusComment.setSender(qiscusAccount.getFullname());
+        qiscusComment.setSender(qiscusAccount.getUsername());
         qiscusComment.setState(STATE_SENDING);
 
         return qiscusComment;

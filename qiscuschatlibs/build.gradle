@@ -73,8 +73,6 @@ dependencies {
     compile 'pub.devrel:easypermissions:0.1.7'
 
     compile 'com.github.pwittchen:reactivenetwork:0.4.0'
-    compile 'com.parse.bolts:bolts-android:1.4.0'
-    compile 'com.parse:parse-android:1.13.1'
     compile 'com.pusher:pusher-java-client:1.2.1'
     compile 'org.greenrobot:eventbus:3.0.0'
 

@@ -2,14 +2,15 @@ package com.qiscus.sdk.data.remote;
 
 import android.net.Uri;
 
+import com.google.gson.JsonElement;
 import com.qiscus.library.chat.BuildConfig;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.response.ChatRoomResponse;
-import com.qiscus.sdk.util.QiscusServiceGenerator;
 import com.qiscus.sdk.util.QiscusFileUtil;
-import com.squareup.okhttp.Headers;
+import com.qiscus.sdk.util.QiscusParser;
+import com.qiscus.sdk.util.QiscusServiceGenerator;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
@@ -22,11 +23,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,12 +34,14 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 import retrofit.RestAdapter;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.POST;
+import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
@@ -60,7 +61,7 @@ public enum QiscusApi {
     private final OkHttpClient httpClient;
 
     static {
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
@@ -68,7 +69,7 @@ public enum QiscusApi {
 
     QiscusApi() {
         api = QiscusServiceGenerator.createService(Api.class, Qiscus.getApiUrl(),
-                                                 BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE);
+                BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.FULL);
         httpClient = QiscusHttpClient.getInstance().getHttpClient();
     }
 
@@ -77,7 +78,21 @@ public enum QiscusApi {
     }
 
     private String generateToken() {
-        return "Token token=" + Qiscus.getToken();
+        return Qiscus.getToken();
+    }
+
+    public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
+        return api.loginOrRegister(email, password, username, avatarUrl)
+                .map(jsonElement -> QiscusParser.get().parser()
+                        .fromJson(jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user"),
+                                QiscusAccount.class));
+    }
+
+    public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails) {
+        return api.createOrGetChatRoom(generateToken(), withEmails)
+                .map(jsonElement -> QiscusParser.get().parser()
+                        .fromJson(jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("room"),
+                                QiscusChatRoom.class));
     }
 
     public Observable<QiscusComment> getComments(int topicId, int lastCommentId) {
@@ -105,9 +120,9 @@ public enum QiscusApi {
                 int id;
                 int commentBeforeId;
                 String message;
-                String usernameAs;
-                String usernameReal;
-                String createdAt;
+                String username;
+                String email;
+                String timestamp;
                 boolean deleted;
 
                 private QiscusComment toComment() {
@@ -116,10 +131,10 @@ public enum QiscusApi {
                     qiscusComment.setUniqueId(String.valueOf(id));
                     qiscusComment.setCommentBeforeId(commentBeforeId);
                     qiscusComment.setMessage(message);
-                    qiscusComment.setSender(usernameAs);
-                    qiscusComment.setSenderEmail(usernameReal);
+                    qiscusComment.setSender(username);
+                    qiscusComment.setSenderEmail(email);
                     try {
-                        qiscusComment.setTime(dateFormat.parse(createdAt));
+                        qiscusComment.setTime(dateFormat.parse(timestamp));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -138,8 +153,8 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
-        return api.postComment(generateToken(), qiscusComment.getMessage(), qiscusComment.getRoomId(),
-                               qiscusComment.getTopicId(), qiscusComment.getUniqueId())
+        return api.postComment(generateToken(), qiscusComment.getMessage(),
+                qiscusComment.getTopicId(), qiscusComment.getUniqueId())
                 .map(postCommentResponse -> {
                     qiscusComment.setId(postCommentResponse.commentId);
                     qiscusComment.setCommentBeforeId(postCommentResponse.commentBeforeId);
@@ -157,23 +172,22 @@ public enum QiscusApi {
 
             RequestBody requestBody = new MultipartBuilder()
                     .type(MultipartBuilder.FORM)
-                    .addPart(Headers.of("Content-Disposition",
-                                        String.format("form-data; name=\"%s\"; filename=\"%s\"", "raw_file", file.getName())),
-                             new CountingFileRequestBody(file, totalBytes -> {
-                                 int progress = (int) (totalBytes * 100 / fileLength);
-                                 progressListener.onProgress(progress);
-                             }))
+                    .addFormDataPart("token", generateToken())
+                    .addFormDataPart("file", file.getName(),
+                            new CountingFileRequestBody(file, totalBytes -> {
+                                int progress = (int) (totalBytes * 100 / fileLength);
+                                progressListener.onProgress(progress);
+                            }))
                     .build();
 
             Request request = new Request.Builder()
-                    .url(Qiscus.getApiUrl() + "/files/upload")
-                    .addHeader("Authorization", generateToken())
+                    .url(Qiscus.getApiUrl() + "/api/v2/mobile/upload")
                     .post(requestBody).build();
 
             try {
                 com.squareup.okhttp.Response response = httpClient.newCall(request).execute();
                 JSONObject responseJ = new JSONObject(response.body().string());
-                String result = responseJ.getJSONObject("data").getJSONObject("file").getString("url");
+                String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
 
                 subscriber.onNext(Uri.parse(result));
                 subscriber.onCompleted();
@@ -242,32 +256,35 @@ public enum QiscusApi {
         });
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(int chatRoomId) {
-        return api.getChatRoom(generateToken(), chatRoomId).map(ChatRoomResponse::getResult);
-    }
-
     private interface Api {
 
-        @GET("/chats/topic_comments")
-        Observable<CommentsResponse> getComments(@Header("Authorization") String token,
-                                                 @Query("topic_id") int topicId,
-                                                 @Query("comment_id") int lastCommentId);
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/login_or_register")
+        Observable<JsonElement> loginOrRegister(@Field("email") String email,
+                                                @Field("password") String password,
+                                                @Field("username") String username,
+                                                @Field("avatar_url") String avatarUrl);
 
         @FormUrlEncoded
-        @POST("/chats/postcomment")
-        Observable<PostCommentResponse> postComment(@Header("Authorization") String token,
+        @POST("/api/v2/mobile/get_or_create_room_with_target")
+        Observable<JsonElement> createOrGetChatRoom(@Field("token") String token,
+                                                    @Field("emails[]") List<String> emails);
+
+        @GET("/api/v2/mobile/load_comments")
+        Observable<CommentsResponse> getComments(@Query("token") String token,
+                                                 @Query("topic_id") int topicId,
+                                                 @Query("last_comment_id") int lastCommentId);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/post_comment")
+        Observable<PostCommentResponse> postComment(@Field("token") String token,
                                                     @Field("comment") String message,
-                                                    @Field("room_id") int roomId,
                                                     @Field("topic_id") int topicId,
-                                                    @Field("unique_id") String uniqueId);
+                                                    @Field("unique_temp_id") String uniqueId);
 
-        @GET("/chats/readnotif")
-        Observable<Void> markTopicAsRead(@Header("Authorization") String token,
-                                         @Query("topic_id") int topicId);
-
-        @GET("/archives/chat_rooms")
-        Observable<ChatRoomResponse> getChatRoom(@Header("Authorization") String token,
-                                                 @Query("room_id") int chatRoomId);
+        @GET("/api/v1/mobile/readnotif/{topic_id}")
+        Observable<Void> markTopicAsRead(@Query("token") String token,
+                                         @Path("topic_id") int topicId);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
@@ -286,21 +303,26 @@ public enum QiscusApi {
         }
 
         @Override
+        public long contentLength() throws IOException {
+            return file.length();
+        }
+
+        @Override
         public void writeTo(BufferedSink sink) throws IOException {
-            InputStream inputStream = new FileInputStream(file);
+            Source source = null;
             try {
-                OutputStream outputStream = sink.outputStream();
+                source = Okio.source(file);
                 long total = 0;
-                int read;
-                byte buffer[] = new byte[SEGMENT_SIZE];
-                while ((read = inputStream.read(buffer)) != -1) {
+                long read;
+
+                while ((read = source.read(sink.buffer(), SEGMENT_SIZE)) != -1) {
                     total += read;
-                    outputStream.write(buffer);
                     sink.flush();
                     progressListener.onProgress(total);
+
                 }
             } finally {
-                Util.closeQuietly(inputStream);
+                Util.closeQuietly(source);
             }
         }
 

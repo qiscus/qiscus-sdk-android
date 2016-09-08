@@ -6,12 +6,15 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 
 import com.google.gson.Gson;
-import com.parse.Parse;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
+import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.util.QiscusParser;
+import com.qiscus.sdk.util.QiscusScheduler;
+
+import rx.Observable;
 
 /**
  * Created on : August 18, 2016
@@ -28,19 +31,17 @@ public class Qiscus {
     private static QiscusChatConfig CHAT_CONFIG;
 
     private static String API_URL;
-    private static String PUSHER_KEY;
-    private static String PARSE_APP_ID = "w19bEjxkdmUKWfYNe5H3x8paGqTwzKl9dcwWG1Ap";
-    private static String PARSE_CLIENT_KEY = "qLtml9adJ01QEEIlEpEyjKYjp4G4dXwOhBZg7mfX";
 
-    public static void init(Application application, String qiscusApiUrl, String pusherKey) {
+    public static void init(Application application, String qiscusApiUrl) {
         APP_INSTANCE = application;
         API_URL = qiscusApiUrl;
-        PUSHER_KEY = pusherKey;
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
         CHAT_CONFIG = new QiscusChatConfig();
+    }
 
-        Parse.initialize(APP_INSTANCE, PARSE_APP_ID, PARSE_CLIENT_KEY);
+    public static LoginBuilder with(String email, String password) {
+        return new LoginBuilder(email, password);
     }
 
     public static Application getApps() {
@@ -59,20 +60,8 @@ public class Qiscus {
         return API_URL;
     }
 
-    public static String getPusherKey() {
-        return PUSHER_KEY;
-    }
-
     public static boolean isLogged() {
         return LOCAL_DATA_MANAGER.isLogged();
-    }
-
-    public static void setQiscusAccount(String email, String token, String fullname) {
-        LOCAL_DATA_MANAGER.saveAccountInfo(new QiscusAccount(email, token, fullname));
-    }
-
-    public static void setQiscusAccount(QiscusAccount qiscusAccount) {
-        LOCAL_DATA_MANAGER.saveAccountInfo(qiscusAccount);
     }
 
     public static QiscusAccount getQiscusAccount() {
@@ -101,7 +90,7 @@ public class Qiscus {
         LocalDataManager() {
             sharedPreferences = Qiscus.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
             gson = QiscusParser.get().parser();
-            token = isLogged() ? getAccountInfo().getAuthenticationToken() : "";
+            token = isLogged() ? getAccountInfo().getToken() : "";
         }
 
         private boolean isLogged() {
@@ -110,7 +99,7 @@ public class Qiscus {
 
         private void saveAccountInfo(QiscusAccount qiscusAccount) {
             sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
-            setToken(qiscusAccount.getAuthenticationToken());
+            setToken(qiscusAccount.getToken());
         }
 
         private QiscusAccount getAccountInfo() {
@@ -128,5 +117,46 @@ public class Qiscus {
         private void clearData() {
             sharedPreferences.edit().clear().apply();
         }
+    }
+
+    public static class LoginBuilder {
+        private String email;
+        private String password;
+        private String username;
+        private String avatarUrl;
+
+        private LoginBuilder(String email, String password) {
+            this.email = email;
+            this.password = password;
+        }
+
+        public LoginBuilder withUsername(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public LoginBuilder withAvatarUrl(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
+            return this;
+        }
+
+        public void login(LoginListener listener) {
+            login().compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                    .subscribe(listener::onSuccess, listener::onError);
+        }
+
+        public Observable<QiscusAccount> login() {
+            return QiscusApi.getInstance()
+                    .loginOrRegister(email, password, username, avatarUrl)
+                    .doOnNext(qiscusAccount -> {
+                        Qiscus.LOCAL_DATA_MANAGER.saveAccountInfo(qiscusAccount);
+                    });
+        }
+    }
+
+    public interface LoginListener {
+        void onSuccess(QiscusAccount qiscusAccount);
+
+        void onError(Throwable throwable);
     }
 }

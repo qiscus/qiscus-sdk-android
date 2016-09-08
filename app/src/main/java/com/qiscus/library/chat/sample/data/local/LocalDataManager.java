@@ -26,7 +26,7 @@ public enum LocalDataManager {
     LocalDataManager() {
         sharedPreferences = Qiscus.getApps().getSharedPreferences("app.cfg", Context.MODE_PRIVATE);
         gson = QiscusParser.get().parser();
-        token = isLogged() ? getAccountInfo().getAuthenticationToken() : "";
+        token = isLogged() ? getAccountInfo().getToken() : "";
     }
 
     public static LocalDataManager getInstance() {
@@ -39,7 +39,7 @@ public enum LocalDataManager {
 
     public void saveAccountInfo(AccountInfo accountInfo) {
         sharedPreferences.edit().putString("cached_account", gson.toJson(accountInfo)).apply();
-        setToken(accountInfo.getAuthenticationToken());
+        setToken(accountInfo.getToken());
     }
 
     public AccountInfo getAccountInfo() {

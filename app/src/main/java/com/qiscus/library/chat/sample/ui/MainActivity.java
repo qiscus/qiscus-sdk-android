@@ -2,21 +2,23 @@ package com.qiscus.library.chat.sample.ui;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.qiscus.library.chat.sample.R;
-import com.qiscus.library.chat.sample.data.local.LocalDataManager;
-import com.qiscus.library.chat.sample.data.remote.SampleApi;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusActivity;
 import com.qiscus.sdk.ui.QiscusChatActivity;
-import com.qiscus.sdk.util.QiscusScheduler;
+
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends QiscusActivity {
 
@@ -34,22 +36,23 @@ public class MainActivity extends QiscusActivity {
 
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
-        loginButton.setText(LocalDataManager.getInstance().isLogged() ? "Logout" : "Login");
+        loginButton.setText(Qiscus.isLogged() ? "Logout" : "Login");
     }
 
     public void loginOrLogout(View view) {
-        if (LocalDataManager.getInstance().isLogged()) {
-            LocalDataManager.getInstance().clearData();
+        if (Qiscus.isLogged()) {
             Qiscus.logout();
             loginButton.setText("Login");
         } else {
             showLoading();
-            SampleApi.getInstance().login("mas@zetra.com", "12345678")
-                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+            Qiscus.with("zetra1@gmail.com", "12345678")
+                    .withUsername("Zetra")
+                    .login()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
-                    .subscribe(accountInfo -> {
-                        LocalDataManager.getInstance().saveAccountInfo(accountInfo);
-                        Qiscus.setQiscusAccount(accountInfo.getEmail(), accountInfo.getAuthenticationToken(), accountInfo.getFullname());
+                    .subscribe(qiscusAccount -> {
+                        Log.i("MainActivity", "Login with account: " + qiscusAccount);
                         loginButton.setText("Logout");
                         dismissLoading();
                     }, throwable -> {
@@ -62,8 +65,9 @@ public class MainActivity extends QiscusActivity {
 
     public void openChat(View view) {
         showLoading();
-        QiscusApi.getInstance().getChatRoom(131)
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+        QiscusApi.getInstance().getChatRoom(Collections.singletonList("rya.meyvriska1@gmail.com"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .subscribe(chatRoom -> {
                     startActivity(QiscusChatActivity.generateIntent(this, chatRoom));

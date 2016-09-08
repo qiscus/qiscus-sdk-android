@@ -4,12 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.util.QiscusParser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created on : May 25, 2016
@@ -45,28 +41,6 @@ public enum QiscusCacheManager {
 
     public String getLastImagePath() {
         return sharedPreferences.getString("last_image_path", "");
-    }
-
-    public void addMessageNotifItem(String message, int roomId) {
-        List<String> notifItems = getMessageNotifItems(roomId);
-        if (notifItems == null) {
-            notifItems = new ArrayList<>();
-        }
-        notifItems.add(message);
-        sharedPreferences.edit()
-                .putString("notif_message_" + roomId, gson.toJson(notifItems))
-                .apply();
-    }
-
-    public List<String> getMessageNotifItems(int roomId) {
-        String json = sharedPreferences.getString("notif_message_" + roomId, "");
-        return gson.fromJson(json, new TypeToken<List<String>>() {}.getType());
-    }
-
-    public void clearMessageNotifItems(int roomId) {
-        sharedPreferences.edit()
-                .putString("notif_message_" + roomId, "")
-                .apply();
     }
 
     public void clearData() {

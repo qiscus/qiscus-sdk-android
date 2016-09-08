@@ -3,18 +3,17 @@ package com.qiscus.sdk.presenter;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.util.QiscusScheduler;
+import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusScheduler;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.util.List;
@@ -34,9 +33,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         this.room = room;
         this.currentTopicId = room.getLastTopicId();
         listenRoomEvent();
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
     }
 
     private void commentSuccess(QiscusComment qiscusComment) {
@@ -272,11 +268,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void listenRoomEvent() {
-        subscription = QiscusPusherApi.getInstance().getRoomEvents(room.getCodeEn())
+        subscription = QiscusPusherApi.getInstance().getTokenEvents(Qiscus.getToken())
                 .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                 .compose(bindToLifecycle())
                 .subscribe(roomEventJsonObjectPair -> {
-                    if (roomEventJsonObjectPair.first == QiscusPusherApi.RoomEvent.COMMENT_POSTED) {
+                    if (roomEventJsonObjectPair.first == QiscusPusherApi.TokenEvent.COMMENT_POSTED) {
                         QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(roomEventJsonObjectPair.second);
                         onGotNewComment(qiscusComment);
                     }
@@ -299,11 +295,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (qiscusComment.getTopicId() == currentTopicId) {
             view.onNewComment(qiscusComment);
         }
-    }
-
-    @Subscribe
-    public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
-        onGotNewComment(event.getQiscusComment());
     }
 
     public void downloadFile(final QiscusComment qiscusComment) {

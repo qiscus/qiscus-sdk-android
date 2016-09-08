@@ -62,13 +62,14 @@ public enum QiscusPusherApi implements ConnectionEventListener {
         USER_EVENTS.put("newmessage", UserEvent.INCOMING_COMMENT);
 
         TOKEN_EVENTS.put("callnewmessage", TokenEvent.BEING_CALLED);
+        TOKEN_EVENTS.put("postcomment", TokenEvent.COMMENT_POSTED);
 
         CHANNEL_EVENTS.put("call_ringing", ChannelEvent.CALLEE_RINGED);
         CHANNEL_EVENTS.put("call_reject", ChannelEvent.CALLEE_REJECTED);
     }
 
     QiscusPusherApi() {
-        pusher = new Pusher(Qiscus.getPusherKey());
+        pusher = new Pusher(Qiscus.getQiscusAccount().getRtKey());
         gson = new GsonBuilder().create();
 
         roomPublishSubjects = new HashMap<>();
@@ -263,7 +264,7 @@ public enum QiscusPusherApi implements ConnectionEventListener {
     }
 
     public enum TokenEvent {
-        BEING_CALLED
+        BEING_CALLED, COMMENT_POSTED
     }
 
     public enum ChannelEvent {
