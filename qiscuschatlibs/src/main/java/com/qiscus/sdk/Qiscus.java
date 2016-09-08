@@ -173,11 +173,13 @@ public class Qiscus {
     public static class ChatActivityBuilder {
         private Set<String> emails;
         private String title;
+        private String subtitle;
         private QiscusChatConfig chatConfig;
 
         private ChatActivityBuilder(String email) {
             emails = new HashSet<>();
             title = "Chat";
+            subtitle = "";
             emails.add(email);
         }
 
@@ -188,6 +190,11 @@ public class Qiscus {
 
         public ChatActivityBuilder withTitle(String title) {
             this.title = title;
+            return this;
+        }
+
+        public ChatActivityBuilder withSubtitle(String subtitle) {
+            this.subtitle = subtitle;
             return this;
         }
 
@@ -204,7 +211,10 @@ public class Qiscus {
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
                     .getChatRoom(new ArrayList<>(emails))
-                    .doOnNext(qiscusChatRoom -> qiscusChatRoom.setName(title))
+                    .doOnNext(qiscusChatRoom -> {
+                        qiscusChatRoom.setName(title);
+                        qiscusChatRoom.setSubtitle(subtitle);
+                    })
                     .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(context, qiscusChatRoom));
         }
     }

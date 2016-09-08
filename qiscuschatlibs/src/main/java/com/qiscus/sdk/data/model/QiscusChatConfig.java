@@ -1,6 +1,7 @@
 package com.qiscus.sdk.data.model;
 
 import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 
 import com.qiscus.library.chat.R;
 import com.qiscus.sdk.util.QiscusDateUtil;
@@ -12,6 +13,7 @@ public class QiscusChatConfig {
     private int statusBarColor = R.color.qiscus_primary_dark;
     private int appBarColor = R.color.qiscus_primary;
     private int titleColor = R.color.qiscus_white;
+    private int subtitleColor = R.color.qiscus_dark_white;
     private int rightBubbleColor = R.color.qiscus_primary_light;
     private int leftBubbleColor = R.color.qiscus_primary;
     private int rightBubbleTextColor = R.color.qiscus_primary_text;
@@ -22,6 +24,16 @@ public class QiscusChatConfig {
     private int dateColor = R.color.qiscus_secondary_text;
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
+    private String emptyRoomTitle = "Welcome!";
+    private String emptyRoomSubtitle = "Lets start conversation";
+    private int emptyImageResource = R.drawable.ic_chat_empty;
+    private String messageFieldHint = "Type a message…";
+    private int addPictureIcon = R.drawable.ic_add_image;
+    private int takePictureIcon = R.drawable.ic_pick_picture;
+    private int addFileIcon = R.drawable.ic_add_file;
+    private int sendActiveIcon = R.drawable.ic_send_on;
+    private int sendInactiveIcon = R.drawable.ic_send_off;
+    private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
@@ -35,6 +47,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setTitleColor(@ColorRes int titleColor) {
         this.titleColor = titleColor;
+        return this;
+    }
+
+    public QiscusChatConfig setSubtitleColor(@ColorRes int subtitleColor) {
+        this.subtitleColor = subtitleColor;
         return this;
     }
 
@@ -88,6 +105,56 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setEmptyRoomTitle(String emptyRoomTitle) {
+        this.emptyRoomTitle = emptyRoomTitle;
+        return this;
+    }
+
+    public QiscusChatConfig setEmptyRoomSubtitle(String emptyRoomSubtitle) {
+        this.emptyRoomSubtitle = emptyRoomSubtitle;
+        return this;
+    }
+
+    public QiscusChatConfig setEmptyImageResource(@DrawableRes int emptyImageResource) {
+        this.emptyImageResource = emptyImageResource;
+        return this;
+    }
+
+    public QiscusChatConfig setMessageFieldHint(String messageFieldHint) {
+        this.messageFieldHint = messageFieldHint;
+        return this;
+    }
+
+    public QiscusChatConfig setAddPictureIcon(@DrawableRes int addPictureIcon) {
+        this.addPictureIcon = addPictureIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setTakePictureIcon(@DrawableRes int takePictureIcon) {
+        this.takePictureIcon = takePictureIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setAddFileIcon(@DrawableRes int addFileIcon) {
+        this.addFileIcon = addFileIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setSendActiveIcon(@DrawableRes int sendActiveIcon) {
+        this.sendActiveIcon = sendActiveIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setSendInactiveIcon(@DrawableRes int sendInactiveIcon) {
+        this.sendInactiveIcon = sendInactiveIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setSwipeRefreshColorScheme(@ColorRes int... colorResIds) {
+        swipeRefreshColorScheme = colorResIds;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -101,6 +168,11 @@ public class QiscusChatConfig {
     @ColorRes
     public int getTitleColor() {
         return titleColor;
+    }
+
+    @ColorRes
+    public int getSubtitleColor() {
+        return subtitleColor;
     }
 
     @ColorRes
@@ -149,5 +221,52 @@ public class QiscusChatConfig {
 
     public DateFormatter getTimeFormat() {
         return timeFormat;
+    }
+
+    public String getEmptyRoomTitle() {
+        return emptyRoomTitle;
+    }
+
+    public String getEmptyRoomSubtitle() {
+        return emptyRoomSubtitle;
+    }
+
+    @DrawableRes
+    public int getEmptyImageResource() {
+        return emptyImageResource;
+    }
+
+    public String getMessageFieldHint() {
+        return messageFieldHint;
+    }
+
+    @DrawableRes
+    public int getAddPictureIcon() {
+        return addPictureIcon;
+    }
+
+    @DrawableRes
+    public int getTakePictureIcon() {
+        return takePictureIcon;
+    }
+
+    @DrawableRes
+    public int getAddFileIcon() {
+        return addFileIcon;
+    }
+
+    @DrawableRes
+    public int getSendActiveIcon() {
+        return sendActiveIcon;
+    }
+
+    @DrawableRes
+    public int getSendInactiveIcon() {
+        return sendInactiveIcon;
+    }
+
+    @ColorRes
+    public int[] getSwipeRefreshColorScheme() {
+        return swipeRefreshColorScheme;
     }
 }

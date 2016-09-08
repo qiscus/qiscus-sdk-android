@@ -33,6 +33,7 @@ import com.qiscus.library.chat.R2;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
@@ -63,6 +64,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
 
     @BindView(R2.id.toolbar) Toolbar toolbar;
     @BindView(R2.id.tv_name) TextView tvName;
+    @BindView(R2.id.tv_subtile) TextView tvSubtitle;
     @BindView(R2.id.empty_chat) LinearLayout emptyChat;
     @BindView(R2.id.swipe_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R2.id.list_message) QiscusRecyclerView listMessage;
@@ -70,7 +72,14 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
     @BindView(R2.id.button_send) ImageView buttonSend;
     @BindView(R2.id.button_new_message) View buttonNewMessage;
     @BindView(R2.id.progressBar) ProgressBar progressBar;
+    @BindView(R2.id.empty_chat_icon) ImageView emptyChatImage;
+    @BindView(R2.id.empty_chat_title) TextView emptyChatTitle;
+    @BindView(R2.id.empty_chat_desc) TextView emptyChatDesc;
+    @BindView(R2.id.button_add_image) ImageView buttonAddImage;
+    @BindView(R2.id.button_pick_picture) ImageView buttonPickImage;
+    @BindView(R2.id.button_add_file) ImageView buttonAddFile;
 
+    private QiscusChatConfig chatConfig;
     private QiscusChatRoom qiscusChatRoom;
     private QiscusChatAdapter adapter;
     private QiscusChatPresenter qiscusChatPresenter;
@@ -88,10 +97,11 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        chatConfig = Qiscus.getChatConfig();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ContextCompat.getColor(this, Qiscus.getChatConfig().getStatusBarColor()));
+            window.setStatusBarColor(ContextCompat.getColor(this, chatConfig.getStatusBarColor()));
         }
         setContentView(R.layout.activity_chat);
         ButterKnife.bind(this);
@@ -104,10 +114,8 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
 
         requestStoragePermission();
 
-        toolbar.setBackgroundResource(Qiscus.getChatConfig().getAppBarColor());
-        tvName.setTextColor(ContextCompat.getColor(this, Qiscus.getChatConfig().getTitleColor()));
+        applyChatConfig();
 
-        swipeRefreshLayout.setColorSchemeResources(R.color.qiscus_primary, R.color.qiscus_accent);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         animation = AnimationUtils.loadAnimation(this, R.anim.simple_grow);
@@ -117,6 +125,8 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
         qiscusAccount = Qiscus.getQiscusAccount();
 
         tvName.setText(qiscusChatRoom.getName());
+        tvSubtitle.setText(qiscusChatRoom.getSubtitle());
+        tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
 
         adapter = new QiscusChatAdapter(this);
         adapter.setOnItemClickListener((view, position) -> onItemCommentClick(adapter.getData().get(position)));
@@ -128,6 +138,21 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
 
         qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
         new Handler().postDelayed(() -> qiscusChatPresenter.loadComments(20), 400);
+    }
+
+    private void applyChatConfig() {
+        toolbar.setBackgroundResource(chatConfig.getAppBarColor());
+        tvName.setTextColor(ContextCompat.getColor(this, chatConfig.getTitleColor()));
+        tvSubtitle.setTextColor(ContextCompat.getColor(this, chatConfig.getSubtitleColor()));
+        swipeRefreshLayout.setColorSchemeResources(chatConfig.getSwipeRefreshColorScheme());
+        emptyChatImage.setImageResource(chatConfig.getEmptyImageResource());
+        emptyChatTitle.setText(chatConfig.getEmptyRoomTitle());
+        emptyChatDesc.setText(chatConfig.getEmptyRoomSubtitle());
+        fieldMessage.setHint(chatConfig.getMessageFieldHint());
+        buttonAddImage.setImageResource(chatConfig.getAddPictureIcon());
+        buttonPickImage.setImageResource(chatConfig.getTakePictureIcon());
+        buttonAddFile.setImageResource(chatConfig.getAddFileIcon());
+
     }
 
     private void resolveChatRoom(Bundle savedInstanceState) {
@@ -167,13 +192,13 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
             if (!fieldMessageEmpty) {
                 fieldMessageEmpty = true;
                 buttonSend.startAnimation(animation);
-                buttonSend.setImageResource(R.drawable.ic_send_off);
+                buttonSend.setImageResource(chatConfig.getSendInactiveIcon());
             }
         } else {
             if (fieldMessageEmpty) {
                 fieldMessageEmpty = false;
                 buttonSend.startAnimation(animation);
-                buttonSend.setImageResource(R.drawable.ic_send_on);
+                buttonSend.setImageResource(chatConfig.getSendActiveIcon());
             }
         }
     }
