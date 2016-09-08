@@ -46,7 +46,6 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
-import timber.log.Timber;
 
 /**
  * Created on : August 18, 2016
