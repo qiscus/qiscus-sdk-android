@@ -30,6 +30,9 @@ public enum QiscusDataBaseHelper {
         if (!isContains(qiscusComment)) {
             sqLiteDatabase.beginTransaction();
             try {
+                if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS) {
+                    qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
+                }
                 sqLiteDatabase.insert(QiscusDb.CommentTable.TABLE_NAME, null, QiscusDb.CommentTable.toContentValues(qiscusComment));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
@@ -94,6 +97,9 @@ public enum QiscusDataBaseHelper {
 
         sqLiteDatabase.beginTransaction();
         try {
+            if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS) {
+                qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
+            }
             sqLiteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
