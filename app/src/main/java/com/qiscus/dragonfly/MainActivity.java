@@ -2,20 +2,20 @@ package com.qiscus.dragonfly;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.ui.QiscusActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends QiscusActivity {
+public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.bt_login) Button loginButton;
 
@@ -26,11 +26,6 @@ public class MainActivity extends QiscusActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        onViewReady(savedInstanceState);
-    }
-
-    @Override
-    protected void onViewReady(Bundle savedInstanceState) {
         loginButton.setText(Qiscus.isLogged() ? "Logout" : "Login");
     }
 
@@ -45,7 +40,6 @@ public class MainActivity extends QiscusActivity {
                     .login()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .compose(bindToLifecycle())
                     .subscribe(qiscusAccount -> {
                         Log.i("MainActivity", "Login with account: " + qiscusAccount);
                         loginButton.setText("Logout");
@@ -65,7 +59,6 @@ public class MainActivity extends QiscusActivity {
                 .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
                 .subscribe(intent -> {
                     startActivity(intent);
                     dismissLoading();
