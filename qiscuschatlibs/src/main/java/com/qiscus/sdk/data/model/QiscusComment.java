@@ -8,6 +8,7 @@ import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusFileUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -209,21 +210,13 @@ public class QiscusComment implements Parcelable {
             throw new RuntimeException("Current comment is not an attachment");
         }
 
-        String ext = MimeTypeMap.getFileExtensionFromUrl(getAttachmentUri().getPath());
-        ext = ext.replace("_", "");
-        ext = ext.toLowerCase();
-
-        return ext;
+        return QiscusFileUtil.getExtension(getAttachmentName());
     }
 
     public boolean isImage() {
         if (isAttachment()) {
-            String path = getAttachmentUri().getPath();
-            int lastDotPosition = path.lastIndexOf(".");
-            String ext = path.substring(lastDotPosition + 1);
-            ext = ext.replace("_", "");
-            ext = ext.toLowerCase();
-            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
             if (type == null) {
                 return false;
             } else if (type.contains("image")) {
