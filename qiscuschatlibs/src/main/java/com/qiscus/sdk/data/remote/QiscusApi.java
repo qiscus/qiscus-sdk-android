@@ -3,6 +3,7 @@ package com.qiscus.sdk.data.remote;
 import android.net.Uri;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.qiscus.library.chat.BuildConfig;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -45,6 +46,7 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
+import timber.log.Timber;
 
 /**
  * Created on : August 18, 2016
@@ -146,18 +148,14 @@ public enum QiscusApi {
 
     }
 
-    private static class PostCommentResponse {
-        public int success;
-        public int commentId;
-        public int commentBeforeId;
-    }
-
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
         return api.postComment(generateToken(), qiscusComment.getMessage(),
                 qiscusComment.getTopicId(), qiscusComment.getUniqueId())
-                .map(postCommentResponse -> {
-                    qiscusComment.setId(postCommentResponse.commentId);
-                    qiscusComment.setCommentBeforeId(postCommentResponse.commentBeforeId);
+                .map(jsonElement -> {
+                    JsonObject commentJson = jsonElement.getAsJsonObject()
+                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
+                    qiscusComment.setId(commentJson.get("id").getAsInt());
+                    qiscusComment.setCommentBeforeId(commentJson.get("comment_before_id").getAsInt());
                     return qiscusComment;
                 });
     }
@@ -277,7 +275,7 @@ public enum QiscusApi {
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/post_comment")
-        Observable<PostCommentResponse> postComment(@Field("token") String token,
+        Observable<JsonElement> postComment(@Field("token") String token,
                                                     @Field("comment") String message,
                                                     @Field("topic_id") int topicId,
                                                     @Field("unique_temp_id") String uniqueId);
