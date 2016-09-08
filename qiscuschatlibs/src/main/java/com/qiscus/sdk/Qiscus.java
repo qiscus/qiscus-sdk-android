@@ -126,6 +126,7 @@ public class Qiscus {
 
         private void clearData() {
             sharedPreferences.edit().clear().apply();
+            setToken("");
         }
     }
 
