@@ -13,8 +13,6 @@ import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusScheduler;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.io.File;
 import java.util.List;
 
@@ -339,7 +337,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
         subscription = null;
         room = null;
-        EventBus.getDefault().unregister(this);
     }
 
     public interface View extends QiscusPresenter.View {
