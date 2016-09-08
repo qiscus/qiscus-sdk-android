@@ -1,4 +1,4 @@
-package com.qiscus.library.chat.sample.ui;
+package com.qiscus.dragonfly;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.qiscus.library.chat.sample.R;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.ui.QiscusActivity;
 

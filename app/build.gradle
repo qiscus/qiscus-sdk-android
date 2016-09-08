@@ -8,7 +8,7 @@ android {
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        applicationId "com.qiscus.library.chat.sample"
+        applicationId "com.qiscus.dragonfly"
         minSdkVersion 16
         targetSdkVersion 24
         versionCode 1

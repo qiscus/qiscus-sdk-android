@@ -1,4 +1,4 @@
-package com.qiscus.library.chat.sample;
+package com.qiscus.dragonfly;
 
 import android.app.Application;
 
