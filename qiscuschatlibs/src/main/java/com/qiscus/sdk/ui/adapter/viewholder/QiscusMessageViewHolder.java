@@ -140,8 +140,8 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
                 message.setTextColor(rightBubbleTextColor);
             }
 
-            if (iconRead != null) {
-                iconRead.setColorFilter(rightBubbleTimeColor);
+            if (fileType != null) {
+                fileType.setTextColor(rightBubbleTimeColor);
             }
 
             if (frame != null) {
@@ -157,6 +157,10 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
 
             if (message != null) {
                 message.setTextColor(leftBubbleTextColor);
+            }
+
+            if (fileType != null) {
+                fileType.setTextColor(leftBubbleTimeColor);
             }
 
             if (frame != null) {
@@ -328,6 +332,8 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
 
     private void showIconReadOrNot(QiscusComment qiscusComment) {
         if (iconRead != null) {
+            iconRead.setColorFilter(qiscusComment.getState() == QiscusComment.STATE_FAILED ?
+                    failedToSendMessageColor : rightBubbleTimeColor);
             switch (qiscusComment.getState()) {
                 case QiscusComment.STATE_SENDING:
                     iconRead.setImageResource(R.drawable.ic_info_time);
