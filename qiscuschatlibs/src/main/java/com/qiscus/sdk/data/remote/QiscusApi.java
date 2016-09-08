@@ -206,8 +206,7 @@ public enum QiscusApi {
             InputStream inputStream = null;
             FileOutputStream fos = null;
             try {
-                Request request = new Request.Builder().url(url)
-                        .addHeader("Authorization", generateToken()).build();
+                Request request = new Request.Builder().url(url).build();
 
                 com.squareup.okhttp.Response response = httpClient.newCall(request).execute();
 
