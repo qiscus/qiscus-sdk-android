@@ -26,7 +26,7 @@ public class QiscusChatConfig {
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
     private String emptyRoomTitle = "Welcome!";
     private String emptyRoomSubtitle = "Lets start conversation";
-    private int emptyImageResource = R.drawable.ic_chat_empty;
+    private int emptyRoomImageResource = R.drawable.ic_chat_empty;
     private String messageFieldHint = "Type a message…";
     private int addPictureIcon = R.drawable.ic_add_image;
     private int takePictureIcon = R.drawable.ic_pick_picture;
@@ -115,8 +115,8 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusChatConfig setEmptyImageResource(@DrawableRes int emptyImageResource) {
-        this.emptyImageResource = emptyImageResource;
+    public QiscusChatConfig setEmptyRoomImageResource(@DrawableRes int emptyRoomImageResource) {
+        this.emptyRoomImageResource = emptyRoomImageResource;
         return this;
     }
 
@@ -232,8 +232,8 @@ public class QiscusChatConfig {
     }
 
     @DrawableRes
-    public int getEmptyImageResource() {
-        return emptyImageResource;
+    public int getEmptyRoomImageResource() {
+        return emptyRoomImageResource;
     }
 
     public String getMessageFieldHint() {

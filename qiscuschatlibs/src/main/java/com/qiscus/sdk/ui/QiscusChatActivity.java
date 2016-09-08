@@ -145,7 +145,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
         tvName.setTextColor(ContextCompat.getColor(this, chatConfig.getTitleColor()));
         tvSubtitle.setTextColor(ContextCompat.getColor(this, chatConfig.getSubtitleColor()));
         swipeRefreshLayout.setColorSchemeResources(chatConfig.getSwipeRefreshColorScheme());
-        emptyChatImage.setImageResource(chatConfig.getEmptyImageResource());
+        emptyChatImage.setImageResource(chatConfig.getEmptyRoomImageResource());
         emptyChatTitle.setText(chatConfig.getEmptyRoomTitle());
         emptyChatDesc.setText(chatConfig.getEmptyRoomSubtitle());
         fieldMessage.setHint(chatConfig.getMessageFieldHint());
