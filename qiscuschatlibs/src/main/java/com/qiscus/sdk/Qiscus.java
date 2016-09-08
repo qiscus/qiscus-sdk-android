@@ -12,9 +12,13 @@ import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.event.QiscusUserEvent;
+import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.util.QiscusParser;
 import com.qiscus.sdk.util.QiscusScheduler;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,6 +48,8 @@ public class Qiscus {
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
         CHAT_CONFIG = new QiscusChatConfig();
+
+        APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
     }
 
     public static LoginBuilder with(String email, String password) {
@@ -90,6 +96,7 @@ public class Qiscus {
         LOCAL_DATA_MANAGER.clearData();
         QiscusDataBaseHelper.getInstance().clear();
         QiscusCacheManager.getInstance().clearData();
+        EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
 
     private static class LocalDataManager {
@@ -161,6 +168,7 @@ public class Qiscus {
                     .loginOrRegister(email, password, username, avatarUrl)
                     .doOnNext(qiscusAccount -> {
                         Qiscus.LOCAL_DATA_MANAGER.saveAccountInfo(qiscusAccount);
+                        EventBus.getDefault().post(QiscusUserEvent.LOGIN);
                     });
         }
     }

@@ -25,6 +25,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/QiscusTheme" />
 
+        <service android:name="com.qiscus.sdk.service.QiscusPusherService"/>
+        <receiver android:name="com.qiscus.sdk.service.QiscusPusherReceiver">
+            <intent-filter>
+                <action android:name="com.qiscus.OPEN_COMMENT_PN"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

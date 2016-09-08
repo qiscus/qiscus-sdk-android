@@ -121,6 +121,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
         animation = AnimationUtils.loadAnimation(this, R.anim.simple_grow);
 
         NotificationManagerCompat.from(this).cancel(qiscusChatRoom.getId());
+        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
 
         qiscusAccount = Qiscus.getQiscusAccount();
 
