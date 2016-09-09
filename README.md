@@ -28,7 +28,7 @@ public class SampleApps extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Qiscus.init(this, "http://your-qiscus-engine-server.com");
+        Qiscus.init(this, "yourQiscusAppId");
     }
 }
 ```
