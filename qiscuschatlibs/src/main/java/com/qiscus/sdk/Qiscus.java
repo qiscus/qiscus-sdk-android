@@ -40,11 +40,11 @@ public class Qiscus {
     private static LocalDataManager LOCAL_DATA_MANAGER;
     private static QiscusChatConfig CHAT_CONFIG;
 
-    private static String API_URL;
+    private static String APP_ID;
 
-    public static void init(Application application, String qiscusApiUrl) {
+    public static void init(Application application, String qiscusAppId) {
         APP_INSTANCE = application;
-        API_URL = qiscusApiUrl;
+        APP_ID = qiscusAppId;
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
         CHAT_CONFIG = new QiscusChatConfig();
@@ -68,8 +68,8 @@ public class Qiscus {
         return APP_HANDLER;
     }
 
-    public static String getApiUrl() {
-        return API_URL;
+    public static String getAppId() {
+        return APP_ID;
     }
 
     public static boolean isLogged() {

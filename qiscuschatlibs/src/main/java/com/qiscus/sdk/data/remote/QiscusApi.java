@@ -66,11 +66,13 @@ public enum QiscusApi {
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
+    private String baseUrl;
     private final Api api;
 
     QiscusApi() {
-        api = QiscusServiceGenerator.createService(Api.class, Qiscus.getApiUrl(),
-                BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE);
+        baseUrl = "http://" + Qiscus.getAppId() + ".qiscus.com";
+        api = QiscusServiceGenerator.createService(Api.class, baseUrl,
+                BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.FULL);
         httpClient = QiscusHttpClient.getInstance().getHttpClient();
     }
 
@@ -178,7 +180,7 @@ public enum QiscusApi {
                     .build();
 
             Request request = new Request.Builder()
-                    .url(Qiscus.getApiUrl() + "/api/v2/mobile/upload")
+                    .url(baseUrl + "/api/v2/mobile/upload")
                     .post(requestBody).build();
 
             try {

@@ -21,7 +21,7 @@ public class SampleApps extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Qiscus.init(this, "http://dragonfly.qiscus.com");
+        Qiscus.init(this, "dragonfly");
 
         Qiscus.getChatConfig()
                 .setStatusBarColor(R.color.accent)
