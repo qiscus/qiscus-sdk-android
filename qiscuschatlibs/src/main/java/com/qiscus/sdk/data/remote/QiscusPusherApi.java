@@ -241,14 +241,14 @@ public enum QiscusPusherApi implements ConnectionEventListener {
         Log.d(TAG, "Got comment: " + jsonObject);
         try {
             QiscusComment qiscusComment = new QiscusComment();
-            qiscusComment.setId(jsonObject.get("comment_id").getAsInt());
+            qiscusComment.setId(jsonObject.get("id").getAsInt());
             qiscusComment.setTopicId(jsonObject.get("topic_id").getAsInt());
             qiscusComment.setRoomId(jsonObject.get("room_id").getAsInt());
-            qiscusComment.setUniqueId(jsonObject.get("unique_id").getAsString());
+            qiscusComment.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
             qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsInt());
             qiscusComment.setMessage(jsonObject.get("comment").getAsString());
             qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
-            qiscusComment.setSenderEmail(jsonObject.get("username_real").getAsString());
+            qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
             qiscusComment.setTime(QiscusDateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
             return qiscusComment;
         } catch (Exception e) {
