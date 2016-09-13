@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.library.chat.R;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusMessageViewHolder;

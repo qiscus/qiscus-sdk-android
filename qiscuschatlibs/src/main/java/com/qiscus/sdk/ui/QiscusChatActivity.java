@@ -28,8 +28,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.qiscus.library.chat.R;
-import com.qiscus.library.chat.R2;
+import com.qiscus.sdk.R;
+import com.qiscus.sdk.R2;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;

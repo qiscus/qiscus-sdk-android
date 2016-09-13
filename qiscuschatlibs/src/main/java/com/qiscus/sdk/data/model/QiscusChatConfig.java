@@ -3,7 +3,7 @@ package com.qiscus.sdk.data.model;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 
-import com.qiscus.library.chat.R;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 /**

@@ -1,18 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.qiscus.library.chat">
+    package="com.qiscus.sdk">
 
-    <permission
-        android:name="com.qiscus.library.chat.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="com.qiscus.library.chat.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Need to request runtime permission -->
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -21,14 +14,14 @@
         android:supportsRtl="true">
 
         <activity
-            android:name="com.qiscus.sdk.ui.QiscusChatActivity"
+            android:name=".ui.QiscusChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/QiscusTheme" />
 
-        <service android:name="com.qiscus.sdk.service.QiscusPusherService"/>
+        <service android:name=".service.QiscusPusherService"/>
         
         <receiver
-            android:name="com.qiscus.sdk.service.QiscusPusherReceiver"
+            android:name=".service.QiscusPusherReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.qiscus.OPEN_COMMENT_PN"/>

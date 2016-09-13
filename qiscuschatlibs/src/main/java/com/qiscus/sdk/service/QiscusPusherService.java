@@ -13,7 +13,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 
-import com.qiscus.library.chat.R;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
