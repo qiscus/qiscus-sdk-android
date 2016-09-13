@@ -18,7 +18,6 @@ import java.util.List;
 
 import rx.Observable;
 import rx.Subscription;
-import timber.log.Timber;
 
 public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.View> {
 
@@ -88,7 +87,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         final QiscusComment qiscusComment = QiscusComment.generateMessage(String.format("[file] %s [/file]", compressedFile.getPath()),
-                                                        room.getId(), currentTopicId);
+                room.getId(), currentTopicId);
         qiscusComment.setDownloading(true);
         view.onSendingComment(qiscusComment);
 
@@ -201,7 +200,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private void markAsRead() {
         QiscusApi.getInstance().markTopicAsRead(room.getLastTopicId())
                 .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
-                .subscribe(aVoid -> Timber.i("mark topic as read"), Throwable::printStackTrace);
+                .subscribe(aVoid -> {
+                }, Throwable::printStackTrace);
     }
 
     private boolean isValidComments(List<QiscusComment> qiscusComments) {
@@ -285,8 +285,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             if (QiscusFileUtil.isContains(qiscusComment.getTopicId(), qiscusComment.getAttachmentName())) {
                 QiscusDataBaseHelper.getInstance()
                         .addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
-                                              QiscusFileUtil.generateFilePath(qiscusComment.getAttachmentName(),
-                                                                        qiscusComment.getTopicId()));
+                                QiscusFileUtil.generateFilePath(qiscusComment.getAttachmentName(),
+                                        qiscusComment.getTopicId()));
             }
         }
 
@@ -305,7 +305,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             qiscusComment.setDownloading(true);
             QiscusApi.getInstance()
                     .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
-                                  percentage -> qiscusComment.setProgress((int) percentage))
+                            percentage -> qiscusComment.setProgress((int) percentage))
                     .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
                     .compose(bindToLifecycle())
                     .doOnNext(file1 -> {
@@ -316,7 +316,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     .subscribe(file1 -> {
                         qiscusComment.setDownloading(false);
                         QiscusDataBaseHelper.getInstance().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
-                                                                          file1.getAbsolutePath());
+                                file1.getAbsolutePath());
                         view.refreshComment(qiscusComment);
                     }, throwable -> {
                         throwable.printStackTrace();

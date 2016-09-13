@@ -28,7 +28,6 @@ import rx.functions.Action1;
 import rx.functions.Action2;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
-import timber.log.Timber;
 
 public enum QiscusPusherApi implements ConnectionEventListener {
     INSTANCE;

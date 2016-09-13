@@ -9,13 +9,12 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
-import com.qiscus.library.chat.R;
+import com.qiscus.sdk.R;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
-import timber.log.Timber;
 
 /**
  * Created on : August 18, 2016
@@ -71,7 +70,6 @@ public abstract class QiscusActivity extends RxAppCompatActivity implements
     protected void requestChangeNetworkStatePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean canWrite = Settings.System.canWrite(this);
-            Timber.d("System.canWrite() : " + canWrite);
 
             if (!canWrite) {
                 AlertDialog dialog = new AlertDialog.Builder(this)
@@ -109,11 +107,10 @@ public abstract class QiscusActivity extends RxAppCompatActivity implements
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-        Timber.e("onPermissionsDenied:" + requestCode + ":" + perms.size());
         EasyPermissions.checkDeniedPermissionsNeverAskAgain(this, "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
     }
 
     public void onNetworkStatePermissionDenied() {
-        Timber.e("onNetworkStatePermissionDenied");
+
     }
 }

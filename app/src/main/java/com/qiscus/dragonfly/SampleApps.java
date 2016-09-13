@@ -6,8 +6,6 @@ import com.qiscus.sdk.Qiscus;
 
 import java.text.SimpleDateFormat;
 
-import timber.log.Timber;
-
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -32,7 +30,5 @@ public class SampleApps extends Application {
                 .setRightBubbleTextColor(R.color.qiscus_white)
                 .setRightBubbleTimeColor(R.color.primary_light)
                 .setTimeFormat(date -> new SimpleDateFormat("HH:mm").format(date));
-
-        Timber.plant(new Timber.DebugTree());
     }
 }
