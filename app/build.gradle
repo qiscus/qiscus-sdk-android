@@ -1,7 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
-apply plugin: 'android-apt'
-apply plugin: 'com.jakewharton.butterknife'
 
 android {
     compileSdkVersion 24
@@ -37,7 +35,6 @@ buildscript {
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
-        classpath 'com.jakewharton:butterknife-gradle-plugin:8.2.1'
     }
 }
 
@@ -45,8 +42,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
-    compile 'com.jakewharton:butterknife:8.2.1'
-    apt 'com.jakewharton:butterknife-compiler:8.2.1'
 
     compile project(':qiscuschatlibs')
 }

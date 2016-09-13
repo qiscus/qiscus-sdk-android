@@ -10,14 +10,12 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.bt_login) Button loginButton;
+    private Button loginButton;
 
     private ProgressDialog progressDialog;
 
@@ -25,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        loginButton = (Button) findViewById(R.id.bt_login);
         loginButton.setText(Qiscus.isLogged() ? "Logout" : "Login");
     }
 
