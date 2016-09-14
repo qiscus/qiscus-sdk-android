@@ -16,8 +16,8 @@ public abstract class QiscusSortedRecyclerAdapter<Item, Holder extends QiscusIte
         RecyclerView.Adapter<Holder> {
     protected Context context;
     protected SortedList<Item> data;
-    protected QiscusRecyclerAdapter.OnItemClickListener itemClickListener;
-    protected QiscusRecyclerAdapter.OnLongItemClickListener longItemClickListener;
+    protected OnItemClickListener itemClickListener;
+    protected OnLongItemClickListener longItemClickListener;
 
     public QiscusSortedRecyclerAdapter(Context context) {
         this.context = context;
@@ -89,11 +89,11 @@ public abstract class QiscusSortedRecyclerAdapter<Item, Holder extends QiscusIte
         return position;
     }
 
-    public void setOnItemClickListener(QiscusRecyclerAdapter.OnItemClickListener itemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
 
-    public void setOnLongItemClickListener(QiscusRecyclerAdapter.OnLongItemClickListener longItemClickListener) {
+    public void setOnLongItemClickListener(OnLongItemClickListener longItemClickListener) {
         this.longItemClickListener = longItemClickListener;
     }
 

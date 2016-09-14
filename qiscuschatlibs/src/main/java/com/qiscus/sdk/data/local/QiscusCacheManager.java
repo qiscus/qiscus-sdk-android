@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.util.QiscusParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public enum QiscusCacheManager {
 
     QiscusCacheManager() {
         sharedPreferences = Qiscus.getApps().getSharedPreferences("qiscus.cache", Context.MODE_PRIVATE);
-        gson = QiscusParser.get().parser();
+        gson = new Gson();
     }
 
     public static QiscusCacheManager getInstance() {

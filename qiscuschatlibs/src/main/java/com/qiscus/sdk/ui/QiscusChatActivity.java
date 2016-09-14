@@ -28,9 +28,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.R2;
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
@@ -40,7 +40,6 @@ import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 
 import java.io.File;
@@ -181,9 +180,9 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
     private void onItemCommentLongClick(QiscusComment qiscusComment) {
         if (qiscusComment.getType() == QiscusComment.Type.TEXT) {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(QiscusAndroidUtil.getString(R.string.chat_activity_label_clipboard), qiscusComment.getMessage());
+            ClipData clip = ClipData.newPlainText(getString(R.string.chat_activity_label_clipboard), qiscusComment.getMessage());
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(this, QiscusAndroidUtil.getString(R.string.chat_activity_copied_message), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.chat_activity_copied_message), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -228,7 +227,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_write));
+                showError(getString(R.string.chat_error_failed_write));
             }
 
             if (photoFile != null) {
@@ -330,7 +329,7 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            showError(QiscusAndroidUtil.getString(R.string.chat_error_no_handler));
+            showError(getString(R.string.chat_error_no_handler));
         }
     }
 
@@ -397,31 +396,31 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusChatPres
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
             if (data == null) {
-                showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_open_picture));
+                showError(getString(R.string.chat_error_failed_open_picture));
                 return;
             }
             try {
                 qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
-                showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_read_picture));
+                showError(getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
             }
         } else if (requestCode == PICK_FILE_REQUEST && resultCode == RESULT_OK) {
             if (data == null) {
-                showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_open_file));
+                showError(getString(R.string.chat_error_failed_open_file));
                 return;
             }
             try {
                 qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
-                showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_read_file));
+                showError(getString(R.string.chat_error_failed_read_file));
                 e.printStackTrace();
             }
         } else if (requestCode == TAKE_PICTURE_REQUEST && resultCode == RESULT_OK) {
             try {
                 qiscusChatPresenter.sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
             } catch (Exception e) {
-                showError(QiscusAndroidUtil.getString(R.string.chat_error_failed_read_picture));
+                showError(getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
             }
         }

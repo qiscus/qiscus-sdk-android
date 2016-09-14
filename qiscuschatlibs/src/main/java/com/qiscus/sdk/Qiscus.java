@@ -15,8 +15,6 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
-import com.qiscus.sdk.util.QiscusParser;
-import com.qiscus.sdk.util.QiscusScheduler;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -25,6 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 18, 2016
@@ -106,7 +106,7 @@ public class Qiscus {
 
         LocalDataManager() {
             sharedPreferences = Qiscus.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
-            gson = QiscusParser.get().parser();
+            gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : "";
         }
 
@@ -159,7 +159,8 @@ public class Qiscus {
         }
 
         public void login(LoginListener listener) {
-            login().compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+            login().subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(listener::onSuccess, listener::onError);
         }
 
@@ -213,7 +214,8 @@ public class Qiscus {
         }
 
         public void build(Context context, ChatActivityBuilderListener listener) {
-            build(context).compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+            build(context).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(listener::onSuccess, listener::onError);
         }
 

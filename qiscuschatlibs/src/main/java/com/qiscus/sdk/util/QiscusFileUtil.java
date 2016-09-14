@@ -5,8 +5,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
 
@@ -186,11 +184,9 @@ public class QiscusFileUtil {
         if (!newFile.equals(file)) {
             if (newFile.exists()) {
                 if (newFile.delete()) {
-                    Log.d("QiscusFileUtil", "Delete old " + newName + " file");
                 }
             }
             if (file.renameTo(newFile)) {
-                Log.d("QiscusFileUtil", "Rename file to " + newName);
             }
         }
         return newFile;
@@ -199,22 +195,6 @@ public class QiscusFileUtil {
     public static boolean isContains(int topicId, String fileName) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(), FILES_PATH + topicId + File.separator + fileName);
         return file.exists();
-    }
-
-    public static boolean isVideo(File file) {
-        String path = file.getPath();
-        int lastDotPosition = path.lastIndexOf(".");
-        String ext = path.substring(lastDotPosition + 1);
-        ext = ext.replace("_", "");
-        ext = ext.toLowerCase();
-        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
-        if (type == null) {
-            return false;
-        } else if (type.contains("video")) {
-            return true;
-        }
-
-        return false;
     }
 
     public static String getExtension(File file) {

@@ -11,13 +11,14 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
-import com.qiscus.sdk.util.QiscusScheduler;
 
 import java.io.File;
 import java.util.List;
 
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.View> {
 
@@ -71,7 +72,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         final QiscusComment qiscusComment = QiscusComment.generateMessage(content, room.getId(), currentTopicId);
         view.onSendingComment(qiscusComment);
         QiscusApi.getInstance().postComment(qiscusComment)
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .subscribe(this::commentSuccess, throwable -> commentFail(qiscusComment));
     }
@@ -97,7 +99,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .subscribe(commentSend -> {
                     qiscusComment.setDownloading(false);
@@ -118,7 +121,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             qiscusComment.setState(QiscusComment.STATE_SENDING);
             view.onNewComment(qiscusComment);
             QiscusApi.getInstance().postComment(qiscusComment)
-                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .subscribe(this::commentSuccess, throwable -> commentFail(qiscusComment));
         }
@@ -132,7 +136,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (!file.exists()) {
             qiscusComment.setProgress(100);
             QiscusApi.getInstance().postComment(qiscusComment)
-                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .subscribe(commentSend -> {
                         qiscusComment.setDownloading(false);
@@ -150,7 +155,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
                         return QiscusApi.getInstance().postComment(qiscusComment);
                     })
-                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .subscribe(commentSend -> {
                         qiscusComment.setDownloading(false);
@@ -166,7 +172,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private Observable<List<QiscusComment>> getCommentsFromNetwork(int lastCommentId) {
         return QiscusApi.getInstance().getComments(currentTopicId, lastCommentId)
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .doOnNext(comment -> {
                     comment.setRoomId(room.getId());
@@ -179,7 +186,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void loadComments(int count) {
         view.showLoading();
         QiscusDataBaseHelper.getInstance().getObservableComments(currentTopicId, count)
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .flatMap(comments -> isValidComments(comments) ? Observable.from(comments).toList() : getCommentsFromNetwork(0))
                 .subscribe(comments -> {
@@ -199,7 +207,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void markAsRead() {
         QiscusApi.getInstance().markTopicAsRead(room.getLastTopicId())
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
                 }, Throwable::printStackTrace);
     }
@@ -247,7 +256,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void loadOlderCommentThan(QiscusComment qiscusComment) {
         view.showLoadMoreLoading();
         QiscusDataBaseHelper.getInstance().getObservableOlderCommentsThan(qiscusComment, currentTopicId, 20)
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .flatMap(comments -> isValidOlderComments(comments, qiscusComment) ?
                         Observable.from(comments).toList() : getCommentsFromNetwork(qiscusComment.getId()))
@@ -267,7 +277,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void listenRoomEvent() {
         subscription = QiscusPusherApi.getInstance().getRoomEvents(Qiscus.getToken())
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .subscribe(roomEventJsonObjectPair -> {
                     if (roomEventJsonObjectPair.first == QiscusPusherApi.RoomEvent.INCOMING_COMMENT) {
@@ -306,7 +317,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             QiscusApi.getInstance()
                     .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
                             percentage -> qiscusComment.setProgress((int) percentage))
-                    .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .doOnNext(file1 -> {
                         if (QiscusImageUtil.isImage(file1)) {

@@ -237,7 +237,6 @@ public enum QiscusPusherApi implements ConnectionEventListener {
     }
 
     public static QiscusComment jsonToComment(JsonObject jsonObject) {
-        Log.d(TAG, "Got comment: " + jsonObject);
         try {
             QiscusComment qiscusComment = new QiscusComment();
             qiscusComment.setId(jsonObject.get("id").getAsInt());

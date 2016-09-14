@@ -11,15 +11,13 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 
-import com.qiscus.sdk.R;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
-import com.qiscus.sdk.util.QiscusScheduler;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -27,6 +25,8 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created on : June 29, 2016
@@ -56,7 +56,6 @@ public class QiscusPusherService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("QiscusPusherService", "Creating...");
 
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
@@ -69,7 +68,8 @@ public class QiscusPusherService extends Service {
 
     private void listenPusherEvent() {
         pusherEvent = QiscusPusherApi.getInstance().getRoomEvents(Qiscus.getToken())
-                .compose(QiscusScheduler.get().applySchedulers(QiscusScheduler.Type.IO))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(roomEventJsonObjectPair -> {
                     if (roomEventJsonObjectPair.first == QiscusPusherApi.RoomEvent.INCOMING_COMMENT) {
                         QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(roomEventJsonObjectPair.second);

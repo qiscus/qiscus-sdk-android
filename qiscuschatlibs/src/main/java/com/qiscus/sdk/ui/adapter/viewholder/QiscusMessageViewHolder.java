@@ -19,8 +19,8 @@ import com.qiscus.sdk.R2;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnItemClickListener;
-import com.qiscus.sdk.ui.adapter.QiscusRecyclerAdapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.adapter.OnItemClickListener;
+import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 
 import java.io.File;
 
