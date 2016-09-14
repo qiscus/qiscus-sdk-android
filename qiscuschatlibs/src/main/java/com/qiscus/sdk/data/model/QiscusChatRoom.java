@@ -18,6 +18,10 @@ public class QiscusChatRoom implements Parcelable {
     protected int lastCommentId;
     protected int lastTopicId;
 
+    public QiscusChatRoom() {
+
+    }
+
     protected QiscusChatRoom(Parcel in) {
         id = in.readInt();
         name = in.readString();

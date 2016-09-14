@@ -1,8 +1,8 @@
 package com.qiscus.sdk.data.remote;
 
-import com.squareup.okhttp.OkHttpClient;
-
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created on : June 14, 2016
@@ -18,9 +18,10 @@ public enum QiscusHttpClient {
     private final OkHttpClient httpClient;
 
     QiscusHttpClient() {
-        httpClient = new OkHttpClient();
-        httpClient.setConnectTimeout(60, TimeUnit.SECONDS);
-        httpClient.setReadTimeout(60, TimeUnit.SECONDS);
+        httpClient = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
     }
 
     public static QiscusHttpClient getInstance() {

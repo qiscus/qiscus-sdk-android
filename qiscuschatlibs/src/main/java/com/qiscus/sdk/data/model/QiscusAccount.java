@@ -3,8 +3,6 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -19,8 +17,11 @@ public class QiscusAccount implements Parcelable {
     protected String avatar;
     protected String token;
     protected String username;
-    @SerializedName("rtKey")
     protected String rtKey;
+
+    public QiscusAccount() {
+
+    }
 
     protected QiscusAccount(Parcel in) {
         id = in.readInt();

@@ -4,21 +4,11 @@ import android.net.Uri;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.util.QiscusFileUtil;
-import com.qiscus.sdk.util.QiscusParser;
-import com.qiscus.sdk.util.QiscusServiceGenerator;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.MultipartBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.ResponseBody;
-import com.squareup.okhttp.internal.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,16 +24,26 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.internal.Util;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
-import retrofit.RestAdapter;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
-import retrofit.http.GET;
-import retrofit.http.POST;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
 
@@ -71,107 +71,103 @@ public enum QiscusApi {
 
     QiscusApi() {
         baseUrl = "http://" + Qiscus.getAppId() + ".qiscus.com";
-        api = QiscusServiceGenerator.createService(Api.class, baseUrl,
-                BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.FULL);
+
         httpClient = QiscusHttpClient.getInstance().getHttpClient();
+
+        api = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .client(httpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build()
+                .create(Api.class);
     }
 
     public static QiscusApi getInstance() {
         return INSTANCE;
     }
 
-    private String generateToken() {
-        return Qiscus.getToken();
-    }
-
     public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
         return api.loginOrRegister(email, password, username, avatarUrl)
-                .map(jsonElement -> QiscusParser.get().parser()
-                        .fromJson(jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user"),
-                                QiscusAccount.class));
+                .map(jsonElement -> {
+                    JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results")
+                            .getAsJsonObject().get("user").getAsJsonObject();
+                    QiscusAccount qiscusAccount = new QiscusAccount();
+                    qiscusAccount.setId(jsonAccount.get("id").getAsInt());
+                    qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
+                    qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
+                    qiscusAccount.setToken(jsonAccount.get("token").getAsString());
+                    qiscusAccount.setRtKey(jsonAccount.get("rtKey").getAsString());
+                    qiscusAccount.setAvatar(jsonAccount.get("avatar").getAsJsonObject().get("avatar")
+                            .getAsJsonObject().get("url").getAsString());
+                    return qiscusAccount;
+                });
     }
 
     public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails) {
-        return api.createOrGetChatRoom(generateToken(), withEmails)
-                .map(jsonElement -> QiscusParser.get().parser()
-                        .fromJson(jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("room"),
-                                QiscusChatRoom.class));
+        return api.createOrGetChatRoom(Qiscus.getToken(), withEmails)
+                .map(jsonElement -> {
+                    JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
+                            .getAsJsonObject().get("room").getAsJsonObject();
+                    QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+                    qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
+                    qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
+                    qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
+                    return qiscusChatRoom;
+                });
     }
 
     public Observable<QiscusComment> getComments(int topicId, int lastCommentId) {
-        return api.getComments(generateToken(), topicId, lastCommentId)
+        return api.getComments(Qiscus.getToken(), topicId, lastCommentId)
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
                     return null;
                 })
-                .filter(commentsResponse -> commentsResponse != null)
-                .flatMap(commentsResponse -> Observable.from(commentsResponse.results.comments))
-                .map(CommentsResponse.CommentsResponseComments.CommentResponseCommentsSingle::toComment)
-                .map(comment -> {
-                    comment.setTopicId(topicId);
-                    return comment;
-                });
-    }
-
-    private static class CommentsResponse {
-        private CommentsResponseComments results;
-
-        private static class CommentsResponseComments {
-            private List<CommentResponseCommentsSingle> comments;
-
-            private static class CommentResponseCommentsSingle {
-                int id;
-                int commentBeforeId;
-                String message;
-                String username;
-                String email;
-                String timestamp;
-                boolean deleted;
-
-                private QiscusComment toComment() {
+                .filter(jsonElement -> jsonElement != null)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> {
                     QiscusComment qiscusComment = new QiscusComment();
-                    qiscusComment.setId(id);
-                    qiscusComment.setUniqueId(String.valueOf(id));
-                    qiscusComment.setCommentBeforeId(commentBeforeId);
-                    qiscusComment.setMessage(message);
-                    qiscusComment.setSender(username);
-                    qiscusComment.setSenderEmail(email);
+                    JsonObject jsonComment = jsonElement.getAsJsonObject();
+                    qiscusComment.setTopicId(topicId);
+                    qiscusComment.setId(jsonComment.get("id").getAsInt());
+                    qiscusComment.setUniqueId(String.valueOf(jsonComment.get("id").getAsInt()));
+                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    qiscusComment.setMessage(jsonComment.get("message").getAsString());
+                    qiscusComment.setSender(jsonComment.get("username").getAsString());
+                    qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
                     try {
-                        qiscusComment.setTime(dateFormat.parse(timestamp));
+                        qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-
                     return qiscusComment;
-                }
-            }
-        }
-
+                });
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
-        return api.postComment(generateToken(), qiscusComment.getMessage(),
+        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
                 qiscusComment.getTopicId(), qiscusComment.getUniqueId())
                 .map(jsonElement -> {
-                    JsonObject commentJson = jsonElement.getAsJsonObject()
+                    JsonObject jsonComment = jsonElement.getAsJsonObject()
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
-                    qiscusComment.setId(commentJson.get("id").getAsInt());
-                    qiscusComment.setCommentBeforeId(commentJson.get("comment_before_id").getAsInt());
+                    qiscusComment.setId(jsonComment.get("id").getAsInt());
+                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
                     return qiscusComment;
                 });
     }
 
     public Observable<Void> markTopicAsRead(int topicId) {
-        return api.markTopicAsRead(generateToken(), topicId);
+        return api.markTopicAsRead(topicId, Qiscus.getToken());
     }
 
     public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
             long fileLength = file.length();
 
-            RequestBody requestBody = new MultipartBuilder()
-                    .type(MultipartBuilder.FORM)
-                    .addFormDataPart("token", generateToken())
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("token", Qiscus.getToken())
                     .addFormDataPart("file", file.getName(),
                             new CountingFileRequestBody(file, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
@@ -184,7 +180,7 @@ public enum QiscusApi {
                     .post(requestBody).build();
 
             try {
-                com.squareup.okhttp.Response response = httpClient.newCall(request).execute();
+                Response response = httpClient.newCall(request).execute();
                 JSONObject responseJ = new JSONObject(response.body().string());
                 String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
 
@@ -209,7 +205,7 @@ public enum QiscusApi {
             try {
                 Request request = new Request.Builder().url(url).build();
 
-                com.squareup.okhttp.Response response = httpClient.newCall(request).execute();
+                Response response = httpClient.newCall(request).execute();
 
                 File output = new File(QiscusFileUtil.generateFilePath(fileName, topicId));
                 fos = new FileOutputStream(output.getPath());
@@ -269,20 +265,20 @@ public enum QiscusApi {
                                                     @Field("emails[]") List<String> emails);
 
         @GET("/api/v2/mobile/load_comments")
-        Observable<CommentsResponse> getComments(@Query("token") String token,
+        Observable<JsonElement> getComments(@Query("token") String token,
                                                  @Query("topic_id") int topicId,
                                                  @Query("last_comment_id") int lastCommentId);
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/post_comment")
         Observable<JsonElement> postComment(@Field("token") String token,
-                                                    @Field("comment") String message,
-                                                    @Field("topic_id") int topicId,
-                                                    @Field("unique_temp_id") String uniqueId);
+                                            @Field("comment") String message,
+                                            @Field("topic_id") int topicId,
+                                            @Field("unique_temp_id") String uniqueId);
 
         @GET("/api/v1/mobile/readnotif/{topic_id}")
-        Observable<Void> markTopicAsRead(@Query("token") String token,
-                                         @Path("topic_id") int topicId);
+        Observable<Void> markTopicAsRead(@Path("topic_id") int topicId,
+                                         @Query("token") String token);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
