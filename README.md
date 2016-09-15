@@ -1,6 +1,6 @@
 Qiscus SDK
 ======
-Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easyly integrating Qiscus engine with your apps to make cool chatting application.
+Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.
 
 # Instalation
 Add to your project build.gradle
@@ -35,11 +35,14 @@ public class SampleApps extends Application {
 #### Login to Qiscus engine
 Before user can start chatting each other, they must login to qiscus engine.
 ```java
-Qiscus.with("user@email.com", "password")
-      .login(new Qiscus.LoginListener() {
+Qiscus.setUser("user@email.com", "password")
+      .withUsername("Tony Stark")
+      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
+      .save(new Qiscus.SetUserListener() {
           @Override
           public void onSuccess(QiscusAccount qiscusAccount) {
-              Log.i(TAG, "Login with account: " + qiscusAccount);
+              DataManager.saveQiscusAccount(qiscusAccount);
+              startActivity(new Intent(this, ConsultationListActivity.class));
           }
           @Override
           public void onError(Throwable throwable) {
@@ -79,13 +82,16 @@ Qiscus.getChatConfig()
 ```
 ### RxJava Support
 ```java
-// Login to qiscus engine with rxjava example
-Qiscus.with("user@email.com", "password")
-      .login()
+// Setup qiscus account with rxjava example
+Qiscus.setUser("user@email.com", "password")
+      .withUsername("Tony Stark")
+      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
+      .save()
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe(qiscusAccount -> {
-          Log.i("MainActivity", "Login with account: " + qiscusAccount);
+          DataManager.saveQiscusAccount(qiscusAccount);
+          startActivity(new Intent(this, ConsultationListActivity.class));
       }, throwable -> {
           throwable.printStackTrace();
           showError(throwable.getMessage());
