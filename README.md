@@ -1,4 +1,4 @@
-Qiscus SDK
+Qiscus SDK [![](https://jitpack.io/v/qiscus/qiscus-sdk-android.svg)](https://jitpack.io/#qiscus/qiscus-sdk-android)
 ======
 Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.
 
