@@ -8,17 +8,18 @@ import android.provider.OpenableColumns;
 
 import com.qiscus.sdk.Qiscus;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class QiscusFileUtil {
     public static final String FILES_PATH = Qiscus.getAppsName() + File.separator + "Files";
+    private static final int EOF = -1;
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     public static File from(Uri uri) throws IOException {
         InputStream inputStream = Qiscus.getApps().getContentResolver().openInputStream(uri);
@@ -34,7 +35,7 @@ public class QiscusFileUtil {
             e.printStackTrace();
         }
         if (inputStream != null) {
-            IOUtils.copy(inputStream, out);
+            copy(inputStream, out);
             inputStream.close();
         }
 
@@ -54,7 +55,7 @@ public class QiscusFileUtil {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        IOUtils.copy(inputStream, out);
+        copy(inputStream, out);
 
         if (out != null) {
             out.close();
@@ -119,7 +120,7 @@ public class QiscusFileUtil {
         try {
             FileInputStream in = new FileInputStream(file);
             FileOutputStream out = new FileOutputStream(newFile);
-            IOUtils.copy(in, out);
+            copy(in, out);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -206,5 +207,27 @@ public class QiscusFileUtil {
         String ext = fileName.substring(lastDotPosition + 1);
         ext = ext.replace("_", "");
         return ext.trim().toLowerCase();
+    }
+
+    private static int copy(InputStream input, OutputStream output) throws IOException {
+        long count = copyLarge(input, output);
+        if (count > Integer.MAX_VALUE) {
+            return -1;
+        }
+        return (int) count;
+    }
+
+    private static long copyLarge(InputStream input, OutputStream output) throws IOException {
+        return copyLarge(input, output, new byte[DEFAULT_BUFFER_SIZE]);
+    }
+
+    private static long copyLarge(InputStream input, OutputStream output, byte[] buffer) throws IOException {
+        long count = 0;
+        int n;
+        while (EOF != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
     }
 }
