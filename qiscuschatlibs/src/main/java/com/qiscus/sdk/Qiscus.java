@@ -52,8 +52,8 @@ public class Qiscus {
         APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
     }
 
-    public static LoginBuilder with(String email, String password) {
-        return new LoginBuilder(email, password);
+    public static SetUserBuilder setUser(String email, String password) {
+        return new SetUserBuilder(email, password);
     }
 
     public static Application getApps() {
@@ -72,7 +72,7 @@ public class Qiscus {
         return APP_ID;
     }
 
-    public static boolean isLogged() {
+    public static boolean hasSetupUser() {
         return LOCAL_DATA_MANAGER.isLogged();
     }
 
@@ -92,7 +92,7 @@ public class Qiscus {
         return new ChatActivityBuilder(email);
     }
 
-    public static void logout() {
+    public static void clearUser() {
         LOCAL_DATA_MANAGER.clearData();
         QiscusDataBaseHelper.getInstance().clear();
         QiscusCacheManager.getInstance().clearData();
@@ -137,34 +137,34 @@ public class Qiscus {
         }
     }
 
-    public static class LoginBuilder {
+    public static class SetUserBuilder {
         private String email;
         private String password;
         private String username;
         private String avatarUrl;
 
-        private LoginBuilder(String email, String password) {
+        private SetUserBuilder(String email, String password) {
             this.email = email;
             this.password = password;
         }
 
-        public LoginBuilder withUsername(String username) {
+        public SetUserBuilder withUsername(String username) {
             this.username = username;
             return this;
         }
 
-        public LoginBuilder withAvatarUrl(String avatarUrl) {
+        public SetUserBuilder withAvatarUrl(String avatarUrl) {
             this.avatarUrl = avatarUrl;
             return this;
         }
 
-        public void login(LoginListener listener) {
-            login().subscribeOn(Schedulers.io())
+        public void save(SetUserListener listener) {
+            save().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(listener::onSuccess, listener::onError);
         }
 
-        public Observable<QiscusAccount> login() {
+        public Observable<QiscusAccount> save() {
             return QiscusApi.getInstance()
                     .loginOrRegister(email, password, username, avatarUrl)
                     .doOnNext(qiscusAccount -> {
@@ -174,7 +174,7 @@ public class Qiscus {
         }
     }
 
-    public interface LoginListener {
+    public interface SetUserListener {
         void onSuccess(QiscusAccount qiscusAccount);
 
         void onError(Throwable throwable);

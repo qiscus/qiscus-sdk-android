@@ -61,7 +61,7 @@ public class QiscusPusherService extends Service {
             EventBus.getDefault().register(this);
         }
 
-        if (Qiscus.isLogged()) {
+        if (Qiscus.hasSetupUser()) {
             listenPusherEvent();
         }
     }

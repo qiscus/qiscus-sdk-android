@@ -24,18 +24,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         loginButton = (Button) findViewById(R.id.bt_login);
-        loginButton.setText(Qiscus.isLogged() ? "Logout" : "Login");
+        loginButton.setText(Qiscus.hasSetupUser() ? "Logout" : "Login");
     }
 
     public void loginOrLogout(View view) {
-        if (Qiscus.isLogged()) {
-            Qiscus.logout();
+        if (Qiscus.hasSetupUser()) {
+            Qiscus.clearUser();
             loginButton.setText("Login");
         } else {
             showLoading();
-            Qiscus.with("zetra1@gmail.com", "12345678")
+            Qiscus.setUser("zetra1@gmail.com", "12345678")
                     .withUsername("Zetra")
-                    .login()
+                    .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(qiscusAccount -> {
