@@ -52,10 +52,10 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
 
     //This for the UI
-    compile 'com.android.support:support-v4:24.2.0'
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:recyclerview-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
 
     //The core of Reactive Programming
     compile 'io.reactivex:rxjava:1.1.7'
