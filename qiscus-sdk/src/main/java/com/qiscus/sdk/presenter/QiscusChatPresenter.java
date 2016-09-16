@@ -3,7 +3,6 @@ package com.qiscus.sdk.presenter;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -276,16 +275,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void listenRoomEvent() {
-        subscription = QiscusPusherApi.getInstance().getRoomEvents(Qiscus.getToken())
+        subscription = QiscusPusherApi.getInstance().listenNewComment()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(roomEventJsonObjectPair -> {
-                    if (roomEventJsonObjectPair.first == QiscusPusherApi.RoomEvent.INCOMING_COMMENT) {
-                        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(roomEventJsonObjectPair.second);
-                        onGotNewComment(qiscusComment);
-                    }
-                }, Throwable::printStackTrace);
+                .subscribe(this::onGotNewComment, Throwable::printStackTrace);
     }
 
     private void onGotNewComment(QiscusComment qiscusComment) {

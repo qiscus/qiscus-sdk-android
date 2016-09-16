@@ -67,15 +67,12 @@ public class QiscusPusherService extends Service {
     }
 
     private void listenPusherEvent() {
-        pusherEvent = QiscusPusherApi.getInstance().getRoomEvents(Qiscus.getToken())
+        pusherEvent = QiscusPusherApi.getInstance().listenNewComment()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(roomEventJsonObjectPair -> {
-                    if (roomEventJsonObjectPair.first == QiscusPusherApi.RoomEvent.INCOMING_COMMENT) {
-                        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(roomEventJsonObjectPair.second);
-                        if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
-                            showPushNotification(qiscusComment);
-                        }
+                .subscribe(qiscusComment -> {
+                    if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+                        showPushNotification(qiscusComment);
                     }
                 }, Throwable::printStackTrace);
     }
