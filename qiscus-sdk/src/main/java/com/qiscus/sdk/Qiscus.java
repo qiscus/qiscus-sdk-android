@@ -107,7 +107,7 @@ public class Qiscus {
         LocalDataManager() {
             sharedPreferences = Qiscus.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
             gson = new Gson();
-            token = isLogged() ? getAccountInfo().getToken() : "";
+            token = isLogged() ? getAccountInfo().getToken() : null;
         }
 
         private boolean isLogged() {
@@ -133,7 +133,7 @@ public class Qiscus {
 
         private void clearData() {
             sharedPreferences.edit().clear().apply();
-            setToken("");
+            setToken(null);
         }
     }
 
