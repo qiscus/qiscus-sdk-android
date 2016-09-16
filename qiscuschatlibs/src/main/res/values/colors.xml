@@ -9,7 +9,6 @@
     <color name="qiscus_white">#FFFFFF</color>
     <color name="qiscus_divider">#B6B6B6</color>
     <color name="qiscus_light_grey">#D8D8D8</color>
-    <color name="qiscus_green">#4caf50</color>
     <color name="qiscus_red">#d32f2f</color>
     <color name="qiscus_dark_white">#f6f6f6</color>
 </resources>

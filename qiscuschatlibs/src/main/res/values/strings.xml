@@ -7,8 +7,6 @@
     <string name="sending_failed">Sending Failed</string>
     <string name="unkown_type">Unknown Type</string>
 
-    <string name="chat_call_rate">Call Rate: %s / Minute</string>
-    <string name="chat_snackbar_coming_soon">Coming soon</string>
     <string name="chat_error_failed_write">Failed to write temporary picture!</string>
     <string name="chat_error_no_handler">No handler for this type of file.</string>
     <string name="chat_error_failed_open_picture">Failed to open picture!</string>
