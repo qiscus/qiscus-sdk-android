@@ -1,1 +1,1 @@
-include ':app', ':qiscuschatlibs'
+include ':app', ':qiscus-sdk'

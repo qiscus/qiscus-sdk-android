@@ -43,5 +43,5 @@ dependencies {
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 
-    compile project(':qiscuschatlibs')
+    compile project(':qiscus-sdk')
 }
