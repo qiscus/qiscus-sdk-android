@@ -1,6 +1,7 @@
 package com.qiscus.dragonfly;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -65,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
                     showError(throwable.getMessage());
                     dismissLoading();
                 });
+    }
+
+    public void openChatFragment(View view) {
+        //Start a sample activity with qiscus chat fragment, so you can customize the toolbar.
+        startActivity(new Intent(this, ChatActivity.class));
     }
 
     public void showError(String errorMessage) {

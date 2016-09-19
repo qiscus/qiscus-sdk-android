@@ -15,6 +15,7 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
+import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -90,6 +91,10 @@ public class Qiscus {
 
     public static ChatActivityBuilder buildChatWith(String email) {
         return new ChatActivityBuilder(email);
+    }
+
+    public static ChatFragmentBuilder buildChatFragmentWith(String email) {
+        return new ChatFragmentBuilder(email);
     }
 
     public static void clearUser() {
@@ -232,6 +237,44 @@ public class Qiscus {
 
     public interface ChatActivityBuilderListener {
         void onSuccess(Intent intent);
+
+        void onError(Throwable throwable);
+    }
+
+    public static class ChatFragmentBuilder {
+        private Set<String> emails;
+        private QiscusChatConfig chatConfig;
+
+        private ChatFragmentBuilder(String email) {
+            emails = new HashSet<>();
+            emails.add(email);
+        }
+
+        public ChatFragmentBuilder addEmail(String email) {
+            emails.add(email);
+            return this;
+        }
+
+        public ChatFragmentBuilder withChatConfig(QiscusChatConfig qiscusChatConfig) {
+            this.chatConfig = qiscusChatConfig;
+            return this;
+        }
+
+        public void build(ChatFragmentBuilderListener listener) {
+            build().subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listener::onSuccess, listener::onError);
+        }
+
+        public Observable<QiscusChatFragment> build() {
+            return QiscusApi.getInstance()
+                    .getChatRoom(new ArrayList<>(emails))
+                    .map(QiscusChatFragment::newInstance);
+        }
+    }
+
+    public interface ChatFragmentBuilderListener {
+        void onSuccess(QiscusChatFragment qiscusChatFragment);
 
         void onError(Throwable throwable);
     }
