@@ -13,7 +13,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
@@ -85,12 +84,12 @@ public class QiscusPusherService extends Service {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-        notificationBuilder.setContentTitle(comment.getSender())
+        notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
                 .setContentIntent(pendingIntent)
                 .setContentText(isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage())
                 .setTicker(isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage())
-                .setSmallIcon(R.drawable.ic_chat)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_chat))
+                .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), Qiscus.getChatConfig().getNotificationBigIcon()))
                 .setGroupSummary(true)
                 .setGroup("CHAT_NOTIF_" + comment.getRoomId())
                 .setAutoCancel(true)

@@ -1,8 +1,11 @@
 package com.qiscus.sdk.data.model;
 
+import android.content.Intent;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.widget.Toast;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
@@ -34,6 +37,25 @@ public class QiscusChatConfig {
     private int sendActiveIcon = R.drawable.ic_send_on;
     private int sendInactiveIcon = R.drawable.ic_send_off;
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
+    private int notificationSmallIcon = R.drawable.ic_chat;
+    private int notificationBigIcon = R.drawable.ic_chat;
+    private NotificationTitleHandler notificationTitleHandler = QiscusComment::getSender;
+    private NotificationClickListener notificationClickListener =
+            (context, qiscusComment) -> Qiscus.buildChatWith(qiscusComment.getSenderEmail())
+                    .withTitle(qiscusComment.getSender())
+                    .build(context, new Qiscus.ChatActivityBuilderListener() {
+                        @Override
+                        public void onSuccess(Intent intent) {
+                            context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                    | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            throwable.printStackTrace();
+                            Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
@@ -155,6 +177,26 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setNotificationSmallIcon(@DrawableRes int notificationSmallIcon) {
+        this.notificationSmallIcon = notificationSmallIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setNotificationBigIcon(@DrawableRes int notificationBigIcon) {
+        this.notificationBigIcon = notificationBigIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setNotificationTitleHandler(NotificationTitleHandler notificationTitleHandler) {
+        this.notificationTitleHandler = notificationTitleHandler;
+        return this;
+    }
+
+    public QiscusChatConfig setNotificationClickListener(NotificationClickListener notificationClickListener) {
+        this.notificationClickListener = notificationClickListener;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -268,5 +310,23 @@ public class QiscusChatConfig {
     @ColorRes
     public int[] getSwipeRefreshColorScheme() {
         return swipeRefreshColorScheme;
+    }
+
+    @DrawableRes
+    public int getNotificationSmallIcon() {
+        return notificationSmallIcon;
+    }
+
+    @DrawableRes
+    public int getNotificationBigIcon() {
+        return notificationBigIcon;
+    }
+
+    public NotificationTitleHandler getNotificationTitleHandler() {
+        return notificationTitleHandler;
+    }
+
+    public NotificationClickListener getNotificationClickListener() {
+        return notificationClickListener;
     }
 }
