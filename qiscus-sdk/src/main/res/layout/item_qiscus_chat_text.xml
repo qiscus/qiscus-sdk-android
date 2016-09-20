@@ -23,7 +23,7 @@
         android:layout_alignTop="@+id/message"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:src="@drawable/ic_arrow_bubble_primary"
+        android:src="@drawable/ic_qiscus_arrow_bubble_primary"
         android:tint="@color/qiscus_primary"/>
 
     <org.apmem.tools.layouts.FlowLayout

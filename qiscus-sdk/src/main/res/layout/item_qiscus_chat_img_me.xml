@@ -27,7 +27,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:scaleType="fitStart"
-        android:src="@drawable/ic_arrow_bubble_primary_light"
+        android:src="@drawable/ic_qiscus_arrow_bubble_primary_light"
         android:tint="@color/qiscus_primary_light"/>
 
     <RelativeLayout
@@ -73,7 +73,7 @@
             android:layout_alignStart="@+id/holder"
             android:layout_alignTop="@+id/holder"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/bg_frame_primary_light"
+            android:src="@drawable/bg_qiscus_frame_primary_light"
             android:tint="@color/qiscus_primary_light"
             android:visibility="visible"/>
 
@@ -90,7 +90,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_margin="4dp"
-                android:src="@drawable/ic_img"
+                android:src="@drawable/ic_qiscus_img"
                 android:tint="@color/qiscus_divider"/>
 
             <TextView
@@ -116,7 +116,7 @@
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/qiscus_circle_divider"
                 android:padding="48dp"
-                android:src="@drawable/ic_download_big"
+                android:src="@drawable/ic_qiscus_download_big"
                 android:tint="@color/qiscus_secondary_text"/>
 
         </RelativeLayout>

@@ -24,7 +24,7 @@
         android:layout_alignTop="@+id/message"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:src="@drawable/ic_arrow_bubble_primary"
+        android:src="@drawable/ic_qiscus_arrow_bubble_primary"
         android:tint="@color/qiscus_primary"/>
 
     <RelativeLayout
@@ -68,7 +68,7 @@
             android:layout_alignStart="@+id/holder"
             android:layout_alignTop="@+id/holder"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/bg_frame_primary"
+            android:src="@drawable/bg_qiscus_frame_primary"
             android:tint="@color/qiscus_primary"
             android:visibility="visible"/>
 
@@ -85,7 +85,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_margin="4dp"
-                android:src="@drawable/ic_img"
+                android:src="@drawable/ic_qiscus_img"
                 android:tint="@color/qiscus_divider"/>
 
             <TextView
@@ -110,7 +110,7 @@
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/qiscus_circle_divider"
                 android:padding="48dp"
-                android:src="@drawable/ic_download_big"
+                android:src="@drawable/ic_qiscus_download_big"
                 android:tint="@color/qiscus_secondary_text"/>
 
             <com.github.lzyzsd.circleprogress.CircleProgress

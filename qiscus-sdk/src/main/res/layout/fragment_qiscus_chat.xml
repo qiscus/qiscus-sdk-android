@@ -19,7 +19,7 @@
             android:layout_width="224dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/ic_chat_empty"/>
+            android:src="@drawable/ic_qiscus_chat_empty"/>
 
         <TextView
             android:id="@+id/empty_chat_title"
@@ -119,13 +119,13 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bt_selector_grey"
+                    android:background="@drawable/bt_qiscus_selector_grey"
                     android:paddingEnd="2dp"
                     android:paddingLeft="2dp"
                     android:paddingRight="2dp"
                     android:paddingStart="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_add_image"/>
+                    android:src="@drawable/ic_qiscus_add_image"/>
 
                 <ImageView
                     android:id="@+id/button_pick_picture"
@@ -136,13 +136,13 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bt_selector_grey"
+                    android:background="@drawable/bt_qiscus_selector_grey"
                     android:paddingEnd="1dp"
                     android:paddingLeft="1dp"
                     android:paddingRight="1dp"
                     android:paddingStart="1dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_pick_picture"/>
+                    android:src="@drawable/ic_qiscus_pick_picture"/>
 
                 <ImageView
                     android:id="@+id/button_add_file"
@@ -153,13 +153,13 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bt_selector_grey"
+                    android:background="@drawable/bt_qiscus_selector_grey"
                     android:paddingEnd="2dp"
                     android:paddingLeft="2dp"
                     android:paddingRight="1dp"
                     android:paddingStart="1dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_add_file"/>
+                    android:src="@drawable/ic_qiscus_add_file"/>
 
                 <RelativeLayout
                     android:layout_width="0dp"
@@ -175,7 +175,7 @@
                         android:layout_marginBottom="6dp"
                         android:layout_marginEnd="8dp"
                         android:layout_marginRight="8dp"
-                        android:src="@drawable/ic_send_off"/>
+                        android:src="@drawable/ic_qiscus_send_off"/>
 
                 </RelativeLayout>
 

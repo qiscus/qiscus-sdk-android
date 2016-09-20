@@ -181,15 +181,15 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
         if (downloadIcon != null) {
             if (qiscusComment.isImage()) {
                 if (qiscusComment.getState() == QiscusComment.STATE_FAILED || qiscusComment.getState() == QiscusComment.STATE_SENDING) {
-                    downloadIcon.setImageResource(R.drawable.ic_upload_big);
+                    downloadIcon.setImageResource(R.drawable.ic_qiscus_upload_big);
                 } else {
-                    downloadIcon.setImageResource(R.drawable.ic_download_big);
+                    downloadIcon.setImageResource(R.drawable.ic_qiscus_download_big);
                 }
             } else {
                 if (qiscusComment.getState() == QiscusComment.STATE_FAILED || qiscusComment.getState() == QiscusComment.STATE_SENDING) {
-                    downloadIcon.setImageResource(R.drawable.ic_upload);
+                    downloadIcon.setImageResource(R.drawable.ic_qiscus_upload);
                 } else {
-                    downloadIcon.setImageResource(R.drawable.ic_download);
+                    downloadIcon.setImageResource(R.drawable.ic_qiscus_download);
                 }
             }
         }
@@ -276,7 +276,7 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
                 thumbnail.setVisibility(View.VISIBLE);
                 Glide.with(thumbnail.getContext())
                         .load(new File(qiscusComment.getAttachmentUri().toString()))
-                        .error(R.drawable.ic_img)
+                        .error(R.drawable.ic_qiscus_img)
                         .into(thumbnail);
             }
         } else {
@@ -304,7 +304,7 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
         if (thumbnail != null) {
             Glide.with(thumbnail.getContext())
                     .load(file)
-                    .error(R.drawable.ic_img)
+                    .error(R.drawable.ic_qiscus_img)
                     .listener(new RequestListener<File, GlideDrawable>() {
                         @Override
                         public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -336,16 +336,16 @@ public class QiscusMessageViewHolder extends QiscusItemViewHolder<QiscusComment>
                     failedToSendMessageColor : rightBubbleTimeColor);
             switch (qiscusComment.getState()) {
                 case QiscusComment.STATE_SENDING:
-                    iconRead.setImageResource(R.drawable.ic_info_time);
+                    iconRead.setImageResource(R.drawable.ic_qiscus_info_time);
                     break;
                 case QiscusComment.STATE_ON_QISCUS:
-                    iconRead.setImageResource(R.drawable.ic_sending);
+                    iconRead.setImageResource(R.drawable.ic_qiscus_sending);
                     break;
                 case QiscusComment.STATE_ON_PUSHER:
-                    iconRead.setImageResource(R.drawable.ic_read);
+                    iconRead.setImageResource(R.drawable.ic_qiscus_read);
                     break;
                 case QiscusComment.STATE_FAILED:
-                    iconRead.setImageResource(R.drawable.ic_sending_failed);
+                    iconRead.setImageResource(R.drawable.ic_qiscus_sending_failed);
                     break;
             }
         }

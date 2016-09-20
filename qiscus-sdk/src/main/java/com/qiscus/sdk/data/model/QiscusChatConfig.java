@@ -29,16 +29,16 @@ public class QiscusChatConfig {
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
     private String emptyRoomTitle = "Welcome!";
     private String emptyRoomSubtitle = "Lets start conversation";
-    private int emptyRoomImageResource = R.drawable.ic_chat_empty;
+    private int emptyRoomImageResource = R.drawable.ic_qiscus_chat_empty;
     private String messageFieldHint = "Type a message…";
-    private int addPictureIcon = R.drawable.ic_add_image;
-    private int takePictureIcon = R.drawable.ic_pick_picture;
-    private int addFileIcon = R.drawable.ic_add_file;
-    private int sendActiveIcon = R.drawable.ic_send_on;
-    private int sendInactiveIcon = R.drawable.ic_send_off;
+    private int addPictureIcon = R.drawable.ic_qiscus_add_image;
+    private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
+    private int addFileIcon = R.drawable.ic_qiscus_add_file;
+    private int sendActiveIcon = R.drawable.ic_qiscus_send_on;
+    private int sendInactiveIcon = R.drawable.ic_qiscus_send_off;
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
-    private int notificationSmallIcon = R.drawable.ic_chat;
-    private int notificationBigIcon = R.drawable.ic_chat;
+    private int notificationSmallIcon = R.drawable.ic_qiscus_chat;
+    private int notificationBigIcon = R.drawable.ic_qiscus_chat;
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getSender;
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> Qiscus.buildChatWith(qiscusComment.getSenderEmail())

@@ -24,7 +24,7 @@
         android:layout_alignTop="@+id/message"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:src="@drawable/ic_arrow_bubble_primary"
+        android:src="@drawable/ic_qiscus_arrow_bubble_primary"
         android:tint="@color/qiscus_primary"/>
 
     <RelativeLayout
@@ -55,7 +55,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_file"
+                android:src="@drawable/ic_qiscus_file"
                 android:tint="@color/qiscus_divider"/>
 
             <TextView
@@ -84,7 +84,7 @@
                 android:layout_marginStart="10dp"
                 android:background="@drawable/qiscus_circle_divider"
                 android:padding="4dp"
-                android:src="@drawable/ic_download"
+                android:src="@drawable/ic_qiscus_download"
                 android:tint="@color/qiscus_secondary_text"
                 android:visibility="visible"/>
 
