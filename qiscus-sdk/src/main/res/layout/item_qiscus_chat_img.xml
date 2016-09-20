@@ -15,34 +15,29 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/bubble"
         android:layout_width="42dp"
         android:layout_height="27dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/message"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:scaleType="fitStart"
-        android:src="@drawable/ic_arrow_bubble_primary_light"
-        android:tint="@color/qiscus_primary_light"/>
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_arrow_bubble_primary"
+        android:tint="@color/qiscus_primary"/>
 
     <RelativeLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/date"
         android:layout_marginBottom="4dp"
-        android:layout_marginEnd="19dp"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="19dp"
-        android:layout_marginStart="64dp"
-        android:background="@drawable/rounded_primary_light_chat_bg"
+        android:layout_marginEnd="64dp"
+        android:layout_marginLeft="19dp"
+        android:layout_marginRight="64dp"
+        android:layout_marginStart="19dp"
+        android:background="@drawable/qiscus_rounded_primary_chat_bg"
         android:gravity="end"
         android:orientation="horizontal"
         android:padding="8dp">
@@ -60,7 +55,7 @@
             android:layout_centerHorizontal="true"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
         <ImageView
             android:id="@+id/frame"
@@ -73,8 +68,8 @@
             android:layout_alignStart="@+id/holder"
             android:layout_alignTop="@+id/holder"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/bg_frame_primary_light"
-            android:tint="@color/qiscus_primary_light"
+            android:src="@drawable/bg_frame_primary"
+            android:tint="@color/qiscus_primary"
             android:visibility="visible"/>
 
         <RelativeLayout
@@ -82,7 +77,7 @@
             android:layout_width="192dp"
             android:layout_height="192dp"
             android:layout_margin="4dp"
-            android:background="@drawable/round_dark_white"
+            android:background="@drawable/qiscus_rounded_dark_white"
             android:padding="4dp">
 
             <ImageView
@@ -108,54 +103,40 @@
                 android:textSize="17sp"/>
 
             <ImageView
-                android:id="@+id/iv_download"
                 android:layout_width="132dp"
                 android:layout_height="132dp"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="12dp"
-                android:background="@drawable/circle_divider"
+                android:background="@drawable/qiscus_circle_divider"
                 android:padding="48dp"
                 android:src="@drawable/ic_download_big"
                 android:tint="@color/qiscus_secondary_text"/>
 
+            <com.github.lzyzsd.circleprogress.CircleProgress
+                android:id="@+id/progress"
+                android:layout_width="132dp"
+                android:layout_height="132dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone"
+                app:circle_finished_color="@color/qiscus_primary"/>
         </RelativeLayout>
-
-        <com.github.lzyzsd.circleprogress.CircleProgress
-            android:id="@+id/progress"
-            android:layout_width="132dp"
-            android:layout_height="132dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="12dp"
-            android:layout_marginTop="49dp"
-            android:visibility="gone"
-            app:circle_finished_color="@color/qiscus_primary_light"/>
 
         <TextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/holder"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="8dp"
-            android:layout_toLeftOf="@+id/icon_read"
-            android:layout_toStartOf="@+id/icon_read"
-            android:textColor="@color/qiscus_secondary_text"
-            android:textSize="12sp"/>
-
-        <ImageView
-            android:id="@+id/icon_read"
-            android:layout_width="18dp"
-            android:layout_height="16dp"
             android:layout_alignEnd="@+id/holder"
             android:layout_alignRight="@+id/holder"
             android:layout_below="@+id/holder"
             android:layout_gravity="bottom"
-            android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"/>
-    </RelativeLayout>
+            android:layout_marginTop="8dp"
+            android:textColor="@color/qiscus_primary_light"
+            android:textSize="12sp"/>
 
+    </RelativeLayout>
 
     <!-- Add this view because Xiaomi need it -->
     <View

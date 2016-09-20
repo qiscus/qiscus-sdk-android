@@ -75,19 +75,19 @@ public class QiscusChatAdapter extends QiscusSortedRecyclerAdapter<QiscusComment
     protected int getItemResourceLayout(int viewType) {
         switch (viewType) {
             case TYPE_MESSAGE_ME:
-                return R.layout.item_chat_text_me;
+                return R.layout.item_qiscus_chat_text_me;
             case TYPE_MESSAGE_OTHER:
-                return R.layout.item_chat_text;
+                return R.layout.item_qiscus_chat_text;
             case TYPE_PICTURE_ME:
-                return R.layout.item_chat_img_me;
+                return R.layout.item_qiscus_chat_img_me;
             case TYPE_PICTURE_OTHER:
-                return R.layout.item_chat_img;
+                return R.layout.item_qiscus_chat_img;
             case TYPE_FILE_ME:
-                return R.layout.item_chat_file_me;
+                return R.layout.item_qiscus_chat_file_me;
             case TYPE_FILE_OTHER:
-                return R.layout.item_chat_file;
+                return R.layout.item_qiscus_chat_file;
             default:
-                return R.layout.item_chat_text;
+                return R.layout.item_qiscus_chat_text;
         }
     }
 

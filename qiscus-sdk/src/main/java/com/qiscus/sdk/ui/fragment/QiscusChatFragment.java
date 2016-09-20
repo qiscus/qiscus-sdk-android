@@ -105,7 +105,7 @@ public class QiscusChatFragment extends QiscusFragment implements QiscusChatPres
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        animation = AnimationUtils.loadAnimation(getActivity(), R.anim.simple_grow);
+        animation = AnimationUtils.loadAnimation(getActivity(), R.anim.qiscus_simple_grow);
 
         NotificationManagerCompat.from(getActivity()).cancel(qiscusChatRoom.getId());
         QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());

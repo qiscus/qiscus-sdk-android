@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/rounded_accent_bg"
+                android:background="@drawable/qiscus_rounded_accent_bg"
                 android:elevation="1dp"
                 android:padding="8dp"
                 android:text="@string/new_message"

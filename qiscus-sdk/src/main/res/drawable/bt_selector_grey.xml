@@ -15,5 +15,5 @@
             <solid android:color="#40727272" />
         </shape>
     </item>
-    <item android:drawable="@drawable/transparent" />
+    <item android:drawable="@drawable/qiscus_transparent" />
 </selector>
