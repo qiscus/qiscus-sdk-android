@@ -48,7 +48,7 @@ public enum QiscusDataBaseHelper {
             sqLiteDatabase.beginTransaction();
             try {
                 sqLiteDatabase.insert(QiscusDb.FilesTable.TABLE_NAME, null,
-                                      QiscusDb.FilesTable.toContentValues(topicId, commentId, localPath));
+                        QiscusDb.FilesTable.toContentValues(topicId, commentId, localPath));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -205,7 +205,7 @@ public enum QiscusDataBaseHelper {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
@@ -227,8 +227,8 @@ public enum QiscusDataBaseHelper {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
-                + QiscusDb.CommentTable.COLUMN_TIME + " < " + qiscusComment.getTime().getTime() + " "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
+                + QiscusDb.CommentTable.COLUMN_ID + " < " + qiscusComment.getId() + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
