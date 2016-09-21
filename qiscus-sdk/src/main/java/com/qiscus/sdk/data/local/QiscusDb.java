@@ -7,24 +7,24 @@ import com.qiscus.sdk.data.model.QiscusComment;
 
 import java.util.Date;
 
-public class QiscusDb {
-    public static final String DATABASE_NAME = "qiscus.db";
-    public static final int DATABASE_VERSION = 1;
+class QiscusDb {
+    static final String DATABASE_NAME = "qiscus.db";
+    static final int DATABASE_VERSION = 1;
 
-    public static abstract class CommentTable {
-        public static final String TABLE_NAME = "comments";
-        public static final String COLUMN_ID = "id";
-        public static final String COLUMN_ROOM_ID = "room_id";
-        public static final String COLUMN_TOPIC_ID = "topic_id";
-        public static final String COLUMN_UNIQUE_ID = "unique_id";
-        public static final String COLUMN_COMMENT_BEFORE_ID = "comment_before_id";
-        public static final String COLUMN_MESSAGE = "message";
-        public static final String COLUMN_SENDER = "sender";
-        public static final String COLUMN_SENDER_EMAIL = "sender_email";
-        public static final String COLUMN_TIME = "time";
-        public static final String COLUMN_STATE = "state";
+    static abstract class CommentTable {
+        static final String TABLE_NAME = "comments";
+        static final String COLUMN_ID = "id";
+        static final String COLUMN_ROOM_ID = "room_id";
+        static final String COLUMN_TOPIC_ID = "topic_id";
+        static final String COLUMN_UNIQUE_ID = "unique_id";
+        static final String COLUMN_COMMENT_BEFORE_ID = "comment_before_id";
+        static final String COLUMN_MESSAGE = "message";
+        static final String COLUMN_SENDER = "sender";
+        static final String COLUMN_SENDER_EMAIL = "sender_email";
+        static final String COLUMN_TIME = "time";
+        static final String COLUMN_STATE = "state";
 
-        public static final String CREATE =
+        static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         COLUMN_ID + " INTEGER," +
                         COLUMN_ROOM_ID + " INTEGER," +
@@ -38,7 +38,7 @@ public class QiscusDb {
                         COLUMN_STATE + " INTEGER NOT NULL" +
                         " ); ";
 
-        public static ContentValues toContentValues(QiscusComment qiscusComment) {
+        static ContentValues toContentValues(QiscusComment qiscusComment) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_ID, qiscusComment.getId());
             values.put(COLUMN_ROOM_ID, qiscusComment.getRoomId());
@@ -53,7 +53,7 @@ public class QiscusDb {
             return values;
         }
 
-        public static QiscusComment parseCursor(Cursor cursor) {
+        static QiscusComment parseCursor(Cursor cursor) {
             QiscusComment qiscusComment = new QiscusComment();
             qiscusComment.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
             qiscusComment.setRoomId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
@@ -69,20 +69,20 @@ public class QiscusDb {
         }
     }
 
-    public static abstract class FilesTable {
-        public static final String TABLE_NAME = "files";
-        public static final String COLUMN_COMMENT_ID = "comment_id";
-        public static final String COLUMN_TOPIC_ID = "topic_id";
-        public static final String COLUMN_LOCAL_PATH = "local_path";
+    static abstract class FilesTable {
+        static final String TABLE_NAME = "files";
+        static final String COLUMN_COMMENT_ID = "comment_id";
+        static final String COLUMN_TOPIC_ID = "topic_id";
+        static final String COLUMN_LOCAL_PATH = "local_path";
 
-        public static final String CREATE =
+        static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         COLUMN_COMMENT_ID + " INTEGER PRIMARY KEY," +
                         COLUMN_TOPIC_ID + " INTEGER NOT NULL," +
                         COLUMN_LOCAL_PATH + " TEXT NOT NULL" +
                         " ); ";
 
-        public static ContentValues toContentValues(int topicId, int commentId, String localPath) {
+        static ContentValues toContentValues(int topicId, int commentId, String localPath) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_TOPIC_ID, topicId);
             values.put(COLUMN_COMMENT_ID, commentId);
@@ -90,7 +90,7 @@ public class QiscusDb {
             return values;
         }
 
-        public static String parseCursor(Cursor cursor) {
+        static String parseCursor(Cursor cursor) {
             return cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCAL_PATH));
         }
     }

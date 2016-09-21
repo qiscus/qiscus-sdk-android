@@ -4,9 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class QiscusDbOpenHelper extends SQLiteOpenHelper {
+class QiscusDbOpenHelper extends SQLiteOpenHelper {
 
-    public QiscusDbOpenHelper(Context context) {
+    QiscusDbOpenHelper(Context context) {
         super(context, QiscusDb.DATABASE_NAME, null, QiscusDb.DATABASE_VERSION);
     }
 
