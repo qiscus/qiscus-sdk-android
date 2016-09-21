@@ -217,7 +217,7 @@ public enum QiscusDataBaseHelper {
     }
 
     public Observable<List<QiscusComment>> getObservableComments(final int topicId, final int count) {
-        return Observable.create((Observable.OnSubscribe<List<QiscusComment>>) subscriber -> {
+        return Observable.create(subscriber -> {
             subscriber.onNext(getComments(topicId, count));
             subscriber.onCompleted();
         });
@@ -240,10 +240,25 @@ public enum QiscusDataBaseHelper {
     }
 
     public Observable<List<QiscusComment>> getObservableOlderCommentsThan(final QiscusComment qiscusComment, final int topicId, final int count) {
-        return Observable.create((Observable.OnSubscribe<List<QiscusComment>>) subscriber -> {
+        return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
             subscriber.onCompleted();
         });
+    }
+
+    public QiscusComment getLatestComment() {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "LIMIT " + 1;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        QiscusComment qiscusComment = null;
+        while (cursor.moveToNext()) {
+            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+        }
+        cursor.close();
+        return qiscusComment;
     }
 
     public void clear() {

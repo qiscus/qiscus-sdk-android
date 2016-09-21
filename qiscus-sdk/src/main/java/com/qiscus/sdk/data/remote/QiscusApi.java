@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -161,6 +162,38 @@ public enum QiscusApi {
         return api.markTopicAsRead(topicId, Qiscus.getToken());
     }
 
+    public Observable<QiscusComment> sync() {
+        QiscusComment latestComment = QiscusDataBaseHelper.getInstance().getLatestComment();
+        return api.sync(Qiscus.getToken(), latestComment == null ? 0 : latestComment.getId())
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .filter(jsonElement -> jsonElement != null)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> {
+                    QiscusComment qiscusComment = new QiscusComment();
+                    JsonObject jsonComment = jsonElement.getAsJsonObject();
+                    qiscusComment.setId(jsonComment.get("id").getAsInt());
+                    qiscusComment.setRoomId(jsonComment.get("room_id").getAsInt());
+                    qiscusComment.setTopicId(jsonComment.get("topic_id").getAsInt());
+                    qiscusComment.setUniqueId(jsonComment.get("unique_id").isJsonNull() ?
+                            qiscusComment.getId() + "" : jsonComment.get("unique_id").getAsString());
+                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    qiscusComment.setMessage(jsonComment.get("message").getAsString());
+                    qiscusComment.setSender(jsonComment.get("username").getAsString());
+                    qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
+                    qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
+                    try {
+                        qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return qiscusComment;
+                });
+    }
+
     public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
             long fileLength = file.length();
@@ -266,8 +299,8 @@ public enum QiscusApi {
 
         @GET("/api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(@Query("token") String token,
-                                                 @Query("topic_id") int topicId,
-                                                 @Query("last_comment_id") int lastCommentId);
+                                            @Query("topic_id") int topicId,
+                                            @Query("last_comment_id") int lastCommentId);
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/post_comment")
@@ -279,6 +312,10 @@ public enum QiscusApi {
         @GET("/api/v1/mobile/readnotif/{topic_id}")
         Observable<Void> markTopicAsRead(@Path("topic_id") int topicId,
                                          @Query("token") String token);
+
+        @GET("/api/v2/mobile/sync")
+        Observable<JsonElement> sync(@Query("token") String token,
+                                     @Query("last_received_comment_id") int lastCommentId);
     }
 
     private static class CountingFileRequestBody extends RequestBody {

@@ -14,14 +14,19 @@ import android.text.SpannableStringBuilder;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
+import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -45,6 +50,7 @@ public class QiscusPusherService extends Service {
     }
 
     private Subscription pusherEvent;
+    private Timer timer;
 
     @Nullable
     @Override
@@ -62,7 +68,32 @@ public class QiscusPusherService extends Service {
 
         if (Qiscus.hasSetupUser()) {
             listenPusherEvent();
+            scheduleSync(Qiscus.getHeartBeat());
         }
+    }
+
+    private void scheduleSync(long period) {
+        if (timer != null) {
+            stopSync();
+        }
+        timer = new Timer("qiscus_sync", true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                QiscusApi.getInstance().sync()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(qiscusComment -> {
+                            EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
+                            qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
+                            QiscusDataBaseHelper.getInstance().addOrUpdate(qiscusComment);
+                        }, Throwable::printStackTrace);
+            }
+        }, 0, period);
+    }
+
+    private void stopSync() {
+        timer.cancel();
     }
 
     private void listenPusherEvent() {
@@ -120,11 +151,13 @@ public class QiscusPusherService extends Service {
             case LOGIN:
                 if (pusherEvent == null || pusherEvent.isUnsubscribed()) {
                     listenPusherEvent();
+                    scheduleSync(Qiscus.getHeartBeat());
                 }
                 break;
             case LOGOUT:
                 if (pusherEvent != null && !pusherEvent.isUnsubscribed()) {
                     pusherEvent.unsubscribe();
+                    stopSync();
                 }
                 break;
         }
