@@ -9,6 +9,7 @@ import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 
 import org.json.JSONException;
@@ -164,7 +165,10 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> sync() {
         QiscusComment latestComment = QiscusDataBaseHelper.getInstance().getLatestComment();
-        return api.sync(Qiscus.getToken(), latestComment == null ? 0 : latestComment.getId())
+        if (latestComment == null || !"Today".equals(QiscusDateUtil.toTodayOrDate(latestComment.getTime()))) {
+            return Observable.empty();
+        }
+        return api.sync(Qiscus.getToken(), latestComment.getId())
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
                     return null;
