@@ -73,7 +73,7 @@
             android:layout_alignStart="@+id/holder"
             android:layout_alignTop="@+id/holder"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/bg_qiscus_frame_primary_light"
+            android:src="@drawable/bg_qiscus_frame"
             android:tint="@color/qiscus_primary_light"
             android:visibility="visible"/>
 
