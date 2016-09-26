@@ -8,6 +8,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusMessageViewHolder;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 /**
@@ -40,7 +41,8 @@ public class QiscusChatAdapter extends QiscusSortedRecyclerAdapter<QiscusComment
 
     @Override
     protected int compare(QiscusComment lhs, QiscusComment rhs) {
-        return rhs.getTime().compareTo(lhs.getTime());
+        return lhs.getId() != -1 && rhs.getId() != -1 ?
+                QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime());
     }
 
     @Override
