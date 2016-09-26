@@ -8,8 +8,12 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.util.List;
@@ -30,6 +34,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         this.room = room;
         this.currentTopicId = room.getLastTopicId();
         listenRoomEvent();
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
     }
 
     private void commentSuccess(QiscusComment qiscusComment) {
@@ -282,6 +289,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .subscribe(this::onGotNewComment, Throwable::printStackTrace);
     }
 
+    @Subscribe
+    public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
+        if (event.getQiscusComment().getTopicId() == currentTopicId) {
+            view.onNewComment(event.getQiscusComment());
+        }
+    }
+
     private void onGotNewComment(QiscusComment qiscusComment) {
         qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
         QiscusDataBaseHelper.getInstance().addOrUpdate(qiscusComment);
@@ -343,6 +357,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
         subscription = null;
         room = null;
+        EventBus.getDefault().unregister(this);
     }
 
     public interface View extends QiscusPresenter.View {

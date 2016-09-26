@@ -42,6 +42,7 @@ public class Qiscus {
     private static QiscusChatConfig CHAT_CONFIG;
 
     private static String APP_ID;
+    private static long HEART_BEAT;
 
     public static void init(Application application, String qiscusAppId) {
         APP_INSTANCE = application;
@@ -49,6 +50,7 @@ public class Qiscus {
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
         CHAT_CONFIG = new QiscusChatConfig();
+        HEART_BEAT = 5000;
 
         APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
     }
@@ -95,6 +97,14 @@ public class Qiscus {
 
     public static ChatFragmentBuilder buildChatFragmentWith(String email) {
         return new ChatFragmentBuilder(email);
+    }
+
+    public static void setHeartBeat(long heartBeat) {
+        HEART_BEAT = heartBeat;
+    }
+
+    public static long getHeartBeat() {
+        return HEART_BEAT;
     }
 
     public static void clearUser() {
