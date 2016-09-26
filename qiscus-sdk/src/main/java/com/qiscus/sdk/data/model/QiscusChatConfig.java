@@ -37,8 +37,8 @@ public class QiscusChatConfig {
     private int sendActiveIcon = R.drawable.ic_qiscus_send_on;
     private int sendInactiveIcon = R.drawable.ic_qiscus_send_off;
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
-    private int notificationSmallIcon = R.drawable.ic_qiscus_chat;
-    private int notificationBigIcon = R.drawable.ic_qiscus_chat;
+    private int notificationSmallIcon = R.drawable.ic_qiscus_notif_app;
+    private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getSender;
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> Qiscus.buildChatWith(qiscusComment.getSenderEmail())
