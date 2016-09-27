@@ -7,24 +7,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qiscus.sdk.ui.adapter.viewholder.QiscusItemViewHolder;
+import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.List;
 
+/**
+ * Created on : September 27, 2016
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * Email      : zetra@mail.ugm.ac.id
+ * GitHub     : https://github.com/zetbaitsu
+ * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
+ */
 
-public abstract class QiscusSortedRecyclerAdapter<Item, Holder extends QiscusItemViewHolder> extends
-        RecyclerView.Adapter<Holder> {
+public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder extends QiscusBaseMessageViewHolder<Item>> extends RecyclerView.Adapter<Holder> {
     protected Context context;
     protected SortedList<Item> data;
     protected OnItemClickListener itemClickListener;
     protected OnLongItemClickListener longItemClickListener;
 
-    public QiscusSortedRecyclerAdapter(Context context) {
+    protected QiscusAccount qiscusAccount;
+
+    public QiscusBaseChatAdapter(Context context) {
         this.context = context;
         data = new SortedList<>(getItemClass(), new SortedList.Callback<Item>() {
             @Override
             public int compare(Item lhs, Item rhs) {
-                return QiscusSortedRecyclerAdapter.this.compare(lhs, rhs);
+                return QiscusBaseChatAdapter.this.compare(lhs, rhs);
             }
 
             @Override
@@ -55,11 +69,28 @@ public abstract class QiscusSortedRecyclerAdapter<Item, Holder extends QiscusIte
                 return oldItem.equals(newItem);
             }
         });
+        qiscusAccount = Qiscus.getQiscusAccount();
     }
 
     protected abstract Class<Item> getItemClass();
 
-    protected abstract int compare(Item lhs, Item rhs);
+    @Override
+    public int getItemViewType(int position) {
+        Item qiscusComment = data.get(position);
+        if (qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+            return getItemViewTypeMyMessage(qiscusComment, position);
+        }
+        return getItemViewTypeOthersMessage(qiscusComment, position);
+    }
+
+    protected abstract int getItemViewTypeMyMessage(Item qiscusComment, int position);
+
+    protected abstract int getItemViewTypeOthersMessage(Item qiscusComment, int position);
+
+    protected int compare(Item lhs, Item rhs) {
+        return lhs.getId() != -1 && rhs.getId() != -1 ?
+                QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime());
+    }
 
     protected View getView(ViewGroup parent, int viewType) {
         return LayoutInflater.from(context).inflate(getItemResourceLayout(viewType), parent, false);
@@ -72,6 +103,26 @@ public abstract class QiscusSortedRecyclerAdapter<Item, Holder extends QiscusIte
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
+        if (position == getItemCount() - 1) {
+            holder.setNeedToShowDate(true);
+        } else {
+            holder.setNeedToShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTime(), data.get(position + 1).getTime()));
+        }
+
+        if (!qiscusAccount.getEmail().equals(data.get(position).getSenderEmail())) {
+            holder.setMessageFromMe(false);
+        } else {
+            holder.setMessageFromMe(true);
+        }
+
+        if (holder.isNeedToShowDate()) {
+            holder.setNeedToShowFirstMessageBubbleIndicator(true);
+        } else if (data.get(position).getSenderEmail().equals(data.get(position + 1).getSenderEmail())) {
+            holder.setNeedToShowFirstMessageBubbleIndicator(false);
+        } else {
+            holder.setNeedToShowFirstMessageBubbleIndicator(true);
+        }
+
         holder.bind(data.get(position));
     }
 
@@ -165,8 +216,8 @@ public abstract class QiscusSortedRecyclerAdapter<Item, Holder extends QiscusIte
             return -1;
         }
 
-        int size = data.size() - 1;
-        for (int i = size; i >= 0; i--) {
+        int size = data.size();
+        for (int i = 0; i < size; i++) {
             if (data.get(i).equals(item)) {
                 return i;
             }
