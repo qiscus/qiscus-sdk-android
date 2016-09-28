@@ -44,6 +44,7 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
     @Override
     protected void onLoadView(View view) {
         super.onLoadView(view);
+        swipeRefreshLayout.setProgressViewOffset(false, 0, 128);
         attachButton = (ImageView) view.findViewById(R.id.button_attach);
         addPanel = (LinearLayout) view.findViewById(R.id.add_panel);
         attachButton.setOnClickListener(v -> {

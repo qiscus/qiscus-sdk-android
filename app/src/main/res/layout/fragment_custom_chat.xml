@@ -60,7 +60,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
-                    android:paddingBottom="64dp"/>
+                    android:paddingBottom="64dp"
+                    android:paddingTop="64dp"/>
             </android.support.v4.widget.SwipeRefreshLayout>
 
             <TextView
@@ -68,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="64dp"
                 android:background="@drawable/qiscus_rounded_accent_bg"
                 android:elevation="1dp"
                 android:padding="8dp"
@@ -85,10 +86,10 @@
             android:layout_above="@+id/input_panel"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
             android:background="@drawable/rounded_white"
-            android:elevation="1dp"
+            android:elevation="4dp"
             android:orientation="vertical"
             android:padding="8dp"
             android:visibility="gone">
@@ -144,7 +145,7 @@
             android:layout_alignParentBottom="true"
             android:layout_margin="8dp"
             android:background="@drawable/rounded_white"
-            android:elevation="1dp"
+            android:elevation="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="8dp">
@@ -153,9 +154,9 @@
                 android:id="@+id/button_attach"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:padding="4dp"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/bt_qiscus_selector_grey"
+                android:padding="4dp"
                 android:src="@drawable/ic_action_add"/>
 
             <EditText
@@ -189,7 +190,7 @@
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-7dp"
+        android:layout_marginTop="48dp"
         android:indeterminate="true"
         android:visibility="gone"/>
 
