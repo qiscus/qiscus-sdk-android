@@ -56,8 +56,8 @@ public class Qiscus {
         APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
     }
 
-    public static SetUserBuilder setUser(String email, String password) {
-        return new SetUserBuilder(email, password);
+    public static SetUserBuilder setUser(String userEmail, String userKey) {
+        return new SetUserBuilder(userEmail, userKey);
     }
 
     public static Application getApps() {
