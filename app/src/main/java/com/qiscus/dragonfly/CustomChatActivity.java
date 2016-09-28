@@ -33,7 +33,7 @@ public class CustomChatActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.qiscus_primary_dark));
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.qiscus_primary_light));
         }
 
         setContentView(R.layout.activity_custom_chat);
