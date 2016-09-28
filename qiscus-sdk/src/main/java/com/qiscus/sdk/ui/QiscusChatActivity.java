@@ -13,20 +13,16 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.R2;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class QiscusChatActivity extends QiscusActivity {
     private static final String CHAT_ROOM_DATA = "chat_room_data";
 
-    @BindView(R2.id.toolbar) Toolbar toolbar;
-    @BindView(R2.id.tv_name) TextView tvName;
-    @BindView(R2.id.tv_subtile) TextView tvSubtitle;
+    protected Toolbar toolbar;
+    protected TextView tvName;
+    protected TextView tvSubtitle;
 
     private QiscusChatConfig chatConfig;
     private QiscusChatRoom qiscusChatRoom;
@@ -47,7 +43,11 @@ public class QiscusChatActivity extends QiscusActivity {
             window.setStatusBarColor(ContextCompat.getColor(this, chatConfig.getStatusBarColor()));
         }
         setContentView(R.layout.activity_qiscus_chat);
-        ButterKnife.bind(this);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        tvName = (TextView) findViewById(R.id.tv_name);
+        tvSubtitle = (TextView) findViewById(R.id.tv_subtile);
+
         onViewReady(savedInstanceState);
     }
 

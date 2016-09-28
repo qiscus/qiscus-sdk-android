@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.R2;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
@@ -47,7 +46,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import butterknife.OnClick;
 
 /**
  * Created on : September 28, 2016
@@ -131,6 +129,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
         sendButton.setOnClickListener(v -> sendMessage());
 
+        if (newMessageButton != null) {
+            newMessageButton.setOnClickListener(v -> scrollToBottom());
+        }
         if (addImageButton != null) {
             addImageButton.setOnClickListener(v -> addImage());
         }
@@ -404,8 +405,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         }
     }
 
-    @OnClick(R2.id.button_new_message)
-    public void scrollToBottom() {
+    protected void scrollToBottom() {
         messageRecyclerView.smoothScrollToPosition(0);
         if (newMessageButton != null) {
             newMessageButton.setVisibility(View.GONE);
