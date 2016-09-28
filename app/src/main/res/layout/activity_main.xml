@@ -37,6 +37,13 @@
             android:layout_marginTop="8dp"
             android:onClick="openChatFragment"
             android:text="Open Chat Fragment"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="openAdvanceCustomChat"
+            android:text="Open Advance Custom Chat"/>
     </LinearLayout>
 
 </RelativeLayout>

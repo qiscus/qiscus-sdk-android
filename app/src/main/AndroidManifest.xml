@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.qiscus.dragonfly"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.qiscus.dragonfly">
 
     <application
         android:name=".SampleApps"
@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ChatActivity"/>
+        <activity android:name=".CustomChatActivity"/>
     </application>
 
 </manifest>

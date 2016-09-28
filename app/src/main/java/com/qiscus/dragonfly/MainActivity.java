@@ -73,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, ChatActivity.class));
     }
 
+    public void openAdvanceCustomChat(View view) {
+        startActivity(new Intent(this, CustomChatActivity.class));
+    }
+
     public void showError(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
