@@ -11,6 +11,7 @@ import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.service.QiscusPusherService;
@@ -89,6 +90,10 @@ public class Qiscus {
 
     public static QiscusChatConfig getChatConfig() {
         return CHAT_CONFIG;
+    }
+
+    public static ChatBuilder buildChatRoomWith(String email) {
+        return new ChatBuilder(email);
     }
 
     public static ChatActivityBuilder buildChatWith(String email) {
@@ -191,6 +196,38 @@ public class Qiscus {
 
     public interface SetUserListener {
         void onSuccess(QiscusAccount qiscusAccount);
+
+        void onError(Throwable throwable);
+    }
+
+    public static class ChatBuilder {
+        private Set<String> emails;
+
+        private ChatBuilder(String email) {
+            emails = new HashSet<>();
+            emails.add(email);
+        }
+
+        public ChatBuilder addEmail(String email) {
+            emails.add(email);
+            return this;
+        }
+
+
+        public void build(ChatBuilderListener listener) {
+            build().subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listener::onSuccess, listener::onError);
+        }
+
+        public Observable<QiscusChatRoom> build() {
+            return QiscusApi.getInstance()
+                    .getChatRoom(new ArrayList<>(emails));
+        }
+    }
+
+    public interface ChatBuilderListener {
+        void onSuccess(QiscusChatRoom qiscusChatRoom);
 
         void onError(Throwable throwable);
     }

@@ -12,11 +12,15 @@ import android.os.Environment;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class QiscusImageUtil {
 
@@ -199,5 +203,14 @@ public class QiscusImageUtil {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         mediaScanIntent.setData(Uri.fromFile(picture));
         Qiscus.getApps().sendBroadcast(mediaScanIntent);
+    }
+
+    public static File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        QiscusCacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());
+        return image;
     }
 }
