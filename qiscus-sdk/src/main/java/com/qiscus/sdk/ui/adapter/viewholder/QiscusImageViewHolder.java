@@ -27,37 +27,37 @@ public class QiscusImageViewHolder extends QiscusBaseImageMessageViewHolder {
 
     @NonNull
     @Override
-    public ImageView getThumbnailView(View itemView) {
+    protected ImageView getThumbnailView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.thumbnail);
     }
 
     @Nullable
     @Override
-    public ViewGroup getImageHolderLayout(View itemView) {
+    protected ViewGroup getImageHolderLayout(View itemView) {
         return (ViewGroup) itemView.findViewById(R.id.holder);
     }
 
     @Nullable
     @Override
-    public ImageView getImageFrameView(View itemView) {
+    protected ImageView getImageFrameView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.frame);
     }
 
     @NonNull
     @Override
-    public TextView getFileNameView(View itemView) {
+    protected TextView getFileNameView(View itemView) {
         return (TextView) itemView.findViewById(R.id.file_name);
     }
 
     @Nullable
     @Override
-    public CircleProgress getProgressView(View itemView) {
+    protected CircleProgress getProgressView(View itemView) {
         return (CircleProgress) itemView.findViewById(R.id.progress);
     }
 
     @Nullable
     @Override
-    public ImageView getDownloadIconView(View itemView) {
+    protected ImageView getDownloadIconView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.iv_download);
     }
 
@@ -75,19 +75,19 @@ public class QiscusImageViewHolder extends QiscusBaseImageMessageViewHolder {
 
     @Nullable
     @Override
-    public TextView getDateView(View itemView) {
+    protected TextView getDateView(View itemView) {
         return (TextView) itemView.findViewById(R.id.date);
     }
 
     @Nullable
     @Override
-    public TextView getTimeView(View itemView) {
+    protected TextView getTimeView(View itemView) {
         return (TextView) itemView.findViewById(R.id.time);
     }
 
     @Nullable
     @Override
-    public ImageView getMessageStateIndicatorView(View itemView) {
+    protected ImageView getMessageStateIndicatorView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.icon_read);
     }
 }

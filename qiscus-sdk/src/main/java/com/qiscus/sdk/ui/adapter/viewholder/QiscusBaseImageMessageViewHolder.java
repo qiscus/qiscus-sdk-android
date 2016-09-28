@@ -49,22 +49,22 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     @NonNull
-    public abstract ImageView getThumbnailView(View itemView);
+    protected abstract ImageView getThumbnailView(View itemView);
 
     @Nullable
-    public abstract ViewGroup getImageHolderLayout(View itemView);
+    protected abstract ViewGroup getImageHolderLayout(View itemView);
 
     @Nullable
-    public abstract ImageView getImageFrameView(View itemView);
+    protected abstract ImageView getImageFrameView(View itemView);
 
     @Nullable
-    public abstract TextView getFileNameView(View itemView);
+    protected abstract TextView getFileNameView(View itemView);
 
     @Nullable
-    public abstract CircleProgress getProgressView(View itemView);
+    protected abstract CircleProgress getProgressView(View itemView);
 
     @Nullable
-    public abstract ImageView getDownloadIconView(View itemView);
+    protected abstract ImageView getDownloadIconView(View itemView);
 
     @Override
     public void bind(QiscusComment qiscusComment) {

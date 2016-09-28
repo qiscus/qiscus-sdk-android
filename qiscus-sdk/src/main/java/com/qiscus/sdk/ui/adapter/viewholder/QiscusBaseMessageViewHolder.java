@@ -91,13 +91,13 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected abstract View getMessageBubbleView(View itemView);
 
     @Nullable
-    public abstract TextView getDateView(View itemView);
+    protected abstract TextView getDateView(View itemView);
 
     @Nullable
-    public abstract TextView getTimeView(View itemView);
+    protected abstract TextView getTimeView(View itemView);
 
     @Nullable
-    public abstract ImageView getMessageStateIndicatorView(View itemView);
+    protected abstract ImageView getMessageStateIndicatorView(View itemView);
 
     public void setNeedToShowDate(boolean needToShowDate) {
         this.needToShowDate = needToShowDate;

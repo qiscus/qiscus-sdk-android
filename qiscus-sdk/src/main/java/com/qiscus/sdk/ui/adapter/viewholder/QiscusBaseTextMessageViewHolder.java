@@ -26,7 +26,7 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
     }
 
     @NonNull
-    public abstract TextView getMessageTextView(View itemView);
+    protected abstract TextView getMessageTextView(View itemView);
 
     @Override
     protected void setUpColor() {

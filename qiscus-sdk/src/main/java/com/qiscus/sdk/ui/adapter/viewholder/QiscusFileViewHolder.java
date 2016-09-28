@@ -39,43 +39,43 @@ public class QiscusFileViewHolder extends QiscusBaseFileMessageViewHolder {
 
     @Nullable
     @Override
-    public TextView getDateView(View itemView) {
+    protected TextView getDateView(View itemView) {
         return (TextView) itemView.findViewById(R.id.date);
     }
 
     @Nullable
     @Override
-    public TextView getTimeView(View itemView) {
+    protected TextView getTimeView(View itemView) {
         return (TextView) itemView.findViewById(R.id.time);
     }
 
     @Nullable
     @Override
-    public ImageView getMessageStateIndicatorView(View itemView) {
+    protected ImageView getMessageStateIndicatorView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.icon_read);
     }
 
     @NonNull
     @Override
-    public TextView getFileNameView(View itemView) {
+    protected TextView getFileNameView(View itemView) {
         return (TextView) itemView.findViewById(R.id.file_name);
     }
 
     @Nullable
     @Override
-    public TextView getFileTypeView(View itemView) {
+    protected TextView getFileTypeView(View itemView) {
         return (TextView) itemView.findViewById(R.id.file_type);
     }
 
     @Nullable
     @Override
-    public CircleProgress getProgressView(View itemView) {
+    protected CircleProgress getProgressView(View itemView) {
         return (CircleProgress) itemView.findViewById(R.id.progress);
     }
 
     @Nullable
     @Override
-    public ImageView getDownloadIconView(View itemView) {
+    protected ImageView getDownloadIconView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.iv_download);
     }
 

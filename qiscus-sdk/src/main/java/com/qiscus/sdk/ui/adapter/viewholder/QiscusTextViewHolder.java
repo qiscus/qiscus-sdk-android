@@ -25,7 +25,7 @@ public class QiscusTextViewHolder extends QiscusBaseTextMessageViewHolder {
 
     @NonNull
     @Override
-    public TextView getMessageTextView(View itemView) {
+    protected TextView getMessageTextView(View itemView) {
         return (TextView) itemView.findViewById(R.id.contents);
     }
 
@@ -43,19 +43,19 @@ public class QiscusTextViewHolder extends QiscusBaseTextMessageViewHolder {
 
     @Nullable
     @Override
-    public TextView getDateView(View itemView) {
+    protected TextView getDateView(View itemView) {
         return (TextView) itemView.findViewById(R.id.date);
     }
 
     @Nullable
     @Override
-    public TextView getTimeView(View itemView) {
+    protected TextView getTimeView(View itemView) {
         return (TextView) itemView.findViewById(R.id.time);
     }
 
     @Nullable
     @Override
-    public ImageView getMessageStateIndicatorView(View itemView) {
+    protected ImageView getMessageStateIndicatorView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.icon_read);
     }
 }

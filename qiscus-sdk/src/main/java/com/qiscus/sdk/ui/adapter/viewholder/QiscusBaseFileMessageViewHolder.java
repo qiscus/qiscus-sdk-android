@@ -40,16 +40,16 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     }
 
     @NonNull
-    public abstract TextView getFileNameView(View itemView);
+    protected abstract TextView getFileNameView(View itemView);
 
     @Nullable
-    public abstract TextView getFileTypeView(View itemView);
+    protected abstract TextView getFileTypeView(View itemView);
 
     @Nullable
-    public abstract CircleProgress getProgressView(View itemView);
+    protected abstract CircleProgress getProgressView(View itemView);
 
     @Nullable
-    public abstract ImageView getDownloadIconView(View itemView);
+    protected abstract ImageView getDownloadIconView(View itemView);
 
     @Override
     public void bind(QiscusComment qiscusComment) {
