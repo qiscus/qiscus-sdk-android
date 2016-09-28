@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -24,6 +25,9 @@ import com.qiscus.sdk.ui.view.QiscusRecyclerView;
  */
 public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter> {
 
+    private ImageView attachButton;
+    private LinearLayout addPanel;
+
     public static CustomChatFragment newInstance(QiscusChatRoom qiscusChatRoom) {
         CustomChatFragment fragment = new CustomChatFragment();
         Bundle bundle = new Bundle();
@@ -34,7 +38,22 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
 
     @Override
     protected int getResourceLayout() {
-        return com.qiscus.sdk.R.layout.fragment_qiscus_chat;
+        return R.layout.fragment_custom_chat;
+    }
+
+    @Override
+    protected void onLoadView(View view) {
+        super.onLoadView(view);
+        attachButton = (ImageView) view.findViewById(R.id.button_attach);
+        addPanel = (LinearLayout) view.findViewById(R.id.add_panel);
+        attachButton.setOnClickListener(v -> {
+            if (addPanel.getVisibility() == View.GONE) {
+                addPanel.startAnimation(animation);
+                addPanel.setVisibility(View.VISIBLE);
+            } else {
+                addPanel.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Nullable

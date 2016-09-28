@@ -25,37 +25,37 @@ public class MyMessageViewHolder extends QiscusBaseTextMessageViewHolder {
 
     @NonNull
     @Override
-    public TextView getMessageTextView(View itemView) {
-        return (TextView) itemView.findViewById(R.id.message);
+    protected TextView getMessageTextView(View itemView) {
+        return (TextView) itemView.findViewById(R.id.contents);
     }
 
     @Nullable
     @Override
     protected ImageView getFirstMessageBubbleIndicatorView(View itemView) {
-        return null;
+        return (ImageView) itemView.findViewById(R.id.bubble);
     }
 
     @NonNull
     @Override
     protected View getMessageBubbleView(View itemView) {
-        return itemView.findViewById(R.id.bubble);
+        return itemView.findViewById(R.id.message);
     }
 
     @Nullable
     @Override
-    public TextView getDateView(View itemView) {
-        return null;
+    protected TextView getDateView(View itemView) {
+        return (TextView) itemView.findViewById(R.id.date);
     }
 
     @Nullable
     @Override
-    public TextView getTimeView(View itemView) {
-        return null;
+    protected TextView getTimeView(View itemView) {
+        return (TextView) itemView.findViewById(R.id.time);
     }
 
     @Nullable
     @Override
-    public ImageView getMessageStateIndicatorView(View itemView) {
-        return null;
+    protected ImageView getMessageStateIndicatorView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.icon_read);
     }
 }
