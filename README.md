@@ -18,7 +18,7 @@ allprojects {
 Then add to your app module build.gradle
 ```groovy
 dependencies {
-    compile 'com.github.qiscus:qiscus-sdk-android:1.5'
+    compile 'com.github.qiscus:qiscus-sdk-android:1.6'
 }
 ```
 # Let's make cools chatting apps!
@@ -36,7 +36,7 @@ public class SampleApps extends Application {
 #### Login to Qiscus engine
 Before user can start chatting each other, they must login to qiscus engine.
 ```java
-Qiscus.setUser("user@email.com", "password")
+Qiscus.setUser("user@email.com", "userKey")
       .withUsername("Tony Stark")
       .withAvatarUrl("http://avatar.url.com/handsome.jpg")
       .save(new Qiscus.SetUserListener() {
