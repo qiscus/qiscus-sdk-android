@@ -60,79 +60,79 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
     @Nullable
     @Override
     protected ViewGroup getEmptyChatHolder(View view) {
-        return (ViewGroup) view.findViewById(com.qiscus.sdk.R.id.empty_chat);
+        return (ViewGroup) view.findViewById(R.id.empty_chat);
     }
 
     @NonNull
     @Override
     protected SwipeRefreshLayout getSwipeRefreshLayout(View view) {
-        return (SwipeRefreshLayout) view.findViewById(com.qiscus.sdk.R.id.swipe_layout);
+        return (SwipeRefreshLayout) view.findViewById(R.id.swipe_layout);
     }
 
     @NonNull
     @Override
     protected QiscusRecyclerView getMessageRecyclerView(View view) {
-        return (QiscusRecyclerView) view.findViewById(com.qiscus.sdk.R.id.list_message);
+        return (QiscusRecyclerView) view.findViewById(R.id.list_message);
     }
 
     @NonNull
     @Override
     protected EditText getMessageEditText(View view) {
-        return (EditText) view.findViewById(com.qiscus.sdk.R.id.field_message);
+        return (EditText) view.findViewById(R.id.field_message);
     }
 
     @NonNull
     @Override
     protected ImageView getSendButton(View view) {
-        return (ImageView) view.findViewById(com.qiscus.sdk.R.id.button_send);
+        return (ImageView) view.findViewById(R.id.button_send);
     }
 
     @Nullable
     @Override
     protected View getNewMessageButton(View view) {
-        return view.findViewById(com.qiscus.sdk.R.id.button_new_message);
+        return view.findViewById(R.id.button_new_message);
     }
 
     @NonNull
     @Override
     protected View getLoadMoreProgressBar(View view) {
-        return view.findViewById(com.qiscus.sdk.R.id.progressBar);
+        return view.findViewById(R.id.progressBar);
     }
 
     @Nullable
     @Override
     protected ImageView getEmptyChatImageView(View view) {
-        return (ImageView) view.findViewById(com.qiscus.sdk.R.id.empty_chat_icon);
+        return (ImageView) view.findViewById(R.id.empty_chat_icon);
     }
 
     @Nullable
     @Override
     protected TextView getEmptyChatTitleView(View view) {
-        return (TextView) view.findViewById(com.qiscus.sdk.R.id.empty_chat_title);
+        return (TextView) view.findViewById(R.id.empty_chat_title);
     }
 
     @Nullable
     @Override
     protected TextView getEmptyChatDescView(View view) {
-        return (TextView) view.findViewById(com.qiscus.sdk.R.id.empty_chat_desc);
+        return (TextView) view.findViewById(R.id.empty_chat_desc);
     }
 
     @Nullable
     @Override
     protected ImageView getAddImageButton(View view) {
-        return (ImageView) view.findViewById(com.qiscus.sdk.R.id.button_add_image);
+        return (ImageView) view.findViewById(R.id.button_add_image);
     }
 
     @Nullable
     @Override
     protected ImageView getTakeImageButton(View view) {
-        return (ImageView) view.findViewById(com.qiscus.sdk.R.id.button_pick_picture);
+        return (ImageView) view.findViewById(R.id.button_pick_picture);
     }
 
     @Nullable
     @Override
     protected ImageView getAddFileButton(View view) {
-        return (ImageView) view.findViewById(com.qiscus.sdk.R.id.button_add_file);
+        return (ImageView) view.findViewById(R.id.button_add_file);
     }
 
     @Override
