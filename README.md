@@ -23,7 +23,7 @@ dependencies {
 ```
 # Let's make cools chatting apps!
 #### Init Qiscus
-Init Qiscus at your application class
+Init Qiscus at your application class with your application ID, you can get app ID here [http://sdk.qiscus.com](http://sdk.qiscus.com)
 ```java
 public class SampleApps extends Application {
     @Override
