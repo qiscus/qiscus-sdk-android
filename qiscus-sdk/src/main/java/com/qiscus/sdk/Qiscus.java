@@ -61,18 +61,22 @@ public class Qiscus {
     }
 
     public static Application getApps() {
+        checkAppIdSetup();
         return APP_INSTANCE;
     }
 
     public static String getAppsName() {
+        checkAppIdSetup();
         return APP_INSTANCE.getApplicationInfo().loadLabel(APP_INSTANCE.getPackageManager()).toString();
     }
 
     public static Handler getAppsHandler() {
+        checkAppIdSetup();
         return APP_HANDLER;
     }
 
     public static String getAppId() {
+        checkAppIdSetup();
         return APP_ID;
     }
 
@@ -81,35 +85,55 @@ public class Qiscus {
     }
 
     public static QiscusAccount getQiscusAccount() {
+        checkUserSetup();
         return LOCAL_DATA_MANAGER.getAccountInfo();
     }
 
     public static String getToken() {
+        checkUserSetup();
         return LOCAL_DATA_MANAGER.getToken();
     }
 
     public static QiscusChatConfig getChatConfig() {
+        checkAppIdSetup();
         return CHAT_CONFIG;
     }
 
     public static ChatBuilder buildChatRoomWith(String email) {
+        checkUserSetup();
         return new ChatBuilder(email);
     }
 
     public static ChatActivityBuilder buildChatWith(String email) {
+        checkUserSetup();
         return new ChatActivityBuilder(email);
     }
 
     public static ChatFragmentBuilder buildChatFragmentWith(String email) {
+        checkUserSetup();
         return new ChatFragmentBuilder(email);
     }
 
     public static void setHeartBeat(long heartBeat) {
+        checkAppIdSetup();
         HEART_BEAT = heartBeat;
     }
 
     public static long getHeartBeat() {
         return HEART_BEAT;
+    }
+
+    private static void checkAppIdSetup() throws RuntimeException {
+        if (APP_ID == null) {
+            throw new RuntimeException("Please init Qiscus with your app id before!");
+        }
+    }
+
+    private static void checkUserSetup() throws RuntimeException {
+        checkAppIdSetup();
+        if (!hasSetupUser()) {
+            throw new RuntimeException("Please set Qiscus user before start the chatting!");
+        }
     }
 
     public static void clearUser() {
