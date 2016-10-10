@@ -14,7 +14,7 @@ public class QiscusDateUtil {
     private static DateFormat hourDateFormat;
 
     static {
-        fullDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        fullDateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
         isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         hourDateFormat = new SimpleDateFormat("hh:mm a", Locale.US);
