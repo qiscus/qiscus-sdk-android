@@ -21,7 +21,7 @@ public class QiscusChatActivity extends QiscusActivity {
     private static final String CHAT_ROOM_DATA = "chat_room_data";
 
     protected Toolbar toolbar;
-    protected TextView tvName;
+    protected TextView tvTitle;
     protected TextView tvSubtitle;
 
     private QiscusChatConfig chatConfig;
@@ -45,8 +45,8 @@ public class QiscusChatActivity extends QiscusActivity {
         setContentView(R.layout.activity_qiscus_chat);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        tvName = (TextView) findViewById(R.id.tv_name);
-        tvSubtitle = (TextView) findViewById(R.id.tv_subtile);
+        tvTitle = (TextView) findViewById(R.id.tv_title);
+        tvSubtitle = (TextView) findViewById(R.id.tv_subtitle);
 
         onViewReady(savedInstanceState);
     }
@@ -59,7 +59,7 @@ public class QiscusChatActivity extends QiscusActivity {
 
         applyChatConfig();
 
-        tvName.setText(qiscusChatRoom.getName());
+        tvTitle.setText(qiscusChatRoom.getName());
         tvSubtitle.setText(qiscusChatRoom.getSubtitle());
         tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
 
@@ -70,7 +70,7 @@ public class QiscusChatActivity extends QiscusActivity {
 
     private void applyChatConfig() {
         toolbar.setBackgroundResource(chatConfig.getAppBarColor());
-        tvName.setTextColor(ContextCompat.getColor(this, chatConfig.getTitleColor()));
+        tvTitle.setTextColor(ContextCompat.getColor(this, chatConfig.getTitleColor()));
         tvSubtitle.setTextColor(ContextCompat.getColor(this, chatConfig.getSubtitleColor()));
     }
 
