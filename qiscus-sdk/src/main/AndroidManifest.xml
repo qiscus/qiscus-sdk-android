@@ -24,6 +24,7 @@
             android:name=".service.QiscusPusherReceiver"
             android:exported="false">
             <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="com.qiscus.OPEN_COMMENT_PN"/>
             </intent-filter>
         </receiver>

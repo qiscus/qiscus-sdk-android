@@ -13,7 +13,11 @@ import com.qiscus.sdk.data.model.QiscusComment;
 public class QiscusPusherReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        QiscusComment comment = intent.getParcelableExtra("data");
-        Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+            context.startService(new Intent(context, QiscusPusherService.class));
+        } else if (intent.getAction().equals("com.qiscus.OPEN_COMMENT_PN")) {
+            QiscusComment comment = intent.getParcelableExtra("data");
+            Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
+        }
     }
 }
