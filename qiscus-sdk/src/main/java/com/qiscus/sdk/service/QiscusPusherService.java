@@ -74,17 +74,19 @@ public class QiscusPusherService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-
+    public int onStartCommand(Intent intent, int flags, int startId) {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
 
         if (Qiscus.hasSetupUser()) {
+            if (pusherEvent != null && !pusherEvent.isUnsubscribed()) {
+                pusherEvent.unsubscribe();
+            }
             listenPusherEvent();
             scheduleSync(Qiscus.getHeartBeat());
         }
+        return START_STICKY;
     }
 
     private void scheduleSync(long period) {
