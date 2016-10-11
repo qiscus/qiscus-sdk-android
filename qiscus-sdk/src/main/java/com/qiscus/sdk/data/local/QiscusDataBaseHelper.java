@@ -28,20 +28,16 @@ import java.util.List;
 
 import rx.Observable;
 
-public enum QiscusDataBaseHelper {
-    INSTANCE;
+public class QiscusDataBaseHelper implements QiscusDataStore {
 
-    private final SQLiteDatabase sqLiteDatabase;
+    protected final SQLiteDatabase sqLiteDatabase;
 
-    QiscusDataBaseHelper() {
+    public QiscusDataBaseHelper() {
         QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(Qiscus.getApps());
         sqLiteDatabase = qiscusDbOpenHelper.getReadableDatabase();
     }
 
-    public static QiscusDataBaseHelper getInstance() {
-        return INSTANCE;
-    }
-
+    @Override
     public void add(QiscusComment qiscusComment) {
         if (!isContains(qiscusComment)) {
             sqLiteDatabase.beginTransaction();
@@ -59,8 +55,9 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public void saveLocalPath(int topicId, int commentId, String localPath) {
-        if (!isContainFileOfComment(commentId)) {
+        if (!isContainsFileOfComment(commentId)) {
             sqLiteDatabase.beginTransaction();
             try {
                 sqLiteDatabase.insert(QiscusDb.FilesTable.TABLE_NAME, null,
@@ -74,6 +71,7 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public boolean isContains(QiscusComment qiscusComment) {
         String query;
         if (qiscusComment.getId() == -1) {
@@ -92,7 +90,8 @@ public enum QiscusDataBaseHelper {
         return contains;
     }
 
-    public boolean isContainFileOfComment(int commentId) {
+    @Override
+    public boolean isContainsFileOfComment(int commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
                 + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
@@ -102,6 +101,7 @@ public enum QiscusDataBaseHelper {
         return contains;
     }
 
+    @Override
     public void update(QiscusComment qiscusComment) {
         String where;
         if (qiscusComment.getId() == -1) {
@@ -125,6 +125,7 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public void updateLocalPath(int topicId, int commentId, String localPath) {
         String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
         sqLiteDatabase.beginTransaction();
@@ -138,6 +139,7 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public void addOrUpdate(QiscusComment qiscusComment) {
         if (!isContains(qiscusComment)) {
             add(qiscusComment);
@@ -146,14 +148,16 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public void addOrUpdateLocalPath(int topicId, int commentId, String localPath) {
-        if (!isContainFileOfComment(commentId)) {
+        if (!isContainsFileOfComment(commentId)) {
             saveLocalPath(topicId, commentId, localPath);
         } else {
             updateLocalPath(topicId, commentId, localPath);
         }
     }
 
+    @Override
     public void delete(QiscusComment qiscusComment) {
         String where;
         if (qiscusComment.getId() == -1) {
@@ -174,6 +178,7 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public File getLocalPath(int commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
@@ -193,6 +198,7 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public QiscusComment getComment(int id, String uniqueId) {
         String query;
         if (id == -1) {
@@ -217,6 +223,7 @@ public enum QiscusDataBaseHelper {
         }
     }
 
+    @Override
     public List<QiscusComment> getComments(int topicId, int count) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
@@ -232,6 +239,7 @@ public enum QiscusDataBaseHelper {
         return qiscusComments;
     }
 
+    @Override
     public Observable<List<QiscusComment>> getObservableComments(final int topicId, final int count) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(topicId, count));
@@ -239,6 +247,7 @@ public enum QiscusDataBaseHelper {
         });
     }
 
+    @Override
     public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
@@ -255,6 +264,7 @@ public enum QiscusDataBaseHelper {
         return qiscusComments;
     }
 
+    @Override
     public Observable<List<QiscusComment>> getObservableOlderCommentsThan(final QiscusComment qiscusComment, final int topicId, final int count) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
@@ -262,6 +272,7 @@ public enum QiscusDataBaseHelper {
         });
     }
 
+    @Override
     public QiscusComment getLatestComment() {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
@@ -277,6 +288,7 @@ public enum QiscusDataBaseHelper {
         return qiscusComment;
     }
 
+    @Override
     public void clear() {
         sqLiteDatabase.beginTransaction();
         try {

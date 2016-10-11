@@ -23,8 +23,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.lzyzsd.circleprogress.CircleProgress;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -106,7 +106,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
 
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
-        File localPath = QiscusDataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
+        File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
         if (downloadIconView != null) {
             downloadIconView.setVisibility(localPath == null ? View.VISIBLE : View.GONE);
         }

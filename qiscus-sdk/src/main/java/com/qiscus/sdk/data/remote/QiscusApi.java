@@ -21,7 +21,6 @@ import android.net.Uri;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -184,7 +183,7 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> sync() {
-        QiscusComment latestComment = QiscusDataBaseHelper.getInstance().getLatestComment();
+        QiscusComment latestComment = Qiscus.getDataStore().getLatestComment();
         if (latestComment == null || !"Today".equals(QiscusDateUtil.toTodayOrDate(latestComment.getTime()))) {
             return Observable.empty();
         }

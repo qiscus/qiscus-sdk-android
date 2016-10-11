@@ -30,7 +30,6 @@ import android.text.SpannableStringBuilder;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
-import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
@@ -102,7 +101,7 @@ public class QiscusPusherService extends Service {
                         .subscribe(qiscusComment -> {
                             EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
                             qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
-                            QiscusDataBaseHelper.getInstance().addOrUpdate(qiscusComment);
+                            Qiscus.getDataStore().addOrUpdate(qiscusComment);
                         }, Throwable::printStackTrace);
             }
         }, 0, period);

@@ -28,8 +28,8 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.lzyzsd.circleprogress.CircleProgress;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -132,7 +132,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     private void showOthersImage(final QiscusComment qiscusComment) {
-        File localPath = QiscusDataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
+        File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
         if (localPath == null) {
             if (imageHolderLayout != null) {
                 imageHolderLayout.setVisibility(View.VISIBLE);
@@ -158,7 +158,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                     .error(R.drawable.ic_qiscus_img)
                     .into(thumbnailView);
         } else {
-            File localPath = QiscusDataBaseHelper.getInstance().getLocalPath(qiscusComment.getId());
+            File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
             if (localPath == null) {
                 if (imageHolderLayout != null) {
                     imageHolderLayout.setVisibility(View.VISIBLE);

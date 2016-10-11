@@ -25,6 +25,7 @@ import android.os.Handler;
 import com.google.gson.Gson;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
+import com.qiscus.sdk.data.local.QiscusDataStore;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -53,6 +54,7 @@ public class Qiscus {
     private static Application APP_INSTANCE;
     private static volatile Handler APP_HANDLER;
     private static LocalDataManager LOCAL_DATA_MANAGER;
+    private static QiscusDataStore DATA_STORE;
     private static QiscusChatConfig CHAT_CONFIG;
 
     private static String APP_ID;
@@ -84,6 +86,7 @@ public class Qiscus {
         APP_ID = qiscusAppId;
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
+        DATA_STORE = new QiscusDataBaseHelper();
         CHAT_CONFIG = new QiscusChatConfig();
         HEART_BEAT = 5000;
 
@@ -172,6 +175,25 @@ public class Qiscus {
     }
 
     /**
+     * Get current qiscus chat data store
+     *
+     * @return Singleton of qiscus data store
+     */
+    public static QiscusDataStore getDataStore() {
+        return DATA_STORE;
+    }
+
+    /**
+     * Use this method if you want to use your own data store implementation, e.g using Realm, your own table,
+     * your own orm, etc
+     *
+     * @param dataStore Your own chat datastore
+     */
+    public static void setDataStore(QiscusDataStore dataStore) {
+        DATA_STORE = dataStore;
+    }
+
+    /**
      * Use this method to get current qiscus chatting configuration, you can also modify it.
      *
      * @return Current qiscus chatting configuration
@@ -251,7 +273,7 @@ public class Qiscus {
      */
     public static void clearUser() {
         LOCAL_DATA_MANAGER.clearData();
-        QiscusDataBaseHelper.getInstance().clear();
+        DATA_STORE.clear();
         QiscusCacheManager.getInstance().clearData();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
