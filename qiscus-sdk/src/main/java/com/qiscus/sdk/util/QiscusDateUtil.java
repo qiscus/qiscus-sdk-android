@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class QiscusDateUtil {
+public final class QiscusDateUtil {
 
     private static DateFormat fullDateFormat;
     private static DateFormat isoDateFormat;
@@ -34,6 +34,10 @@ public class QiscusDateUtil {
         isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         hourDateFormat = new SimpleDateFormat("hh:mm a", Locale.US);
+    }
+
+    private QiscusDateUtil() {
+
     }
 
     public static String toTodayOrDate(Date date) {

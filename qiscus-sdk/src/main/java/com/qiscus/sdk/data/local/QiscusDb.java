@@ -23,7 +23,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 
 import java.util.Date;
 
-class QiscusDb {
+final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
     static final int DATABASE_VERSION = 1;
 

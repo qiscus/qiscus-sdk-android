@@ -38,10 +38,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class QiscusImageUtil {
+public final class QiscusImageUtil {
 
     public static final String IMAGE_PATH = Qiscus.getAppsName() + File.separator +
             Qiscus.getAppsName() + " Images";
+
+    private QiscusImageUtil() {
+
+    }
 
     public static Bitmap getScaledBitmap(Uri imageUri) {
         String filePath = QiscusFileUtil.getRealPathFromURI(imageUri);

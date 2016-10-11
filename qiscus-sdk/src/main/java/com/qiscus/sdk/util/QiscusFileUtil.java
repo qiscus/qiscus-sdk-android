@@ -32,10 +32,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class QiscusFileUtil {
+public final class QiscusFileUtil {
     public static final String FILES_PATH = Qiscus.getAppsName() + File.separator + "Files";
     private static final int EOF = -1;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+
+    private QiscusFileUtil() {
+
+    }
 
     public static File from(Uri uri) throws IOException {
         InputStream inputStream = Qiscus.getApps().getContentResolver().openInputStream(uri);
