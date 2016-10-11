@@ -276,7 +276,6 @@ public class Qiscus {
         private Set<String> emails;
         private String title;
         private String subtitle;
-        private QiscusChatConfig chatConfig;
 
         private ChatActivityBuilder(String email) {
             emails = new HashSet<>();
@@ -297,11 +296,6 @@ public class Qiscus {
 
         public ChatActivityBuilder withSubtitle(String subtitle) {
             this.subtitle = subtitle;
-            return this;
-        }
-
-        public ChatActivityBuilder withChatConfig(QiscusChatConfig qiscusChatConfig) {
-            this.chatConfig = qiscusChatConfig;
             return this;
         }
 
@@ -330,7 +324,6 @@ public class Qiscus {
 
     public static class ChatFragmentBuilder {
         private Set<String> emails;
-        private QiscusChatConfig chatConfig;
 
         private ChatFragmentBuilder(String email) {
             emails = new HashSet<>();
@@ -339,11 +332,6 @@ public class Qiscus {
 
         public ChatFragmentBuilder addEmail(String email) {
             emails.add(email);
-            return this;
-        }
-
-        public ChatFragmentBuilder withChatConfig(QiscusChatConfig qiscusChatConfig) {
-            this.chatConfig = qiscusChatConfig;
             return this;
         }
 
