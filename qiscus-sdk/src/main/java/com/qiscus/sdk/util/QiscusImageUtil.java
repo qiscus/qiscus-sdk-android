@@ -61,6 +61,12 @@ public final class QiscusImageUtil {
         int actualHeight = options.outHeight;
         int actualWidth = options.outWidth;
 
+        if (actualWidth < 0 || actualHeight < 0) {
+            Bitmap bitmap2 = BitmapFactory.decodeFile(filePath);
+            actualWidth = bitmap2.getWidth();
+            actualHeight = bitmap2.getHeight();
+        }
+
         //max Height and width values of the compressed image is taken as 816x612
         float maxHeight = 816.0f;
         float maxWidth = 612.0f;
