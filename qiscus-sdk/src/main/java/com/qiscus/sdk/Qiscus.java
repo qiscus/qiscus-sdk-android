@@ -394,6 +394,7 @@ public class Qiscus {
 
     public static class ChatBuilder {
         private Set<String> emails;
+        private String distinctId;
 
         private ChatBuilder(String email) {
             emails = new HashSet<>();
@@ -408,6 +409,17 @@ public class Qiscus {
          */
         public ChatBuilder addEmail(String email) {
             emails.add(email);
+            return this;
+        }
+
+        /**
+         * If you need different room for those users
+         *
+         * @param distinctId The unique id for every rooms
+         * @return builder
+         */
+        public ChatBuilder withDistinctId(String distinctId) {
+            this.distinctId = distinctId;
             return this;
         }
 
@@ -429,7 +441,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails));
+                    .getChatRoom(new ArrayList<>(emails), distinctId);
         }
     }
 
@@ -453,6 +465,7 @@ public class Qiscus {
         private Set<String> emails;
         private String title;
         private String subtitle;
+        private String distinctId;
 
         private ChatActivityBuilder(String email) {
             emails = new HashSet<>();
@@ -495,6 +508,17 @@ public class Qiscus {
         }
 
         /**
+         * If you need different room for those users
+         *
+         * @param distinctId The unique id for every rooms
+         * @return builder
+         */
+        public ChatActivityBuilder withDistinctId(String distinctId) {
+            this.distinctId = distinctId;
+            return this;
+        }
+
+        /**
          * Build the Chat activity intent
          *
          * @param context  Context for start the Activity
@@ -514,7 +538,7 @@ public class Qiscus {
          */
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails))
+                    .getChatRoom(new ArrayList<>(emails), distinctId)
                     .doOnNext(qiscusChatRoom -> {
                         qiscusChatRoom.setName(title);
                         qiscusChatRoom.setSubtitle(subtitle);
@@ -541,6 +565,7 @@ public class Qiscus {
 
     public static class ChatFragmentBuilder {
         private Set<String> emails;
+        private String distinctId;
 
         private ChatFragmentBuilder(String email) {
             emails = new HashSet<>();
@@ -555,6 +580,17 @@ public class Qiscus {
          */
         public ChatFragmentBuilder addEmail(String email) {
             emails.add(email);
+            return this;
+        }
+
+        /**
+         * If you need different room for those users
+         *
+         * @param distinctId The unique id for every rooms
+         * @return builder
+         */
+        public ChatFragmentBuilder withDistinctId(String distinctId) {
+            this.distinctId = distinctId;
             return this;
         }
 
@@ -576,7 +612,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails))
+                    .getChatRoom(new ArrayList<>(emails), distinctId)
                     .map(QiscusChatFragment::newInstance);
         }
     }

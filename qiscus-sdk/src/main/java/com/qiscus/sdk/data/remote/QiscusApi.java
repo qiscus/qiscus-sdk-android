@@ -125,8 +125,8 @@ public enum QiscusApi {
                 });
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails) {
-        return api.createOrGetChatRoom(Qiscus.getToken(), withEmails)
+    public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails, String distinctId) {
+        return api.createOrGetChatRoom(Qiscus.getToken(), withEmails, distinctId)
                 .map(jsonElement -> {
                     JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
                             .getAsJsonObject().get("room").getAsJsonObject();
@@ -318,7 +318,8 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/get_or_create_room_with_target")
         Observable<JsonElement> createOrGetChatRoom(@Field("token") String token,
-                                                    @Field("emails[]") List<String> emails);
+                                                    @Field("emails[]") List<String> emails,
+                                                    @Field("distinct_id") String distinctId);
 
         @GET("/api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(@Query("token") String token,
