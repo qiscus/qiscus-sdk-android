@@ -119,8 +119,7 @@ public enum QiscusApi {
                     qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
                     qiscusAccount.setToken(jsonAccount.get("token").getAsString());
                     qiscusAccount.setRtKey(jsonAccount.get("rtKey").getAsString());
-                    qiscusAccount.setAvatar(jsonAccount.get("avatar").getAsJsonObject().get("avatar")
-                            .getAsJsonObject().get("url").getAsString());
+                    qiscusAccount.setAvatar(jsonAccount.get("avatar").getAsString());
                     return qiscusAccount;
                 });
     }
