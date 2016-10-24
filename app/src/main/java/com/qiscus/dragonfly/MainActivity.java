@@ -93,6 +93,20 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, CustomChatActivity.class));
     }
 
+    public void buildRoom() {
+        Qiscus.buildChatRoomWith("rya.meyvriska1@gmail.com")
+                .build()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(qiscusChatRoom -> {
+                    Log.d(MainActivity.class.getSimpleName(), "Room: " + qiscusChatRoom.toString());
+                    Log.d(MainActivity.class.getSimpleName(), "Last message: " + qiscusChatRoom.getLastCommentMessage());
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    showError(throwable.getMessage());
+                });
+    }
+
     public void showError(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }

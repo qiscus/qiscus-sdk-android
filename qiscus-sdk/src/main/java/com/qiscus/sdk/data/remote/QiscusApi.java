@@ -132,6 +132,7 @@ public enum QiscusApi {
                     QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
                     qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
                     qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
+                    qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                     qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                     return qiscusChatRoom;
                 });

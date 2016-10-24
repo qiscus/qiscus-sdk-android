@@ -32,6 +32,7 @@ public class QiscusChatRoom implements Parcelable {
     protected String name;
     protected String subtitle = "";
     protected int lastCommentId;
+    protected String lastCommentMessage;
     protected int lastTopicId;
 
     public QiscusChatRoom() {
@@ -43,6 +44,7 @@ public class QiscusChatRoom implements Parcelable {
         name = in.readString();
         subtitle = in.readString();
         lastCommentId = in.readInt();
+        lastCommentMessage = in.readString();
         lastTopicId = in.readInt();
     }
 
@@ -90,6 +92,14 @@ public class QiscusChatRoom implements Parcelable {
         this.lastCommentId = lastCommentId;
     }
 
+    public String getLastCommentMessage() {
+        return lastCommentMessage;
+    }
+
+    public void setLastCommentMessage(String lastCommentMessage) {
+        this.lastCommentMessage = lastCommentMessage;
+    }
+
     public int getLastTopicId() {
         return lastTopicId;
     }
@@ -110,6 +120,7 @@ public class QiscusChatRoom implements Parcelable {
                 ", name='" + name + '\'' +
                 ", subtitle='" + subtitle + '\'' +
                 ", lastCommentId=" + lastCommentId +
+                ", lastCommentMessage='" + lastCommentMessage + '\'' +
                 ", lastTopicId=" + lastTopicId +
                 '}';
     }
@@ -125,6 +136,7 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(name);
         dest.writeString(subtitle);
         dest.writeInt(lastCommentId);
+        dest.writeString(lastCommentMessage);
         dest.writeInt(lastTopicId);
     }
 }
