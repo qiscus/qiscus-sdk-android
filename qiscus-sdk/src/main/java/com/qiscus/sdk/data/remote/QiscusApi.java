@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.remote;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -124,8 +125,8 @@ public enum QiscusApi {
                 });
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails, String distinctId) {
-        return api.createOrGetChatRoom(Qiscus.getToken(), withEmails, distinctId)
+    public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails, String distinctId, String options) {
+        return api.createOrGetChatRoom(Qiscus.getToken(), withEmails, distinctId, options)
                 .map(jsonElement -> {
                     JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
                             .getAsJsonObject().get("room").getAsJsonObject();
@@ -134,6 +135,8 @@ public enum QiscusApi {
                     qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                     qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                     qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
+                    qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
+                            : jsonChatRoom.get("options").getAsString());
                     return qiscusChatRoom;
                 });
     }
@@ -319,7 +322,8 @@ public enum QiscusApi {
         @POST("/api/v2/mobile/get_or_create_room_with_target")
         Observable<JsonElement> createOrGetChatRoom(@Field("token") String token,
                                                     @Field("emails[]") List<String> emails,
-                                                    @Field("distinct_id") String distinctId);
+                                                    @Field("distinct_id") String distinctId,
+                                                    @Field("options") String options);
 
         @GET("/api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(@Query("token") String token,

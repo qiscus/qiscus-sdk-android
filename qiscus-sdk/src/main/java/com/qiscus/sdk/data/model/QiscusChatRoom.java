@@ -34,6 +34,7 @@ public class QiscusChatRoom implements Parcelable {
     protected int lastCommentId;
     protected String lastCommentMessage;
     protected int lastTopicId;
+    protected String options;
 
     public QiscusChatRoom() {
 
@@ -46,6 +47,7 @@ public class QiscusChatRoom implements Parcelable {
         lastCommentId = in.readInt();
         lastCommentMessage = in.readString();
         lastTopicId = in.readInt();
+        options = in.readString();
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -108,6 +110,14 @@ public class QiscusChatRoom implements Parcelable {
         this.lastTopicId = lastTopicId;
     }
 
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
@@ -122,6 +132,7 @@ public class QiscusChatRoom implements Parcelable {
                 ", lastCommentId=" + lastCommentId +
                 ", lastCommentMessage='" + lastCommentMessage + '\'' +
                 ", lastTopicId=" + lastTopicId +
+                ", options='" + options + '\'' +
                 '}';
     }
 
@@ -138,5 +149,6 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeInt(lastCommentId);
         dest.writeString(lastCommentMessage);
         dest.writeInt(lastTopicId);
+        dest.writeString(options);
     }
 }
