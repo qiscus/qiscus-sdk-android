@@ -86,7 +86,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChatFragment(View view) {
         //Start a sample activity with qiscus chat fragment, so you can customize the toolbar.
-        startActivity(new Intent(this, ChatActivity.class));
+        startActivity(ChatActivity.generateIntent(this, false));
+    }
+
+    public void openSimpleCustomChat(View view) {
+        startActivity(ChatActivity.generateIntent(this, true));
     }
 
     public void openAdvanceCustomChat(View view) {

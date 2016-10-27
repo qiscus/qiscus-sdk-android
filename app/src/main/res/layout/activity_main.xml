@@ -58,6 +58,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:onClick="openSimpleCustomChat"
+            android:text="Open Simple Custom Chat"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:onClick="openAdvanceCustomChat"
             android:text="Open Advanced Custom Chat"/>
     </LinearLayout>
