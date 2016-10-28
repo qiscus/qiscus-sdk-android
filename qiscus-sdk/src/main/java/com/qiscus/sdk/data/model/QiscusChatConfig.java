@@ -21,9 +21,13 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.widget.Toast;
 
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.util.QiscusDateUtil;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by zetra. on 9/5/16.
@@ -57,20 +61,18 @@ public class QiscusChatConfig {
     private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getSender;
     private NotificationClickListener notificationClickListener =
-            (context, qiscusComment) -> Qiscus.buildChatWith(qiscusComment.getSenderEmail())
-                    .withTitle(qiscusComment.getSender())
-                    .build(context, new Qiscus.ChatActivityBuilderListener() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+            (context, qiscusComment) -> QiscusApi.getInstance()
+                    .getChatRoom(qiscusComment.getRoomId())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext(qiscusChatRoom -> qiscusChatRoom.setName(qiscusComment.getSender()))
+                    .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(context, qiscusChatRoom))
+                    .subscribe(intent -> {
+                        context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                                     | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                        }
-
-                        @Override
-                        public void onError(Throwable throwable) {
-                            throwable.printStackTrace();
-                            Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
+                    }, throwable -> {
+                        throwable.printStackTrace();
+                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     });
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {

@@ -17,7 +17,6 @@
 package com.qiscus.sdk.data.remote;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -127,6 +126,22 @@ public enum QiscusApi {
 
     public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails, String distinctId, String options) {
         return api.createOrGetChatRoom(Qiscus.getToken(), withEmails, distinctId, options)
+                .map(jsonElement -> {
+                    JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
+                            .getAsJsonObject().get("room").getAsJsonObject();
+                    QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+                    qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
+                    qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
+                    qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
+                    qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
+                    qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
+                            : jsonChatRoom.get("options").getAsString());
+                    return qiscusChatRoom;
+                });
+    }
+
+    public Observable<QiscusChatRoom> getChatRoom(int roomId) {
+        return api.getChatRoom(Qiscus.getToken(), roomId)
                 .map(jsonElement -> {
                     JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
                             .getAsJsonObject().get("room").getAsJsonObject();
@@ -324,6 +339,10 @@ public enum QiscusApi {
                                                     @Field("emails[]") List<String> emails,
                                                     @Field("distinct_id") String distinctId,
                                                     @Field("options") String options);
+
+        @GET("/api/v2/mobile/get_room_by_id")
+        Observable<JsonElement> getChatRoom(@Query("token") String token,
+                                            @Query("id") int roomId);
 
         @GET("/api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(@Query("token") String token,
