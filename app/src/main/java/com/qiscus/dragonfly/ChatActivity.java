@@ -17,9 +17,12 @@
 package com.qiscus.dragonfly;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
@@ -34,16 +37,49 @@ public class ChatActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    public static Intent generateIntent(Context context, boolean simpleCustom) {
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra("simple_custom", simpleCustom);
+        return intent;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        if (getIntent().getBooleanExtra("simple_custom", false)) {
+            openSimpleCustom();
+        } else {
+            openQiscusFragment();
+        }
+    }
+
+    private void openQiscusFragment() {
         showLoading();
         Qiscus.buildChatFragmentWith("rya.meyvriska1@gmail.com")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(qiscusChatFragment -> {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, qiscusChatFragment)
+                            .commit();
+                    dismissLoading();
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    showError(throwable.getMessage());
+                    dismissLoading();
+                });
+    }
+
+    private void openSimpleCustom() {
+        showLoading();
+        Qiscus.buildChatRoomWith("rya.meyvriska1@gmail.com")
+                .build()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(SimpleCustomChatFragment::newInstance)
                 .subscribe(qiscusChatFragment -> {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, qiscusChatFragment)

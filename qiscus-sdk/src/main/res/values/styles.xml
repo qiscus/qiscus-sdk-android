@@ -24,15 +24,4 @@
         <item name="colorControlActivated">@color/qiscus_accent</item>
         <item name="colorControlHighlight">@color/qiscus_accent</item>
     </style>
-
-    <style name="QiscusCallTheme" parent="QiscusTheme"/>
-
-    <style name="TextAppearance.App.TextInputLayout" parent="@android:style/TextAppearance">
-        <item name="android:textColor">@color/qiscus_accent</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="DatePickerTheme" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorAccent">@color/qiscus_accent</item>
-    </style>
 </resources>

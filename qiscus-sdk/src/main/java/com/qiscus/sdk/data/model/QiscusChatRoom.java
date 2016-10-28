@@ -32,7 +32,9 @@ public class QiscusChatRoom implements Parcelable {
     protected String name;
     protected String subtitle = "";
     protected int lastCommentId;
+    protected String lastCommentMessage;
     protected int lastTopicId;
+    protected String options;
 
     public QiscusChatRoom() {
 
@@ -43,7 +45,9 @@ public class QiscusChatRoom implements Parcelable {
         name = in.readString();
         subtitle = in.readString();
         lastCommentId = in.readInt();
+        lastCommentMessage = in.readString();
         lastTopicId = in.readInt();
+        options = in.readString();
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -90,12 +94,28 @@ public class QiscusChatRoom implements Parcelable {
         this.lastCommentId = lastCommentId;
     }
 
+    public String getLastCommentMessage() {
+        return lastCommentMessage;
+    }
+
+    public void setLastCommentMessage(String lastCommentMessage) {
+        this.lastCommentMessage = lastCommentMessage;
+    }
+
     public int getLastTopicId() {
         return lastTopicId;
     }
 
     public void setLastTopicId(int lastTopicId) {
         this.lastTopicId = lastTopicId;
+    }
+
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
     }
 
     @Override
@@ -110,7 +130,9 @@ public class QiscusChatRoom implements Parcelable {
                 ", name='" + name + '\'' +
                 ", subtitle='" + subtitle + '\'' +
                 ", lastCommentId=" + lastCommentId +
+                ", lastCommentMessage='" + lastCommentMessage + '\'' +
                 ", lastTopicId=" + lastTopicId +
+                ", options='" + options + '\'' +
                 '}';
     }
 
@@ -125,6 +147,8 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(name);
         dest.writeString(subtitle);
         dest.writeInt(lastCommentId);
+        dest.writeString(lastCommentMessage);
         dest.writeInt(lastTopicId);
+        dest.writeString(options);
     }
 }

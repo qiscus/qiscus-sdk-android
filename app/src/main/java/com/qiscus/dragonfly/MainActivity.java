@@ -86,11 +86,29 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChatFragment(View view) {
         //Start a sample activity with qiscus chat fragment, so you can customize the toolbar.
-        startActivity(new Intent(this, ChatActivity.class));
+        startActivity(ChatActivity.generateIntent(this, false));
+    }
+
+    public void openSimpleCustomChat(View view) {
+        startActivity(ChatActivity.generateIntent(this, true));
     }
 
     public void openAdvanceCustomChat(View view) {
         startActivity(new Intent(this, CustomChatActivity.class));
+    }
+
+    public void buildRoom() {
+        Qiscus.buildChatRoomWith("rya.meyvriska1@gmail.com")
+                .build()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(qiscusChatRoom -> {
+                    Log.d(MainActivity.class.getSimpleName(), "Room: " + qiscusChatRoom.toString());
+                    Log.d(MainActivity.class.getSimpleName(), "Last message: " + qiscusChatRoom.getLastCommentMessage());
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    showError(throwable.getMessage());
+                });
     }
 
     public void showError(String errorMessage) {

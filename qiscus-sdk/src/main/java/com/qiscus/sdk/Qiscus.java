@@ -395,6 +395,7 @@ public class Qiscus {
     public static class ChatBuilder {
         private Set<String> emails;
         private String distinctId;
+        private String options;
 
         private ChatBuilder(String email) {
             emails = new HashSet<>();
@@ -424,6 +425,17 @@ public class Qiscus {
         }
 
         /**
+         * If you need to save options or extra data to this room
+         *
+         * @param options The data need to save
+         * @return builder
+         */
+        public ChatBuilder withOptions(String options) {
+            this.options = options;
+            return this;
+        }
+
+        /**
          * Build the chat room
          *
          * @param listener Listener of building chat room process
@@ -441,7 +453,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails), distinctId);
+                    .getChatRoom(new ArrayList<>(emails), distinctId, options);
         }
     }
 
@@ -466,6 +478,7 @@ public class Qiscus {
         private String title;
         private String subtitle;
         private String distinctId;
+        private String options;
 
         private ChatActivityBuilder(String email) {
             emails = new HashSet<>();
@@ -519,6 +532,17 @@ public class Qiscus {
         }
 
         /**
+         * If you need to save options or extra data to this room
+         *
+         * @param options The data need to save
+         * @return builder
+         */
+        public ChatActivityBuilder withOptions(String options) {
+            this.options = options;
+            return this;
+        }
+
+        /**
          * Build the Chat activity intent
          *
          * @param context  Context for start the Activity
@@ -538,7 +562,7 @@ public class Qiscus {
          */
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails), distinctId)
+                    .getChatRoom(new ArrayList<>(emails), distinctId, options)
                     .doOnNext(qiscusChatRoom -> {
                         qiscusChatRoom.setName(title);
                         qiscusChatRoom.setSubtitle(subtitle);
@@ -566,6 +590,7 @@ public class Qiscus {
     public static class ChatFragmentBuilder {
         private Set<String> emails;
         private String distinctId;
+        private String options;
 
         private ChatFragmentBuilder(String email) {
             emails = new HashSet<>();
@@ -595,6 +620,17 @@ public class Qiscus {
         }
 
         /**
+         * If you need to save options or extra data to this room
+         *
+         * @param options The data need to save
+         * @return builder
+         */
+        public ChatFragmentBuilder withOptions(String options) {
+            this.options = options;
+            return this;
+        }
+
+        /**
          * Build the Chat fragment instance
          *
          * @param listener Listener of building chat fragment
@@ -612,7 +648,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails), distinctId)
+                    .getChatRoom(new ArrayList<>(emails), distinctId, options)
                     .map(QiscusChatFragment::newInstance);
         }
     }

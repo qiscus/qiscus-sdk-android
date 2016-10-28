@@ -184,5 +184,6 @@ public class QiscusPusherService extends Service {
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
     }
 }

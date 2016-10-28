@@ -29,7 +29,8 @@ import com.qiscus.sdk.data.model.QiscusComment;
 public class QiscusPusherReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)
+                || intent.getAction().equals("com.qiscus.START_SERVICE")) {
             context.startService(new Intent(context, QiscusPusherService.class));
         } else if (intent.getAction().equals("com.qiscus.OPEN_COMMENT_PN")) {
             QiscusComment comment = intent.getParcelableExtra("data");
