@@ -106,6 +106,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
         } else if (QiscusImageUtil.isImage(file)) {
             compressedFile = QiscusImageUtil.compressImage(Uri.fromFile(file), currentTopicId);
+        } else if (file.getName().endsWith(".mp3")) {
+            compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
+        } else if (file.getName().endsWith(".m4a")) {
+            compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
         } else {
             compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
         }

@@ -242,11 +242,32 @@ public class QiscusComment implements Parcelable {
         return false;
     }
 
+    public boolean isSound() {
+        if (isAttachment()) {
+            String path = getAttachmentUri().getPath();
+            int lastDotPosition = path.lastIndexOf(".");
+            String ext = path.substring(lastDotPosition + 1);
+            ext = ext.replace("_", "");
+            ext = ext.toLowerCase();
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+            if (type == null) {
+                return false;
+            } else if (type.contains("mp3")) {
+                return true;
+            } else if (type.contains("m4a")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Type getType() {
         if (!isAttachment()) {
             return Type.TEXT;
         } else if (isImage()) {
             return Type.IMAGE;
+        } else if (isSound()) {
+            return Type.SOUND;
         } else {
             return Type.FILE;
         }
@@ -331,7 +352,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE
+        TEXT, IMAGE, FILE, SOUND
     }
 
     public interface ProgressListener {

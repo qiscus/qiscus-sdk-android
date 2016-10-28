@@ -23,7 +23,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qiscus.sdk.R;
@@ -130,6 +132,24 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected ImageView getAddFileButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_file);
+    }
+
+    @Nullable
+    @Override
+    protected ImageButton getChatAudioCancelButton(View view) {
+        return (ImageButton) view.findViewById(R.id.chat_audio_cancel);
+    }
+
+    @Nullable
+    @Override
+    protected LinearLayout getLinItemSoundRec(View view) {
+        return (LinearLayout) view.findViewById(R.id.linItemSoundRec);
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getButtonAddSound(View view) {
+        return (ImageView) view.findViewById(R.id.button_add_sound);
     }
 
     @Override

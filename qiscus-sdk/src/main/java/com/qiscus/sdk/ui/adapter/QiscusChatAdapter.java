@@ -41,6 +41,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_IMAGE_OTHER = 4;
     private static final int TYPE_FILE_ME = 5;
     private static final int TYPE_FILE_OTHER = 6;
+    private static final int TYPE_SOUND_ME = 7;
+    private static final int TYPE_SOUND_OTHER = 8;
 
     public QiscusChatAdapter(Context context) {
         super(context);
@@ -59,7 +61,14 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case IMAGE:
                 return TYPE_IMAGE_ME;
             case FILE:
-                return TYPE_FILE_ME;
+                if(qiscusComment.getExtension().equals("mp3")){
+                    return TYPE_SOUND_ME;
+                } else if(qiscusComment.getExtension().equals("m4a")){
+                    return TYPE_SOUND_ME;
+                } else
+                    return TYPE_FILE_ME;
+            case SOUND:
+                return TYPE_SOUND_ME;
             default:
                 return TYPE_MESSAGE_ME;
         }
@@ -73,7 +82,14 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case IMAGE:
                 return TYPE_IMAGE_OTHER;
             case FILE:
-                return TYPE_FILE_OTHER;
+                if(qiscusComment.getExtension().equals("mp3")){
+                    return TYPE_SOUND_OTHER;
+                } else if(qiscusComment.getExtension().equals("m4a")){
+                    return TYPE_SOUND_OTHER;
+                } else
+                    return TYPE_FILE_OTHER;
+            case SOUND:
+                return TYPE_SOUND_OTHER;
             default:
                 return TYPE_MESSAGE_OTHER;
         }
@@ -94,6 +110,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_file_me;
             case TYPE_FILE_OTHER:
                 return R.layout.item_qiscus_chat_file;
+            case TYPE_SOUND_ME:
+                return R.layout.item_qiscus_chat_sound_me;
+            case TYPE_SOUND_OTHER:
+                return R.layout.item_qiscus_chat_sound;
             default:
                 return R.layout.item_qiscus_chat_text;
         }
@@ -110,6 +130,9 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return new QiscusImageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_FILE_ME:
             case TYPE_FILE_OTHER:
+                return new QiscusFileViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+            case TYPE_SOUND_ME:
+            case TYPE_SOUND_OTHER:
                 return new QiscusFileViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             default:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);

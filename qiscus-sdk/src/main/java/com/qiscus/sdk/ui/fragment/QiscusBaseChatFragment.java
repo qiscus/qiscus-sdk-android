@@ -22,9 +22,13 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.SystemClock;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,7 +43,9 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,15 +58,21 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
+import com.qiscus.sdk.ui.dialog.QiscusSoundDialog;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusRecordUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Timer;
 
 
 /**
@@ -91,6 +103,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable protected ImageView addImageButton;
     @Nullable protected ImageView takeImageButton;
     @Nullable protected ImageView addFileButton;
+    @Nullable protected ImageButton chatAudioCancel;
+    @Nullable protected LinearLayout linItemSoundRec;
+    @Nullable protected ImageView buttonAddSound;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -100,6 +115,11 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected LinearLayoutManager chatLayoutManager;
     private QiscusAccount qiscusAccount;
     private boolean fieldMessageEmpty = true;
+    public static long startTime = 0L;
+    private Timer timer;
+    private MediaRecorder myAudioRecorder;
+    Boolean soundTrue = false;
+    File sound;
 
     @Nullable
     @Override
@@ -125,6 +145,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         addImageButton = getAddImageButton(view);
         takeImageButton = getTakeImageButton(view);
         addFileButton = getAddFileButton(view);
+        chatAudioCancel= getChatAudioCancelButton(view);
+        linItemSoundRec= getLinItemSoundRec(view);
+        buttonAddSound = getButtonAddSound(view);
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -156,6 +179,12 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         }
         if (addFileButton != null) {
             addFileButton.setOnClickListener(v -> addFile());
+        }
+        if(buttonAddSound!=null){
+            buttonAddSound.setOnClickListener(v -> addSound());
+        }
+        if(chatAudioCancel!=null){
+            chatAudioCancel.setOnClickListener(v -> cancelAudioSound());
         }
     }
 
@@ -197,6 +226,15 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Nullable
     protected abstract ImageView getAddFileButton(View view);
+
+    @Nullable
+    protected abstract ImageButton getChatAudioCancelButton(View view);
+
+    @Nullable
+    protected abstract LinearLayout getLinItemSoundRec(View view);
+
+    @Nullable
+    protected abstract ImageView getButtonAddSound(View view);
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -268,6 +306,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         if (addFileButton != null) {
             addFileButton.setImageResource(chatConfig.getAddFileIcon());
         }
+
+        if (buttonAddSound != null) {
+            buttonAddSound.setImageResource(chatConfig.getAddSoundIcon());
+        }
     }
 
     protected Animation onLoadAnimation() {
@@ -318,7 +360,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     protected void sendMessage() {
         String message = messageEditText.getText().toString().trim();
-        if (!message.isEmpty()) {
+        if (soundTrue == true) {
+            sendRecord();
+        } else if (!message.isEmpty()) {
             qiscusChatPresenter.sendComment(message);
             messageEditText.setText("");
         }
@@ -430,13 +474,20 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Override
     public void onFileDownloaded(File file, String mimeType) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(file), mimeType);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            showError(getString(R.string.chat_error_no_handler));
+        if (file.getPath().contains(".mp3")) {
+            showSoundDialog(file.getName(), file);
+        } else if (file.getPath().contains(".m4a")) {
+            showSoundDialog(file.getName(), file);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            intent.setDataAndType(Uri.fromFile(file), mimeType);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                showError(getString(R.string.chat_error_no_handler));
+            }
         }
     }
 
@@ -547,4 +598,141 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         super.onDestroyView();
         qiscusChatPresenter.detachView();
     }
+
+    private void startrecord() {
+        chatAudioCancel.setVisibility(View.VISIBLE);
+        // TODO Auto-generated method stub
+        startTime = SystemClock.uptimeMillis();
+        timer = new Timer();
+        QiscusRecordUtil myTimerTask = new QiscusRecordUtil(getActivity());
+        timer.schedule(myTimerTask, 1000, 1000);
+        vibrate();
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        try {
+
+            String soundFileName = "SOUND_" + timeStamp + "";
+
+            File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+            sound = File.createTempFile(soundFileName, ".m4a", storageDir);
+            QiscusCacheManager.getInstance().cacheLastSoundPath("file:" + sound.getAbsolutePath());
+
+            myAudioRecorder = new MediaRecorder();
+            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            myAudioRecorder.setOutputFile(sound.getPath());
+            myAudioRecorder.prepare();
+            myAudioRecorder.start();
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    private void cancelrecord() {
+        if(myAudioRecorder!=null){
+            myAudioRecorder.reset();
+            messageEditText.setVisibility(View.VISIBLE);
+            linItemSoundRec.setVisibility(View.GONE);
+            if (timer != null) {
+                timer.cancel();
+                QiscusRecordUtil.recordingTimeText.setText("00:00");
+                chatAudioCancel.setVisibility(View.INVISIBLE);
+            }
+            QiscusRecordUtil.recordingTimeText.setText("00:00");
+            chatAudioCancel.setVisibility(View.INVISIBLE);
+        }else {
+            messageEditText.setVisibility(View.VISIBLE);
+            linItemSoundRec.setVisibility(View.GONE);
+            if (timer != null) {
+                timer.cancel();
+                QiscusRecordUtil.recordingTimeText.setText("00:00");
+                chatAudioCancel.setVisibility(View.INVISIBLE);
+            }
+            QiscusRecordUtil.recordingTimeText.setText("00:00");
+            chatAudioCancel.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void vibrate() {
+        // TODO Auto-generated method stub
+        try {
+            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendRecord() {
+        if (timer != null) {
+            timer.cancel();
+
+            try {
+                myAudioRecorder.stop();
+                myAudioRecorder.reset();
+                myAudioRecorder.release();
+
+                chatAudioCancel.setVisibility(View.INVISIBLE);
+
+                try {
+                    qiscusChatPresenter.sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastSoundPath())));
+                    soundTrue = false;
+                    fieldMessageEmpty = false;
+                    sendButton.startAnimation(animation);
+                    sendButton.setImageResource(chatConfig.getSendActiveIcon());
+                } catch (IOException e) {
+                    showError(getString(R.string.chat_error_failed_read_file));
+                    e.printStackTrace();
+                }
+
+
+            } catch (IllegalStateException e) {
+                // it is called before start()
+                e.printStackTrace();
+            } catch (RuntimeException e) {
+                // no valid audio/video data has been received
+                e.printStackTrace();
+            }
+
+            linItemSoundRec.setVisibility(View.GONE);
+            messageEditText.setVisibility(View.VISIBLE);
+
+
+        }
+        if (QiscusRecordUtil.recordingTimeText.getText().toString().equals("00:00")) {
+            chatAudioCancel.setVisibility(View.INVISIBLE);
+            vibrate();
+        }
+        QiscusRecordUtil.recordingTimeText.setText("00:00");
+        chatAudioCancel.setVisibility(View.INVISIBLE);
+    }
+
+    protected void addSound() {
+        linItemSoundRec.setVisibility(View.VISIBLE);
+        messageEditText.setVisibility(View.GONE);
+        startrecord();
+        soundTrue = true;
+        fieldMessageEmpty = true;
+        sendButton.startAnimation(animation);
+        sendButton.setImageResource(chatConfig.getSendActiveIcon());
+    }
+
+    protected void cancelAudioSound() {
+        cancelrecord();
+        soundTrue = false;
+        fieldMessageEmpty = true;
+        sendButton.startAnimation(animation);
+        sendButton.setImageResource(chatConfig.getSendActiveIcon());
+    }
+
+    private void showSoundDialog(String name, File file) {
+        QiscusSoundDialog.newInstance(getActivity(), name, file).show(getFragmentManager(), "SOUND_DIALOG");
+    }
+
 }
