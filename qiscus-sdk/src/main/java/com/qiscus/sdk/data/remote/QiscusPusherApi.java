@@ -134,11 +134,11 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         }
     }
 
-    public void publishMessage(QiscusComment comment) {
+    public void publishMessage(QiscusComment comment, String tokenDestination) {
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload(gson.toJson(comment).getBytes());
-            mqttAndroidClient.publish(comment.getTopicId() + "/c", message);
+            mqttAndroidClient.publish(tokenDestination + "/c", message);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -199,8 +199,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         if (topic.contains(qiscusAccount.getToken())) {
             QiscusComment qiscusComment = gson.fromJson(new String(message.getPayload()), QiscusComment.class);
             if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
-                EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
                 setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(), qiscusComment.getId());
+                EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {
             String data[] = topic.split("/");

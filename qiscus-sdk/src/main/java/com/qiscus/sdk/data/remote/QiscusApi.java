@@ -194,6 +194,10 @@ public enum QiscusApi {
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
                     qiscusComment.setId(jsonComment.get("id").getAsInt());
                     qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    QiscusPusherApi.getInstance()
+                            .publishMessage(qiscusComment,
+                                    Qiscus.getToken().equals("qfbL52Rb7nD-crjhhJzFV") ? "qNiL7no2z32BLLtbq7yxi" :
+                                            "qfbL52Rb7nD-crjhhJzFV");
                     return qiscusComment;
                 });
     }

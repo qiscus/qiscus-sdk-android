@@ -96,14 +96,14 @@ public class QiscusPusherService extends Service {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                QiscusApi.getInstance().sync()
+                /*QiscusApi.getInstance().sync()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(qiscusComment -> {
                             EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
                             qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
                             Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                        }, Throwable::printStackTrace);
+                        }, Throwable::printStackTrace);*/
             }
         }, 0, period);
     }
