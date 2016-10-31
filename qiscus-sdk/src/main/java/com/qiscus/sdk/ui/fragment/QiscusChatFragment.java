@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -135,5 +136,10 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
         return new QiscusChatAdapter(getActivity());
+    }
+
+    @Override
+    public void onUserTyping(String user, boolean typing) {
+        Toast.makeText(getActivity(), user + (typing ? "" : " stop") + " typing..", Toast.LENGTH_SHORT).show();
     }
 }

@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -136,6 +137,7 @@ public enum QiscusApi {
                     qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                     qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                             : jsonChatRoom.get("options").getAsString());
+                    qiscusChatRoom.setUsers(new HashSet<>(withEmails));
                     return qiscusChatRoom;
                 });
     }
@@ -225,7 +227,7 @@ public enum QiscusApi {
                     qiscusComment.setMessage(jsonComment.get("message").getAsString());
                     qiscusComment.setSender(jsonComment.get("username").getAsString());
                     qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
-                    qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
+                    qiscusComment.setState(QiscusComment.STATE_DELIVERED);
                     try {
                         qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
                     } catch (ParseException e) {

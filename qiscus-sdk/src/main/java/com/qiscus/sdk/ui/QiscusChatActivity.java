@@ -31,9 +31,12 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
-public class QiscusChatActivity extends QiscusActivity {
+import java.util.Date;
+
+public class QiscusChatActivity extends QiscusActivity implements QiscusUserStatusPresenter.View {
     private static final String CHAT_ROOM_DATA = "chat_room_data";
 
     protected Toolbar toolbar;
@@ -42,6 +45,7 @@ public class QiscusChatActivity extends QiscusActivity {
 
     private QiscusChatConfig chatConfig;
     private QiscusChatRoom qiscusChatRoom;
+    private QiscusUserStatusPresenter userStatusPresenter;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
         Intent intent = new Intent(context, QiscusChatActivity.class);
@@ -64,12 +68,19 @@ public class QiscusChatActivity extends QiscusActivity {
         tvTitle = (TextView) findViewById(R.id.tv_title);
         tvSubtitle = (TextView) findViewById(R.id.tv_subtitle);
 
+        userStatusPresenter = new QiscusUserStatusPresenter(this);
+
         onViewReady(savedInstanceState);
     }
 
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
+        for (String user : qiscusChatRoom.getUsers()) {
+            if (!user.equals(Qiscus.getQiscusAccount().getEmail())) {
+                userStatusPresenter.listenUser(user);
+            }
+        }
 
         requestStoragePermission();
 
@@ -106,5 +117,31 @@ public class QiscusChatActivity extends QiscusActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+    }
+
+    @Override
+    public void onUserStatusChanged(String user, boolean online, Date lastActive) {
+        tvSubtitle.setText(online ? "Online" : String.format("Last active at %s", lastActive));
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+
+    }
+
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void dismissLoading() {
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        userStatusPresenter.detachView();
     }
 }

@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         showLoading();
         Qiscus.buildChatWith("rya.meyvriska1@gmail.com")
                 .withTitle("Rya Meyvriska")
+                .withSubtitle("Tes")
                 .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

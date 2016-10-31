@@ -19,6 +19,10 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -35,9 +39,10 @@ public class QiscusChatRoom implements Parcelable {
     protected String lastCommentMessage;
     protected int lastTopicId;
     protected String options;
+    protected Set<String> users;
 
     public QiscusChatRoom() {
-
+        users = new HashSet<>();
     }
 
     protected QiscusChatRoom(Parcel in) {
@@ -48,6 +53,7 @@ public class QiscusChatRoom implements Parcelable {
         lastCommentMessage = in.readString();
         lastTopicId = in.readInt();
         options = in.readString();
+        users = new HashSet<>(in.createStringArrayList());
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -118,6 +124,14 @@ public class QiscusChatRoom implements Parcelable {
         this.options = options;
     }
 
+    public Set<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<String> users) {
+        this.users = users;
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
@@ -150,5 +164,6 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(lastCommentMessage);
         dest.writeInt(lastTopicId);
         dest.writeString(options);
+        dest.writeStringList(new ArrayList<>(users));
     }
 }

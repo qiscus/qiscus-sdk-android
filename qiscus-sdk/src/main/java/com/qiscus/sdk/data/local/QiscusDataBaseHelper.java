@@ -43,7 +43,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.beginTransaction();
             try {
                 if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS) {
-                    qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
+                    qiscusComment.setState(QiscusComment.STATE_DELIVERED);
                 }
                 sqLiteDatabase.insert(QiscusDb.CommentTable.TABLE_NAME, null, QiscusDb.CommentTable.toContentValues(qiscusComment));
                 sqLiteDatabase.setTransactionSuccessful();
@@ -114,7 +114,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         sqLiteDatabase.beginTransaction();
         try {
             if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS) {
-                qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
+                qiscusComment.setState(QiscusComment.STATE_DELIVERED);
             }
             sqLiteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
             sqLiteDatabase.setTransactionSuccessful();

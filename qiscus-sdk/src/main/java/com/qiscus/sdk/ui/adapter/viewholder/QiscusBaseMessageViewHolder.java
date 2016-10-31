@@ -191,7 +191,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
                 case QiscusComment.STATE_ON_QISCUS:
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending);
                     break;
-                case QiscusComment.STATE_ON_PUSHER:
+                case QiscusComment.STATE_DELIVERED:
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_read);
                     break;
                 case QiscusComment.STATE_FAILED:

@@ -20,6 +20,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <!-- Need to request runtime permission -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -33,6 +35,8 @@
             android:theme="@style/QiscusTheme"/>
 
         <service android:name=".service.QiscusPusherService"/>
+
+        <service android:name="org.eclipse.paho.android.service.MqttService"/>
 
         <receiver
             android:name=".service.QiscusPusherReceiver"

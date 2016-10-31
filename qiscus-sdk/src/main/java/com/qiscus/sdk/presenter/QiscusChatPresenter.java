@@ -17,13 +17,16 @@
 package com.qiscus.sdk.presenter;
 
 import android.net.Uri;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
@@ -35,20 +38,20 @@ import java.io.File;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.View> {
 
     private QiscusChatRoom room;
-    private Subscription subscription;
     private int currentTopicId;
+    private QiscusAccount qiscusAccount;
 
     public QiscusChatPresenter(View view, QiscusChatRoom room) {
         super(view);
         this.room = room;
         this.currentTopicId = room.getLastTopicId();
+        qiscusAccount = Qiscus.getQiscusAccount();
         listenRoomEvent();
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
@@ -59,7 +62,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
-            if (savedQiscusComment.getState() != QiscusComment.STATE_ON_PUSHER) {
+            if (savedQiscusComment.getState() != QiscusComment.STATE_DELIVERED) {
                 Qiscus.getDataStore().addOrUpdate(qiscusComment);
                 if (qiscusComment.getTopicId() == currentTopicId) {
                     view.onSuccessSendComment(qiscusComment);
@@ -76,7 +79,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private void commentFail(QiscusComment qiscusComment) {
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
-            if (savedQiscusComment.getState() != QiscusComment.STATE_ON_PUSHER) {
+            if (savedQiscusComment.getState() != QiscusComment.STATE_DELIVERED) {
                 qiscusComment.setState(QiscusComment.STATE_FAILED);
                 if (qiscusComment.getTopicId() == currentTopicId) {
                     view.onFailedSendComment(qiscusComment);
@@ -199,7 +202,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .compose(bindToLifecycle())
                 .doOnNext(comment -> {
                     comment.setRoomId(room.getId());
-                    comment.setState(QiscusComment.STATE_ON_PUSHER);
+                    comment.setState(QiscusComment.STATE_DELIVERED);
                     Qiscus.getDataStore().addOrUpdate(comment);
                 })
                 .toList();
@@ -298,22 +301,37 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void listenRoomEvent() {
-        subscription = QiscusPusherApi.getInstance().listenNewComment()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(this::onGotNewComment, Throwable::printStackTrace);
+        QiscusPusherApi.getInstance().listenRoom(room);
+    }
+
+    @Subscribe
+    public void onRoomEvent(QiscusChatRoomEvent event) {
+        Log.d("TES", "Got event: " + event);
+        if (event.getTopicId() == currentTopicId) {
+            switch (event.getEvent()) {
+                case TYPING:
+                    Log.d("TES", event.getUser() + " is typing");
+                    view.onUserTyping(event.getUser(), event.isTyping());
+                    break;
+                case DELIVERED:
+                    Log.d("TES", event.getCommentId() + " is delivered");
+                    break;
+                case READ:
+                    Log.d("TES", event.getCommentId() + " have been read");
+                    break;
+            }
+        }
     }
 
     @Subscribe
     public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
         if (event.getQiscusComment().getTopicId() == currentTopicId) {
-            view.onNewComment(event.getQiscusComment());
+            onGotNewComment(event.getQiscusComment());
         }
     }
 
     private void onGotNewComment(QiscusComment qiscusComment) {
-        qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
+        qiscusComment.setState(QiscusComment.STATE_DELIVERED);
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
 
         if (qiscusComment.isAttachment()) {
@@ -326,6 +344,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         if (qiscusComment.getTopicId() == currentTopicId) {
+            if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
+                QiscusPusherApi.getInstance().setUserRead(room.getId(), currentTopicId, qiscusComment.getId());
+            }
             view.onNewComment(qiscusComment);
         }
     }
@@ -368,10 +389,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void detachView() {
         super.detachView();
         markAsRead();
-        if (subscription != null) {
-            subscription.unsubscribe();
-        }
-        subscription = null;
+        QiscusPusherApi.getInstance().unListenRoom(room);
         room = null;
         EventBus.getDefault().unregister(this);
     }
@@ -395,5 +413,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void refreshComment(QiscusComment qiscusComment);
 
         void onFileDownloaded(File file, String mimeType);
+
+        void onUserTyping(String user, boolean typing);
     }
 }

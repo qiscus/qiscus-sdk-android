@@ -30,6 +30,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
@@ -90,6 +91,7 @@ public class Qiscus {
         CHAT_CONFIG = new QiscusChatConfig();
         HEART_BEAT = 5000;
 
+        QiscusPusherApi.getInstance();
         APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
     }
 

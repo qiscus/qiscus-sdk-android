@@ -155,4 +155,9 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
     protected CustomChatAdapter onCreateChatAdapter() {
         return new CustomChatAdapter(getActivity());
     }
+
+    @Override
+    public void onUserTyping(String user, boolean typing) {
+
+    }
 }

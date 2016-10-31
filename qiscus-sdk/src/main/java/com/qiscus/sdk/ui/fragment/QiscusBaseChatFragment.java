@@ -50,6 +50,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
@@ -282,7 +283,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected abstract Adapter onCreateChatAdapter();
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
-        if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
+        if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_DELIVERED) {
             if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
                 qiscusChatPresenter.downloadFile(qiscusComment);
             }
@@ -306,12 +307,14 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 fieldMessageEmpty = true;
                 sendButton.startAnimation(animation);
                 sendButton.setImageResource(chatConfig.getSendInactiveIcon());
+                QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
             }
         } else {
             if (fieldMessageEmpty) {
                 fieldMessageEmpty = false;
                 sendButton.startAnimation(animation);
                 sendButton.setImageResource(chatConfig.getSendActiveIcon());
+                QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), true);
             }
         }
     }

@@ -81,10 +81,10 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'pub.devrel:easypermissions:0.1.7'
 
-    compile 'com.github.pwittchen:reactivenetwork:0.4.0'
-    compile 'com.pusher:pusher-java-client:1.2.1'
-    compile 'org.greenrobot:eventbus:3.0.0'
-
     compile 'org.apmem.tools:layouts:1.10@aar'
     compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
+
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+    compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.0'
 }

@@ -32,7 +32,6 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 
@@ -114,14 +113,14 @@ public class QiscusPusherService extends Service {
     }
 
     private void listenPusherEvent() {
-        pusherEvent = QiscusPusherApi.getInstance().listenNewComment()
+        /*pusherEvent = QiscusPusherApi.getInstance().listenNewComment()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(qiscusComment -> {
                     if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
                         showPushNotification(qiscusComment);
                     }
-                }, Throwable::printStackTrace);
+                }, Throwable::printStackTrace);*/
     }
 
     private void showPushNotification(QiscusComment comment) {
