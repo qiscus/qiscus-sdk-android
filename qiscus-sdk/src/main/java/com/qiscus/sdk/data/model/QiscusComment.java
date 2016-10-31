@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
@@ -244,17 +245,10 @@ public class QiscusComment implements Parcelable {
 
     public boolean isSound() {
         if (isAttachment()) {
-            String path = getAttachmentUri().getPath();
-            int lastDotPosition = path.lastIndexOf(".");
-            String ext = path.substring(lastDotPosition + 1);
-            ext = ext.replace("_", "");
-            ext = ext.toLowerCase();
-            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
             if (type == null) {
                 return false;
-            } else if (type.contains("mp3")) {
-                return true;
-            } else if (type.contains("m4a")) {
+            } else if (type.contains("audio/mpeg")) {
                 return true;
             }
         }

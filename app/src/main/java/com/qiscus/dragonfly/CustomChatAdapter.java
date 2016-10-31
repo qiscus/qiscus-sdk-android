@@ -24,6 +24,7 @@ import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusFileViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusImageViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusSoundViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusTextViewHolder;
 
 /**
@@ -61,12 +62,7 @@ public class CustomChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case IMAGE:
                 return TYPE_IMAGE_ME;
             case FILE:
-                if(qiscusComment.getExtension().equals("mp3")){
-                    return TYPE_SOUND_ME;
-                } else if(qiscusComment.getExtension().equals("m4a")){
-                    return TYPE_SOUND_ME;
-                } else
-                    return TYPE_FILE_ME;
+                 return TYPE_FILE_ME;
             case SOUND:
                 return TYPE_SOUND_ME;
             default:
@@ -82,12 +78,7 @@ public class CustomChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case IMAGE:
                 return TYPE_IMAGE_OTHER;
             case FILE:
-                if(qiscusComment.getExtension().equals("mp3")){
-                    return TYPE_SOUND_OTHER;
-                } else if(qiscusComment.getExtension().equals("m4a")){
-                    return TYPE_SOUND_OTHER;
-                } else
-                    return TYPE_FILE_OTHER;
+                 return TYPE_FILE_OTHER;
             case SOUND:
                 return TYPE_SOUND_OTHER;
             default:
@@ -134,7 +125,7 @@ public class CustomChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return new QiscusFileViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_SOUND_ME:
             case TYPE_SOUND_OTHER:
-                return new QiscusFileViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+                return new QiscusSoundViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             default:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
         }

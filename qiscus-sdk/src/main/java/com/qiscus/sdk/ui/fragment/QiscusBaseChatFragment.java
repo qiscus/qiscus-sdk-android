@@ -37,11 +37,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -325,7 +327,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
         if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
-            if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
+            if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.SOUND  || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
                 qiscusChatPresenter.downloadFile(qiscusComment);
             }
         } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
@@ -474,9 +476,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Override
     public void onFileDownloaded(File file, String mimeType) {
-        if (file.getPath().contains(".mp3")) {
+        if (QiscusFileUtil.getExtension(file).equals("mp3")) {
             showSoundDialog(file.getName(), file);
-        } else if (file.getPath().contains(".m4a")) {
+        } else if (QiscusFileUtil.getExtension(file).equals("m4a")) {
             showSoundDialog(file.getName(), file);
         } else {
             Intent intent = new Intent(Intent.ACTION_VIEW);

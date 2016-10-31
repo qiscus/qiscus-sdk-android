@@ -195,9 +195,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:id="@+id/linItemSoundRec"
                 android:visibility="gone">
 
@@ -255,7 +252,7 @@
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginLeft="6dp"
                                 android:text="00:00"
-                                android:textColor="#4d4c4b"
+                                android:textColor="@color/qiscus_secondary_text"
                                 android:textSize="16dp" />
                         </LinearLayout>
                     </LinearLayout>

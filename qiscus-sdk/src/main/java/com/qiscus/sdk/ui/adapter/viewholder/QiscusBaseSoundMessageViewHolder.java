@@ -18,7 +18,6 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,7 +39,7 @@ import java.io.File;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
+public abstract class QiscusBaseSoundMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
         implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
 
     @NonNull protected TextView fileNameView;
@@ -48,7 +47,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     @Nullable protected CircleProgress progressView;
     @Nullable protected ImageView downloadIconView;
 
-    public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusBaseSoundMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         fileNameView = getFileNameView(itemView);
         fileTypeView = getFileTypeView(itemView);
@@ -117,6 +116,8 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
             if (qiscusComment.getExtension().isEmpty()) {
                 fileNameView.setText(qiscusComment.getAttachmentName());
                 fileTypeView.setText(R.string.unkown_type);
+            } else if (qiscusComment.getExtension().equals("m4a")) {
+
             } else {
                 fileNameView.setText(qiscusComment.getAttachmentName());
                 fileTypeView.setText(String.format("%s File", qiscusComment.getExtension().toUpperCase()));
