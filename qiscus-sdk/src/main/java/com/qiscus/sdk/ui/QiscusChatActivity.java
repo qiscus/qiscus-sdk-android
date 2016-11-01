@@ -22,7 +22,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -89,7 +88,6 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusUserStat
 
         tvTitle.setText(qiscusChatRoom.getName());
         tvSubtitle.setText(qiscusChatRoom.getSubtitle());
-        tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, QiscusChatFragment.newInstance(qiscusChatRoom))
@@ -122,12 +120,16 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusUserStat
 
     @Override
     public void onUserStatusChanged(String user, boolean online, Date lastActive) {
-        tvSubtitle.setText(online ? "Online" : "Offline");
+        if (qiscusChatRoom.getSubtitle().isEmpty()) {
+            tvSubtitle.setText(online ? "Online" : "Offline");
+        }
     }
 
     @Override
     public void onUserTyping(String user, boolean typing) {
-        tvSubtitle.setText(typing ? "Typing..." : "Online");
+        if (qiscusChatRoom.getSubtitle().isEmpty()) {
+            tvSubtitle.setText(typing ? "Typing..." : "Online");
+        }
     }
 
     @Override

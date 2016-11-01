@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         Qiscus.buildChatWith(Qiscus.getQiscusAccount().getEmail().contains("zetra") ? "rya.meyvriska3@gmail.com"
                 : "zetra1@gmail.com")
                 .withTitle(Qiscus.getQiscusAccount().getEmail().contains("zetra") ? "Rya Meyvriska" : "Zetra")
-                .withSubtitle("Tes")
                 .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
