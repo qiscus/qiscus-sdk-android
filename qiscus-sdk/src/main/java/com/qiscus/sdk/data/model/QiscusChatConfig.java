@@ -44,6 +44,7 @@ public class QiscusChatConfig {
     private int rightBubbleTimeColor = R.color.qiscus_secondary_text;
     private int leftBubbleTimeColor = R.color.qiscus_primary_light;
     private int failedToSendMessageColor = R.color.qiscus_red;
+    private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
@@ -127,6 +128,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setFailedToSendMessageColor(@ColorRes int failedToSendMessageColor) {
         this.failedToSendMessageColor = failedToSendMessageColor;
+        return this;
+    }
+
+    public QiscusChatConfig setReadIconColor(@ColorRes int readIconColor) {
+        this.readIconColor = readIconColor;
         return this;
     }
 
@@ -268,6 +274,11 @@ public class QiscusChatConfig {
     @ColorRes
     public int getFailedToSendMessageColor() {
         return failedToSendMessageColor;
+    }
+
+    @ColorRes
+    public int getReadIconColor() {
+        return readIconColor;
     }
 
     @ColorRes

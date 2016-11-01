@@ -45,6 +45,7 @@ public class SampleApps extends Application {
                 .setRightBubbleColor(R.color.primary)
                 .setRightBubbleTextColor(R.color.qiscus_white)
                 .setRightBubbleTimeColor(R.color.primary_light)
+                .setReadIconColor(R.color.qiscus_white)
                 .setTimeFormat(date -> new SimpleDateFormat("HH:mm").format(date));
     }
 }
