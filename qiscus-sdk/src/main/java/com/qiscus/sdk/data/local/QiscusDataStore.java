@@ -64,5 +64,9 @@ public interface QiscusDataStore {
 
     QiscusComment getLatestComment();
 
+    QiscusComment getLatestDeliveredComment(int topicId);
+
+    QiscusComment getLatestReadComment(int topicId);
+
     void clear();
 }

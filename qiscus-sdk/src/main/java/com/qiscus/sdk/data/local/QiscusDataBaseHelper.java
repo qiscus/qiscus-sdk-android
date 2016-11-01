@@ -42,9 +42,6 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         if (!isContains(qiscusComment)) {
             sqLiteDatabase.beginTransaction();
             try {
-                if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS) {
-                    qiscusComment.setState(QiscusComment.STATE_DELIVERED);
-                }
                 sqLiteDatabase.insert(QiscusDb.CommentTable.TABLE_NAME, null, QiscusDb.CommentTable.toContentValues(qiscusComment));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
@@ -113,9 +110,6 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         sqLiteDatabase.beginTransaction();
         try {
-            if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS) {
-                qiscusComment.setState(QiscusComment.STATE_DELIVERED);
-            }
             sqLiteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
@@ -278,6 +272,42 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "LIMIT " + 1;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        QiscusComment qiscusComment = null;
+        while (cursor.moveToNext()) {
+            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+        }
+        cursor.close();
+        return qiscusComment;
+    }
+
+    @Override
+    public QiscusComment getLatestDeliveredComment(int topicId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
+                + " AND " + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_DELIVERED
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "LIMIT " + 1;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        QiscusComment qiscusComment = null;
+        while (cursor.moveToNext()) {
+            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+        }
+        cursor.close();
+        return qiscusComment;
+    }
+
+    @Override
+    public QiscusComment getLatestReadComment(int topicId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
+                + " AND " + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_READ
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
                 + "LIMIT " + 1;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;
