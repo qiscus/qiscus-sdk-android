@@ -31,9 +31,7 @@ import android.text.SpannableStringBuilder;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.event.QiscusUserEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -41,10 +39,6 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created on : June 29, 2016
@@ -63,7 +57,6 @@ public class QiscusPusherService extends Service {
                 0, fileMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    private Subscription pusherEvent;
     private Timer timer;
 
     @Nullable
@@ -79,10 +72,6 @@ public class QiscusPusherService extends Service {
         }
 
         if (Qiscus.hasSetupUser()) {
-            if (pusherEvent != null && !pusherEvent.isUnsubscribed()) {
-                pusherEvent.unsubscribe();
-            }
-            listenPusherEvent();
             scheduleSync(Qiscus.getHeartBeat());
         }
         return START_STICKY;
@@ -110,17 +99,6 @@ public class QiscusPusherService extends Service {
 
     private void stopSync() {
         timer.cancel();
-    }
-
-    private void listenPusherEvent() {
-        /*pusherEvent = QiscusPusherApi.getInstance().listenNewComment()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(qiscusComment -> {
-                    if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
-                        showPushNotification(qiscusComment);
-                    }
-                }, Throwable::printStackTrace);*/
     }
 
     private void showPushNotification(QiscusComment comment) {
@@ -162,21 +140,8 @@ public class QiscusPusherService extends Service {
     }
 
     @Subscribe
-    public void onUserEvent(QiscusUserEvent userEvent) {
-        switch (userEvent) {
-            case LOGIN:
-                if (pusherEvent == null || pusherEvent.isUnsubscribed()) {
-                    listenPusherEvent();
-                    scheduleSync(Qiscus.getHeartBeat());
-                }
-                break;
-            case LOGOUT:
-                if (pusherEvent != null && !pusherEvent.isUnsubscribed()) {
-                    pusherEvent.unsubscribe();
-                    stopSync();
-                }
-                break;
-        }
+    public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
+        showPushNotification(event.getQiscusComment());
     }
 
     @Override
