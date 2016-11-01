@@ -39,11 +39,11 @@ import java.util.Date;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusComment implements Parcelable {
+    public static final int STATE_FAILED = 0;
     public static final int STATE_SENDING = 1;
     public static final int STATE_ON_QISCUS = 2;
     public static final int STATE_DELIVERED = 3;
     public static final int STATE_READ = 4;
-    public static final int STATE_FAILED = 5;
 
     protected int id;
     protected int roomId;
