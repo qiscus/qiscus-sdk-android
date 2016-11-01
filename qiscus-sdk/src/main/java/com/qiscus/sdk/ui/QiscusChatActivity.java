@@ -36,7 +36,8 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
 import java.util.Date;
 
-public class QiscusChatActivity extends QiscusActivity implements QiscusUserStatusPresenter.View {
+public class QiscusChatActivity extends QiscusActivity implements QiscusUserStatusPresenter.View,
+        QiscusChatFragment.UserTypingListener {
     private static final String CHAT_ROOM_DATA = "chat_room_data";
 
     protected Toolbar toolbar;
@@ -121,7 +122,12 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusUserStat
 
     @Override
     public void onUserStatusChanged(String user, boolean online, Date lastActive) {
-        tvSubtitle.setText(online ? "Online" : String.format("Last active at %s", lastActive));
+        tvSubtitle.setText(online ? "Online" : "Offline");
+    }
+
+    @Override
+    public void onUserTyping(String user, boolean typing) {
+        tvSubtitle.setText(typing ? "Typing..." : "Online");
     }
 
     @Override

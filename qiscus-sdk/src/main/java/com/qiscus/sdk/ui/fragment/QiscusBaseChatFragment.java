@@ -548,6 +548,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
         qiscusChatPresenter.detachView();
     }
 }

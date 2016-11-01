@@ -16,6 +16,8 @@
 
 package com.qiscus.sdk.ui.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,7 +27,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -42,6 +43,8 @@ import com.qiscus.sdk.ui.view.QiscusRecyclerView;
  */
 public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter> {
 
+    protected UserTypingListener userTypingListener;
+
     public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom) {
         QiscusChatFragment fragment = new QiscusChatFragment();
         Bundle bundle = new Bundle();
@@ -53,6 +56,15 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected int getResourceLayout() {
         return R.layout.fragment_qiscus_chat;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity activity = getActivity();
+        if (activity instanceof UserTypingListener) {
+            userTypingListener = (UserTypingListener) activity;
+        }
     }
 
     @Nullable
@@ -140,6 +152,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Override
     public void onUserTyping(String user, boolean typing) {
-        Toast.makeText(getActivity(), user + (typing ? "" : " stop") + " typing..", Toast.LENGTH_SHORT).show();
+        if (userTypingListener != null) {
+            userTypingListener.onUserTyping(user, typing);
+        }
+    }
+
+    public interface UserTypingListener {
+        void onUserTyping(String user, boolean typing);
     }
 }
