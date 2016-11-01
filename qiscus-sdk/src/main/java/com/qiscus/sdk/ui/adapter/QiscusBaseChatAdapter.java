@@ -48,6 +48,8 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
     protected OnLongItemClickListener longItemClickListener;
 
     protected QiscusAccount qiscusAccount;
+    protected int lastDeliveredCommentId;
+    protected int lastReadCommentId;
 
     public QiscusBaseChatAdapter(Context context) {
         this.context = context;
@@ -119,6 +121,9 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
+        holder.setLastDeliveredCommentId(lastDeliveredCommentId);
+        holder.setLastReadCommentId(lastReadCommentId);
+
         if (position == getItemCount() - 1) {
             holder.setNeedToShowDate(true);
         } else {
@@ -240,5 +245,15 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         }
 
         return -1;
+    }
+
+    public void updateLastDeliveredComment(int lastDeliveredCommentId) {
+        this.lastDeliveredCommentId = lastDeliveredCommentId;
+        notifyDataSetChanged();
+    }
+
+    public void updateLastReadComment(int lastReadCommentId) {
+        this.lastReadCommentId = lastReadCommentId;
+        notifyDataSetChanged();
     }
 }

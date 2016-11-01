@@ -411,6 +411,16 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         chatAdapter.addOrUpdate(qiscusComment);
     }
 
+    @Override
+    public void updateLastDeliveredComment(int lastDeliveredCommentId) {
+        chatAdapter.updateLastDeliveredComment(lastDeliveredCommentId);
+    }
+
+    @Override
+    public void updateLastReadComment(int lastReadCommentId) {
+        chatAdapter.updateLastReadComment(lastReadCommentId);
+    }
+
     private boolean shouldShowNewMessageButton() {
         return chatLayoutManager.findFirstVisibleItemPosition() > 2;
     }
