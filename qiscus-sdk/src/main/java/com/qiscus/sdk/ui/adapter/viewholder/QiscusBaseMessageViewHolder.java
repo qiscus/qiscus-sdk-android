@@ -65,6 +65,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected int rightBubbleTimeColor;
     protected int leftBubbleTimeColor;
     protected int failedToSendMessageColor;
+    protected int readIconColor;
     protected int dateColor;
 
     public QiscusBaseMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
@@ -97,6 +98,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         leftBubbleDrawable.setColorFilter(leftBubbleColor, PorterDuff.Mode.SRC_ATOP);
 
         failedToSendMessageColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getFailedToSendMessageColor());
+        readIconColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getReadIconColor());
         dateColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getDateColor());
     }
 
@@ -186,15 +188,23 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
                     failedToSendMessageColor : rightBubbleTimeColor);
             switch (qiscusComment.getState()) {
                 case QiscusComment.STATE_SENDING:
+                    messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_info_time);
                     break;
                 case QiscusComment.STATE_ON_QISCUS:
+                    messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending);
                     break;
                 case QiscusComment.STATE_DELIVERED:
+                    messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
+                    messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_read);
+                    break;
+                case QiscusComment.STATE_READ:
+                    messageStateIndicatorView.setColorFilter(readIconColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_read);
                     break;
                 case QiscusComment.STATE_FAILED:
+                    messageStateIndicatorView.setColorFilter(failedToSendMessageColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending_failed);
                     break;
             }
