@@ -171,6 +171,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload(String.valueOf(commentId).getBytes());
+            message.setQos(1);
+            message.setRetained(true);
             mqttAndroidClient.publish("r/" + roomId + "/" + topicId + "/" + qiscusAccount.getEmail() + "/r", message);
         } catch (MqttException e) {
             e.printStackTrace();
@@ -181,6 +183,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload(String.valueOf(commentId).getBytes());
+            message.setQos(1);
+            message.setRetained(true);
             mqttAndroidClient.publish("r/" + roomId + "/" + topicId + "/" + qiscusAccount.getEmail() + "/d", message);
         } catch (MqttException e) {
             e.printStackTrace();
