@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -121,7 +122,9 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusUserStat
     @Override
     public void onUserStatusChanged(String user, boolean online, Date lastActive) {
         if (qiscusChatRoom.getSubtitle().isEmpty()) {
-            tvSubtitle.setText(online ? "Online" : "Offline");
+            String last = DateUtils.getRelativeTimeSpanString(lastActive.getTime(),
+                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+            tvSubtitle.setText(online ? "Online" : "Last seen " + last);
         }
     }
 
