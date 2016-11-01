@@ -231,7 +231,7 @@ public enum QiscusApi {
                     qiscusComment.setMessage(jsonComment.get("message").getAsString());
                     qiscusComment.setSender(jsonComment.get("username").getAsString());
                     qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
-                    qiscusComment.setState(QiscusComment.STATE_DELIVERED);
+                    qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
                     try {
                         qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
                     } catch (ParseException e) {
