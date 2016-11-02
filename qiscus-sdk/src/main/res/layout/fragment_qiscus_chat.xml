@@ -219,7 +219,8 @@
         <com.qiscus.sdk.ui.view.QiscusAudioRecorderView
             android:id="@+id/record_panel"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
     </LinearLayout>
 
