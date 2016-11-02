@@ -31,7 +31,6 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
-import com.qiscus.sdk.util.QiscusAudioRecorder;
 
 /**
  * Created on : September 28, 2016
@@ -96,7 +95,7 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
     @Nullable
     @Override
     protected ViewGroup getMessageInputPanel(View view) {
-        return null;
+        return (ViewGroup) view.findViewById(R.id.input_panel);
     }
 
     @NonNull
@@ -162,17 +161,23 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
     @Nullable
     @Override
     protected ImageView getRecordAudioButton(View view) {
-        return null;
+        return (ImageView) view.findViewById(R.id.button_add_audio);
     }
 
     @Nullable
     @Override
     protected QiscusAudioRecorderView getRecordAudioPanel(View view) {
-        return null;
+        return (QiscusAudioRecorderView) view.findViewById(R.id.record_panel);
     }
 
     @Override
     protected CustomChatAdapter onCreateChatAdapter() {
         return new CustomChatAdapter(getActivity());
+    }
+
+    @Override
+    protected void recordAudio() {
+        super.recordAudio();
+        addPanel.setVisibility(View.GONE);
     }
 }
