@@ -72,6 +72,7 @@ public class QiscusChatActivity extends QiscusActivity {
         resolveChatRoom(savedInstanceState);
 
         requestStoragePermission();
+        requestAudioRecordPermission();
 
         applyChatConfig();
 

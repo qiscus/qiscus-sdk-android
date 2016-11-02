@@ -37,11 +37,14 @@ import pub.devrel.easypermissions.EasyPermissions;
 public abstract class QiscusActivity extends RxAppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     protected static final int RC_STORAGE_PERMISSION = 1;
+    protected static final int RC_RECORD_AUDIO_PERMISSION = 2;
 
     private static final String[] STORAGE_PERMISSION = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE"
     };
+
+    private static final String[] RECORD_AUDIO_PERMISSION = {"android.permission.RECORD_AUDIO"};
 
     protected abstract void onViewReady(Bundle savedInstanceState);
 
@@ -49,6 +52,13 @@ public abstract class QiscusActivity extends RxAppCompatActivity implements Easy
         if (!EasyPermissions.hasPermissions(this, STORAGE_PERMISSION)) {
             EasyPermissions.requestPermissions(this, "To make this apps working properly we need to access external storage to save your chatting data. So please allow the apps to access the storage!",
                     RC_STORAGE_PERMISSION, STORAGE_PERMISSION);
+        }
+    }
+
+    protected void requestAudioRecordPermission() {
+        if (!EasyPermissions.hasPermissions(this, RECORD_AUDIO_PERMISSION)) {
+            EasyPermissions.requestPermissions(this, "We need your permission to record audio to able send audio message!",
+                    RC_RECORD_AUDIO_PERMISSION, RECORD_AUDIO_PERMISSION);
         }
     }
 
