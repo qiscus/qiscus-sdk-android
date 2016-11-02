@@ -32,4 +32,5 @@
     <string name="chat_activity_label_clipboard">Message</string>
     <string name="chat_activity_copied_message">Copied</string>
     <string name="hint_message">Type a message…</string>
+    <string name="time_start_record">00:00:00</string>
 </resources>

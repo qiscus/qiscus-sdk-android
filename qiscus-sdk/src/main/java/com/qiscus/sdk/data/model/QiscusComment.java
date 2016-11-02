@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
@@ -242,11 +243,25 @@ public class QiscusComment implements Parcelable {
         return false;
     }
 
+    public boolean isSound() {
+        if (isAttachment()) {
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
+            if (type == null) {
+                return false;
+            } else if (type.contains("audio/mpeg")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Type getType() {
         if (!isAttachment()) {
             return Type.TEXT;
         } else if (isImage()) {
             return Type.IMAGE;
+        } else if (isSound()) {
+            return Type.SOUND;
         } else {
             return Type.FILE;
         }
@@ -331,7 +346,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE
+        TEXT, IMAGE, FILE, SOUND
     }
 
     public interface ProgressListener {

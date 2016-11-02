@@ -58,6 +58,16 @@ public enum QiscusCacheManager {
                 .apply();
     }
 
+    public void cacheLastSoundPath(String path) {
+        sharedPreferences.edit()
+                .putString("last_sound_path", path)
+                .apply();
+    }
+
+    public String getLastSoundPath() {
+        return sharedPreferences.getString("last_sound_path", "");
+    }
+
     public void addMessageNotifItem(String message, int roomId) {
         List<String> notifItems = getMessageNotifItems(roomId);
         if (notifItems == null) {

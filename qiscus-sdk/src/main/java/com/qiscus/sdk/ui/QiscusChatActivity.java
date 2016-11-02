@@ -48,7 +48,6 @@ public class QiscusChatActivity extends QiscusActivity {
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         return intent;
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

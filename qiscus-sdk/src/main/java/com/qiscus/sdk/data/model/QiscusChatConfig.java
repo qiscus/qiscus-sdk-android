@@ -54,6 +54,7 @@ public class QiscusChatConfig {
     private int addPictureIcon = R.drawable.ic_qiscus_add_image;
     private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
     private int addFileIcon = R.drawable.ic_qiscus_add_file;
+    private int addSoundIcon = R.drawable.ic_qiscus_mic_plus;
     private int sendActiveIcon = R.drawable.ic_qiscus_send_on;
     private int sendInactiveIcon = R.drawable.ic_qiscus_send_off;
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
@@ -177,6 +178,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setAddFileIcon(@DrawableRes int addFileIcon) {
         this.addFileIcon = addFileIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setAddSoundIcon(@DrawableRes int addSoundIcon) {
+        this.addSoundIcon = addSoundIcon;
         return this;
     }
 
@@ -313,6 +319,11 @@ public class QiscusChatConfig {
     @DrawableRes
     public int getAddFileIcon() {
         return addFileIcon;
+    }
+
+    @DrawableRes
+    public int getAddSoundIcon() {
+        return addSoundIcon;
     }
 
     @DrawableRes
