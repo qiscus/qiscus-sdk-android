@@ -36,15 +36,5 @@ public class SampleApps extends Application {
     public void onCreate() {
         super.onCreate();
         Qiscus.init(this, "dragonfly");
-
-        Qiscus.getChatConfig()
-                .setStatusBarColor(R.color.accent)
-                .setAppBarColor(R.color.accent)
-                .setTitleColor(R.color.qiscus_dark_white)
-                .setLeftBubbleColor(R.color.accent)
-                .setRightBubbleColor(R.color.primary)
-                .setRightBubbleTextColor(R.color.qiscus_white)
-                .setRightBubbleTimeColor(R.color.primary_light)
-                .setTimeFormat(date -> new SimpleDateFormat("HH:mm").format(date));
     }
 }
