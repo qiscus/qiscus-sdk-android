@@ -42,24 +42,14 @@ import java.io.File;
 public abstract class QiscusBaseSoundMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
         implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
 
-    @NonNull protected TextView fileNameView;
-    @Nullable protected TextView fileTypeView;
     @Nullable protected CircleProgress progressView;
     @Nullable protected ImageView downloadIconView;
 
     public QiscusBaseSoundMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
-        fileNameView = getFileNameView(itemView);
-        fileTypeView = getFileTypeView(itemView);
         progressView = getProgressView(itemView);
         downloadIconView = getDownloadIconView(itemView);
     }
-
-    @NonNull
-    protected abstract TextView getFileNameView(View itemView);
-
-    @Nullable
-    protected abstract TextView getFileTypeView(View itemView);
 
     @Nullable
     protected abstract CircleProgress getProgressView(View itemView);
@@ -95,9 +85,6 @@ public abstract class QiscusBaseSoundMessageViewHolder extends QiscusBaseMessage
 
     @Override
     protected void setUpColor() {
-        if (fileTypeView != null) {
-            fileTypeView.setTextColor(messageFromMe ? rightBubbleTimeColor : leftBubbleTimeColor);
-        }
         if (progressView != null) {
             progressView.setFinishedColor(messageFromMe ? rightBubbleColor : leftBubbleColor);
         }
@@ -109,19 +96,6 @@ public abstract class QiscusBaseSoundMessageViewHolder extends QiscusBaseMessage
         File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
         if (downloadIconView != null) {
             downloadIconView.setVisibility(localPath == null ? View.VISIBLE : View.GONE);
-        }
-
-
-        if (fileTypeView != null) {
-            if (qiscusComment.getExtension().isEmpty()) {
-                fileNameView.setText(qiscusComment.getAttachmentName());
-                fileTypeView.setText(R.string.unkown_type);
-            } else if (qiscusComment.getExtension().equals("m4a")) {
-
-            } else {
-                fileNameView.setText(qiscusComment.getAttachmentName());
-                fileTypeView.setText(String.format("%s File", qiscusComment.getExtension().toUpperCase()));
-            }
         }
     }
 

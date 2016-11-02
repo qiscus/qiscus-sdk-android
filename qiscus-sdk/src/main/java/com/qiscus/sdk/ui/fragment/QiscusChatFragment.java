@@ -152,6 +152,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return (ImageView) view.findViewById(R.id.button_add_sound);
     }
 
+    @Nullable
+    @Override
+    protected TextView getRecordingTimeText(View view) {
+        return (TextView) view.findViewById(R.id.recording_time_text);
+    }
+
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
         return new QiscusChatAdapter(getActivity());

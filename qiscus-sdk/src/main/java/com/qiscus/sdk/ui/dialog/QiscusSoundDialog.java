@@ -5,11 +5,13 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.qiscus.sdk.R;
@@ -24,34 +26,22 @@ import java.util.concurrent.TimeUnit;
  * Created by arief on 08/08/16.
  */
 public class QiscusSoundDialog extends QiscusCustomDialog {
-
-    private Context context;
-    public static String name;
-    public static File file;
     ImageButton buttonPlay;
     ImageButton buttonPause;
     ImageButton imageButtonClose;
     SeekBar seekBarSound;
     TextView textViewCurrentPos;
     TextView textViewStopPos;
-
+    private File file;
     private Handler myHandler = new Handler();
     private MediaPlayer mediaPlayer;
     private double startTimeCurentPos = 0;
     private double finalTime = 0;
-    private int oneTimeOnly = 0;
 
-    public static QiscusSoundDialog newInstance(Context context, String name, File file) {
+    public static QiscusSoundDialog newInstance(File file) {
         QiscusSoundDialog dialog = new QiscusSoundDialog();
-        dialog.context = context;
-        dialog.name = name;
         dialog.file = file;
         return dialog;
-    }
-
-    @Override
-    protected int getResourceLayout() {
-        return R.layout.dialog_qiscus_sound;
     }
 
     @Override
@@ -66,7 +56,6 @@ public class QiscusSoundDialog extends QiscusCustomDialog {
 
         startTimeCurentPos = 0;
         finalTime = 0;
-        oneTimeOnly = 0;
 
 
         buttonPlay.setOnClickListener(v -> soundPlay());
@@ -77,11 +66,19 @@ public class QiscusSoundDialog extends QiscusCustomDialog {
 
     }
 
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile( File newFile) {
+        file = newFile;
+    }
+
     public void soundPlay() {
         if (mediaPlayer == null) {
             mediaPlayer = new MediaPlayer();
             try {
-                mediaPlayer.setDataSource(QiscusSoundDialog.file + "");
+                mediaPlayer.setDataSource(file + "");
                 mediaPlayer.prepare();
                 seekBarSound.setMax(mediaPlayer.getDuration());
                 finalTime = mediaPlayer.getDuration();
@@ -105,13 +102,8 @@ public class QiscusSoundDialog extends QiscusCustomDialog {
                     buttonPause.setVisibility(View.VISIBLE);
                     mediaPlayer.start();
 
-                    seekBarSound.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View view, MotionEvent motionEvent) {
-                            mediaPlayer.seekTo(seekBarSound.getProgress());
-                            return false;
-                        }
-                    });
+                    seekBarSound.setOnTouchListener((v, event) -> seekBarOnTouch());
+
                 }catch (NullPointerException x){
                     x.printStackTrace();
                 }
@@ -121,17 +113,7 @@ public class QiscusSoundDialog extends QiscusCustomDialog {
                 e.printStackTrace();
             }
 
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer playSound) {
-                    try {
-                        buttonPlay.setVisibility(View.VISIBLE);
-                        buttonPause.setVisibility(View.GONE);
-                    }catch (NullPointerException e){
-                    }
-
-                }
-            });
+            mediaPlayer.setOnCompletionListener(v -> mediaPlayerOnCompletion());
         } else {
             if (mediaPlayer != null) {
                 if (mediaPlayer.isPlaying()) {
@@ -155,7 +137,21 @@ public class QiscusSoundDialog extends QiscusCustomDialog {
         }
     }
 
-    public void soundPause() {
+    private void mediaPlayerOnCompletion() {
+        try {
+            buttonPlay.setVisibility(View.VISIBLE);
+            buttonPause.setVisibility(View.GONE);
+        }catch (NullPointerException e){
+
+        }
+    }
+
+    private boolean seekBarOnTouch() {
+        mediaPlayer.seekTo(seekBarSound.getProgress());
+        return false;
+    }
+
+    private void soundPause() {
         if (mediaPlayer.isPlaying()) {
             if (mediaPlayer != null) {
                 mediaPlayer.pause();
@@ -175,7 +171,7 @@ public class QiscusSoundDialog extends QiscusCustomDialog {
     }
 
 
-    public void cancel() {
+    private void cancel() {
         dismiss();
         if (mediaPlayer != null) {
             mediaPlayer.reset();

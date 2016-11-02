@@ -18,7 +18,6 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -111,14 +110,12 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
         if (downloadIconView != null) {
             downloadIconView.setVisibility(localPath == null ? View.VISIBLE : View.GONE);
         }
-
+        fileNameView.setText(qiscusComment.getAttachmentName());
 
         if (fileTypeView != null) {
             if (qiscusComment.getExtension().isEmpty()) {
-                fileNameView.setText(qiscusComment.getAttachmentName());
                 fileTypeView.setText(R.string.unkown_type);
             } else {
-                fileNameView.setText(qiscusComment.getAttachmentName());
                 fileTypeView.setText(String.format("%s File", qiscusComment.getExtension().toUpperCase()));
             }
         }

@@ -170,6 +170,12 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
         return (ImageView) view.findViewById(R.id.button_add_sound);
     }
 
+    @Nullable
+    @Override
+    protected TextView getRecordingTimeText(View view) {
+        return (TextView) view.findViewById(R.id.recording_time_text);
+    }
+
     @Override
     protected CustomChatAdapter onCreateChatAdapter() {
         return new CustomChatAdapter(getActivity());

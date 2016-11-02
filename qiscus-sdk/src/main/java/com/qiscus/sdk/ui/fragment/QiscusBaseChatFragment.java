@@ -65,7 +65,6 @@ import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
-import com.qiscus.sdk.util.QiscusRecordUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import java.io.File;
@@ -75,6 +74,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -102,12 +102,14 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable protected ImageView emptyChatImageView;
     @Nullable protected TextView emptyChatTitleView;
     @Nullable protected TextView emptyChatDescView;
+    @Nullable protected TextView recordingTimeText;
     @Nullable protected ImageView addImageButton;
     @Nullable protected ImageView takeImageButton;
     @Nullable protected ImageView addFileButton;
-    @Nullable protected ImageButton chatAudioCancel;
-    @Nullable protected LinearLayout linItemSoundRec;
-    @Nullable protected ImageView buttonAddSound;
+    @Nullable protected ImageView addSoundRecord;
+    @NonNull protected ImageButton cancelAudioRecord;
+    @Nullable protected LinearLayout layoutSoundRecord;
+
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -117,11 +119,11 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected LinearLayoutManager chatLayoutManager;
     private QiscusAccount qiscusAccount;
     private boolean fieldMessageEmpty = true;
-    public static long startTime = 0L;
-    private Timer timer;
     private MediaRecorder myAudioRecorder;
     Boolean soundTrue = false;
     File sound;
+    private int  minute =0, seconds = 0, hour = 0;
+    Timer t = new Timer();
 
     @Nullable
     @Override
@@ -147,9 +149,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         addImageButton = getAddImageButton(view);
         takeImageButton = getTakeImageButton(view);
         addFileButton = getAddFileButton(view);
-        chatAudioCancel= getChatAudioCancelButton(view);
-        linItemSoundRec= getLinItemSoundRec(view);
-        buttonAddSound = getButtonAddSound(view);
+        cancelAudioRecord= getChatAudioCancelButton(view);
+        layoutSoundRecord= getLinItemSoundRec(view);
+        addSoundRecord = getButtonAddSound(view);
+        recordingTimeText = getRecordingTimeText(view);
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -182,11 +185,11 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         if (addFileButton != null) {
             addFileButton.setOnClickListener(v -> addFile());
         }
-        if(buttonAddSound!=null){
-            buttonAddSound.setOnClickListener(v -> addSound());
+        if(addSoundRecord!=null){
+            addSoundRecord.setOnClickListener(v -> addSound());
         }
-        if(chatAudioCancel!=null){
-            chatAudioCancel.setOnClickListener(v -> cancelAudioSound());
+        if(cancelAudioRecord!=null){
+            cancelAudioRecord.setOnClickListener(v -> cancelAudioSound());
         }
     }
 
@@ -229,7 +232,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable
     protected abstract ImageView getAddFileButton(View view);
 
-    @Nullable
+    @NonNull
     protected abstract ImageButton getChatAudioCancelButton(View view);
 
     @Nullable
@@ -237,6 +240,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Nullable
     protected abstract ImageView getButtonAddSound(View view);
+
+    @Nullable
+    protected abstract TextView getRecordingTimeText(View view);
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -309,8 +315,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             addFileButton.setImageResource(chatConfig.getAddFileIcon());
         }
 
-        if (buttonAddSound != null) {
-            buttonAddSound.setImageResource(chatConfig.getAddSoundIcon());
+        if (addSoundRecord != null) {
+            addSoundRecord.setImageResource(chatConfig.getAddSoundIcon());
         }
     }
 
@@ -476,10 +482,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Override
     public void onFileDownloaded(File file, String mimeType) {
-        if (QiscusFileUtil.getExtension(file).equals("mp3")) {
-            showSoundDialog(file.getName(), file);
-        } else if (QiscusFileUtil.getExtension(file).equals("m4a")) {
-            showSoundDialog(file.getName(), file);
+        if (QiscusFileUtil.getExtension(file).equals("mp3") || QiscusFileUtil.getExtension(file).equals("m4a")) {
+            showSoundDialog(file);
         } else {
             Intent intent = new Intent(Intent.ACTION_VIEW);
 
@@ -602,12 +606,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     private void startrecord() {
-        chatAudioCancel.setVisibility(View.VISIBLE);
-        // TODO Auto-generated method stub
-        startTime = SystemClock.uptimeMillis();
-        timer = new Timer();
-        QiscusRecordUtil myTimerTask = new QiscusRecordUtil(getActivity());
-        timer.schedule(myTimerTask, 1000, 1000);
+        cancelAudioRecord.setVisibility(View.VISIBLE);
+        doTimerTaskRecord();
         vibrate();
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
@@ -638,26 +638,45 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     private void cancelrecord() {
         if(myAudioRecorder!=null){
-            myAudioRecorder.reset();
-            messageEditText.setVisibility(View.VISIBLE);
-            linItemSoundRec.setVisibility(View.GONE);
-            if (timer != null) {
-                timer.cancel();
-                QiscusRecordUtil.recordingTimeText.setText("00:00");
-                chatAudioCancel.setVisibility(View.INVISIBLE);
+            try {
+                myAudioRecorder.stop();
+                myAudioRecorder.reset();
+                myAudioRecorder.release();
+            }catch (IllegalStateException e){
+                e.printStackTrace();
             }
-            QiscusRecordUtil.recordingTimeText.setText("00:00");
-            chatAudioCancel.setVisibility(View.INVISIBLE);
+            messageEditText.setVisibility(View.VISIBLE);
+            layoutSoundRecord.setVisibility(View.GONE);
+            cancelAudioRecord.setVisibility(View.INVISIBLE);
+            if(t != null)
+            {
+                t.cancel();
+            }
+            t = new Timer();
+            minute=0;
+            seconds=0;
+            hour=0;
+            recordingTimeText.setText("00:00:00");
         }else {
-            messageEditText.setVisibility(View.VISIBLE);
-            linItemSoundRec.setVisibility(View.GONE);
-            if (timer != null) {
-                timer.cancel();
-                QiscusRecordUtil.recordingTimeText.setText("00:00");
-                chatAudioCancel.setVisibility(View.INVISIBLE);
+            try {
+                myAudioRecorder.stop();
+                myAudioRecorder.reset();
+                myAudioRecorder.release();
+            }catch (IllegalStateException e){
+                e.printStackTrace();
             }
-            QiscusRecordUtil.recordingTimeText.setText("00:00");
-            chatAudioCancel.setVisibility(View.INVISIBLE);
+            messageEditText.setVisibility(View.VISIBLE);
+            layoutSoundRecord.setVisibility(View.GONE);
+            cancelAudioRecord.setVisibility(View.INVISIBLE);
+            if(t != null)
+            {
+                t.cancel();
+            }
+            t = new Timer();
+            minute=0;
+            seconds=0;
+            hour=0;
+            recordingTimeText.setText("00:00:00");
         }
     }
 
@@ -671,16 +690,52 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         }
     }
 
-    private void sendRecord() {
-        if (timer != null) {
-            timer.cancel();
+    private void doTimerTaskRecord(){
 
+        t.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                recordingTimeText.post(new Runnable() {
+
+                    public void run() {
+                        seconds++;
+                        if (seconds == 60) {
+                            seconds = 0;
+                            minute++;
+                        }
+                        if (minute == 60) {
+                            minute = 0;
+                            hour++;
+                        }
+                        recordingTimeText.setText(""
+                                + (hour > 9 ? hour : ("0" + hour)) + ":"
+                                + (minute > 9 ? minute : ("0" + minute))
+                                + ":"
+                                + (seconds > 9 ? seconds : "0" + seconds));
+
+                    }
+                });
+
+            }
+        }, 1000, 1000);
+
+    }
+
+    private void sendRecord() {
+        if (t != null) {
+            t.cancel();
+            t = new Timer();
+            minute=0;
+            seconds=0;
+            hour=0;
+            recordingTimeText.setText("00:00:00");
             try {
                 myAudioRecorder.stop();
                 myAudioRecorder.reset();
                 myAudioRecorder.release();
 
-                chatAudioCancel.setVisibility(View.INVISIBLE);
+                cancelAudioRecord.setVisibility(View.INVISIBLE);
 
                 try {
                     qiscusChatPresenter.sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastSoundPath())));
@@ -702,21 +757,16 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 e.printStackTrace();
             }
 
-            linItemSoundRec.setVisibility(View.GONE);
+            layoutSoundRecord.setVisibility(View.GONE);
             messageEditText.setVisibility(View.VISIBLE);
 
 
         }
-        if (QiscusRecordUtil.recordingTimeText.getText().toString().equals("00:00")) {
-            chatAudioCancel.setVisibility(View.INVISIBLE);
-            vibrate();
-        }
-        QiscusRecordUtil.recordingTimeText.setText("00:00");
-        chatAudioCancel.setVisibility(View.INVISIBLE);
+        cancelAudioRecord.setVisibility(View.INVISIBLE);
     }
 
     protected void addSound() {
-        linItemSoundRec.setVisibility(View.VISIBLE);
+        layoutSoundRecord.setVisibility(View.VISIBLE);
         messageEditText.setVisibility(View.GONE);
         startrecord();
         soundTrue = true;
@@ -733,8 +783,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         sendButton.setImageResource(chatConfig.getSendActiveIcon());
     }
 
-    private void showSoundDialog(String name, File file) {
-        QiscusSoundDialog.newInstance(getActivity(), name, file).show(getFragmentManager(), "SOUND_DIALOG");
+    private void showSoundDialog(File file) {
+        QiscusSoundDialog.newInstance(file).show(getFragmentManager(), "SOUND_DIALOG");
     }
 
 }

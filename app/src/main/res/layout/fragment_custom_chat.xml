@@ -191,10 +191,11 @@
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:id="@+id/linItemSoundRec"
                 android:visibility="gone">
 
@@ -207,7 +208,7 @@
                         android:id="@+id/chat_audio_cancel"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@android:color/white"
+                        android:background="@color/qiscus_white"
                         android:enabled="false"
                         android:scaleType="centerInside"
                         android:src="@android:drawable/ic_delete" />
@@ -225,7 +226,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="2dp"
-                        android:background="#ffffff"
+                        android:background="@color/qiscus_white"
                         android:visibility="visible"
                         android:layout_gravity="bottom">
 
@@ -233,10 +234,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_gravity="center_vertical"
-                            android:background="#ffffffff"
+                            android:background="@color/qiscus_white"
                             android:orientation="horizontal"
-                            android:paddingLeft="13dp"
-                            android:gravity="center_horizontal">
+                            android:gravity="center_horizontal"
+                            android:paddingRight="48dp"
+                            android:paddingEnd="48dp">
 
                             <ImageView
                                 android:layout_width="25dp"
@@ -251,21 +253,13 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginLeft="6dp"
-                                android:text="00:00"
+                                android:layout_marginStart="6dp"
+                                android:text="@string/time_start_record"
                                 android:textColor="@color/qiscus_secondary_text"
                                 android:textSize="16dp" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp">
-
-                </LinearLayout>
-
-
             </LinearLayout>
 
             <EditText

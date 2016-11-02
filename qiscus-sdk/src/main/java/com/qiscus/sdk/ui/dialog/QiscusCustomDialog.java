@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public abstract class QiscusCustomDialog extends RxDialogFragment {
-    public View view ;
+    View view ;
 
     @Nullable
     @Override
@@ -48,8 +48,6 @@ public abstract class QiscusCustomDialog extends RxDialogFragment {
         super.onActivityCreated(savedInstanceState);
         onViewReady(savedInstanceState);
     }
-
-    protected abstract int getResourceLayout();
 
     protected abstract void onViewReady(@Nullable Bundle savedInstanceState);
 
@@ -72,8 +70,12 @@ public abstract class QiscusCustomDialog extends RxDialogFragment {
         }
     }
 
-    public void onDestroyView() {
-        super.onDestroyView();
+    public View getView() {
+        return view;
+    }
+
+    public void setView(View newView) {
+        view = newView;
     }
 
 }

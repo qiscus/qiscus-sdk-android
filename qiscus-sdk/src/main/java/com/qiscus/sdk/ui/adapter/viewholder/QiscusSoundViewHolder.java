@@ -71,18 +71,6 @@ public class QiscusSoundViewHolder extends QiscusBaseSoundMessageViewHolder {
         return (ImageView) itemView.findViewById(R.id.icon_read);
     }
 
-    @NonNull
-    @Override
-    protected TextView getFileNameView(View itemView) {
-        return (TextView) itemView.findViewById(R.id.file_name);
-    }
-
-    @Nullable
-    @Override
-    protected TextView getFileTypeView(View itemView) {
-        return (TextView) itemView.findViewById(R.id.file_type);
-    }
-
     @Nullable
     @Override
     protected CircleProgress getProgressView(View itemView) {
