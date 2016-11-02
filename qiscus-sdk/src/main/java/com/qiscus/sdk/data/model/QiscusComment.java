@@ -73,9 +73,9 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setRoomId(roomId);
         qiscusComment.setTopicId(topicId);
         qiscusComment.setUniqueId("android_"
-                                    + System.currentTimeMillis()
-                                    + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
-                                                                Settings.Secure.ANDROID_ID));
+                + System.currentTimeMillis()
+                + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
+                Settings.Secure.ANDROID_ID));
         qiscusComment.setMessage(content);
         qiscusComment.setTime(new Date());
         qiscusComment.setSenderEmail(qiscusAccount.getEmail());
@@ -217,7 +217,7 @@ public class QiscusComment implements Parcelable {
         int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
 
         String fileName = message.substring(fileNameBeginIndex,
-                                            fileNameEndIndex);
+                fileNameEndIndex);
         try {
             return URLDecoder.decode(fileName, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -225,7 +225,7 @@ public class QiscusComment implements Parcelable {
         }
 
         throw new RuntimeException("The filename '" + fileName
-                                           + "' is not valid UTF-8");
+                + "' is not valid UTF-8");
     }
 
     public String getExtension() {
@@ -379,6 +379,23 @@ public class QiscusComment implements Parcelable {
 
     public void setPlayingAudioListener(PlayingAudioListener playingAudioListener) {
         this.playingAudioListener = playingAudioListener;
+    }
+
+    public void destroy() {
+        if (playingAudioListener != null) {
+            playingAudioListener = null;
+        }
+        if (observer != null) {
+            observer.stop();
+            observer = null;
+        }
+        if (player != null) {
+            if (player.isPlaying()) {
+                player.stop();
+            }
+            player.release();
+            player = null;
+        }
     }
 
     @Override
