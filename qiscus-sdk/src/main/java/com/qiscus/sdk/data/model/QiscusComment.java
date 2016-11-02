@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.data.model;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -26,9 +27,12 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created on : August 18, 2016
@@ -58,6 +62,9 @@ public class QiscusComment implements Parcelable {
     protected int progress;
     protected ProgressListener progressListener;
     protected DownloadingListener downloadingListener;
+    protected PlayingAudioListener playingAudioListener;
+    private MediaObserver observer;
+    private MediaPlayer player;
 
     public static QiscusComment generateMessage(String content, int roomId, int topicId) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
@@ -66,9 +73,9 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setRoomId(roomId);
         qiscusComment.setTopicId(topicId);
         qiscusComment.setUniqueId("android_"
-                                    + System.currentTimeMillis()
-                                    + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
-                                                                Settings.Secure.ANDROID_ID));
+                + System.currentTimeMillis()
+                + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
+                Settings.Secure.ANDROID_ID));
         qiscusComment.setMessage(content);
         qiscusComment.setTime(new Date());
         qiscusComment.setSenderEmail(qiscusAccount.getEmail());
@@ -210,7 +217,7 @@ public class QiscusComment implements Parcelable {
         int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
 
         String fileName = message.substring(fileNameBeginIndex,
-                                            fileNameEndIndex);
+                fileNameEndIndex);
         try {
             return URLDecoder.decode(fileName, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -218,7 +225,7 @@ public class QiscusComment implements Parcelable {
         }
 
         throw new RuntimeException("The filename '" + fileName
-                                           + "' is not valid UTF-8");
+                + "' is not valid UTF-8");
     }
 
     public String getExtension() {
@@ -242,11 +249,26 @@ public class QiscusComment implements Parcelable {
         return false;
     }
 
+    public boolean isAudio() {
+        if (isAttachment()) {
+
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
+            if (type == null) {
+                return false;
+            } else if (type.contains("audio")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Type getType() {
         if (!isAttachment()) {
             return Type.TEXT;
         } else if (isImage()) {
             return Type.IMAGE;
+        } else if (isAudio()) {
+            return Type.AUDIO;
         } else {
             return Type.FILE;
         }
@@ -274,12 +296,106 @@ public class QiscusComment implements Parcelable {
         }
     }
 
+    private void setupPlayer() {
+        if (player == null) {
+            File localPath = Qiscus.getDataStore().getLocalPath(id);
+            if (localPath != null) {
+                try {
+                    player = new MediaPlayer();
+                    player.setDataSource(localPath.getAbsolutePath());
+                    player.prepare();
+                    player.setOnCompletionListener(mp -> {
+                        observer.stop();
+                        if (playingAudioListener != null) {
+                            playingAudioListener.onStopAudio(this);
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void playAudio() {
+        if (!isAudio()) {
+            throw new RuntimeException("Current comment is not an audio");
+        }
+
+        if (observer == null) {
+            observer = new MediaObserver();
+        }
+
+        setupPlayer();
+
+        if (!player.isPlaying()) {
+            player.start();
+            observer.start();
+            new Thread(observer).start();
+        } else {
+            player.pause();
+            observer.stop();
+            if (playingAudioListener != null) {
+                playingAudioListener.onPauseAudio(this);
+            }
+        }
+    }
+
+    public boolean isPlayingAudio() {
+        return player != null && player.isPlaying();
+    }
+
+    public int getAudioDuration() {
+        if (player == null && isAudio()) {
+            File localPath = Qiscus.getDataStore().getLocalPath(id);
+            if (localPath == null) {
+                return 0;
+            } else {
+                setupPlayer();
+            }
+        }
+        return player.getDuration();
+    }
+
+    public int getCurrentAudioPosition() {
+        if (player == null && isAudio()) {
+            File localPath = Qiscus.getDataStore().getLocalPath(id);
+            if (localPath == null) {
+                return 0;
+            } else {
+                setupPlayer();
+            }
+        }
+        return player.getCurrentPosition();
+    }
+
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
     }
 
     public void setDownloadingListener(DownloadingListener downloadingListener) {
         this.downloadingListener = downloadingListener;
+    }
+
+    public void setPlayingAudioListener(PlayingAudioListener playingAudioListener) {
+        this.playingAudioListener = playingAudioListener;
+    }
+
+    public void destroy() {
+        if (playingAudioListener != null) {
+            playingAudioListener = null;
+        }
+        if (observer != null) {
+            observer.stop();
+            observer = null;
+        }
+        if (player != null) {
+            if (player.isPlaying()) {
+                player.stop();
+            }
+            player.release();
+            player = null;
+        }
     }
 
     @Override
@@ -331,7 +447,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE
+        TEXT, IMAGE, FILE, AUDIO
     }
 
     public interface ProgressListener {
@@ -340,5 +456,41 @@ public class QiscusComment implements Parcelable {
 
     public interface DownloadingListener {
         void onDownloading(QiscusComment qiscusComment, boolean downloading);
+    }
+
+    public interface PlayingAudioListener {
+        void onPlayingAudio(QiscusComment qiscusComment, int currentPosition);
+
+        void onPauseAudio(QiscusComment qiscusComment);
+
+        void onStopAudio(QiscusComment qiscusComment);
+    }
+
+    private class MediaObserver implements Runnable {
+        private AtomicBoolean stop = new AtomicBoolean(false);
+
+        public void stop() {
+            stop.set(true);
+        }
+
+        public void start() {
+            stop.set(false);
+        }
+
+        @Override
+        public void run() {
+            while (!stop.get()) {
+                QiscusAndroidUtil.runOnUIThread(() -> {
+                    if (playingAudioListener != null) {
+                        playingAudioListener.onPlayingAudio(QiscusComment.this, player.getCurrentPosition());
+                    }
+                });
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

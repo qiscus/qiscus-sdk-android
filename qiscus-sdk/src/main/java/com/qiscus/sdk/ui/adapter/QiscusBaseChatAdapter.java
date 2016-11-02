@@ -241,4 +241,11 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
 
         return -1;
     }
+
+    public void detachView() {
+        int size = data.size();
+        for (int i = 0; i < size; i++) {
+            data.get(i).destroy();
+        }
+    }
 }

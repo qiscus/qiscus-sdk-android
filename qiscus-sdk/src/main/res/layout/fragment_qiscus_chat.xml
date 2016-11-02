@@ -177,6 +177,23 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_qiscus_add_file"/>
 
+                <ImageView
+                    android:id="@+id/button_add_audio"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bt_qiscus_selector_grey"
+                    android:paddingEnd="2dp"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="1dp"
+                    android:paddingStart="1dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_qiscus_add_audio"/>
+
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -198,6 +215,12 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <com.qiscus.sdk.ui.view.QiscusAudioRecorderView
+            android:id="@+id/record_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

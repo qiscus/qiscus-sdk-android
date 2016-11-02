@@ -52,6 +52,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
+import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -72,7 +73,7 @@ import java.util.List;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapter> extends RxFragment
-        implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener, QiscusChatPresenter.View {
+        implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener, QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener {
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int PICK_IMAGE_REQUEST = 2;
@@ -81,6 +82,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable protected ViewGroup emptyChatHolder;
     @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
     @NonNull protected QiscusRecyclerView messageRecyclerView;
+    @Nullable protected ViewGroup messageInputPanel;
     @NonNull protected EditText messageEditText;
     @NonNull protected ImageView sendButton;
     @Nullable protected View newMessageButton;
@@ -91,6 +93,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable protected ImageView addImageButton;
     @Nullable protected ImageView takeImageButton;
     @Nullable protected ImageView addFileButton;
+    @Nullable protected ImageView recordAudioButton;
+    @Nullable protected QiscusAudioRecorderView recordAudioPanel;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -115,6 +119,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         emptyChatHolder = getEmptyChatHolder(view);
         swipeRefreshLayout = getSwipeRefreshLayout(view);
         messageRecyclerView = getMessageRecyclerView(view);
+        messageInputPanel = getMessageInputPanel(view);
         messageEditText = getMessageEditText(view);
         sendButton = getSendButton(view);
         newMessageButton = getNewMessageButton(view);
@@ -125,6 +130,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         addImageButton = getAddImageButton(view);
         takeImageButton = getTakeImageButton(view);
         addFileButton = getAddFileButton(view);
+        recordAudioButton = getRecordAudioButton(view);
+        recordAudioPanel = getRecordAudioPanel(view);
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -157,6 +164,12 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         if (addFileButton != null) {
             addFileButton.setOnClickListener(v -> addFile());
         }
+        if (recordAudioButton != null) {
+            recordAudioButton.setOnClickListener(v -> recordAudio());
+        }
+        if (recordAudioPanel != null) {
+            recordAudioPanel.setRecordListener(this);
+        }
     }
 
     @Nullable
@@ -167,6 +180,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @NonNull
     protected abstract QiscusRecyclerView getMessageRecyclerView(View view);
+
+    @Nullable
+    protected abstract ViewGroup getMessageInputPanel(View view);
 
     @NonNull
     protected abstract EditText getMessageEditText(View view);
@@ -197,6 +213,12 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Nullable
     protected abstract ImageView getAddFileButton(View view);
+
+    @Nullable
+    protected abstract ImageView getRecordAudioButton(View view);
+
+    @Nullable
+    protected abstract QiscusAudioRecorderView getRecordAudioPanel(View view);
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -283,7 +305,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
         if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
-            if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
+            if (qiscusComment.getType() == QiscusComment.Type.FILE
+                    || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                    || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                 qiscusChatPresenter.downloadFile(qiscusComment);
             }
         } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
@@ -351,6 +375,21 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
         startActivityForResult(intent, PICK_FILE_REQUEST);
+    }
+
+    protected void recordAudio() {
+        if (recordAudioPanel != null) {
+            recordAudioPanel.setVisibility(View.VISIBLE);
+            try {
+                recordAudioPanel.startRecord();
+            } catch (IOException e) {
+                e.printStackTrace();
+                showError("Failed to record audio!");
+            }
+        }
+        if (messageInputPanel != null) {
+            messageInputPanel.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -536,6 +575,27 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     @Override
+    public void onStartRecord() {
+
+    }
+
+    @Override
+    public void onCancelRecord() {
+        if (recordAudioPanel != null) {
+            recordAudioPanel.setVisibility(View.GONE);
+        }
+        if (messageInputPanel != null) {
+            messageInputPanel.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onStopRecord(File audioFile) {
+        qiscusChatPresenter.sendFile(audioFile);
+        onCancelRecord();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
@@ -545,6 +605,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        chatAdapter.detachView();
+        if (recordAudioPanel != null) {
+            recordAudioPanel.cancelRecord();
+        }
         qiscusChatPresenter.detachView();
     }
 }
