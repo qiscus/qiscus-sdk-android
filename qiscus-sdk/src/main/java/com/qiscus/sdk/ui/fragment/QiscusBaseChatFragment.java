@@ -305,7 +305,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
         if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
-            if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
+            if (qiscusComment.getType() == QiscusComment.Type.FILE
+                    || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                    || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                 qiscusChatPresenter.downloadFile(qiscusComment);
             }
         } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
