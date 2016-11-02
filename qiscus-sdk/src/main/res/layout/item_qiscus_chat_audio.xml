@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016 Qiscus.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/qiscus_secondary_text"
+        android:textSize="14sp"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/bubble"
+        android:layout_width="42dp"
+        android:layout_height="27dp"
+        android:layout_alignTop="@+id/message"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_qiscus_arrow_bubble_primary"
+        android:tint="@color/qiscus_primary"/>
+
+    <RelativeLayout
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/date"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginLeft="19dp"
+        android:layout_marginRight="64dp"
+        android:layout_marginStart="19dp"
+        android:background="@drawable/qiscus_rounded_primary_chat_bg"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <RelativeLayout
+            android:id="@+id/file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/iv_play"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"
+                android:padding="4dp"
+                android:src="@drawable/ic_qiscus_play_audio"
+                android:visibility="visible"/>
+
+            <com.github.lzyzsd.circleprogress.CircleProgress
+                android:id="@+id/progress"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"
+                android:visibility="gone"
+                app:circle_finished_color="@color/qiscus_primary"
+                app:circle_text_size="14sp"
+                app:circle_unfinished_color="@color/qiscus_primary"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="-8dp"
+                android:layout_marginStart="-8dp"
+                android:layout_toEndOf="@+id/iv_play"
+                android:layout_toRightOf="@+id/iv_play"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatSeekBar
+                    android:id="@+id/seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progressDrawable="@drawable/qiscus_audio_progress"
+                    android:thumb="@drawable/qiscus_audio_progress_thumb"/>
+
+                <TextView
+                    android:id="@+id/duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="17dp"
+                    android:layout_marginStart="17dp"
+                    android:text="00:00"
+                    android:textColor="@color/qiscus_primary_text"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/file"
+            android:layout_alignRight="@+id/file"
+            android:layout_below="@+id/file"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/qiscus_primary_light"
+            android:textSize="12sp"/>
+
+    </RelativeLayout>
+
+    <!-- Add this view because Xiaomi need it -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@+id/message"/>
+</RelativeLayout>
