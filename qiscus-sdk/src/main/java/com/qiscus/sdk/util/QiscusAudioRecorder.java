@@ -68,13 +68,13 @@ public class QiscusAudioRecorder {
 
     public void cancelRecording() {
         if (recording) {
+            recording = false;
             try {
                 recorder.stop();
                 recorder.release();
                 recorder = null;
-                recording = false;
-            } catch (Exception ignored) {
-
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

@@ -380,15 +380,19 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected void recordAudio() {
         if (recordAudioPanel != null) {
             recordAudioPanel.setVisibility(View.VISIBLE);
+            if (messageInputPanel != null) {
+                messageInputPanel.setVisibility(View.GONE);
+            }
             try {
                 recordAudioPanel.startRecord();
             } catch (IOException e) {
                 e.printStackTrace();
                 showError("Failed to record audio!");
+                recordAudioPanel.cancelRecord();
+            } catch (IllegalStateException e) {
+                showError("Can not record audio, microphone may be in use!");
+                recordAudioPanel.cancelRecord();
             }
-        }
-        if (messageInputPanel != null) {
-            messageInputPanel.setVisibility(View.GONE);
         }
     }
 
