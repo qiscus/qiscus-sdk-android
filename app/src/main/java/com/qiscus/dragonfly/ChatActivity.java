@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
@@ -57,7 +56,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void openQiscusFragment() {
         showLoading();
-        Qiscus.buildChatFragmentWith("rya.meyvriska1@gmail.com")
+        Qiscus.buildChatFragmentWith("rya.meyvriska24@gmail.com")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -75,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void openSimpleCustom() {
         showLoading();
-        Qiscus.buildChatRoomWith("rya.meyvriska1@gmail.com")
+        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

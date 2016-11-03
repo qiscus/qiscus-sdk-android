@@ -54,7 +54,7 @@ public class CustomChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_custom_chat);
 
         showLoading();
-        Qiscus.buildChatRoomWith("rya.meyvriska1@gmail.com")
+        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
