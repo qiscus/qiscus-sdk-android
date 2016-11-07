@@ -16,14 +16,24 @@
 
 package com.qiscus.sdk.data.local;
 
+import java.io.File;
+
 /**
- * Created on : October 11, 2016
+ * Created on : November 07, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
  * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public interface QiscusDataStore extends QiscusChatRoomStore, QiscusCommentStore, QiscusFileStore {
-    void clear();
+public interface QiscusFileStore {
+    void saveLocalPath(int topicId, int commentId, String localPath);
+
+    boolean isContainsFileOfComment(int commentId);
+
+    void updateLocalPath(int topicId, int commentId, String localPath);
+
+    void addOrUpdateLocalPath(int topicId, int commentId, String localPath);
+
+    File getLocalPath(int commentId);
 }

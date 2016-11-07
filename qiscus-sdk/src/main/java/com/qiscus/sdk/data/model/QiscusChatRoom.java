@@ -19,6 +19,8 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -29,12 +31,15 @@ import android.os.Parcelable;
  */
 public class QiscusChatRoom implements Parcelable {
     protected int id;
+    protected String distinctId;
     protected String name;
     protected String subtitle = "";
     protected int lastCommentId;
     protected String lastCommentMessage;
     protected int lastTopicId;
     protected String options;
+    protected boolean group;
+    protected List<String> member;
 
     public QiscusChatRoom() {
 
@@ -42,12 +47,15 @@ public class QiscusChatRoom implements Parcelable {
 
     protected QiscusChatRoom(Parcel in) {
         id = in.readInt();
+        distinctId = in.readString();
         name = in.readString();
         subtitle = in.readString();
         lastCommentId = in.readInt();
         lastCommentMessage = in.readString();
         lastTopicId = in.readInt();
         options = in.readString();
+        group = in.readByte() != 0;
+        member = in.createStringArrayList();
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -68,6 +76,14 @@ public class QiscusChatRoom implements Parcelable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getDistinctId() {
+        return distinctId;
+    }
+
+    public void setDistinctId(String distinctId) {
+        this.distinctId = distinctId;
     }
 
     public String getName() {
@@ -118,6 +134,22 @@ public class QiscusChatRoom implements Parcelable {
         this.options = options;
     }
 
+    public boolean isGroup() {
+        return group;
+    }
+
+    public void setGroup(boolean group) {
+        this.group = group;
+    }
+
+    public List<String> getMember() {
+        return member;
+    }
+
+    public void setMember(List<String> member) {
+        this.member = member;
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
@@ -127,12 +159,15 @@ public class QiscusChatRoom implements Parcelable {
     public String toString() {
         return "QiscusChatRoom{" +
                 "id=" + id +
+                ", distinctId='" + distinctId + '\'' +
                 ", name='" + name + '\'' +
                 ", subtitle='" + subtitle + '\'' +
                 ", lastCommentId=" + lastCommentId +
                 ", lastCommentMessage='" + lastCommentMessage + '\'' +
                 ", lastTopicId=" + lastTopicId +
                 ", options='" + options + '\'' +
+                ", group=" + group +
+                ", member=" + member +
                 '}';
     }
 
@@ -144,11 +179,14 @@ public class QiscusChatRoom implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
+        dest.writeString(distinctId);
         dest.writeString(name);
         dest.writeString(subtitle);
         dest.writeInt(lastCommentId);
         dest.writeString(lastCommentMessage);
         dest.writeInt(lastTopicId);
         dest.writeString(options);
+        dest.writeByte((byte) (group ? 1 : 0));
+        dest.writeStringList(member);
     }
 }

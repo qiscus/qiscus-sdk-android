@@ -30,6 +30,8 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
+            db.execSQL(QiscusDb.RoomTable.CREATE);
+            db.execSQL(QiscusDb.RoomMemberTable.CREATE);
             db.execSQL(QiscusDb.CommentTable.CREATE);
             db.execSQL(QiscusDb.FilesTable.CREATE);
             db.setTransactionSuccessful();
@@ -45,6 +47,8 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     }
 
     private void clearOldData(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomMemberTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.CommentTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.FilesTable.TABLE_NAME);
     }
