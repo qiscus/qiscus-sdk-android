@@ -17,8 +17,8 @@
 package com.qiscus.sdk.data.remote;
 
 import android.net.Uri;
-import android.util.Log;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
@@ -142,6 +142,20 @@ public enum QiscusApi {
                         qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                                 : jsonChatRoom.get("options").getAsString());
                         qiscusChatRoom.setMember(withEmails);
+                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("comments").getAsJsonArray();
+
+                        if (comments.size() > 0) {
+                            JsonObject lastComment = comments.get(0).getAsJsonObject();
+                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
+                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
+                            try {
+                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                         return qiscusChatRoom;
                     }
                     qiscusChatRoom = Qiscus.getDataStore().getChatRoom(withEmails.get(0),
@@ -149,7 +163,6 @@ public enum QiscusApi {
                     if (qiscusChatRoom == null) {
                         throw new RuntimeException("Unable to connect with qiscus server!");
                     }
-                    Log.d("ZETRA", "Room local: " + qiscusChatRoom);
                     return qiscusChatRoom;
                 });
     }
@@ -170,6 +183,19 @@ public enum QiscusApi {
                             : jsonChatRoom.get("options").getAsString());
                     //TODO minta server ngasih tau member room siapa aja
                     //qiscusChatRoom.setMember(withEmails);
+                    JsonArray comments = jsonElement.getAsJsonObject().get("results")
+                            .getAsJsonObject().get("comments").getAsJsonArray();
+
+                    if (comments.size() > 0) {
+                        JsonObject lastComment = comments.get(0).getAsJsonObject();
+                        qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
+                        qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
+                        try {
+                            qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     return qiscusChatRoom;
                 });
     }
