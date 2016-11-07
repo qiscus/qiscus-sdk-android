@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,13 +37,16 @@ public class QiscusChatRoom implements Parcelable {
     protected String subtitle = "";
     protected int lastCommentId;
     protected String lastCommentMessage;
+    protected String lastCommentSender;
+    protected String lastCommentSenderEmail;
+    protected Date lastCommentTime;
     protected int lastTopicId;
     protected String options;
     protected boolean group;
     protected List<String> member;
 
     public QiscusChatRoom() {
-
+        lastCommentTime = new Date(0L);
     }
 
     protected QiscusChatRoom(Parcel in) {
@@ -52,6 +56,9 @@ public class QiscusChatRoom implements Parcelable {
         subtitle = in.readString();
         lastCommentId = in.readInt();
         lastCommentMessage = in.readString();
+        lastCommentSender = in.readString();
+        lastCommentSenderEmail = in.readString();
+        lastCommentTime = new Date(in.readLong());
         lastTopicId = in.readInt();
         options = in.readString();
         group = in.readByte() != 0;
@@ -118,6 +125,30 @@ public class QiscusChatRoom implements Parcelable {
         this.lastCommentMessage = lastCommentMessage;
     }
 
+    public String getLastCommentSender() {
+        return lastCommentSender;
+    }
+
+    public void setLastCommentSender(String lastCommentSender) {
+        this.lastCommentSender = lastCommentSender;
+    }
+
+    public String getLastCommentSenderEmail() {
+        return lastCommentSenderEmail;
+    }
+
+    public void setLastCommentSenderEmail(String lastCommentSenderEmail) {
+        this.lastCommentSenderEmail = lastCommentSenderEmail;
+    }
+
+    public Date getLastCommentTime() {
+        return lastCommentTime;
+    }
+
+    public void setLastCommentTime(Date lastCommentTime) {
+        this.lastCommentTime = lastCommentTime;
+    }
+
     public int getLastTopicId() {
         return lastTopicId;
     }
@@ -164,6 +195,9 @@ public class QiscusChatRoom implements Parcelable {
                 ", subtitle='" + subtitle + '\'' +
                 ", lastCommentId=" + lastCommentId +
                 ", lastCommentMessage='" + lastCommentMessage + '\'' +
+                ", lastCommentSender='" + lastCommentSender + '\'' +
+                ", lastCommentSenderEmail='" + lastCommentSenderEmail + '\'' +
+                ", lastCommentTime=" + lastCommentTime +
                 ", lastTopicId=" + lastTopicId +
                 ", options='" + options + '\'' +
                 ", group=" + group +
@@ -184,6 +218,9 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(subtitle);
         dest.writeInt(lastCommentId);
         dest.writeString(lastCommentMessage);
+        dest.writeString(lastCommentSender);
+        dest.writeString(lastCommentSenderEmail);
+        dest.writeLong(lastCommentTime.getTime());
         dest.writeInt(lastTopicId);
         dest.writeString(options);
         dest.writeByte((byte) (group ? 1 : 0));

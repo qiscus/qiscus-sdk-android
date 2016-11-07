@@ -108,6 +108,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QiscusComment latestComment = getLatestComment(id);
             qiscusChatRoom.setLastCommentId(latestComment.getId());
             qiscusChatRoom.setLastCommentMessage(latestComment.getMessage());
+            qiscusChatRoom.setLastCommentSender(latestComment.getSender());
+            qiscusChatRoom.setLastCommentSenderEmail(latestComment.getSenderEmail());
+            qiscusChatRoom.setLastCommentTime(latestComment.getTime());
             qiscusChatRoom.setLastTopicId(latestComment.getTopicId());
             cursor.close();
             return qiscusChatRoom;
