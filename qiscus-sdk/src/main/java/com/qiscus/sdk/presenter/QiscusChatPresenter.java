@@ -194,6 +194,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
     }
 
+    public void deleteComment(QiscusComment qiscusComment) {
+        Qiscus.getDataStore().delete(qiscusComment);
+        view.onCommentDeleted(qiscusComment);
+    }
+
     private Observable<List<QiscusComment>> getCommentsFromNetwork(int lastCommentId) {
         return QiscusApi.getInstance().getComments(currentTopicId, lastCommentId)
                 .subscribeOn(Schedulers.io())
@@ -401,6 +406,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void onFailedSendComment(QiscusComment qiscusComment);
 
         void onNewComment(QiscusComment qiscusComment);
+
+        void onCommentDeleted(QiscusComment qiscusComment);
 
         void refreshComment(QiscusComment qiscusComment);
 

@@ -30,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -311,8 +312,23 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 qiscusChatPresenter.downloadFile(qiscusComment);
             }
         } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
-            qiscusChatPresenter.resendComment(qiscusComment);
+            showFailedCommentDialog(qiscusComment);
         }
+    }
+
+    protected void showFailedCommentDialog(QiscusComment qiscusComment) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Message send failed")
+                .setItems(new CharSequence[]{"Resend", "Delete"}, (dialog, which) -> {
+                    if (which == 0) {
+                        qiscusChatPresenter.resendComment(qiscusComment);
+                    } else {
+                        qiscusChatPresenter.deleteComment(qiscusComment);
+                    }
+                })
+                .setCancelable(true)
+                .create()
+                .show();
     }
 
     protected void onItemCommentLongClick(QiscusComment qiscusComment) {
@@ -444,6 +460,11 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         if (emptyChatHolder != null) {
             emptyChatHolder.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onCommentDeleted(QiscusComment qiscusComment) {
+        chatAdapter.remove(qiscusComment);
     }
 
     @Override
