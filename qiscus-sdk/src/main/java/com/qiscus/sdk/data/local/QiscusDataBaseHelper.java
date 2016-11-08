@@ -418,7 +418,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
@@ -442,8 +442,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
-                + QiscusDb.CommentTable.COLUMN_ID + " < " + qiscusComment.getId() + " "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + QiscusDb.CommentTable.COLUMN_TIME + " < " + qiscusComment.getTime().getTime() + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
@@ -455,7 +455,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(final QiscusComment qiscusComment, final int topicId, final int count) {
+    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
             subscriber.onCompleted();
@@ -464,16 +464,26 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public QiscusComment getLatestComment() {
-        return getLatestComment(0);
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME
+                + " WHERE " + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "LIMIT " + 1;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        QiscusComment qiscusComment = null;
+        while (cursor.moveToNext()) {
+            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+        }
+        cursor.close();
+        return qiscusComment;
     }
 
     @Override
     public QiscusComment getLatestComment(int roomId) {
         String query = "SELECT * FROM "
-                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + ((roomId > 0) ? QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND " : "")
-                + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + QiscusDb.CommentTable.TABLE_NAME
+                + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + 1;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;

@@ -458,7 +458,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     private void loadMoreComments() {
         if (loadMoreProgressBar.getVisibility() == View.GONE && chatAdapter.getItemCount() > 0) {
             QiscusComment qiscusComment = (QiscusComment) chatAdapter.getData().get(chatAdapter.getItemCount() - 1);
-            if (qiscusComment.getCommentBeforeId() > 0) {
+            if (qiscusComment.getId() == -1 || qiscusComment.getCommentBeforeId() > 0) {
                 qiscusChatPresenter.loadOlderCommentThan(qiscusComment);
             }
         }

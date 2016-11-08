@@ -78,12 +78,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (savedQiscusComment != null) {
             if (savedQiscusComment.getState() != QiscusComment.STATE_ON_PUSHER) {
                 qiscusComment.setState(QiscusComment.STATE_FAILED);
+                Qiscus.getDataStore().addOrUpdate(qiscusComment);
                 if (qiscusComment.getTopicId() == currentTopicId) {
                     view.onFailedSendComment(qiscusComment);
                 }
             }
         } else {
             qiscusComment.setState(QiscusComment.STATE_FAILED);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
             if (qiscusComment.getTopicId() == currentTopicId) {
                 view.onFailedSendComment(qiscusComment);
             }
@@ -244,6 +246,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         for (int i = 0; i < size - 1; i++) {
+            if (qiscusComments.get(i).getId() == -1 || qiscusComments.get(i + 1).getId() == -1) {
+                return true;
+            }
+
             if (!containsLastValidComment && qiscusComments.get(i).getId() == room.getLastCommentId()) {
                 containsLastValidComment = true;
             }
@@ -264,6 +270,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         for (int i = 0; i < size - 1; i++) {
+            if (qiscusComments.get(i).getId() == -1 || qiscusComments.get(i + 1).getId() == -1) {
+                return true;
+            }
+
             if (!containsLastValidComment && qiscusComments.get(i).getId() == lastQiscusComment.getCommentBeforeId()) {
                 containsLastValidComment = true;
             }
