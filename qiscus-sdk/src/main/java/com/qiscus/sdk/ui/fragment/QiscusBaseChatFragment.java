@@ -64,6 +64,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import pub.devrel.easypermissions.EasyPermissions;
+
 
 /**
  * Created on : September 28, 2016
@@ -74,7 +76,19 @@ import java.util.List;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapter> extends RxFragment
-        implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener, QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener {
+        implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
+        QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener, EasyPermissions.PermissionCallbacks {
+
+    protected static final int RC_PERMISSIONS = 1;
+    protected static final int RC_STORAGE_PERMISSION = 2;
+    protected static final int RC_RECORD_AUDIO_PERMISSION = 3;
+
+    private static final String[] PERMISSIONS = {
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.RECORD_AUDIO"
+    };
+
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int PICK_IMAGE_REQUEST = 2;
@@ -224,6 +238,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        requestPermissions();
         onCreateChatComponents(savedInstanceState);
     }
 
@@ -635,5 +650,43 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             recordAudioPanel.cancelRecord();
         }
         qiscusChatPresenter.detachView();
+    }
+
+    protected void requestPermissions() {
+        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS)) {
+            EasyPermissions.requestPermissions(this, "Please grant permissions to make apps working properly!",
+                    RC_PERMISSIONS, PERMISSIONS);
+        }
+    }
+
+    protected void requestStoragePermission() {
+        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS[0], PERMISSIONS[1])) {
+            EasyPermissions.requestPermissions(this, "To make this apps working properly we need to access external storage to save your chatting data. " +
+                            "So please allow the apps to access the storage!",
+                    RC_STORAGE_PERMISSION, PERMISSIONS[0], PERMISSIONS[1]);
+        }
+    }
+
+    protected void requestAudioRecordPermission() {
+        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS[3])) {
+            EasyPermissions.requestPermissions(this, "We need your permission to record audio to able send audio message!",
+                    RC_RECORD_AUDIO_PERMISSION, PERMISSIONS[3]);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        EasyPermissions.checkDeniedPermissionsNeverAskAgain(this, "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
     }
 }

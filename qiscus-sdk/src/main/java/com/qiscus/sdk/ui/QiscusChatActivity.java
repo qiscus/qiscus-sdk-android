@@ -32,8 +32,9 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
-public class QiscusChatActivity extends QiscusActivity {
+public class QiscusChatActivity extends RxAppCompatActivity {
     private static final String CHAT_ROOM_DATA = "chat_room_data";
 
     protected Toolbar toolbar;
@@ -67,12 +68,8 @@ public class QiscusChatActivity extends QiscusActivity {
         onViewReady(savedInstanceState);
     }
 
-    @Override
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
-
-        requestStoragePermission();
-        requestAudioRecordPermission();
 
         applyChatConfig();
 
