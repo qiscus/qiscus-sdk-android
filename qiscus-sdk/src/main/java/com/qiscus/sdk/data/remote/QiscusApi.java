@@ -169,32 +169,41 @@ public enum QiscusApi {
 
     public Observable<QiscusChatRoom> getChatRoom(int roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
+                .onErrorReturn(throwable -> null)
                 .map(jsonElement -> {
-                    JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
-                            .getAsJsonObject().get("room").getAsJsonObject();
-                    QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
-                    qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-                    //TODO minta server ngasih tau distinctId biar bisa disimpen
-                    //qiscusChatRoom.setDistinctId("default");
-                    qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
-                    qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
-                    qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-                    qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
-                            : jsonChatRoom.get("options").getAsString());
-                    //TODO minta server ngasih tau member room siapa aja
-                    //qiscusChatRoom.setMember(withEmails);
-                    JsonArray comments = jsonElement.getAsJsonObject().get("results")
-                            .getAsJsonObject().get("comments").getAsJsonArray();
+                    QiscusChatRoom qiscusChatRoom;
+                    if (jsonElement != null) {
+                        JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("room").getAsJsonObject();
+                        qiscusChatRoom = new QiscusChatRoom();
+                        qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
+                        //TODO minta server ngasih tau distinctId biar bisa disimpen
+                        //qiscusChatRoom.setDistinctId("default");
+                        qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
+                        qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
+                        qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
+                        qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
+                                : jsonChatRoom.get("options").getAsString());
+                        //TODO minta server ngasih tau member room siapa aja
+                        //qiscusChatRoom.setMember(withEmails);
+                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("comments").getAsJsonArray();
 
-                    if (comments.size() > 0) {
-                        JsonObject lastComment = comments.get(0).getAsJsonObject();
-                        qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
-                        qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
-                        try {
-                            qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                        if (comments.size() > 0) {
+                            JsonObject lastComment = comments.get(0).getAsJsonObject();
+                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
+                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
+                            try {
+                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                         }
+                        return qiscusChatRoom;
+                    }
+                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(roomId);
+                    if (qiscusChatRoom == null) {
+                        throw new RuntimeException("Unable to connect with qiscus server!");
                     }
                     return qiscusChatRoom;
                 });
