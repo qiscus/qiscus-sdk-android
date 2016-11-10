@@ -42,6 +42,7 @@ public class QiscusAudioRecorder {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String audioFileName = "AUDIO_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+        storageDir.mkdirs();
         String file = storageDir.getAbsolutePath();
         file += File.separator + audioFileName + ".m4a";
         startRecording(file);
