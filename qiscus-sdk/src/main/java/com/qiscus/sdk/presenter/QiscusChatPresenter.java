@@ -86,12 +86,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
             if (savedQiscusComment.getState() < qiscusComment.getState()) {
+                qiscusComment.setState(QiscusComment.STATE_FAILED);
                 Qiscus.getDataStore().addOrUpdate(qiscusComment);
                 if (qiscusComment.getTopicId() == currentTopicId) {
                     view.onFailedSendComment(qiscusComment);
                 }
             }
         } else {
+            qiscusComment.setState(QiscusComment.STATE_FAILED);
             Qiscus.getDataStore().addOrUpdate(qiscusComment);
             if (qiscusComment.getTopicId() == currentTopicId) {
                 view.onFailedSendComment(qiscusComment);
@@ -201,6 +203,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
     }
 
+    public void deleteComment(QiscusComment qiscusComment) {
+        Qiscus.getDataStore().delete(qiscusComment);
+        view.onCommentDeleted(qiscusComment);
+    }
+
     private Observable<List<QiscusComment>> getCommentsFromNetwork(int lastCommentId) {
         return QiscusApi.getInstance().getComments(currentTopicId, lastCommentId)
                 .subscribeOn(Schedulers.io())
@@ -268,6 +275,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         for (int i = 0; i < size - 1; i++) {
+            if (qiscusComments.get(i).getId() == -1 || qiscusComments.get(i + 1).getId() == -1) {
+                return true;
+            }
+
             if (!containsLastValidComment && qiscusComments.get(i).getId() == room.getLastCommentId()) {
                 containsLastValidComment = true;
             }
@@ -288,6 +299,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         for (int i = 0; i < size - 1; i++) {
+            if (qiscusComments.get(i).getId() == -1 || qiscusComments.get(i + 1).getId() == -1) {
+                return true;
+            }
+
             if (!containsLastValidComment && qiscusComments.get(i).getId() == lastQiscusComment.getCommentBeforeId()) {
                 containsLastValidComment = true;
             }
@@ -470,6 +485,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void onFailedSendComment(QiscusComment qiscusComment);
 
         void onNewComment(QiscusComment qiscusComment);
+
+        void onCommentDeleted(QiscusComment qiscusComment);
 
         void refreshComment(QiscusComment qiscusComment);
 

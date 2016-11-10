@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -33,10 +34,11 @@ import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.Date;
 
-public class QiscusChatActivity extends QiscusActivity implements QiscusUserStatusPresenter.View,
+public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUserStatusPresenter.View,
         QiscusChatFragment.UserTypingListener {
     private static final String CHAT_ROOM_DATA = "chat_room_data";
 
@@ -74,16 +76,13 @@ public class QiscusChatActivity extends QiscusActivity implements QiscusUserStat
         onViewReady(savedInstanceState);
     }
 
-    @Override
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
-        for (String user : qiscusChatRoom.getUsers()) {
+        for (String user : qiscusChatRoom.getMember()) {
             if (!user.equals(Qiscus.getQiscusAccount().getEmail())) {
                 userStatusPresenter.listenUser(user);
             }
         }
-
-        requestStoragePermission();
 
         applyChatConfig();
 

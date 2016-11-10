@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
+import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 
 /**
@@ -91,6 +92,12 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
         return (QiscusRecyclerView) view.findViewById(R.id.list_message);
     }
 
+    @Nullable
+    @Override
+    protected ViewGroup getMessageInputPanel(View view) {
+        return (ViewGroup) view.findViewById(R.id.input_panel);
+    }
+
     @NonNull
     @Override
     protected EditText getMessageEditText(View view) {
@@ -151,6 +158,18 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
         return (ImageView) view.findViewById(R.id.button_add_file);
     }
 
+    @Nullable
+    @Override
+    protected ImageView getRecordAudioButton(View view) {
+        return (ImageView) view.findViewById(R.id.button_add_audio);
+    }
+
+    @Nullable
+    @Override
+    protected QiscusAudioRecorderView getRecordAudioPanel(View view) {
+        return (QiscusAudioRecorderView) view.findViewById(R.id.record_panel);
+    }
+
     @Override
     protected CustomChatAdapter onCreateChatAdapter() {
         return new CustomChatAdapter(getActivity());
@@ -159,5 +178,10 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
     @Override
     public void onUserTyping(String user, boolean typing) {
 
+    }
+
+    protected void recordAudio() {
+        super.recordAudio();
+        addPanel.setVisibility(View.GONE);
     }
 }

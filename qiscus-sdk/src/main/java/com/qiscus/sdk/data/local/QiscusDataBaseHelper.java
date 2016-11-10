@@ -17,9 +17,11 @@
 package com.qiscus.sdk.data.local;
 
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 
 import java.io.File;
@@ -35,6 +37,194 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public QiscusDataBaseHelper() {
         QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(Qiscus.getApps());
         sqLiteDatabase = qiscusDbOpenHelper.getReadableDatabase();
+    }
+
+    @Override
+    public void add(QiscusChatRoom qiscusChatRoom) {
+        if (!isContains(qiscusChatRoom)) {
+            sqLiteDatabase.beginTransaction();
+            try {
+                sqLiteDatabase.insert(QiscusDb.RoomTable.TABLE_NAME, null, QiscusDb.RoomTable.toContentValues(qiscusChatRoom));
+                sqLiteDatabase.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                sqLiteDatabase.endTransaction();
+            }
+            for (String member : qiscusChatRoom.getMember()) {
+                addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
+            }
+        }
+    }
+
+    @Override
+    public boolean isContains(QiscusChatRoom qiscusChatRoom) {
+        String query = "SELECT * FROM "
+                + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
+                + QiscusDb.RoomTable.COLUMN_ID + " = " + qiscusChatRoom.getId();
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        boolean contains = cursor.getCount() > 0;
+        cursor.close();
+        return contains;
+    }
+
+    @Override
+    public void update(QiscusChatRoom qiscusChatRoom) {
+        String where = QiscusDb.RoomTable.COLUMN_ID + " = " + qiscusChatRoom.getId();
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.update(QiscusDb.RoomTable.TABLE_NAME, QiscusDb.RoomTable.toContentValues(qiscusChatRoom), where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+        for (String member : qiscusChatRoom.getMember()) {
+            addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
+        }
+    }
+
+    @Override
+    public void addOrUpdate(QiscusChatRoom qiscusChatRoom) {
+        if (!isContains(qiscusChatRoom)) {
+            add(qiscusChatRoom);
+        } else {
+            update(qiscusChatRoom);
+        }
+    }
+
+    @Override
+    public QiscusChatRoom getChatRoom(int id) {
+        String query = "SELECT * FROM "
+                + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
+                + QiscusDb.RoomTable.COLUMN_ID + " = " + id;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+
+        if (cursor.moveToNext()) {
+            QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
+            qiscusChatRoom.setMember(getRoomMembers(id));
+            QiscusComment latestComment = getLatestComment(id);
+            qiscusChatRoom.setLastCommentId(latestComment.getId());
+            qiscusChatRoom.setLastCommentMessage(latestComment.getMessage());
+            qiscusChatRoom.setLastCommentSender(latestComment.getSender());
+            qiscusChatRoom.setLastCommentSenderEmail(latestComment.getSenderEmail());
+            qiscusChatRoom.setLastCommentTime(latestComment.getTime());
+            qiscusChatRoom.setLastTopicId(latestComment.getTopicId());
+            cursor.close();
+            return qiscusChatRoom;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
+    @Override
+    public QiscusChatRoom getChatRoom(String email) {
+        return getChatRoom(email, "default");
+    }
+
+    @Override
+    public QiscusChatRoom getChatRoom(String email, String distinctId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.RoomMemberTable.TABLE_NAME + " WHERE "
+                + QiscusDb.RoomMemberTable.COLUMN_DISTINCT_ID + " = " + DatabaseUtils.sqlEscapeString(distinctId) + " "
+                + "AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL
+                + " = " + DatabaseUtils.sqlEscapeString(email);
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+
+        if (cursor.moveToNext()) {
+            return getChatRoom(QiscusDb.RoomMemberTable.getRoomId(cursor));
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
+    @Override
+    public List<QiscusChatRoom> getChatRooms(int count) {
+        String query = "SELECT * FROM "
+                + QiscusDb.RoomTable.TABLE_NAME + " "
+                + "LIMIT " + count;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
+            qiscusChatRoom.setMember(getRoomMembers(qiscusChatRoom.getId()));
+            qiscusChatRooms.add(qiscusChatRoom);
+        }
+        cursor.close();
+        return qiscusChatRooms;
+    }
+
+    @Override
+    public Observable<List<QiscusChatRoom>> getObservableChatRooms(int count) {
+        return Observable.create(subscriber -> {
+            subscriber.onNext(getChatRooms(count));
+            subscriber.onCompleted();
+        });
+    }
+
+    @Override
+    public void addRoomMember(int roomId, String email, String distinctId) {
+        distinctId = distinctId == null ? "default" : distinctId;
+        if (!isContainsRoomMember(roomId, email)) {
+            sqLiteDatabase.beginTransaction();
+            try {
+                sqLiteDatabase.insert(QiscusDb.RoomMemberTable.TABLE_NAME, null,
+                        QiscusDb.RoomMemberTable.toContentValues(roomId, email, distinctId));
+                sqLiteDatabase.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                sqLiteDatabase.endTransaction();
+            }
+        }
+    }
+
+    @Override
+    public boolean isContainsRoomMember(int roomId, String email) {
+        String query = "SELECT * FROM "
+                + QiscusDb.RoomMemberTable.TABLE_NAME + " WHERE "
+                + QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId + " "
+                + "AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL
+                + " = " + DatabaseUtils.sqlEscapeString(email);
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        boolean contains = cursor.getCount() > 0;
+        cursor.close();
+        return contains;
+    }
+
+    @Override
+    public List<String> getRoomMembers(int roomId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.RoomMemberTable.TABLE_NAME + " "
+                + "WHERE " + QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<String> members = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            members.add(QiscusDb.RoomMemberTable.getMember(cursor));
+        }
+        cursor.close();
+        return members;
+    }
+
+    @Override
+    public void deleteRoomMember(int roomId, String email) {
+        String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId + " "
+                + "AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(email);
+
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
     }
 
     @Override
@@ -222,7 +412,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
@@ -246,8 +436,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
-                + QiscusDb.CommentTable.COLUMN_ID + " < " + qiscusComment.getId() + " "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + QiscusDb.CommentTable.COLUMN_TIME + " < " + qiscusComment.getTime().getTime() + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
@@ -259,7 +449,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(final QiscusComment qiscusComment, final int topicId, final int count) {
+    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
             subscriber.onCompleted();
@@ -272,6 +462,22 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "LIMIT " + 1;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        QiscusComment qiscusComment = null;
+        while (cursor.moveToNext()) {
+            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+        }
+        cursor.close();
+        return qiscusComment;
+    }
+
+    @Override
+    public QiscusComment getLatestComment(int roomId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME
+                + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + 1;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;
@@ -322,6 +528,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void clear() {
         sqLiteDatabase.beginTransaction();
         try {
+            sqLiteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, null, null);
+            sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, null, null);
             sqLiteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, null, null);
             sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
             sqLiteDatabase.setTransactionSuccessful();

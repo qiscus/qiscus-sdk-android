@@ -19,9 +19,8 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created on : August 18, 2016
@@ -33,27 +32,37 @@ import java.util.Set;
  */
 public class QiscusChatRoom implements Parcelable {
     protected int id;
+    protected String distinctId;
     protected String name;
     protected String subtitle = "";
     protected int lastCommentId;
     protected String lastCommentMessage;
+    protected String lastCommentSender;
+    protected String lastCommentSenderEmail;
+    protected Date lastCommentTime;
     protected int lastTopicId;
     protected String options;
-    protected Set<String> users;
+    protected boolean group;
+    protected List<String> member;
 
     public QiscusChatRoom() {
-        users = new HashSet<>();
+        lastCommentTime = new Date(0L);
     }
 
     protected QiscusChatRoom(Parcel in) {
         id = in.readInt();
+        distinctId = in.readString();
         name = in.readString();
         subtitle = in.readString();
         lastCommentId = in.readInt();
         lastCommentMessage = in.readString();
+        lastCommentSender = in.readString();
+        lastCommentSenderEmail = in.readString();
+        lastCommentTime = new Date(in.readLong());
         lastTopicId = in.readInt();
         options = in.readString();
-        users = new HashSet<>(in.createStringArrayList());
+        group = in.readByte() != 0;
+        member = in.createStringArrayList();
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -74,6 +83,14 @@ public class QiscusChatRoom implements Parcelable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getDistinctId() {
+        return distinctId;
+    }
+
+    public void setDistinctId(String distinctId) {
+        this.distinctId = distinctId;
     }
 
     public String getName() {
@@ -108,6 +125,30 @@ public class QiscusChatRoom implements Parcelable {
         this.lastCommentMessage = lastCommentMessage;
     }
 
+    public String getLastCommentSender() {
+        return lastCommentSender;
+    }
+
+    public void setLastCommentSender(String lastCommentSender) {
+        this.lastCommentSender = lastCommentSender;
+    }
+
+    public String getLastCommentSenderEmail() {
+        return lastCommentSenderEmail;
+    }
+
+    public void setLastCommentSenderEmail(String lastCommentSenderEmail) {
+        this.lastCommentSenderEmail = lastCommentSenderEmail;
+    }
+
+    public Date getLastCommentTime() {
+        return lastCommentTime;
+    }
+
+    public void setLastCommentTime(Date lastCommentTime) {
+        this.lastCommentTime = lastCommentTime;
+    }
+
     public int getLastTopicId() {
         return lastTopicId;
     }
@@ -124,12 +165,20 @@ public class QiscusChatRoom implements Parcelable {
         this.options = options;
     }
 
-    public Set<String> getUsers() {
-        return users;
+    public boolean isGroup() {
+        return group;
     }
 
-    public void setUsers(Set<String> users) {
-        this.users = users;
+    public void setGroup(boolean group) {
+        this.group = group;
+    }
+
+    public List<String> getMember() {
+        return member;
+    }
+
+    public void setMember(List<String> member) {
+        this.member = member;
     }
 
     @Override
@@ -141,12 +190,18 @@ public class QiscusChatRoom implements Parcelable {
     public String toString() {
         return "QiscusChatRoom{" +
                 "id=" + id +
+                ", distinctId='" + distinctId + '\'' +
                 ", name='" + name + '\'' +
                 ", subtitle='" + subtitle + '\'' +
                 ", lastCommentId=" + lastCommentId +
                 ", lastCommentMessage='" + lastCommentMessage + '\'' +
+                ", lastCommentSender='" + lastCommentSender + '\'' +
+                ", lastCommentSenderEmail='" + lastCommentSenderEmail + '\'' +
+                ", lastCommentTime=" + lastCommentTime +
                 ", lastTopicId=" + lastTopicId +
                 ", options='" + options + '\'' +
+                ", group=" + group +
+                ", member=" + member +
                 '}';
     }
 
@@ -158,12 +213,17 @@ public class QiscusChatRoom implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
+        dest.writeString(distinctId);
         dest.writeString(name);
         dest.writeString(subtitle);
         dest.writeInt(lastCommentId);
         dest.writeString(lastCommentMessage);
+        dest.writeString(lastCommentSender);
+        dest.writeString(lastCommentSenderEmail);
+        dest.writeLong(lastCommentTime.getTime());
         dest.writeInt(lastTopicId);
         dest.writeString(options);
-        dest.writeStringList(new ArrayList<>(users));
+        dest.writeByte((byte) (group ? 1 : 0));
+        dest.writeStringList(member);
     }
 }

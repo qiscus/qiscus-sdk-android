@@ -256,4 +256,11 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         this.lastReadCommentId = lastReadCommentId;
         notifyDataSetChanged();
     }
+
+    public void detachView() {
+        int size = data.size();
+        for (int i = 0; i < size; i++) {
+            data.get(i).destroy();
+        }
+    }
 }

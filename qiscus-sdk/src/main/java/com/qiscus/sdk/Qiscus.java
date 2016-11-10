@@ -455,7 +455,8 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails), distinctId, options);
+                    .getChatRoom(new ArrayList<>(emails), distinctId, options)
+                    .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
 
@@ -569,6 +570,7 @@ public class Qiscus {
                         qiscusChatRoom.setName(title);
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
+                    .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(context, qiscusChatRoom));
         }
     }
@@ -651,6 +653,7 @@ public class Qiscus {
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
                     .getChatRoom(new ArrayList<>(emails), distinctId, options)
+                    .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(QiscusChatFragment::newInstance);
         }
     }

@@ -19,13 +19,90 @@ package com.qiscus.sdk.data.local;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 
 import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
+
+    static abstract class RoomTable {
+        static final String TABLE_NAME = "rooms";
+        static final String COLUMN_ID = "id";
+        static final String COLUMN_DISTINCT_ID = "distinct_id";
+        static final String COLUMN_NAME = "name";
+        static final String COLUMN_SUBTITLE = "subtitle";
+        static final String COLUMN_IS_GROUP = "is_group";
+        static final String COLUMN_OPTIONS = "options";
+
+        static final String CREATE =
+                "CREATE TABLE " + TABLE_NAME + " (" +
+                        COLUMN_ID + " INTEGER," +
+                        COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
+                        COLUMN_NAME + " TEXT," +
+                        COLUMN_SUBTITLE + " TEXT," +
+                        COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
+                        COLUMN_OPTIONS + " TEXT" +
+                        " ); ";
+
+        static ContentValues toContentValues(QiscusChatRoom qiscusChatRoom) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ID, qiscusChatRoom.getId());
+            values.put(COLUMN_DISTINCT_ID, qiscusChatRoom.getDistinctId());
+            values.put(COLUMN_NAME, qiscusChatRoom.getName());
+            values.put(COLUMN_SUBTITLE, qiscusChatRoom.getSubtitle());
+            values.put(COLUMN_IS_GROUP, qiscusChatRoom.isGroup() ? 1 : 0);
+            values.put(COLUMN_OPTIONS, qiscusChatRoom.getOptions());
+            return values;
+        }
+
+        static QiscusChatRoom parseCursor(Cursor cursor) {
+            QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+            qiscusChatRoom.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qiscusChatRoom.setDistinctId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DISTINCT_ID)));
+            qiscusChatRoom.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
+            qiscusChatRoom.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBTITLE)));
+            qiscusChatRoom.setGroup(cursor.getShort(cursor.getColumnIndexOrThrow(COLUMN_IS_GROUP)) == 1);
+            qiscusChatRoom.setOptions(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OPTIONS)));
+            return qiscusChatRoom;
+        }
+    }
+
+    static abstract class RoomMemberTable {
+        static final String TABLE_NAME = "room_members";
+        static final String COLUMN_ROOM_ID = "room_id";
+        static final String COLUMN_USER_EMAIL = "user_email";
+        static final String COLUMN_DISTINCT_ID = "distinct_id";
+
+        static final String CREATE =
+                "CREATE TABLE " + TABLE_NAME + " (" +
+                        COLUMN_ROOM_ID + " INTEGER," +
+                        COLUMN_USER_EMAIL + " TEXT," +
+                        COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'" +
+                        " ); ";
+
+        static ContentValues toContentValues(int roomId, String userEmail) {
+            return toContentValues(roomId, userEmail, "default");
+        }
+
+        static ContentValues toContentValues(int roomId, String userEmail, String distinctId) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ROOM_ID, roomId);
+            values.put(COLUMN_USER_EMAIL, userEmail);
+            values.put(COLUMN_DISTINCT_ID, distinctId);
+            return values;
+        }
+
+        static int getRoomId(Cursor cursor) {
+            return cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID));
+        }
+
+        static String getMember(Cursor cursor) {
+            return cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL));
+        }
+    }
 
     static abstract class CommentTable {
         static final String TABLE_NAME = "comments";

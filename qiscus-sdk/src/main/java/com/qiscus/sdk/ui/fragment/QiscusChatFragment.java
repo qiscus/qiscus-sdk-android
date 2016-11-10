@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
+import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 
 /**
@@ -83,6 +84,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected QiscusRecyclerView getMessageRecyclerView(View view) {
         return (QiscusRecyclerView) view.findViewById(R.id.list_message);
+    }
+
+    @Nullable
+    @Override
+    protected ViewGroup getMessageInputPanel(View view) {
+        return (ViewGroup) view.findViewById(R.id.box);
     }
 
     @NonNull
@@ -143,6 +150,18 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected ImageView getAddFileButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_file);
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getRecordAudioButton(View view) {
+        return (ImageView) view.findViewById(R.id.button_add_audio);
+    }
+
+    @Nullable
+    @Override
+    protected QiscusAudioRecorderView getRecordAudioPanel(View view) {
+        return (QiscusAudioRecorderView) view.findViewById(R.id.record_panel);
     }
 
     @Override

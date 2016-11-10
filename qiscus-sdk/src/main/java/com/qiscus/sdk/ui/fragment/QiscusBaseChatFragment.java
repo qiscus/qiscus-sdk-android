@@ -30,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -53,6 +54,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
+import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -62,6 +64,8 @@ import com.trello.rxlifecycle.components.support.RxFragment;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import pub.devrel.easypermissions.EasyPermissions;
 
 
 /**
@@ -73,7 +77,19 @@ import java.util.List;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapter> extends RxFragment
-        implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener, QiscusChatPresenter.View {
+        implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
+        QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener, EasyPermissions.PermissionCallbacks {
+
+    protected static final int RC_PERMISSIONS = 1;
+    protected static final int RC_STORAGE_PERMISSION = 2;
+    protected static final int RC_RECORD_AUDIO_PERMISSION = 3;
+
+    private static final String[] PERMISSIONS = {
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.RECORD_AUDIO"
+    };
+
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int PICK_IMAGE_REQUEST = 2;
@@ -82,6 +98,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable protected ViewGroup emptyChatHolder;
     @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
     @NonNull protected QiscusRecyclerView messageRecyclerView;
+    @Nullable protected ViewGroup messageInputPanel;
     @NonNull protected EditText messageEditText;
     @NonNull protected ImageView sendButton;
     @Nullable protected View newMessageButton;
@@ -92,6 +109,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable protected ImageView addImageButton;
     @Nullable protected ImageView takeImageButton;
     @Nullable protected ImageView addFileButton;
+    @Nullable protected ImageView recordAudioButton;
+    @Nullable protected QiscusAudioRecorderView recordAudioPanel;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -116,6 +135,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         emptyChatHolder = getEmptyChatHolder(view);
         swipeRefreshLayout = getSwipeRefreshLayout(view);
         messageRecyclerView = getMessageRecyclerView(view);
+        messageInputPanel = getMessageInputPanel(view);
         messageEditText = getMessageEditText(view);
         sendButton = getSendButton(view);
         newMessageButton = getNewMessageButton(view);
@@ -126,6 +146,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         addImageButton = getAddImageButton(view);
         takeImageButton = getTakeImageButton(view);
         addFileButton = getAddFileButton(view);
+        recordAudioButton = getRecordAudioButton(view);
+        recordAudioPanel = getRecordAudioPanel(view);
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -158,6 +180,12 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         if (addFileButton != null) {
             addFileButton.setOnClickListener(v -> addFile());
         }
+        if (recordAudioButton != null) {
+            recordAudioButton.setOnClickListener(v -> recordAudio());
+        }
+        if (recordAudioPanel != null) {
+            recordAudioPanel.setRecordListener(this);
+        }
     }
 
     @Nullable
@@ -168,6 +196,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @NonNull
     protected abstract QiscusRecyclerView getMessageRecyclerView(View view);
+
+    @Nullable
+    protected abstract ViewGroup getMessageInputPanel(View view);
 
     @NonNull
     protected abstract EditText getMessageEditText(View view);
@@ -199,9 +230,16 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Nullable
     protected abstract ImageView getAddFileButton(View view);
 
+    @Nullable
+    protected abstract ImageView getRecordAudioButton(View view);
+
+    @Nullable
+    protected abstract QiscusAudioRecorderView getRecordAudioPanel(View view);
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        requestPermissions();
         onCreateChatComponents(savedInstanceState);
     }
 
@@ -284,12 +322,29 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
         if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_DELIVERED) {
-            if (qiscusComment.getType() == QiscusComment.Type.FILE || qiscusComment.getType() == QiscusComment.Type.IMAGE) {
+            if (qiscusComment.getType() == QiscusComment.Type.FILE
+                    || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                    || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                 qiscusChatPresenter.downloadFile(qiscusComment);
             }
         } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
-            qiscusChatPresenter.resendComment(qiscusComment);
+            showFailedCommentDialog(qiscusComment);
         }
+    }
+
+    protected void showFailedCommentDialog(QiscusComment qiscusComment) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Message send failed")
+                .setItems(new CharSequence[]{"Resend", "Delete"}, (dialog, which) -> {
+                    if (which == 0) {
+                        qiscusChatPresenter.resendComment(qiscusComment);
+                    } else {
+                        qiscusChatPresenter.deleteComment(qiscusComment);
+                    }
+                })
+                .setCancelable(true)
+                .create()
+                .show();
     }
 
     protected void onItemCommentLongClick(QiscusComment qiscusComment) {
@@ -356,6 +411,25 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         startActivityForResult(intent, PICK_FILE_REQUEST);
     }
 
+    protected void recordAudio() {
+        if (recordAudioPanel != null) {
+            recordAudioPanel.setVisibility(View.VISIBLE);
+            if (messageInputPanel != null) {
+                messageInputPanel.setVisibility(View.GONE);
+            }
+            try {
+                recordAudioPanel.startRecord();
+            } catch (IOException e) {
+                e.printStackTrace();
+                showError("Failed to record audio!");
+                recordAudioPanel.cancelRecord();
+            } catch (IllegalStateException e) {
+                showError("Can not record audio, microphone may be in use!");
+                recordAudioPanel.cancelRecord();
+            }
+        }
+    }
+
     @Override
     public void showComments(List<QiscusComment> qiscusComments) {
         chatAdapter.refreshWithData(qiscusComments);
@@ -407,6 +481,11 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     @Override
+    public void onCommentDeleted(QiscusComment qiscusComment) {
+        chatAdapter.remove(qiscusComment);
+    }
+
+    @Override
     public void refreshComment(QiscusComment qiscusComment) {
         chatAdapter.addOrUpdate(qiscusComment);
     }
@@ -428,7 +507,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     private void loadMoreComments() {
         if (loadMoreProgressBar.getVisibility() == View.GONE && chatAdapter.getItemCount() > 0) {
             QiscusComment qiscusComment = (QiscusComment) chatAdapter.getData().get(chatAdapter.getItemCount() - 1);
-            if (qiscusComment.getCommentBeforeId() > 0) {
+            if (qiscusComment.getId() == -1 || qiscusComment.getCommentBeforeId() > 0) {
                 qiscusChatPresenter.loadOlderCommentThan(qiscusComment);
             }
         }
@@ -549,6 +628,27 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     @Override
+    public void onStartRecord() {
+
+    }
+
+    @Override
+    public void onCancelRecord() {
+        if (recordAudioPanel != null) {
+            recordAudioPanel.setVisibility(View.GONE);
+        }
+        if (messageInputPanel != null) {
+            messageInputPanel.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onStopRecord(File audioFile) {
+        qiscusChatPresenter.sendFile(audioFile);
+        onCancelRecord();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
@@ -559,6 +659,48 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     public void onDestroyView() {
         super.onDestroyView();
         QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
+        chatAdapter.detachView();
+        if (recordAudioPanel != null) {
+            recordAudioPanel.cancelRecord();
+        }
         qiscusChatPresenter.detachView();
+    }
+
+    protected void requestPermissions() {
+        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS)) {
+            EasyPermissions.requestPermissions(this, "Please grant permissions to make apps working properly!",
+                    RC_PERMISSIONS, PERMISSIONS);
+        }
+    }
+
+    protected void requestStoragePermission() {
+        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS[0], PERMISSIONS[1])) {
+            EasyPermissions.requestPermissions(this, "To make this apps working properly we need to access external storage to save your chatting data. " +
+                            "So please allow the apps to access the storage!",
+                    RC_STORAGE_PERMISSION, PERMISSIONS[0], PERMISSIONS[1]);
+        }
+    }
+
+    protected void requestAudioRecordPermission() {
+        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS[3])) {
+            EasyPermissions.requestPermissions(this, "We need your permission to record audio to able send audio message!",
+                    RC_RECORD_AUDIO_PERMISSION, PERMISSIONS[3]);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        EasyPermissions.checkDeniedPermissionsNeverAskAgain(this, "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
     }
 }

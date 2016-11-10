@@ -27,7 +27,6 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.util.QiscusDateUtil;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -54,10 +53,8 @@ public class CustomChatActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_custom_chat);
 
-        customizeChatUI();
-
         showLoading();
-        Qiscus.buildChatRoomWith("rya.meyvriska1@gmail.com")
+        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -72,15 +69,6 @@ public class CustomChatActivity extends AppCompatActivity {
                     showError(throwable.getMessage());
                     dismissLoading();
                 });
-    }
-
-    private void customizeChatUI() {
-        Qiscus.getChatConfig()
-                .setLeftBubbleColor(R.color.qiscus_primary)
-                .setRightBubbleColor(R.color.qiscus_primary_light)
-                .setRightBubbleTextColor(R.color.qiscus_primary_text)
-                .setRightBubbleTimeColor(R.color.qiscus_secondary_text)
-                .setTimeFormat(QiscusDateUtil::toHour);
     }
 
     public void showError(String errorMessage) {
