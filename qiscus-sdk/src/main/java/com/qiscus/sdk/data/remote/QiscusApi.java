@@ -186,6 +186,7 @@ public enum QiscusApi {
                                 : jsonChatRoom.get("options").getAsString());
                         //TODO minta server ngasih tau member room siapa aja
                         //qiscusChatRoom.setMember(withEmails);
+                        qiscusChatRoom.setMember(Qiscus.getDataStore().getRoomMembers(roomId));
                         JsonArray comments = jsonElement.getAsJsonObject().get("results")
                                 .getAsJsonObject().get("comments").getAsJsonArray();
 
