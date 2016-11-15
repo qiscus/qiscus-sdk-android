@@ -89,7 +89,7 @@ public enum QiscusApi {
     private final Api api;
 
     QiscusApi() {
-        baseUrl = "http://" + Qiscus.getAppId() + ".qiscus.com";
+        baseUrl = Qiscus.getAppServer();
 
         httpClient = new OkHttpClient.Builder()
                 .connectTimeout(60, TimeUnit.SECONDS)

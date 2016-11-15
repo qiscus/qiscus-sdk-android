@@ -57,7 +57,7 @@ public class Qiscus {
     private static QiscusDataStore DATA_STORE;
     private static QiscusChatConfig CHAT_CONFIG;
 
-    private static String APP_ID;
+    private static String APP_SERVER;
     private static long HEART_BEAT;
 
     private Qiscus() {
@@ -82,8 +82,30 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
+        initWithCustomServer(application, "http://" + qiscusAppId + ".qiscus.com");
+    }
+
+    /**
+     * The first method you need to be invoke to using qiscus sdk. Call this method from your Application
+     * class. You can not using another qiscus feature if you not invoke this method first. Here sample
+     * to call this method:
+     * <pre>
+     * {@code
+     * public class SampleApps extends Application {
+     *  public void onCreate() {
+     *      super.onCreate();
+     *      Qiscus.initWithCustomServer(this, "http://myserver.com");
+     *  }
+     * }
+     * }
+     * </pre>
+     *
+     * @param application   Application instance
+     * @param serverBaseUrl Your qiscus chat engine base url
+     */
+    public static void initWithCustomServer(Application application, String serverBaseUrl) {
         APP_INSTANCE = application;
-        APP_ID = qiscusAppId;
+        APP_SERVER = serverBaseUrl;
         APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
         DATA_STORE = new QiscusDataBaseHelper();
@@ -140,9 +162,9 @@ public class Qiscus {
      *
      * @return Current qiscus app id
      */
-    public static String getAppId() {
+    public static String getAppServer() {
         checkAppIdSetup();
-        return APP_ID;
+        return APP_SERVER;
     }
 
     /**
@@ -256,7 +278,7 @@ public class Qiscus {
     }
 
     private static void checkAppIdSetup() throws RuntimeException {
-        if (APP_ID == null) {
+        if (APP_SERVER == null) {
             throw new RuntimeException("Please init Qiscus with your app id before!");
         }
     }
