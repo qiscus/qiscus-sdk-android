@@ -91,7 +91,6 @@
                 android:layout_toStartOf="@+id/iv_download"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="sasasa sasasasasasasasasasa"
                 android:textSize="16sp"/>
 
             <ImageView
