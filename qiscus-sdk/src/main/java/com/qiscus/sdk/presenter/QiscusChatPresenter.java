@@ -368,6 +368,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
                                 file1.getAbsolutePath());
                         view.refreshComment(qiscusComment);
+                        if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
+                            qiscusComment.playAudio();
+                        } else if (qiscusComment.getType() == QiscusComment.Type.FILE) {
+                            view.onFileDownloaded(file1, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
+                        }
                     }, throwable -> {
                         throwable.printStackTrace();
                         qiscusComment.setDownloading(false);
