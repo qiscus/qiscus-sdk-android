@@ -445,12 +445,25 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             if (emptyChatHolder != null) {
                 emptyChatHolder.setVisibility(View.VISIBLE);
             }
+        } else {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.GONE);
+            }
         }
     }
 
     @Override
     public void onLoadMore(List<QiscusComment> qiscusComments) {
         chatAdapter.addOrUpdate(qiscusComments);
+        if (chatAdapter.isEmpty() && qiscusComments.isEmpty()) {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
