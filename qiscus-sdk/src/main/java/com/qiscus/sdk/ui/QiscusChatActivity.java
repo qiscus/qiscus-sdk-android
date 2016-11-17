@@ -23,7 +23,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
-import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -88,6 +88,7 @@ public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUse
 
         tvTitle.setText(qiscusChatRoom.getName());
         tvSubtitle.setText(qiscusChatRoom.getSubtitle());
+        tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, QiscusChatFragment.newInstance(qiscusChatRoom))
@@ -124,6 +125,7 @@ public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUse
             String last = DateUtils.getRelativeTimeSpanString(lastActive.getTime(),
                     System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
             tvSubtitle.setText(online ? "Online" : "Last seen " + last);
+            tvSubtitle.setVisibility(View.VISIBLE);
         }
     }
 
@@ -131,6 +133,7 @@ public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUse
     public void onUserTyping(String user, boolean typing) {
         if (qiscusChatRoom.getSubtitle().isEmpty()) {
             tvSubtitle.setText(typing ? "Typing..." : "Online");
+            tvSubtitle.setVisibility(View.VISIBLE);
         }
     }
 

@@ -61,7 +61,8 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="@color/qiscus_primary_light"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:visibility="gone"/>
             </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
