@@ -28,6 +28,7 @@ public class QiscusChatRoomEvent {
     private int roomId;
     private int topicId;
     private int commentId;
+    private String commentUniqueId;
     private boolean typing;
     private String user;
     private Event event;
@@ -56,6 +57,15 @@ public class QiscusChatRoomEvent {
 
     public QiscusChatRoomEvent setCommentId(int commentId) {
         this.commentId = commentId;
+        return this;
+    }
+
+    public String getCommentUniqueId() {
+        return commentUniqueId;
+    }
+
+    public QiscusChatRoomEvent setCommentUniqueId(String commentUniqueId) {
+        this.commentUniqueId = commentUniqueId;
         return this;
     }
 
@@ -92,6 +102,8 @@ public class QiscusChatRoomEvent {
                 "roomId=" + roomId +
                 ", topicId=" + topicId +
                 ", commentId=" + commentId +
+                ", commentUniqueId='" + commentUniqueId + '\'' +
+                ", typing=" + typing +
                 ", user='" + user + '\'' +
                 ", event=" + event +
                 '}';
