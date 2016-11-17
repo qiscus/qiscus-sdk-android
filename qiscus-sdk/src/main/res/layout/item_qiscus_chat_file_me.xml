@@ -132,6 +132,10 @@
             android:layout_below="@+id/file"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
+            android:layout_toLeftOf="@+id/time"
+            android:layout_toStartOf="@+id/time"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"
             android:visibility="visible"/>

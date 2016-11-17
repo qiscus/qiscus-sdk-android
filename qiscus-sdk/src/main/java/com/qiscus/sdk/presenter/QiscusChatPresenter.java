@@ -136,11 +136,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .subscribe(commentSend -> {
-                    qiscusComment.setDownloading(false);
                     Qiscus.getDataStore()
                             .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), finalCompressedFile.getAbsolutePath());
+                    qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
-                    view.refreshComment(qiscusComment);
                 }, throwable -> {
                     qiscusComment.setDownloading(false);
                     commentFail(qiscusComment);
@@ -173,9 +172,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .subscribe(commentSend -> {
-                        qiscusComment.setDownloading(false);
                         Qiscus.getDataStore()
                                 .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
+                        qiscusComment.setDownloading(false);
                         commentSuccess(commentSend);
                     }, throwable -> {
                         qiscusComment.setDownloading(false);
@@ -192,9 +191,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .subscribe(commentSend -> {
-                        qiscusComment.setDownloading(false);
                         Qiscus.getDataStore()
                                 .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
+                        qiscusComment.setDownloading(false);
                         commentSuccess(commentSend);
                     }, throwable -> {
                         qiscusComment.setDownloading(false);
@@ -452,6 +451,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
                                 file1.getAbsolutePath());
                         view.refreshComment(qiscusComment);
+                        if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
+                            qiscusComment.playAudio();
+                        } else if (qiscusComment.getType() == QiscusComment.Type.FILE) {
+                            view.onFileDownloaded(file1, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
+                        }
                     }, throwable -> {
                         throwable.printStackTrace();
                         qiscusComment.setDownloading(false);
