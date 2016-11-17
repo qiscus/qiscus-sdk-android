@@ -321,7 +321,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected abstract Adapter onCreateChatAdapter();
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
-        if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_DELIVERED) {
+        if (qiscusComment.getState() > QiscusComment.STATE_SENDING) {
             if (qiscusComment.getType() == QiscusComment.Type.FILE
                     || qiscusComment.getType() == QiscusComment.Type.IMAGE
                     || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
@@ -437,12 +437,25 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             if (emptyChatHolder != null) {
                 emptyChatHolder.setVisibility(View.VISIBLE);
             }
+        } else {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.GONE);
+            }
         }
     }
 
     @Override
     public void onLoadMore(List<QiscusComment> qiscusComments) {
         chatAdapter.addOrUpdate(qiscusComments);
+        if (chatAdapter.isEmpty() && qiscusComments.isEmpty()) {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
