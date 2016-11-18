@@ -15,20 +15,23 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/qiscus_dark_white">
+    android:background="@color/qiscus_dark_white"
+    android:orientation="vertical">
 
     <include
-        layout="@layout/fragment_qiscus_chat"/>
+        layout="@layout/fragment_qiscus_chat"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <TextView
         android:id="@+id/lock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
         android:background="@color/accent"
         android:gravity="center"
         android:padding="16dp"
@@ -37,4 +40,4 @@
         android:textSize="16sp"
         android:visibility="gone"/>
 
-</FrameLayout>
+</LinearLayout>
