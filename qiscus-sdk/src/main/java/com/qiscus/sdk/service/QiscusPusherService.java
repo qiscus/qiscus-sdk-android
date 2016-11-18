@@ -143,7 +143,8 @@ public class QiscusPusherService extends Service {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(comment.getRoomId());
-        for (QiscusPushNotificationMessage message : notifItems) {
+        for (int i = notifItems.size() - 1; i >= 0; i--) {
+            QiscusPushNotificationMessage message  = notifItems.get(i);
             if (isAttachment(message.getMessage())) {
                 inboxStyle.addLine(fileMessage);
             } else {
