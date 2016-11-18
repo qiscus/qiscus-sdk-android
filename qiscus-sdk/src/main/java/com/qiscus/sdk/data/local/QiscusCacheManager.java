@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,20 +59,26 @@ public enum QiscusCacheManager {
                 .apply();
     }
 
-    public void addMessageNotifItem(String message, int roomId) {
-        List<String> notifItems = getMessageNotifItems(roomId);
+    public boolean addMessageNotifItem(QiscusPushNotificationMessage message, int roomId) {
+        List<QiscusPushNotificationMessage> notifItems = getMessageNotifItems(roomId);
         if (notifItems == null) {
             notifItems = new ArrayList<>();
         }
-        notifItems.add(message);
-        sharedPreferences.edit()
-                .putString("notif_message_" + roomId, gson.toJson(notifItems))
-                .apply();
+
+        if (!notifItems.contains(message)) {
+            notifItems.add(message);
+            sharedPreferences.edit()
+                    .putString("push_notif_message_" + roomId, gson.toJson(notifItems))
+                    .apply();
+            return true;
+        }
+        return false;
     }
 
-    public List<String> getMessageNotifItems(int roomId) {
-        String json = sharedPreferences.getString("notif_message_" + roomId, "");
-        return gson.fromJson(json, new TypeToken<List<String>>() {}.getType());
+    public List<QiscusPushNotificationMessage> getMessageNotifItems(int roomId) {
+        String json = sharedPreferences.getString("push_notif_message_" + roomId, "");
+        return gson.fromJson(json, new TypeToken<List<QiscusPushNotificationMessage>>() {
+        }.getType());
     }
 
     public void clearMessageNotifItems(int roomId) {

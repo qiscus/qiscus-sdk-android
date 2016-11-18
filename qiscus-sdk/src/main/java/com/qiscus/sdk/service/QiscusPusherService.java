@@ -30,8 +30,13 @@ import android.text.SpannableStringBuilder;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
+import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusUserEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -39,6 +44,9 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created on : June 29, 2016
@@ -58,6 +66,7 @@ public class QiscusPusherService extends Service {
     }
 
     private Timer timer;
+    private QiscusAccount qiscusAccount;
 
     @Nullable
     @Override
@@ -78,6 +87,7 @@ public class QiscusPusherService extends Service {
     }
 
     private void scheduleSync(long period) {
+        qiscusAccount = Qiscus.getQiscusAccount();
         if (timer != null) {
             stopSync();
         }
@@ -85,14 +95,23 @@ public class QiscusPusherService extends Service {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                /*QiscusApi.getInstance().sync()
+                QiscusApi.getInstance().sync()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(qiscusComment -> {
-                            EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-                            qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
+                            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+                                QiscusPusherApi.getInstance()
+                                        .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
+                                                qiscusComment.getId(), qiscusComment.getUniqueId());
+                            }
+                            QiscusComment savedQiscusComment = Qiscus.getDataStore()
+                                    .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+                            if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
+                                qiscusComment.setState(savedQiscusComment.getState());
+                            }
                             Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                        }, Throwable::printStackTrace);*/
+                            EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
+                        }, Throwable::printStackTrace);
             }
         }, 0, period);
     }
@@ -102,7 +121,9 @@ public class QiscusPusherService extends Service {
     }
 
     private void showPushNotification(QiscusComment comment) {
-        QiscusCacheManager.getInstance().addMessageNotifItem(comment.getMessage(), comment.getRoomId());
+        if (!QiscusCacheManager.getInstance().addMessageNotifItem(new QiscusPushNotificationMessage(comment), comment.getRoomId())) {
+            return;
+        }
 
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
@@ -121,12 +142,12 @@ public class QiscusPusherService extends Service {
                 .setDefaults(Notification.DEFAULT_ALL);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        List<String> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(comment.getRoomId());
-        for (String message : notifItems) {
-            if (isAttachment(message)) {
+        List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(comment.getRoomId());
+        for (QiscusPushNotificationMessage message : notifItems) {
+            if (isAttachment(message.getMessage())) {
                 inboxStyle.addLine(fileMessage);
             } else {
-                inboxStyle.addLine(message);
+                inboxStyle.addLine(message.getMessage());
             }
         }
         inboxStyle.setSummaryText(notifItems.size() + " new message");
@@ -141,7 +162,21 @@ public class QiscusPusherService extends Service {
 
     @Subscribe
     public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
-        showPushNotification(event.getQiscusComment());
+        if (!event.getQiscusComment().getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
+            showPushNotification(event.getQiscusComment());
+        }
+    }
+
+    @Subscribe
+    public void onUserEvent(QiscusUserEvent userEvent) {
+        switch (userEvent) {
+            case LOGIN:
+                scheduleSync(Qiscus.getHeartBeat());
+                break;
+            case LOGOUT:
+                stopSync();
+                break;
+        }
     }
 
     @Override

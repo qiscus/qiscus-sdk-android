@@ -334,6 +334,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private boolean isValidOlderComments(List<QiscusComment> qiscusComments, QiscusComment lastQiscusComment) {
+        if (qiscusComments.isEmpty()) return false;
+
         qiscusComments = cleanFailedComments(qiscusComments);
         boolean containsLastValidComment = qiscusComments.size() <= 0 || lastQiscusComment.getId() == -1;
         int size = qiscusComments.size();
@@ -471,9 +473,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void onGotNewComment(QiscusComment qiscusComment) {
-        updateLastReadComment(qiscusComment);
-        qiscusComment.setState(QiscusComment.STATE_READ);
-        Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        if (qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
+            commentSuccess(qiscusComment);
+        } else {
+            updateLastReadComment(qiscusComment);
+            qiscusComment.setState(QiscusComment.STATE_READ);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        }
 
         if (qiscusComment.isAttachment()) {
             if (QiscusFileUtil.isContains(qiscusComment.getTopicId(), qiscusComment.getAttachmentName())) {

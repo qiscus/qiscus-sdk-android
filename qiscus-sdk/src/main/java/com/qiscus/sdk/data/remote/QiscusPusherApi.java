@@ -196,8 +196,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             QiscusComment qiscusComment = jsonToComment(gson.fromJson(new String(message.getPayload()), JsonObject.class));
             if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
                 setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(), qiscusComment.getId(), qiscusComment.getUniqueId());
-                EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
             }
+            EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {
             String data[] = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
@@ -300,6 +300,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
             qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
             qiscusComment.setTime(QiscusDateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
+            qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
             return qiscusComment;
         } catch (Exception e) {
             e.printStackTrace();
