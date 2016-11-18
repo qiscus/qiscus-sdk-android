@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.remote;
 
 import android.provider.Settings;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -61,7 +62,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         }
 
         gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
-        String clientId = Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
+        String clientId = Qiscus.getApps().getPackageName() + "-";
+        clientId += Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
         String serverUri = "tcp://52.77.234.57:1883";
         mqttAndroidClient = new MqttAndroidClient(Qiscus.getApps().getApplicationContext(), serverUri, clientId);
         mqttAndroidClient.setCallback(this);
