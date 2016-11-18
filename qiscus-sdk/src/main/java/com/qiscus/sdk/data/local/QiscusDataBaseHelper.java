@@ -436,7 +436,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
-                + QiscusDb.CommentTable.COLUMN_TIME + " < " + qiscusComment.getTime().getTime() + " "
+                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + qiscusComment.getTime().getTime() + " "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + count;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
