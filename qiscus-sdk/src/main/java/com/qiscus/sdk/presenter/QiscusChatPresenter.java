@@ -255,7 +255,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 })
                 .doOnNext(comments -> {
                     for (QiscusComment qiscusComment : comments) {
-                        if (qiscusComment.getState() != QiscusComment.STATE_FAILED
+                        if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
+                            qiscusComment.setState(QiscusComment.STATE_FAILED);
+                            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                        } else if (qiscusComment.getState() != QiscusComment.STATE_FAILED
                                 && qiscusComment.getState() != QiscusComment.STATE_READ) {
                             if (qiscusComment.getId() > lastDeliveredCommentId) {
                                 qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
@@ -368,7 +371,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 })
                 .doOnNext(comments -> {
                     for (QiscusComment comment : comments) {
-                        if (qiscusComment.getState() != QiscusComment.STATE_FAILED
+                        if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
+                            qiscusComment.setState(QiscusComment.STATE_FAILED);
+                            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                        } else if (qiscusComment.getState() != QiscusComment.STATE_FAILED
                                 && qiscusComment.getState() != QiscusComment.STATE_READ) {
                             if (comment.getId() > lastDeliveredCommentId) {
                                 comment.setState(QiscusComment.STATE_ON_QISCUS);
