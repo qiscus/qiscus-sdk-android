@@ -132,6 +132,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         final QiscusComment qiscusComment = QiscusComment.generateMessage(String.format("[file] %s [/file]", compressedFile.getPath()),
                 room.getId(), currentTopicId);
         qiscusComment.setDownloading(true);
+        Qiscus.getDataStore().add(qiscusComment);
         view.onSendingComment(qiscusComment);
 
         final File finalCompressedFile = compressedFile;
@@ -174,6 +175,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         File file = new File(qiscusComment.getAttachmentUri().toString());
         qiscusComment.setDownloading(true);
         qiscusComment.setState(QiscusComment.STATE_SENDING);
+        qiscusComment.setTime(new Date());
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
         view.onNewComment(qiscusComment);
         if (!file.exists()) { //Not exist because the uri is not local
             qiscusComment.setProgress(100);
