@@ -116,7 +116,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(this::commentSuccess, throwable -> commentFail(qiscusComment));
+                .subscribe(this::commentSuccess, throwable -> {
+                    throwable.printStackTrace();
+                    commentFail(qiscusComment);
+                });
     }
 
     public void sendFile(File file) {
@@ -150,6 +153,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
                 }, throwable -> {
+                    throwable.printStackTrace();
                     qiscusComment.setDownloading(false);
                     commentFail(qiscusComment);
                 });
@@ -167,7 +171,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
-                    .subscribe(this::commentSuccess, throwable -> commentFail(qiscusComment));
+                    .subscribe(this::commentSuccess, throwable -> {
+                        throwable.printStackTrace();
+                        commentFail(qiscusComment);
+                    });
         }
     }
 
@@ -190,6 +197,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         qiscusComment.setDownloading(false);
                         commentSuccess(commentSend);
                     }, throwable -> {
+                        throwable.printStackTrace();
                         qiscusComment.setDownloading(false);
                         commentFail(qiscusComment);
                     });
@@ -209,6 +217,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         qiscusComment.setDownloading(false);
                         commentSuccess(commentSend);
                     }, throwable -> {
+                        throwable.printStackTrace();
                         qiscusComment.setDownloading(false);
                         commentFail(qiscusComment);
                     });

@@ -90,9 +90,11 @@ public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUse
         tvSubtitle.setText(qiscusChatRoom.getSubtitle());
         tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, QiscusChatFragment.newInstance(qiscusChatRoom))
-                .commit();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, QiscusChatFragment.newInstance(qiscusChatRoom))
+                    .commit();
+        }
     }
 
     private void applyChatConfig() {
