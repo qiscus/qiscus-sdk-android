@@ -62,6 +62,7 @@ import com.trello.rxlifecycle.components.support.RxFragment;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
@@ -90,6 +91,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     };
 
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
+    protected static final String COMMENTS_DATA = "saved_comments_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int PICK_IMAGE_REQUEST = 2;
     protected static final int PICK_FILE_REQUEST = 3;
@@ -266,7 +268,16 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         messageRecyclerView.addOnScrollListener(new QiscusChatScrollListener(chatLayoutManager, this));
 
         qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
-        new Handler().postDelayed(() -> qiscusChatPresenter.loadComments(20), 400);
+        if (savedInstanceState == null) {
+            new Handler().postDelayed(() -> qiscusChatPresenter.loadComments(20), 400);
+        } else {
+            ArrayList<QiscusComment> comments = savedInstanceState.getParcelableArrayList(COMMENTS_DATA);
+            if (comments == null) {
+                new Handler().postDelayed(() -> qiscusChatPresenter.loadComments(20), 400);
+            } else {
+                showComments(comments);
+            }
+        }
     }
 
     protected QiscusChatConfig onLoadChatConfig() {
@@ -639,6 +650,12 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+        ArrayList<QiscusComment> comments = new ArrayList<>();
+        int size = chatAdapter.getData().size();
+        for (int i = 0; i < size; i++) {
+            comments.add((QiscusComment) chatAdapter.getData().get(i));
+        }
+        outState.putParcelableArrayList(COMMENTS_DATA, comments);
     }
 
 
