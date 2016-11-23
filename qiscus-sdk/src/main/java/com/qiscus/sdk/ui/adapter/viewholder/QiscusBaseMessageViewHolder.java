@@ -58,6 +58,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected boolean needToShowDate;
     protected boolean messageFromMe;
     protected boolean needToShowFirstMessageBubbleIndicator;
+    protected boolean groupChat;
 
     protected Drawable rightBubbleDrawable;
     protected Drawable leftBubbleDrawable;
@@ -142,6 +143,10 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         this.needToShowFirstMessageBubbleIndicator = needToShowFirstMessageBubbleIndicator;
     }
 
+    public void setGroupChat(boolean groupChat) {
+        this.groupChat = groupChat;
+    }
+
     public void bind(Data qiscusComment) {
         setUpColor();
 
@@ -160,7 +165,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     }
 
     private void showSenderName(Data qiscusComment) {
-        if (senderNameView != null && !messageFromMe) {
+        if (senderNameView != null && !messageFromMe && groupChat) {
             if (needToShowFirstMessageBubbleIndicator) {
                 senderNameView.setVisibility(View.VISIBLE);
                 senderNameView.setText(String.format("~ %s", qiscusComment.getSender()));
