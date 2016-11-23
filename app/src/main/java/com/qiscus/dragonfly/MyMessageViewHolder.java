@@ -74,4 +74,16 @@ public class MyMessageViewHolder extends QiscusBaseTextMessageViewHolder {
     protected ImageView getMessageStateIndicatorView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.icon_read);
     }
+
+    @Nullable
+    @Override
+    protected ImageView getAvatarView(View itemView) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    protected TextView getSenderNameView(View itemView) {
+        return null;
+    }
 }

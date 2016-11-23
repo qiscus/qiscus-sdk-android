@@ -106,4 +106,16 @@ public class QiscusImageViewHolder extends QiscusBaseImageMessageViewHolder {
     protected ImageView getMessageStateIndicatorView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.icon_read);
     }
+
+    @Nullable
+    @Override
+    protected ImageView getAvatarView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.avatar);
+    }
+
+    @Nullable
+    @Override
+    protected TextView getSenderNameView(View itemView) {
+        return (TextView) itemView.findViewById(R.id.name);
+    }
 }
