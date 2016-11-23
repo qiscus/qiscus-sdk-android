@@ -228,6 +228,7 @@ public enum QiscusApi {
                     qiscusComment.setMessage(jsonComment.get("message").getAsString());
                     qiscusComment.setSender(jsonComment.get("username").getAsString());
                     qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
+                    qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
                     try {
                         qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
                     } catch (ParseException e) {
@@ -278,6 +279,7 @@ public enum QiscusApi {
                     qiscusComment.setMessage(jsonComment.get("message").getAsString());
                     qiscusComment.setSender(jsonComment.get("username").getAsString());
                     qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
+                    qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
                     qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
                     try {
                         qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));

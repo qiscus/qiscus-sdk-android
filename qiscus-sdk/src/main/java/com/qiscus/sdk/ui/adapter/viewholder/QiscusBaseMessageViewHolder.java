@@ -170,7 +170,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         if (avatarView != null) {
             avatarView.setVisibility(needToShowFirstMessageBubbleIndicator ? View.VISIBLE : View.GONE);
             Glide.with(avatarView.getContext())
-                    .load("TODO")
+                    .load(qiscusComment.getSenderAvatar())
                     .dontAnimate()
                     .placeholder(R.drawable.ic_qiscus_avatar)
                     .error(R.drawable.ic_qiscus_avatar)

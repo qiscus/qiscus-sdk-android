@@ -26,7 +26,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 2;
+    static final int DATABASE_VERSION = 3;
 
     static abstract class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -114,6 +114,7 @@ final class QiscusDb {
         static final String COLUMN_MESSAGE = "message";
         static final String COLUMN_SENDER = "sender";
         static final String COLUMN_SENDER_EMAIL = "sender_email";
+        static final String COLUMN_SENDER_AVATAR = "sender_avatar";
         static final String COLUMN_TIME = "time";
         static final String COLUMN_STATE = "state";
 
@@ -127,6 +128,7 @@ final class QiscusDb {
                         COLUMN_MESSAGE + " TEXT," +
                         COLUMN_SENDER + " TEXT," +
                         COLUMN_SENDER_EMAIL + " TEXT NOT NULL," +
+                        COLUMN_SENDER_AVATAR + " TEXT," +
                         COLUMN_TIME + " LONG NOT NULL," +
                         COLUMN_STATE + " INTEGER NOT NULL" +
                         " ); ";
@@ -141,6 +143,7 @@ final class QiscusDb {
             values.put(COLUMN_MESSAGE, qiscusComment.getMessage());
             values.put(COLUMN_SENDER, qiscusComment.getSender());
             values.put(COLUMN_SENDER_EMAIL, qiscusComment.getSenderEmail());
+            values.put(COLUMN_SENDER_AVATAR, qiscusComment.getSenderAvatar());
             values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
             values.put(COLUMN_STATE, qiscusComment.getState());
             return values;
@@ -156,6 +159,7 @@ final class QiscusDb {
             qiscusComment.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
             qiscusComment.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
             qiscusComment.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
+            qiscusComment.setSenderAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
             qiscusComment.setTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
             qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             return qiscusComment;
