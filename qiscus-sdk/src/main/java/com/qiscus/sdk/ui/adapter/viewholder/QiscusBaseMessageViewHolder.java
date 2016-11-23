@@ -160,21 +160,30 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     }
 
     private void showSenderName(Data qiscusComment) {
-        if (senderNameView != null) {
-            senderNameView.setVisibility(needToShowFirstMessageBubbleIndicator ? View.VISIBLE : View.GONE);
-            senderNameView.setText(String.format("~ %s", qiscusComment.getSender()));
+        if (senderNameView != null && !messageFromMe) {
+            if (needToShowFirstMessageBubbleIndicator) {
+                senderNameView.setVisibility(View.VISIBLE);
+                senderNameView.setText(String.format("~ %s", qiscusComment.getSender()));
+            } else {
+                senderNameView.setVisibility(View.GONE);
+            }
+
         }
     }
 
     private void showSenderAvatar(Data qiscusComment) {
-        if (avatarView != null) {
-            avatarView.setVisibility(needToShowFirstMessageBubbleIndicator ? View.VISIBLE : View.GONE);
-            Glide.with(avatarView.getContext())
-                    .load(qiscusComment.getSenderAvatar())
-                    .dontAnimate()
-                    .placeholder(R.drawable.ic_qiscus_avatar)
-                    .error(R.drawable.ic_qiscus_avatar)
-                    .into(avatarView);
+        if (avatarView != null && !messageFromMe) {
+            if (needToShowFirstMessageBubbleIndicator) {
+                avatarView.setVisibility(View.VISIBLE);
+                Glide.with(avatarView.getContext())
+                        .load(qiscusComment.getSenderAvatar())
+                        .dontAnimate()
+                        .placeholder(R.drawable.ic_qiscus_avatar)
+                        .error(R.drawable.ic_qiscus_avatar)
+                        .into(avatarView);
+            } else {
+                avatarView.setVisibility(View.GONE);
+            }
         }
     }
 
