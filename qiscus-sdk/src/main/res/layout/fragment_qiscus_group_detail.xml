@@ -139,10 +139,10 @@
                     android:background="@color/qiscus_light_grey"/>
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:padding="4dp"
-                    android:src="@drawable/ic_qiscus_add_audio"
+                    android:src="@drawable/ic_qiscus_edit"
                     android:tint="@color/qiscus_primary"/>
 
             </LinearLayout>
@@ -190,10 +190,10 @@
                     android:background="@color/qiscus_light_grey"/>
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:padding="4dp"
-                    android:src="@drawable/ic_qiscus_add_audio"
+                    android:src="@drawable/ic_qiscus_add_participant"
                     android:tint="@color/qiscus_primary"/>
 
             </LinearLayout>
