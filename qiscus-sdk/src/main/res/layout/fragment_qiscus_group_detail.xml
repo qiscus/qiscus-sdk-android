@@ -49,8 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="240dp"
                     android:background="@color/qiscus_primary"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_qiscus_avatar"/>
+                    android:scaleType="centerCrop"/>
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -123,10 +122,9 @@
                         android:textSize="12sp"/>
 
                     <TextView
-                        android:id="@+id/tv_name"
+                        android:id="@+id/group_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Senam Bugar"
                         android:textColor="@color/qiscus_secondary_text"
                         android:textSize="18sp"/>
 
@@ -139,6 +137,7 @@
                     android:background="@color/qiscus_light_grey"/>
 
                 <ImageView
+                    android:id="@+id/button_edit_group_name"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:padding="4dp"
@@ -174,10 +173,10 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/member_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="Participant (2)"
                         android:textColor="@color/qiscus_primary"
                         android:textSize="12sp"/>
 
@@ -190,6 +189,7 @@
                     android:background="@color/qiscus_light_grey"/>
 
                 <ImageView
+                    android:id="@+id/button_add_member"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:padding="4dp"
@@ -209,6 +209,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/button_leave_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
