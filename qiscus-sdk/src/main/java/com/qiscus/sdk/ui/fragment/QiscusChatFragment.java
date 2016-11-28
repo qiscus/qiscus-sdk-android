@@ -153,6 +153,6 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
-        return new QiscusChatAdapter(getActivity());
+        return new QiscusChatAdapter(getActivity(), qiscusChatRoom.isGroup());
     }
 }

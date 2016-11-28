@@ -19,8 +19,11 @@ package com.qiscus.sdk.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 /**
  * Created on : November 24, 2016
@@ -30,7 +33,10 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
  */
 public class QiscusGroupChatActivity extends QiscusChatActivity {
 
+    protected String subtitle;
+
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
+        qiscusChatRoom.setGroup(true);
         Intent intent = new Intent(context, QiscusGroupChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         return intent;
@@ -40,5 +46,23 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     protected void onViewReady(Bundle savedInstanceState) {
         super.onViewReady(savedInstanceState);
         toolbar.setOnClickListener(v -> startActivity(QiscusGroupDetailActivity.generateIntent(this, qiscusChatRoom)));
+        generateSubtitle();
+        tvSubtitle.setText(subtitle);
+        tvSubtitle.setVisibility(View.VISIBLE);
+    }
+
+    protected void generateSubtitle() {
+        subtitle = "";
+        int count = 0;
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+            if (!member.getEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+                count++;
+                subtitle += member.getUsername().split(" ")[0];
+                if (count < qiscusChatRoom.getMember().size() - 1) {
+                    subtitle += ", ";
+                }
+            }
+        }
+        subtitle += " and you";
     }
 }
