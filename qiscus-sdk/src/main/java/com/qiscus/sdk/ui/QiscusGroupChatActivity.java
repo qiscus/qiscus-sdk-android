@@ -25,6 +25,8 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 
+import java.util.Date;
+
 /**
  * Created on : November 24, 2016
  * Author     : zetbaitsu
@@ -64,5 +66,24 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
             }
         }
         subtitle += " and you";
+    }
+
+    @Override
+    public void onUserStatusChanged(String user, boolean online, Date lastActive) {
+
+    }
+
+    @Override
+    public void onUserTyping(String user, boolean typing) {
+        if (typing) {
+            for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+                if (member.getEmail().equals(user)) {
+                    tvSubtitle.setText(String.format("%s is typing...", member.getUsername()));
+                    break;
+                }
+            }
+        } else {
+            tvSubtitle.setText(subtitle);
+        }
     }
 }
