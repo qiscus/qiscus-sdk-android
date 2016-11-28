@@ -150,8 +150,9 @@ public enum QiscusApi {
                         for (JsonElement jsonMember : jsonMembers) {
                             QiscusRoomMember member = new QiscusRoomMember();
                             member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                            member.setAvatar(jsonMember.getAsJsonObject().get("username").getAsString());
-                            member.setUsername(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+                            members.add(member);
                         }
                         qiscusChatRoom.setMember(members);
 
@@ -203,8 +204,9 @@ public enum QiscusApi {
                         for (JsonElement jsonMember : jsonMembers) {
                             QiscusRoomMember member = new QiscusRoomMember();
                             member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                            member.setAvatar(jsonMember.getAsJsonObject().get("username").getAsString());
-                            member.setUsername(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+                            members.add(member);
                         }
                         qiscusChatRoom.setMember(members);
 
