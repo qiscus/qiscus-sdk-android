@@ -43,7 +43,7 @@ public class QiscusChatRoom implements Parcelable {
     protected int lastTopicId;
     protected String options;
     protected boolean group;
-    protected List<String> member;
+    protected List<QiscusRoomMember> member;
 
     public QiscusChatRoom() {
         lastCommentTime = new Date(0L);
@@ -62,7 +62,7 @@ public class QiscusChatRoom implements Parcelable {
         lastTopicId = in.readInt();
         options = in.readString();
         group = in.readByte() != 0;
-        member = in.createStringArrayList();
+        member = in.createTypedArrayList(QiscusRoomMember.CREATOR);
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -173,11 +173,11 @@ public class QiscusChatRoom implements Parcelable {
         this.group = group;
     }
 
-    public List<String> getMember() {
+    public List<QiscusRoomMember> getMember() {
         return member;
     }
 
-    public void setMember(List<String> member) {
+    public void setMember(List<QiscusRoomMember> member) {
         this.member = member;
     }
 
@@ -224,6 +224,6 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeInt(lastTopicId);
         dest.writeString(options);
         dest.writeByte((byte) (group ? 1 : 0));
-        dest.writeStringList(member);
+        dest.writeTypedList(member);
     }
 }

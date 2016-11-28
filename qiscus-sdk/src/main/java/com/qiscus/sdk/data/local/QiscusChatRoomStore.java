@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.local;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.util.List;
 
@@ -49,11 +50,11 @@ public interface QiscusChatRoomStore {
 
     Observable<List<QiscusChatRoom>> getObservableChatRooms(int count);
 
-    void addRoomMember(int roomId, String email, String distinctId);
+    void addRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
 
     boolean isContainsRoomMember(int roomId, String email);
 
-    List<String> getRoomMembers(int roomId);
+    List<QiscusRoomMember> getRoomMembers(int roomId);
 
     void deleteRoomMember(int roomId, String email);
 }

@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
             loginButton.setText("Login");
         } else {
             showLoading();
-            Qiscus.setUser("zetra25@gmail.com", "12345678")
-                    .withUsername("Zetra")
+            Qiscus.setUser("rya.meyvriska3@gmail.com", "12345678")
+                    .withUsername("Rya Meyvriska")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

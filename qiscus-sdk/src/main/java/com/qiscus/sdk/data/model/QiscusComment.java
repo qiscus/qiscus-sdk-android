@@ -57,6 +57,7 @@ public class QiscusComment implements Parcelable {
     protected String message;
     protected String sender;
     protected String senderEmail;
+    protected String senderAvatar;
     protected Date time;
     protected int state;
     protected boolean downloading;
@@ -81,6 +82,7 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setTime(new Date());
         qiscusComment.setSenderEmail(qiscusAccount.getEmail());
         qiscusComment.setSender(qiscusAccount.getUsername());
+        qiscusComment.setSenderAvatar(qiscusAccount.getAvatar());
         qiscusComment.setState(STATE_SENDING);
 
         return qiscusComment;
@@ -99,6 +101,7 @@ public class QiscusComment implements Parcelable {
         message = in.readString();
         sender = in.readString();
         senderEmail = in.readString();
+        senderAvatar = in.readString();
         time = new Date(in.readLong());
         state = in.readInt();
     }
@@ -177,6 +180,14 @@ public class QiscusComment implements Parcelable {
 
     public void setSenderEmail(String senderEmail) {
         this.senderEmail = senderEmail;
+    }
+
+    public String getSenderAvatar() {
+        return senderAvatar;
+    }
+
+    public void setSenderAvatar(String senderAvatar) {
+        this.senderAvatar = senderAvatar;
     }
 
     public Date getTime() {
@@ -423,6 +434,7 @@ public class QiscusComment implements Parcelable {
                 ", message='" + message + '\'' +
                 ", sender='" + sender + '\'' +
                 ", senderEmail='" + senderEmail + '\'' +
+                ", senderAvatar='" + senderAvatar + '\'' +
                 ", time=" + time +
                 ", state=" + state +
                 '}';
@@ -443,6 +455,7 @@ public class QiscusComment implements Parcelable {
         dest.writeString(message);
         dest.writeString(sender);
         dest.writeString(senderEmail);
+        dest.writeString(senderAvatar);
         dest.writeLong(time.getTime());
         dest.writeInt(state);
     }

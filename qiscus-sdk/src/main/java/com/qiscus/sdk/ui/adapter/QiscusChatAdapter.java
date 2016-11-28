@@ -45,6 +45,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_AUDIO_ME = 7;
     private static final int TYPE_AUDIO_OTHER = 8;
 
+    public QiscusChatAdapter(Context context, boolean groupChat) {
+        super(context, groupChat);
+    }
+
     public QiscusChatAdapter(Context context) {
         super(context);
     }

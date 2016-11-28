@@ -335,6 +335,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         for (int i = 0; i < size - 1; i++) {
+            if (qiscusComments.get(i).getId() == -1 || qiscusComments.get(i + 1).getId() == -1) {
+                return true;
+            }
+
             if (!containsLastValidComment && qiscusComments.get(i).getId() == room.getLastCommentId()) {
                 containsLastValidComment = true;
             }

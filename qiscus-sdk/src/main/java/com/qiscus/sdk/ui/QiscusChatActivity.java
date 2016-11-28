@@ -32,6 +32,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
@@ -40,14 +41,14 @@ import java.util.Date;
 
 public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUserStatusPresenter.View,
         QiscusChatFragment.UserTypingListener {
-    private static final String CHAT_ROOM_DATA = "chat_room_data";
+    protected static final String CHAT_ROOM_DATA = "chat_room_data";
 
     protected Toolbar toolbar;
     protected TextView tvTitle;
     protected TextView tvSubtitle;
 
-    private QiscusChatConfig chatConfig;
-    private QiscusChatRoom qiscusChatRoom;
+    protected QiscusChatConfig chatConfig;
+    protected QiscusChatRoom qiscusChatRoom;
     private QiscusUserStatusPresenter userStatusPresenter;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
@@ -78,9 +79,9 @@ public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUse
 
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
-        for (String user : qiscusChatRoom.getMember()) {
-            if (!user.equals(Qiscus.getQiscusAccount().getEmail())) {
-                userStatusPresenter.listenUser(user);
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+            if (!member.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                userStatusPresenter.listenUser(member.getEmail());
             }
         }
 

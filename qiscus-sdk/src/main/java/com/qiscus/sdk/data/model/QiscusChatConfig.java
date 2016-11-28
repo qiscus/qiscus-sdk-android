@@ -21,7 +21,6 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.widget.Toast;
 
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusChatActivity;
@@ -68,12 +67,6 @@ public class QiscusChatConfig {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(qiscusChatRoom -> qiscusChatRoom.setName(qiscusComment.getSender()))
-                    .doOnNext(qiscusChatRoom -> Qiscus.getDataStore()
-                            .addRoomMember(qiscusChatRoom.getId(), qiscusComment.getSenderEmail(), null))
-                    .map(qiscusChatRoom -> {
-                        qiscusChatRoom.setMember(Qiscus.getDataStore().getRoomMembers(qiscusChatRoom.getId()));
-                        return qiscusChatRoom;
-                    })
                     .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(context, qiscusChatRoom))
                     .subscribe(intent -> {
                         context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK

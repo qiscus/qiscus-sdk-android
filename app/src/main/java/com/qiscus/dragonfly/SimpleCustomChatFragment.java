@@ -18,9 +18,9 @@ package com.qiscus.dragonfly;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
@@ -66,6 +66,14 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     protected void onCreateChatComponents(Bundle savedInstanceState) {
         super.onCreateChatComponents(savedInstanceState);
         lockChatAfter(2000);
+    }
+
+    @Override
+    protected void sendMessage() {
+        if (chatAdapter.isEmpty()) {
+            Toast.makeText(getActivity(), "First message sent!", Toast.LENGTH_SHORT).show();
+        }
+        super.sendMessage();
     }
 
     private void lockChatAfter(int duration) {

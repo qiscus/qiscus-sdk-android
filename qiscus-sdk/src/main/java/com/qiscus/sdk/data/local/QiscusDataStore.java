@@ -24,6 +24,6 @@ package com.qiscus.sdk.data.local;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public interface QiscusDataStore extends QiscusChatRoomStore, QiscusCommentStore, QiscusFileStore {
+public interface QiscusDataStore extends QiscusChatRoomStore, QiscusRoomMemberStore, QiscusCommentStore, QiscusFileStore {
     void clear();
 }

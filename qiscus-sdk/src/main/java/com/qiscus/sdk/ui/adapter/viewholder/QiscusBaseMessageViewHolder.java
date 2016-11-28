@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -48,6 +49,8 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     @Nullable protected TextView dateView;
     @Nullable protected TextView timeView;
     @Nullable protected ImageView messageStateIndicatorView;
+    @Nullable protected ImageView avatarView;
+    @Nullable protected TextView senderNameView;
 
     private OnItemClickListener itemClickListener;
     private OnLongItemClickListener longItemClickListener;
@@ -57,6 +60,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected boolean needToShowFirstMessageBubbleIndicator;
     protected int lastDeliveredCommentId;
     protected int lastReadCommentId;
+    protected boolean groupChat;
 
     protected Drawable rightBubbleDrawable;
     protected Drawable leftBubbleDrawable;
@@ -80,6 +84,8 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         dateView = getDateView(itemView);
         timeView = getTimeView(itemView);
         messageStateIndicatorView = getMessageStateIndicatorView(itemView);
+        avatarView = getAvatarView(itemView);
+        senderNameView = getSenderNameView(itemView);
 
         messageBubbleView.setOnClickListener(this);
         messageBubbleView.setOnLongClickListener(this);
@@ -119,6 +125,12 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     @Nullable
     protected abstract ImageView getMessageStateIndicatorView(View itemView);
 
+    @Nullable
+    protected abstract ImageView getAvatarView(View itemView);
+
+    @Nullable
+    protected abstract TextView getSenderNameView(View itemView);
+
     public void setNeedToShowDate(boolean needToShowDate) {
         this.needToShowDate = needToShowDate;
     }
@@ -135,6 +147,10 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         this.needToShowFirstMessageBubbleIndicator = needToShowFirstMessageBubbleIndicator;
     }
 
+    public void setGroupChat(boolean groupChat) {
+        this.groupChat = groupChat;
+    }
+
     public void bind(Data qiscusComment) {
         setUpColor();
 
@@ -146,7 +162,38 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
             firstMessageBubbleIndicatorView.setVisibility(needToShowFirstMessageBubbleIndicator ? View.VISIBLE : View.GONE);
         }
 
+        showSenderAvatar(qiscusComment);
+        showSenderName(qiscusComment);
+
         showMessage(qiscusComment);
+    }
+
+    private void showSenderName(Data qiscusComment) {
+        if (senderNameView != null && !messageFromMe && groupChat) {
+            if (needToShowFirstMessageBubbleIndicator) {
+                senderNameView.setVisibility(View.VISIBLE);
+                senderNameView.setText(String.format("~ %s", qiscusComment.getSender()));
+            } else {
+                senderNameView.setVisibility(View.GONE);
+            }
+
+        }
+    }
+
+    private void showSenderAvatar(Data qiscusComment) {
+        if (avatarView != null && !messageFromMe) {
+            if (needToShowFirstMessageBubbleIndicator) {
+                avatarView.setVisibility(View.VISIBLE);
+                Glide.with(avatarView.getContext())
+                        .load(qiscusComment.getSenderAvatar())
+                        .dontAnimate()
+                        .placeholder(R.drawable.ic_qiscus_avatar)
+                        .error(R.drawable.ic_qiscus_avatar)
+                        .into(avatarView);
+            } else {
+                avatarView.setVisibility(View.GONE);
+            }
+        }
     }
 
     protected abstract void showMessage(Data qiscusComment);
