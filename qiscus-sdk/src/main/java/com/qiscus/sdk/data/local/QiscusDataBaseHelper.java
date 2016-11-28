@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             } finally {
                 sqLiteDatabase.endTransaction();
             }
-            for (String member : qiscusChatRoom.getMember()) {
+            for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
                 addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
             }
         }
@@ -80,7 +81,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } finally {
             sqLiteDatabase.endTransaction();
         }
-        for (String member : qiscusChatRoom.getMember()) {
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
             addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
         }
     }
@@ -168,19 +169,21 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void addRoomMember(int roomId, String email, String distinctId) {
+    public void addRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
         distinctId = distinctId == null ? "default" : distinctId;
-        if (!isContainsRoomMember(roomId, email)) {
+        if (!isContainsRoomMember(roomId, qiscusRoomMember.getEmail())) {
             sqLiteDatabase.beginTransaction();
             try {
                 sqLiteDatabase.insert(QiscusDb.RoomMemberTable.TABLE_NAME, null,
-                        QiscusDb.RoomMemberTable.toContentValues(roomId, email, distinctId));
+                        QiscusDb.RoomMemberTable.toContentValues(roomId, qiscusRoomMember.getEmail(), distinctId));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 sqLiteDatabase.endTransaction();
             }
+
+            addOrUpdate(qiscusRoomMember);
         }
     }
 
@@ -198,14 +201,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<String> getRoomMembers(int roomId) {
+    public List<QiscusRoomMember> getRoomMembers(int roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.RoomMemberTable.TABLE_NAME + " "
                 + "WHERE " + QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-        List<String> members = new ArrayList<>();
+        List<QiscusRoomMember> members = new ArrayList<>();
         while (cursor.moveToNext()) {
-            members.add(QiscusDb.RoomMemberTable.getMember(cursor));
+            members.add(getMember(QiscusDb.RoomMemberTable.getMember(cursor)));
         }
         cursor.close();
         return members;
@@ -224,6 +227,73 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             e.printStackTrace();
         } finally {
             sqLiteDatabase.endTransaction();
+        }
+    }
+
+    @Override
+    public void add(QiscusRoomMember qiscusRoomMember) {
+        if (!isContains(qiscusRoomMember)) {
+            sqLiteDatabase.beginTransaction();
+            try {
+                sqLiteDatabase.insert(QiscusDb.MemberTable.TABLE_NAME, null, QiscusDb.MemberTable.toContentValues(qiscusRoomMember));
+                sqLiteDatabase.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                sqLiteDatabase.endTransaction();
+            }
+        }
+    }
+
+    @Override
+    public boolean isContains(QiscusRoomMember qiscusRoomMember) {
+        String query = "SELECT * FROM "
+                + QiscusDb.MemberTable.TABLE_NAME + " WHERE "
+                + QiscusDb.MemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(qiscusRoomMember.getEmail());
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        boolean contains = cursor.getCount() > 0;
+        cursor.close();
+        return contains;
+    }
+
+    @Override
+    public void update(QiscusRoomMember qiscusRoomMember) {
+        String where = QiscusDb.MemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(qiscusRoomMember.getEmail());
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.update(QiscusDb.MemberTable.TABLE_NAME, QiscusDb.MemberTable.toContentValues(qiscusRoomMember), where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+    }
+
+    @Override
+    public void addOrUpdate(QiscusRoomMember qiscusRoomMember) {
+        if (!isContains(qiscusRoomMember)) {
+            add(qiscusRoomMember);
+        } else {
+            update(qiscusRoomMember);
+        }
+    }
+
+    @Override
+    public QiscusRoomMember getMember(String email) {
+        String query = "SELECT * FROM "
+                + QiscusDb.MemberTable.TABLE_NAME + " WHERE "
+                + QiscusDb.MemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(email);
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+
+        if (cursor.moveToNext()) {
+            QiscusRoomMember qiscusRoomMember = QiscusDb.MemberTable.getMember(cursor);
+            cursor.close();
+            return qiscusRoomMember;
+        } else {
+            cursor.close();
+            return null;
         }
     }
 

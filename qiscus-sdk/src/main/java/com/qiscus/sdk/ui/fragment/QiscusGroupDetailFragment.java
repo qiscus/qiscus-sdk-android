@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 public class QiscusGroupDetailFragment extends RxFragment {
@@ -110,7 +111,7 @@ public class QiscusGroupDetailFragment extends RxFragment {
 
         membersTitle.setText("Members (" + qiscusChatRoom.getMember().size() + ")");
 
-        for (String s : qiscusChatRoom.getMember()) {
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
             View item = LayoutInflater.from(getActivity()).inflate(R.layout.item_qiscus_group_member, null);
             memberContainer.addView(item);
         }

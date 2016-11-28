@@ -16,14 +16,17 @@
 
 package com.qiscus.sdk.data.local;
 
-/**
- * Created on : October 11, 2016
- * Author     : zetbaitsu
- * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
- * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
- */
-public interface QiscusDataStore extends QiscusChatRoomStore, QiscusRoomMemberStore, QiscusCommentStore, QiscusFileStore {
-    void clear();
+import com.qiscus.sdk.data.model.QiscusRoomMember;
+
+public interface QiscusRoomMemberStore {
+
+    void add(QiscusRoomMember qiscusRoomMember);
+
+    boolean isContains(QiscusRoomMember qiscusRoomMember);
+
+    void update(QiscusRoomMember qiscusRoomMember);
+
+    void addOrUpdate(QiscusRoomMember qiscusRoomMember);
+
+    QiscusRoomMember getMember(String email);
 }
