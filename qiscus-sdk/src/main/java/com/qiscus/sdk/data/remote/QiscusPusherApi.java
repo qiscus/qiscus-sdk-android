@@ -124,6 +124,8 @@ public enum QiscusPusherApi implements ConnectionEventListener {
             qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
             qiscusComment.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
             qiscusComment.setTime(QiscusDateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
+            qiscusComment.setRoomName(jsonObject.get("room_name").getAsString());
+            qiscusComment.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
             return qiscusComment;
         } catch (Exception e) {
             e.printStackTrace();

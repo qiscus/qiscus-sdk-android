@@ -131,11 +131,14 @@ public class QiscusPusherService extends Service {
         openIntent.putExtra("data", comment);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
+        String messageText = comment.isGroupMessage() ? comment.getSender().split(" ")[0] + ": " : "";
+        messageText += isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage();
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
                 .setContentIntent(pendingIntent)
-                .setContentText(isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage())
-                .setTicker(isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage())
+                .setContentText(messageText)
+                .setTicker(messageText)
                 .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), Qiscus.getChatConfig().getNotificationBigIcon()))
                 .setGroupSummary(true)
