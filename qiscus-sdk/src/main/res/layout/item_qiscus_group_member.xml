@@ -51,7 +51,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Zetra"
             android:textColor="@color/qiscus_primary_text"
             android:textSize="16sp"
             android:textStyle="bold"/>
@@ -61,7 +60,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:text="zetra@ui.ac.id"
             android:maxLines="1"
             android:textColor="@color/qiscus_secondary_text"
             android:textSize="14sp"/>
