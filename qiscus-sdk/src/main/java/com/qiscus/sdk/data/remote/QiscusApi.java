@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -125,8 +126,8 @@ public enum QiscusApi {
                 });
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails, String distinctId, String options) {
-        return api.createOrGetChatRoom(Qiscus.getToken(), withEmails, distinctId, options)
+    public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, String options) {
+        return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId, options)
                 .onErrorReturn(throwable -> null)
                 .map(jsonElement -> {
                     QiscusChatRoom qiscusChatRoom;
@@ -141,7 +142,7 @@ public enum QiscusApi {
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                         qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                                 : jsonChatRoom.get("options").getAsString());
-                        qiscusChatRoom.setMember(withEmails);
+                        qiscusChatRoom.setMember(Collections.singletonList(withEmail));
                         JsonArray comments = jsonElement.getAsJsonObject().get("results")
                                 .getAsJsonObject().get("comments").getAsJsonArray();
 
@@ -158,7 +159,7 @@ public enum QiscusApi {
 
                         return qiscusChatRoom;
                     }
-                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(withEmails.get(0),
+                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(withEmail,
                             distinctId == null ? "default" : distinctId);
                     if (qiscusChatRoom == null) {
                         throw new RuntimeException("Unable to connect with qiscus server!");
