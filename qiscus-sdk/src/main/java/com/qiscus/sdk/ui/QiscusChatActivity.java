@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
@@ -117,6 +118,18 @@ public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUse
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        QiscusCacheManager.getInstance().setLastChatActivity(true, qiscusChatRoom.getId());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
@@ -153,6 +166,12 @@ public class QiscusChatActivity extends RxAppCompatActivity implements QiscusUse
     @Override
     public void dismissLoading() {
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
     }
 
     @Override

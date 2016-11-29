@@ -18,6 +18,7 @@ package com.qiscus.sdk.data.local;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v4.util.Pair;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -89,6 +90,18 @@ public enum QiscusCacheManager {
 
     public String getLastImagePath() {
         return sharedPreferences.getString("last_image_path", "");
+    }
+
+    public void setLastChatActivity(boolean active, int roomId) {
+        sharedPreferences.edit()
+                .putBoolean("last_chat_status", active)
+                .putInt("last_active_chat", roomId)
+                .apply();
+    }
+
+    public Pair<Boolean, Integer> getLastChatActivity() {
+        return Pair.create(sharedPreferences.getBoolean("last_chat_status", false),
+                sharedPreferences.getInt("last_active_chat", 0));
     }
 
     public void clearData() {

@@ -60,6 +60,8 @@ public class QiscusComment implements Parcelable {
     protected String senderAvatar;
     protected Date time;
     protected int state;
+    protected String roomName;
+    protected boolean groupMessage;
     protected boolean downloading;
     protected int progress;
     protected ProgressListener progressListener;
@@ -204,6 +206,22 @@ public class QiscusComment implements Parcelable {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public boolean isGroupMessage() {
+        return groupMessage;
+    }
+
+    public void setGroupMessage(boolean groupMessage) {
+        this.groupMessage = groupMessage;
     }
 
     public boolean isAttachment() {

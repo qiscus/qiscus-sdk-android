@@ -40,6 +40,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -127,8 +128,8 @@ public enum QiscusApi {
                 });
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(List<String> withEmails, String distinctId, String options) {
-        return api.createOrGetChatRoom(Qiscus.getToken(), withEmails, distinctId, options)
+    public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, String options) {
+        return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId, options)
                 .onErrorReturn(throwable -> null)
                 .map(jsonElement -> {
                     QiscusChatRoom qiscusChatRoom;
@@ -138,6 +139,7 @@ public enum QiscusApi {
                         qiscusChatRoom = new QiscusChatRoom();
                         qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
                         qiscusChatRoom.setDistinctId(distinctId == null ? "default" : distinctId);
+                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
@@ -171,7 +173,7 @@ public enum QiscusApi {
 
                         return qiscusChatRoom;
                     }
-                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(withEmails.get(0),
+                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(withEmail,
                             distinctId == null ? "default" : distinctId);
                     if (qiscusChatRoom == null) {
                         throw new RuntimeException("Unable to connect with qiscus server!");
@@ -192,6 +194,7 @@ public enum QiscusApi {
                         qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
                         //TODO minta server ngasih tau distinctId biar bisa disimpen
                         //qiscusChatRoom.setDistinctId("default");
+                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());

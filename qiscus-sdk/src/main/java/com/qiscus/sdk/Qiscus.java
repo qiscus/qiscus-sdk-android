@@ -38,10 +38,6 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -115,6 +111,7 @@ public class Qiscus {
 
         QiscusPusherApi.getInstance();
         APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
+        QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
     }
 
     /**
@@ -417,24 +414,12 @@ public class Qiscus {
     }
 
     public static class ChatBuilder {
-        private Set<String> emails;
+        private String email;
         private String distinctId;
         private String options;
 
         private ChatBuilder(String email) {
-            emails = new HashSet<>();
-            emails.add(email);
-        }
-
-        /**
-         * Add more qiscus user email to the chat room. For group chat.
-         *
-         * @param email Qiscus user email
-         * @return builder
-         */
-        public ChatBuilder addEmail(String email) {
-            emails.add(email);
-            return this;
+            this.email = email;
         }
 
         /**
@@ -477,7 +462,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails), distinctId, options)
+                    .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -499,28 +484,16 @@ public class Qiscus {
     }
 
     public static class ChatActivityBuilder {
-        private Set<String> emails;
+        private String email;
         private String title;
         private String subtitle;
         private String distinctId;
         private String options;
 
         private ChatActivityBuilder(String email) {
-            emails = new HashSet<>();
             title = "Chat";
             subtitle = "";
-            emails.add(email);
-        }
-
-        /**
-         * Add more qiscus user email to the chat room. For group chat.
-         *
-         * @param email Qiscus user email
-         * @return builder
-         */
-        public ChatActivityBuilder addEmail(String email) {
-            emails.add(email);
-            return this;
+            this.email = email;
         }
 
         /**
@@ -587,7 +560,7 @@ public class Qiscus {
          */
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails), distinctId, options)
+                    .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> {
                         qiscusChatRoom.setName(title);
                         qiscusChatRoom.setSubtitle(subtitle);
@@ -614,24 +587,12 @@ public class Qiscus {
     }
 
     public static class ChatFragmentBuilder {
-        private Set<String> emails;
+        private String email;
         private String distinctId;
         private String options;
 
         private ChatFragmentBuilder(String email) {
-            emails = new HashSet<>();
-            emails.add(email);
-        }
-
-        /**
-         * Add more qiscus user email to the chat room. For group chat.
-         *
-         * @param email Qiscus user email
-         * @return builder
-         */
-        public ChatFragmentBuilder addEmail(String email) {
-            emails.add(email);
-            return this;
+            this.email = email;
         }
 
         /**
@@ -674,7 +635,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(new ArrayList<>(emails), distinctId, options)
+                    .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(QiscusChatFragment::newInstance);
         }
