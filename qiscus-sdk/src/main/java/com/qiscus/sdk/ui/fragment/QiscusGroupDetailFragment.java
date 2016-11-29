@@ -33,6 +33,7 @@ import com.bumptech.glide.Glide;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.ui.view.QiscusGroupMemberView;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 public class QiscusGroupDetailFragment extends RxFragment {
@@ -112,8 +113,7 @@ public class QiscusGroupDetailFragment extends RxFragment {
         membersTitle.setText("Members (" + qiscusChatRoom.getMember().size() + ")");
 
         for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            View item = LayoutInflater.from(getActivity()).inflate(R.layout.item_qiscus_group_member, null);
-            memberContainer.addView(item);
+            memberContainer.addView(new QiscusGroupMemberView(getActivity(), member, v -> onMemberClicked(member)));
         }
     }
 
@@ -141,6 +141,10 @@ public class QiscusGroupDetailFragment extends RxFragment {
 
     private void addNewMember() {
         Toast.makeText(getActivity(), "Add", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onMemberClicked(QiscusRoomMember member) {
+        Toast.makeText(getActivity(), member.getUsername(), Toast.LENGTH_SHORT).show();
     }
 
     protected void leaveGroup() {
