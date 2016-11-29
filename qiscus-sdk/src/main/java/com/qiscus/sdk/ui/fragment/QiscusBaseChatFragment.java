@@ -330,6 +330,18 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     protected abstract Adapter onCreateChatAdapter();
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        QiscusCacheManager.getInstance().setLastChatActivity(true, qiscusChatRoom.getId());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
+    }
+
     protected void onItemCommentClick(QiscusComment qiscusComment) {
         if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
             if (qiscusComment.getType() == QiscusComment.Type.FILE
@@ -675,6 +687,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
         chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();

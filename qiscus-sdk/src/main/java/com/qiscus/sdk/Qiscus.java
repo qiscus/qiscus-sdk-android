@@ -109,6 +109,7 @@ public class Qiscus {
         HEART_BEAT = 5000;
 
         APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
+        QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
     }
 
     /**

@@ -25,6 +25,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.util.Pair;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 
@@ -118,8 +119,17 @@ public class QiscusPusherService extends Service {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(qiscusComment -> {
-                    if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
-                        showPushNotification(qiscusComment);
+                    if (Qiscus.getChatConfig().isEnablePushNotification()) {
+                        if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+                            if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
+                                Pair<Boolean, Integer> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
+                                if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
+                                    showPushNotification(qiscusComment);
+                                }
+                            } else {
+                                showPushNotification(qiscusComment);
+                            }
+                        }
                     }
                 }, Throwable::printStackTrace);
     }
