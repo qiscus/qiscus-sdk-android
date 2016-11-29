@@ -83,6 +83,8 @@ public class QiscusChatConfig {
                         throwable.printStackTrace();
                         Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     });
+    private boolean enablePushNotification = true;
+    private boolean onlyEnablePushNotificationOutsideChatRoom = false;
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
@@ -224,6 +226,16 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setEnablePushNotification(boolean enablePushNotification) {
+        this.enablePushNotification = enablePushNotification;
+        return this;
+    }
+
+    public QiscusChatConfig setOnlyEnablePushNotificationOutsideChatRoom(boolean onlyEnablePushNotificationOutsideChatRoom) {
+        this.onlyEnablePushNotificationOutsideChatRoom = onlyEnablePushNotificationOutsideChatRoom;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -355,5 +367,13 @@ public class QiscusChatConfig {
 
     public NotificationClickListener getNotificationClickListener() {
         return notificationClickListener;
+    }
+
+    public boolean isEnablePushNotification() {
+        return enablePushNotification;
+    }
+
+    public boolean isOnlyEnablePushNotificationOutsideChatRoom() {
+        return onlyEnablePushNotificationOutsideChatRoom;
     }
 }
