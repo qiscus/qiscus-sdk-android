@@ -140,6 +140,9 @@ public enum QiscusApi {
                         qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
                         qiscusChatRoom.setDistinctId(distinctId == null ? "default" : distinctId);
                         qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
+                        if (qiscusChatRoom.isGroup()) {
+                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+                        }
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
@@ -195,6 +198,9 @@ public enum QiscusApi {
                         //TODO minta server ngasih tau distinctId biar bisa disimpen
                         //qiscusChatRoom.setDistinctId("default");
                         qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
+                        if (qiscusChatRoom.isGroup()) {
+                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+                        }
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());

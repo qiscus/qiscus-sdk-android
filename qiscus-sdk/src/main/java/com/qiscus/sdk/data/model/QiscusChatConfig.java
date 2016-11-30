@@ -70,10 +70,14 @@ public class QiscusChatConfig {
                     .getChatRoom(qiscusComment.getRoomId())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(qiscusChatRoom -> qiscusChatRoom.setName(qiscusComment.getSender()))
+                    .doOnNext(qiscusChatRoom -> {
+                        if (!qiscusChatRoom.isGroup()) {
+                            qiscusChatRoom.setName(qiscusComment.getSender());
+                        }
+                    })
                     .map(qiscusChatRoom -> {
                         if (qiscusChatRoom.isGroup()) {
-                            QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom);
+                            return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom);
                         }
                         return QiscusChatActivity.generateIntent(context, qiscusChatRoom);
                     })

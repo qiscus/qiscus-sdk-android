@@ -32,6 +32,7 @@ import android.text.SpannableStringBuilder;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
 import com.qiscus.sdk.data.remote.QiscusApi;
@@ -111,6 +112,7 @@ public class QiscusPusherService extends Service {
                                 qiscusComment.setState(savedQiscusComment.getState());
                             }
                             Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                            qiscusComment.setRoomName("sync");
                             EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
                         }, Throwable::printStackTrace);
             }
@@ -122,16 +124,17 @@ public class QiscusPusherService extends Service {
     }
 
     private void showPushNotification(QiscusComment comment) {
-        if (!QiscusCacheManager.getInstance().addMessageNotifItem(new QiscusPushNotificationMessage(comment), comment.getRoomId())) {
+        String messageText = comment.isGroupMessage() ? comment.getSender().split(" ")[0] + ": " : "";
+        messageText += isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage();
+
+        if (!QiscusCacheManager.getInstance()
+                .addMessageNotifItem(new QiscusPushNotificationMessage(comment.getId(), messageText), comment.getRoomId())) {
             return;
         }
 
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        String messageText = comment.isGroupMessage() ? comment.getSender().split(" ")[0] + ": " : "";
-        messageText += isAttachment(comment.getMessage()) ? fileMessage : comment.getMessage();
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
@@ -148,7 +151,7 @@ public class QiscusPusherService extends Service {
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(comment.getRoomId());
         for (int i = notifItems.size() - 1; i >= 0; i--) {
-            QiscusPushNotificationMessage message  = notifItems.get(i);
+            QiscusPushNotificationMessage message = notifItems.get(i);
             if (isAttachment(message.getMessage())) {
                 inboxStyle.addLine(fileMessage);
             } else {
@@ -168,6 +171,16 @@ public class QiscusPusherService extends Service {
     @Subscribe
     public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
         QiscusComment qiscusComment = event.getQiscusComment();
+        if ("sync".equals(qiscusComment.getRoomName())) {
+            QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+            if (chatRoom == null) {
+                return;
+            }
+            if (chatRoom.isGroup()) {
+                qiscusComment.setGroupMessage(true);
+                qiscusComment.setRoomName(chatRoom.getName());
+            }
+        }
         if (Qiscus.getChatConfig().isEnablePushNotification()) {
             if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
                 if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
