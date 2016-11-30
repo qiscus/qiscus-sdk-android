@@ -635,6 +635,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         sqLiteDatabase.beginTransaction();
         try {
             sqLiteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, null, null);
+            sqLiteDatabase.delete(QiscusDb.MemberTable.TABLE_NAME, null, null);
             sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, null, null);
             sqLiteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, null, null);
             sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
