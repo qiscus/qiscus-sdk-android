@@ -182,9 +182,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             } finally {
                 sqLiteDatabase.endTransaction();
             }
-
-            addOrUpdate(qiscusRoomMember);
         }
+        addOrUpdate(qiscusRoomMember);
     }
 
     @Override
@@ -469,6 +468,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         if (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
             cursor.close();
             return qiscusComment;
         } else {
@@ -487,7 +491,13 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
-            qiscusComments.add(QiscusDb.CommentTable.parseCursor(cursor));
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
         }
         cursor.close();
         return qiscusComments;
@@ -512,7 +522,13 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
-            qiscusComments.add(QiscusDb.CommentTable.parseCursor(cursor));
+            QiscusComment comment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(comment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                comment.setSender(qiscusRoomMember.getUsername());
+                comment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(comment);
         }
         cursor.close();
         return qiscusComments;
@@ -537,6 +553,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
         }
         cursor.close();
         return qiscusComment;
@@ -553,6 +574,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
         }
         cursor.close();
         return qiscusComment;
@@ -571,6 +597,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
         }
         cursor.close();
         return qiscusComment;
@@ -589,6 +620,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
         }
         cursor.close();
         return qiscusComment;
