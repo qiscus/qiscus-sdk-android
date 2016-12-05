@@ -286,6 +286,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 showComments(comments);
             }
         }
+
+        if (commentSelectedListener != null) {
+            commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
+        }
     }
 
     protected QiscusChatConfig onLoadChatConfig() {
