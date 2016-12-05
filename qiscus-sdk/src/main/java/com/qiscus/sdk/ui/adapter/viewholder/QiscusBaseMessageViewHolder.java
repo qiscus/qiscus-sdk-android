@@ -148,7 +148,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
 
         showMessage(qiscusComment);
 
-        itemView.setBackground(qiscusComment.isSelected() ? selectionBackground : null);
+        onCommentSelected(qiscusComment);
     }
 
     protected abstract void showMessage(Data qiscusComment);
@@ -216,6 +216,10 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
                 dateView.setVisibility(View.GONE);
             }
         }
+    }
+
+    protected void onCommentSelected(Data qiscusComment) {
+        itemView.setBackground(qiscusComment.isSelected() ? selectionBackground : null);
     }
 
     @Override
