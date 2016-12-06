@@ -83,6 +83,7 @@ public class QiscusPusherService extends Service {
         }
 
         if (Qiscus.hasSetupUser()) {
+            QiscusPusherApi.getInstance().connect();
             scheduleSync(Qiscus.getHeartBeat());
         }
         return START_STICKY;
@@ -199,9 +200,11 @@ public class QiscusPusherService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
+                QiscusPusherApi.getInstance().connect();
                 scheduleSync(Qiscus.getHeartBeat());
                 break;
             case LOGOUT:
+                QiscusPusherApi.getInstance().disconnect();
                 stopSync();
                 break;
         }
@@ -209,8 +212,8 @@ public class QiscusPusherService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         EventBus.getDefault().unregister(this);
         sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
+        super.onDestroy();
     }
 }

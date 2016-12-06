@@ -85,7 +85,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         return INSTANCE;
     }
 
-    private void connect() {
+    public void connect() {
         if (!connecting) {
             connecting = true;
             qiscusAccount = Qiscus.getQiscusAccount();
@@ -103,7 +103,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         }
     }
 
-    private void disconnect() {
+    public void disconnect() {
         try {
             connecting = false;
             mqttAndroidClient.disconnect();
