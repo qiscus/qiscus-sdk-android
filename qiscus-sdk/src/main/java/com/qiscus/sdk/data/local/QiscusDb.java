@@ -26,11 +26,12 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 2;
+    static final int DATABASE_VERSION = 3;
 
     static abstract class RoomTable {
         static final String TABLE_NAME = "rooms";
         static final String COLUMN_ID = "id";
+        static final String COLUMN_TOPIC_ID = "last_topic";
         static final String COLUMN_DISTINCT_ID = "distinct_id";
         static final String COLUMN_NAME = "name";
         static final String COLUMN_SUBTITLE = "subtitle";
@@ -40,6 +41,7 @@ final class QiscusDb {
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         COLUMN_ID + " INTEGER," +
+                        COLUMN_TOPIC_ID + " INTEGER," +
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
                         COLUMN_NAME + " TEXT," +
                         COLUMN_SUBTITLE + " TEXT," +
@@ -50,6 +52,7 @@ final class QiscusDb {
         static ContentValues toContentValues(QiscusChatRoom qiscusChatRoom) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_ID, qiscusChatRoom.getId());
+            values.put(COLUMN_TOPIC_ID, qiscusChatRoom.getLastTopicId());
             values.put(COLUMN_DISTINCT_ID, qiscusChatRoom.getDistinctId());
             values.put(COLUMN_NAME, qiscusChatRoom.getName());
             values.put(COLUMN_SUBTITLE, qiscusChatRoom.getSubtitle());
@@ -61,6 +64,7 @@ final class QiscusDb {
         static QiscusChatRoom parseCursor(Cursor cursor) {
             QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
             qiscusChatRoom.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qiscusChatRoom.setLastTopicId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
             qiscusChatRoom.setDistinctId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DISTINCT_ID)));
             qiscusChatRoom.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
             qiscusChatRoom.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBTITLE)));
