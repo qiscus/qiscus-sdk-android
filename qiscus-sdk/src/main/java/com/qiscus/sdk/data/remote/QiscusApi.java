@@ -64,7 +64,6 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
@@ -277,10 +276,6 @@ public enum QiscusApi {
                 });
     }
 
-    public Observable<Void> markTopicAsRead(int topicId) {
-        return api.markTopicAsRead(topicId, Qiscus.getToken());
-    }
-
     public Observable<QiscusComment> sync() {
         QiscusComment latestComment = Qiscus.getDataStore().getLatestComment();
         if (latestComment == null || !"Today".equals(QiscusDateUtil.toTodayOrDate(latestComment.getTime()))) {
@@ -437,10 +432,6 @@ public enum QiscusApi {
                                             @Field("comment") String message,
                                             @Field("topic_id") int topicId,
                                             @Field("unique_temp_id") String uniqueId);
-
-        @GET("/api/v1/mobile/readnotif/{topic_id}")
-        Observable<Void> markTopicAsRead(@Path("topic_id") int topicId,
-                                         @Query("token") String token);
 
         @GET("/api/v2/mobile/sync")
         Observable<JsonElement> sync(@Query("token") String token,

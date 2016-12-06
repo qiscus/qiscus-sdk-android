@@ -222,14 +222,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     public void loadComments(int count) {
         view.showLoading();
-        Qiscus.getDataStore().getObservableComments(currentTopicId, count)
+        getCommentsFromNetwork(0)
+                .startWith(Qiscus.getDataStore().getObservableComments(currentTopicId, count))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .flatMap(comments -> isValidComments(comments) ? Observable.from(comments).toList() : getCommentsFromNetwork(0))
                 .subscribe(comments -> {
                     if (view != null) {
-                        markAsRead();
                         view.showComments(comments);
                         view.dismissLoading();
                     }
@@ -240,42 +239,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.dismissLoading();
                     }
                 });
-    }
-
-    private void markAsRead() {
-        QiscusApi.getInstance().markTopicAsRead(room.getLastTopicId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aVoid -> {
-                }, Throwable::printStackTrace);
-    }
-
-    private boolean isValidComments(List<QiscusComment> qiscusComments) {
-        boolean containsLastValidComment = false;
-        int size = qiscusComments.size();
-
-        if (size == 1) {
-            return qiscusComments.get(0).getId() == room.getLastCommentId();
-        }
-
-        if (size > 0 && size < 20 && qiscusComments.get(size - 1).getCommentBeforeId() != 0) {
-            return false;
-        }
-
-        for (int i = 0; i < size - 1; i++) {
-            if (qiscusComments.get(i).getId() == -1 || qiscusComments.get(i + 1).getId() == -1) {
-                return true;
-            }
-
-            if (!containsLastValidComment && qiscusComments.get(i).getId() == room.getLastCommentId()) {
-                containsLastValidComment = true;
-            }
-
-            if (qiscusComments.get(i).getCommentBeforeId() != qiscusComments.get(i + 1).getId()) {
-                return false;
-            }
-        }
-        return containsLastValidComment;
     }
 
     private boolean isValidOlderComments(List<QiscusComment> qiscusComments, QiscusComment lastQiscusComment) {
@@ -403,7 +366,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     @Override
     public void detachView() {
         super.detachView();
-        markAsRead();
         if (subscription != null) {
             subscription.unsubscribe();
         }
