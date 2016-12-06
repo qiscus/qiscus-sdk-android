@@ -413,11 +413,37 @@ public class Qiscus {
 
     public static class ChatBuilder {
         private String email;
+        private String title;
+        private String subtitle;
         private String distinctId;
         private String options;
 
         private ChatBuilder(String email) {
+            title = "Chat";
+            subtitle = "";
             this.email = email;
+        }
+
+        /**
+         * Set the title of of chat. Default id "Chat"
+         *
+         * @param title The title of chat room
+         * @return builder
+         */
+        public ChatBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        /**
+         * Set the subtitle of chat
+         *
+         * @param subtitle The subtitle of chat
+         * @return builder
+         */
+        public ChatBuilder withSubtitle(String subtitle) {
+            this.subtitle = subtitle;
+            return this;
         }
 
         /**
@@ -586,11 +612,37 @@ public class Qiscus {
 
     public static class ChatFragmentBuilder {
         private String email;
+        private String title;
+        private String subtitle;
         private String distinctId;
         private String options;
 
         private ChatFragmentBuilder(String email) {
+            title = "Chat";
+            subtitle = "";
             this.email = email;
+        }
+
+        /**
+         * Set the title of of chat. Default id "Chat"
+         *
+         * @param title The title of chat room
+         * @return builder
+         */
+        public ChatFragmentBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        /**
+         * Set the subtitle of chat
+         *
+         * @param subtitle The subtitle of chat
+         * @return builder
+         */
+        public ChatFragmentBuilder withSubtitle(String subtitle) {
+            this.subtitle = subtitle;
+            return this;
         }
 
         /**
