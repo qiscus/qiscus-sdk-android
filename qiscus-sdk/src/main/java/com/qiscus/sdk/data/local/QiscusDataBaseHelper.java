@@ -107,12 +107,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qiscusChatRoom.setMember(getRoomMembers(id));
             QiscusComment latestComment = getLatestComment(id);
-            qiscusChatRoom.setLastCommentId(latestComment.getId());
-            qiscusChatRoom.setLastCommentMessage(latestComment.getMessage());
-            qiscusChatRoom.setLastCommentSender(latestComment.getSender());
-            qiscusChatRoom.setLastCommentSenderEmail(latestComment.getSenderEmail());
-            qiscusChatRoom.setLastCommentTime(latestComment.getTime());
-            qiscusChatRoom.setLastTopicId(latestComment.getTopicId());
+            if (latestComment != null) {
+                qiscusChatRoom.setLastCommentId(latestComment.getId());
+                qiscusChatRoom.setLastCommentMessage(latestComment.getMessage());
+                qiscusChatRoom.setLastCommentSender(latestComment.getSender());
+                qiscusChatRoom.setLastCommentSenderEmail(latestComment.getSenderEmail());
+                qiscusChatRoom.setLastCommentTime(latestComment.getTime());
+                qiscusChatRoom.setLastTopicId(latestComment.getTopicId());
+            }
             cursor.close();
             return qiscusChatRoom;
         } else {
