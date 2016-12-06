@@ -16,9 +16,9 @@
 
 package com.qiscus.sdk.service;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -26,12 +26,12 @@ import com.qiscus.sdk.data.model.QiscusComment;
 /**
  * Created by zetra. on 9/8/16.
  */
-public class QiscusPusherReceiver extends BroadcastReceiver {
+public class QiscusPusherReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)
                 || intent.getAction().equals("com.qiscus.START_SERVICE")) {
-            context.startService(new Intent(context, QiscusPusherService.class));
+            startWakefulService(context, new Intent(context, QiscusPusherService.class));
         } else if (intent.getAction().equals("com.qiscus.OPEN_COMMENT_PN")) {
             QiscusComment comment = intent.getParcelableExtra("data");
             Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
