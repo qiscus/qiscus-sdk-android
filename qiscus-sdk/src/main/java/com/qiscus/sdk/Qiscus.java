@@ -489,6 +489,10 @@ public class Qiscus {
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
+                    .doOnNext(qiscusChatRoom -> {
+                        qiscusChatRoom.setName(title);
+                        qiscusChatRoom.setSubtitle(subtitle);
+                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -688,6 +692,10 @@ public class Qiscus {
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
+                    .doOnNext(qiscusChatRoom -> {
+                        qiscusChatRoom.setName(title);
+                        qiscusChatRoom.setSubtitle(subtitle);
+                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(QiscusChatFragment::newInstance);
         }
