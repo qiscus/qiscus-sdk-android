@@ -229,7 +229,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .compose(bindToLifecycle())
                 .subscribe(comments -> {
                     if (view != null) {
-                        markAsRead();
                         view.showComments(comments);
                         view.dismissLoading();
                     }
@@ -240,14 +239,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.dismissLoading();
                     }
                 });
-    }
-
-    private void markAsRead() {
-        QiscusApi.getInstance().markTopicAsRead(room.getLastTopicId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aVoid -> {
-                }, Throwable::printStackTrace);
     }
 
     private boolean isValidOlderComments(List<QiscusComment> qiscusComments, QiscusComment lastQiscusComment) {
@@ -375,7 +366,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     @Override
     public void detachView() {
         super.detachView();
-        markAsRead();
         if (subscription != null) {
             subscription.unsubscribe();
         }
