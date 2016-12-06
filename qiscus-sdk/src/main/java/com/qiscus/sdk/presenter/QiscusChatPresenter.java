@@ -444,16 +444,27 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 case DELIVERED:
                     QiscusComment deliveredComment = Qiscus.getDataStore()
                             .getComment(event.getCommentId(), event.getCommentUniqueId());
-                    deliveredComment.setId(event.getCommentId());
-                    updateCommentState(deliveredComment, QiscusComment.STATE_DELIVERED);
-                    updateLastDeliveredComment(deliveredComment);
+                    if (deliveredComment != null) {
+                        deliveredComment.setId(event.getCommentId());
+                        updateCommentState(deliveredComment, QiscusComment.STATE_DELIVERED);
+                        updateLastDeliveredComment(deliveredComment);
+                    } else {
+                        lastDeliveredCommentId = event.getCommentId();
+                        view.updateLastDeliveredComment(lastDeliveredCommentId);
+                    }
                     break;
                 case READ:
                     QiscusComment readComment = Qiscus.getDataStore()
                             .getComment(event.getCommentId(), String.valueOf(event.getCommentId()));
-                    readComment.setId(event.getCommentId());
-                    updateCommentState(readComment, QiscusComment.STATE_READ);
-                    updateLastReadComment(readComment);
+                    if (readComment != null) {
+                        readComment.setId(event.getCommentId());
+                        updateCommentState(readComment, QiscusComment.STATE_READ);
+                        updateLastReadComment(readComment);
+                    } else {
+                        lastReadCommentId = event.getCommentId();
+                        lastDeliveredCommentId = lastReadCommentId;
+                        view.updateLastReadComment(lastReadCommentId);
+                    }
                     break;
             }
         }
