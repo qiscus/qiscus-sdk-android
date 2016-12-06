@@ -18,8 +18,6 @@ package com.qiscus.sdk.ui.fragment;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -121,6 +119,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected LinearLayoutManager chatLayoutManager;
     private QiscusAccount qiscusAccount;
     private boolean fieldMessageEmpty = true;
+    private CommentSelectedListener commentSelectedListener;
 
     @Nullable
     @Override
@@ -238,6 +237,15 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected abstract QiscusAudioRecorderView getRecordAudioPanel(View view);
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity activity = getActivity();
+        if (activity instanceof CommentSelectedListener) {
+            commentSelectedListener = (CommentSelectedListener) activity;
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         requestPermissions();
@@ -277,6 +285,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             } else {
                 showComments(comments);
             }
+        }
+
+        if (commentSelectedListener != null) {
+            commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
         }
     }
 
@@ -343,14 +355,18 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
-        if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
-            if (qiscusComment.getType() == QiscusComment.Type.FILE
-                    || qiscusComment.getType() == QiscusComment.Type.IMAGE
-                    || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
-                qiscusChatPresenter.downloadFile(qiscusComment);
+        if (chatAdapter.getSelectedComments().isEmpty()) {
+            if (qiscusComment.getState() == QiscusComment.STATE_ON_QISCUS || qiscusComment.getState() == QiscusComment.STATE_ON_PUSHER) {
+                if (qiscusComment.getType() == QiscusComment.Type.FILE
+                        || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                        || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
+                    qiscusChatPresenter.downloadFile(qiscusComment);
+                }
+            } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+                showFailedCommentDialog(qiscusComment);
             }
-        } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
-            showFailedCommentDialog(qiscusComment);
+        } else {
+            toggleSelectComment(qiscusComment);
         }
     }
 
@@ -370,12 +386,25 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     protected void onItemCommentLongClick(QiscusComment qiscusComment) {
-        if (qiscusComment.getType() == QiscusComment.Type.TEXT) {
-            ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(getString(R.string.chat_activity_label_clipboard), qiscusComment.getMessage());
-            clipboard.setPrimaryClip(clip);
-            Toast.makeText(getActivity(), getString(R.string.chat_activity_copied_message), Toast.LENGTH_SHORT).show();
+        if (chatAdapter.getSelectedComments().isEmpty()) {
+            toggleSelectComment(qiscusComment);
         }
+    }
+
+    protected void toggleSelectComment(QiscusComment qiscusComment) {
+        qiscusComment.setSelected(!qiscusComment.isSelected());
+        refreshComment(qiscusComment);
+        if (commentSelectedListener != null) {
+            commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
+        }
+    }
+
+    public List<QiscusComment> getSelectedComments() {
+        return chatAdapter.getSelectedComments();
+    }
+
+    public void clearSelectedComments() {
+        chatAdapter.clearSelectedComments();
     }
 
     protected void onMessageEditTextChanged(CharSequence message) {
@@ -731,5 +760,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         EasyPermissions.checkDeniedPermissionsNeverAskAgain(this, "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
+    }
+
+    public interface CommentSelectedListener {
+        void onCommentSelected(List<QiscusComment> selectedComments);
     }
 }

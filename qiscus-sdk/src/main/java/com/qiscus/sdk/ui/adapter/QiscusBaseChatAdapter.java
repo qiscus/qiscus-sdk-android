@@ -30,6 +30,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -255,6 +256,27 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         }
 
         return -1;
+    }
+
+    public List<Item> getSelectedComments() {
+        List<Item> selectedComments = new ArrayList<>();
+        int size = data.size();
+        for (int i = size - 1; i >= 0; i--) {
+            if (data.get(i).isSelected()) {
+                selectedComments.add(data.get(i));
+            }
+        }
+        return selectedComments;
+    }
+
+    public void clearSelectedComments() {
+        int size = data.size();
+        for (int i = size - 1; i >= 0; i--) {
+            if (data.get(i).isSelected()) {
+                data.get(i).setSelected(false);
+            }
+        }
+        notifyDataSetChanged();
     }
 
     public void detachView() {

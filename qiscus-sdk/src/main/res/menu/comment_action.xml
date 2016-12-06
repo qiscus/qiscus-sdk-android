@@ -15,15 +15,21 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <style name="QiscusTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/qiscus_primary</item>
-        <item name="colorPrimaryDark">@color/qiscus_primary_dark</item>
-        <item name="colorAccent">@color/qiscus_accent</item>
-        <item name="colorControlNormal">@color/qiscus_divider</item>
-        <item name="colorControlActivated">@color/qiscus_accent</item>
-        <item name="colorControlHighlight">@color/qiscus_accent</item>
-        <item name="actionModeBackground">@color/qiscus_primary</item>
-        <item name="windowActionModeOverlay">true</item>
-    </style>
-</resources>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_copy"
+        android:icon="@drawable/ic_qiscus_copy"
+        android:orderInCategory="100"
+        android:title="Copy"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_qiscus_share"
+        android:orderInCategory="100"
+        android:title="Share"
+        app:showAsAction="always"/>
+
+</menu>
