@@ -484,7 +484,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Override
     public void showComments(List<QiscusComment> qiscusComments) {
-        chatAdapter.refreshWithData(qiscusComments);
+        if (!qiscusComments.isEmpty()) {
+            chatAdapter.addOrUpdate(qiscusComments);
+        }
         if (chatAdapter.isEmpty() && qiscusComments.isEmpty()) {
             if (emptyChatHolder != null) {
                 emptyChatHolder.setVisibility(View.VISIBLE);

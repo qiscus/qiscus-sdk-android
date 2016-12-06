@@ -248,9 +248,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .toSortedList(commentComparator);
     }
 
-    public void loadComments(int count) {
-        view.showLoading();
-        Qiscus.getDataStore().getObservableComments(currentTopicId, 2 * count)
+    private Observable<List<QiscusComment>> getLocalComments(int count) {
+        return Qiscus.getDataStore().getObservableComments(currentTopicId, 2 * count)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
@@ -279,17 +278,16 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             Qiscus.getDataStore().addOrUpdate(qiscusComment);
                         }
                     }
-                })
-                .flatMap(comments -> isValidComments(comments) ?
-                        Observable.from(comments).toSortedList(commentComparator) :
-                        getCommentsFromNetwork(0).map(comments1 -> {
-                            for (QiscusComment localComment : comments) {
-                                if (localComment.getState() <= QiscusComment.STATE_SENDING) {
-                                    comments1.add(localComment);
-                                }
-                            }
-                            return comments1;
-                        }))
+                });
+    }
+
+    public void loadComments(int count) {
+        view.showLoading();
+        getCommentsFromNetwork(0)
+                .startWith(getLocalComments(count))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
                 .subscribe(comments -> {
                     if (view != null) {
                         if (!comments.isEmpty()) {
@@ -319,35 +317,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             }
         }
         return comments;
-    }
-
-    private boolean isValidComments(List<QiscusComment> qiscusComments) {
-        qiscusComments = cleanFailedComments(qiscusComments);
-        boolean containsLastValidComment = room.getLastCommentId() == -1;
-        int size = qiscusComments.size();
-
-        if (size == 1) {
-            return qiscusComments.get(0).getId() == room.getLastCommentId();
-        }
-
-        if (size > 0 && size < 20 && qiscusComments.get(size - 1).getCommentBeforeId() != 0) {
-            return false;
-        }
-
-        for (int i = 0; i < size - 1; i++) {
-            if (qiscusComments.get(i).getId() == -1 || qiscusComments.get(i + 1).getId() == -1) {
-                return true;
-            }
-
-            if (!containsLastValidComment && qiscusComments.get(i).getId() == room.getLastCommentId()) {
-                containsLastValidComment = true;
-            }
-
-            if (qiscusComments.get(i).getCommentBeforeId() != qiscusComments.get(i + 1).getId()) {
-                return false;
-            }
-        }
-        return containsLastValidComment;
     }
 
     private boolean isValidOlderComments(List<QiscusComment> qiscusComments, QiscusComment lastQiscusComment) {
