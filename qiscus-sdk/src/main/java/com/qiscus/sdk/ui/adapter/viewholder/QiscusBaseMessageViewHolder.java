@@ -17,6 +17,7 @@
 package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -73,6 +74,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected int failedToSendMessageColor;
     protected int readIconColor;
     protected int dateColor;
+    protected Drawable selectionBackground;
 
     public QiscusBaseMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView);
@@ -108,6 +110,8 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         failedToSendMessageColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getFailedToSendMessageColor());
         readIconColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getReadIconColor());
         dateColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getDateColor());
+        selectionBackground = new ColorDrawable(leftBubbleColor);
+        selectionBackground.setAlpha(51);
     }
 
     @Nullable
@@ -166,6 +170,8 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         showSenderName(qiscusComment);
 
         showMessage(qiscusComment);
+
+        onCommentSelected(qiscusComment);
     }
 
     private void showSenderName(Data qiscusComment) {
@@ -279,6 +285,10 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
                 dateView.setVisibility(View.GONE);
             }
         }
+    }
+
+    protected void onCommentSelected(Data qiscusComment) {
+        itemView.setBackground(qiscusComment.isSelected() ? selectionBackground : null);
     }
 
     @Override

@@ -123,16 +123,11 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
         }
     }
 
-    @Override
-    public void onClick(View v) {
-
-    }
-
     protected void playAudio(QiscusComment qiscusComment) {
         if (qiscusComment.getAudioDuration() > 0) {
             qiscusComment.playAudio();
         } else {
-            super.onClick(messageBubbleView);
+            onClick(messageBubbleView);
         }
     }
 

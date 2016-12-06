@@ -553,7 +553,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.showError("Failed to download file!");
                     });
         } else {
-            view.onFileDownloaded(file, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
+            if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
+                qiscusComment.playAudio();
+            } else {
+                view.onFileDownloaded(file, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
+            }
         }
     }
 

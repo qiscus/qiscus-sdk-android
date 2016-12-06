@@ -62,6 +62,7 @@ public class QiscusComment implements Parcelable {
     protected int state;
     protected String roomName;
     protected boolean groupMessage;
+    protected boolean selected;
     protected boolean downloading;
     protected int progress;
     protected ProgressListener progressListener;
@@ -106,6 +107,7 @@ public class QiscusComment implements Parcelable {
         senderAvatar = in.readString();
         time = new Date(in.readLong());
         state = in.readInt();
+        selected = in.readByte() != 0;
     }
 
     public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
@@ -222,6 +224,14 @@ public class QiscusComment implements Parcelable {
 
     public void setGroupMessage(boolean groupMessage) {
         this.groupMessage = groupMessage;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public boolean isAttachment() {
@@ -476,6 +486,7 @@ public class QiscusComment implements Parcelable {
         dest.writeString(senderAvatar);
         dest.writeLong(time.getTime());
         dest.writeInt(state);
+        dest.writeByte((byte) (selected ? 1 : 0));
     }
 
     public enum Type {
