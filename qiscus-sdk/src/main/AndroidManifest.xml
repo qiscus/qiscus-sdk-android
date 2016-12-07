@@ -51,11 +51,18 @@
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
 
         <receiver
-            android:name=".service.QiscusPusherReceiver"
-            android:exported="false">
+            android:name=".service.QiscusStartReceiver"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="com.qiscus.START_SERVICE"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".service.QiscusPusherReceiver"
+            android:exported="false">
+            <intent-filter>
                 <action android:name="com.qiscus.OPEN_COMMENT_PN"/>
             </intent-filter>
         </receiver>

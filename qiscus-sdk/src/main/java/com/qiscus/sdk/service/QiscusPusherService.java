@@ -28,6 +28,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.util.Pair;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
@@ -59,6 +60,7 @@ import rx.schedulers.Schedulers;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusPusherService extends Service {
+    private static final String TAG = QiscusPusherService.class.getSimpleName();
     private static SpannableStringBuilder fileMessage;
 
     static {
@@ -70,14 +72,9 @@ public class QiscusPusherService extends Service {
     private Timer timer;
     private QiscusAccount qiscusAccount;
 
-    @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public void onCreate() {
+        Log.i(TAG, "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
@@ -86,6 +83,16 @@ public class QiscusPusherService extends Service {
             QiscusPusherApi.getInstance().connect();
             scheduleSync(Qiscus.getHeartBeat());
         }
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
     }
 
@@ -212,8 +219,9 @@ public class QiscusPusherService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "Destroying...");
         EventBus.getDefault().unregister(this);
         sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
-        super.onDestroy();
+        stopSync();
     }
 }

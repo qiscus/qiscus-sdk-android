@@ -21,15 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 
-/**
- * Created by zetra. on 9/8/16.
- */
-public class QiscusPusherReceiver extends BroadcastReceiver {
+public class QiscusStartReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
-        QiscusComment comment = intent.getParcelableExtra("data");
-        Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
+        QiscusAndroidUtil.runOnUIThread(Qiscus::startPusherService);
     }
 }

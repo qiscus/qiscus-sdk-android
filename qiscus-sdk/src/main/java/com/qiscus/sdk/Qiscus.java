@@ -49,6 +49,7 @@ import rx.schedulers.Schedulers;
 public class Qiscus {
 
     private static Application APP_INSTANCE;
+    private static volatile Context APPLICATION_CONTEXT;
     private static volatile Handler APP_HANDLER;
     private static LocalDataManager LOCAL_DATA_MANAGER;
     private static QiscusDataStore DATA_STORE;
@@ -103,15 +104,20 @@ public class Qiscus {
     public static void initWithCustomServer(Application application, String serverBaseUrl) {
         APP_INSTANCE = application;
         APP_SERVER = serverBaseUrl;
-        APP_HANDLER = new Handler(APP_INSTANCE.getMainLooper());
+        APPLICATION_CONTEXT = APP_INSTANCE.getApplicationContext();
+        APP_HANDLER = new Handler(APPLICATION_CONTEXT.getMainLooper());
         LOCAL_DATA_MANAGER = new LocalDataManager();
         DATA_STORE = new QiscusDataBaseHelper();
         CHAT_CONFIG = new QiscusChatConfig();
         HEART_BEAT = 5000;
 
         QiscusPusherApi.getInstance();
-        APP_INSTANCE.startService(new Intent(APP_INSTANCE, QiscusPusherService.class));
+        startPusherService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
+    }
+
+    public static void startPusherService() {
+        APPLICATION_CONTEXT.startService(new Intent(APPLICATION_CONTEXT, QiscusPusherService.class));
     }
 
     /**
