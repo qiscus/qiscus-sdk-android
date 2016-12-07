@@ -18,6 +18,7 @@ package com.qiscus.sdk.data.remote;
 
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -57,12 +58,14 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     private final MqttAndroidClient mqttAndroidClient;
     private QiscusAccount qiscusAccount;
     private final Handler handler;
+    private Runnable fallbackConnect = this::connect;
     private Runnable fallBackListenComment = this::listenComment;
     private Runnable fallBackListenRoom;
     private Runnable fallBackListenUserStatus;
     private boolean connecting;
 
     QiscusPusherApi() {
+        Log.i("QiscusPusherApi", "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
@@ -87,10 +90,11 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     public void connect() {
         if (!connecting) {
+            Log.i(TAG, "Connecting...");
             connecting = true;
             qiscusAccount = Qiscus.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-            mqttConnectOptions.setAutomaticReconnect(true);
+            mqttConnectOptions.setAutomaticReconnect(false);
             mqttConnectOptions.setCleanSession(false);
             mqttConnectOptions.setWill("u/" + qiscusAccount.getEmail()
                     + "/s", ("0:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis())
@@ -113,17 +117,20 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     }
 
     private void listenComment() {
+        Log.i(TAG, "Listening comment...");
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
         } catch (MqttException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
+            Log.e(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
             connect();
             handler.postDelayed(fallBackListenComment, RETRY_PERIOD);
         }
     }
 
     public void listenRoom(QiscusChatRoom qiscusChatRoom) {
+        Log.i(TAG, "Listening room...");
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
         try {
             int roomId = qiscusChatRoom.getId();
@@ -133,6 +140,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         } catch (MqttException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
+            Log.e(TAG, "Failure listen room, try again in " + RETRY_PERIOD + " ms");
             connect();
             handler.postDelayed(fallBackListenRoom, RETRY_PERIOD);
         }
@@ -234,10 +242,12 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     @Override
     public void connectionLost(Throwable cause) {
+        Log.e(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD + " ms");
         connecting = false;
         if (cause != null) {
             cause.printStackTrace();
         }
+        handler.postDelayed(fallbackConnect, RETRY_PERIOD);
     }
 
     @Override
@@ -305,6 +315,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     @Override
     public void onSuccess(IMqttToken asyncActionToken) {
+        Log.i(TAG, "Connected...");
         connecting = false;
         DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
         disconnectedBufferOptions.setBufferEnabled(true);
@@ -324,10 +335,12 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     @Override
     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+        Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD + " ms");
         if (exception != null) {
             exception.printStackTrace();
         }
         connecting = false;
+        handler.postDelayed(fallbackConnect, RETRY_PERIOD);
     }
 
     @Subscribe
