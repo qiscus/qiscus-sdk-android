@@ -346,6 +346,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onResume() {
         super.onResume();
+        onClearNotification();
         QiscusCacheManager.getInstance().setLastChatActivity(true, qiscusChatRoom.getId());
     }
 
