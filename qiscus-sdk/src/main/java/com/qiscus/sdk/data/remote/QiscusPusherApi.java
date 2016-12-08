@@ -89,7 +89,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     }
 
     public void connect() {
-        if (!connecting) {
+        if (Qiscus.hasSetupUser() && !connecting) {
             Log.i(TAG, "Connecting...");
             connecting = true;
             qiscusAccount = Qiscus.getQiscusAccount();

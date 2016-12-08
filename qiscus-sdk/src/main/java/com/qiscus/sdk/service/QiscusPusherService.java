@@ -211,7 +211,6 @@ public class QiscusPusherService extends Service {
                 scheduleSync(Qiscus.getHeartBeat());
                 break;
             case LOGOUT:
-                QiscusPusherApi.getInstance().disconnect();
                 stopSync();
                 break;
         }
