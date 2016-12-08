@@ -438,6 +438,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         }
     }
 
+    protected void sendFile(File file) {
+        qiscusChatPresenter.sendFile(file);
+    }
+
     protected void addImage() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
@@ -662,7 +666,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 return;
             }
             try {
-                qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
+                sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
                 showError(getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
@@ -673,14 +677,14 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 return;
             }
             try {
-                qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
+                sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
                 showError(getString(R.string.chat_error_failed_read_file));
                 e.printStackTrace();
             }
         } else if (requestCode == TAKE_PICTURE_REQUEST && resultCode == Activity.RESULT_OK) {
             try {
-                qiscusChatPresenter.sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
+                sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
             } catch (Exception e) {
                 showError(getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
@@ -705,7 +709,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Override
     public void onStopRecord(File audioFile) {
-        qiscusChatPresenter.sendFile(audioFile);
+        sendFile(audioFile);
         onCancelRecord();
     }
 
