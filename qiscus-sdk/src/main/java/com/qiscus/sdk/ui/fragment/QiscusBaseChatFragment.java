@@ -330,6 +330,12 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         if (addFileButton != null) {
             addFileButton.setImageResource(chatConfig.getAddFileIcon());
         }
+        if (recordAudioButton != null) {
+            recordAudioButton.setImageResource(chatConfig.getRecordAudioIcon());
+        }
+        if (recordAudioPanel != null) {
+            recordAudioPanel.setButtonCancelRecord(chatConfig.getCancelRecordIcon());
+        }
     }
 
     protected Animation onLoadAnimation() {
@@ -433,6 +439,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             qiscusChatPresenter.sendComment(message);
             messageEditText.setText("");
         }
+    }
+
+    protected void sendFile(File file) {
+        qiscusChatPresenter.sendFile(file);
     }
 
     protected void addImage() {
@@ -669,7 +679,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 return;
             }
             try {
-                qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
+                sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
                 showError(getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
@@ -680,14 +690,14 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 return;
             }
             try {
-                qiscusChatPresenter.sendFile(QiscusFileUtil.from(data.getData()));
+                sendFile(QiscusFileUtil.from(data.getData()));
             } catch (IOException e) {
                 showError(getString(R.string.chat_error_failed_read_file));
                 e.printStackTrace();
             }
         } else if (requestCode == TAKE_PICTURE_REQUEST && resultCode == Activity.RESULT_OK) {
             try {
-                qiscusChatPresenter.sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
+                sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
             } catch (Exception e) {
                 showError(getString(R.string.chat_error_failed_read_picture));
                 e.printStackTrace();
@@ -712,7 +722,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Override
     public void onStopRecord(File audioFile) {
-        qiscusChatPresenter.sendFile(audioFile);
+        sendFile(audioFile);
         onCancelRecord();
     }
 

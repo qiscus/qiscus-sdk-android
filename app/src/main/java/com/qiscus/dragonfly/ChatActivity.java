@@ -16,95 +16,68 @@
 
 package com.qiscus.dragonfly;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.ui.QiscusBaseChatActivity;
+import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
+import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import java.util.Date;
 
 /**
  * Created by zetra. on 9/19/16.
  */
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends QiscusBaseChatActivity {
+    private TextView title;
 
-    private ProgressDialog progressDialog;
-
-    public static Intent generateIntent(Context context, boolean simpleCustom) {
+    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom, boolean simpleCustom) {
         Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra("simple_custom", simpleCustom);
         return intent;
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+    protected void onSetStatusBarColor() {
 
-        if (getIntent().getBooleanExtra("simple_custom", false)) {
-            openSimpleCustom();
-        } else {
-            openQiscusFragment();
-        }
     }
 
-    private void openQiscusFragment() {
-        showLoading();
-        Qiscus.buildChatFragmentWith("rya.meyvriska24@gmail.com")
-                .build()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(qiscusChatFragment -> {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, qiscusChatFragment)
-                            .commit();
-                    dismissLoading();
-                }, throwable -> {
-                    throwable.printStackTrace();
-                    showError(throwable.getMessage());
-                    dismissLoading();
-                });
+    @Override
+    protected int getResourceLayout() {
+        return R.layout.activity_chat;
     }
 
-    private void openSimpleCustom() {
-        showLoading();
-        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
-                .build()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(SimpleCustomChatFragment::newInstance)
-                .subscribe(qiscusChatFragment -> {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, qiscusChatFragment)
-                            .commit();
-                    dismissLoading();
-                }, throwable -> {
-                    throwable.printStackTrace();
-                    showError(throwable.getMessage());
-                    dismissLoading();
-                });
+    @Override
+    protected void onLoadView() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        title = (TextView) findViewById(R.id.tv_title);
     }
 
-    public void showError(String errorMessage) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+    @Override
+    protected QiscusBaseChatFragment onCreateChatFragment() {
+        return getIntent().getBooleanExtra("simple_custom", false) ? SimpleCustomChatFragment.newInstance(qiscusChatRoom)
+                : QiscusChatFragment.newInstance(qiscusChatRoom);
     }
 
-    public void showLoading() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Please wait...");
-        }
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+    @Override
+    protected void onViewReady(Bundle savedInstanceState) {
+        super.onViewReady(savedInstanceState);
+        title.setText(qiscusChatRoom.getName());
     }
 
-    public void dismissLoading() {
-        progressDialog.dismiss();
+    @Override
+    public void onUserStatusChanged(String user, boolean online, Date lastActive) {
+
+    }
+
+    @Override
+    public void onUserTyping(String user, boolean typing) {
+
     }
 }

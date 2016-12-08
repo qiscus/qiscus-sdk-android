@@ -17,7 +17,6 @@
 package com.qiscus.dragonfly;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -86,15 +85,57 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChatFragment(View view) {
         //Start a sample activity with qiscus chat fragment, so you can customize the toolbar.
-        startActivity(ChatActivity.generateIntent(this, false));
+        showLoading();
+        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
+                .withTitle("Rya Meyvriska")
+                .build()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(qiscusChatRoom -> ChatActivity.generateIntent(this, qiscusChatRoom, false))
+                .subscribe(intent -> {
+                    startActivity(intent);
+                    dismissLoading();
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    showError(throwable.getMessage());
+                    dismissLoading();
+                });
     }
 
     public void openSimpleCustomChat(View view) {
-        startActivity(ChatActivity.generateIntent(this, true));
+        showLoading();
+        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
+                .withTitle("Rya Meyvriska")
+                .build()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(qiscusChatRoom -> ChatActivity.generateIntent(this, qiscusChatRoom, true))
+                .subscribe(intent -> {
+                    startActivity(intent);
+                    dismissLoading();
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    showError(throwable.getMessage());
+                    dismissLoading();
+                });
     }
 
     public void openAdvanceCustomChat(View view) {
-        startActivity(new Intent(this, CustomChatActivity.class));
+        showLoading();
+        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
+                .withTitle("Rya Meyvriska")
+                .build()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(qiscusChatRoom -> CustomChatActivity.generateIntent(this, qiscusChatRoom))
+                .subscribe(intent -> {
+                    startActivity(intent);
+                    dismissLoading();
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    showError(throwable.getMessage());
+                    dismissLoading();
+                });
     }
 
     public void buildRoom() {

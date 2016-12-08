@@ -47,7 +47,6 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
         super.onViewReady(savedInstanceState);
-        toolbar.setOnClickListener(v -> startActivity(QiscusGroupDetailActivity.generateIntent(this, qiscusChatRoom)));
         generateSubtitle();
         tvSubtitle.setText(subtitle);
         tvSubtitle.setVisibility(View.VISIBLE);
