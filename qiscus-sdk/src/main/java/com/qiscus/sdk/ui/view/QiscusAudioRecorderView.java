@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.support.annotation.DrawableRes;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -131,6 +132,10 @@ public class QiscusAudioRecorderView extends LinearLayout {
 
     public boolean isRecording() {
         return recorder.isRecording();
+    }
+
+    public void setButtonCancelRecord(@DrawableRes int icon) {
+        buttonCancelRecord.setImageResource(icon);
     }
 
     private Runnable timer = new Runnable() {

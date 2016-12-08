@@ -55,8 +55,12 @@ public class QiscusChatConfig {
     private int addPictureIcon = R.drawable.ic_qiscus_add_image;
     private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
     private int addFileIcon = R.drawable.ic_qiscus_add_file;
+    private int recordAudioIcon = R.drawable.ic_qiscus_add_audio;
+    private int cancelRecordIcon = R.drawable.ic_qiscus_cancel_record;
     private int sendActiveIcon = R.drawable.ic_qiscus_send_on;
     private int sendInactiveIcon = R.drawable.ic_qiscus_send_off;
+    private int playAudioIcon = R.drawable.ic_qiscus_play_audio;
+    private int pauseAudioIcon = R.drawable.ic_qiscus_pause_audio;
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
     private int notificationSmallIcon = R.drawable.ic_qiscus_notif_app;
     private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
@@ -191,6 +195,16 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setRecordAudioIcon(@DrawableRes int recordAudioIcon) {
+        this.recordAudioIcon = recordAudioIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setCancelRecordIcon(@DrawableRes int cancelRecordIcon) {
+        this.cancelRecordIcon = cancelRecordIcon;
+        return this;
+    }
+
     public QiscusChatConfig setSendActiveIcon(@DrawableRes int sendActiveIcon) {
         this.sendActiveIcon = sendActiveIcon;
         return this;
@@ -198,6 +212,16 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setSendInactiveIcon(@DrawableRes int sendInactiveIcon) {
         this.sendInactiveIcon = sendInactiveIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setPlayAudioIcon(@DrawableRes int playAudioIcon) {
+        this.playAudioIcon = playAudioIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setPauseAudioIcon(@DrawableRes int pauseAudioIcon) {
+        this.pauseAudioIcon = pauseAudioIcon;
         return this;
     }
 
@@ -337,6 +361,16 @@ public class QiscusChatConfig {
     }
 
     @DrawableRes
+    public int getRecordAudioIcon() {
+        return recordAudioIcon;
+    }
+
+    @DrawableRes
+    public int getCancelRecordIcon() {
+        return cancelRecordIcon;
+    }
+
+    @DrawableRes
     public int getSendActiveIcon() {
         return sendActiveIcon;
     }
@@ -344,6 +378,16 @@ public class QiscusChatConfig {
     @DrawableRes
     public int getSendInactiveIcon() {
         return sendInactiveIcon;
+    }
+
+    @DrawableRes
+    public int getPlayAudioIcon() {
+        return playAudioIcon;
+    }
+
+    @DrawableRes
+    public int getPauseAudioIcon() {
+        return pauseAudioIcon;
     }
 
     @ColorRes
