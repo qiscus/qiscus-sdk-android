@@ -36,7 +36,10 @@ import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
+import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
@@ -47,13 +50,15 @@ import java.util.List;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseChatActivity extends RxAppCompatActivity implements QiscusBaseChatFragment.CommentSelectedListener, ActionMode.Callback {
+public abstract class QiscusBaseChatActivity extends RxAppCompatActivity implements QiscusBaseChatFragment.CommentSelectedListener,
+        ActionMode.Callback, QiscusChatFragment.UserTypingListener, QiscusUserStatusPresenter.View {
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
 
     private ActionMode actionMode;
+    private QiscusUserStatusPresenter userStatusPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +67,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         onSetStatusBarColor();
         setContentView(getResourceLayout());
         onLoadView();
+        userStatusPresenter = new QiscusUserStatusPresenter(this);
         onViewReady(savedInstanceState);
     }
 
@@ -87,6 +93,12 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
+
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+            if (!member.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                userStatusPresenter.listenUser(member.getEmail());
+            }
+        }
 
         applyChatConfig();
 
@@ -207,5 +219,20 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         if (fragment != null) {
             fragment.clearSelectedComments();
         }
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+
+    }
+
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void dismissLoading() {
+
     }
 }
