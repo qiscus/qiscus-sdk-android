@@ -108,6 +108,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     }
 
     public void disconnect() {
+        setUserStatus("0:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis());
         try {
             connecting = false;
             mqttAndroidClient.disconnect();
