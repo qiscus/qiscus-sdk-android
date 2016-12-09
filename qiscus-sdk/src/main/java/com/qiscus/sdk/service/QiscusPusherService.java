@@ -80,7 +80,7 @@ public class QiscusPusherService extends Service {
         }
 
         if (Qiscus.hasSetupUser()) {
-            QiscusPusherApi.getInstance().connect();
+            QiscusPusherApi.getInstance().restartConnection();
             scheduleSync(Qiscus.getHeartBeat());
         }
     }
@@ -207,7 +207,7 @@ public class QiscusPusherService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusPusherApi.getInstance().connect();
+                QiscusPusherApi.getInstance().restartConnection();
                 scheduleSync(Qiscus.getHeartBeat());
                 break;
             case LOGOUT:
