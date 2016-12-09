@@ -91,6 +91,7 @@ public class QiscusLinkPreviewView extends LinearLayout {
     }
 
     public void bind(PreviewData previewData) {
+        this.previewData = previewData;
         if (previewData == null) {
             setVisibility(GONE);
         } else {
