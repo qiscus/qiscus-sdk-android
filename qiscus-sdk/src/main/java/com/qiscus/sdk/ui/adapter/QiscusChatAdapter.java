@@ -25,6 +25,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusAudioViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusFileViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusImageViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusLinkViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusTextViewHolder;
 
 /**
@@ -44,6 +45,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_FILE_OTHER = 6;
     private static final int TYPE_AUDIO_ME = 7;
     private static final int TYPE_AUDIO_OTHER = 8;
+    private static final int TYPE_LINK_ME = 9;
+    private static final int TYPE_LINK_OTHER = 10;
 
     public QiscusChatAdapter(Context context) {
         super(context);
@@ -59,6 +62,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
         switch (qiscusComment.getType()) {
             case TEXT:
                 return TYPE_MESSAGE_ME;
+            case LINK:
+                return TYPE_LINK_ME;
             case IMAGE:
                 return TYPE_IMAGE_ME;
             case AUDIO:
@@ -75,6 +80,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
         switch (qiscusComment.getType()) {
             case TEXT:
                 return TYPE_MESSAGE_OTHER;
+            case LINK:
+                return TYPE_LINK_OTHER;
             case IMAGE:
                 return TYPE_IMAGE_OTHER;
             case AUDIO:
@@ -93,6 +100,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_text_me;
             case TYPE_MESSAGE_OTHER:
                 return R.layout.item_qiscus_chat_text;
+            case TYPE_LINK_ME:
+                return R.layout.item_qiscus_chat_link_me;
+            case TYPE_LINK_OTHER:
+                return R.layout.item_qiscus_chat_link;
             case TYPE_IMAGE_ME:
                 return R.layout.item_qiscus_chat_img_me;
             case TYPE_IMAGE_OTHER:
@@ -116,6 +127,9 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case TYPE_MESSAGE_ME:
             case TYPE_MESSAGE_OTHER:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+            case TYPE_LINK_ME:
+            case TYPE_LINK_OTHER:
+                return new QiscusLinkViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_IMAGE_ME:
             case TYPE_IMAGE_OTHER:
                 return new QiscusImageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
