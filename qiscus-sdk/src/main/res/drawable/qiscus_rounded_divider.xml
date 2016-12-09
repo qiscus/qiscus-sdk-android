@@ -15,13 +15,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <declare-styleable name="QiscusAudioRecorderView">
-        <attr name="qrecord_cancelSrc" format="color|reference"/>
-        <attr name="qrecord_stopSrc" format="color|reference"/>
-    </declare-styleable>
-    <declare-styleable name="QiscusLinkPreviewView">
-        <attr name="qpreview_titleColor" format="color|reference"/>
-        <attr name="qpreview_descColor" format="color|reference"/>
-    </declare-styleable>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#51B6B6B6"/>
+    <corners android:radius="8dp"/>
+</shape>
