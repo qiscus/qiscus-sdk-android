@@ -24,15 +24,21 @@ import android.provider.Settings;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
+import com.schinizer.rxunfurl.model.PreviewData;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 18, 2016
@@ -58,12 +64,19 @@ public class QiscusComment implements Parcelable {
     protected String senderEmail;
     protected Date time;
     protected int state;
+
     protected boolean selected;
     protected boolean downloading;
     protected int progress;
+
+    private List<String> urls;
+    private PreviewData previewData;
+
     protected ProgressListener progressListener;
     protected DownloadingListener downloadingListener;
     protected PlayingAudioListener playingAudioListener;
+    protected LinkPreviewListener linkPreviewListener;
+
     private MediaObserver observer;
     private MediaPlayer player;
 
@@ -272,8 +285,44 @@ public class QiscusComment implements Parcelable {
         return false;
     }
 
+    private boolean containsUrl() {
+        if (urls == null) {
+            urls = QiscusAndroidUtil.extractUrl(message);
+        }
+        return !urls.isEmpty();
+    }
+
+    public List<String> getUrls() {
+        if (urls == null) {
+            urls = QiscusAndroidUtil.extractUrl(message);
+        }
+        return urls;
+    }
+
+    public void loadLinkPreviewData() {
+        if (getType() == Type.LINK) {
+            if (previewData != null) {
+                linkPreviewListener.onLinkPreviewReady(this, previewData);
+            } else {
+                QiscusUrlScraper.getInstance()
+                        .generatePreviewData(urls.get(0))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(previewData -> {
+                            this.previewData = previewData;
+                            if (linkPreviewListener != null) {
+                                linkPreviewListener.onLinkPreviewReady(this, previewData);
+                            }
+                        }, Throwable::printStackTrace);
+            }
+        }
+    }
+
     public Type getType() {
         if (!isAttachment()) {
+            if (containsUrl()) {
+                return Type.LINK;
+            }
             return Type.TEXT;
         } else if (isImage()) {
             return Type.IMAGE;
@@ -391,6 +440,10 @@ public class QiscusComment implements Parcelable {
         this.playingAudioListener = playingAudioListener;
     }
 
+    public void setLinkPreviewListener(LinkPreviewListener linkPreviewListener) {
+        this.linkPreviewListener = linkPreviewListener;
+    }
+
     public void destroy() {
         if (playingAudioListener != null) {
             playingAudioListener = null;
@@ -458,7 +511,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, AUDIO
+        TEXT, IMAGE, FILE, AUDIO, LINK
     }
 
     public interface ProgressListener {
@@ -475,6 +528,10 @@ public class QiscusComment implements Parcelable {
         void onPauseAudio(QiscusComment qiscusComment);
 
         void onStopAudio(QiscusComment qiscusComment);
+    }
+
+    public interface LinkPreviewListener {
+        void onLinkPreviewReady(QiscusComment qiscusComment, PreviewData previewData);
     }
 
     private class MediaObserver implements Runnable {
