@@ -88,4 +88,5 @@ dependencies {
     compile 'org.apmem.tools:layouts:1.10@aar'
     compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.schinizer:rxunfurl:0.2.0'
 }

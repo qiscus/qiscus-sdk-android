@@ -16,7 +16,14 @@
 
 package com.qiscus.sdk.util;
 
+import android.graphics.Color;
+import android.util.Patterns;
+
 import com.qiscus.sdk.Qiscus;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created on : May 31, 2016
@@ -27,6 +34,8 @@ import com.qiscus.sdk.Qiscus;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public final class QiscusAndroidUtil {
+
+    private static final Random random = new Random();
 
     private QiscusAndroidUtil() {
     }
@@ -49,5 +58,27 @@ public final class QiscusAndroidUtil {
 
     public static int compare(int x, int y) {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    }
+
+    public static boolean isUrl(String s) {
+        return Patterns.WEB_URL.matcher(s).matches();
+    }
+
+    public static List<String> extractUrl(String text) {
+        String[] strings = text.split(" ");
+        List<String> urls = new ArrayList<>();
+        for (String s : strings) {
+            if (isUrl(s)) {
+                if (!s.startsWith("http")) {
+                    s = "http://" + s;
+                }
+                urls.add(s);
+            }
+        }
+        return urls;
+    }
+
+    public static int getRandomColor() {
+        return Color.argb(100, random.nextInt(256), random.nextInt(256), random.nextInt(256));
     }
 }
