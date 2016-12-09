@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
@@ -40,7 +41,7 @@ import com.qiscus.sdk.ui.view.QiscusRecyclerView;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter> {
+public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter> {
 
     private ImageView attachButton;
     private LinearLayout addPanel;
@@ -171,8 +172,8 @@ public class CustomChatFragment extends QiscusBaseChatFragment<CustomChatAdapter
     }
 
     @Override
-    protected CustomChatAdapter onCreateChatAdapter() {
-        return new CustomChatAdapter(getActivity());
+    protected QiscusChatAdapter onCreateChatAdapter() {
+        return new QiscusChatAdapter(getActivity());
     }
 
     @Override
