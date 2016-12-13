@@ -40,6 +40,7 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -80,7 +81,7 @@ public class QiscusPusherService extends Service {
         }
 
         if (Qiscus.hasSetupUser()) {
-            QiscusPusherApi.getInstance().restartConnection();
+            QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync(Qiscus.getHeartBeat());
         }
     }
@@ -207,7 +208,7 @@ public class QiscusPusherService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusPusherApi.getInstance().restartConnection();
+                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                 scheduleSync(Qiscus.getHeartBeat());
                 break;
             case LOGOUT:
