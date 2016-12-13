@@ -96,7 +96,6 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     }
 
     private void buildClient() {
-        mqttAndroidClient = null;
         pendingTokens = new ArrayList<>();
         mqttAndroidClient = new MqttAndroidClient(Qiscus.getApps().getApplicationContext(), serverUri, clientId);
         mqttAndroidClient.setCallback(this);
