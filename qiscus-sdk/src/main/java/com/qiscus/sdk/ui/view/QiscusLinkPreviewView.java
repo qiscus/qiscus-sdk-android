@@ -134,4 +134,9 @@ public class QiscusLinkPreviewView extends LinearLayout {
             bind(previewData);
         }
     }
+
+    public void clearView() {
+        previewData = null;
+        bind(previewData);
+    }
 }
