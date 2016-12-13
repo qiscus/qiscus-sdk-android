@@ -170,7 +170,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             connecting = false;
             mqttAndroidClient.disconnect();
             mqttAndroidClient.close();
-        } catch (MqttException | NullPointerException e) {
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             e.printStackTrace();
         }
         stopFallbackChecker();
