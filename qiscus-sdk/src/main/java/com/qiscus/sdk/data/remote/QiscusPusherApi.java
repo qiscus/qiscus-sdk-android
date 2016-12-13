@@ -96,6 +96,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     }
 
     private void buildClient() {
+        mqttAndroidClient = null;
         pendingTokens = new ArrayList<>();
         mqttAndroidClient = new MqttAndroidClient(Qiscus.getApps().getApplicationContext(), serverUri, clientId);
         mqttAndroidClient.setCallback(this);
@@ -168,6 +169,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         try {
             connecting = false;
             mqttAndroidClient.disconnect();
+            mqttAndroidClient.close();
         } catch (MqttException | NullPointerException e) {
             e.printStackTrace();
         }
@@ -377,23 +379,28 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     @Override
     public void onSuccess(IMqttToken asyncActionToken) {
         Log.i(TAG, "Connected...");
-        connecting = false;
-        DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
-        disconnectedBufferOptions.setBufferEnabled(true);
-        disconnectedBufferOptions.setBufferSize(100);
-        disconnectedBufferOptions.setPersistBuffer(true);
-        disconnectedBufferOptions.setDeleteOldestMessages(true);
-        mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-        setUserStatus("1:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis());
-        listenComment();
-        if (fallBackListenRoom != null) {
-            handler.post(fallBackListenRoom);
+        try {
+            connecting = false;
+            DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
+            disconnectedBufferOptions.setBufferEnabled(true);
+            disconnectedBufferOptions.setBufferSize(100);
+            disconnectedBufferOptions.setPersistBuffer(true);
+            disconnectedBufferOptions.setDeleteOldestMessages(true);
+            mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+            setUserStatus("1:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis());
+            listenComment();
+            if (fallBackListenRoom != null) {
+                handler.post(fallBackListenRoom);
+            }
+            if (fallBackListenUserStatus != null) {
+                handler.post(fallBackListenUserStatus);
+            }
+            pendingTokens.clear();
+            startFallbackChecker(Qiscus.getHeartBeat());
+        } catch (NullPointerException ignored) {
+
         }
-        if (fallBackListenUserStatus != null) {
-            handler.post(fallBackListenUserStatus);
-        }
-        pendingTokens.clear();
-        startFallbackChecker(Qiscus.getHeartBeat());
+
     }
 
     @Override
@@ -409,9 +416,6 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     @Subscribe
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
-            case LOGIN:
-                connect();
-                break;
             case LOGOUT:
                 disconnect();
                 break;
