@@ -479,11 +479,18 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         if (qiscusComment.isAttachment()) {
-            if (QiscusFileUtil.isContains(qiscusComment.getTopicId(), qiscusComment.getAttachmentName())) {
-                Qiscus.getDataStore()
-                        .addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
-                                QiscusFileUtil.generateFilePath(qiscusComment.getAttachmentName(),
-                                        qiscusComment.getTopicId()));
+            String path = QiscusFileUtil.generateFilePath(qiscusComment.getAttachmentName(), qiscusComment.getTopicId());
+            boolean exist = QiscusFileUtil.isContains(path);
+            if (!exist) {
+                String message = qiscusComment.getMessage();
+                int fileNameEndIndex = message.lastIndexOf(" [/file]");
+                int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
+                String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
+                path = QiscusFileUtil.generateFilePath(fileName, qiscusComment.getTopicId());
+                exist = QiscusFileUtil.isContains(path);
+            }
+            if (exist) {
+                Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(), path);
             }
         }
 

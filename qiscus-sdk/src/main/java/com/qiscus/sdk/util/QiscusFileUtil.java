@@ -213,8 +213,8 @@ public final class QiscusFileUtil {
         return newFile;
     }
 
-    public static boolean isContains(int topicId, String fileName) {
-        File file = new File(Environment.getExternalStorageDirectory().getPath(), FILES_PATH + topicId + File.separator + fileName);
+    public static boolean isContains(String path) {
+        File file = new File(path);
         return file.exists();
     }
 
