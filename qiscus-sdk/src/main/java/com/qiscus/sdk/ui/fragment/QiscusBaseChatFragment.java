@@ -121,6 +121,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     private QiscusAccount qiscusAccount;
     private boolean fieldMessageEmpty = true;
     private CommentSelectedListener commentSelectedListener;
+    private RoomChangedListener roomChangedListener;
 
     @Nullable
     @Override
@@ -243,6 +244,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         Activity activity = getActivity();
         if (activity instanceof CommentSelectedListener) {
             commentSelectedListener = (CommentSelectedListener) activity;
+        }
+
+        if (activity instanceof RoomChangedListener) {
+            roomChangedListener = (RoomChangedListener) activity;
         }
     }
 
@@ -491,6 +496,15 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
                 recordAudioPanel.cancelRecord();
             }
         }
+    }
+
+    @Override
+    public void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments) {
+        this.qiscusChatRoom = qiscusChatRoom;
+        if (roomChangedListener != null) {
+            roomChangedListener.onRoomUpdated(qiscusChatRoom);
+        }
+        showComments(comments);
     }
 
     @Override
@@ -791,5 +805,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     public interface CommentSelectedListener {
         void onCommentSelected(List<QiscusComment> selectedComments);
+    }
+
+    public interface RoomChangedListener {
+        void onRoomUpdated(QiscusChatRoom qiscusChatRoom);
     }
 }

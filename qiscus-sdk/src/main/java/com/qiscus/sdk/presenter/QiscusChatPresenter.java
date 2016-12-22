@@ -17,6 +17,7 @@
 package com.qiscus.sdk.presenter;
 
 import android.net.Uri;
+import android.support.v4.util.Pair;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
@@ -36,6 +37,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -229,6 +231,32 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         view.onCommentDeleted(qiscusComment);
     }
 
+    private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
+        return QiscusApi.getInstance().getChatRoomComments(room, 40)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .doOnNext(roomData -> {
+                    for (QiscusComment qiscusComment : roomData.second){
+                        qiscusComment.setRoomId(room.getId());
+                        if (qiscusComment.getId() > lastDeliveredCommentId) {
+                            qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+                        } else if (qiscusComment.getId() > lastReadCommentId) {
+                            qiscusComment.setState(QiscusComment.STATE_DELIVERED);
+                        } else {
+                            qiscusComment.setState(QiscusComment.STATE_READ);
+                        }
+                        Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                    }
+                    Collections.sort(roomData.second, (lhs, rhs) -> lhs.getId() != -1 && rhs.getId() != -1 ?
+                            QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime()));
+
+                    roomData.first.setName(room.getName());
+                    roomData.first.setSubtitle(room.getSubtitle());
+                    Qiscus.getDataStore().addOrUpdate(roomData.first);
+                });
+    }
+
     private Observable<List<QiscusComment>> getCommentsFromNetwork(int lastCommentId) {
         return QiscusApi.getInstance().getComments(currentTopicId, lastCommentId)
                 .subscribeOn(Schedulers.io())
@@ -283,21 +311,22 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     public void loadComments(int count) {
         view.showLoading();
-        getCommentsFromNetwork(0)
-                .startWith(getLocalComments(count))
+        getInitRoomData()
+                .startWith(getLocalComments(count).map(comments -> Pair.create(room, comments)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(comments -> {
+                .subscribe(roomData -> {
                     if (view != null) {
-                        if (!comments.isEmpty()) {
-                            QiscusComment lastComment = comments.get(0);
+                        if (!roomData.second.isEmpty()) {
+                            QiscusComment lastComment = roomData.second.get(0);
                             QiscusPusherApi.getInstance().setUserRead(room.getId(),
                                     currentTopicId,
                                     lastComment.getId(),
                                     lastComment.getUniqueId());
                         }
-                        view.showComments(comments);
+                        room = roomData.first;
+                        view.initRoomData(roomData.first, roomData.second);
                         view.dismissLoading();
                     }
                 }, throwable -> {
@@ -559,6 +588,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public interface View extends QiscusPresenter.View {
 
         void showLoadMoreLoading();
+
+        void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments);
 
         void showComments(List<QiscusComment> qiscusComments);
 

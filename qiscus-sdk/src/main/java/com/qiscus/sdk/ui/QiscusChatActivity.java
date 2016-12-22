@@ -18,7 +18,6 @@ package com.qiscus.sdk.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
@@ -64,11 +63,13 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     }
 
     @Override
-    protected void onViewReady(Bundle savedInstanceState) {
-        super.onViewReady(savedInstanceState);
+    protected void binRoomData() {
+        super.binRoomData();
         tvTitle.setText(qiscusChatRoom.getName());
-        tvSubtitle.setText(qiscusChatRoom.getSubtitle());
-        tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
+        if (!qiscusChatRoom.getSubtitle().isEmpty()) {
+            tvSubtitle.setText(qiscusChatRoom.getSubtitle());
+            tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
+        }
     }
 
     @Override

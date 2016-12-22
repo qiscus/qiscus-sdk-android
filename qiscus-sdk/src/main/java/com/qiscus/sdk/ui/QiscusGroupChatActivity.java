@@ -18,7 +18,6 @@ package com.qiscus.sdk.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
@@ -45,8 +44,8 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     }
 
     @Override
-    protected void onViewReady(Bundle savedInstanceState) {
-        super.onViewReady(savedInstanceState);
+    protected void binRoomData() {
+        super.binRoomData();
         generateSubtitle();
         tvSubtitle.setText(subtitle);
         tvSubtitle.setVisibility(View.VISIBLE);

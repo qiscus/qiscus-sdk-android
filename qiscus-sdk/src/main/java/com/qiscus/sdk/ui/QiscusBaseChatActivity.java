@@ -50,8 +50,9 @@ import java.util.List;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseChatActivity extends RxAppCompatActivity implements QiscusBaseChatFragment.CommentSelectedListener,
-        ActionMode.Callback, QiscusChatFragment.UserTypingListener, QiscusUserStatusPresenter.View {
+public abstract class QiscusBaseChatActivity extends RxAppCompatActivity implements QiscusBaseChatFragment.RoomChangedListener,
+        QiscusBaseChatFragment.CommentSelectedListener, ActionMode.Callback, QiscusChatFragment.UserTypingListener,
+        QiscusUserStatusPresenter.View {
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
 
     protected QiscusChatConfig chatConfig;
@@ -94,11 +95,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
 
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
-                userStatusPresenter.listenUser(member.getEmail());
-            }
-        }
+        binRoomData();
 
         applyChatConfig();
 
@@ -118,6 +115,14 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         if (qiscusChatRoom == null) {
             finish();
             return;
+        }
+    }
+
+    protected void binRoomData() {
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+            if (!member.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                userStatusPresenter.listenUser(member.getEmail());
+            }
         }
     }
 
@@ -145,6 +150,12 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected void onStop() {
         super.onStop();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
+    }
+
+    @Override
+    public void onRoomUpdated(QiscusChatRoom qiscusChatRoom) {
+        this.qiscusChatRoom = qiscusChatRoom;
+        binRoomData();
     }
 
     @Override
