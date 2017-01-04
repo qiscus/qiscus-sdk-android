@@ -246,4 +246,10 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     public void dismissLoading() {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        userStatusPresenter.detachView();
+    }
 }
