@@ -16,6 +16,31 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.github.dcendents.android-maven'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'Qiscus-SDK'
+
+    publishedGroupId = 'com.qiscus'
+    libraryName = 'Qiscus-SDK'
+    artifact = 'sdk'
+
+    libraryDescription = 'Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.'
+
+    siteUrl = 'https://github.com/qiscus/qiscus-sdk-android'
+    gitUrl = 'https://github.com/qiscus/qiscus-sdk-android.git'
+
+    libraryVersion = '1.8.2'
+
+    developerId = 'qiscustech'
+    developerName = 'Qiscus Tech'
+    developerEmail = 'qiscus.tech@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 android {
     compileSdkVersion 25
@@ -47,9 +72,12 @@ android {
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
     }
 }
 
@@ -57,6 +85,9 @@ repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
 }
+
+apply from: '../buildsystem/bintrayv1.gradle'
+apply from: '../buildsystem/installv1.gradle'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
