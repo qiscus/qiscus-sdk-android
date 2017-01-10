@@ -20,11 +20,11 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'Qiscus-SDK'
+    bintrayName = 'chat'
 
-    publishedGroupId = 'com.qiscus'
-    libraryName = 'Qiscus-SDK'
-    artifact = 'sdk'
+    publishedGroupId = 'com.qiscus.sdk'
+    libraryName = 'chat'
+    artifact = 'chat'
 
     libraryDescription = 'Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.'
 
