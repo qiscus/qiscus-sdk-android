@@ -49,9 +49,11 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
     protected OnLongItemClickListener longItemClickListener;
 
     protected QiscusAccount qiscusAccount;
+    protected boolean groupChat;
 
-    public QiscusBaseChatAdapter(Context context) {
+    public QiscusBaseChatAdapter(Context context, boolean groupChat){
         this.context = context;
+        this.groupChat = groupChat;
         data = new SortedList<>(getItemClass(), new SortedList.Callback<Item>() {
             @Override
             public int compare(Item lhs, Item rhs) {
@@ -89,6 +91,18 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         qiscusAccount = Qiscus.getQiscusAccount();
     }
 
+    public QiscusBaseChatAdapter(Context context) {
+        this(context, false);
+    }
+
+    public boolean isGroupChat() {
+        return groupChat;
+    }
+
+    public void setGroupChat(boolean groupChat) {
+        this.groupChat = groupChat;
+    }
+
     protected abstract Class<Item> getItemClass();
 
     @Override
@@ -120,6 +134,7 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
+        holder.setGroupChat(groupChat);
         if (position == getItemCount() - 1) {
             holder.setNeedToShowDate(true);
         } else {

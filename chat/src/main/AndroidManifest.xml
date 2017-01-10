@@ -33,6 +33,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/QiscusTheme"/>
 
+        <activity
+            android:name=".ui.QiscusGroupChatActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/QiscusTheme"/>
+
+        <activity
+            android:name=".ui.QiscusGroupDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/QiscusTheme"/>
+
         <service android:name=".service.QiscusPusherService"/>
 
         <receiver

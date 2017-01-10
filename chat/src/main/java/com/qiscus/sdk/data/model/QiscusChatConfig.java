@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusChatActivity;
+import com.qiscus.sdk.ui.QiscusGroupChatActivity;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -63,17 +64,25 @@ public class QiscusChatConfig {
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
     private int notificationSmallIcon = R.drawable.ic_qiscus_notif_app;
     private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
-    private NotificationTitleHandler notificationTitleHandler = QiscusComment::getSender;
+
+    private NotificationTitleHandler notificationTitleHandler = qiscusComment -> qiscusComment.isGroupMessage() ?
+            qiscusComment.getRoomName() : qiscusComment.getSender();
+
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
                     .getChatRoom(qiscusComment.getRoomId())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(qiscusChatRoom -> qiscusChatRoom.setName(qiscusComment.getSender()))
-                    .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(context, qiscusChatRoom))
+                    .map(qiscusChatRoom -> {
+                        if (qiscusChatRoom.isGroup()) {
+                            QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom);
+                        }
+                        return QiscusChatActivity.generateIntent(context, qiscusChatRoom);
+                    })
                     .subscribe(intent -> {
                         context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                    | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     }, throwable -> {
                         throwable.printStackTrace();
                         Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();

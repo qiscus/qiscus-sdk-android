@@ -21,12 +21,13 @@ import android.database.Cursor;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 3;
+    static final int DATABASE_VERSION = 5;
 
     static abstract class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -74,6 +75,36 @@ final class QiscusDb {
         }
     }
 
+    static abstract class MemberTable {
+        static final String TABLE_NAME = "members";
+        static final String COLUMN_USER_EMAIL = "user_email";
+        static final String COLUMN_USER_NAME = "user_name";
+        static final String COLUMN_USER_AVATAR = "user_avatar";
+
+        static final String CREATE =
+                "CREATE TABLE " + TABLE_NAME + " (" +
+                        COLUMN_USER_EMAIL + " TEXT," +
+                        COLUMN_USER_NAME + " TEXT," +
+                        COLUMN_USER_AVATAR + " TEXT" +
+                        " ); ";
+
+        static ContentValues toContentValues(QiscusRoomMember qiscusRoomMember) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_USER_EMAIL, qiscusRoomMember.getEmail());
+            values.put(COLUMN_USER_NAME, qiscusRoomMember.getUsername());
+            values.put(COLUMN_USER_AVATAR, qiscusRoomMember.getAvatar());
+            return values;
+        }
+
+        static QiscusRoomMember getMember(Cursor cursor) {
+            QiscusRoomMember qiscusRoomMember = new QiscusRoomMember();
+            qiscusRoomMember.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
+            qiscusRoomMember.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_NAME)));
+            qiscusRoomMember.setAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_AVATAR)));
+            return qiscusRoomMember;
+        }
+    }
+
     static abstract class RoomMemberTable {
         static final String TABLE_NAME = "room_members";
         static final String COLUMN_ROOM_ID = "room_id";
@@ -118,6 +149,7 @@ final class QiscusDb {
         static final String COLUMN_MESSAGE = "message";
         static final String COLUMN_SENDER = "sender";
         static final String COLUMN_SENDER_EMAIL = "sender_email";
+        static final String COLUMN_SENDER_AVATAR = "sender_avatar";
         static final String COLUMN_TIME = "time";
         static final String COLUMN_STATE = "state";
 
@@ -131,6 +163,7 @@ final class QiscusDb {
                         COLUMN_MESSAGE + " TEXT," +
                         COLUMN_SENDER + " TEXT," +
                         COLUMN_SENDER_EMAIL + " TEXT NOT NULL," +
+                        COLUMN_SENDER_AVATAR + " TEXT," +
                         COLUMN_TIME + " LONG NOT NULL," +
                         COLUMN_STATE + " INTEGER NOT NULL" +
                         " ); ";
@@ -145,6 +178,7 @@ final class QiscusDb {
             values.put(COLUMN_MESSAGE, qiscusComment.getMessage());
             values.put(COLUMN_SENDER, qiscusComment.getSender());
             values.put(COLUMN_SENDER_EMAIL, qiscusComment.getSenderEmail());
+            values.put(COLUMN_SENDER_AVATAR, qiscusComment.getSenderAvatar());
             values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
             values.put(COLUMN_STATE, qiscusComment.getState());
             return values;
@@ -160,6 +194,7 @@ final class QiscusDb {
             qiscusComment.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
             qiscusComment.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
             qiscusComment.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
+            qiscusComment.setSenderAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
             qiscusComment.setTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
             qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             return qiscusComment;

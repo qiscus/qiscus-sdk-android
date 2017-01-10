@@ -62,8 +62,11 @@ public class QiscusComment implements Parcelable {
     protected String message;
     protected String sender;
     protected String senderEmail;
+    protected String senderAvatar;
     protected Date time;
     protected int state;
+    protected String roomName;
+    protected boolean groupMessage;
 
     protected boolean selected;
     protected boolean downloading;
@@ -94,6 +97,7 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setTime(new Date());
         qiscusComment.setSenderEmail(qiscusAccount.getEmail());
         qiscusComment.setSender(qiscusAccount.getUsername());
+        qiscusComment.setSenderAvatar(qiscusAccount.getAvatar());
         qiscusComment.setState(STATE_SENDING);
 
         return qiscusComment;
@@ -112,6 +116,7 @@ public class QiscusComment implements Parcelable {
         message = in.readString();
         sender = in.readString();
         senderEmail = in.readString();
+        senderAvatar = in.readString();
         time = new Date(in.readLong());
         state = in.readInt();
         selected = in.readByte() != 0;
@@ -193,6 +198,14 @@ public class QiscusComment implements Parcelable {
         this.senderEmail = senderEmail;
     }
 
+    public String getSenderAvatar() {
+        return senderAvatar;
+    }
+
+    public void setSenderAvatar(String senderAvatar) {
+        this.senderAvatar = senderAvatar;
+    }
+
     public Date getTime() {
         return time;
     }
@@ -207,6 +220,22 @@ public class QiscusComment implements Parcelable {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public boolean isGroupMessage() {
+        return groupMessage;
+    }
+
+    public void setGroupMessage(boolean groupMessage) {
+        this.groupMessage = groupMessage;
     }
 
     public boolean isSelected() {
@@ -485,6 +514,7 @@ public class QiscusComment implements Parcelable {
                 ", message='" + message + '\'' +
                 ", sender='" + sender + '\'' +
                 ", senderEmail='" + senderEmail + '\'' +
+                ", senderAvatar='" + senderAvatar + '\'' +
                 ", time=" + time +
                 ", state=" + state +
                 '}';
@@ -505,6 +535,7 @@ public class QiscusComment implements Parcelable {
         dest.writeString(message);
         dest.writeString(sender);
         dest.writeString(senderEmail);
+        dest.writeString(senderAvatar);
         dest.writeLong(time.getTime());
         dest.writeInt(state);
         dest.writeByte((byte) (selected ? 1 : 0));

@@ -30,7 +30,6 @@ import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
 public class QiscusChatActivity extends QiscusBaseChatActivity {
-
     protected Toolbar toolbar;
     protected TextView tvTitle;
     protected TextView tvSubtitle;

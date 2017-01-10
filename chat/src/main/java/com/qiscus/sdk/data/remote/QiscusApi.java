@@ -25,6 +25,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 
@@ -38,6 +39,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -136,15 +138,27 @@ public enum QiscusApi {
                         qiscusChatRoom = new QiscusChatRoom();
                         qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
                         qiscusChatRoom.setDistinctId(distinctId == null ? "default" : distinctId);
+                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                         qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                                 : jsonChatRoom.get("options").getAsString());
-                        qiscusChatRoom.setMember(Collections.singletonList(withEmail));
+
+                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
+                        List<QiscusRoomMember> members = new ArrayList<>();
+                        for (JsonElement jsonMember : jsonMembers) {
+                            QiscusRoomMember member = new QiscusRoomMember();
+                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
+                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+                            members.add(member);
+                        }
+                        qiscusChatRoom.setMember(members);
+
                         JsonArray comments = jsonElement.getAsJsonObject().get("results")
                                 .getAsJsonObject().get("comments").getAsJsonArray();
-
                         if (comments.size() > 0) {
                             JsonObject lastComment = comments.get(0).getAsJsonObject();
                             qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
@@ -179,13 +193,25 @@ public enum QiscusApi {
                         qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
                         //TODO minta server ngasih tau distinctId biar bisa disimpen
                         //qiscusChatRoom.setDistinctId("default");
+                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                         qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                                 : jsonChatRoom.get("options").getAsString());
-                        //TODO minta server ngasih tau member room siapa aja
-                        //qiscusChatRoom.setMember(withEmails);
+
+                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
+                        List<QiscusRoomMember> members = new ArrayList<>();
+                        for (JsonElement jsonMember : jsonMembers) {
+                            QiscusRoomMember member = new QiscusRoomMember();
+                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
+                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+                            members.add(member);
+                        }
+                        qiscusChatRoom.setMember(members);
+
                         JsonArray comments = jsonElement.getAsJsonObject().get("results")
                                 .getAsJsonObject().get("comments").getAsJsonArray();
 
@@ -228,6 +254,7 @@ public enum QiscusApi {
                     qiscusComment.setMessage(jsonComment.get("message").getAsString());
                     qiscusComment.setSender(jsonComment.get("username").getAsString());
                     qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
+                    qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
                     try {
                         qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
                     } catch (ParseException e) {
@@ -274,6 +301,7 @@ public enum QiscusApi {
                     qiscusComment.setMessage(jsonComment.get("message").getAsString());
                     qiscusComment.setSender(jsonComment.get("username").getAsString());
                     qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
+                    qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
                     qiscusComment.setState(QiscusComment.STATE_ON_PUSHER);
                     try {
                         qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));

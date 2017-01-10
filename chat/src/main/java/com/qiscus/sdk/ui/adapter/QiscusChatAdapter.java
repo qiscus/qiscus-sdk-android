@@ -48,6 +48,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_LINK_ME = 9;
     private static final int TYPE_LINK_OTHER = 10;
 
+    public QiscusChatAdapter(Context context, boolean groupChat) {
+        super(context, groupChat);
+    }
+
     public QiscusChatAdapter(Context context) {
         super(context);
     }

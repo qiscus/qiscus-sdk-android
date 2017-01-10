@@ -71,6 +71,18 @@ public class QiscusFileViewHolder extends QiscusBaseFileMessageViewHolder {
         return (ImageView) itemView.findViewById(R.id.icon_read);
     }
 
+    @Nullable
+    @Override
+    protected ImageView getAvatarView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.avatar);
+    }
+
+    @Nullable
+    @Override
+    protected TextView getSenderNameView(View itemView) {
+        return (TextView) itemView.findViewById(R.id.name);
+    }
+
     @NonNull
     @Override
     protected TextView getFileNameView(View itemView) {
