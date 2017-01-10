@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-include ':app', ':qiscus-sdk'
+include ':app', ':chat'

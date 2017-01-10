@@ -160,6 +160,12 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         } else {
             File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
             if (localPath == null) {
+                File file = new File(qiscusComment.getAttachmentUri().toString());
+                if (file.exists()) {
+                    localPath = file;
+                }
+            }
+            if (localPath == null) {
                 if (imageHolderLayout != null) {
                     imageHolderLayout.setVisibility(View.VISIBLE);
                 }

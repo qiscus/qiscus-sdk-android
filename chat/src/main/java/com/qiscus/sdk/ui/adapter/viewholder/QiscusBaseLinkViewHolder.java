@@ -48,6 +48,7 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
     public void bind(QiscusComment qiscusComment) {
         super.bind(qiscusComment);
         this.qiscusComment = qiscusComment;
+        linkPreviewView.clearView();
         qiscusComment.setLinkPreviewListener(this);
         qiscusComment.loadLinkPreviewData();
     }
