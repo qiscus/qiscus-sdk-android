@@ -339,6 +339,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             recordAudioButton.setImageResource(chatConfig.getRecordAudioIcon());
         }
         if (recordAudioPanel != null) {
+            recordAudioPanel.setButtonStopRecord(chatConfig.getStopRecordIcon());
             recordAudioPanel.setButtonCancelRecord(chatConfig.getCancelRecordIcon());
         }
     }

@@ -134,6 +134,10 @@ public class QiscusAudioRecorderView extends LinearLayout {
         return recorder.isRecording();
     }
 
+    public void setButtonStopRecord(@DrawableRes int icon) {
+        buttonStopRecord.setImageResource(icon);
+    }
+
     public void setButtonCancelRecord(@DrawableRes int icon) {
         buttonCancelRecord.setImageResource(icon);
     }
