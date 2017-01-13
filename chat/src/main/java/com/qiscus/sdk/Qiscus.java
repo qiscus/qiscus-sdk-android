@@ -115,6 +115,7 @@ public class Qiscus {
     }
 
     public static void startPusherService() {
+        checkAppIdSetup();
         APPLICATION_CONTEXT.startService(new Intent(APPLICATION_CONTEXT, QiscusPusherService.class));
     }
 
