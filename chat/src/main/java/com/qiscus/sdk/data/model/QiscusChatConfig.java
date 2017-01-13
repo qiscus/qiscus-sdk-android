@@ -55,6 +55,7 @@ public class QiscusChatConfig {
     private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
     private int addFileIcon = R.drawable.ic_qiscus_add_file;
     private int recordAudioIcon = R.drawable.ic_qiscus_add_audio;
+    private int stopRecordIcon = R.drawable.ic_qiscus_send_on;
     private int cancelRecordIcon = R.drawable.ic_qiscus_cancel_record;
     private int sendActiveIcon = R.drawable.ic_qiscus_send_on;
     private int sendInactiveIcon = R.drawable.ic_qiscus_send_off;
@@ -188,6 +189,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setRecordAudioIcon(@DrawableRes int recordAudioIcon) {
         this.recordAudioIcon = recordAudioIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setStopRecordIcon(@DrawableRes int stopRecordIcon) {
+        this.stopRecordIcon = stopRecordIcon;
         return this;
     }
 
@@ -354,6 +360,11 @@ public class QiscusChatConfig {
     @DrawableRes
     public int getRecordAudioIcon() {
         return recordAudioIcon;
+    }
+
+    @DrawableRes
+    public int getStopRecordIcon() {
+        return stopRecordIcon;
     }
 
     @DrawableRes
