@@ -55,6 +55,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return R.layout.fragment_qiscus_chat;
     }
 
+    @NonNull
+    @Override
+    protected ViewGroup getRootView(View view) {
+        return (ViewGroup) view.findViewById(R.id.root_view);
+    }
+
     @Nullable
     @Override
     protected ViewGroup getEmptyChatHolder(View view) {

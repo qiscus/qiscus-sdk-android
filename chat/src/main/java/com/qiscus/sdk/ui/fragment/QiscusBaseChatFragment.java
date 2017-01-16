@@ -94,6 +94,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected static final int PICK_IMAGE_REQUEST = 2;
     protected static final int PICK_FILE_REQUEST = 3;
 
+    @NonNull protected ViewGroup rootView;
     @Nullable protected ViewGroup emptyChatHolder;
     @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
     @NonNull protected QiscusRecyclerView messageRecyclerView;
@@ -132,6 +133,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     protected abstract int getResourceLayout();
 
     protected void onLoadView(View view) {
+        rootView = getRootView(view);
         emptyChatHolder = getEmptyChatHolder(view);
         swipeRefreshLayout = getSwipeRefreshLayout(view);
         messageRecyclerView = getMessageRecyclerView(view);
@@ -187,6 +189,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             recordAudioPanel.setRecordListener(this);
         }
     }
+
+    @NonNull
+    protected abstract ViewGroup getRootView(View view);
 
     @Nullable
     protected abstract ViewGroup getEmptyChatHolder(View view);
@@ -309,6 +314,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     protected void onApplyChatConfig() {
+        rootView.setBackground(chatConfig.getChatRoomBackground());
         swipeRefreshLayout.setColorSchemeResources(chatConfig.getSwipeRefreshColorScheme());
         if (emptyChatImageView != null) {
             emptyChatImageView.setImageResource(chatConfig.getEmptyRoomImageResource());
