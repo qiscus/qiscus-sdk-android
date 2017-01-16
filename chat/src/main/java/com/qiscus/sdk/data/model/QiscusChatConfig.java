@@ -17,10 +17,14 @@
 package com.qiscus.sdk.data.model;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusChatActivity;
@@ -90,6 +94,7 @@ public class QiscusChatConfig {
                     });
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
+    private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
@@ -266,6 +271,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setChatRoomBackground(Drawable chatRoomBackground) {
+        this.chatRoomBackground = chatRoomBackground;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -430,5 +440,9 @@ public class QiscusChatConfig {
 
     public boolean isOnlyEnablePushNotificationOutsideChatRoom() {
         return onlyEnablePushNotificationOutsideChatRoom;
+    }
+
+    public Drawable getChatRoomBackground() {
+        return chatRoomBackground;
     }
 }

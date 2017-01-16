@@ -17,6 +17,7 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/qiscus_dark_white">
@@ -215,9 +216,9 @@
 
         <com.qiscus.sdk.ui.view.QiscusAudioRecorderView
             android:id="@+id/record_panel"
-            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:visibility="gone"/>
 
     </RelativeLayout>
