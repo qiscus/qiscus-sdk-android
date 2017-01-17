@@ -114,7 +114,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         failedToSendMessageColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getFailedToSendMessageColor());
         readIconColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getReadIconColor());
         dateColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getDateColor());
-        selectionBackground = new ColorDrawable(leftBubbleColor);
+        selectionBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getSelectedBubbleBackgroundColor()));
         selectionBackground.setAlpha(51);
     }
 

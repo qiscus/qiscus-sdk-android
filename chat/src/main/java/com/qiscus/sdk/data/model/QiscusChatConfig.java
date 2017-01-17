@@ -53,6 +53,7 @@ public class QiscusChatConfig {
     private int failedToSendMessageColor = R.color.qiscus_red;
     private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
+    private int selectedBubbleBackgroundColor = R.color.qiscus_primary;
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
     private String emptyRoomTitle = "Welcome!";
@@ -175,6 +176,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setDateColor(@ColorRes int dateColor) {
         this.dateColor = dateColor;
+        return this;
+    }
+
+    public QiscusChatConfig setSelectedBubbleBackgroundColor(@ColorRes int selectedBubbleBackgroundColor) {
+        this.selectedBubbleBackgroundColor = selectedBubbleBackgroundColor;
         return this;
     }
 
@@ -371,6 +377,11 @@ public class QiscusChatConfig {
     @ColorRes
     public int getDateColor() {
         return dateColor;
+    }
+
+    @ColorRes
+    public int getSelectedBubbleBackgroundColor() {
+        return selectedBubbleBackgroundColor;
     }
 
     public DateFormatter getDateFormat() {
