@@ -71,6 +71,8 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected int leftBubbleTextColor;
     protected int rightBubbleTimeColor;
     protected int leftBubbleTimeColor;
+    protected int rightLinkTextColor;
+    protected int leftLinkTextColor;
     protected int failedToSendMessageColor;
     protected int readIconColor;
     protected int dateColor;
@@ -98,12 +100,14 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         rightBubbleColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightBubbleColor());
         rightBubbleTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightBubbleTextColor());
         rightBubbleTimeColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightBubbleTimeColor());
+        rightLinkTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightLinkTextColor());
         rightBubbleDrawable = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_rounded_primary_light_chat_bg);
         rightBubbleDrawable.setColorFilter(rightBubbleColor, PorterDuff.Mode.SRC_ATOP);
 
         leftBubbleColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftBubbleColor());
         leftBubbleTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftBubbleTextColor());
         leftBubbleTimeColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftBubbleTimeColor());
+        leftLinkTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftLinkTextColor());
         leftBubbleDrawable = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_rounded_primary_chat_bg);
         leftBubbleDrawable.setColorFilter(leftBubbleColor, PorterDuff.Mode.SRC_ATOP);
 

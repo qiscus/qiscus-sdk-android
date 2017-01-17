@@ -48,6 +48,8 @@ public class QiscusChatConfig {
     private int leftBubbleTextColor = R.color.qiscus_white;
     private int rightBubbleTimeColor = R.color.qiscus_secondary_text;
     private int leftBubbleTimeColor = R.color.qiscus_primary_light;
+    private int rightLinkTextColor = R.color.qiscus_primary_text;
+    private int leftLinkTextColor = R.color.qiscus_white;
     private int failedToSendMessageColor = R.color.qiscus_red;
     private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
@@ -148,6 +150,16 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setLeftBubbleTimeColor(@ColorRes int leftBubbleTimeColor) {
         this.leftBubbleTimeColor = leftBubbleTimeColor;
+        return this;
+    }
+
+    public QiscusChatConfig setRightLinkTextColor(@ColorRes int rightLinkTextColor) {
+        this.rightLinkTextColor = rightLinkTextColor;
+        return this;
+    }
+
+    public QiscusChatConfig setLeftLinkTextColor(@ColorRes int leftLinkTextColor) {
+        this.leftLinkTextColor = leftLinkTextColor;
         return this;
     }
 
@@ -334,6 +346,16 @@ public class QiscusChatConfig {
     @ColorRes
     public int getLeftBubbleTimeColor() {
         return leftBubbleTimeColor;
+    }
+
+    @ColorRes
+    public int getRightLinkTextColor() {
+        return rightLinkTextColor;
+    }
+
+    @ColorRes
+    public int getLeftLinkTextColor() {
+        return leftLinkTextColor;
     }
 
     @ColorRes

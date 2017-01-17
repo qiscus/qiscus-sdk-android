@@ -47,6 +47,7 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
     @Override
     protected void setUpColor() {
         messageTextView.setTextColor(messageFromMe ? rightBubbleTextColor : leftBubbleTextColor);
+        messageTextView.setLinkTextColor(messageFromMe ? rightLinkTextColor : leftLinkTextColor);
         super.setUpColor();
     }
 
