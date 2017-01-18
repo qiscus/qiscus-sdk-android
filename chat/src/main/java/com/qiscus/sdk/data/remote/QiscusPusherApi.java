@@ -83,7 +83,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         clientId = Qiscus.getApps().getPackageName() + "-";
         clientId += Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
-        serverUri = "ssl://52.77.234.57:1885";
+        serverUri = "ssl://mqtt.qiscus.com:1885";
 
         buildClient();
 
