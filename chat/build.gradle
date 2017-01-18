@@ -118,6 +118,7 @@ dependencies {
     compile 'com.schinizer:rxunfurl:0.2.0'
 
     compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
-    compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.0'
+
+    compile 'com.qiscus.mqtt:client:1.1.0'
+    compile 'com.qiscus.mqtt:android:1.1.0'
 }
