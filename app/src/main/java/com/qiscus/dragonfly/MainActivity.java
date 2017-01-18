@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChat(View view) {
         showLoading();
-        Qiscus.buildChatWith("rya.meyvriska3@gmail.com")
+        Qiscus.buildChatWith("rya.meyvriska24@gmail.com")
                 .withTitle("Rya Meyvriska")
                 .build(this)
                 .subscribeOn(Schedulers.io())
