@@ -24,4 +24,11 @@
         <attr name="qpreview_titleColor" format="color|reference"/>
         <attr name="qpreview_descColor" format="color|reference"/>
     </declare-styleable>
+    <declare-styleable name="QiscusCircularImageView">
+        <attr name="qciv_border_width" format="dimension"/>
+        <attr name="qciv_border_color" format="color"/>
+        <attr name="qciv_border_overlay" format="boolean"/>
+        <attr name="qciv_fill_color" format="color"/>
+    </declare-styleable>
+
 </resources>
