@@ -170,6 +170,20 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public void deleteChatRoom(int roomId) {
+        String where = QiscusDb.RoomTable.COLUMN_ID + " = " + roomId;
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+    }
+
+    @Override
     public void addRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
         distinctId = distinctId == null ? "default" : distinctId;
         if (!isContainsRoomMember(roomId, qiscusRoomMember.getEmail())) {

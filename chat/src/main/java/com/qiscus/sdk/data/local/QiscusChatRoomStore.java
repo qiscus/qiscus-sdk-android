@@ -50,6 +50,8 @@ public interface QiscusChatRoomStore {
 
     Observable<List<QiscusChatRoom>> getObservableChatRooms(int count);
 
+    void deleteChatRoom(int roomId);
+
     void addRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
 
     boolean isContainsRoomMember(int roomId, String email);
