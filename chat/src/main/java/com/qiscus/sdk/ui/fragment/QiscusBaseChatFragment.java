@@ -55,6 +55,7 @@ import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
+import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
@@ -63,8 +64,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import pub.devrel.easypermissions.EasyPermissions;
 
 
 /**
@@ -77,7 +76,7 @@ import pub.devrel.easypermissions.EasyPermissions;
  */
 public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapter> extends RxFragment
         implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
-        QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener, EasyPermissions.PermissionCallbacks {
+        QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener, QiscusPermissionsUtil.PermissionCallbacks {
 
     protected static final int RC_PERMISSIONS = 1;
     protected static final int RC_STORAGE_PERMISSION = 2;
@@ -773,23 +772,23 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     }
 
     protected void requestPermissions() {
-        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS)) {
-            EasyPermissions.requestPermissions(this, "Please grant permissions to make apps working properly!",
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
+            QiscusPermissionsUtil.requestPermissions(this, "Please grant permissions to make apps working properly!",
                     RC_PERMISSIONS, PERMISSIONS);
         }
     }
 
     protected void requestStoragePermission() {
-        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS[0], PERMISSIONS[1])) {
-            EasyPermissions.requestPermissions(this, "To make this apps working properly we need to access external storage to save your chatting data. " +
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS[0], PERMISSIONS[1])) {
+            QiscusPermissionsUtil.requestPermissions(this, "To make this apps working properly we need to access external storage to save your chatting data. " +
                             "So please allow the apps to access the storage!",
                     RC_STORAGE_PERMISSION, PERMISSIONS[0], PERMISSIONS[1]);
         }
     }
 
     protected void requestAudioRecordPermission() {
-        if (!EasyPermissions.hasPermissions(getActivity(), PERMISSIONS[3])) {
-            EasyPermissions.requestPermissions(this, "We need your permission to record audio to able send audio message!",
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS[3])) {
+            QiscusPermissionsUtil.requestPermissions(this, "We need your permission to record audio to able send audio message!",
                     RC_RECORD_AUDIO_PERMISSION, PERMISSIONS[3]);
         }
     }
@@ -797,7 +796,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        QiscusPermissionsUtil.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     @Override
@@ -807,7 +806,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-        EasyPermissions.checkDeniedPermissionsNeverAskAgain(this, "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
+        QiscusPermissionsUtil.checkDeniedPermissionsNeverAskAgain(this, "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
     }
 
     public interface CommentSelectedListener {
