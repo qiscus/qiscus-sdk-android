@@ -551,6 +551,7 @@ public class Qiscus {
         private String subtitle;
         private String distinctId;
         private String options;
+        private String message;
 
         private ChatActivityBuilder(String email) {
             title = "Chat";
@@ -603,6 +604,17 @@ public class Qiscus {
         }
 
         /**
+         * If you want to automatically send a message after the activity started
+         *
+         * @param message The message
+         * @return builder
+         */
+        public ChatActivityBuilder withMessage(String message) {
+            this.message = message;
+            return this;
+        }
+
+        /**
          * Build the Chat activity intent
          *
          * @param context  Context for start the Activity
@@ -628,7 +640,12 @@ public class Qiscus {
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
-                    .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(context, qiscusChatRoom));
+                    .map(qiscusChatRoom -> {
+                        if (message == null || message.isEmpty()) {
+                            return QiscusChatActivity.generateIntent(context, qiscusChatRoom);
+                        }
+                        return QiscusChatActivity.generateIntent(context, qiscusChatRoom, message);
+                    });
         }
     }
 
@@ -654,6 +671,7 @@ public class Qiscus {
         private String subtitle;
         private String distinctId;
         private String options;
+        private String message;
 
         private ChatFragmentBuilder(String email) {
             title = "Chat";
@@ -706,6 +724,17 @@ public class Qiscus {
         }
 
         /**
+         * If you want to automatically send a message after the activity started
+         *
+         * @param message The message
+         * @return builder
+         */
+        public ChatFragmentBuilder withMessage(String message) {
+            this.message = message;
+            return this;
+        }
+
+        /**
          * Build the Chat fragment instance
          *
          * @param listener Listener of building chat fragment
@@ -729,7 +758,12 @@ public class Qiscus {
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
-                    .map(QiscusChatFragment::newInstance);
+                    .map(qiscusChatRoom -> {
+                        if (message == null || message.isEmpty()) {
+                            return QiscusChatFragment.newInstance(qiscusChatRoom);
+                        }
+                        return QiscusChatFragment.newInstance(qiscusChatRoom, message);
+                    });
         }
     }
 

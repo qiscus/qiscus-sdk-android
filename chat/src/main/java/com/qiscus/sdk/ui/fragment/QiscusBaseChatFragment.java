@@ -55,9 +55,9 @@ import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
-import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import java.io.File;
@@ -89,6 +89,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     };
 
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
+    protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
     protected static final String COMMENTS_DATA = "saved_comments_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int PICK_IMAGE_REQUEST = 2;
@@ -114,6 +115,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
+    protected String startingMessage;
     protected Adapter chatAdapter;
     protected QiscusChatPresenter qiscusChatPresenter;
     protected Animation animation;
@@ -266,6 +268,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         chatConfig = onLoadChatConfig();
 
         resolveChatRoom(savedInstanceState);
+        resolveStartingMessage();
 
         onApplyChatConfig();
 
@@ -300,6 +303,10 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
         if (commentSelectedListener != null) {
             commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
         }
+
+        if (startingMessage != null && !startingMessage.isEmpty()) {
+            qiscusChatPresenter.sendComment(startingMessage);
+        }
     }
 
     protected QiscusChatConfig onLoadChatConfig() {
@@ -316,6 +323,11 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             getActivity().finish();
             return;
         }
+    }
+
+    protected void resolveStartingMessage() {
+        startingMessage = getArguments().getString(EXTRA_STARTING_MESSAGE);
+        getArguments().remove(EXTRA_STARTING_MESSAGE);
     }
 
     protected void onApplyChatConfig() {

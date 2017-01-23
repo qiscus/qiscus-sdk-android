@@ -42,6 +42,13 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
         return intent;
     }
 
+    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom, String message) {
+        Intent intent = new Intent(context, QiscusChatActivity.class);
+        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
+        intent.putExtra(EXTRA_STARTING_MESSAGE, message);
+        return intent;
+    }
+
     @Override
     protected int getResourceLayout() {
         return R.layout.activity_qiscus_chat;
@@ -74,7 +81,10 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return QiscusChatFragment.newInstance(qiscusChatRoom);
+        if (startingMessage == null || startingMessage.isEmpty()) {
+            return QiscusChatFragment.newInstance(qiscusChatRoom);
+        }
+        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage);
     }
 
     @Override

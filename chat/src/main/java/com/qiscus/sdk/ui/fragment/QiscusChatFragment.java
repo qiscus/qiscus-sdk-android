@@ -54,6 +54,15 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return fragment;
     }
 
+    public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom, String message) {
+        QiscusChatFragment fragment = new QiscusChatFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+        bundle.putString(EXTRA_STARTING_MESSAGE, message);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     protected int getResourceLayout() {
         return R.layout.fragment_qiscus_chat;

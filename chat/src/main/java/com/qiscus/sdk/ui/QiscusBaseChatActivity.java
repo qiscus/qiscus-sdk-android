@@ -54,9 +54,11 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         QiscusBaseChatFragment.CommentSelectedListener, ActionMode.Callback, QiscusChatFragment.UserTypingListener,
         QiscusUserStatusPresenter.View {
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
+    protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
+    protected String startingMessage;
 
     private ActionMode actionMode;
     private QiscusUserStatusPresenter userStatusPresenter;
@@ -94,6 +96,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
+        resolveStartingMessage();
 
         binRoomData();
 
@@ -115,6 +118,13 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         if (qiscusChatRoom == null) {
             finish();
             return;
+        }
+    }
+
+    protected void resolveStartingMessage() {
+        if (getIntent().hasExtra(EXTRA_STARTING_MESSAGE)) {
+            startingMessage = getIntent().getStringExtra(EXTRA_STARTING_MESSAGE);
+            getIntent().removeExtra(EXTRA_STARTING_MESSAGE);
         }
     }
 
