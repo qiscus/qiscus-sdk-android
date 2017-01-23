@@ -185,6 +185,59 @@ public enum QiscusApi {
                 });
     }
 
+    public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, String options) {
+        return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options)
+                .onErrorReturn(throwable -> null)
+                .map(jsonElement -> {
+                    if (jsonElement != null) {
+                        JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("room").getAsJsonObject();
+                        QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+                        qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
+                        qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
+                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
+                        if (qiscusChatRoom.isGroup()) {
+                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+                        }
+                        qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
+                        qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
+                        qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
+                        qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
+                                : jsonChatRoom.get("options").getAsString());
+                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
+
+                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
+                        List<QiscusRoomMember> members = new ArrayList<>();
+                        for (JsonElement jsonMember : jsonMembers) {
+                            QiscusRoomMember member = new QiscusRoomMember();
+                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
+                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+                            members.add(member);
+                        }
+                        qiscusChatRoom.setMember(members);
+
+                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
+                                .getAsJsonObject().get("comments").getAsJsonArray();
+                        if (comments.size() > 0) {
+                            JsonObject lastComment = comments.get(0).getAsJsonObject();
+                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
+                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
+                            try {
+                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        return qiscusChatRoom;
+                    } else {
+                        throw new RuntimeException("Unable to connect with qiscus server!");
+                    }
+                });
+    }
+
     public Observable<QiscusChatRoom> getChatRoom(int roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
                 .onErrorReturn(throwable -> null)
@@ -494,6 +547,14 @@ public enum QiscusApi {
         Observable<JsonElement> createOrGetChatRoom(@Field("token") String token,
                                                     @Field("emails[]") List<String> emails,
                                                     @Field("distinct_id") String distinctId,
+                                                    @Field("options") String options);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/create_room")
+        Observable<JsonElement> createGroupChatRoom(@Field("token") String token,
+                                                    @Field("name") String name,
+                                                    @Field("participants[]") List<String> emails,
+                                                    @Field("avatar_url") String avatar_url,
                                                     @Field("options") String options);
 
         @GET("/api/v2/mobile/get_room_by_id")

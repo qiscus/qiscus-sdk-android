@@ -37,6 +37,11 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -260,6 +265,28 @@ public class Qiscus {
     public static ChatFragmentBuilder buildChatFragmentWith(String email) {
         checkUserSetup();
         return new ChatFragmentBuilder(email);
+    }
+
+    /**
+     * Use this method to create new group chat.
+     *
+     * @param email Email or username of group chat member.
+     * @return Group Chat room builder
+     */
+    public static GroupChatBuilder buildGroupChatRoom(String name, String email) {
+        checkUserSetup();
+        return new GroupChatBuilder(name, email);
+    }
+
+    /**
+     * Use this method to create new group chat.
+     *
+     * @param emails Emails or username of group chat member.
+     * @return Group Chat room builder
+     */
+    public static GroupChatBuilder buildGroupChatRoom(String name, List<String> emails) {
+        checkUserSetup();
+        return new GroupChatBuilder(name, emails);
     }
 
     /**
@@ -720,5 +747,78 @@ public class Qiscus {
          * @param throwable The cause of error
          */
         void onError(Throwable throwable);
+    }
+
+    public static class GroupChatBuilder {
+        private Set<String> emails;
+        private String name;
+        private String options;
+        private String avatarUrl;
+
+        private GroupChatBuilder(String name, String email) {
+            this.name = name;
+            emails = new HashSet<>();
+            emails.add(email);
+        }
+
+        private GroupChatBuilder(String name, List<String> emails) {
+            this.name = name;
+            this.emails = new HashSet<>(emails);
+        }
+
+        /**
+         * Adding initial group chat members
+         *
+         * @param email qiscus member
+         * @return builder
+         */
+        public GroupChatBuilder addEmail(String email) {
+            emails.add(email);
+            return this;
+        }
+
+        /**
+         * If you need to set the avatar or picture of group chat room
+         *
+         * @param avatarUrl the picture url
+         * @return builder
+         */
+        public GroupChatBuilder withAvatar(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
+            return this;
+        }
+
+        /**
+         * If you need to save options or extra data to this room
+         *
+         * @param options The data need to save
+         * @return builder
+         */
+        public GroupChatBuilder withOptions(String options) {
+            this.options = options;
+            return this;
+        }
+
+        /**
+         * Build the chat room
+         *
+         * @param listener Listener of building chat room process
+         */
+        public void build(ChatBuilderListener listener) {
+            build().subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listener::onSuccess, listener::onError);
+        }
+
+        /**
+         * Build the chat room as Observable
+         *
+         * @return Observable chat room
+         */
+        public Observable<QiscusChatRoom> build() {
+            return QiscusApi.getInstance()
+                    .createGroupChatRoom(name, new ArrayList<>(emails), avatarUrl, options)
+                    .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
+        }
     }
 }

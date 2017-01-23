@@ -43,6 +43,7 @@ public class QiscusChatRoom implements Parcelable {
     protected int lastTopicId;
     protected String options;
     protected boolean group;
+    protected String avatarUrl;
     protected List<QiscusRoomMember> member;
 
     public QiscusChatRoom() {
@@ -62,6 +63,7 @@ public class QiscusChatRoom implements Parcelable {
         lastTopicId = in.readInt();
         options = in.readString();
         group = in.readByte() != 0;
+        avatarUrl = in.readString();
         member = in.createTypedArrayList(QiscusRoomMember.CREATOR);
     }
 
@@ -173,6 +175,14 @@ public class QiscusChatRoom implements Parcelable {
         this.group = group;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
     public List<QiscusRoomMember> getMember() {
         return member;
     }
@@ -201,6 +211,7 @@ public class QiscusChatRoom implements Parcelable {
                 ", lastTopicId=" + lastTopicId +
                 ", options='" + options + '\'' +
                 ", group=" + group +
+                ", avatarUrl='" + avatarUrl + '\'' +
                 ", member=" + member +
                 '}';
     }
@@ -224,6 +235,7 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeInt(lastTopicId);
         dest.writeString(options);
         dest.writeByte((byte) (group ? 1 : 0));
+        dest.writeString(avatarUrl);
         dest.writeTypedList(member);
     }
 }
