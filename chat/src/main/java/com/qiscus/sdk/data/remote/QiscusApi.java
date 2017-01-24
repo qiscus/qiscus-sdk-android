@@ -142,6 +142,7 @@ public enum QiscusApi {
                         qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                         if (qiscusChatRoom.isGroup()) {
                             qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+                            qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
                         }
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
@@ -254,6 +255,7 @@ public enum QiscusApi {
                         qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                         if (qiscusChatRoom.isGroup()) {
                             qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+                            qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
                         }
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
@@ -312,6 +314,7 @@ public enum QiscusApi {
                         qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                         if (qiscusChatRoom.isGroup()) {
                             qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+                            qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
                         }
                         qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
                         qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());

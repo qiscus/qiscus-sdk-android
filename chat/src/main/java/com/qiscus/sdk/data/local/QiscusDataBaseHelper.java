@@ -137,12 +137,16 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 
-        if (cursor.moveToNext()) {
-            return getChatRoom(QiscusDb.RoomMemberTable.getRoomId(cursor));
-        } else {
-            cursor.close();
-            return null;
+        while (cursor.moveToNext()) {
+            QiscusChatRoom qiscusChatRoom = getChatRoom(QiscusDb.RoomMemberTable.getRoomId(cursor));
+            if (!qiscusChatRoom.isGroup()) {
+                cursor.close();
+                return qiscusChatRoom;
+            }
         }
+
+        cursor.close();
+        return null;
     }
 
     @Override
