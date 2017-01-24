@@ -36,9 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Utility to request and check System permissions for apps targeting Android M (API >= 23).
- */
 public final class QiscusPermissionsUtil {
 
     private static final String TAG = "QiscusPermissionsUtil";
@@ -55,14 +52,6 @@ public final class QiscusPermissionsUtil {
 
     }
 
-    /**
-     * Check if the calling context has a set of permissions.
-     *
-     * @param context the calling context.
-     * @param perms   one ore more permissions, such as {@code android.Manifest.permission.CAMERA}.
-     * @return true if all permissions are already granted, false if at least one permission
-     * is not yet granted.
-     */
     public static boolean hasPermissions(Context context, String... perms) {
         // Always return true for SDK < M, let the system deal with the permissions 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -81,16 +70,6 @@ public final class QiscusPermissionsUtil {
         return true;
     }
 
-    /**
-     * Request a set of permissions, showing rationale if the system requests it.
-     *
-     * @param object      Activity or Fragment requesting permissions. Should implement
-     *                    {@link android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback}
-     * @param rationale   a message explaining why the application needs this set of permissions, will
-     *                    be displayed if the user rejects the request the first time.
-     * @param requestCode request code to track this request, must be < 256.
-     * @param perms       a set of permissions to be requested.
-     */
     public static void requestPermissions(final Object object, String rationale,
                                           final int requestCode, final String... perms) {
         requestPermissions(object, rationale,
@@ -99,18 +78,6 @@ public final class QiscusPermissionsUtil {
                 requestCode, perms);
     }
 
-    /**
-     * Request a set of permissions, showing rationale if the system requests it.
-     *
-     * @param object         Activity or Fragment requesting permissions. Should implement
-     *                       {@link android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback}
-     * @param rationale      a message explaining why the application needs this set of permissions, will
-     *                       be displayed if the user rejects the request the first time.
-     * @param positiveButton custom text for positive button
-     * @param negativeButton custom text for negative button
-     * @param requestCode    request code to track this request, must be < 256.
-     * @param perms          a set of permissions to be requested.
-     */
     public static void requestPermissions(final Object object, String rationale,
                                           @StringRes int positiveButton,
                                           @StringRes int negativeButton,
@@ -144,22 +111,6 @@ public final class QiscusPermissionsUtil {
         }
     }
 
-    /**
-     * Handle the result of a permission request, should be called from the calling Activity's
-     * {@link android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback#onRequestPermissionsResult(int, String[], int[])}
-     * method.
-     * <p>
-     * If any permissions were granted or denied, the Activity will receive the appropriate
-     * callbacks through {@link PermissionCallbacks} and methods annotated with
-     * {@link AfterPermissionGranted} will be run if appropriate.
-     *
-     * @param requestCode  requestCode argument to permission result callback.
-     * @param permissions  permissions argument to permission result callback.
-     * @param grantResults grantResults argument to permission result callback.
-     * @param object       the calling Activity or Fragment.
-     * @throws IllegalArgumentException if the calling Activity does not implement
-     *                                  {@link PermissionCallbacks}.
-     */
     public static void onRequestPermissionsResult(int requestCode, String[] permissions,
                                                   int[] grantResults, Object object) {
 
@@ -195,17 +146,6 @@ public final class QiscusPermissionsUtil {
         }
     }
 
-    /**
-     * If user denied permissions with the flag NEVER ASK AGAIN, open a dialog explaining the
-     * permissions rationale again and directing the user to the app settings.
-     * <p>
-     * NOTE: use of this method is optional, should be called from
-     * {@link PermissionCallbacks#onPermissionsDenied(int, List)}
-     *
-     * @param object      the calling Activity or Fragment.
-     * @param deniedPerms the set of denied permissions.
-     * @return {@code true} if user denied at least one permission with the flag NEVER ASK AGAIN.
-     */
     public static boolean checkDeniedPermissionsNeverAskAgain(Object object, String rationale,
                                                               @StringRes int positiveButton,
                                                               @StringRes int negativeButton,
