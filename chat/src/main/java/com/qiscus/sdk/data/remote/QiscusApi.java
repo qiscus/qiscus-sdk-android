@@ -148,6 +148,7 @@ public enum QiscusApi {
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                         qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                                 : jsonChatRoom.get("options").getAsString());
+                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
 
                         JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
                                 .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
@@ -259,6 +260,8 @@ public enum QiscusApi {
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                         qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                                 : jsonChatRoom.get("options").getAsString());
+                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
+
                         JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
                                 .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
                         List<QiscusRoomMember> members = new ArrayList<>();
@@ -315,6 +318,8 @@ public enum QiscusApi {
                         qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
                         qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
                                 : jsonChatRoom.get("options").getAsString());
+                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
+
                         JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
                                 .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
                         List<QiscusRoomMember> members = new ArrayList<>();

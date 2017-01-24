@@ -27,7 +27,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 5;
+    static final int DATABASE_VERSION = 6;
 
     static abstract class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -38,6 +38,7 @@ final class QiscusDb {
         static final String COLUMN_SUBTITLE = "subtitle";
         static final String COLUMN_IS_GROUP = "is_group";
         static final String COLUMN_OPTIONS = "options";
+        static final String COLUMN_AVATAR_URL = "avatar_url";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
@@ -47,7 +48,8 @@ final class QiscusDb {
                         COLUMN_NAME + " TEXT," +
                         COLUMN_SUBTITLE + " TEXT," +
                         COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
-                        COLUMN_OPTIONS + " TEXT" +
+                        COLUMN_OPTIONS + " TEXT," +
+                        COLUMN_AVATAR_URL + " TEXT" +
                         " ); ";
 
         static ContentValues toContentValues(QiscusChatRoom qiscusChatRoom) {
@@ -59,6 +61,7 @@ final class QiscusDb {
             values.put(COLUMN_SUBTITLE, qiscusChatRoom.getSubtitle());
             values.put(COLUMN_IS_GROUP, qiscusChatRoom.isGroup() ? 1 : 0);
             values.put(COLUMN_OPTIONS, qiscusChatRoom.getOptions());
+            values.put(COLUMN_AVATAR_URL, qiscusChatRoom.getAvatarUrl());
             return values;
         }
 
@@ -71,6 +74,7 @@ final class QiscusDb {
             qiscusChatRoom.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBTITLE)));
             qiscusChatRoom.setGroup(cursor.getShort(cursor.getColumnIndexOrThrow(COLUMN_IS_GROUP)) == 1);
             qiscusChatRoom.setOptions(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OPTIONS)));
+            qiscusChatRoom.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AVATAR_URL)));
             return qiscusChatRoom;
         }
     }
