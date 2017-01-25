@@ -81,6 +81,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } finally {
             sqLiteDatabase.endTransaction();
         }
+
+        deleteRoomMembers(qiscusChatRoom.getId());
         for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
             addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
         }
@@ -236,6 +238,21 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void deleteRoomMember(int roomId, String email) {
         String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId + " "
                 + "AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(email);
+
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+    }
+
+    @Override
+    public void deleteRoomMembers(int roomId) {
+        String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId;
 
         sqLiteDatabase.beginTransaction();
         try {

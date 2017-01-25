@@ -59,4 +59,6 @@ public interface QiscusChatRoomStore {
     List<QiscusRoomMember> getRoomMembers(int roomId);
 
     void deleteRoomMember(int roomId, String email);
+
+    void deleteRoomMembers(int roomId);
 }
