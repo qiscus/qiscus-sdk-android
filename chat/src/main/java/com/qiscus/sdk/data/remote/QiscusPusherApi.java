@@ -52,6 +52,9 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     INSTANCE;
@@ -272,35 +275,19 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
 
     public void setUserRead(int roomId, int topicId, int commentId, String commentUniqueId) {
-        if (!mqttAndroidClient.isConnected()) {
-            connect();
-        }
-        try {
-            MqttMessage message = new MqttMessage();
-            message.setPayload((commentId + ":" + commentUniqueId).getBytes());
-            message.setQos(1);
-            message.setRetained(true);
-            pendingTokens.add(mqttAndroidClient.publish("r/" + roomId + "/" + topicId + "/"
-                    + qiscusAccount.getEmail() + "/r", message));
-        } catch (MqttException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aVoid -> {
+                }, Throwable::printStackTrace);
     }
 
     public void setUserDelivery(int roomId, int topicId, int commentId, String commentUniqueId) {
-        if (!mqttAndroidClient.isConnected()) {
-            connect();
-        }
-        try {
-            MqttMessage message = new MqttMessage();
-            message.setPayload((commentId + ":" + commentUniqueId).getBytes());
-            message.setQos(1);
-            message.setRetained(true);
-            pendingTokens.add(mqttAndroidClient.publish("r/" + roomId + "/" + topicId + "/"
-                    + qiscusAccount.getEmail() + "/d", message));
-        } catch (MqttException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aVoid -> {
+                }, Throwable::printStackTrace);
     }
 
     @Override

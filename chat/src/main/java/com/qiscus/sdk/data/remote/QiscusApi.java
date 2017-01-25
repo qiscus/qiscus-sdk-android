@@ -600,6 +600,12 @@ public enum QiscusApi {
                 .doOnNext(qiscusChatRoom1 -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom1));
     }
 
+    public Observable<Void> updateCommentStatus(int roomId, int lastReadId, int lastReceivedId) {
+        return api.updateCommentStatus(Qiscus.getToken(), roomId, lastReadId, lastReceivedId)
+                .map(jsonElement -> null);
+    }
+
+
     private interface Api {
 
         @FormUrlEncoded
@@ -651,6 +657,13 @@ public enum QiscusApi {
                                                @Field("room_name") String name,
                                                @Field("avatar_url") String avatarUrl,
                                                @Field("options") String options);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/update_comment_status")
+        Observable<JsonElement> updateCommentStatus(@Field("token") String token,
+                                                    @Field("room_id") int roomId,
+                                                    @Field("last_comment_read_id") int lastReadId,
+                                                    @Field("last_comment_received_id") int lastReceivedId);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
