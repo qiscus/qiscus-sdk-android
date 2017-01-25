@@ -541,6 +541,24 @@ public enum QiscusApi {
         });
     }
 
+    public Observable<QiscusChatRoom> updateChatRoom(QiscusChatRoom qiscusChatRoom,
+                                                     String name, String avatarUrl, String options) {
+        return api.updateChatRoom(Qiscus.getToken(), qiscusChatRoom.getId(), name, avatarUrl, options)
+                .map(jsonElement -> {
+                    if (name != null) {
+                        qiscusChatRoom.setName(name);
+                    }
+                    if (avatarUrl != null) {
+                        qiscusChatRoom.setAvatarUrl(avatarUrl);
+                    }
+                    if (options != null) {
+                        qiscusChatRoom.setOptions(options);
+                    }
+                    return qiscusChatRoom;
+                })
+                .doOnNext(qiscusChatRoom1 -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom1));
+    }
+
     private interface Api {
 
         @FormUrlEncoded
@@ -584,6 +602,14 @@ public enum QiscusApi {
         @GET("/api/v2/mobile/sync")
         Observable<JsonElement> sync(@Query("token") String token,
                                      @Query("last_received_comment_id") int lastCommentId);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/update_room")
+        Observable<JsonElement> updateChatRoom(@Field("token") String token,
+                                               @Field("id") int id,
+                                               @Field("room_name") String name,
+                                               @Field("avatar_url") String avatarUrl,
+                                               @Field("options") String options);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
