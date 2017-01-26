@@ -31,7 +31,7 @@ ext {
     siteUrl = 'https://github.com/qiscus/qiscus-sdk-android'
     gitUrl = 'https://github.com/qiscus/qiscus-sdk-android.git'
 
-    libraryVersion = '1.10.1'
+    libraryVersion = '1.10.2'
 
     developerId = 'qiscustech'
     developerName = 'Qiscus Tech'
