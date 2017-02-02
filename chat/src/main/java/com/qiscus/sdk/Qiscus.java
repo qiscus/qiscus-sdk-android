@@ -84,7 +84,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, "http://" + qiscusAppId + ".qiscus.com");
+        initWithCustomServer(application, "https://" + qiscusAppId + ".qiscus.com");
     }
 
     /**
