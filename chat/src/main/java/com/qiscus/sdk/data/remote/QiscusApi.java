@@ -19,14 +19,12 @@ package com.qiscus.sdk.data.remote;
 import android.net.Uri;
 import android.support.v4.util.Pair;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 
@@ -37,14 +35,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -79,14 +71,7 @@ import rx.exceptions.OnErrorThrowable;
  */
 public enum QiscusApi {
     INSTANCE;
-    private static DateFormat dateFormat;
-
     private final OkHttpClient httpClient;
-
-    static {
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     private String baseUrl;
     private final Api api;
@@ -114,268 +99,55 @@ public enum QiscusApi {
 
     public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
         return api.loginOrRegister(email, password, username, avatarUrl)
-                .map(jsonElement -> {
-                    JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results")
-                            .getAsJsonObject().get("user").getAsJsonObject();
-                    QiscusAccount qiscusAccount = new QiscusAccount();
-                    qiscusAccount.setId(jsonAccount.get("id").getAsInt());
-                    qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
-                    qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
-                    qiscusAccount.setToken(jsonAccount.get("token").getAsString());
-                    qiscusAccount.setRtKey(jsonAccount.get("rtKey").getAsString());
-                    qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
-                    return qiscusAccount;
-                });
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .filter(jsonElement -> jsonElement != null)
+                .map(QiscusApiParser::parseQiscusAccount);
     }
 
     public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, String options) {
         return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId, options)
-                .onErrorReturn(throwable -> null)
-                .map(jsonElement -> {
-                    QiscusChatRoom qiscusChatRoom;
-                    if (jsonElement != null) {
-                        JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject();
-                        qiscusChatRoom = new QiscusChatRoom();
-                        qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-                        qiscusChatRoom.setDistinctId(distinctId == null ? "default" : distinctId);
-                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
-                        if (qiscusChatRoom.isGroup()) {
-                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
-                            qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
-                        }
-                        qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
-                        qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
-                        qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-                        qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
-                                : jsonChatRoom.get("options").getAsString());
-                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
-
-                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
-                        List<QiscusRoomMember> members = new ArrayList<>();
-                        for (JsonElement jsonMember : jsonMembers) {
-                            QiscusRoomMember member = new QiscusRoomMember();
-                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
-                            members.add(member);
-                        }
-                        qiscusChatRoom.setMember(members);
-
-                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("comments").getAsJsonArray();
-                        if (comments.size() > 0) {
-                            JsonObject lastComment = comments.get(0).getAsJsonObject();
-                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
-                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
-                            try {
-                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        return qiscusChatRoom;
-                    }
-                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(withEmail,
-                            distinctId == null ? "default" : distinctId);
-                    if (qiscusChatRoom == null) {
-                        throw new RuntimeException("Unable to connect with qiscus server!");
-                    }
-                    return qiscusChatRoom;
-                });
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .filter(jsonElement -> jsonElement != null)
+                .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, String options) {
         return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options)
-                .onErrorReturn(throwable -> null)
-                .map(jsonElement -> {
-                    if (jsonElement != null) {
-                        JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject();
-                        QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
-                        qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-                        qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
-                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
-                        if (qiscusChatRoom.isGroup()) {
-                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
-                        }
-                        qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
-                        qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
-                        qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-                        qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
-                                : jsonChatRoom.get("options").getAsString());
-                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
-
-                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
-                        List<QiscusRoomMember> members = new ArrayList<>();
-                        for (JsonElement jsonMember : jsonMembers) {
-                            QiscusRoomMember member = new QiscusRoomMember();
-                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
-                            members.add(member);
-                        }
-                        qiscusChatRoom.setMember(members);
-
-                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("comments").getAsJsonArray();
-                        if (comments.size() > 0) {
-                            JsonObject lastComment = comments.get(0).getAsJsonObject();
-                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
-                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
-                            try {
-                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        return qiscusChatRoom;
-                    } else {
-                        throw new RuntimeException("Unable to connect with qiscus server!");
-                    }
-                });
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .filter(jsonElement -> jsonElement != null)
+                .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     public Observable<QiscusChatRoom> getChatRoom(int roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
-                .onErrorReturn(throwable -> null)
-                .map(jsonElement -> {
-                    QiscusChatRoom qiscusChatRoom;
-                    if (jsonElement != null) {
-                        JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject();
-                        qiscusChatRoom = new QiscusChatRoom();
-                        qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-                        //TODO minta server ngasih tau distinctId biar bisa disimpen
-                        //qiscusChatRoom.setDistinctId("default");
-                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
-                        if (qiscusChatRoom.isGroup()) {
-                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
-                            qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
-                        }
-                        qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
-                        qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
-                        qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-                        qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
-                                : jsonChatRoom.get("options").getAsString());
-                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
-
-                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
-                        List<QiscusRoomMember> members = new ArrayList<>();
-                        for (JsonElement jsonMember : jsonMembers) {
-                            QiscusRoomMember member = new QiscusRoomMember();
-                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
-                            members.add(member);
-                        }
-                        qiscusChatRoom.setMember(members);
-
-                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("comments").getAsJsonArray();
-
-                        if (comments.size() > 0) {
-                            JsonObject lastComment = comments.get(0).getAsJsonObject();
-                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
-                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
-                            try {
-                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        return qiscusChatRoom;
-                    }
-                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(roomId);
-                    if (qiscusChatRoom == null) {
-                        throw new RuntimeException("Unable to connect with qiscus server!");
-                    }
-                    return qiscusChatRoom;
-                });
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .filter(jsonElement -> jsonElement != null)
+                .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(QiscusChatRoom room, int count) {
-        return api.getChatRoom(Qiscus.getToken(), room.getId())
-                .onErrorReturn(throwable -> null)
-                .map(jsonElement -> {
-                    QiscusChatRoom qiscusChatRoom;
-                    if (jsonElement != null) {
-                        JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject();
-                        qiscusChatRoom = new QiscusChatRoom();
-                        qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-                        //TODO minta server ngasih tau distinctId biar bisa disimpen
-                        //qiscusChatRoom.setDistinctId("default");
-                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
-                        if (qiscusChatRoom.isGroup()) {
-                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
-                            qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
-                        }
-                        qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
-                        qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
-                        qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-                        qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
-                                : jsonChatRoom.get("options").getAsString());
-                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
-
-                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
-                        List<QiscusRoomMember> members = new ArrayList<>();
-                        for (JsonElement jsonMember : jsonMembers) {
-                            QiscusRoomMember member = new QiscusRoomMember();
-                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
-                            members.add(member);
-                        }
-                        qiscusChatRoom.setMember(members);
-
-                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("comments").getAsJsonArray();
-                        List<QiscusComment> qiscusComments = new ArrayList<>();
-                        for (JsonElement jsonComment : comments) {
-                            QiscusComment qiscusComment = new QiscusComment();
-                            qiscusComment.setTopicId(room.getLastTopicId());
-                            qiscusComment.setId(jsonComment.getAsJsonObject().get("id").getAsInt());
-                            qiscusComment.setUniqueId(String.valueOf(jsonComment.getAsJsonObject().get("id").getAsInt()));
-                            qiscusComment.setCommentBeforeId(jsonComment.getAsJsonObject().get("comment_before_id").getAsInt());
-                            qiscusComment.setMessage(jsonComment.getAsJsonObject().get("message").getAsString());
-                            qiscusComment.setSender(jsonComment.getAsJsonObject().get("username").getAsString());
-                            qiscusComment.setSenderEmail(jsonComment.getAsJsonObject().get("email").getAsString());
-                            qiscusComment.setSenderAvatar(jsonComment.getAsJsonObject().get("user_avatar_url").getAsString());
-                            try {
-                                qiscusComment.setTime(dateFormat.parse(jsonComment.getAsJsonObject().get("timestamp").getAsString()));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            qiscusComments.add(qiscusComment);
-                        }
-                        if (comments.size() > 0) {
-                            JsonObject lastComment = comments.get(0).getAsJsonObject();
-                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
-                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
-                            try {
-                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        return Pair.create(qiscusChatRoom, qiscusComments);
-                    }
-                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(room.getId());
-                    if (qiscusChatRoom == null) {
-                        throw new RuntimeException("Unable to connect with qiscus server!");
-                    }
-                    return Pair.create(qiscusChatRoom, Qiscus.getDataStore().getComments(qiscusChatRoom.getLastTopicId(), count));
-                });
+    public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(int roomId) {
+        return api.getChatRoom(Qiscus.getToken(), roomId)
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .filter(jsonElement -> jsonElement != null)
+                .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
 
-    public Observable<QiscusComment> getComments(int topicId, int lastCommentId) {
+    public Observable<QiscusComment> getComments(int roomId, int topicId, int lastCommentId) {
         return api.getComments(Qiscus.getToken(), topicId, lastCommentId)
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
@@ -384,24 +156,7 @@ public enum QiscusApi {
                 .filter(jsonElement -> jsonElement != null)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
-                .map(jsonElement -> {
-                    QiscusComment qiscusComment = new QiscusComment();
-                    JsonObject jsonComment = jsonElement.getAsJsonObject();
-                    qiscusComment.setTopicId(topicId);
-                    qiscusComment.setId(jsonComment.get("id").getAsInt());
-                    qiscusComment.setUniqueId(String.valueOf(jsonComment.get("id").getAsInt()));
-                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
-                    qiscusComment.setMessage(jsonComment.get("message").getAsString());
-                    qiscusComment.setSender(jsonComment.get("username").getAsString());
-                    qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
-                    qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
-                    try {
-                        qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return qiscusComment;
-                });
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId, topicId));
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
@@ -430,25 +185,9 @@ public enum QiscusApi {
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
-                    QiscusComment qiscusComment = new QiscusComment();
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
-                    qiscusComment.setId(jsonComment.get("id").getAsInt());
-                    qiscusComment.setRoomId(jsonComment.get("room_id").getAsInt());
-                    qiscusComment.setTopicId(jsonComment.get("topic_id").getAsInt());
-                    qiscusComment.setUniqueId(jsonComment.get("unique_id").isJsonNull() ?
-                            qiscusComment.getId() + "" : jsonComment.get("unique_id").getAsString());
-                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
-                    qiscusComment.setMessage(jsonComment.get("message").getAsString());
-                    qiscusComment.setSender(jsonComment.get("username").getAsString());
-                    qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
-                    qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-                    qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
-                    try {
-                        qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return qiscusComment;
+                    return QiscusApiParser.parseQiscusComment(jsonElement,
+                            jsonComment.get("room_id").getAsInt(), jsonComment.get("topic_id").getAsInt());
                 });
     }
 
@@ -484,8 +223,7 @@ public enum QiscusApi {
         });
     }
 
-    public Observable<File> downloadFile(final int topicId, final String url,
-                                         final String fileName, ProgressListener progressListener) {
+    public Observable<File> downloadFile(int topicId, String url, String fileName, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
             if (subscriber.isUnsubscribed()) {
                 return;
@@ -543,65 +281,22 @@ public enum QiscusApi {
 
     public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, String options) {
         return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options)
-                .map(jsonElement -> {
-                    QiscusChatRoom qiscusChatRoom;
-                    if (jsonElement != null) {
-                        JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject();
-                        qiscusChatRoom = new QiscusChatRoom();
-                        qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-                        //TODO minta server ngasih tau distinctId biar bisa disimpen
-                        //qiscusChatRoom.setDistinctId("default");
-                        qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
-                        if (qiscusChatRoom.isGroup()) {
-                            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
-                            qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
-                        }
-                        qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());
-                        qiscusChatRoom.setLastCommentMessage(jsonChatRoom.get("last_comment_message").getAsString());
-                        qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-                        qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null
-                                : jsonChatRoom.get("options").getAsString());
-                        qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
-
-                        JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
-                        List<QiscusRoomMember> members = new ArrayList<>();
-                        for (JsonElement jsonMember : jsonMembers) {
-                            QiscusRoomMember member = new QiscusRoomMember();
-                            member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                            member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                            member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
-                            members.add(member);
-                        }
-                        qiscusChatRoom.setMember(members);
-
-                        JsonArray comments = jsonElement.getAsJsonObject().get("results")
-                                .getAsJsonObject().get("comments").getAsJsonArray();
-
-                        if (comments.size() > 0) {
-                            JsonObject lastComment = comments.get(0).getAsJsonObject();
-                            qiscusChatRoom.setLastCommentSender(lastComment.get("username").getAsString());
-                            qiscusChatRoom.setLastCommentSenderEmail(lastComment.get("email").getAsString());
-                            try {
-                                qiscusChatRoom.setLastCommentTime(dateFormat.parse(lastComment.get("timestamp").getAsString()));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        return qiscusChatRoom;
-                    }
-                    qiscusChatRoom = Qiscus.getDataStore().getChatRoom(roomId);
-                    if (qiscusChatRoom == null) {
-                        throw new RuntimeException("Unable to connect with qiscus server!");
-                    }
-                    return qiscusChatRoom;
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
                 })
-                .doOnNext(qiscusChatRoom1 -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom1));
+                .filter(jsonElement -> jsonElement != null)
+                .map(QiscusApiParser::parseQiscusChatRoom)
+                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
 
     public Observable<Void> updateCommentStatus(int roomId, int lastReadId, int lastReceivedId) {
         return api.updateCommentStatus(Qiscus.getToken(), roomId, lastReadId, lastReceivedId)
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .filter(jsonElement -> jsonElement != null)
                 .map(jsonElement -> null);
     }
 
