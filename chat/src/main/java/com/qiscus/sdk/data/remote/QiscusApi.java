@@ -99,61 +99,31 @@ public enum QiscusApi {
 
     public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
         return api.loginOrRegister(email, password, username, avatarUrl)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
     public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, String options) {
         return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId, options)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, String options) {
         return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     public Observable<QiscusChatRoom> getChatRoom(int roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(int roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
 
     public Observable<QiscusComment> getComments(int roomId, int topicId, int lastCommentId) {
         return api.getComments(Qiscus.getToken(), topicId, lastCommentId)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId, topicId));
@@ -281,22 +251,12 @@ public enum QiscusApi {
 
     public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, String options) {
         return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .map(QiscusApiParser::parseQiscusChatRoom)
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
 
     public Observable<Void> updateCommentStatus(int roomId, int lastReadId, int lastReceivedId) {
         return api.updateCommentStatus(Qiscus.getToken(), roomId, lastReadId, lastReceivedId)
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .filter(jsonElement -> jsonElement != null)
                 .map(jsonElement -> null);
     }
 
