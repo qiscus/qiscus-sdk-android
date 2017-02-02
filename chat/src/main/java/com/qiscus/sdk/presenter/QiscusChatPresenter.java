@@ -61,6 +61,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         this.room = room;
         this.currentTopicId = room.getLastTopicId();
         qiscusAccount = Qiscus.getQiscusAccount();
+        lastDeliveredCommentId = 0;
+        lastReadCommentId = 0;
 
         updateLastReadComment(Qiscus.getDataStore().getLatestReadComment(currentTopicId));
         updateLastDeliveredComment(Qiscus.getDataStore().getLatestDeliveredComment(currentTopicId));
@@ -232,13 +234,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
-        return QiscusApi.getInstance().getChatRoomComments(room, 40)
+        return QiscusApi.getInstance().getChatRoomComments(room.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .doOnNext(roomData -> {
+                    checkForLastRead(roomData.second);
                     for (QiscusComment qiscusComment : roomData.second) {
-                        qiscusComment.setRoomId(room.getId());
                         if (qiscusComment.getId() > lastDeliveredCommentId) {
                             qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
                         } else if (qiscusComment.getId() > lastReadCommentId) {
@@ -259,8 +261,19 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    private void checkForLastRead(List<QiscusComment> qiscusComments) {
+        for (QiscusComment qiscusComment : qiscusComments) {
+            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+                if (qiscusComment.getId() > lastReadCommentId) {
+                    lastReadCommentId = qiscusComment.getId();
+                    lastDeliveredCommentId = lastReadCommentId;
+                }
+            }
+        }
+    }
+
     private Observable<List<QiscusComment>> getCommentsFromNetwork(int lastCommentId) {
-        return QiscusApi.getInstance().getComments(currentTopicId, lastCommentId)
+        return QiscusApi.getInstance().getComments(room.getId(), currentTopicId, lastCommentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
@@ -275,7 +288,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     }
                     Qiscus.getDataStore().addOrUpdate(qiscusComment);
                 })
-                .toSortedList(commentComparator);
+                .toSortedList(commentComparator)
+                .doOnNext(this::checkForLastRead);
     }
 
     private Observable<List<QiscusComment>> getLocalComments(int count) {
@@ -292,6 +306,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     return comments;
                 })
                 .doOnNext(comments -> {
+                    checkForLastRead(comments);
                     for (QiscusComment qiscusComment : comments) {
                         if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
                             qiscusComment.setState(QiscusComment.STATE_FAILED);
@@ -322,6 +337,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (view != null) {
                         if (!roomData.second.isEmpty()) {
                             QiscusComment lastComment = roomData.second.get(0);
+                            for (QiscusComment qiscusComment : roomData.second) {
+                                if (qiscusComment.getId() > lastComment.getId()) {
+                                    lastComment = qiscusComment;
+                                }
+                            }
                             QiscusPusherApi.getInstance().setUserRead(room.getId(),
                                     currentTopicId,
                                     lastComment.getId(),
@@ -389,6 +409,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     return comments;
                 })
                 .doOnNext(comments -> {
+                    checkForLastRead(comments);
                     for (QiscusComment comment : comments) {
                         if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
                             qiscusComment.setState(QiscusComment.STATE_FAILED);
@@ -446,7 +467,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             .getComment(event.getCommentId(), event.getCommentUniqueId());
                     if (deliveredComment != null) {
                         deliveredComment.setId(event.getCommentId());
-                        updateCommentState(deliveredComment, QiscusComment.STATE_DELIVERED);
                         updateLastDeliveredComment(deliveredComment);
                     } else {
                         lastDeliveredCommentId = event.getCommentId();
@@ -458,7 +478,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             .getComment(event.getCommentId(), String.valueOf(event.getCommentId()));
                     if (readComment != null) {
                         readComment.setId(event.getCommentId());
-                        updateCommentState(readComment, QiscusComment.STATE_READ);
                         updateLastReadComment(readComment);
                     } else {
                         lastReadCommentId = event.getCommentId();
@@ -467,14 +486,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     }
                     break;
             }
-        }
-    }
-
-    private void updateCommentState(QiscusComment qiscusComment, int state) {
-        if (qiscusComment != null && qiscusComment.getState() < state) {
-            qiscusComment.setState(state);
-            Qiscus.getDataStore().addOrUpdate(qiscusComment);
-            view.refreshComment(qiscusComment);
         }
     }
 

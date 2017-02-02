@@ -59,8 +59,6 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected boolean needToShowDate;
     protected boolean messageFromMe;
     protected boolean needToShowFirstMessageBubbleIndicator;
-    protected int lastDeliveredCommentId;
-    protected int lastReadCommentId;
     protected boolean groupChat;
 
     protected Drawable rightBubbleDrawable;
@@ -243,18 +241,6 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
 
     protected void showIconReadOrNot(QiscusComment qiscusComment) {
         if (messageStateIndicatorView != null) {
-            if (qiscusComment.getState() != QiscusComment.STATE_FAILED
-                    && qiscusComment.getState() != QiscusComment.STATE_READ) {
-                if (qiscusComment.getId() < 0) {
-                    qiscusComment.setState(QiscusComment.STATE_SENDING);
-                } else if (qiscusComment.getId() > lastDeliveredCommentId) {
-                    qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-                } else if (qiscusComment.getId() > lastReadCommentId) {
-                    qiscusComment.setState(QiscusComment.STATE_DELIVERED);
-                } else {
-                    qiscusComment.setState(QiscusComment.STATE_READ);
-                }
-            }
             switch (qiscusComment.getState()) {
                 case QiscusComment.STATE_SENDING:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
@@ -309,13 +295,5 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
             return true;
         }
         return false;
-    }
-
-    public void setLastDeliveredCommentId(int lastDeliveredCommentId) {
-        this.lastDeliveredCommentId = lastDeliveredCommentId;
-    }
-
-    public void setLastReadCommentId(int lastReadCommentId) {
-        this.lastReadCommentId = lastReadCommentId;
     }
 }

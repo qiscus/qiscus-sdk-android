@@ -53,7 +53,7 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
     protected int lastReadCommentId;
     protected boolean groupChat;
 
-    public QiscusBaseChatAdapter(Context context, boolean groupChat){
+    public QiscusBaseChatAdapter(Context context, boolean groupChat) {
         this.context = context;
         this.groupChat = groupChat;
         data = new SortedList<>(getItemClass(), new SortedList.Callback<Item>() {
@@ -136,8 +136,6 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
-        holder.setLastDeliveredCommentId(lastDeliveredCommentId);
-        holder.setLastReadCommentId(lastReadCommentId);
         holder.setGroupChat(groupChat);
 
         if (position == getItemCount() - 1) {
@@ -265,11 +263,34 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
 
     public void updateLastDeliveredComment(int lastDeliveredCommentId) {
         this.lastDeliveredCommentId = lastDeliveredCommentId;
+        updateCommentState();
         notifyDataSetChanged();
+    }
+
+    private void updateCommentState() {
+        int size = data.size();
+        for (int i = 0; i < size; i++) {
+            if (data.get(i).getState() > QiscusComment.STATE_SENDING) {
+                if (data.get(i).getId() <= lastReadCommentId) {
+                    if (data.get(i).getState() == QiscusComment.STATE_READ) {
+                        break;
+                    }
+                    data.get(i).setState(QiscusComment.STATE_READ);
+                } else if (data.get(i).getId() <= lastDeliveredCommentId) {
+                    if (data.get(i).getState() == QiscusComment.STATE_DELIVERED) {
+                        break;
+                    }
+                    data.get(i).setState(QiscusComment.STATE_DELIVERED);
+                }
+            }
+        }
     }
 
     public void updateLastReadComment(int lastReadCommentId) {
         this.lastReadCommentId = lastReadCommentId;
+        this.lastDeliveredCommentId = lastReadCommentId;
+        updateCommentState();
+        notifyDataSetChanged();
     }
 
     public List<Item> getSelectedComments() {
