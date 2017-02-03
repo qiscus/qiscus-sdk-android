@@ -22,12 +22,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.CircleProgress;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.QiscusProgressView;
 
 import java.io.File;
 
@@ -44,7 +44,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
 
     @NonNull protected TextView fileNameView;
     @Nullable protected TextView fileTypeView;
-    @Nullable protected CircleProgress progressView;
+    @Nullable protected QiscusProgressView progressView;
     @Nullable protected ImageView downloadIconView;
 
     public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
@@ -62,7 +62,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     protected abstract TextView getFileTypeView(View itemView);
 
     @Nullable
-    protected abstract CircleProgress getProgressView(View itemView);
+    protected abstract QiscusProgressView getProgressView(View itemView);
 
     @Nullable
     protected abstract ImageView getDownloadIconView(View itemView);

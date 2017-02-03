@@ -24,11 +24,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.CircleProgress;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.QiscusProgressView;
 
 /**
  * Created on : September 27, 2016
@@ -44,7 +44,7 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
     @NonNull protected ImageView playButton;
     @NonNull protected AppCompatSeekBar seekBar;
     @NonNull protected TextView durationView;
-    @Nullable protected CircleProgress progressView;
+    @Nullable protected QiscusProgressView progressView;
 
     protected int playIcon;
     protected int pauseIcon;
@@ -70,7 +70,7 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
     protected abstract TextView getDurationView(View itemView);
 
     @Nullable
-    protected abstract CircleProgress getProgressView(View itemView);
+    protected abstract QiscusProgressView getProgressView(View itemView);
 
     @Override
     protected void loadChatConfig() {

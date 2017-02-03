@@ -45,4 +45,14 @@
         <attr name="layout_weight" format="float"/>
         <attr name="android:layout_gravity"/>
     </declare-styleable>
+    <declare-styleable name="QiscusCircleProgress">
+        <attr name="qcircle_progress" format="integer"/>
+        <attr name="qcircle_max" format="integer"/>
+        <attr name="qcircle_unfinished_color" format="color"/>
+        <attr name="qcircle_finished_color" format="color"/>
+        <attr name="qcircle_text_size" format="dimension"/>
+        <attr name="qcircle_text_color" format="color"/>
+        <attr name="qcircle_prefix_text" format="string"/>
+        <attr name="qcircle_suffix_text" format="string"/>
+    </declare-styleable>
 </resources>

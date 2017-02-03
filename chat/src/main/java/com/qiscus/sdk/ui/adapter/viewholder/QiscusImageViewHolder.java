@@ -23,10 +23,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.CircleProgress;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.QiscusProgressView;
 
 /**
  * Created on : September 27, 2016
@@ -67,8 +67,8 @@ public class QiscusImageViewHolder extends QiscusBaseImageMessageViewHolder {
 
     @Nullable
     @Override
-    protected CircleProgress getProgressView(View itemView) {
-        return (CircleProgress) itemView.findViewById(R.id.progress);
+    protected QiscusProgressView getProgressView(View itemView) {
+        return (QiscusProgressView) itemView.findViewById(R.id.progress);
     }
 
     @Nullable

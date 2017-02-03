@@ -23,10 +23,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.CircleProgress;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.QiscusProgressView;
 
 /**
  * Created on : November 02, 2016
@@ -103,7 +103,7 @@ public class QiscusAudioViewHolder extends QiscusBaseAudioMessageViewHolder {
 
     @Nullable
     @Override
-    protected CircleProgress getProgressView(View itemView) {
-        return (CircleProgress) itemView.findViewById(R.id.progress);
+    protected QiscusProgressView getProgressView(View itemView) {
+        return (QiscusProgressView) itemView.findViewById(R.id.progress);
     }
 }

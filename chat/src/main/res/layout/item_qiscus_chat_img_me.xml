@@ -136,7 +136,7 @@
 
         </RelativeLayout>
 
-        <com.github.lzyzsd.circleprogress.CircleProgress
+        <com.qiscus.sdk.ui.view.QiscusCircleProgress
             android:id="@+id/progress"
             android:layout_width="132dp"
             android:layout_height="132dp"
@@ -144,7 +144,7 @@
             android:layout_marginBottom="12dp"
             android:layout_marginTop="49dp"
             android:visibility="gone"
-            app:circle_finished_color="@color/qiscus_primary_light"/>
+            app:qcircle_finished_color="@color/qiscus_primary_light"/>
 
         <TextView
             android:id="@+id/time"

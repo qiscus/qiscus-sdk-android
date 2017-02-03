@@ -108,7 +108,7 @@
                 android:tint="@color/qiscus_secondary_text"
                 android:visibility="visible"/>
 
-            <com.github.lzyzsd.circleprogress.CircleProgress
+            <com.qiscus.sdk.ui.view.QiscusCircleProgress
                 android:id="@+id/progress"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
@@ -118,8 +118,8 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:visibility="gone"
-                app:circle_finished_color="@color/qiscus_primary_light"
-                app:circle_text_size="12sp"/>
+                app:qcircle_finished_color="@color/qiscus_primary_light"
+                app:qcircle_text_size="12sp"/>
 
         </RelativeLayout>
 
