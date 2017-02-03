@@ -94,10 +94,10 @@ dependencies {
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 
     //This for the UI
-    compile 'com.android.support:support-v4:25.1.0'
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:recyclerview-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:support-v4:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:recyclerview-v7:25.1.1'
+    compile 'com.android.support:design:25.1.1'
 
     //The core of Reactive Programming
     compile 'io.reactivex:rxjava:1.1.7'
