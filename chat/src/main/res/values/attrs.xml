@@ -30,5 +30,19 @@
         <attr name="qciv_border_overlay" format="boolean"/>
         <attr name="qciv_fill_color" format="color"/>
     </declare-styleable>
-
+    <declare-styleable name="QiscusFlowLayout">
+        <attr name="android:orientation"/>
+        <attr name="layoutDirection" format="enum">
+            <enum name="ltr" value="0"/>
+            <enum name="rtl" value="1"/>
+        </attr>
+        <attr name="debugDraw" format="boolean"/>
+        <attr name="weightDefault" format="float"/>
+        <attr name="android:gravity"/>
+    </declare-styleable>
+    <declare-styleable name="QiscusFlowLayout_LayoutParams">
+        <attr name="layout_newLine" format="boolean"/>
+        <attr name="layout_weight" format="float"/>
+        <attr name="android:layout_gravity"/>
+    </declare-styleable>
 </resources>

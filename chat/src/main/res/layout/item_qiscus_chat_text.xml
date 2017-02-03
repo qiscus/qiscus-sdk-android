@@ -70,7 +70,7 @@
         android:src="@drawable/ic_qiscus_arrow_bubble_primary"
         android:tint="@color/qiscus_primary"/>
 
-    <org.apmem.tools.layouts.FlowLayout
+    <com.qiscus.sdk.ui.view.QiscusFlowLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
             android:textColor="@color/qiscus_primary_light"
             android:textSize="12sp"/>
 
-    </org.apmem.tools.layouts.FlowLayout>
+    </com.qiscus.sdk.ui.view.QiscusFlowLayout>
 
     <!-- Add this view because Xiaomi need it -->
     <View
