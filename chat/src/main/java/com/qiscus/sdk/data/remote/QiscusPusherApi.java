@@ -125,6 +125,10 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         }
     }
 
+    public boolean isConnected() {
+        return mqttAndroidClient != null && mqttAndroidClient.isConnected();
+    }
+
     private void startFallbackChecker(long period) {
         if (timer != null) {
             stopFallbackChecker();

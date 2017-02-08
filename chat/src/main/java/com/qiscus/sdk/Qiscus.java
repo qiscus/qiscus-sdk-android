@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
@@ -37,6 +38,7 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -117,6 +119,8 @@ public class Qiscus {
 
         startPusherService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
+
+        configureFcmToken();
     }
 
     public static void startPusherService() {
@@ -308,6 +312,52 @@ public class Qiscus {
         return HEART_BEAT;
     }
 
+    /**
+     * Set the FCM token to configure push notification with firebase cloud messaging
+     *
+     * @param fcmToken the token
+     */
+    public static void setFcmToken(String fcmToken) {
+        if (hasSetupUser()) {
+            QiscusApi.getInstance().registerFcmToken(fcmToken)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aVoid -> {
+                    }, Throwable::printStackTrace);
+        }
+
+        LOCAL_DATA_MANAGER.setFcmToken(fcmToken);
+    }
+
+    /**
+     * @return current fcm token, null if not set
+     */
+    public static String getFcmToken() {
+        return LOCAL_DATA_MANAGER.getFcmToken();
+    }
+
+    private static void configureFcmToken() {
+        if (hasSetupUser()) {
+            String fcmToken = getFcmToken();
+            if (fcmToken != null) {
+                setFcmToken(fcmToken);
+            } else {
+                Observable.just(null)
+                        .doOnNext(o -> {
+                            try {
+                                FirebaseInstanceId.getInstance().deleteInstanceId();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(aVoid -> {
+                        }, Throwable::printStackTrace);
+            }
+        }
+    }
+
     private static void checkAppIdSetup() throws RuntimeException {
         if (APP_SERVER == null) {
             throw new RuntimeException("Please init Qiscus with your app id before!");
@@ -361,6 +411,14 @@ public class Qiscus {
 
         private void setToken(String token) {
             this.token = token;
+        }
+
+        private String getFcmToken() {
+            return sharedPreferences.getString("fcm_token", null);
+        }
+
+        private void setFcmToken(String fcmToken) {
+            sharedPreferences.edit().putString("fcm_token", fcmToken).apply();
         }
 
         private void clearData() {
@@ -425,6 +483,7 @@ public class Qiscus {
                     .doOnNext(qiscusAccount -> {
                         Qiscus.LOCAL_DATA_MANAGER.saveAccountInfo(qiscusAccount);
                         EventBus.getDefault().post(QiscusUserEvent.LOGIN);
+                        configureFcmToken();
                     });
         }
     }

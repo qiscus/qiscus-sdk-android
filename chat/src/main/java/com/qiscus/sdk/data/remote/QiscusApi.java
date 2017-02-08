@@ -260,6 +260,10 @@ public enum QiscusApi {
                 .map(jsonElement -> null);
     }
 
+    public Observable<Void> registerFcmToken(String fcmToken) {
+        return api.registerFcmToken(Qiscus.getToken(), "android", fcmToken)
+                .map(jsonElement -> null);
+    }
 
     private interface Api {
 
@@ -319,6 +323,12 @@ public enum QiscusApi {
                                                     @Field("room_id") int roomId,
                                                     @Field("last_comment_read_id") int lastReadId,
                                                     @Field("last_comment_received_id") int lastReceivedId);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/set_user_device_token")
+        Observable<JsonElement> registerFcmToken(@Field("token") String token,
+                                                 @Field("device_platform") String devicePlatform,
+                                                 @Field("device_token") String fcmToken);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
