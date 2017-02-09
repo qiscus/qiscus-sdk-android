@@ -99,12 +99,12 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         clientId += Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
         serverUri = "ssl://mqtt.qiscus.com:1885";
 
-        scheduleUserStatus();
-
         buildClient();
 
         handler = new Handler();
         connecting = false;
+
+        scheduleUserStatus();
     }
 
     public static QiscusPusherApi getInstance() {
