@@ -19,22 +19,17 @@ package com.qiscus.sdk.util;
 import android.text.format.DateUtils;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public final class QiscusDateUtil {
 
     private static DateFormat fullDateFormat;
-    private static DateFormat isoDateFormat;
     private static DateFormat hourDateFormat;
 
     static {
         fullDateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
-        isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-        isoDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         hourDateFormat = new SimpleDateFormat("hh:mm a", Locale.US);
     }
 
@@ -54,10 +49,6 @@ public final class QiscusDateUtil {
 
     public static boolean isDateEqualIgnoreTime(Date lhs, Date rhs) {
         return toTodayOrDate(lhs).equals(toTodayOrDate(rhs));
-    }
-
-    public static Date parseIsoFormat(String date) throws ParseException {
-        return isoDateFormat.parse(date);
     }
 
     public static String getRelativeTimeDiff(Date date) {

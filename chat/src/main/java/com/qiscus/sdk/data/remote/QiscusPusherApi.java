@@ -31,7 +31,6 @@ import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
-import com.qiscus.sdk.util.QiscusDateUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -45,9 +44,12 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -61,6 +63,13 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     private static final String TAG = QiscusPusherApi.class.getSimpleName();
     private static final int RETRY_PERIOD = 2000;
     private static final int MAX_PENDING_MESSAGES = 10;
+
+    private static DateFormat dateFormat;
+
+    static {
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     private final Gson gson;
     private String clientId;
@@ -428,7 +437,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
             qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
             qiscusComment.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
-            qiscusComment.setTime(QiscusDateUtil.parseIsoFormat(jsonObject.get("created_at").getAsString()));
+            qiscusComment.setTime(dateFormat.parse(jsonObject.get("timestamp").getAsString()));
             qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
             qiscusComment.setRoomName(jsonObject.get("room_name").isJsonNull() ? qiscusComment.getSender() : jsonObject.get("room_name").getAsString());
             qiscusComment.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
