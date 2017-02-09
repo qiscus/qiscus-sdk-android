@@ -116,6 +116,7 @@ public class Qiscus {
         DATA_STORE = new QiscusDataBaseHelper();
         CHAT_CONFIG = new QiscusChatConfig();
         HEART_BEAT = 5000;
+        APP_INSTANCE.registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
         startPusherService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
@@ -356,6 +357,15 @@ public class Qiscus {
                         }, Throwable::printStackTrace);
             }
         }
+    }
+
+    /**
+     * Check is apps opened on foreground
+     *
+     * @return true if apps on foreground, and false if on background
+     */
+    public static boolean isOnForeground() {
+        return QiscusActivityCallback.INSTANCE.isForeground();
     }
 
     private static void checkAppIdSetup() throws RuntimeException {

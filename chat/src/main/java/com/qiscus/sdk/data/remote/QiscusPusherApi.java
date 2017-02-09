@@ -77,6 +77,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     private Timer timer;
     private List<IMqttDeliveryToken> pendingTokens;
 
+    private int setOfflineCounter;
+
     QiscusPusherApi() {
         Log.i("QiscusPusherApi", "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
@@ -87,6 +89,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         clientId = Qiscus.getApps().getPackageName() + "-";
         clientId += Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
         serverUri = "ssl://mqtt.qiscus.com:1885";
+
+        scheduleUserStatus();
 
         buildClient();
 
@@ -172,7 +176,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     public void disconnect() {
         Log.i(TAG, "Disconnecting...");
-        setUserStatus("0:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis());
+        setUserStatus(false);
         try {
             connecting = false;
             mqttAndroidClient.disconnect();
@@ -248,13 +252,13 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         fallBackListenUserStatus = null;
     }
 
-    private void setUserStatus(String status) {
+    private void setUserStatus(boolean online) {
         if (!mqttAndroidClient.isConnected()) {
             connect();
         }
         try {
             MqttMessage message = new MqttMessage();
-            message.setPayload(status.getBytes());
+            message.setPayload(online ? "1".getBytes() : "0".getBytes());
             message.setQos(2);
             message.setRetained(true);
             pendingTokens.add(mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message));
@@ -378,7 +382,6 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             disconnectedBufferOptions.setPersistBuffer(true);
             disconnectedBufferOptions.setDeleteOldestMessages(true);
             mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-            setUserStatus("1:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis());
             listenComment();
             if (fallBackListenRoom != null) {
                 handler.post(fallBackListenRoom);
@@ -434,5 +437,25 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             e.printStackTrace();
         }
         throw new RuntimeException("Unable to parse the JSON QiscusComment");
+    }
+
+    private static void scheduleUserStatus() {
+        Timer timer = new Timer("qiscus_online_status", true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (Qiscus.hasSetupUser()) {
+                    if (Qiscus.isOnForeground()) {
+                        INSTANCE.setOfflineCounter = 0;
+                        INSTANCE.setUserStatus(true);
+                    } else {
+                        if (INSTANCE.setOfflineCounter <= 2) {
+                            INSTANCE.setUserStatus(false);
+                            INSTANCE.setOfflineCounter++;
+                        }
+                    }
+                }
+            }
+        }, 0, 10000);
     }
 }

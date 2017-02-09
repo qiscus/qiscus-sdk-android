@@ -16,6 +16,8 @@
 
 package com.qiscus.sdk.util;
 
+import android.text.format.DateUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,5 +58,16 @@ public final class QiscusDateUtil {
 
     public static Date parseIsoFormat(String date) throws ParseException {
         return isoDateFormat.parse(date);
+    }
+
+    public static String getRelativeTimeDiff(Date date) {
+        String timeDiff = DateUtils.getRelativeTimeSpanString(date.getTime(),
+                System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString();
+
+        if (timeDiff.contains("0 ")) {
+            timeDiff = "in few seconds ago";
+        }
+
+        return timeDiff;
     }
 }

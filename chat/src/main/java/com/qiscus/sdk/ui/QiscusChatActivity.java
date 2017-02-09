@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,6 +27,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.Date;
 
@@ -98,8 +98,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     @Override
     public void onUserStatusChanged(String user, boolean online, Date lastActive) {
         if (qiscusChatRoom.getSubtitle().isEmpty()) {
-            String last = DateUtils.getRelativeTimeSpanString(lastActive.getTime(),
-                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+            String last = QiscusDateUtil.getRelativeTimeDiff(lastActive);
             tvSubtitle.setText(online ? "Online" : "Last seen " + last);
             tvSubtitle.setVisibility(View.VISIBLE);
         }
