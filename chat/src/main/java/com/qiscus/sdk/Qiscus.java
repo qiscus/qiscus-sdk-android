@@ -347,14 +347,14 @@ public class Qiscus {
                         .doOnNext(o -> {
                             try {
                                 FirebaseInstanceId.getInstance().deleteInstanceId();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            } catch (IOException ignored) {
+
                             }
                         })
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(aVoid -> {
-                        }, Throwable::printStackTrace);
+                        }, throwable -> {});
             }
         }
     }
