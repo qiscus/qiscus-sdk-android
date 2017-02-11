@@ -406,7 +406,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             }
             pendingTokens.clear();
             startFallbackChecker(Qiscus.getHeartBeat());
-        } catch (NullPointerException ignored) {
+        } catch (NullPointerException | IllegalArgumentException ignored) {
 
         }
 
