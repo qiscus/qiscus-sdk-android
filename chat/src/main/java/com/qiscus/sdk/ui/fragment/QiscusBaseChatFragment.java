@@ -27,6 +27,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -485,7 +486,8 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
             }
 
             if (photoFile != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        FileProvider.getUriForFile(getActivity(), "com.qiscus.sdk.provider", photoFile));
                 startActivityForResult(intent, TAKE_PICTURE_REQUEST);
             }
         }
@@ -633,8 +635,9 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onFileDownloaded(File file, String mimeType) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(file), mimeType);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(FileProvider.getUriForFile(getActivity(), "com.qiscus.sdk.provider", file), mimeType);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
