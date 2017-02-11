@@ -263,9 +263,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     }
 
     private void setUserStatus(boolean online) {
-        if (!mqttAndroidClient.isConnected()) {
-            connect();
-        }
+        checkAndConnect();
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload(online ? "1".getBytes() : "0".getBytes());
@@ -278,9 +276,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     }
 
     public void setUserTyping(int roomId, int topicId, boolean typing) {
-        if (!mqttAndroidClient.isConnected()) {
-            connect();
-        }
+        checkAndConnect();
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload((typing ? "1" : "0").getBytes());
@@ -290,7 +286,6 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             e.printStackTrace();
         }
     }
-
 
     public void setUserRead(int roomId, int topicId, int commentId, String commentUniqueId) {
         QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0)
@@ -306,6 +301,16 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
                 }, Throwable::printStackTrace);
+    }
+
+    private void checkAndConnect() {
+        try {
+            if (!mqttAndroidClient.isConnected()) {
+                connect();
+            }
+        } catch (NullPointerException e) {
+            connect();
+        }
     }
 
     @Override
