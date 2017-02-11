@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.remote;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -101,7 +102,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
         buildClient();
 
-        handler = new Handler();
+        handler = new Handler(Looper.getMainLooper());
         connecting = false;
 
         scheduleUserStatus();
