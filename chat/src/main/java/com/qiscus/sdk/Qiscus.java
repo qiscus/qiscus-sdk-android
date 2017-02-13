@@ -446,6 +446,7 @@ public class Qiscus {
         private SetUserBuilder(String email, String password) {
             this.email = email;
             this.password = password;
+            this.username = email;
         }
 
         /**
