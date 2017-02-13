@@ -18,6 +18,7 @@ package com.qiscus.sdk.service;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
@@ -37,7 +38,7 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
      */
     public static boolean handleMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getData().containsKey("qiscus_sdk")) {
-            if (!QiscusPusherApi.getInstance().isConnected()) {
+            if (Qiscus.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
                 QiscusPusherApi.getInstance().restartConnection();
             }
             return true;
