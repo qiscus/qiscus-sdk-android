@@ -273,7 +273,9 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             message.setRetained(true);
             pendingTokens.add(mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message));
         } catch (MqttException | NullPointerException e) {
-            e.printStackTrace();
+            if (e instanceof MqttException) {
+                e.printStackTrace();
+            }
         }
     }
 
