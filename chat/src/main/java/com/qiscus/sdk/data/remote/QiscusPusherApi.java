@@ -62,10 +62,12 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     INSTANCE;
     private static final String TAG = QiscusPusherApi.class.getSimpleName();
-    private static final int RETRY_PERIOD = 2000;
+    private static final long RETRY_PERIOD = 2000;
+    private static final long FALLBACK_PERIOD = 5000;
     private static final int MAX_PENDING_MESSAGES = 10;
 
     private static DateFormat dateFormat;
+    private static long reconnectCounter;
 
     static {
         dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
@@ -315,12 +317,13 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     @Override
     public void connectionLost(Throwable cause) {
-        Log.e(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD + " ms");
+        reconnectCounter++;
+        Log.e(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * reconnectCounter + " ms");
         connecting = false;
         if (cause != null) {
             cause.printStackTrace();
         }
-        handler.postDelayed(fallbackConnect, RETRY_PERIOD);
+        handler.postDelayed(fallbackConnect, RETRY_PERIOD * reconnectCounter);
     }
 
     @Override
@@ -391,6 +394,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         Log.i(TAG, "Connected...");
         try {
             connecting = false;
+            reconnectCounter = 0;
             DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
             disconnectedBufferOptions.setBufferEnabled(true);
             disconnectedBufferOptions.setBufferSize(100);
@@ -405,7 +409,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
                 handler.post(fallBackListenUserStatus);
             }
             pendingTokens.clear();
-            startFallbackChecker(Qiscus.getHeartBeat());
+            handler.removeCallbacks(fallbackConnect);
+            startFallbackChecker(FALLBACK_PERIOD);
         } catch (NullPointerException | IllegalArgumentException ignored) {
 
         }
@@ -414,12 +419,13 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     @Override
     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-        Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD + " ms");
+        reconnectCounter++;
+        Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms");
         if (exception != null) {
             exception.printStackTrace();
         }
         connecting = false;
-        handler.postDelayed(fallbackConnect, RETRY_PERIOD);
+        handler.postDelayed(fallbackConnect, RETRY_PERIOD * reconnectCounter);
     }
 
     @Subscribe
