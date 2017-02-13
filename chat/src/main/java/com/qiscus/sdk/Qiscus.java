@@ -115,7 +115,7 @@ public class Qiscus {
         LOCAL_DATA_MANAGER = new LocalDataManager();
         DATA_STORE = new QiscusDataBaseHelper();
         CHAT_CONFIG = new QiscusChatConfig();
-        HEART_BEAT = 5000;
+        HEART_BEAT = 60000;
         APP_INSTANCE.registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
         startPusherService();
