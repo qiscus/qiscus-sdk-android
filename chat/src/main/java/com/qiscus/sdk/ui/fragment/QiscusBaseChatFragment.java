@@ -487,7 +487,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
             if (photoFile != null) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        FileProvider.getUriForFile(getActivity(), "com.qiscus.sdk.provider", photoFile));
+                        FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), photoFile));
                 startActivityForResult(intent, TAKE_PICTURE_REQUEST);
             }
         }
@@ -635,7 +635,7 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
     @Override
     public void onFileDownloaded(File file, String mimeType) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(FileProvider.getUriForFile(getActivity(), "com.qiscus.sdk.provider", file), mimeType);
+        intent.setDataAndType(FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), file), mimeType);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         try {

@@ -359,6 +359,10 @@ public class Qiscus {
         }
     }
 
+    public static String getProviderAuthorities() {
+        return APP_INSTANCE.getPackageName() + ".qiscus.sdk.provider";
+    }
+
     /**
      * Check is apps opened on foreground
      *
