@@ -31,11 +31,11 @@ ext {
     siteUrl = 'https://github.com/qiscus/qiscus-sdk-android'
     gitUrl = 'https://github.com/qiscus/qiscus-sdk-android.git'
 
-    libraryVersion = '1.10.6'
+    libraryVersion = '1.10.7'
 
     developerId = 'qiscustech'
     developerName = 'Qiscus Tech'
-    developerEmail = 'qiscus.tech@gmail.com'
+    developerEmail = 'developer@qiscus.com'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
