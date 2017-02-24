@@ -21,6 +21,7 @@ import android.support.v4.util.Pair;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -538,10 +539,12 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         if (qiscusComment.getTopicId() == currentTopicId) {
             if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
-                QiscusPusherApi.getInstance().setUserRead(room.getId(),
-                        currentTopicId,
-                        qiscusComment.getId(),
-                        qiscusComment.getUniqueId());
+                if (QiscusCacheManager.getInstance().getLastChatActivity().first) {
+                    QiscusPusherApi.getInstance().setUserRead(room.getId(),
+                            currentTopicId,
+                            qiscusComment.getId(),
+                            qiscusComment.getUniqueId());
+                }
             }
             view.onNewComment(qiscusComment);
         }
