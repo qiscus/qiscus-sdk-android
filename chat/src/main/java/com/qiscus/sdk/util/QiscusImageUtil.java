@@ -67,9 +67,9 @@ public final class QiscusImageUtil {
             actualHeight = bitmap2.getHeight();
         }
 
-        //max Height and width values of the compressed image is taken as 816x612
-        float maxHeight = 816.0f;
-        float maxWidth = 612.0f;
+        //max Height and width values of the compressed image is taken as 1440x900
+        float maxHeight = 900.0f;
+        float maxWidth = 1440.0f;
         float imgRatio = actualWidth / actualHeight;
         float maxRatio = maxWidth / maxHeight;
 
