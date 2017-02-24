@@ -45,7 +45,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
 
     @Override
     protected void binRoomData() {
-        super.binRoomData();
+        tvTitle.setText(qiscusChatRoom.getName());
         generateSubtitle();
         tvSubtitle.setText(subtitle);
         tvSubtitle.setVisibility(View.VISIBLE);

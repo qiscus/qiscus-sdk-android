@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -291,11 +290,11 @@ public abstract class QiscusBaseChatFragment<Adapter extends QiscusBaseChatAdapt
 
         qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
         if (savedInstanceState == null) {
-            new Handler().postDelayed(() -> qiscusChatPresenter.loadComments(20), 400);
+            qiscusChatPresenter.loadComments(20);
         } else {
             ArrayList<QiscusComment> comments = savedInstanceState.getParcelableArrayList(COMMENTS_DATA);
             if (comments == null) {
-                new Handler().postDelayed(() -> qiscusChatPresenter.loadComments(20), 400);
+                qiscusChatPresenter.loadComments(20);
             } else {
                 showComments(comments);
             }
