@@ -44,7 +44,7 @@ ext {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 16
@@ -94,10 +94,10 @@ dependencies {
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 
     //This for the UI
-    compile 'com.android.support:support-v4:25.1.1'
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support:recyclerview-v7:25.1.1'
-    compile 'com.android.support:design:25.1.1'
+    compile 'com.android.support:support-v4:25.2.0'
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:recyclerview-v7:25.2.0'
+    compile 'com.android.support:design:25.2.0'
 
     //The core of Reactive Programming
     compile 'io.reactivex:rxjava:1.1.7'
