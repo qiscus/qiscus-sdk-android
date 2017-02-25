@@ -30,23 +30,21 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
-
-    private Button loginButton;
-
-    private ProgressDialog progressDialog;
+    private Button mLoginButton;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        loginButton = (Button) findViewById(R.id.bt_login);
-        loginButton.setText(Qiscus.hasSetupUser() ? "Logout" : "Login");
+        mLoginButton = (Button) findViewById(R.id.bt_login);
+        mLoginButton.setText(Qiscus.hasSetupUser() ? "Logout" : "Login");
     }
 
     public void loginOrLogout(View view) {
         if (Qiscus.hasSetupUser()) {
             Qiscus.clearUser();
-            loginButton.setText("Login");
+            mLoginButton.setText("Login");
         } else {
             showLoading();
             Qiscus.setUser("zetra25@gmail.com", "12345678")
@@ -56,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(qiscusAccount -> {
                         Log.i("MainActivity", "Login with account: " + qiscusAccount);
-                        loginButton.setText("Logout");
+                        mLoginButton.setText("Logout");
                         dismissLoading();
                     }, throwable -> {
                         throwable.printStackTrace();
@@ -145,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(qiscusChatRoom -> {
                     Log.d(MainActivity.class.getSimpleName(), "Room: " + qiscusChatRoom.toString());
-                    Log.d(MainActivity.class.getSimpleName(), "Last message: " + qiscusChatRoom.getLastCommentMessage());
+                    Log.d(MainActivity.class.getSimpleName(),
+                            "Last message: " + qiscusChatRoom.getLastCommentMessage());
                 }, throwable -> {
                     throwable.printStackTrace();
                     showError(throwable.getMessage());
@@ -157,15 +156,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showLoading() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Please wait...");
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Please wait...");
         }
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
     }
 
     public void dismissLoading() {
-        progressDialog.dismiss();
+        mProgressDialog.dismiss();
     }
 }

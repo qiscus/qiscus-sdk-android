@@ -95,10 +95,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private void commentSuccess(QiscusComment qiscusComment) {
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
-        if (savedQiscusComment != null) {
-            if (savedQiscusComment.getState() > qiscusComment.getState()) {
-                qiscusComment.setState(savedQiscusComment.getState());
-            }
+        if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
+            qiscusComment.setState(savedQiscusComment.getState());
         }
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
     }
@@ -315,11 +313,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void checkForLastRead(List<QiscusComment> qiscusComments) {
         for (QiscusComment qiscusComment : qiscusComments) {
-            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
-                if (qiscusComment.getId() > lastReadCommentId.get()) {
-                    lastReadCommentId.set(qiscusComment.getId());
-                    lastDeliveredCommentId.set(lastReadCommentId.get());
-                }
+            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail()) && qiscusComment.getId() > lastReadCommentId.get()) {
+                lastReadCommentId.set(qiscusComment.getId());
+                lastDeliveredCommentId.set(lastReadCommentId.get());
             }
         }
     }
@@ -587,13 +583,12 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         if (qiscusComment.getTopicId() == currentTopicId) {
             doInIo(() -> {
-                if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
-                    if (QiscusCacheManager.getInstance().getLastChatActivity().first) {
-                        QiscusPusherApi.getInstance().setUserRead(room.getId(),
-                                currentTopicId,
-                                qiscusComment.getId(),
-                                qiscusComment.getUniqueId());
-                    }
+                if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())
+                        && QiscusCacheManager.getInstance().getLastChatActivity().first) {
+                    QiscusPusherApi.getInstance().setUserRead(room.getId(),
+                            currentTopicId,
+                            qiscusComment.getId(),
+                            qiscusComment.getUniqueId());
                 }
             });
             view.onNewComment(qiscusComment);
@@ -609,8 +604,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (file == null) {
             qiscusComment.setDownloading(true);
             QiscusApi.getInstance()
-                    .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
-                            percentage -> qiscusComment.setProgress((int) percentage))
+                    .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(),
+                            qiscusComment.getAttachmentName(), percentage -> qiscusComment.setProgress((int) percentage))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())

@@ -36,7 +36,8 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
 
     @NonNull protected TextView messageTextView;
 
-    public QiscusBaseTextMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusBaseTextMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                           OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageTextView = getMessageTextView(itemView);
     }

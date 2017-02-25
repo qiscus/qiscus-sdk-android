@@ -47,7 +47,8 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     @Nullable protected QiscusProgressView progressView;
     @Nullable protected ImageView downloadIconView;
 
-    public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                           OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         fileNameView = getFileNameView(itemView);
         fileTypeView = getFileTypeView(itemView);

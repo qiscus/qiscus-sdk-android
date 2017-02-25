@@ -33,9 +33,11 @@ import java.util.Date;
  * Created by zetra. on 9/19/16.
  */
 public class ChatActivity extends QiscusBaseChatActivity {
-    private TextView title;
+    private TextView mTitle;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom, boolean simpleCustom) {
+    public static Intent generateIntent(Context context,
+                                        QiscusChatRoom qiscusChatRoom,
+                                        boolean simpleCustom) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra("simple_custom", simpleCustom);
@@ -56,19 +58,20 @@ public class ChatActivity extends QiscusBaseChatActivity {
     protected void onLoadView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        title = (TextView) findViewById(R.id.tv_title);
+        mTitle = (TextView) findViewById(R.id.tv_title);
     }
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return getIntent().getBooleanExtra("simple_custom", false) ? SimpleCustomChatFragment.newInstance(qiscusChatRoom)
-                : QiscusChatFragment.newInstance(qiscusChatRoom);
+        return getIntent().getBooleanExtra("simple_custom", false) ?
+                SimpleCustomChatFragment.newInstance(qiscusChatRoom) :
+                QiscusChatFragment.newInstance(qiscusChatRoom);
     }
 
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
         super.onViewReady(savedInstanceState);
-        title.setText(qiscusChatRoom.getName());
+        mTitle.setText(qiscusChatRoom.getName());
     }
 
     @Override

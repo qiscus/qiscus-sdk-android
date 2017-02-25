@@ -51,7 +51,8 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
 
     private QiscusComment qiscusComment;
 
-    public QiscusBaseAudioMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusBaseAudioMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         playButton = getPlayButton(itemView);
         seekBar = getSeekBar(itemView);

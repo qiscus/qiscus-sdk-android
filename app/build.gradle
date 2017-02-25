@@ -16,6 +16,7 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
+apply from: rootProject.file('gradle/quality.gradle')
 
 android {
     compileSdkVersion 25
@@ -40,6 +41,7 @@ android {
     }
     lintOptions {
         abortOnError false
+        textReport true
     }
 
     useLibrary 'org.apache.http.legacy'

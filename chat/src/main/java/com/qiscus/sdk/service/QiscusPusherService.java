@@ -75,6 +75,7 @@ public class QiscusPusherService extends Service {
 
     @Override
     public void onCreate() {
+        super.onCreate();
         Log.i(TAG, "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
@@ -190,16 +191,15 @@ public class QiscusPusherService extends Service {
                 qiscusComment.setRoomName(chatRoom.getName());
             }
         }
-        if (Qiscus.getChatConfig().isEnablePushNotification()) {
-            if (!qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
-                if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
-                    Pair<Boolean, Integer> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
-                    if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
-                        showPushNotification(qiscusComment);
-                    }
-                } else {
+        if (Qiscus.getChatConfig().isEnablePushNotification()
+                && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+            if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
+                Pair<Boolean, Integer> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
+                if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
                     showPushNotification(qiscusComment);
                 }
+            } else {
+                showPushNotification(qiscusComment);
             }
         }
     }
@@ -223,5 +223,6 @@ public class QiscusPusherService extends Service {
         EventBus.getDefault().unregister(this);
         sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
         stopSync();
+        super.onDestroy();
     }
 }

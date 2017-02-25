@@ -42,9 +42,10 @@ import java.util.List;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 
-public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder extends QiscusBaseMessageViewHolder<Item>> extends RecyclerView.Adapter<Holder> {
+public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends QiscusBaseMessageViewHolder<E>>
+        extends RecyclerView.Adapter<H> {
     protected Context context;
-    protected SortedList<Item> data;
+    protected SortedList<E> data;
     protected OnItemClickListener itemClickListener;
     protected OnLongItemClickListener longItemClickListener;
 
@@ -56,9 +57,9 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
     public QiscusBaseChatAdapter(Context context, boolean groupChat) {
         this.context = context;
         this.groupChat = groupChat;
-        data = new SortedList<>(getItemClass(), new SortedList.Callback<Item>() {
+        data = new SortedList<>(getItemClass(), new SortedList.Callback<E>() {
             @Override
-            public int compare(Item lhs, Item rhs) {
+            public int compare(E lhs, E rhs) {
                 return QiscusBaseChatAdapter.this.compare(lhs, rhs);
             }
 
@@ -81,13 +82,13 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
             }
 
             @Override
-            public boolean areContentsTheSame(Item oldItem, Item newItem) {
-                return oldItem.equals(newItem);
+            public boolean areContentsTheSame(E oldE, E newE) {
+                return oldE.equals(newE);
             }
 
             @Override
-            public boolean areItemsTheSame(Item oldItem, Item newItem) {
-                return oldItem.equals(newItem);
+            public boolean areItemsTheSame(E oldE, E newE) {
+                return oldE.equals(newE);
             }
         });
         qiscusAccount = Qiscus.getQiscusAccount();
@@ -105,22 +106,22 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         this.groupChat = groupChat;
     }
 
-    protected abstract Class<Item> getItemClass();
+    protected abstract Class<E> getItemClass();
 
     @Override
     public int getItemViewType(int position) {
-        Item qiscusComment = data.get(position);
+        E qiscusComment = data.get(position);
         if (qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
             return getItemViewTypeMyMessage(qiscusComment, position);
         }
         return getItemViewTypeOthersMessage(qiscusComment, position);
     }
 
-    protected abstract int getItemViewTypeMyMessage(Item qiscusComment, int position);
+    protected abstract int getItemViewTypeMyMessage(E qiscusComment, int position);
 
-    protected abstract int getItemViewTypeOthersMessage(Item qiscusComment, int position);
+    protected abstract int getItemViewTypeOthersMessage(E qiscusComment, int position);
 
-    protected int compare(Item lhs, Item rhs) {
+    protected int compare(E lhs, E rhs) {
         return lhs.getId() != -1 && rhs.getId() != -1 ?
                 QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime());
     }
@@ -132,33 +133,33 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
     protected abstract int getItemResourceLayout(int viewType);
 
     @Override
-    public abstract Holder onCreateViewHolder(ViewGroup parent, int viewType);
+    public abstract H onCreateViewHolder(ViewGroup parent, int viewType);
 
     @Override
-    public void onBindViewHolder(Holder holder, int position) {
-        holder.setGroupChat(groupChat);
+    public void onBindViewHolder(H h, int position) {
+        h.setGroupChat(groupChat);
 
         if (position == getItemCount() - 1) {
-            holder.setNeedToShowDate(true);
+            h.setNeedToShowDate(true);
         } else {
-            holder.setNeedToShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTime(), data.get(position + 1).getTime()));
+            h.setNeedToShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTime(), data.get(position + 1).getTime()));
         }
 
         if (!qiscusAccount.getEmail().equals(data.get(position).getSenderEmail())) {
-            holder.setMessageFromMe(false);
+            h.setMessageFromMe(false);
         } else {
-            holder.setMessageFromMe(true);
+            h.setMessageFromMe(true);
         }
 
-        if (holder.isNeedToShowDate()) {
-            holder.setNeedToShowFirstMessageBubbleIndicator(true);
+        if (h.isNeedToShowDate()) {
+            h.setNeedToShowFirstMessageBubbleIndicator(true);
         } else if (data.get(position).getSenderEmail().equals(data.get(position + 1).getSenderEmail())) {
-            holder.setNeedToShowFirstMessageBubbleIndicator(false);
+            h.setNeedToShowFirstMessageBubbleIndicator(false);
         } else {
-            holder.setNeedToShowFirstMessageBubbleIndicator(true);
+            h.setNeedToShowFirstMessageBubbleIndicator(true);
         }
 
-        holder.bind(data.get(position));
+        h.bind(data.get(position));
     }
 
     @Override
@@ -183,7 +184,7 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         this.longItemClickListener = longItemClickListener;
     }
 
-    public SortedList<Item> getData() {
+    public SortedList<E> getData() {
         return data;
     }
 
@@ -191,42 +192,42 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         return data.size() < 1;
     }
 
-    public int add(Item item) {
-        int i = data.add(item);
+    public int add(E e) {
+        int i = data.add(e);
         notifyItemInserted(i);
         return i;
     }
 
-    public void add(final List<Item> items) {
-        data.addAll(items);
+    public void add(final List<E> es) {
+        data.addAll(es);
         notifyDataSetChanged();
     }
 
-    public void addOrUpdate(Item item) {
-        int i = findPosition(item);
+    public void addOrUpdate(E e) {
+        int i = findPosition(e);
         if (i >= 0) {
-            data.updateItemAt(i, item);
+            data.updateItemAt(i, e);
             notifyItemChanged(i);
         } else {
-            add(item);
+            add(e);
         }
     }
 
-    public void addOrUpdate(final List<Item> items) {
-        for (Item item : items) {
-            int i = findPosition(item);
+    public void addOrUpdate(final List<E> es) {
+        for (E e : es) {
+            int i = findPosition(e);
             if (i >= 0) {
-                data.updateItemAt(i, item);
+                data.updateItemAt(i, e);
             } else {
-                data.add(item);
+                data.add(e);
             }
         }
         notifyDataSetChanged();
     }
 
-    public void refreshWithData(List<Item> items) {
+    public void refreshWithData(List<E> es) {
         data.clear();
-        data.addAll(items);
+        data.addAll(es);
         notifyDataSetChanged();
     }
 
@@ -237,8 +238,8 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         }
     }
 
-    public void remove(Item item) {
-        int position = findPosition(item);
+    public void remove(E e) {
+        int position = findPosition(e);
         remove(position);
     }
 
@@ -246,14 +247,14 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         data.clear();
     }
 
-    public int findPosition(Item item) {
+    public int findPosition(E e) {
         if (data == null) {
             return -1;
         }
 
         int size = data.size();
         for (int i = 0; i < size; i++) {
-            if (data.get(i).equals(item)) {
+            if (data.get(i).equals(e)) {
                 return i;
             }
         }
@@ -293,8 +294,8 @@ public abstract class QiscusBaseChatAdapter<Item extends QiscusComment, Holder e
         notifyDataSetChanged();
     }
 
-    public List<Item> getSelectedComments() {
-        List<Item> selectedComments = new ArrayList<>();
+    public List<E> getSelectedComments() {
+        List<E> selectedComments = new ArrayList<>();
         int size = data.size();
         for (int i = size - 1; i >= 0; i--) {
             if (data.get(i).isSelected()) {

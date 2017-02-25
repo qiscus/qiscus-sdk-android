@@ -168,6 +168,7 @@ public final class QiscusImageUtil {
                     out.close();
                 }
             } catch (IOException ignored) {
+                //Do nothing
             }
         }
 

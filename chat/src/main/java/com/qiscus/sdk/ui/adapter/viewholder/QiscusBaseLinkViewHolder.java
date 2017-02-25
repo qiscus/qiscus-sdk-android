@@ -36,7 +36,8 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
 
     private QiscusComment qiscusComment;
 
-    public QiscusBaseLinkViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusBaseLinkViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                    OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         linkPreviewView = getLinkPreviewView(itemView);
     }

@@ -192,6 +192,25 @@ public class QiscusChatRoom implements Parcelable {
     }
 
     @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (distinctId != null ? distinctId.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (subtitle != null ? subtitle.hashCode() : 0);
+        result = 31 * result + lastCommentId;
+        result = 31 * result + (lastCommentMessage != null ? lastCommentMessage.hashCode() : 0);
+        result = 31 * result + (lastCommentSender != null ? lastCommentSender.hashCode() : 0);
+        result = 31 * result + (lastCommentSenderEmail != null ? lastCommentSenderEmail.hashCode() : 0);
+        result = 31 * result + (lastCommentTime != null ? lastCommentTime.hashCode() : 0);
+        result = 31 * result + lastTopicId;
+        result = 31 * result + (options != null ? options.hashCode() : 0);
+        result = 31 * result + (group ? 1 : 0);
+        result = 31 * result + (avatarUrl != null ? avatarUrl.hashCode() : 0);
+        result = 31 * result + (member != null ? member.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
     }

@@ -86,7 +86,7 @@ public final class QiscusFileUtil {
     public static String[] splitFileName(String fileName) {
         String name = fileName;
         String extension = "";
-        int i = fileName.lastIndexOf(".");
+        int i = fileName.lastIndexOf('.');
         if (i != -1) {
             name = fileName.substring(0, i);
             extension = fileName.substring(i);
@@ -204,11 +204,9 @@ public final class QiscusFileUtil {
         File newFile = new File(file.getParent(), newName);
         if (!newFile.equals(file)) {
             if (newFile.exists()) {
-                if (newFile.delete()) {
-                }
+                newFile.delete();
             }
-            if (file.renameTo(newFile)) {
-            }
+            file.renameTo(newFile);
         }
         return newFile;
     }
@@ -223,7 +221,7 @@ public final class QiscusFileUtil {
     }
 
     public static String getExtension(String fileName) {
-        int lastDotPosition = fileName.lastIndexOf(".");
+        int lastDotPosition = fileName.lastIndexOf('.');
         String ext = fileName.substring(lastDotPosition + 1);
         ext = ext.replace("_", "");
         return ext.trim().toLowerCase();

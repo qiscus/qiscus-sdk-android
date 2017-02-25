@@ -34,9 +34,8 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class SimpleCustomChatFragment extends QiscusChatFragment {
-
-    private View inputPanel;
-    private TextView lockedView;
+    private View mInputPanel;
+    private TextView mLockedView;
 
     public static SimpleCustomChatFragment newInstance(QiscusChatRoom qiscusChatRoom) {
         SimpleCustomChatFragment fragment = new SimpleCustomChatFragment();
@@ -54,9 +53,9 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     @Override
     protected void onLoadView(View view) {
         super.onLoadView(view);
-        inputPanel = view.findViewById(R.id.box);
-        lockedView = (TextView) view.findViewById(R.id.lock);
-        lockedView.setOnLongClickListener(v -> {
+        mInputPanel = view.findViewById(R.id.box);
+        mLockedView = (TextView) view.findViewById(R.id.lock);
+        mLockedView.setOnLongClickListener(v -> {
             openLockedChat();
             return true;
         });
@@ -70,7 +69,7 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
 
     @Override
     protected void sendMessage() {
-        if (chatAdapter.isEmpty()) {
+        if (chatT.isEmpty()) {
             Toast.makeText(getActivity(), "First message sent!", Toast.LENGTH_SHORT).show();
         }
         super.sendMessage();
@@ -78,14 +77,14 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
 
     private void lockChatAfter(int duration) {
         new Handler().postDelayed(() -> {
-            inputPanel.setVisibility(View.GONE);
-            lockedView.setVisibility(View.VISIBLE);
+            mInputPanel.setVisibility(View.GONE);
+            mLockedView.setVisibility(View.VISIBLE);
         }, duration);
     }
 
     private void openLockedChat() {
-        inputPanel.setVisibility(View.VISIBLE);
-        lockedView.setVisibility(View.GONE);
+        mInputPanel.setVisibility(View.VISIBLE);
+        mLockedView.setVisibility(View.GONE);
         lockChatAfter(2000);
     }
 }

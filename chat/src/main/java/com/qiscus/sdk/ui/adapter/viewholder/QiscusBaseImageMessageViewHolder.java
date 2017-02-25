@@ -54,7 +54,8 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     @Nullable protected QiscusProgressView progressView;
     @Nullable protected ImageView downloadIconView;
 
-    public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         thumbnailView = getThumbnailView(itemView);
         imageHolderLayout = getImageHolderLayout(itemView);
@@ -191,7 +192,8 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                     }
 
                     @Override
-                    public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    public boolean onResourceReady(GlideDrawable resource, File model,
+                                                   Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                         if (imageHolderLayout != null) {
                             imageHolderLayout.setVisibility(View.INVISIBLE);
                         }

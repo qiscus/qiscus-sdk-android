@@ -215,7 +215,7 @@ public enum QiscusApi {
                     long fileLength = responseBody.contentLength();
 
                     inputStream = responseBody.byteStream();
-                    byte buffer[] = new byte[4096];
+                    byte[] buffer = new byte[4096];
                     long total = 0;
                     int count;
                     while ((count = inputStream.read(buffer)) != -1) {
@@ -244,6 +244,7 @@ public enum QiscusApi {
                         inputStream.close();
                     }
                 } catch (IOException ignored) {
+                    //Do nothing
                 }
             }
         });
@@ -286,7 +287,7 @@ public enum QiscusApi {
         Observable<JsonElement> createGroupChatRoom(@Field("token") String token,
                                                     @Field("name") String name,
                                                     @Field("participants[]") List<String> emails,
-                                                    @Field("avatar_url") String avatar_url,
+                                                    @Field("avatar_url") String avatarUrl,
                                                     @Field("options") String options);
 
         @GET("/api/v2/mobile/get_room_by_id")

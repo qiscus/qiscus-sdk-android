@@ -42,9 +42,8 @@ import com.qiscus.sdk.ui.view.QiscusRecyclerView;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter> {
-
-    private ImageView attachButton;
-    private LinearLayout addPanel;
+    private ImageView mAttachButton;
+    private LinearLayout mAddPanel;
 
     public static CustomChatFragment newInstance(QiscusChatRoom qiscusChatRoom) {
         CustomChatFragment fragment = new CustomChatFragment();
@@ -63,14 +62,14 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     protected void onLoadView(View view) {
         super.onLoadView(view);
         swipeRefreshLayout.setProgressViewOffset(false, 0, 128);
-        attachButton = (ImageView) view.findViewById(R.id.button_attach);
-        addPanel = (LinearLayout) view.findViewById(R.id.add_panel);
-        attachButton.setOnClickListener(v -> {
-            if (addPanel.getVisibility() == View.GONE) {
-                addPanel.startAnimation(animation);
-                addPanel.setVisibility(View.VISIBLE);
+        mAttachButton = (ImageView) view.findViewById(R.id.button_attach);
+        mAddPanel = (LinearLayout) view.findViewById(R.id.add_panel);
+        mAttachButton.setOnClickListener(v -> {
+            if (mAddPanel.getVisibility() == View.GONE) {
+                mAddPanel.startAnimation(animation);
+                mAddPanel.setVisibility(View.VISIBLE);
             } else {
-                addPanel.setVisibility(View.GONE);
+                mAddPanel.setVisibility(View.GONE);
             }
         });
     }
@@ -189,6 +188,6 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     protected void recordAudio() {
         super.recordAudio();
-        addPanel.setVisibility(View.GONE);
+        mAddPanel.setVisibility(View.GONE);
     }
 }

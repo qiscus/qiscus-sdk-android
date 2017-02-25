@@ -67,6 +67,13 @@ public class QiscusPushNotificationMessage implements Parcelable {
     }
 
     @Override
+    public int hashCode() {
+        int result = commentId;
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         return o instanceof QiscusPushNotificationMessage && commentId == ((QiscusPushNotificationMessage) o).commentId;
     }

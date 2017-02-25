@@ -29,7 +29,7 @@ final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
     static final int DATABASE_VERSION = 6;
 
-    static abstract class RoomTable {
+    abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
         static final String COLUMN_ID = "id";
         static final String COLUMN_TOPIC_ID = "last_topic";
@@ -79,7 +79,7 @@ final class QiscusDb {
         }
     }
 
-    static abstract class MemberTable {
+    abstract static class MemberTable {
         static final String TABLE_NAME = "members";
         static final String COLUMN_USER_EMAIL = "user_email";
         static final String COLUMN_USER_NAME = "user_name";
@@ -109,7 +109,7 @@ final class QiscusDb {
         }
     }
 
-    static abstract class RoomMemberTable {
+    abstract static class RoomMemberTable {
         static final String TABLE_NAME = "room_members";
         static final String COLUMN_ROOM_ID = "room_id";
         static final String COLUMN_USER_EMAIL = "user_email";
@@ -143,7 +143,7 @@ final class QiscusDb {
         }
     }
 
-    static abstract class CommentTable {
+    abstract static class CommentTable {
         static final String TABLE_NAME = "comments";
         static final String COLUMN_ID = "id";
         static final String COLUMN_ROOM_ID = "room_id";
@@ -205,7 +205,7 @@ final class QiscusDb {
         }
     }
 
-    static abstract class FilesTable {
+    abstract static class FilesTable {
         static final String TABLE_NAME = "files";
         static final String COLUMN_COMMENT_ID = "comment_id";
         static final String COLUMN_TOPIC_ID = "topic_id";

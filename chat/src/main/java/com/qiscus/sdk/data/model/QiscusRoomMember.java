@@ -19,7 +19,7 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class QiscusRoomMember implements Parcelable{
+public class QiscusRoomMember implements Parcelable {
     private String email;
     private String username;
     private String avatar;
@@ -77,6 +77,14 @@ public class QiscusRoomMember implements Parcelable{
                 ", username='" + username + '\'' +
                 ", avatar='" + avatar + '\'' +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int result = email != null ? email.hashCode() : 0;
+        result = 31 * result + (username != null ? username.hashCode() : 0);
+        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
+        return result;
     }
 
     @Override

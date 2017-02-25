@@ -124,6 +124,17 @@ public class QiscusAccount implements Parcelable {
     }
 
     @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
+        result = 31 * result + (token != null ? token.hashCode() : 0);
+        result = 31 * result + (username != null ? username.hashCode() : 0);
+        result = 31 * result + (rtKey != null ? rtKey.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         return o instanceof QiscusAccount && id == (((QiscusAccount) o).id);
     }

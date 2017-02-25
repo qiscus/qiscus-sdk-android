@@ -34,7 +34,8 @@ import static android.view.View.VISIBLE;
 public interface QiscusProgressView {
     @IntDef({VISIBLE, INVISIBLE, GONE})
     @Retention(RetentionPolicy.SOURCE)
-    @interface Visibility {}
+    @interface Visibility {
+    }
 
     void setProgress(int progress);
 

@@ -42,7 +42,7 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  * GitHub     : https://github.com/zetbaitsu
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> extends RecyclerView.ViewHolder implements
+public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> extends RecyclerView.ViewHolder implements
         View.OnClickListener, View.OnLongClickListener {
 
     @Nullable protected ImageView firstMessageBubbleIndicatorView;
@@ -76,7 +76,8 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
     protected int dateColor;
     protected Drawable selectionBackground;
 
-    public QiscusBaseMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+    public QiscusBaseMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                       OnLongItemClickListener longItemClickListener) {
         super(itemView);
         this.itemClickListener = itemClickListener;
         this.longItemClickListener = longItemClickListener;
@@ -112,7 +113,8 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         failedToSendMessageColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getFailedToSendMessageColor());
         readIconColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getReadIconColor());
         dateColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getDateColor());
-        selectionBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getSelectedBubbleBackgroundColor()));
+        selectionBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(),
+                Qiscus.getChatConfig().getSelectedBubbleBackgroundColor()));
         selectionBackground.setAlpha(51);
     }
 
@@ -157,7 +159,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         this.groupChat = groupChat;
     }
 
-    public void bind(Data qiscusComment) {
+    public void bind(E qiscusComment) {
         setUpColor();
 
         showDateOrNot(qiscusComment);
@@ -176,7 +178,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         onCommentSelected(qiscusComment);
     }
 
-    private void showSenderName(Data qiscusComment) {
+    private void showSenderName(E qiscusComment) {
         if (senderNameView != null && !messageFromMe && groupChat) {
             if (needToShowFirstMessageBubbleIndicator) {
                 senderNameView.setVisibility(View.VISIBLE);
@@ -188,7 +190,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         }
     }
 
-    private void showSenderAvatar(Data qiscusComment) {
+    private void showSenderAvatar(E qiscusComment) {
         if (avatarView != null && !messageFromMe) {
             if (needToShowFirstMessageBubbleIndicator) {
                 avatarView.setVisibility(View.VISIBLE);
@@ -204,7 +206,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         }
     }
 
-    protected abstract void showMessage(Data qiscusComment);
+    protected abstract void showMessage(E qiscusComment);
 
     protected void setUpColor() {
         if (messageFromMe) {
@@ -277,7 +279,7 @@ public abstract class QiscusBaseMessageViewHolder<Data extends QiscusComment> ex
         }
     }
 
-    protected void onCommentSelected(Data qiscusComment) {
+    protected void onCommentSelected(E qiscusComment) {
         itemView.setBackground(qiscusComment.isSelected() ? selectionBackground : null);
     }
 

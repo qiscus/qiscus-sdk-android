@@ -267,7 +267,8 @@ public class QiscusFlowLayout extends ViewGroup {
 
         View lastChild = views.get(viewCount - 1);
         LayoutParams lastChildLayoutParams = (LayoutParams) lastChild.getLayoutParams();
-        int excessLength = line.getLineLength() - (lastChildLayoutParams.getLength() + lastChildLayoutParams.getSpacingLength() + lastChildLayoutParams.getInlineStartLength());
+        int excessLength = line.getLineLength() - (lastChildLayoutParams.getLength() + lastChildLayoutParams.getSpacingLength() +
+                lastChildLayoutParams.getInlineStartLength());
         int excessOffset = 0;
         for (int i = 0; i < viewCount; i++) {
             final View child = views.get(i);

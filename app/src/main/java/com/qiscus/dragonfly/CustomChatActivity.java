@@ -37,8 +37,7 @@ import java.util.Date;
  * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class CustomChatActivity extends QiscusBaseChatActivity {
-
-    private TextView title;
+    private TextView mTitle;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
         Intent intent = new Intent(context, CustomChatActivity.class);
@@ -55,7 +54,7 @@ public class CustomChatActivity extends QiscusBaseChatActivity {
     protected void onLoadView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        title = (TextView) findViewById(R.id.tv_title);
+        mTitle = (TextView) findViewById(R.id.tv_title);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class CustomChatActivity extends QiscusBaseChatActivity {
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
         super.onViewReady(savedInstanceState);
-        title.setText(qiscusChatRoom.getName());
+        mTitle.setText(qiscusChatRoom.getName());
     }
 
     @Override

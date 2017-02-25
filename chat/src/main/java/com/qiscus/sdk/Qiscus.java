@@ -54,15 +54,15 @@ import rx.schedulers.Schedulers;
  */
 public class Qiscus {
 
-    private static Application APP_INSTANCE;
-    private static volatile Context APPLICATION_CONTEXT;
-    private static volatile Handler APP_HANDLER;
-    private static LocalDataManager LOCAL_DATA_MANAGER;
-    private static QiscusDataStore DATA_STORE;
-    private static QiscusChatConfig CHAT_CONFIG;
+    private static Application appInstance;
+    private static volatile Context applicationContext;
+    private static volatile Handler appHandler;
+    private static LocalDataManager localDataManager;
+    private static QiscusDataStore dataStore;
+    private static QiscusChatConfig chatConfig;
 
-    private static String APP_SERVER;
-    private static long HEART_BEAT;
+    private static String appServer;
+    private static long heartBeat;
 
     private Qiscus() {
     }
@@ -108,15 +108,15 @@ public class Qiscus {
      * @param serverBaseUrl Your qiscus chat engine base url
      */
     public static void initWithCustomServer(Application application, String serverBaseUrl) {
-        APP_INSTANCE = application;
-        APP_SERVER = serverBaseUrl;
-        APPLICATION_CONTEXT = APP_INSTANCE.getApplicationContext();
-        APP_HANDLER = new Handler(APPLICATION_CONTEXT.getMainLooper());
-        LOCAL_DATA_MANAGER = new LocalDataManager();
-        DATA_STORE = new QiscusDataBaseHelper();
-        CHAT_CONFIG = new QiscusChatConfig();
-        HEART_BEAT = 60000;
-        APP_INSTANCE.registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
+        appInstance = application;
+        appServer = serverBaseUrl;
+        applicationContext = appInstance.getApplicationContext();
+        appHandler = new Handler(applicationContext.getMainLooper());
+        localDataManager = new LocalDataManager();
+        dataStore = new QiscusDataBaseHelper();
+        chatConfig = new QiscusChatConfig();
+        heartBeat = 60000;
+        appInstance.registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
         startPusherService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
@@ -126,7 +126,7 @@ public class Qiscus {
 
     public static void startPusherService() {
         checkAppIdSetup();
-        APPLICATION_CONTEXT.startService(new Intent(APPLICATION_CONTEXT, QiscusPusherService.class));
+        applicationContext.startService(new Intent(applicationContext, QiscusPusherService.class));
     }
 
     /**
@@ -148,7 +148,7 @@ public class Qiscus {
      */
     public static Application getApps() {
         checkAppIdSetup();
-        return APP_INSTANCE;
+        return appInstance;
     }
 
     /**
@@ -158,7 +158,7 @@ public class Qiscus {
      */
     public static String getAppsName() {
         checkAppIdSetup();
-        return APP_INSTANCE.getApplicationInfo().loadLabel(APP_INSTANCE.getPackageManager()).toString();
+        return appInstance.getApplicationInfo().loadLabel(appInstance.getPackageManager()).toString();
     }
 
     /**
@@ -168,7 +168,7 @@ public class Qiscus {
      */
     public static Handler getAppsHandler() {
         checkAppIdSetup();
-        return APP_HANDLER;
+        return appHandler;
     }
 
     /**
@@ -178,7 +178,7 @@ public class Qiscus {
      */
     public static String getAppServer() {
         checkAppIdSetup();
-        return APP_SERVER;
+        return appServer;
     }
 
     /**
@@ -187,7 +187,7 @@ public class Qiscus {
      * @return true if already setup, false if not yet
      */
     public static boolean hasSetupUser() {
-        return LOCAL_DATA_MANAGER.isLogged();
+        return localDataManager.isLogged();
     }
 
     /**
@@ -197,7 +197,7 @@ public class Qiscus {
      */
     public static QiscusAccount getQiscusAccount() {
         checkUserSetup();
-        return LOCAL_DATA_MANAGER.getAccountInfo();
+        return localDataManager.getAccountInfo();
     }
 
     /**
@@ -207,7 +207,7 @@ public class Qiscus {
      */
     public static String getToken() {
         checkUserSetup();
-        return LOCAL_DATA_MANAGER.getToken();
+        return localDataManager.getToken();
     }
 
     /**
@@ -216,7 +216,7 @@ public class Qiscus {
      * @return Singleton of qiscus data store
      */
     public static QiscusDataStore getDataStore() {
-        return DATA_STORE;
+        return dataStore;
     }
 
     /**
@@ -226,7 +226,7 @@ public class Qiscus {
      * @param dataStore Your own chat datastore
      */
     public static void setDataStore(QiscusDataStore dataStore) {
-        DATA_STORE = dataStore;
+        Qiscus.dataStore = dataStore;
     }
 
     /**
@@ -236,7 +236,7 @@ public class Qiscus {
      */
     public static QiscusChatConfig getChatConfig() {
         checkAppIdSetup();
-        return CHAT_CONFIG;
+        return chatConfig;
     }
 
     /**
@@ -301,7 +301,7 @@ public class Qiscus {
      */
     public static void setHeartBeat(long heartBeat) {
         checkAppIdSetup();
-        HEART_BEAT = heartBeat;
+        Qiscus.heartBeat = heartBeat;
     }
 
     /**
@@ -310,7 +310,7 @@ public class Qiscus {
      * @return Heartbeat duration in milliseconds
      */
     public static long getHeartBeat() {
-        return HEART_BEAT;
+        return heartBeat;
     }
 
     /**
@@ -327,14 +327,14 @@ public class Qiscus {
                     }, Throwable::printStackTrace);
         }
 
-        LOCAL_DATA_MANAGER.setFcmToken(fcmToken);
+        localDataManager.setFcmToken(fcmToken);
     }
 
     /**
      * @return current fcm token, null if not set
      */
     public static String getFcmToken() {
-        return LOCAL_DATA_MANAGER.getFcmToken();
+        return localDataManager.getFcmToken();
     }
 
     private static void configureFcmToken() {
@@ -348,19 +348,20 @@ public class Qiscus {
                             try {
                                 FirebaseInstanceId.getInstance().deleteInstanceId();
                             } catch (IOException ignored) {
-
+                                //Do nothing
                             }
                         })
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(aVoid -> {
-                        }, throwable -> {});
+                        }, throwable -> {
+                        });
             }
         }
     }
 
     public static String getProviderAuthorities() {
-        return APP_INSTANCE.getPackageName() + ".qiscus.sdk.provider";
+        return appInstance.getPackageName() + ".qiscus.sdk.provider";
     }
 
     /**
@@ -373,7 +374,7 @@ public class Qiscus {
     }
 
     private static void checkAppIdSetup() throws RuntimeException {
-        if (APP_SERVER == null) {
+        if (appServer == null) {
             throw new RuntimeException("Please init Qiscus with your app id before!");
         }
     }
@@ -389,8 +390,8 @@ public class Qiscus {
      * Clear all current user qiscus data, you can call this method when user logout for example.
      */
     public static void clearUser() {
-        LOCAL_DATA_MANAGER.clearData();
-        DATA_STORE.clear();
+        localDataManager.clearData();
+        dataStore.clear();
         QiscusCacheManager.getInstance().clearData();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
@@ -496,7 +497,7 @@ public class Qiscus {
             return QiscusApi.getInstance()
                     .loginOrRegister(email, password, username, avatarUrl)
                     .doOnNext(qiscusAccount -> {
-                        Qiscus.LOCAL_DATA_MANAGER.saveAccountInfo(qiscusAccount);
+                        Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
                         EventBus.getDefault().post(QiscusUserEvent.LOGIN);
                         configureFcmToken();
                     });

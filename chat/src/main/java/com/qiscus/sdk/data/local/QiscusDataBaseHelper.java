@@ -422,7 +422,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
         sqLiteDatabase.beginTransaction();
         try {
-            sqLiteDatabase.update(QiscusDb.FilesTable.TABLE_NAME, QiscusDb.FilesTable.toContentValues(topicId, commentId, localPath), where, null);
+            sqLiteDatabase.update(QiscusDb.FilesTable.TABLE_NAME,
+                    QiscusDb.FilesTable.toContentValues(topicId, commentId, localPath), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

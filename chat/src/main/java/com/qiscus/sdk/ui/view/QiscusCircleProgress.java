@@ -45,12 +45,12 @@ public class QiscusCircleProgress extends View implements QiscusProgressView {
     private String prefixText = "";
     private String suffixText = "%";
 
-    private final int default_finished_color = Color.rgb(66, 145, 241);
-    private final int default_unfinished_color = Color.rgb(204, 204, 204);
-    private final int default_text_color = Color.WHITE;
-    private final int default_max = 100;
-    private final float default_text_size;
-    private final int min_size;
+    private final int defaultFinishedColor = Color.rgb(66, 145, 241);
+    private final int defaultUnfinishedColor = Color.rgb(204, 204, 204);
+    private final int defaultTextColor = Color.WHITE;
+    private final int defaultMax = 100;
+    private final float defaultTextSize;
+    private final int minSize;
 
     private static final String INSTANCE_STATE = "saved_instance";
     private static final String INSTANCE_TEXT_COLOR = "text_color";
@@ -75,8 +75,8 @@ public class QiscusCircleProgress extends View implements QiscusProgressView {
     public QiscusCircleProgress(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        default_text_size = QiscusAndroidUtil.sp2px(getResources(), 18);
-        min_size = (int) QiscusAndroidUtil.dp2px(getResources(), 100);
+        defaultTextSize = QiscusAndroidUtil.sp2px(getResources(), 18);
+        minSize = (int) QiscusAndroidUtil.dp2px(getResources(), 100);
 
         final TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.QiscusCircleProgress, defStyleAttr, 0);
         initByAttributes(attributes);
@@ -86,12 +86,12 @@ public class QiscusCircleProgress extends View implements QiscusProgressView {
     }
 
     protected void initByAttributes(TypedArray attributes) {
-        finishedColor = attributes.getColor(R.styleable.QiscusCircleProgress_qcircle_finished_color, default_finished_color);
-        unfinishedColor = attributes.getColor(R.styleable.QiscusCircleProgress_qcircle_unfinished_color, default_unfinished_color);
-        textColor = attributes.getColor(R.styleable.QiscusCircleProgress_qcircle_text_color, default_text_color);
-        textSize = attributes.getDimension(R.styleable.QiscusCircleProgress_qcircle_text_size, default_text_size);
+        finishedColor = attributes.getColor(R.styleable.QiscusCircleProgress_qcircle_finished_color, defaultFinishedColor);
+        unfinishedColor = attributes.getColor(R.styleable.QiscusCircleProgress_qcircle_unfinished_color, defaultUnfinishedColor);
+        textColor = attributes.getColor(R.styleable.QiscusCircleProgress_qcircle_text_color, defaultTextColor);
+        textSize = attributes.getDimension(R.styleable.QiscusCircleProgress_qcircle_text_size, defaultTextSize);
 
-        setMax(attributes.getInt(R.styleable.QiscusCircleProgress_qcircle_max, default_max));
+        setMax(attributes.getInt(R.styleable.QiscusCircleProgress_qcircle_max, defaultMax));
         setProgress(attributes.getInt(R.styleable.QiscusCircleProgress_qcircle_progress, 0));
 
         if (attributes.getString(R.styleable.QiscusCircleProgress_qcircle_prefix_text) != null) {
@@ -206,12 +206,12 @@ public class QiscusCircleProgress extends View implements QiscusProgressView {
 
     @Override
     protected int getSuggestedMinimumHeight() {
-        return min_size;
+        return minSize;
     }
 
     @Override
     protected int getSuggestedMinimumWidth() {
-        return min_size;
+        return minSize;
     }
 
     public float getProgressPercentage() {
