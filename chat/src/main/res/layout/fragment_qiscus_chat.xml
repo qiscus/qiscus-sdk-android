@@ -112,9 +112,10 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:hint="@string/hint_message"
-                android:imeOptions="actionSend"
-                android:inputType="textLongMessage|textMultiLine|textCapSentences"
+                android:imeOptions="actionSend|flagNoEnterAction"
+                android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
                 android:maxLines="5"
+                android:nextFocusRight="@+id/button_send"
                 android:padding="8dp"
                 android:textColor="@color/qiscus_primary_text"
                 android:textSize="16sp"/>
