@@ -33,6 +33,6 @@ public class SampleApps extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Qiscus.init(this, "dragonfly");
+        Qiscus.init(this, "dummy");
     }
 }
