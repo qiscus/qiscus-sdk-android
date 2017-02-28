@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void buildRoom() {
-        Qiscus.buildChatRoomWith("rya.meyvriska1@gmail.com")
+        Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
