@@ -572,7 +572,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, AUDIO, LINK
+        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING
     }
 
     public interface ProgressListener {

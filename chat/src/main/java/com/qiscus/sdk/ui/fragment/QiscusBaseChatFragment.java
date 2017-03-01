@@ -32,6 +32,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -394,6 +395,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                         || qiscusComment.getType() == QiscusComment.Type.IMAGE
                         || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                     qiscusChatPresenter.downloadFile(qiscusComment);
+                } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING){
+                    accountLinkingClick(qiscusComment);
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 showFailedCommentDialog(qiscusComment);
@@ -401,6 +404,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         } else {
             toggleSelectComment(qiscusComment);
         }
+    }
+
+    protected void accountLinkingClick(QiscusComment qiscusComment) {
+        Log.d(getClass().getSimpleName(), "Open account linking page.....");
     }
 
     protected void showFailedCommentDialog(QiscusComment qiscusComment) {

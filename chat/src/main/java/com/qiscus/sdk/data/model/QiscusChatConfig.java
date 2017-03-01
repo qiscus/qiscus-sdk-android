@@ -54,6 +54,9 @@ public class QiscusChatConfig {
     private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
     private int selectedBubbleBackgroundColor = R.color.qiscus_primary;
+    private int accountLinkingTextColor = R.color.qiscus_primary;
+    private int accountLinkingBackground = R.color.qiscus_light_grey;
+    private String accountLinkingText = "LOGIN";
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
     private String emptyRoomTitle = "Welcome!";
@@ -181,6 +184,21 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setSelectedBubbleBackgroundColor(@ColorRes int selectedBubbleBackgroundColor) {
         this.selectedBubbleBackgroundColor = selectedBubbleBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setAccountLinkingTextColor(@ColorRes int accountLinkingTextColor) {
+        this.accountLinkingTextColor = accountLinkingTextColor;
+        return this;
+    }
+
+    public QiscusChatConfig setAccountLinkingBackground(@ColorRes int accountLinkingBackground) {
+        this.accountLinkingBackground = accountLinkingBackground;
+        return this;
+    }
+
+    public QiscusChatConfig setAccountLinkingText(String accountLinkingText) {
+        this.accountLinkingText = accountLinkingText;
         return this;
     }
 
@@ -382,6 +400,20 @@ public class QiscusChatConfig {
     @ColorRes
     public int getSelectedBubbleBackgroundColor() {
         return selectedBubbleBackgroundColor;
+    }
+
+    @ColorRes
+    public int getAccountLinkingTextColor() {
+        return accountLinkingTextColor;
+    }
+
+    @ColorRes
+    public int getAccountLinkingBackground() {
+        return accountLinkingBackground;
+    }
+
+    public String getAccountLinkingText() {
+        return accountLinkingText;
     }
 
     public DateFormatter getDateFormat() {
