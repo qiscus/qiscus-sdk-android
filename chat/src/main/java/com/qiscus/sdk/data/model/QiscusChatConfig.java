@@ -73,6 +73,7 @@ public class QiscusChatConfig {
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
     private int notificationSmallIcon = R.drawable.ic_qiscus_notif_app;
     private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
+    private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
 
     private NotificationTitleHandler notificationTitleHandler = qiscusComment -> qiscusComment.isGroupMessage() ?
             qiscusComment.getRoomName() : qiscusComment.getSender();
@@ -304,6 +305,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setQiscusImageCompressionConfig(QiscusImageCompressionConfig qiscusImageCompressionConfig) {
+        this.qiscusImageCompressionConfig = qiscusImageCompressionConfig;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -492,5 +498,9 @@ public class QiscusChatConfig {
 
     public Drawable getChatRoomBackground() {
         return chatRoomBackground;
+    }
+
+    public QiscusImageCompressionConfig getQiscusImageCompressionConfig() {
+        return qiscusImageCompressionConfig;
     }
 }
