@@ -59,6 +59,8 @@ import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiPopup;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,6 +126,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     private boolean fieldMessageEmpty = true;
     private CommentSelectedListener commentSelectedListener;
     private RoomChangedListener roomChangedListener;
+    private EmojiPopup emojiPopup;
 
     @Nullable
     @Override
@@ -290,6 +293,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageRecyclerView.setAdapter(chatT);
         messageRecyclerView.addOnScrollListener(new QiscusChatScrollListener(chatLayoutManager, this));
 
+        setupEmojiPopup();
+
         qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
         if (savedInstanceState == null) {
             qiscusChatPresenter.loadComments(20);
@@ -308,6 +313,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         if (startingMessage != null && !startingMessage.isEmpty()) {
             qiscusChatPresenter.sendComment(startingMessage);
+        }
+    }
+
+    protected void setupEmojiPopup() {
+        if (messageEditText instanceof EmojiEditText){
+            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                    .setOnSoftKeyboardCloseListener(() -> emojiPopup.dismiss())
+                    .build((EmojiEditText) messageEditText);
         }
     }
 
@@ -774,6 +787,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         outState.putParcelableArrayList(COMMENTS_DATA, comments);
     }
 
+    @Override
+    public void onStop() {
+        if (emojiPopup != null) {
+            emojiPopup.dismiss();
+        }
+
+        super.onStop();
+    }
 
     @Override
     public void onDestroyView() {

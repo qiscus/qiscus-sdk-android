@@ -17,6 +17,7 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -106,7 +107,7 @@
                 android:alpha="0.5"
                 android:background="@color/qiscus_light_grey"/>
 
-            <EditText
+            <com.vanniktech.emoji.EmojiEditText
                 android:id="@+id/field_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -118,7 +119,8 @@
                 android:nextFocusRight="@+id/button_send"
                 android:padding="8dp"
                 android:textColor="@color/qiscus_primary_text"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                app:emojiSize="22sp"/>
 
             <LinearLayout
                 android:id="@+id/add_panel"

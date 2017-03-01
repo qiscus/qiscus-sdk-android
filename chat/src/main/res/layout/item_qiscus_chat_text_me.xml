@@ -17,6 +17,7 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -61,7 +62,7 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
-        <TextView
+        <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/contents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,7 +71,8 @@
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            app:emojiSize="22sp"/>
 
         <TextView
             android:id="@+id/time"
