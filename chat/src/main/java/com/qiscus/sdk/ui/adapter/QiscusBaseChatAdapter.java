@@ -122,6 +122,9 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected abstract int getItemViewTypeOthersMessage(E qiscusComment, int position);
 
     protected int compare(E lhs, E rhs) {
+        if (lhs.getState() != QiscusComment.STATE_SENDING && rhs.getState() == QiscusComment.STATE_SENDING) {
+            return 1;
+        }
         return lhs.getId() != -1 && rhs.getId() != -1 ?
                 QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime());
     }
