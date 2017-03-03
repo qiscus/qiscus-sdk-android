@@ -87,7 +87,7 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     protected int getItemViewTypeOthersMessage(QiscusComment qiscusComment, int position) {
         switch (qiscusComment.getType()) {
             case TEXT:
-                return TYPE_ACCOUNT_LINKING;
+                return TYPE_MESSAGE_OTHER;
             case LINK:
                 return TYPE_LINK_OTHER;
             case IMAGE:
