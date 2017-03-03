@@ -68,8 +68,8 @@ public final class QiscusImageUtil {
         }
 
         //max Height and width values of the compressed image is taken as 1440x900
-        float maxHeight = 900.0f;
-        float maxWidth = 1440.0f;
+        float maxHeight = Qiscus.getChatConfig().getQiscusImageCompressionConfig().getMaxHeight();
+        float maxWidth = Qiscus.getChatConfig().getQiscusImageCompressionConfig().getMaxWidth();
         float imgRatio = actualWidth / actualHeight;
         float maxRatio = maxWidth / maxHeight;
 
@@ -158,7 +158,8 @@ public final class QiscusImageUtil {
             out = new FileOutputStream(filename);
 
             //write the compressed bitmap at the destination specified by filename.
-            QiscusImageUtil.getScaledBitmap(imageUri).compress(Bitmap.CompressFormat.JPEG, 80, out);
+            QiscusImageUtil.getScaledBitmap(imageUri).compress(Bitmap.CompressFormat.JPEG,
+                    Qiscus.getChatConfig().getQiscusImageCompressionConfig().getQuality(), out);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
