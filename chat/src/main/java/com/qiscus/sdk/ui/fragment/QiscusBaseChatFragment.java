@@ -52,6 +52,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
+import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
@@ -59,7 +60,11 @@ import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.trello.rxlifecycle.components.support.RxFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -395,7 +400,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                         || qiscusComment.getType() == QiscusComment.Type.IMAGE
                         || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                     qiscusChatPresenter.downloadFile(qiscusComment);
-                } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING){
+                } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING) {
                     accountLinkingClick(qiscusComment);
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
@@ -407,7 +412,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void accountLinkingClick(QiscusComment qiscusComment) {
-        Log.d(getClass().getSimpleName(), "Open account linking page.....");
+        JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+        try {
+            startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), payload.getString("url"),
+                    payload.getString("redirect_url")));
+        } catch (JSONException e) {
+            Log.e("Qiscus", e.getMessage());
+        }
     }
 
     protected void showFailedCommentDialog(QiscusComment qiscusComment) {
@@ -804,7 +815,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void requestStoragePermission() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS[0], PERMISSIONS[1])) {
             QiscusPermissionsUtil.requestPermissions(this, "To make this apps working properly we " +
-                    "need to access external storage to save your chatting data. " +
+                            "need to access external storage to save your chatting data. " +
                             "So please allow the apps to access the storage!",
                     RC_STORAGE_PERMISSION, PERMISSIONS[0], PERMISSIONS[1]);
         }
