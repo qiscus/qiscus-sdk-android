@@ -61,4 +61,8 @@ public final class QiscusDateUtil {
 
         return timeDiff;
     }
+
+    public static String toFullDateFormat(Date date) {
+        return toTodayOrDate(date) + " at " + toHour(date);
+    }
 }

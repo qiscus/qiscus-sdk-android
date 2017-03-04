@@ -632,6 +632,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         } else {
             if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                 qiscusComment.playAudio();
+            } else if (qiscusComment.getType() == QiscusComment.Type.IMAGE) {
+                view.startPhotoViewer(qiscusComment);
             } else {
                 view.onFileDownloaded(file, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
             }
@@ -673,6 +675,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void updateLastReadComment(int lastReadCommentId);
 
         void onFileDownloaded(File file, String mimeType);
+
+        void startPhotoViewer(QiscusComment qiscusComment);
 
         void onUserTyping(String user, boolean typing);
     }
