@@ -53,6 +53,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
+import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
@@ -662,6 +663,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         } catch (ActivityNotFoundException e) {
             showError(getString(R.string.chat_error_no_handler));
         }
+    }
+
+    @Override
+    public void startPhotoViewer(QiscusComment qiscusComment) {
+        startActivity(QiscusPhotoViewerActivity.generateIntent(getActivity(), qiscusComment));
     }
 
     @Override
