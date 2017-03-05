@@ -152,6 +152,11 @@ final class QiscusApiParser {
             qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
         }
 
+        if (jsonComment.has("type")) {
+            qiscusComment.setRawType(jsonComment.get("type").getAsString());
+            qiscusComment.setExtraPayload(jsonComment.get("payload").toString());
+        }
+
         return qiscusComment;
     }
 }
