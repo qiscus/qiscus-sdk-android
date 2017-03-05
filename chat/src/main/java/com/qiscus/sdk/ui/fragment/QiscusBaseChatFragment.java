@@ -51,6 +51,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
+import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
@@ -647,6 +648,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Override
+    public void startPhotoViewer(QiscusComment qiscusComment) {
+        startActivity(QiscusPhotoViewerActivity.generateIntent(getActivity(), qiscusComment));
+    }
+
+    @Override
     public void onTopOffListMessage() {
         loadMoreComments();
     }
@@ -797,7 +803,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void requestStoragePermission() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS[0], PERMISSIONS[1])) {
             QiscusPermissionsUtil.requestPermissions(this, "To make this apps working properly we " +
-                    "need to access external storage to save your chatting data. " +
+                            "need to access external storage to save your chatting data. " +
                             "So please allow the apps to access the storage!",
                     RC_STORAGE_PERMISSION, PERMISSIONS[0], PERMISSIONS[1]);
         }
