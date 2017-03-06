@@ -342,6 +342,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void onApplyChatConfig() {
         rootView.setBackground(chatConfig.getChatRoomBackground());
         swipeRefreshLayout.setColorSchemeResources(chatConfig.getSwipeRefreshColorScheme());
+        sendButton.setImageResource(chatConfig.getSendInactiveIcon());
         if (emptyChatImageView != null) {
             emptyChatImageView.setImageResource(chatConfig.getEmptyRoomImageResource());
         }
