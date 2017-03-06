@@ -18,9 +18,9 @@ package com.qiscus.sdk.util;
 
 import android.support.annotation.RestrictTo;
 
-import com.google.gson.Gson;
 import com.qiscus.sdk.data.model.QiscusComment;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -32,12 +32,11 @@ import org.json.JSONObject;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class QiscusRawDataExtractor {
-    private static Gson gson = new Gson();
 
     private QiscusRawDataExtractor() {
     }
 
-    public static JSONObject getPayload(QiscusComment qiscusComment) {
-        return gson.fromJson(qiscusComment.getExtraPayload(), JSONObject.class);
+    public static JSONObject getPayload(QiscusComment qiscusComment) throws JSONException {
+        return new JSONObject(qiscusComment.getExtraPayload());
     }
 }

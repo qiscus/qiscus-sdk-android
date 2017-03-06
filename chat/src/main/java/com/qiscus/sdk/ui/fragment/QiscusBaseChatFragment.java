@@ -413,8 +413,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void accountLinkingClick(QiscusComment qiscusComment) {
-        JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
         try {
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
             startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), payload.getString("url"),
                     payload.getString("redirect_url")));
         } catch (JSONException e) {
