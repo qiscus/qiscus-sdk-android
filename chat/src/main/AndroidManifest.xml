@@ -42,6 +42,11 @@
             android:theme="@style/QiscusTheme"/>
 
         <activity
+            android:name=".ui.QiscusAccountLinkingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/QiscusTheme"/>
+
+        <activity
             android:name=".ui.QiscusPhotoViewerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/QiscusTheme"/>

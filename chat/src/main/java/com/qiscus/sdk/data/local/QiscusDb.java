@@ -27,7 +27,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 6;
+    static final int DATABASE_VERSION = 7;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -156,6 +156,8 @@ final class QiscusDb {
         static final String COLUMN_SENDER_AVATAR = "sender_avatar";
         static final String COLUMN_TIME = "time";
         static final String COLUMN_STATE = "state";
+        static final String COLUMN_TYPE = "type";
+        static final String COLUMN_PAYLOAD = "payload";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
@@ -169,7 +171,9 @@ final class QiscusDb {
                         COLUMN_SENDER_EMAIL + " TEXT NOT NULL," +
                         COLUMN_SENDER_AVATAR + " TEXT," +
                         COLUMN_TIME + " LONG NOT NULL," +
-                        COLUMN_STATE + " INTEGER NOT NULL" +
+                        COLUMN_STATE + " INTEGER NOT NULL," +
+                        COLUMN_TYPE + " TEXT," +
+                        COLUMN_PAYLOAD + " TEXT" +
                         " ); ";
 
         static ContentValues toContentValues(QiscusComment qiscusComment) {
@@ -185,6 +189,8 @@ final class QiscusDb {
             values.put(COLUMN_SENDER_AVATAR, qiscusComment.getSenderAvatar());
             values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
             values.put(COLUMN_STATE, qiscusComment.getState());
+            values.put(COLUMN_TYPE, qiscusComment.getRawType());
+            values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
             return values;
         }
 
@@ -201,6 +207,8 @@ final class QiscusDb {
             qiscusComment.setSenderAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
             qiscusComment.setTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
             qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
+            qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
+            qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
             return qiscusComment;
         }
     }
