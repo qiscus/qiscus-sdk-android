@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
@@ -76,6 +77,9 @@ public class QiscusComment implements Parcelable {
     private List<String> urls;
     private PreviewData previewData;
 
+    private String rawType;
+    private String extraPayload;
+
     protected ProgressListener progressListener;
     protected DownloadingListener downloadingListener;
     protected PlayingAudioListener playingAudioListener;
@@ -121,6 +125,8 @@ public class QiscusComment implements Parcelable {
         time = new Date(in.readLong());
         state = in.readInt();
         selected = in.readByte() != 0;
+        rawType = in.readString();
+        extraPayload = in.readString();
     }
 
     public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
@@ -247,6 +253,22 @@ public class QiscusComment implements Parcelable {
         this.selected = selected;
     }
 
+    public void setRawType(String rawType) {
+        this.rawType = rawType;
+    }
+
+    public String getRawType() {
+        return rawType;
+    }
+
+    public String getExtraPayload() {
+        return extraPayload;
+    }
+
+    public void setExtraPayload(String extraPayload) {
+        this.extraPayload = extraPayload;
+    }
+
     public boolean isAttachment() {
         String trimmedMessage = message.trim();
         return trimmedMessage.startsWith("[file]") && trimmedMessage.endsWith("[/file]");
@@ -349,7 +371,9 @@ public class QiscusComment implements Parcelable {
     }
 
     public Type getType() {
-        if (!isAttachment()) {
+        if (!TextUtils.isEmpty(rawType) && rawType.equals("account_linking")) {
+            return Type.ACCOUNT_LINKING;
+        } else if (!isAttachment()) {
             if (containsUrl()) {
                 return Type.LINK;
             }
@@ -569,10 +593,12 @@ public class QiscusComment implements Parcelable {
         dest.writeLong(time.getTime());
         dest.writeInt(state);
         dest.writeByte((byte) (selected ? 1 : 0));
+        dest.writeString(rawType);
+        dest.writeString(extraPayload);
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, AUDIO, LINK
+        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING
     }
 
     public interface ProgressListener {

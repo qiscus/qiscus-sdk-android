@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply from: 'gradle/jacoco.gradle'
+package com.qiscus.sdk.util;
 
-buildscript {
-    repositories {
-        jcenter()
+import android.support.annotation.RestrictTo;
+
+import com.qiscus.sdk.data.model.QiscusComment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * Created on : March 04, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
+ */
+
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class QiscusRawDataExtractor {
+
+    private QiscusRawDataExtractor() {
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+    public static JSONObject getPayload(QiscusComment qiscusComment) throws JSONException {
+        return new JSONObject(qiscusComment.getExtraPayload());
     }
-}
-
-allprojects {
-    repositories {
-        jcenter()
-        maven { url  "http://dl.bintray.com/qiscustech/maven" }
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
