@@ -32,6 +32,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
+import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
@@ -59,7 +61,11 @@ import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.trello.rxlifecycle.components.support.RxFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -395,12 +401,24 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                         || qiscusComment.getType() == QiscusComment.Type.IMAGE
                         || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                     qiscusChatPresenter.downloadFile(qiscusComment);
+                } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING) {
+                    accountLinkingClick(qiscusComment);
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 showFailedCommentDialog(qiscusComment);
             }
         } else {
             toggleSelectComment(qiscusComment);
+        }
+    }
+
+    protected void accountLinkingClick(QiscusComment qiscusComment) {
+        try {
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), payload.getString("url"),
+                    payload.getString("redirect_url")));
+        } catch (JSONException e) {
+            Log.e("Qiscus", e.getMessage());
         }
     }
 
