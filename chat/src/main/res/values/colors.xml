@@ -27,4 +27,10 @@
     <color name="qiscus_light_grey">#D8D8D8</color>
     <color name="qiscus_red">#d32f2f</color>
     <color name="qiscus_dark_white">#f6f6f6</color>
+    <color name="qiscus_camera_background">#a1887f</color>
+    <color name="qiscus_gallery_background">#ba68c8</color>
+    <color name="qiscus_file_background">#64b5f6</color>
+    <color name="qiscus_record_background">#4db6ac</color>
+    <color name="qiscus_keyboard_background">#90a4ae</color>
+
 </resources>
