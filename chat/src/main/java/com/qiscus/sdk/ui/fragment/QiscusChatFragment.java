@@ -107,6 +107,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return (ViewGroup) view.findViewById(R.id.box);
     }
 
+    @Nullable
+    @Override
+    protected ViewGroup getMessageEditTextContainer(View view) {
+        return (ViewGroup) view.findViewById(R.id.field_message_container);
+    }
+
     @NonNull
     @Override
     protected EditText getMessageEditText(View view) {
@@ -151,8 +157,20 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected ViewGroup getAttachmentPanel(View view) {
+        return (ViewGroup) view.findViewById(R.id.add_panel);
+    }
+
+    @Nullable
+    @Override
     protected ImageView getAddImageButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_image);
+    }
+
+    @Nullable
+    @Override
+    protected TextView getAddImageTextView(View view) {
+        return (TextView) view.findViewById(R.id.button_add_image_text);
     }
 
     @Nullable
@@ -163,14 +181,44 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected TextView getTakeImageTextView(View view) {
+        return (TextView) view.findViewById(R.id.button_pick_picture_text);
+    }
+
+    @Nullable
+    @Override
     protected ImageView getAddFileButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_file);
     }
 
     @Nullable
     @Override
+    protected TextView getAddFileTextView(View view) {
+        return (TextView) view.findViewById(R.id.button_add_file_text);
+    }
+
+    @Nullable
+    @Override
     protected ImageView getRecordAudioButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_audio);
+    }
+
+    @Nullable
+    @Override
+    protected TextView getRecordAudioTextView(View view) {
+        return (TextView) view.findViewById(R.id.button_add_audio_text);
+    }
+
+    @Nullable
+    @Override
+    public ImageView getHideAttachmentButton(View view) {
+        return (ImageView) view.findViewById(R.id.button_keyboard);
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getToggleEmojiButton(View view) {
+        return (ImageView) view.findViewById(R.id.button_add_emoticon);
     }
 
     @Nullable

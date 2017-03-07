@@ -19,6 +19,7 @@ package com.qiscus.dragonfly;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -74,6 +76,27 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         });
     }
 
+    @Override
+    protected void onApplyChatConfig() {
+        super.onApplyChatConfig();
+        if (addImageButton != null) {
+            addImageButton.setBackground(ContextCompat.getDrawable(Qiscus.getApps(),
+                    R.drawable.bt_qiscus_selector_grey));
+        }
+        if (takeImageButton != null) {
+            takeImageButton.setBackground(ContextCompat.getDrawable(Qiscus.getApps(),
+                    R.drawable.bt_qiscus_selector_grey));
+        }
+        if (addFileButton != null) {
+            addFileButton.setBackground(ContextCompat.getDrawable(Qiscus.getApps(),
+                    R.drawable.bt_qiscus_selector_grey));
+        }
+        if (recordAudioButton != null) {
+            recordAudioButton.setBackground(ContextCompat.getDrawable(Qiscus.getApps(),
+                    R.drawable.bt_qiscus_selector_grey));
+        }
+    }
+
     @NonNull
     @Override
     protected ViewGroup getRootView(View view) {
@@ -102,6 +125,12 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected ViewGroup getMessageInputPanel(View view) {
         return (ViewGroup) view.findViewById(R.id.input_panel);
+    }
+
+    @Nullable
+    @Override
+    protected ViewGroup getMessageEditTextContainer(View view) {
+        return null;
     }
 
     @NonNull
@@ -148,6 +177,12 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected ViewGroup getAttachmentPanel(View view) {
+        return null;
+    }
+
+    @Nullable
+    @Override
     protected ImageView getAddImageButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_image);
     }
@@ -168,6 +203,18 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected ImageView getRecordAudioButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_audio);
+    }
+
+    @Nullable
+    @Override
+    public ImageView getHideAttachmentButton(View view) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getToggleEmojiButton(View view) {
+        return (ImageView) view.findViewById(R.id.button_emoji);
     }
 
     @Nullable
