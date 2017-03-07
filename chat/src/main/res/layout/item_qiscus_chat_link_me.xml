@@ -70,7 +70,7 @@
             app:qpreview_descColor="@color/qiscus_secondary_text"
             app:qpreview_titleColor="@color/qiscus_primary_text"/>
 
-        <TextView
+        <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/contents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,7 +78,8 @@
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            app:emojiSize="22sp"/>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -54,28 +54,65 @@ public class QiscusChatConfig {
     private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
     private int selectedBubbleBackgroundColor = R.color.qiscus_primary;
+
     private int accountLinkingTextColor = R.color.qiscus_primary;
     private int accountLinkingBackground = R.color.qiscus_light_grey;
     private String accountLinkingText = "LOGIN";
+
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
+
     private String emptyRoomTitle = "Welcome!";
     private String emptyRoomSubtitle = "Lets start conversation";
     private int emptyRoomImageResource = R.drawable.ic_qiscus_chat_empty;
     private String messageFieldHint = "Type a message…";
+
     private int addPictureIcon = R.drawable.ic_qiscus_add_image;
+    private int addPictureBackgroundColor = R.color.qiscus_gallery_background;
+    private String addPictureText = "Gallery";
+
     private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
+    private int takePictureBackgroundColor = R.color.qiscus_camera_background;
+    private String takePictureText = "Camera";
+
     private int addFileIcon = R.drawable.ic_qiscus_add_file;
+    private int addFileBackgroundColor = R.color.qiscus_file_background;
+    private String addFileText = "File";
+
     private int recordAudioIcon = R.drawable.ic_qiscus_add_audio;
+    private int recordBackgroundColor = R.color.qiscus_record_background;
+    private String recordText = "Record";
+
     private int stopRecordIcon = R.drawable.ic_qiscus_send_on;
     private int cancelRecordIcon = R.drawable.ic_qiscus_cancel_record;
+
+    private int sendButtonIcon = R.drawable.ic_qiscus_send;
+    private int showAttachmentPanelIcon = R.drawable.ic_qiscus_attach;
+    private int hideAttachmentPanelIcon = R.drawable.ic_qiscus_back_to_keyboard;
+    private int hideAttachmentPanelBackgroundColor = R.color.qiscus_keyboard_background;
+
+    /**
+     * @deprecated please use {@link #sendButtonIcon} instead
+     */
+    @Deprecated
     private int sendActiveIcon = R.drawable.ic_qiscus_send_on;
+
+    /**
+     * @deprecated please use {@link #sendButtonIcon} instead
+     */
+    @Deprecated
     private int sendInactiveIcon = R.drawable.ic_qiscus_send_off;
+
     private int playAudioIcon = R.drawable.ic_qiscus_play_audio;
     private int pauseAudioIcon = R.drawable.ic_qiscus_pause_audio;
+    private int showEmojiIcon = R.drawable.ic_qiscus_emot;
+    private int showKeyboardIcon = R.drawable.ic_qiscus_keyboard;
+
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
+
     private int notificationSmallIcon = R.drawable.ic_qiscus_notif_app;
     private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
+
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
 
     private NotificationTitleHandler notificationTitleHandler = qiscusComment -> qiscusComment.isGroupMessage() ?
@@ -106,6 +143,7 @@ public class QiscusChatConfig {
                     });
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
+
     private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
@@ -238,8 +276,28 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setAddPictureBackgroundColor(@ColorRes int addPictureBackgroundColor) {
+        this.addPictureBackgroundColor = addPictureBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setAddPictureText(String addPictureText) {
+        this.addPictureText = addPictureText;
+        return this;
+    }
+
     public QiscusChatConfig setTakePictureIcon(@DrawableRes int takePictureIcon) {
         this.takePictureIcon = takePictureIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setTakePictureBackgroundColor(@ColorRes int takePictureBackgroundColor) {
+        this.takePictureBackgroundColor = takePictureBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setTakePictureText(String takePictureText) {
+        this.takePictureText = takePictureText;
         return this;
     }
 
@@ -248,8 +306,28 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setAddFileBackgroundColor(@ColorRes int addFileBackgroundColor) {
+        this.addFileBackgroundColor = addFileBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setAddFileText(String addFileText) {
+        this.addFileText = addFileText;
+        return this;
+    }
+
     public QiscusChatConfig setRecordAudioIcon(@DrawableRes int recordAudioIcon) {
         this.recordAudioIcon = recordAudioIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setRecordBackgroundColor(@ColorRes int recordBackgroundColor) {
+        this.recordBackgroundColor = recordBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setRecordText(String recordText) {
+        this.recordText = recordText;
         return this;
     }
 
@@ -263,11 +341,39 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setSendButtonIcon(@DrawableRes int sendButtonIcon) {
+        this.sendButtonIcon = sendButtonIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setShowAttachmentPanelIcon(@DrawableRes int showAttachmentPanelIcon) {
+        this.showAttachmentPanelIcon = showAttachmentPanelIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setHideAttachmentPanelIcon(@DrawableRes int hideAttachmentPanelIcon) {
+        this.hideAttachmentPanelIcon = hideAttachmentPanelIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setHideAttachmentPanelBackgroundColor(@ColorRes int hideAttachmentPanelBackgroundColor) {
+        this.hideAttachmentPanelBackgroundColor = hideAttachmentPanelBackgroundColor;
+        return this;
+    }
+
+    /**
+     * @deprecated please use {@link #setSendButtonIcon} instead
+     */
+    @Deprecated
     public QiscusChatConfig setSendActiveIcon(@DrawableRes int sendActiveIcon) {
         this.sendActiveIcon = sendActiveIcon;
         return this;
     }
 
+    /**
+     * @deprecated please use {@link #setSendButtonIcon} instead
+     */
+    @Deprecated
     public QiscusChatConfig setSendInactiveIcon(@DrawableRes int sendInactiveIcon) {
         this.sendInactiveIcon = sendInactiveIcon;
         return this;
@@ -280,6 +386,16 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setPauseAudioIcon(@DrawableRes int pauseAudioIcon) {
         this.pauseAudioIcon = pauseAudioIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setShowEmojiIcon(@DrawableRes int showEmojiIcon) {
+        this.showEmojiIcon = showEmojiIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setShowKeyboardIcon(@DrawableRes int showKeyboardIcon) {
+        this.showKeyboardIcon = showKeyboardIcon;
         return this;
     }
 
@@ -452,9 +568,27 @@ public class QiscusChatConfig {
         return addPictureIcon;
     }
 
+    @ColorRes
+    public int getAddPictureBackgroundColor() {
+        return addPictureBackgroundColor;
+    }
+
+    public String getAddPictureText() {
+        return addPictureText;
+    }
+
     @DrawableRes
     public int getTakePictureIcon() {
         return takePictureIcon;
+    }
+
+    @ColorRes
+    public int getTakePictureBackgroundColor() {
+        return takePictureBackgroundColor;
+    }
+
+    public String getTakePictureText() {
+        return takePictureText;
     }
 
     @DrawableRes
@@ -462,9 +596,27 @@ public class QiscusChatConfig {
         return addFileIcon;
     }
 
+    @ColorRes
+    public int getAddFileBackgroundColor() {
+        return addFileBackgroundColor;
+    }
+
+    public String getAddFileText() {
+        return addFileText;
+    }
+
     @DrawableRes
     public int getRecordAudioIcon() {
         return recordAudioIcon;
+    }
+
+    @ColorRes
+    public int getRecordBackgroundColor() {
+        return recordBackgroundColor;
+    }
+
+    public String getRecordText() {
+        return recordText;
     }
 
     @DrawableRes
@@ -478,10 +630,38 @@ public class QiscusChatConfig {
     }
 
     @DrawableRes
+    public int getSendButtonIcon() {
+        return sendButtonIcon;
+    }
+
+    @DrawableRes
+    public int getShowAttachmentPanelIcon() {
+        return showAttachmentPanelIcon;
+    }
+
+    @DrawableRes
+    public int getHideAttachmentPanelIcon() {
+        return hideAttachmentPanelIcon;
+    }
+
+    @ColorRes
+    public int getHideAttachmentPanelBackgroundColor() {
+        return hideAttachmentPanelBackgroundColor;
+    }
+
+    /**
+     * @deprecated please use {@link #getSendButtonIcon} instead
+     */
+    @Deprecated
+    @DrawableRes
     public int getSendActiveIcon() {
         return sendActiveIcon;
     }
 
+    /**
+     * @deprecated please use {@link #getSendButtonIcon} instead
+     */
+    @Deprecated
     @DrawableRes
     public int getSendInactiveIcon() {
         return sendInactiveIcon;
@@ -495,6 +675,16 @@ public class QiscusChatConfig {
     @DrawableRes
     public int getPauseAudioIcon() {
         return pauseAudioIcon;
+    }
+
+    @DrawableRes
+    public int getShowEmojiIcon() {
+        return showEmojiIcon;
+    }
+
+    @DrawableRes
+    public int getShowKeyboardIcon() {
+        return showKeyboardIcon;
     }
 
     @ColorRes

@@ -16,9 +16,12 @@
 
 package com.qiscus.sdk.util;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.Patterns;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.qiscus.sdk.Qiscus;
 
@@ -91,5 +94,17 @@ public final class QiscusAndroidUtil {
     public static float sp2px(Resources resources, float sp) {
         final float scale = resources.getDisplayMetrics().scaledDensity;
         return sp * scale;
+    }
+
+    public static void showKeyboard(Context context, View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (view.requestFocus()) {
+            inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
+    public static void hideKeyboard(Context context, View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

@@ -17,6 +17,7 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -102,116 +103,201 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="1.6dp"
                 android:alpha="0.5"
                 android:background="@color/qiscus_light_grey"/>
 
-            <EditText
-                android:id="@+id/field_message"
+            <LinearLayout
+                android:id="@+id/field_message_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:hint="@string/hint_message"
-                android:imeOptions="actionSend|flagNoEnterAction"
-                android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
-                android:maxLines="5"
-                android:nextFocusRight="@+id/button_send"
-                android:padding="8dp"
-                android:textColor="@color/qiscus_primary_text"
-                android:textSize="16sp"/>
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <ImageView
+                    android:id="@+id/button_add_emoticon"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/bt_qiscus_selector_grey"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_qiscus_emot"/>
+
+                <com.vanniktech.emoji.EmojiEditText
+                    android:id="@+id/field_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/hint_message"
+                    android:imeOptions="actionSend|flagNoEnterAction"
+                    android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
+                    android:maxLines="4"
+                    android:nextFocusRight="@+id/button_send"
+                    android:padding="8dp"
+                    android:textColor="@color/qiscus_primary_text"
+                    android:textSize="16sp"
+                    app:emojiSize="22sp"/>
+
+                <ImageView
+                    android:id="@+id/button_send"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="bottom"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_qiscus_attach"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/add_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:visibility="gone">
 
-                <ImageView
-                    android:id="@+id/button_add_image"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginBottom="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bt_qiscus_selector_grey"
-                    android:paddingEnd="2dp"
-                    android:paddingLeft="2dp"
-                    android:paddingRight="2dp"
-                    android:paddingStart="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_qiscus_add_image"/>
-
-                <ImageView
-                    android:id="@+id/button_pick_picture"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginBottom="7dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bt_qiscus_selector_grey"
-                    android:paddingEnd="1dp"
-                    android:paddingLeft="1dp"
-                    android:paddingRight="1dp"
-                    android:paddingStart="1dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_qiscus_pick_picture"/>
-
-                <ImageView
-                    android:id="@+id/button_add_file"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginBottom="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bt_qiscus_selector_grey"
-                    android:paddingEnd="2dp"
-                    android:paddingLeft="2dp"
-                    android:paddingRight="1dp"
-                    android:paddingStart="1dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_qiscus_add_file"/>
-
-                <ImageView
-                    android:id="@+id/button_add_audio"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginBottom="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bt_qiscus_selector_grey"
-                    android:paddingEnd="2dp"
-                    android:paddingLeft="2dp"
-                    android:paddingRight="1dp"
-                    android:paddingStart="1dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_qiscus_add_audio"/>
-
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:id="@+id/button_send"
-                        android:layout_width="46dp"
-                        android:layout_height="46dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginBottom="6dp"
+                        android:id="@+id/button_pick_picture"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
                         android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
-                        android:src="@drawable/ic_qiscus_send_off"/>
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/qiscus_camera_button_bg"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_qiscus_pick_picture"/>
 
-                </RelativeLayout>
+                    <TextView
+                        android:id="@+id/button_pick_picture_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Camera"
+                        android:textColor="@color/qiscus_secondary_text"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/button_add_image"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/qiscus_gallery_button_bg"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_qiscus_add_image"/>
+
+                    <TextView
+                        android:id="@+id/button_add_image_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Gallery"
+                        android:textColor="@color/qiscus_secondary_text"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/button_add_file"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/qiscus_file_button_bg"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_qiscus_add_file"/>
+
+                    <TextView
+                        android:id="@+id/button_add_file_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="File"
+                        android:textColor="@color/qiscus_secondary_text"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/button_add_audio"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/qiscus_record_button_bg"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_qiscus_add_audio"/>
+
+                    <TextView
+                        android:id="@+id/button_add_audio_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Record"
+                        android:textColor="@color/qiscus_secondary_text"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/button_keyboard"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/qiscus_keyboard_button_bg"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_qiscus_back_to_keyboard"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 

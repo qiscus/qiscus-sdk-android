@@ -35,6 +35,8 @@ import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -122,6 +124,8 @@ public class Qiscus {
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
 
         configureFcmToken();
+
+        EmojiManager.install(new EmojiOneProvider());
     }
 
     public static void startPusherService() {
