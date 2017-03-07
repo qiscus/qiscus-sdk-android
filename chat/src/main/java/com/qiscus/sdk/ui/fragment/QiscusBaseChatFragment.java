@@ -398,14 +398,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void setupEmojiPopup() {
-        if (messageEditText instanceof EmojiEditText) {
-            if (toggleEmojiButton != null) {
-                emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
-                        .setOnSoftKeyboardCloseListener(this::dismissEmoji)
-                        .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
-                        .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
-                        .build((EmojiEditText) messageEditText);
-            }
+        if (messageEditText instanceof EmojiEditText && toggleEmojiButton != null) {
+            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                    .setOnSoftKeyboardCloseListener(this::dismissEmoji)
+                    .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
+                    .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
+                    .build((EmojiEditText) messageEditText);
         }
     }
 
@@ -419,13 +417,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void showAttachmentPanel() {
-        if (attachmentPanel != null) {
-            if (attachmentPanel.getVisibility() == View.GONE) {
-                attachmentPanel.setVisibility(View.VISIBLE);
-                if (messageEditTextContainer != null) {
-                    messageEditTextContainer.setVisibility(View.GONE);
-                    QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
-                }
+        if (attachmentPanel != null && attachmentPanel.getVisibility() == View.GONE) {
+            attachmentPanel.setVisibility(View.VISIBLE);
+            if (messageEditTextContainer != null) {
+                messageEditTextContainer.setVisibility(View.GONE);
+                QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
             }
         }
     }
