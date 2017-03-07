@@ -181,7 +181,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         takeImageTextView = getTakeImageTextView(view);
 
         addFileButton = getAddFileButton(view);
-        addImageTextView = getAddImageTextView(view);
+        addFileTextView = getAddFileTextView(view);
 
         recordAudioButton = getRecordAudioButton(view);
         recordAudioTextView = getRecordAudioTextView(view);
