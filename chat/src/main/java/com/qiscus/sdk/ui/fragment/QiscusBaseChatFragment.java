@@ -20,12 +20,15 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -58,6 +61,7 @@ import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
@@ -88,8 +92,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener, QiscusPermissionsUtil.PermissionCallbacks {
 
     protected static final int RC_PERMISSIONS = 1;
-    protected static final int RC_STORAGE_PERMISSION = 2;
-    protected static final int RC_RECORD_AUDIO_PERMISSION = 3;
 
     private static final String[] PERMISSIONS = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
@@ -109,6 +111,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
     @NonNull protected QiscusRecyclerView messageRecyclerView;
     @Nullable protected ViewGroup messageInputPanel;
+    @Nullable protected ViewGroup messageEditTextContainer;
     @NonNull protected EditText messageEditText;
     @NonNull protected ImageView sendButton;
     @Nullable protected View newMessageButton;
@@ -116,16 +119,23 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable protected ImageView emptyChatImageView;
     @Nullable protected TextView emptyChatTitleView;
     @Nullable protected TextView emptyChatDescView;
+    @Nullable protected ViewGroup attachmentPanel;
     @Nullable protected ImageView addImageButton;
+    @Nullable protected TextView addImageTextView;
     @Nullable protected ImageView takeImageButton;
+    @Nullable protected TextView takeImageTextView;
     @Nullable protected ImageView addFileButton;
+    @Nullable protected TextView addFileTextView;
     @Nullable protected ImageView recordAudioButton;
+    @Nullable protected TextView recordAudioTextView;
+    @Nullable protected ImageView hideAttachmentButton;
+    @Nullable protected ImageView toggleEmojiButton;
     @Nullable protected QiscusAudioRecorderView recordAudioPanel;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
     protected String startingMessage;
-    protected T chatT;
+    protected T chatAdapter;
     protected QiscusChatPresenter qiscusChatPresenter;
     protected Animation animation;
     protected LinearLayoutManager chatLayoutManager;
@@ -151,18 +161,37 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         swipeRefreshLayout = getSwipeRefreshLayout(view);
         messageRecyclerView = getMessageRecyclerView(view);
         messageInputPanel = getMessageInputPanel(view);
+        messageEditTextContainer = getMessageEditTextContainer(view);
         messageEditText = getMessageEditText(view);
         sendButton = getSendButton(view);
         newMessageButton = getNewMessageButton(view);
         loadMoreProgressBar = getLoadMoreProgressBar(view);
+
         emptyChatImageView = getEmptyChatImageView(view);
         emptyChatTitleView = getEmptyChatTitleView(view);
         emptyChatDescView = getEmptyChatDescView(view);
+
+        attachmentPanel = getAttachmentPanel(view);
+        hideAttachmentButton = getHideAttachmentButton(view);
+
         addImageButton = getAddImageButton(view);
+        addImageTextView = getAddImageTextView(view);
+
         takeImageButton = getTakeImageButton(view);
+        takeImageTextView = getTakeImageTextView(view);
+
         addFileButton = getAddFileButton(view);
+        addImageTextView = getAddImageTextView(view);
+
         recordAudioButton = getRecordAudioButton(view);
+        recordAudioTextView = getRecordAudioTextView(view);
+
+        toggleEmojiButton = getToggleEmojiButton(view);
         recordAudioPanel = getRecordAudioPanel(view);
+
+        if (toggleEmojiButton != null && !(messageEditText instanceof EmojiEditText)) {
+            throw new RuntimeException("Please use EmojiEditText as message text field if you want to using EmojiKeyboard.");
+        }
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -181,7 +210,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
         });
 
-        sendButton.setOnClickListener(v -> sendMessage());
+        sendButton.setOnClickListener(v -> {
+            String message = messageEditText.getText().toString().trim();
+            if (message.isEmpty()) {
+                showAttachmentPanel();
+            } else {
+                sendMessage(message);
+            }
+        });
 
         if (newMessageButton != null) {
             newMessageButton.setOnClickListener(v -> scrollToBottom());
@@ -197,6 +233,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (recordAudioButton != null) {
             recordAudioButton.setOnClickListener(v -> recordAudio());
+        }
+        if (toggleEmojiButton != null) {
+            toggleEmojiButton.setOnClickListener(v -> toggleEmoji());
+        }
+        if (hideAttachmentButton != null) {
+            hideAttachmentButton.setOnClickListener(v -> hideAttachmentPanel());
         }
         if (recordAudioPanel != null) {
             recordAudioPanel.setRecordListener(this);
@@ -217,6 +259,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Nullable
     protected abstract ViewGroup getMessageInputPanel(View view);
+
+    @Nullable
+    protected abstract ViewGroup getMessageEditTextContainer(View view);
 
     @NonNull
     protected abstract EditText getMessageEditText(View view);
@@ -240,16 +285,45 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected abstract TextView getEmptyChatDescView(View view);
 
     @Nullable
+    protected abstract ViewGroup getAttachmentPanel(View view);
+
+    @Nullable
     protected abstract ImageView getAddImageButton(View view);
+
+    @Nullable
+    protected TextView getAddImageTextView(View view) {
+        return null;
+    }
 
     @Nullable
     protected abstract ImageView getTakeImageButton(View view);
 
     @Nullable
+    protected TextView getTakeImageTextView(View view) {
+        return null;
+    }
+
+    @Nullable
     protected abstract ImageView getAddFileButton(View view);
 
     @Nullable
+    protected TextView getAddFileTextView(View view) {
+        return null;
+    }
+
+    @Nullable
     protected abstract ImageView getRecordAudioButton(View view);
+
+    @Nullable
+    protected TextView getRecordAudioTextView(View view) {
+        return null;
+    }
+
+    @Nullable
+    public abstract ImageView getHideAttachmentButton(View view);
+
+    @Nullable
+    protected abstract ImageView getToggleEmojiButton(View view);
 
     @Nullable
     protected abstract QiscusAudioRecorderView getRecordAudioPanel(View view);
@@ -290,14 +364,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         qiscusAccount = Qiscus.getQiscusAccount();
 
-        chatT = onCreateChatAdapter();
-        chatT.setOnItemClickListener((view, position) ->
-                onItemCommentClick((QiscusComment) chatT.getData().get(position)));
-        chatT.setOnLongItemClickListener((view, position) ->
-                onItemCommentLongClick((QiscusComment) chatT.getData().get(position)));
+        chatAdapter = onCreateChatAdapter();
+        chatAdapter.setOnItemClickListener((view, position) ->
+                onItemCommentClick((QiscusComment) chatAdapter.getData().get(position)));
+        chatAdapter.setOnLongItemClickListener((view, position) ->
+                onItemCommentLongClick((QiscusComment) chatAdapter.getData().get(position)));
         messageRecyclerView.setUpAsBottomList();
         chatLayoutManager = (LinearLayoutManager) messageRecyclerView.getLayoutManager();
-        messageRecyclerView.setAdapter(chatT);
+        messageRecyclerView.setAdapter(chatAdapter);
         messageRecyclerView.addOnScrollListener(new QiscusChatScrollListener(chatLayoutManager, this));
 
         setupEmojiPopup();
@@ -315,7 +389,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
 
         if (commentSelectedListener != null) {
-            commentSelectedListener.onCommentSelected(chatT.getSelectedComments());
+            commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
         }
 
         if (startingMessage != null && !startingMessage.isEmpty()) {
@@ -324,10 +398,35 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void setupEmojiPopup() {
-        if (messageEditText instanceof EmojiEditText){
-            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
-                    .setOnSoftKeyboardCloseListener(() -> emojiPopup.dismiss())
-                    .build((EmojiEditText) messageEditText);
+        if (messageEditText instanceof EmojiEditText) {
+            if (toggleEmojiButton != null) {
+                emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                        .setOnSoftKeyboardCloseListener(this::dismissEmoji)
+                        .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
+                        .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
+                        .build((EmojiEditText) messageEditText);
+            }
+        }
+    }
+
+    protected void hideAttachmentPanel() {
+        if (attachmentPanel != null) {
+            attachmentPanel.setVisibility(View.GONE);
+            if (messageEditTextContainer != null) {
+                messageEditTextContainer.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    protected void showAttachmentPanel() {
+        if (attachmentPanel != null) {
+            if (attachmentPanel.getVisibility() == View.GONE) {
+                attachmentPanel.setVisibility(View.VISIBLE);
+                if (messageEditTextContainer != null) {
+                    messageEditTextContainer.setVisibility(View.GONE);
+                    QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
+                }
+            }
         }
     }
 
@@ -353,9 +452,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onApplyChatConfig() {
+        Drawable buttonBg;
+
         rootView.setBackground(chatConfig.getChatRoomBackground());
         swipeRefreshLayout.setColorSchemeResources(chatConfig.getSwipeRefreshColorScheme());
-        sendButton.setImageResource(chatConfig.getSendInactiveIcon());
+        sendButton.setImageResource(chatConfig.getShowAttachmentPanelIcon());
+        messageEditText.setHint(chatConfig.getMessageFieldHint());
+
         if (emptyChatImageView != null) {
             emptyChatImageView.setImageResource(chatConfig.getEmptyRoomImageResource());
         }
@@ -365,22 +468,59 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (emptyChatDescView != null) {
             emptyChatDescView.setText(chatConfig.getEmptyRoomSubtitle());
         }
-        messageEditText.setHint(chatConfig.getMessageFieldHint());
         if (addImageButton != null) {
             addImageButton.setImageResource(chatConfig.getAddPictureIcon());
+            buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_gallery_button_bg);
+            buttonBg.setColorFilter(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getAddPictureBackgroundColor()), PorterDuff.Mode.SRC_ATOP);
+            addImageButton.setBackground(buttonBg);
+        }
+        if (addImageTextView != null) {
+            addImageTextView.setText(chatConfig.getAddPictureText());
         }
         if (takeImageButton != null) {
             takeImageButton.setImageResource(chatConfig.getTakePictureIcon());
+            buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_camera_button_bg);
+            buttonBg.setColorFilter(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getTakePictureBackgroundColor()), PorterDuff.Mode.SRC_ATOP);
+            takeImageButton.setBackground(buttonBg);
+        }
+        if (takeImageTextView != null) {
+            takeImageTextView.setText(chatConfig.getTakePictureText());
         }
         if (addFileButton != null) {
             addFileButton.setImageResource(chatConfig.getAddFileIcon());
+            buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_file_button_bg);
+            buttonBg.setColorFilter(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getAddFileBackgroundColor()), PorterDuff.Mode.SRC_ATOP);
+            addFileButton.setBackground(buttonBg);
+        }
+        if (addFileTextView != null) {
+            addFileTextView.setText(chatConfig.getAddFileText());
         }
         if (recordAudioButton != null) {
             recordAudioButton.setImageResource(chatConfig.getRecordAudioIcon());
+            buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_record_button_bg);
+            buttonBg.setColorFilter(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getRecordBackgroundColor()), PorterDuff.Mode.SRC_ATOP);
+            recordAudioButton.setBackground(buttonBg);
+        }
+        if (recordAudioTextView != null) {
+            recordAudioTextView.setText(chatConfig.getRecordText());
+        }
+        if (hideAttachmentButton != null) {
+            hideAttachmentButton.setImageResource(chatConfig.getHideAttachmentPanelIcon());
+            buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_keyboard_button_bg);
+            buttonBg.setColorFilter(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getHideAttachmentPanelBackgroundColor()), PorterDuff.Mode.SRC_ATOP);
+            hideAttachmentButton.setBackground(buttonBg);
         }
         if (recordAudioPanel != null) {
             recordAudioPanel.setButtonStopRecord(chatConfig.getStopRecordIcon());
             recordAudioPanel.setButtonCancelRecord(chatConfig.getCancelRecordIcon());
+        }
+        if (toggleEmojiButton != null) {
+            toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon());
         }
     }
 
@@ -409,7 +549,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onItemCommentClick(QiscusComment qiscusComment) {
-        if (chatT.getSelectedComments().isEmpty()) {
+        if (chatAdapter.getSelectedComments().isEmpty()) {
             if (qiscusComment.getState() > QiscusComment.STATE_SENDING) {
                 if (qiscusComment.getType() == QiscusComment.Type.FILE
                         || qiscusComment.getType() == QiscusComment.Type.IMAGE
@@ -452,7 +592,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onItemCommentLongClick(QiscusComment qiscusComment) {
-        if (chatT.getSelectedComments().isEmpty()) {
+        if (chatAdapter.getSelectedComments().isEmpty()) {
             toggleSelectComment(qiscusComment);
         }
     }
@@ -461,16 +601,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         qiscusComment.setSelected(!qiscusComment.isSelected());
         refreshComment(qiscusComment);
         if (commentSelectedListener != null) {
-            commentSelectedListener.onCommentSelected(chatT.getSelectedComments());
+            commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
         }
     }
 
     public List<QiscusComment> getSelectedComments() {
-        return chatT.getSelectedComments();
+        return chatAdapter.getSelectedComments();
     }
 
     public void clearSelectedComments() {
-        chatT.clearSelectedComments();
+        chatAdapter.clearSelectedComments();
     }
 
     protected void onMessageEditTextChanged(CharSequence message) {
@@ -478,28 +618,27 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (!fieldMessageEmpty) {
                 fieldMessageEmpty = true;
                 sendButton.startAnimation(animation);
-                sendButton.setImageResource(chatConfig.getSendInactiveIcon());
+                sendButton.setImageResource(chatConfig.getShowAttachmentPanelIcon());
                 QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
             }
         } else {
             if (fieldMessageEmpty) {
                 fieldMessageEmpty = false;
                 sendButton.startAnimation(animation);
-                sendButton.setImageResource(chatConfig.getSendActiveIcon());
+                sendButton.setImageResource(chatConfig.getSendButtonIcon());
                 QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), true);
             }
         }
     }
 
-    protected void sendMessage() {
-        String message = messageEditText.getText().toString().trim();
+    public void sendMessage(String message) {
         if (!message.isEmpty()) {
             qiscusChatPresenter.sendComment(message);
             messageEditText.setText("");
         }
     }
 
-    protected void sendFile(File file) {
+    public void sendFile(File file) {
         qiscusChatPresenter.sendFile(file);
     }
 
@@ -507,6 +646,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        hideAttachmentPanel();
     }
 
     protected void takeImage() {
@@ -524,6 +664,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                         FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), photoFile));
                 startActivityForResult(intent, TAKE_PICTURE_REQUEST);
             }
+            hideAttachmentPanel();
         }
     }
 
@@ -531,6 +672,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
         startActivityForResult(intent, PICK_FILE_REQUEST);
+        hideAttachmentPanel();
     }
 
     protected void recordAudio() {
@@ -552,6 +694,20 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
+    protected void toggleEmoji() {
+        boolean lastShowing = emojiPopup.isShowing();
+        emojiPopup.toggle();
+        if (!lastShowing && !emojiPopup.isShowing()) {
+            emojiPopup.toggle();
+        }
+    }
+
+    protected void dismissEmoji() {
+        if (emojiPopup != null && emojiPopup.isShowing()) {
+            emojiPopup.dismiss();
+        }
+    }
+
     @Override
     public void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments) {
         this.qiscusChatRoom = qiscusChatRoom;
@@ -564,9 +720,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void showComments(List<QiscusComment> qiscusComments) {
         if (!qiscusComments.isEmpty()) {
-            chatT.addOrUpdate(qiscusComments);
+            chatAdapter.addOrUpdate(qiscusComments);
         }
-        if (chatT.isEmpty() && qiscusComments.isEmpty()) {
+        if (chatAdapter.isEmpty() && qiscusComments.isEmpty()) {
             if (emptyChatHolder != null) {
                 emptyChatHolder.setVisibility(View.VISIBLE);
             }
@@ -579,8 +735,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onLoadMore(List<QiscusComment> qiscusComments) {
-        chatT.addOrUpdate(qiscusComments);
-        if (chatT.isEmpty() && qiscusComments.isEmpty()) {
+        chatAdapter.addOrUpdate(qiscusComments);
+        if (chatAdapter.isEmpty() && qiscusComments.isEmpty()) {
             if (emptyChatHolder != null) {
                 emptyChatHolder.setVisibility(View.VISIBLE);
             }
@@ -593,7 +749,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onSendingComment(QiscusComment qiscusComment) {
-        chatT.addOrUpdate(qiscusComment);
+        chatAdapter.addOrUpdate(qiscusComment);
         scrollToBottom();
         if (emptyChatHolder != null) {
             emptyChatHolder.setVisibility(View.GONE);
@@ -602,17 +758,17 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onSuccessSendComment(QiscusComment qiscusComment) {
-        chatT.addOrUpdate(qiscusComment);
+        chatAdapter.addOrUpdate(qiscusComment);
     }
 
     @Override
     public void onFailedSendComment(QiscusComment qiscusComment) {
-        chatT.addOrUpdate(qiscusComment);
+        chatAdapter.addOrUpdate(qiscusComment);
     }
 
     @Override
     public void onNewComment(QiscusComment qiscusComment) {
-        chatT.addOrUpdate(qiscusComment);
+        chatAdapter.addOrUpdate(qiscusComment);
         if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail()) && shouldShowNewMessageButton()) {
             if (newMessageButton != null && newMessageButton.getVisibility() == View.GONE) {
                 newMessageButton.setVisibility(View.VISIBLE);
@@ -628,22 +784,22 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onCommentDeleted(QiscusComment qiscusComment) {
-        chatT.remove(qiscusComment);
+        chatAdapter.remove(qiscusComment);
     }
 
     @Override
     public void refreshComment(QiscusComment qiscusComment) {
-        chatT.addOrUpdate(qiscusComment);
+        chatAdapter.addOrUpdate(qiscusComment);
     }
 
     @Override
     public void updateLastDeliveredComment(int lastDeliveredCommentId) {
-        chatT.updateLastDeliveredComment(lastDeliveredCommentId);
+        chatAdapter.updateLastDeliveredComment(lastDeliveredCommentId);
     }
 
     @Override
     public void updateLastReadComment(int lastReadCommentId) {
-        chatT.updateLastReadComment(lastReadCommentId);
+        chatAdapter.updateLastReadComment(lastReadCommentId);
     }
 
     private boolean shouldShowNewMessageButton() {
@@ -651,8 +807,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void loadMoreComments() {
-        if (loadMoreProgressBar.getVisibility() == View.GONE && chatT.getItemCount() > 0) {
-            QiscusComment qiscusComment = (QiscusComment) chatT.getData().get(chatT.getItemCount() - 1);
+        if (loadMoreProgressBar.getVisibility() == View.GONE && chatAdapter.getItemCount() > 0) {
+            QiscusComment qiscusComment = (QiscusComment) chatAdapter.getData().get(chatAdapter.getItemCount() - 1);
             if (qiscusComment.getId() == -1 || qiscusComment.getCommentBeforeId() > 0) {
                 qiscusChatPresenter.loadOlderCommentThan(qiscusComment);
             }
@@ -736,7 +892,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onRefresh() {
-        if (chatT.getData().size() > 0) {
+        if (chatAdapter.getData().size() > 0) {
             loadMoreComments();
             swipeRefreshLayout.setRefreshing(false);
         } else {
@@ -781,7 +937,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onStartRecord() {
-
+        hideAttachmentPanel();
     }
 
     @Override
@@ -805,9 +961,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         super.onSaveInstanceState(outState);
         outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
         ArrayList<QiscusComment> comments = new ArrayList<>();
-        int size = chatT.getData().size();
+        int size = chatAdapter.getData().size();
         for (int i = 0; i < size; i++) {
-            comments.add((QiscusComment) chatT.getData().get(i));
+            comments.add((QiscusComment) chatAdapter.getData().get(i));
         }
         outState.putParcelableArrayList(COMMENTS_DATA, comments);
     }
@@ -826,7 +982,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         super.onDestroyView();
         QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
         QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
-        chatT.detachView();
+        chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();
         }
@@ -837,22 +993,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
             QiscusPermissionsUtil.requestPermissions(this, "Please grant permissions to make apps working properly!",
                     RC_PERMISSIONS, PERMISSIONS);
-        }
-    }
-
-    protected void requestStoragePermission() {
-        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS[0], PERMISSIONS[1])) {
-            QiscusPermissionsUtil.requestPermissions(this, "To make this apps working properly we " +
-                            "need to access external storage to save your chatting data. " +
-                            "So please allow the apps to access the storage!",
-                    RC_STORAGE_PERMISSION, PERMISSIONS[0], PERMISSIONS[1]);
-        }
-    }
-
-    protected void requestAudioRecordPermission() {
-        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS[3])) {
-            QiscusPermissionsUtil.requestPermissions(this, "We need your permission to record audio to able send audio message!",
-                    RC_RECORD_AUDIO_PERMISSION, PERMISSIONS[3]);
         }
     }
 

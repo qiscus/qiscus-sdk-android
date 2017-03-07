@@ -68,11 +68,11 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     }
 
     @Override
-    protected void sendMessage() {
-        if (chatT.isEmpty()) {
+    public void sendMessage(String message) {
+        if (chatAdapter.isEmpty()) {
             Toast.makeText(getActivity(), "First message sent!", Toast.LENGTH_SHORT).show();
         }
-        super.sendMessage();
+        super.sendMessage(message);
     }
 
     private void lockChatAfter(int duration) {

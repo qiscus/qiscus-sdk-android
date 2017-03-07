@@ -17,6 +17,7 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -123,7 +124,8 @@
                 android:paddingRight="2dp"
                 android:paddingStart="2dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_qiscus_add_image"/>
+                android:src="@drawable/ic_qiscus_add_image"
+                android:tint="@color/qiscus_secondary_text"/>
 
             <ImageView
                 android:id="@+id/button_pick_picture"
@@ -137,7 +139,8 @@
                 android:paddingRight="1dp"
                 android:paddingStart="1dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_qiscus_pick_picture"/>
+                android:src="@drawable/ic_qiscus_pick_picture"
+                android:tint="@color/qiscus_secondary_text"/>
 
             <ImageView
                 android:id="@+id/button_add_file"
@@ -151,7 +154,8 @@
                 android:paddingRight="1dp"
                 android:paddingStart="1dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_qiscus_add_file"/>
+                android:src="@drawable/ic_qiscus_add_file"
+                android:tint="@color/qiscus_secondary_text"/>
 
             <ImageView
                 android:id="@+id/button_add_audio"
@@ -165,7 +169,8 @@
                 android:paddingRight="1dp"
                 android:paddingStart="1dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_qiscus_add_audio"/>
+                android:src="@drawable/ic_qiscus_add_audio"
+                android:tint="@color/qiscus_secondary_text"/>
 
         </LinearLayout>
 
@@ -190,7 +195,7 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_action_add"/>
 
-            <EditText
+            <com.vanniktech.emoji.EmojiEditText
                 android:id="@+id/field_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -198,12 +203,24 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:hint="@string/hint_message"
-                android:imeOptions="actionSend"
-                android:inputType="textLongMessage|textMultiLine|textCapSentences"
+                android:imeOptions="actionSend|flagNoEnterAction"
+                android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
                 android:maxLines="4"
                 android:padding="8dp"
                 android:textColor="@color/qiscus_primary_text"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                app:emojiSize="22sp"/>
+
+            <ImageView
+                android:id="@+id/button_emoji"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/bt_qiscus_selector_grey"
+                android:padding="2dp"
+                android:src="@drawable/ic_qiscus_emot"/>
 
             <ImageView
                 android:id="@+id/button_send"

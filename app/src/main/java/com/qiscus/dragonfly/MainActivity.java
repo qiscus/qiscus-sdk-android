@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(intent -> {
+                    revertCustomChatConfig();
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(qiscusChatRoom -> ChatActivity.generateIntent(this, qiscusChatRoom, false))
                 .subscribe(intent -> {
+                    revertCustomChatConfig();
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
@@ -109,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(qiscusChatRoom -> ChatActivity.generateIntent(this, qiscusChatRoom, true))
                 .subscribe(intent -> {
+                    revertCustomChatConfig();
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
@@ -127,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(qiscusChatRoom -> CustomChatActivity.generateIntent(this, qiscusChatRoom))
                 .subscribe(intent -> {
+                    setupCustomChatConfig();
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
@@ -166,5 +170,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void dismissLoading() {
         mProgressDialog.dismiss();
+    }
+
+    private void revertCustomChatConfig() {
+        Qiscus.getChatConfig()
+                .setSendButtonIcon(R.drawable.ic_qiscus_send)
+                .setShowAttachmentPanelIcon(R.drawable.ic_qiscus_attach);
+    }
+
+    private void setupCustomChatConfig() {
+        Qiscus.getChatConfig()
+                .setSendButtonIcon(R.drawable.ic_qiscus_send_on)
+                .setShowAttachmentPanelIcon(R.drawable.ic_qiscus_send_off);
     }
 }
