@@ -536,14 +536,22 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (qiscusComment != null && qiscusComment.getId() > lastReadCommentId.get()) {
             lastReadCommentId.set(qiscusComment.getId());
             lastDeliveredCommentId.set(lastReadCommentId.get());
-            QiscusAndroidUtil.runOnUIThread(() -> view.updateLastReadComment(lastReadCommentId.get()));
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.updateLastReadComment(lastReadCommentId.get());
+                }
+            });
         }
     }
 
     private void updateLastDeliveredComment(QiscusComment qiscusComment) {
         if (qiscusComment != null && qiscusComment.getId() > lastDeliveredCommentId.get()) {
             lastDeliveredCommentId.set(qiscusComment.getId());
-            QiscusAndroidUtil.runOnUIThread(() -> view.updateLastDeliveredComment(lastDeliveredCommentId.get()));
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.updateLastDeliveredComment(lastDeliveredCommentId.get());
+                }
+            });
         }
     }
 
