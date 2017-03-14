@@ -144,7 +144,7 @@ public class QiscusPusherService extends Service {
 
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))

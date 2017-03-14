@@ -286,14 +286,20 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     @Override
     public void onClick(View v) {
         if (v.equals(messageBubbleView)) {
-            itemClickListener.onItemClick(v, getAdapterPosition());
+            int position = getAdapterPosition();
+            if (position >= 0) {
+                itemClickListener.onItemClick(v, position);
+            }
         }
     }
 
     @Override
     public boolean onLongClick(View v) {
         if (longItemClickListener != null) {
-            longItemClickListener.onLongItemClick(v, getAdapterPosition());
+            int position = getAdapterPosition();
+            if (position >= 0) {
+                longItemClickListener.onLongItemClick(v, position);
+            }
             return true;
         }
         return false;

@@ -628,6 +628,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     public void sendMessage(String message) {
+        message = message.trim();
         if (!message.isEmpty()) {
             qiscusChatPresenter.sendComment(message);
             messageEditText.setText("");
