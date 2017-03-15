@@ -65,6 +65,7 @@ public class Qiscus {
 
     private static String appServer;
     private static long heartBeat;
+    private static String authorities;
 
     private Qiscus() {
     }
@@ -119,6 +120,7 @@ public class Qiscus {
         chatConfig = new QiscusChatConfig();
         heartBeat = 60000;
         appInstance.registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
+        authorities = appInstance.getPackageName() + ".qiscus.sdk.provider";
 
         startPusherService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
@@ -365,7 +367,11 @@ public class Qiscus {
     }
 
     public static String getProviderAuthorities() {
-        return appInstance.getPackageName() + ".qiscus.sdk.provider";
+        return authorities;
+    }
+
+    public static void setProviderAuthorities(String providerAuthorities) {
+        authorities = providerAuthorities;
     }
 
     /**
