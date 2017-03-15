@@ -210,6 +210,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
         });
 
+        messageEditText.setOnClickListener(v -> {
+            if (emojiPopup != null && emojiPopup.isShowing()) {
+                toggleEmoji();
+            }
+        });
+
         sendButton.setOnClickListener(v -> {
             String message = messageEditText.getText().toString().trim();
             if (message.isEmpty()) {
