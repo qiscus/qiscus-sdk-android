@@ -20,7 +20,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
+import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 
@@ -49,6 +51,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
         generateSubtitle();
         tvSubtitle.setText(subtitle);
         tvSubtitle.setVisibility(View.VISIBLE);
+        showRoomImage();
     }
 
     protected void generateSubtitle() {
@@ -64,6 +67,15 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
             }
         }
         subtitle += " and you";
+    }
+
+    @Override
+    protected void showRoomImage() {
+        Glide.with(this).load(qiscusChatRoom.getAvatarUrl())
+                .error(R.drawable.ic_qiscus_avatar)
+                .placeholder(R.drawable.ic_qiscus_avatar)
+                .dontAnimate()
+                .into(ivAvatar);
     }
 
     @Override
