@@ -28,6 +28,10 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created on : March 01, 2017
@@ -77,7 +81,13 @@ public abstract class QiscusBaseAccountLinkingMessageViewHolder extends QiscusBa
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
         super.showMessage(qiscusComment);
-        accountLinkingView.setText(accountLinkingText);
+        try {
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            accountLinkingView.setText(payload.optString("button_text", accountLinkingText));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            accountLinkingView.setText(accountLinkingText);
+        }
     }
 
     @Override

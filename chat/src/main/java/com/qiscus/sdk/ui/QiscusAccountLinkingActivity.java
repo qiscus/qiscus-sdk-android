@@ -33,6 +33,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -45,17 +46,22 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
+    private static final String EXTRA_TITLE = "extra_title";
     private static final String EXTRA_URL = "extra_url";
     private static final String EXTRA_FINISH_URL = "extra_finish_url";
+    private static final String EXTRA_SUCCESS_MESSAGE = "extra_success_message";
 
     private WebView webView;
     private ProgressBar progressBar;
     private boolean success;
+    private String successMessage;
 
-    public static Intent generateIntent(Context context, String url, String finishUrl) {
+    public static Intent generateIntent(Context context, String title, String url, String finishUrl, String successMessage) {
         Intent intent = new Intent(context, QiscusAccountLinkingActivity.class);
+        intent.putExtra(EXTRA_TITLE, title);
         intent.putExtra(EXTRA_URL, url);
         intent.putExtra(EXTRA_FINISH_URL, finishUrl);
+        intent.putExtra(EXTRA_SUCCESS_MESSAGE, successMessage);
         return intent;
     }
 
@@ -65,6 +71,15 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         onSetStatusBarColor();
         setContentView(R.layout.activity_qiscus_account_linking);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        TextView titleView = (TextView) findViewById(R.id.title);
+        String title = getIntent().getStringExtra(EXTRA_TITLE);
+        title = (title == null || title.isEmpty()) ? "Account Linking" : title;
+        titleView.setText(title);
+
+        successMessage = getIntent().getStringExtra(EXTRA_SUCCESS_MESSAGE);
+        successMessage = (successMessage == null || successMessage.isEmpty()) ? "Account linking successfully." : successMessage;
+
         webView = (WebView) findViewById(R.id.web_view);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
@@ -127,12 +142,21 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         success = false; // To prevent showing multiple dialog
         new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setMessage("Account linking successfully.")
+                .setMessage(successMessage)
                 .setPositiveButton("OK", (dialog, which) -> {
                     dialog.dismiss();
                     finish();
                 })
                 .create()
                 .show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
