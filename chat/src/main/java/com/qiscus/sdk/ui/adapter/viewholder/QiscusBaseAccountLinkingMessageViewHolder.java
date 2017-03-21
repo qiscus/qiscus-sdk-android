@@ -83,7 +83,11 @@ public abstract class QiscusBaseAccountLinkingMessageViewHolder extends QiscusBa
         super.showMessage(qiscusComment);
         try {
             JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
-            accountLinkingView.setText(payload.optString("button_text", accountLinkingText));
+            String text = payload.getJSONObject("params").optString("button_text", accountLinkingText);
+            if (text == null || text.isEmpty()) {
+                text = accountLinkingText;
+            }
+            accountLinkingView.setText(text);
         } catch (JSONException e) {
             e.printStackTrace();
             accountLinkingView.setText(accountLinkingText);
