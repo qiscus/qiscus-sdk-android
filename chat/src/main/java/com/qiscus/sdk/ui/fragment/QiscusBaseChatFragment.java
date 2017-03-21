@@ -210,6 +210,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
         });
 
+        messageEditText.setOnClickListener(v -> {
+            if (emojiPopup != null && emojiPopup.isShowing()) {
+                toggleEmoji();
+            }
+        });
+
         sendButton.setOnClickListener(v -> {
             String message = messageEditText.getText().toString().trim();
             if (message.isEmpty()) {
@@ -565,8 +571,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void accountLinkingClick(QiscusComment qiscusComment) {
         try {
             JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
-            startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), payload.getString("url"),
-                    payload.getString("redirect_url")));
+            JSONObject params = payload.getJSONObject("params");
+            startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), params.optString("view_title"),
+                    payload.getString("url"), payload.getString("redirect_url"), params.optString("success_message")));
         } catch (JSONException e) {
             Log.e("Qiscus", e.getMessage());
         }

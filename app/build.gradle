@@ -52,14 +52,12 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+        classpath 'me.tatarka:gradle-retrolambda:3.6.0'
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 
     compile project(':chat')
 }

@@ -18,15 +18,21 @@ package com.qiscus.sdk.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.ui.view.QiscusCircularImageView;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.Date;
@@ -35,6 +41,9 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     protected Toolbar toolbar;
     protected TextView tvTitle;
     protected TextView tvSubtitle;
+    protected QiscusCircularImageView ivAvatar;
+
+    protected QiscusAccount qiscusAccount;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
         Intent intent = new Intent(context, QiscusChatActivity.class);
@@ -59,7 +68,15 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         tvTitle = (TextView) findViewById(R.id.tv_title);
         tvSubtitle = (TextView) findViewById(R.id.tv_subtitle);
+        ivAvatar = (QiscusCircularImageView) findViewById(R.id.profile_picture);
+        findViewById(R.id.back).setOnClickListener(v -> onBackPressed());
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    protected void onViewReady(Bundle savedInstanceState) {
+        qiscusAccount = Qiscus.getQiscusAccount();
+        super.onViewReady(savedInstanceState);
     }
 
     @Override
@@ -76,6 +93,20 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
         if (!qiscusChatRoom.getSubtitle().isEmpty()) {
             tvSubtitle.setText(qiscusChatRoom.getSubtitle());
             tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
+        }
+        showRoomImage();
+    }
+
+    protected void showRoomImage() {
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+            if (!member.getEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
+                Glide.with(this).load(member.getAvatar())
+                        .error(R.drawable.ic_qiscus_avatar)
+                        .placeholder(R.drawable.ic_qiscus_avatar)
+                        .dontAnimate()
+                        .into(ivAvatar);
+                break;
+            }
         }
     }
 
