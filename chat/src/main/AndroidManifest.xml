@@ -51,6 +51,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/QiscusTheme"/>
 
+        <activity
+            android:name=".filepicker.FilePickerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/QiscusTheme"/>
+
+        <activity
+            android:name=".filepicker.MediaDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/QiscusTheme"/>
+
         <service android:name=".service.QiscusPusherService"/>
 
         <service android:name="org.eclipse.paho.android.service.MqttService"/>

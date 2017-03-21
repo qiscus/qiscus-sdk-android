@@ -32,4 +32,18 @@
     <string name="chat_activity_label_clipboard">Message</string>
     <string name="chat_activity_copied_message">Copied</string>
     <string name="hint_message">Type a message…</string>
+
+    <string name="qiscus_no_files_found">No Files Found</string>
+    <string name="qiscus_pdf_title">PDF</string>
+    <string name="qiscus_ppt_title">PPT</string>
+    <string name="qiscus_word_title">DOC</string>
+    <string name="qiscus_excel_title">XLS</string>
+    <string name="qiscus_txt_title">TXT</string>
+    <string name="qiscus_videos">Videos</string>
+    <string name="qiscus_images">Images</string>
+    <string name="qiscus_all_photos">All Photos</string>
+    <string name="qiscus_all_videos">All Videos</string>
+    <string name="qiscus_all_files">All Files</string>
+    <string name="qiscus_select_media">Select a media</string>
+    <string name="qiscus_select_file">Select a file</string>
 </resources>
