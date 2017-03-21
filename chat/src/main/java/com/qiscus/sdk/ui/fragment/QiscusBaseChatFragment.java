@@ -54,6 +54,8 @@ import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.filepicker.FilePickerBuilder;
+import com.qiscus.sdk.filepicker.FilePickerConst;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
@@ -646,9 +648,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void addImage() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        FilePickerBuilder.getInstance(getActivity())
+                .setMaxCount(1)
+                .addVideoPicker()
+                .pickPhoto(this);
         hideAttachmentPanel();
     }
 
@@ -672,9 +675,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void addFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        startActivityForResult(intent, PICK_FILE_REQUEST);
+        FilePickerBuilder.getInstance(getActivity())
+                .setMaxCount(1)
+                .pickFile(this);
         hideAttachmentPanel();
     }
 
@@ -906,27 +909,23 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+        if (requestCode == FilePickerConst.REQUEST_CODE_PHOTO && resultCode == Activity.RESULT_OK) {
             if (data == null) {
                 showError(getString(R.string.chat_error_failed_open_picture));
                 return;
             }
-            try {
-                sendFile(QiscusFileUtil.from(data.getData()));
-            } catch (IOException e) {
-                showError(getString(R.string.chat_error_failed_read_picture));
-                e.printStackTrace();
+            ArrayList<String> paths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
+            if (paths.size() > 0) {
+                sendFile(new File(paths.get(0)));
             }
-        } else if (requestCode == PICK_FILE_REQUEST && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == FilePickerConst.REQUEST_CODE_DOC && resultCode == Activity.RESULT_OK) {
             if (data == null) {
                 showError(getString(R.string.chat_error_failed_open_file));
                 return;
             }
-            try {
-                sendFile(QiscusFileUtil.from(data.getData()));
-            } catch (IOException e) {
-                showError(getString(R.string.chat_error_failed_read_file));
-                e.printStackTrace();
+            ArrayList<String> paths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS);
+            if (paths.size() > 0) {
+                sendFile(new File(paths.get(0)));
             }
         } else if (requestCode == TAKE_PICTURE_REQUEST && resultCode == Activity.RESULT_OK) {
             try {
