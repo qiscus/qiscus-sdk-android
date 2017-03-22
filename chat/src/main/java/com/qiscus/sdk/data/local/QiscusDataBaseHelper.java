@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Emitter;
 import rx.Observable;
 
 public class QiscusDataBaseHelper implements QiscusDataStore {
@@ -175,7 +176,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         return Observable.create(subscriber -> {
             subscriber.onNext(getChatRooms(count));
             subscriber.onCompleted();
-        });
+        }, Emitter.BackpressureMode.BUFFER);
     }
 
     @Override
@@ -548,7 +549,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(topicId, count));
             subscriber.onCompleted();
-        });
+        }, Emitter.BackpressureMode.BUFFER);
     }
 
     @Override
@@ -579,7 +580,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
             subscriber.onCompleted();
-        });
+        }, Emitter.BackpressureMode.BUFFER);
     }
 
     @Override
