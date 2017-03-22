@@ -16,13 +16,24 @@
 
 package com.qiscus.sdk.ui.adapter.viewholder;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.content.ContextCompat;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusLinkPreviewView;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
 
 /**
@@ -55,6 +66,30 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
     }
 
     @Override
+    protected void showMessage(QiscusComment qiscusComment) {
+        super.showMessage(qiscusComment);
+        setUpLinks(qiscusComment);
+    }
+
+    private void setUpLinks(QiscusComment qiscusComment) {
+        for (String link : QiscusAndroidUtil.extractPlainUrl(qiscusComment.getMessage())) {
+            clickify(link, () -> {
+                String url = link;
+                if (!url.startsWith("http")) {
+                    url = "http://" + url;
+                }
+                new CustomTabsIntent.Builder()
+                        .setToolbarColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getAppBarColor()))
+                        .setShowTitle(true)
+                        .addDefaultShareMenuItem()
+                        .enableUrlBarHiding()
+                        .build()
+                        .launchUrl(messageTextView.getContext(), Uri.parse(url));
+            });
+        }
+    }
+
+    @Override
     protected void setUpColor() {
         super.setUpColor();
         linkPreviewView.setTitleColor(messageFromMe ? rightBubbleTextColor : leftBubbleTextColor);
@@ -65,6 +100,50 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
     public void onLinkPreviewReady(QiscusComment qiscusComment, PreviewData previewData) {
         if (qiscusComment.equals(this.qiscusComment)) {
             linkPreviewView.bind(previewData);
+        }
+    }
+
+    private static class ClickSpan extends ClickableSpan {
+        private OnClickListener listener;
+
+        public ClickSpan(OnClickListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onClick(View widget) {
+            if (listener != null) {
+                listener.onClick();
+            }
+        }
+
+        public interface OnClickListener {
+            void onClick();
+        }
+    }
+
+    private void clickify(String clickableText, ClickSpan.OnClickListener listener) {
+        CharSequence text = messageTextView.getText();
+        String string = text.toString();
+        ClickSpan span = new ClickSpan(listener);
+
+        int start = string.indexOf(clickableText);
+        int end = start + clickableText.length();
+        if (start == -1) {
+            return;
+        }
+
+        if (text instanceof Spannable) {
+            ((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            SpannableString s = SpannableString.valueOf(text);
+            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            messageTextView.setText(s);
+        }
+
+        MovementMethod m = messageTextView.getMovementMethod();
+        if (m == null || !(m instanceof LinkMovementMethod)) {
+            messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
         }
     }
 }

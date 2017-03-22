@@ -58,6 +58,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
+import rx.Emitter;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
 
@@ -190,15 +191,11 @@ public enum QiscusApi {
                 e.printStackTrace();
                 subscriber.onError(e);
             }
-        });
+        }, Emitter.BackpressureMode.BUFFER);
     }
 
     public Observable<File> downloadFile(int topicId, String url, String fileName, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
-            if (subscriber.isUnsubscribed()) {
-                return;
-            }
-
             InputStream inputStream = null;
             FileOutputStream fos = null;
             try {
@@ -228,10 +225,8 @@ public enum QiscusApi {
                     }
                     fos.flush();
 
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onNext(output);
-                        subscriber.onCompleted();
-                    }
+                    subscriber.onNext(output);
+                    subscriber.onCompleted();
                 }
             } catch (Exception e) {
                 throw OnErrorThrowable.from(OnErrorThrowable.addValueAsLastCause(e, url));
@@ -247,7 +242,7 @@ public enum QiscusApi {
                     //Do nothing
                 }
             }
-        });
+        }, Emitter.BackpressureMode.BUFFER);
     }
 
     public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, String options) {
