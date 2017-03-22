@@ -78,6 +78,15 @@ public class Document extends BaseFile {
         return o instanceof Document && id == ((Document) o).id;
     }
 
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
+        result = 31 * result + (size != null ? size.hashCode() : 0);
+        result = 31 * result + (fileType != null ? fileType.hashCode() : 0);
+        return result;
+    }
+
     private boolean contains(String[] types, String path) {
         for (String string : types) {
             if (path.toLowerCase().endsWith(string)) {

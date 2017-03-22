@@ -25,8 +25,7 @@ import android.support.v4.content.CursorLoader;
 import com.qiscus.sdk.filepicker.FilePickerConst;
 
 public class PhotoDirectoryLoader extends CursorLoader {
-
-    private final String[] IMAGE_PROJECTION = {
+    private static final String[] IMAGE_PROJECTION = {
             Media._ID,
             Media.DATA,
             Media.BUCKET_ID,

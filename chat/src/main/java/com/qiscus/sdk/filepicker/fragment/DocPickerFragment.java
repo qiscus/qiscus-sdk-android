@@ -102,7 +102,7 @@ public class DocPickerFragment extends Fragment {
 
     private void setUpViewPager() {
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager());
-        ArrayList<FileType> supportedTypes = PickerManager.getInstance(getActivity()).getFileTypes();
+        ArrayList<FileType> supportedTypes = PickerManager.getInstance().getFileTypes();
         for (int index = 0; index < supportedTypes.size(); index++) {
             adapter.addFragment(DocFragment.newInstance(supportedTypes.get(index)), supportedTypes.get(index).getTitle());
         }

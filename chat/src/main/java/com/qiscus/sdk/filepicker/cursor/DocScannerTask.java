@@ -41,7 +41,7 @@ import static android.provider.MediaStore.MediaColumns.DATA;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class DocScannerTask extends AsyncTask<Void, Void, List<Document>> {
-    private final String[] DOC_PROJECTION = {
+    private static final String[] DOC_PROJECTION = {
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DATA,
             MediaStore.Files.FileColumns.MIME_TYPE,
@@ -89,15 +89,15 @@ public class DocScannerTask extends AsyncTask<Void, Void, List<Document>> {
             String title = data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE));
 
             if (path != null) {
-                FileType fileType = getFileType(PickerManager.getInstance(context).getFileTypes(), path);
+                FileType fileType = getFileType(PickerManager.getInstance().getFileTypes(), path);
                 if (fileType != null && !(new File(path).isDirectory())) {
                     Document document = new Document(imageId, title, path);
                     document.setFileType(fileType);
 
                     String mimeType = data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE));
-                    if (mimeType != null && !TextUtils.isEmpty(mimeType))
+                    if (mimeType != null && !TextUtils.isEmpty(mimeType)) {
                         document.setMimeType(mimeType);
-                    else {
+                    } else {
                         document.setMimeType("");
                     }
 

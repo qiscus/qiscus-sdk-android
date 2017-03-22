@@ -83,7 +83,7 @@ public class DocFragment extends Fragment {
             FileListAdapter fileListAdapter = (FileListAdapter) recyclerView.getAdapter();
             if (fileListAdapter == null) {
                 fileListAdapter = new FileListAdapter(getActivity(), dirs,
-                        PickerManager.getInstance(getActivity()).getSelectedFiles());
+                        PickerManager.getInstance().getSelectedFiles());
 
                 recyclerView.setAdapter(fileListAdapter);
             } else {

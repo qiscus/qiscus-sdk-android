@@ -468,15 +468,13 @@ public class TabLayoutHelper {
         public void onPageScrolled(int position, float positionOffset,
                                    int positionOffsetPixels) {
             final TabLayout tabLayout = mTabLayoutRef.get();
-            if (tabLayout != null) {
-                if (shouldUpdateScrollPosition()) {
-                    // Update the scroll position, only update the text selection if we're being
-                    // dragged (or we're settling after a drag)
-                    final boolean updateText = (mScrollState == ViewPager.SCROLL_STATE_DRAGGING)
-                            || (mScrollState == ViewPager.SCROLL_STATE_SETTLING
-                            && mPreviousScrollState == ViewPager.SCROLL_STATE_DRAGGING);
-                    tabLayout.setScrollPosition(position, positionOffset, updateText);
-                }
+            if (tabLayout != null && shouldUpdateScrollPosition()) {
+                // Update the scroll position, only update the text selection if we're being
+                // dragged (or we're settling after a drag)
+                final boolean updateText = (mScrollState == ViewPager.SCROLL_STATE_DRAGGING)
+                        || (mScrollState == ViewPager.SCROLL_STATE_SETTLING
+                        && mPreviousScrollState == ViewPager.SCROLL_STATE_DRAGGING);
+                tabLayout.setScrollPosition(position, positionOffset, updateText);
             }
         }
 
@@ -505,7 +503,8 @@ public class TabLayoutHelper {
             mMethodSelectTab = getAccessiblePrivateMethod(TabLayout.class, "selectTab", TabLayout.Tab.class, boolean.class);
         }
 
-        private static Method getAccessiblePrivateMethod(Class<?> targetClass, String methodName, Class<?>... params) throws RuntimeException {
+        private static Method getAccessiblePrivateMethod(Class<?> targetClass, String methodName,
+                                                         Class<?>... params) throws RuntimeException {
             try {
                 Method m = targetClass.getDeclaredMethod(methodName, params);
                 m.setAccessible(true);

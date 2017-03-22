@@ -27,7 +27,7 @@ import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.ui.view.TouchImageView;
+import com.qiscus.sdk.ui.view.QiscusTouchImageView;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
@@ -53,7 +53,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qiscus_photo_viewer);
 
-        TouchImageView imageView = (TouchImageView) findViewById(R.id.image_view);
+        QiscusTouchImageView imageView = (QiscusTouchImageView) findViewById(R.id.image_view);
         TextView senderName = (TextView) findViewById(R.id.sender_name);
         TextView date = (TextView) findViewById(R.id.date);
         ImageButton shareButton = (ImageButton) findViewById(R.id.action_share);

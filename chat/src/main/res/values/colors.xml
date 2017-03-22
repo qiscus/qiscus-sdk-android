@@ -32,10 +32,5 @@
     <color name="qiscus_file_background">#64b5f6</color>
     <color name="qiscus_record_background">#4db6ac</color>
     <color name="qiscus_keyboard_background">#90a4ae</color>
-
     <color name="qiscus_bg_gray">#ecedef</color>
-    <color name="qiscus_transparent_black">#94333232</color>
-
-    <drawable name="qiscus_tab_gray">@color/qiscus_bg_gray</drawable>
-    <drawable name="qiscus_tab_white">@android:color/white</drawable>
 </resources>

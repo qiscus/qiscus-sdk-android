@@ -54,7 +54,7 @@ import android.widget.OverScroller;
 import android.widget.Scroller;
 
 
-public class TouchImageView extends AppCompatImageView {
+public class QiscusTouchImageView extends AppCompatImageView {
 
     private static final String DEBUG = "DEBUG";
 
@@ -118,17 +118,17 @@ public class TouchImageView extends AppCompatImageView {
     private OnTouchListener userTouchListener = null;
     private OnTouchImageViewListener touchImageViewListener = null;
 
-    public TouchImageView(Context context) {
+    public QiscusTouchImageView(Context context) {
         super(context);
         sharedConstructing(context);
     }
 
-    public TouchImageView(Context context, AttributeSet attrs) {
+    public QiscusTouchImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         sharedConstructing(context);
     }
 
-    public TouchImageView(Context context, AttributeSet attrs, int defStyle) {
+    public QiscusTouchImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         sharedConstructing(context);
     }
@@ -447,7 +447,7 @@ public class TouchImageView extends AppCompatImageView {
      *
      * @param img
      */
-    public void setZoom(TouchImageView img) {
+    public void setZoom(QiscusTouchImageView img) {
         PointF center = img.getScrollPosition();
         setZoom(img.getCurrentZoom(), center.x, center.y, img.getScaleType());
     }

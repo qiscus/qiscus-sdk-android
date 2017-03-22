@@ -23,8 +23,8 @@ import com.qiscus.sdk.filepicker.model.BaseFile;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder, T extends BaseFile>
-        extends RecyclerView.Adapter<VH> implements Selectable<T> {
+public abstract class SelectableAdapter<V extends RecyclerView.ViewHolder, T extends BaseFile>
+        extends RecyclerView.Adapter<V> implements Selectable<T> {
 
     private List<T> items;
     protected List<T> selectedPhotos;
