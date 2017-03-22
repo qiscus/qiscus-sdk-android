@@ -115,7 +115,7 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
       });
 ```
 
-Check sample apps -> [DragonFly](https://github.com/qiscus/qiscus-sdk-android-sample)
+Check sample apps -> [DragonGo](https://github.com/qiscus/qiscus-sdk-android-sample)
 
 License
 -------
