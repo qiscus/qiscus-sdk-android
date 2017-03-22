@@ -127,4 +127,5 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.2.0'
 
     compile 'com.vanniktech:emoji-one:0.4.0'
+    compile 'com.android.support:customtabs:25.3.0'
 }

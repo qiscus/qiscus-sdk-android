@@ -17,10 +17,10 @@
 package com.qiscus.sdk.ui.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.support.annotation.ColorInt;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -110,7 +111,13 @@ public class QiscusLinkPreviewView extends LinearLayout {
     }
 
     private void openUrl() {
-        getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(previewData.getUrl())));
+        new CustomTabsIntent.Builder()
+                .setToolbarColor(ContextCompat.getColor(getContext(), Qiscus.getChatConfig().getAppBarColor()))
+                .setShowTitle(true)
+                .addDefaultShareMenuItem()
+                .enableUrlBarHiding()
+                .build()
+                .launchUrl(getContext(), Uri.parse(previewData.getUrl()));
     }
 
     public void setTitleColor(@ColorInt int color) {

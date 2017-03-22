@@ -82,6 +82,17 @@ public final class QiscusAndroidUtil {
         return urls;
     }
 
+    public static List<String> extractPlainUrl(String text) {
+        String[] strings = text.split(" ");
+        List<String> urls = new ArrayList<>();
+        for (String s : strings) {
+            if (isUrl(s)) {
+                urls.add(s);
+            }
+        }
+        return urls;
+    }
+
     public static int getRandomColor() {
         return Color.argb(100, random.nextInt(256), random.nextInt(256), random.nextInt(256));
     }
