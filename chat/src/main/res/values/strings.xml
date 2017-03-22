@@ -28,17 +28,10 @@
     <string name="chat_error_failed_open_picture">Failed to open picture!</string>
     <string name="chat_error_failed_read_picture">Failed to read picture data!</string>
     <string name="chat_error_failed_open_file">Failed to open file!</string>
-    <string name="chat_error_failed_read_file">Failed to read file data!</string>
     <string name="chat_activity_label_clipboard">Message</string>
-    <string name="chat_activity_copied_message">Copied</string>
     <string name="hint_message">Type a message…</string>
 
     <string name="qiscus_no_files_found">No Files Found</string>
-    <string name="qiscus_pdf_title">PDF</string>
-    <string name="qiscus_ppt_title">PPT</string>
-    <string name="qiscus_word_title">DOC</string>
-    <string name="qiscus_excel_title">XLS</string>
-    <string name="qiscus_txt_title">TXT</string>
     <string name="qiscus_videos">Videos</string>
     <string name="qiscus_images">Images</string>
     <string name="qiscus_all_photos">All Photos</string>

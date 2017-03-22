@@ -61,8 +61,8 @@ public class FileListAdapter extends SelectableAdapter<FileListAdapter.FileViewH
         holder.fileSizeTextView.setText(Formatter.formatShortFileSize(context, Long.parseLong(document.getSize())));
 
         holder.itemView.setOnClickListener(v -> {
-            if (PickerManager.getInstance(context).getMaxCount() == 1) {
-                PickerManager.getInstance(context).add(document.getPath(), FilePickerConst.FILE_TYPE_DOCUMENT);
+            if (PickerManager.getInstance().getMaxCount() == 1) {
+                PickerManager.getInstance().add(document.getPath(), FilePickerConst.FILE_TYPE_DOCUMENT);
             } else {
                 onItemClicked(document, holder);
             }
@@ -86,16 +86,16 @@ public class FileListAdapter extends SelectableAdapter<FileListAdapter.FileViewH
     }
 
     private void onItemClicked(Document document, FileViewHolder holder) {
-        if (holder.checkBox.isChecked() || PickerManager.getInstance(context).shouldAdd()) {
+        if (holder.checkBox.isChecked() || PickerManager.getInstance().shouldAdd()) {
             holder.checkBox.setChecked(!holder.checkBox.isChecked(), true);
         }
 
         if (holder.checkBox.isChecked()) {
             holder.checkBox.setVisibility(View.VISIBLE);
-            PickerManager.getInstance(context).add(document.getPath(), FilePickerConst.FILE_TYPE_DOCUMENT);
+            PickerManager.getInstance().add(document.getPath(), FilePickerConst.FILE_TYPE_DOCUMENT);
         } else {
             holder.checkBox.setVisibility(View.GONE);
-            PickerManager.getInstance(context).remove(document.getPath(), FilePickerConst.FILE_TYPE_DOCUMENT);
+            PickerManager.getInstance().remove(document.getPath(), FilePickerConst.FILE_TYPE_DOCUMENT);
         }
     }
 

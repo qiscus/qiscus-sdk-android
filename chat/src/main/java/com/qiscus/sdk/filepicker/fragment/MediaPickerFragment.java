@@ -61,17 +61,21 @@ public class MediaPickerFragment extends Fragment {
 
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager());
 
-        if (PickerManager.getInstance(getActivity()).isShowFolderView()) {
-            adapter.addFragment(MediaFolderPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_IMAGE), getString(R.string.qiscus_images));
+        if (PickerManager.getInstance().isShowFolderView()) {
+            adapter.addFragment(MediaFolderPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_IMAGE),
+                    getString(R.string.qiscus_images));
         } else {
-            adapter.addFragment(MediaDetailPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_IMAGE), getString(R.string.qiscus_images));
+            adapter.addFragment(MediaDetailPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_IMAGE),
+                    getString(R.string.qiscus_images));
         }
 
-        if (PickerManager.getInstance(getActivity()).showVideo()) {
-            if (PickerManager.getInstance(getActivity()).isShowFolderView()) {
-                adapter.addFragment(MediaFolderPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_VIDEO), getString(R.string.qiscus_videos));
+        if (PickerManager.getInstance().showVideo()) {
+            if (PickerManager.getInstance().isShowFolderView()) {
+                adapter.addFragment(MediaFolderPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_VIDEO),
+                        getString(R.string.qiscus_videos));
             } else {
-                adapter.addFragment(MediaDetailPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_VIDEO), getString(R.string.qiscus_videos));
+                adapter.addFragment(MediaDetailPickerFragment.newInstance(FilePickerConst.MEDIA_TYPE_VIDEO),
+                        getString(R.string.qiscus_videos));
             }
         } else {
             tabLayout.setVisibility(View.GONE);

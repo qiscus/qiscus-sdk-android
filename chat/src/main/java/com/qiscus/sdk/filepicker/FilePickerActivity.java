@@ -88,7 +88,7 @@ public class FilePickerActivity extends AppCompatActivity implements PickerManag
                 tvTitle.setText(R.string.qiscus_select_file);
             }
 
-            PickerManager.getInstance(this).setPickerManagerListener(this);
+            PickerManager.getInstance().setPickerManagerListener(this);
             openSpecificFragment(type);
         }
     }
@@ -97,8 +97,8 @@ public class FilePickerActivity extends AppCompatActivity implements PickerManag
         if (type == FilePickerConst.MEDIA_PICKER) {
             addFragment(this, R.id.container, MediaPickerFragment.newInstance());
         } else {
-            if (PickerManager.getInstance(this).isDocSupport()) {
-                PickerManager.getInstance(this).addDocTypes();
+            if (PickerManager.getInstance().isDocSupport()) {
+                PickerManager.getInstance().addDocTypes();
             }
             addFragment(this, R.id.container, DocPickerFragment.newInstance());
         }
@@ -127,8 +127,8 @@ public class FilePickerActivity extends AppCompatActivity implements PickerManag
         switch (requestCode) {
             case FilePickerConst.REQUEST_CODE_MEDIA_DETAIL:
                 if (resultCode == RESULT_OK) {
-                    returnData(type == FilePickerConst.MEDIA_PICKER ? PickerManager.getInstance(this).getSelectedPhotos()
-                            : PickerManager.getInstance(this).getSelectedFiles());
+                    returnData(type == FilePickerConst.MEDIA_PICKER ? PickerManager.getInstance().getSelectedPhotos()
+                            : PickerManager.getInstance().getSelectedFiles());
                 }
                 break;
         }

@@ -40,4 +40,11 @@ public class Media extends BaseFile {
     public boolean equals(Object o) {
         return o instanceof Media && id == ((Media) o).id;
     }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + mediaType;
+        return result;
+    }
 }

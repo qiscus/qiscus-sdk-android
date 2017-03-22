@@ -112,7 +112,7 @@ public class MediaDetailPickerFragment extends Fragment {
             photoGridAdapter.notifyDataSetChanged();
         } else {
             photoGridAdapter = new PhotoGridAdapter(getActivity(), medias,
-                    PickerManager.getInstance(getActivity()).getSelectedPhotos());
+                    PickerManager.getInstance().getSelectedPhotos());
             recyclerView.setAdapter(photoGridAdapter);
         }
 

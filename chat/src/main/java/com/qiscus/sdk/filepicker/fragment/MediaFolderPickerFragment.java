@@ -91,7 +91,7 @@ public class MediaFolderPickerFragment extends Fragment implements FolderGridAda
 
     private void getDataFromMedia() {
         Bundle mediaStoreArgs = new Bundle();
-        mediaStoreArgs.putBoolean(FilePickerConst.EXTRA_SHOW_GIF, PickerManager.getInstance(getActivity()).isShowGif());
+        mediaStoreArgs.putBoolean(FilePickerConst.EXTRA_SHOW_GIF, PickerManager.getInstance().isShowGif());
         mediaStoreArgs.putInt(FilePickerConst.EXTRA_FILE_TYPE, fileType);
 
         if (fileType == FilePickerConst.MEDIA_TYPE_IMAGE) {

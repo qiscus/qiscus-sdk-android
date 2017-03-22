@@ -45,42 +45,42 @@ public class FilePickerBuilder {
     }
 
     public FilePickerBuilder setMaxCount(int maxCount) {
-        PickerManager.getInstance(context).setMaxCount(maxCount);
+        PickerManager.getInstance().setMaxCount(maxCount);
         return this;
     }
 
     public FilePickerBuilder addVideoPicker() {
-        PickerManager.getInstance(context).setShowVideos(true);
+        PickerManager.getInstance().setShowVideos(true);
         return this;
     }
 
     public FilePickerBuilder showGifs(boolean status) {
-        PickerManager.getInstance(context).setShowGif(status);
+        PickerManager.getInstance().setShowGif(status);
         return this;
     }
 
     public FilePickerBuilder showFolderView(boolean status) {
-        PickerManager.getInstance(context).setShowFolderView(status);
+        PickerManager.getInstance().setShowFolderView(status);
         return this;
     }
 
     public FilePickerBuilder enableDocSupport(boolean status) {
-        PickerManager.getInstance(context).setDocSupport(status);
+        PickerManager.getInstance().setDocSupport(status);
         return this;
     }
 
     public FilePickerBuilder enableOrientation(boolean status) {
-        PickerManager.getInstance(context).setEnableOrientation(status);
+        PickerManager.getInstance().setEnableOrientation(status);
         return this;
     }
 
     public FilePickerBuilder addFileSupport(String title, String[] extensions, @DrawableRes int drawable) {
-        PickerManager.getInstance(context).addFileType(new FileType(title, extensions, drawable));
+        PickerManager.getInstance().addFileType(new FileType(title, extensions, drawable));
         return this;
     }
 
     public FilePickerBuilder addFileSupport(String title, String[] extensions) {
-        PickerManager.getInstance(context).addFileType(new FileType(title, extensions, 0));
+        PickerManager.getInstance().addFileType(new FileType(title, extensions, 0));
         return this;
     }
 

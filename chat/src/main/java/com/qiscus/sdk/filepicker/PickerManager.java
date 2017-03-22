@@ -16,8 +16,6 @@
 
 package com.qiscus.sdk.filepicker;
 
-import android.content.Context;
-
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.filepicker.model.BaseFile;
 import com.qiscus.sdk.filepicker.model.FileType;
@@ -30,8 +28,8 @@ import java.util.ArrayList;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class PickerManager {
-    private static PickerManager instance;
+public enum PickerManager {
+    INSTANCE;
     private int maxCount = FilePickerConst.DEFAULT_MAX_COUNT;
     private int currentCount;
     private PickerManagerListener pickerManagerListener;
@@ -46,18 +44,11 @@ public class PickerManager {
     private boolean enableOrientation = false;
     private boolean showFolderView = true;
 
-    public static PickerManager getInstance(Context context) {
-        if (instance == null) {
-            synchronized (PickerManager.class) {
-                if (instance == null) {
-                    instance = new PickerManager(context);
-                }
-            }
-        }
-        return instance;
+    public static PickerManager getInstance() {
+        return INSTANCE;
     }
 
-    private PickerManager(Context context) {
+    PickerManager() {
         mediaFiles = new ArrayList<>();
         docFiles = new ArrayList<>();
         fileTypes = new ArrayList<>();

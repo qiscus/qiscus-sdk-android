@@ -66,9 +66,9 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
         holder.videoIcon.setVisibility(media.getMediaType() == FilePickerConst.MEDIA_TYPE_VIDEO ? View.VISIBLE : View.GONE);
 
         holder.itemView.setOnClickListener(v -> {
-            if (PickerManager.getInstance(context).getMaxCount() == 1) {
-                PickerManager.getInstance(context).add(media.getPath(), FilePickerConst.FILE_TYPE_MEDIA);
-            } else if (holder.checkBox.isChecked() || PickerManager.getInstance(context).shouldAdd()) {
+            if (PickerManager.getInstance().getMaxCount() == 1) {
+                PickerManager.getInstance().add(media.getPath(), FilePickerConst.FILE_TYPE_MEDIA);
+            } else if (holder.checkBox.isChecked() || PickerManager.getInstance().shouldAdd()) {
                 holder.checkBox.setChecked(!holder.checkBox.isChecked(), true);
             }
         });
@@ -77,7 +77,7 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
         holder.checkBox.setVisibility(View.GONE);
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setOnClickListener(view -> {
-            if (holder.checkBox.isChecked() || PickerManager.getInstance(context).shouldAdd()) {
+            if (holder.checkBox.isChecked() || PickerManager.getInstance().shouldAdd()) {
                 holder.checkBox.setChecked(!holder.checkBox.isChecked(), true);
             }
         });
@@ -94,10 +94,10 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
 
             if (isChecked) {
                 holder.checkBox.setVisibility(View.VISIBLE);
-                PickerManager.getInstance(context).add(media.getPath(), FilePickerConst.FILE_TYPE_MEDIA);
+                PickerManager.getInstance().add(media.getPath(), FilePickerConst.FILE_TYPE_MEDIA);
             } else {
                 holder.checkBox.setVisibility(View.GONE);
-                PickerManager.getInstance(context).remove(media.getPath(), FilePickerConst.FILE_TYPE_MEDIA);
+                PickerManager.getInstance().remove(media.getPath(), FilePickerConst.FILE_TYPE_MEDIA);
             }
         });
     }

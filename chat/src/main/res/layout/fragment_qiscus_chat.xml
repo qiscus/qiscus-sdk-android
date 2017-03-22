@@ -154,6 +154,7 @@
                 android:id="@+id/add_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:padding="12dp"
                 android:visibility="gone">

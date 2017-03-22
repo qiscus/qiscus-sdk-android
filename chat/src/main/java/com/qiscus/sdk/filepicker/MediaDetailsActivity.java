@@ -94,7 +94,7 @@ public class MediaDetailsActivity extends AppCompatActivity implements PickerMan
             PhotoDirectory photoDirectory = intent.getParcelableExtra(PhotoDirectory.class.getSimpleName());
             if (photoDirectory != null) {
                 setUpView(photoDirectory);
-                PickerManager.getInstance(this).setPickerManagerListener(this);
+                PickerManager.getInstance().setPickerManagerListener(this);
             }
         }
     }
@@ -146,7 +146,7 @@ public class MediaDetailsActivity extends AppCompatActivity implements PickerMan
             photoGridAdapter.setData(medias);
             photoGridAdapter.notifyDataSetChanged();
         } else {
-            photoGridAdapter = new PhotoGridAdapter(this, medias, PickerManager.getInstance(this).getSelectedPhotos());
+            photoGridAdapter = new PhotoGridAdapter(this, medias, PickerManager.getInstance().getSelectedPhotos());
             recyclerView.setAdapter(photoGridAdapter);
         }
 
