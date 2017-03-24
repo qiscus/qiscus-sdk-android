@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.media.RingtoneManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -187,7 +188,11 @@ public class QiscusPusherService extends Service {
                 .setGroupSummary(true)
                 .setGroup("CHAT_NOTIF_" + comment.getRoomId())
                 .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL);
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+
+        if (Qiscus.getChatConfig().getNotificationBuilderInterceptor() != null) {
+            Qiscus.getChatConfig().getNotificationBuilderInterceptor().intercept(notificationBuilder);
+        }
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(comment.getRoomId());

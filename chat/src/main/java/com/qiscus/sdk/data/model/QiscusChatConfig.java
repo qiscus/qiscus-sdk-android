@@ -113,6 +113,7 @@ public class QiscusChatConfig {
     private int notificationSmallIcon = R.drawable.ic_qiscus_notif_app;
     private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
     private boolean enableAvatarAsNotificationIcon = true;
+    private QiscusNotificationBuilderInterceptor notificationBuilderInterceptor;
 
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
 
@@ -419,6 +420,10 @@ public class QiscusChatConfig {
         this.enableAvatarAsNotificationIcon = enableAvatarAsNotificationIcon;
     }
 
+    public void setNotificationBuilderInterceptor(QiscusNotificationBuilderInterceptor notificationBuilderInterceptor) {
+        this.notificationBuilderInterceptor = notificationBuilderInterceptor;
+    }
+
     public QiscusChatConfig setNotificationTitleHandler(NotificationTitleHandler notificationTitleHandler) {
         this.notificationTitleHandler = notificationTitleHandler;
         return this;
@@ -709,6 +714,10 @@ public class QiscusChatConfig {
 
     public boolean isEnableAvatarAsNotificationIcon() {
         return enableAvatarAsNotificationIcon;
+    }
+
+    public QiscusNotificationBuilderInterceptor getNotificationBuilderInterceptor() {
+        return notificationBuilderInterceptor;
     }
 
     public NotificationTitleHandler getNotificationTitleHandler() {
