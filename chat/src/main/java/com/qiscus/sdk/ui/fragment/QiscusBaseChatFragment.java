@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -667,8 +668,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
 
             if (photoFile != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), photoFile));
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                } else {
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                            FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), photoFile));
+                }
                 startActivityForResult(intent, TAKE_PICTURE_REQUEST);
             }
             hideAttachmentPanel();
@@ -832,9 +837,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onFileDownloaded(File file, String mimeType) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), file), mimeType);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            intent.setDataAndType(Uri.fromFile(file), mimeType);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        } else {
+            intent.setDataAndType(FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), file), mimeType);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {

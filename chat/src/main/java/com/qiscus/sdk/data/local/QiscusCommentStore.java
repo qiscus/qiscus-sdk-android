@@ -43,7 +43,11 @@ public interface QiscusCommentStore {
 
     QiscusComment getComment(int id, String uniqueId);
 
+    List<QiscusComment> getComments(int topicId);
+
     List<QiscusComment> getComments(int topicId, int count);
+
+    Observable<List<QiscusComment>> getObservableComments(int topicId);
 
     Observable<List<QiscusComment>> getObservableComments(int topicId, int count);
 
