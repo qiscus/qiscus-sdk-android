@@ -160,13 +160,21 @@ public class QiscusPusherService extends Service {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(comment.getRoomId());
-        for (int i = notifItems.size() - 1; i >= 0; i--) {
+        int notifSize = 5;
+        if (notifItems.size() < notifSize) {
+            notifSize = notifItems.size();
+        }
+        int start = notifItems.size() - notifSize;
+        for (int i = start; i < notifItems.size(); i++) {
             QiscusPushNotificationMessage message = notifItems.get(i);
             if (isAttachment(message.getMessage())) {
                 inboxStyle.addLine(fileMessage);
             } else {
                 inboxStyle.addLine(message.getMessage());
             }
+        }
+        if (notifItems.size() > notifSize) {
+            inboxStyle.addLine(".......");
         }
         inboxStyle.setSummaryText(notifItems.size() + " new message");
         notificationBuilder.setStyle(inboxStyle);
