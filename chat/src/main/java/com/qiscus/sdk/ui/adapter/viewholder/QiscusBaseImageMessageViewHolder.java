@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -156,6 +157,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
             thumbnailView.setVisibility(View.VISIBLE);
             Glide.with(thumbnailView.getContext())
                     .load(new File(qiscusComment.getAttachmentUri().toString()))
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .error(R.drawable.ic_qiscus_img)
                     .into(thumbnailView);
         } else {
@@ -184,6 +186,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected void showImage(File file) {
         Glide.with(thumbnailView.getContext())
                 .load(file)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .error(R.drawable.ic_qiscus_img)
                 .listener(new RequestListener<File, GlideDrawable>() {
                     @Override

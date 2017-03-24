@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.view.QiscusTouchImageView;
 import com.trello.rxlifecycle.components.support.RxFragment;
@@ -69,7 +70,7 @@ public class QiscusPhotoFragment extends RxFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         resolveImageFile(savedInstanceState);
-        Glide.with(this).load(imageFile).into(imageView);
+        Glide.with(this).load(imageFile).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
     }
 
     @Override
