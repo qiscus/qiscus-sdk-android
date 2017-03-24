@@ -523,6 +523,27 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public List<QiscusComment> getComments(int topicId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
+        }
+        cursor.close();
+        return qiscusComments;
+    }
+
+    @Override
     public List<QiscusComment> getComments(int topicId, int count) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
@@ -542,6 +563,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         }
         cursor.close();
         return qiscusComments;
+    }
+
+    @Override
+    public Observable<List<QiscusComment>> getObservableComments(final int topicId) {
+        return Observable.create(subscriber -> {
+            subscriber.onNext(getComments(topicId));
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
     }
 
     @Override
