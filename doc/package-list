@@ -3,6 +3,14 @@ com.qiscus.sdk.data.local
 com.qiscus.sdk.data.model
 com.qiscus.sdk.data.remote
 com.qiscus.sdk.event
+com.qiscus.sdk.filepicker
+com.qiscus.sdk.filepicker.adapter
+com.qiscus.sdk.filepicker.cursor
+com.qiscus.sdk.filepicker.cursor.loadercallbacks
+com.qiscus.sdk.filepicker.fragment
+com.qiscus.sdk.filepicker.model
+com.qiscus.sdk.filepicker.util
+com.qiscus.sdk.filepicker.view
 com.qiscus.sdk.presenter
 com.qiscus.sdk.service
 com.qiscus.sdk.ui

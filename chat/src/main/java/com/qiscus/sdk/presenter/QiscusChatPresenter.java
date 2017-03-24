@@ -308,7 +308,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     roomData.first.setSubtitle(room.getSubtitle());
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
                 })
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.io())
+                .onErrorReturn(throwable -> null);
     }
 
     private void checkForLastRead(List<QiscusComment> qiscusComments) {
@@ -371,8 +372,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void loadComments(int count) {
-        getInitRoomData()
-                .startWith(getLocalComments(count).map(comments -> Pair.create(room, comments)))
+        Observable.merge(getInitRoomData(), getLocalComments(count).map(comments -> Pair.create(room, comments)))
+                .filter(qiscusChatRoomListPair -> qiscusChatRoomListPair != null)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
