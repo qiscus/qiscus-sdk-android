@@ -68,6 +68,7 @@ public class QiscusComment implements Parcelable {
     protected Date time;
     protected int state;
     protected String roomName;
+    protected String roomAvatar;
     protected boolean groupMessage;
 
     protected boolean selected;
@@ -235,6 +236,14 @@ public class QiscusComment implements Parcelable {
 
     public void setRoomName(String roomName) {
         this.roomName = roomName;
+    }
+
+    public String getRoomAvatar() {
+        return isGroupMessage() ? roomAvatar : senderAvatar;
+    }
+
+    public void setRoomAvatar(String roomAvatar) {
+        this.roomAvatar = roomAvatar;
     }
 
     public boolean isGroupMessage() {

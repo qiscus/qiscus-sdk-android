@@ -20,7 +20,9 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -30,6 +32,9 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -41,6 +46,7 @@ import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusImageUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -142,6 +148,31 @@ public class QiscusPusherService extends Service {
             return;
         }
 
+        String finalMessageText = messageText;
+        if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
+            Glide.with(Qiscus.getApps())
+                    .load(comment.getRoomAvatar())
+                    .asBitmap()
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            pushNotification(comment, finalMessageText, QiscusImageUtil.getCircularBitmap(resource));
+                        }
+
+                        @Override
+                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                            super.onLoadFailed(e, errorDrawable);
+                            pushNotification(comment, finalMessageText,
+                                    BitmapFactory.decodeResource(getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
+                        }
+                    });
+        } else {
+            pushNotification(comment, finalMessageText,
+                    BitmapFactory.decodeResource(getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
+        }
+    }
+
+    private void pushNotification(QiscusComment comment, String messageText, Bitmap largeIcon) {
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -152,7 +183,7 @@ public class QiscusPusherService extends Service {
                 .setContentText(messageText)
                 .setTicker(messageText)
                 .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), Qiscus.getChatConfig().getNotificationBigIcon()))
+                .setLargeIcon(largeIcon)
                 .setGroupSummary(true)
                 .setGroup("CHAT_NOTIF_" + comment.getRoomId())
                 .setAutoCancel(true)

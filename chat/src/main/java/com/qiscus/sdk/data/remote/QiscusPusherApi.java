@@ -455,6 +455,9 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
             qiscusComment.setRoomName(jsonObject.get("room_name").isJsonNull() ?
                     qiscusComment.getSender() : jsonObject.get("room_name").getAsString());
+            if (jsonObject.has("room_avatar")) {
+                qiscusComment.setRoomAvatar(jsonObject.get("room_avatar").getAsString());
+            }
             qiscusComment.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
             if (jsonObject.has("type")) {
                 qiscusComment.setRawType(jsonObject.get("type").getAsString());
