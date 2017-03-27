@@ -101,6 +101,45 @@
             android:scaleType="centerCrop"
             android:visibility="gone"/>
 
+        <RelativeLayout
+            android:id="@+id/holder"
+            android:layout_width="192dp"
+            android:layout_height="192dp"
+            android:layout_margin="4dp">
+
+            <ImageView
+                android:id="@+id/blurry_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="10dp"
+                android:background="@drawable/qiscus_circle_divider"
+                android:padding="4dp"
+                android:src="@drawable/ic_qiscus_download"
+                android:tint="@color/qiscus_secondary_text"/>
+
+            <com.qiscus.sdk.ui.view.QiscusCircleProgress
+                android:id="@+id/progress"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="10dp"
+                android:visibility="gone"
+                app:qcircle_finished_color="@color/qiscus_primary"
+                app:qcircle_text_size="12sp"/>
+        </RelativeLayout>
+
         <ImageView
             android:id="@+id/frame"
             android:layout_width="match_parent"
@@ -115,58 +154,6 @@
             android:src="@drawable/bg_qiscus_frame"
             android:tint="@color/qiscus_primary"
             android:visibility="visible"/>
-
-        <RelativeLayout
-            android:id="@+id/holder"
-            android:layout_width="192dp"
-            android:layout_height="192dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/qiscus_rounded_dark_white"
-            android:padding="4dp">
-
-            <ImageView
-                android:id="@+id/ic_img"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_margin="4dp"
-                android:src="@drawable/ic_qiscus_img"
-                android:tint="@color/qiscus_divider"/>
-
-            <TextView
-                android:id="@+id/file_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/ic_img"
-                android:layout_marginLeft="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_toEndOf="@+id/ic_img"
-                android:layout_toRightOf="@+id/ic_img"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/qiscus_divider"
-                android:textSize="17sp"/>
-
-            <ImageView
-                android:layout_width="132dp"
-                android:layout_height="132dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/qiscus_circle_divider"
-                android:padding="48dp"
-                android:src="@drawable/ic_qiscus_download_big"
-                android:tint="@color/qiscus_secondary_text"/>
-
-            <com.qiscus.sdk.ui.view.QiscusCircleProgress
-                android:id="@+id/progress"
-                android:layout_width="132dp"
-                android:layout_height="132dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone"
-                app:qcircle_finished_color="@color/qiscus_primary"/>
-        </RelativeLayout>
 
         <TextView
             android:id="@+id/time"

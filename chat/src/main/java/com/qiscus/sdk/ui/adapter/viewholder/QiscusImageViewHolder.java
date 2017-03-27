@@ -55,14 +55,14 @@ public class QiscusImageViewHolder extends QiscusBaseImageMessageViewHolder {
 
     @Nullable
     @Override
-    protected ImageView getImageFrameView(View itemView) {
-        return (ImageView) itemView.findViewById(R.id.frame);
+    protected ImageView getBlurryImageView(View view) {
+        return (ImageView) itemView.findViewById(R.id.blurry_thumbnail);
     }
 
-    @NonNull
+    @Nullable
     @Override
-    protected TextView getFileNameView(View itemView) {
-        return (TextView) itemView.findViewById(R.id.file_name);
+    protected ImageView getImageFrameView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.frame);
     }
 
     @Nullable
