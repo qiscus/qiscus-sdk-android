@@ -314,6 +314,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             }
         } catch (NullPointerException e) {
             connect();
+        } catch (Exception ignored) {
+            //ignored
         }
     }
 
