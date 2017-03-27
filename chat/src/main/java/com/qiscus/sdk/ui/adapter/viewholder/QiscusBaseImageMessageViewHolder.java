@@ -18,10 +18,10 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -34,6 +34,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
+import com.qiscus.sdk.util.QiscusImageUtil;
 
 import java.io.File;
 
@@ -50,20 +51,30 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
 
     @NonNull protected ImageView thumbnailView;
     @Nullable protected ViewGroup imageHolderLayout;
+    @Nullable protected ImageView blurryImageView;
     @Nullable protected ImageView imageFrameView;
-    @Nullable protected TextView fileNameView;
     @Nullable protected QiscusProgressView progressView;
     @Nullable protected ImageView downloadIconView;
+
+    protected int rightProgressFinishedColor;
+    protected int leftProgressFinishedColor;
 
     public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         thumbnailView = getThumbnailView(itemView);
         imageHolderLayout = getImageHolderLayout(itemView);
+        blurryImageView = getBlurryImageView(itemView);
         imageFrameView = getImageFrameView(itemView);
-        fileNameView = getFileNameView(itemView);
         progressView = getProgressView(itemView);
         downloadIconView = getDownloadIconView(itemView);
+    }
+
+    @Override
+    protected void loadChatConfig() {
+        super.loadChatConfig();
+        rightProgressFinishedColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightProgressFinishedColor());
+        leftProgressFinishedColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftProgressFinishedColor());
     }
 
     @NonNull
@@ -73,10 +84,10 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected abstract ViewGroup getImageHolderLayout(View itemView);
 
     @Nullable
-    protected abstract ImageView getImageFrameView(View itemView);
+    protected abstract ImageView getBlurryImageView(View view);
 
     @Nullable
-    protected abstract TextView getFileNameView(View itemView);
+    protected abstract ImageView getImageFrameView(View itemView);
 
     @Nullable
     protected abstract QiscusProgressView getProgressView(View itemView);
@@ -116,7 +127,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
             imageFrameView.setColorFilter(messageFromMe ? rightBubbleColor : leftBubbleColor);
         }
         if (progressView != null) {
-            progressView.setFinishedColor(messageFromMe ? rightBubbleColor : leftBubbleColor);
+            progressView.setFinishedColor(messageFromMe ? rightProgressFinishedColor : leftProgressFinishedColor);
         }
         super.setUpColor();
     }
@@ -128,9 +139,6 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         } else {
             showOthersImage(qiscusComment);
         }
-        if (fileNameView != null) {
-            fileNameView.setText(qiscusComment.getAttachmentName());
-        }
     }
 
     private void showOthersImage(final QiscusComment qiscusComment) {
@@ -138,6 +146,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         if (localPath == null) {
             if (imageHolderLayout != null) {
                 imageHolderLayout.setVisibility(View.VISIBLE);
+                showBlurryImage(qiscusComment);
             }
             thumbnailView.setVisibility(View.GONE);
         } else {
@@ -145,7 +154,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                 imageHolderLayout.setVisibility(View.INVISIBLE);
             }
             thumbnailView.setVisibility(View.VISIBLE);
-            showImage(localPath);
+            showImage(qiscusComment, localPath);
         }
     }
 
@@ -158,7 +167,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
             Glide.with(thumbnailView.getContext())
                     .load(new File(qiscusComment.getAttachmentUri().toString()))
                     .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .error(R.drawable.ic_qiscus_img)
+                    .error(R.drawable.qiscus_image_placeholder)
                     .into(thumbnailView);
         } else {
             File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
@@ -171,6 +180,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
             if (localPath == null) {
                 if (imageHolderLayout != null) {
                     imageHolderLayout.setVisibility(View.VISIBLE);
+                    showBlurryImage(qiscusComment);
                 }
                 thumbnailView.setVisibility(View.GONE);
             } else {
@@ -178,16 +188,16 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                     imageHolderLayout.setVisibility(View.INVISIBLE);
                 }
                 thumbnailView.setVisibility(View.VISIBLE);
-                showImage(localPath);
+                showImage(qiscusComment, localPath);
             }
         }
     }
 
-    protected void showImage(File file) {
+    protected void showImage(QiscusComment qiscusComment, File file) {
         Glide.with(thumbnailView.getContext())
                 .load(file)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .error(R.drawable.ic_qiscus_img)
+                .error(R.drawable.qiscus_image_placeholder)
                 .listener(new RequestListener<File, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -199,12 +209,26 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                                                    Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                         if (imageHolderLayout != null) {
                             imageHolderLayout.setVisibility(View.INVISIBLE);
+                            showBlurryImage(qiscusComment);
                         }
                         thumbnailView.setVisibility(View.VISIBLE);
                         return false;
                     }
                 })
                 .into(thumbnailView);
+    }
+
+    protected void showBlurryImage(QiscusComment qiscusComment) {
+        if (blurryImageView != null) {
+            Glide.with(blurryImageView.getContext())
+                    .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                    .dontAnimate()
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .placeholder(R.drawable.qiscus_image_placeholder)
+                    .error(R.drawable.qiscus_image_placeholder)
+                    .into(blurryImageView);
+        }
+
     }
 
     @Override

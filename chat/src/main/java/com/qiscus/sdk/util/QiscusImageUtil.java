@@ -277,4 +277,28 @@ public final class QiscusImageUtil {
 
         return output;
     }
+
+    public static String generateBlurryThumbnailUrl(String imageUrl) {
+        return generateBlurryThumbnailUrl(imageUrl, 320, 320, 300);
+    }
+
+    public static String generateBlurryThumbnailUrl(String imageUrl, int width, int height, int blur) {
+        if (imageUrl == null) {
+            return null;
+        }
+
+        int i = imageUrl.indexOf("upload/");
+        if (i > 0) {
+            i += 7;
+            String blurryImageUrl = imageUrl.substring(0, i);
+            blurryImageUrl += "w_" + width + ",h_" + height + ",c_limit,e_blur:" + blur + "/";
+            String file = imageUrl.substring(i);
+            i = file.lastIndexOf('.');
+            if (i > 0) {
+                file = file.substring(0, i);
+            }
+            return blurryImageUrl + file + ".jpg";
+        }
+        return imageUrl;
+    }
 }
