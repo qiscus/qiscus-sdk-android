@@ -34,6 +34,8 @@ import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 
+import java.io.File;
+
 /**
  * Created on : September 28, 2016
  * Author     : zetbaitsu
@@ -59,6 +61,15 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
         bundle.putString(EXTRA_STARTING_MESSAGE, message);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom, File file) {
+        QiscusChatFragment fragment = new QiscusChatFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+        bundle.putSerializable(EXTRA_SHARE_FILE, file);
         fragment.setArguments(bundle);
         return fragment;
     }

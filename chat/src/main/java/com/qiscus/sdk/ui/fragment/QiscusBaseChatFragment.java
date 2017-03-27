@@ -104,10 +104,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
+    protected static final String EXTRA_SHARE_FILE = "extra_share_file";
     protected static final String COMMENTS_DATA = "saved_comments_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
-    protected static final int PICK_IMAGE_REQUEST = 2;
-    protected static final int PICK_FILE_REQUEST = 3;
 
     @NonNull protected ViewGroup rootView;
     @Nullable protected ViewGroup emptyChatHolder;
@@ -138,6 +137,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
     protected String startingMessage;
+    protected File shareFile;
     protected T chatAdapter;
     protected QiscusChatPresenter qiscusChatPresenter;
     protected Animation animation;
@@ -362,6 +362,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         resolveChatRoom(savedInstanceState);
         resolveStartingMessage();
+        resolveShareFile();
 
         onApplyChatConfig();
 
@@ -402,7 +403,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
 
         if (startingMessage != null && !startingMessage.isEmpty()) {
-            qiscusChatPresenter.sendComment(startingMessage);
+            sendMessage(startingMessage);
+        }
+
+        if (shareFile != null) {
+            sendFile(shareFile);
         }
     }
 
@@ -454,6 +459,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void resolveStartingMessage() {
         startingMessage = getArguments().getString(EXTRA_STARTING_MESSAGE);
         getArguments().remove(EXTRA_STARTING_MESSAGE);
+    }
+
+    protected void resolveShareFile() {
+        shareFile = (File) getArguments().getSerializable(EXTRA_SHARE_FILE);
+        getArguments().remove(EXTRA_SHARE_FILE);
     }
 
     protected void onApplyChatConfig() {
