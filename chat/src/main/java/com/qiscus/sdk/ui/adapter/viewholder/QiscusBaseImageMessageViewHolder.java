@@ -18,6 +18,7 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -55,6 +56,9 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     @Nullable protected QiscusProgressView progressView;
     @Nullable protected ImageView downloadIconView;
 
+    protected int rightProgressFinishedColor;
+    protected int leftProgressFinishedColor;
+
     public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
@@ -64,6 +68,13 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         imageFrameView = getImageFrameView(itemView);
         progressView = getProgressView(itemView);
         downloadIconView = getDownloadIconView(itemView);
+    }
+
+    @Override
+    protected void loadChatConfig() {
+        super.loadChatConfig();
+        rightProgressFinishedColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getRightProgressFinishedColor());
+        leftProgressFinishedColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getLeftProgressFinishedColor());
     }
 
     @NonNull
@@ -116,7 +127,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
             imageFrameView.setColorFilter(messageFromMe ? rightBubbleColor : leftBubbleColor);
         }
         if (progressView != null) {
-            progressView.setFinishedColor(messageFromMe ? rightBubbleColor : leftBubbleColor);
+            progressView.setFinishedColor(messageFromMe ? rightProgressFinishedColor : leftProgressFinishedColor);
         }
         super.setUpColor();
     }

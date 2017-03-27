@@ -55,6 +55,9 @@ public class QiscusChatConfig {
     private int dateColor = R.color.qiscus_secondary_text;
     private int selectedBubbleBackgroundColor = R.color.qiscus_primary;
 
+    private int rightProgressFinishedColor = R.color.qiscus_primary_light;
+    private int leftProgressFinishedColor = R.color.qiscus_primary;
+
     private int accountLinkingTextColor = R.color.qiscus_primary;
     private int accountLinkingBackground = R.color.qiscus_light_grey;
     private String accountLinkingText = "LOGIN";
@@ -225,6 +228,16 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setSelectedBubbleBackgroundColor(@ColorRes int selectedBubbleBackgroundColor) {
         this.selectedBubbleBackgroundColor = selectedBubbleBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setRightProgressFinishedColor(@ColorRes int rightProgressFinishedColor) {
+        this.rightProgressFinishedColor = rightProgressFinishedColor;
+        return this;
+    }
+
+    public QiscusChatConfig setLeftProgressFinishedColor(@ColorRes int leftProgressFinishedColor) {
+        this.leftProgressFinishedColor = leftProgressFinishedColor;
         return this;
     }
 
@@ -532,6 +545,16 @@ public class QiscusChatConfig {
     @ColorRes
     public int getSelectedBubbleBackgroundColor() {
         return selectedBubbleBackgroundColor;
+    }
+
+    @ColorRes
+    public int getRightProgressFinishedColor() {
+        return rightProgressFinishedColor;
+    }
+
+    @ColorRes
+    public int getLeftProgressFinishedColor() {
+        return leftProgressFinishedColor;
     }
 
     @ColorRes
