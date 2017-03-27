@@ -293,7 +293,7 @@ public final class QiscusImageUtil {
             String blurryImageUrl = imageUrl.substring(0, i);
             blurryImageUrl += "w_" + width + ",h_" + height + ",c_limit,e_blur:" + blur + "/";
             String file = imageUrl.substring(i);
-            i = file.lastIndexOf(".");
+            i = file.lastIndexOf('.');
             if (i > 0) {
                 file = file.substring(0, i);
             }
