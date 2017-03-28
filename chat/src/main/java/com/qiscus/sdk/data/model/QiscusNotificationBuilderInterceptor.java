@@ -25,5 +25,5 @@ import android.support.v4.app.NotificationCompat;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusNotificationBuilderInterceptor {
-    void intercept(NotificationCompat.Builder notificationBuilder);
+    void intercept(NotificationCompat.Builder notificationBuilder, QiscusComment qiscusComment);
 }

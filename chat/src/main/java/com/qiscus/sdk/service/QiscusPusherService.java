@@ -190,7 +190,7 @@ public class QiscusPusherService extends Service {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         if (Qiscus.getChatConfig().getNotificationBuilderInterceptor() != null) {
-            Qiscus.getChatConfig().getNotificationBuilderInterceptor().intercept(notificationBuilder);
+            Qiscus.getChatConfig().getNotificationBuilderInterceptor().intercept(notificationBuilder, comment);
         }
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
