@@ -25,5 +25,12 @@ import android.support.v4.app.NotificationCompat;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusNotificationBuilderInterceptor {
-    void intercept(NotificationCompat.Builder notificationBuilder);
+    /**
+     * Intercept notification builder, to customizing notification
+     *
+     * @param notificationBuilder The builder
+     * @param qiscusComment       comment to show
+     * @return true to continue showing push notification, false to cancel push notification
+     */
+    boolean intercept(NotificationCompat.Builder notificationBuilder, QiscusComment qiscusComment);
 }

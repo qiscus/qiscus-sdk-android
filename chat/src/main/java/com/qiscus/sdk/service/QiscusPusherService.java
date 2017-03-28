@@ -189,8 +189,14 @@ public class QiscusPusherService extends Service {
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
+        boolean cancel = false;
         if (Qiscus.getChatConfig().getNotificationBuilderInterceptor() != null) {
-            Qiscus.getChatConfig().getNotificationBuilderInterceptor().intercept(notificationBuilder);
+            cancel = !Qiscus.getChatConfig().getNotificationBuilderInterceptor()
+                    .intercept(notificationBuilder, comment);
+        }
+
+        if (cancel) {
+            return;
         }
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
