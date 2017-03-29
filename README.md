@@ -4,68 +4,68 @@ Qiscus SDK [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Qi
 Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.
 
 # Quick Start
-    ## 1. Create a new SDK application in the Dashboard and get app_id 
-    ## 2. When integrating SDK with an existing app 
-    ## 3. Rx Java support? → Android
+## 1. Create a new SDK application in the Dashboard and get app_id 
+## 2. When integrating SDK with an existing app 
+## 3. Rx Java support? → Android
 
 # Authentication 
-    ## Initializing with APP_ID
-    ## Login or register
-    ## Disconnecting/logout 
-    ## Updating a User Profile and Avatar
+## Initializing with APP_ID
+## Login or register
+## Disconnecting/logout 
+## Updating a User Profile and Avatar
     
 # Room Types  
-    ## Room Channel
-    ## 1 on 1 
+## Room Channel
+## 1 on 1 
     
 # 1-to-1 Chat
-    ## Creating and starting 1-to-1 chat 
+## Creating and starting 1-to-1 chat 
     
 # Group Room 
-    ## Creating a Group Room 
-    ## Getting a Group Room instance with room id 
-    ## Inviting users to an existing room 
-    ## Leaving a Group Room 
-    ## Advanced 
-        ### Getting a list of all room members 
-        ### Getting participants' online statuses 
-        ### Typing indicators
-        ### Read Receipts 
-        ### Admin messages 
-        ### Room cover images
-        ### Custom room types 
-        ### Custom message types 
-        ### Message auto-translation 
-        ### File Message thumbnails 
+## Creating a Group Room 
+## Getting a Group Room instance with room id 
+## Inviting users to an existing room 
+## Leaving a Group Room 
+## Advanced 
+### Getting a list of all room members 
+### Getting participants' online statuses 
+### Typing indicators
+### Read Receipts 
+### Admin messages 
+### Room cover images
+### Custom room types 
+### Custom message types 
+### Message auto-translation 
+### File Message thumbnails 
         
 # Messaging
-    ### Sending messages 
-    ### Receiving messages 
-    ### Loading previous messages 
-    ### Loading messages by timestamp 
-    ### Getting a list of participants in a room 
-    ### Getting participants' online statuses 
-    ### Getting a list of banned or muted users in a room 
-    ### Deleting messages
+## Sending messages 
+## Receiving messages 
+## Loading previous messages 
+## Loading messages by timestamp 
+## Getting a list of participants in a room 
+## Getting participants' online statuses 
+## Getting a list of banned or muted users in a room 
+## Deleting messages
     
 # Room Metadata
-    ## MetaData 
-    ## MetaCounter 
+## MetaData 
+## MetaCounter 
     
 # Event Handler
-    ## Room Handler 
+## Room Handler 
 
 
 # UI Customization
-    ## Theme Customization 
-    ## UI Source code? 
+## Theme Customization 
+## UI Source code? 
     
 # Push Notifications
-    ## (1) Generate FCM Server API Key and FCM Sender ID
-    ## (2) Register FCM Server API Key and FCM Sender ID 
-    ## (3) Set up FCM client code in your Android application 
-    ## (4) Register FCM Registration Token in the SendBird SDK and parse SendBird FCM messages 
-    ## Push notification message templates 
+## (1) Generate FCM Server API Key and FCM Sender ID
+## (2) Register FCM Server API Key and FCM Sender ID 
+## (3) Set up FCM client code in your Android application 
+## (4) Register FCM Registration Token in the SendBird SDK and parse SendBird FCM messages 
+## Push notification message templates 
     
 # Caching Data
 # Miscellaneous 
