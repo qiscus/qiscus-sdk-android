@@ -15,7 +15,8 @@ Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will a
 ### Updating a User Profile and Avatar
     
 # Room Types  
-### Room Channel
+### Open Room 
+### Group Room
 ### 1 on 1 
     
 # 1-to-1 Chat
