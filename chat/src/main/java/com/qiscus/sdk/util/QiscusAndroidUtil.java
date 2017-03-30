@@ -28,6 +28,7 @@ import com.qiscus.sdk.Qiscus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
 
 /**
  * Created on : May 31, 2016
@@ -69,26 +70,23 @@ public final class QiscusAndroidUtil {
     }
 
     public static List<String> extractUrl(String text) {
-        String[] strings = text.split(" ");
         List<String> urls = new ArrayList<>();
-        for (String s : strings) {
-            if (isUrl(s)) {
-                if (!s.startsWith("http")) {
-                    s = "http://" + s;
-                }
-                urls.add(s);
+        Matcher matcher = Patterns.WEB_URL.matcher(text);
+        while (matcher.find()) {
+            String url = matcher.group();
+            if (!url.startsWith("http")) {
+                url = "http://" + url;
             }
+            urls.add(url);
         }
         return urls;
     }
 
     public static List<String> extractPlainUrl(String text) {
-        String[] strings = text.split(" ");
         List<String> urls = new ArrayList<>();
-        for (String s : strings) {
-            if (isUrl(s)) {
-                urls.add(s);
-            }
+        Matcher matcher = Patterns.WEB_URL.matcher(text);
+        while (matcher.find()) {
+            urls.add(matcher.group());
         }
         return urls;
     }
