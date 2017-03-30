@@ -6,7 +6,7 @@ Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will a
 # Quick Start
 ### 1. Create a new SDK application in the Dashboard and get app_id 
 ### 2. When integrating SDK with an existing app 
-### 3. Rx Java support? → Android
+### 3. Rx Java support?
 
 # Authentication 
 ### Initializing with APP_ID
