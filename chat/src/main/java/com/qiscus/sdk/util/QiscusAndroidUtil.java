@@ -73,20 +73,15 @@ public final class QiscusAndroidUtil {
         List<String> urls = new ArrayList<>();
         Matcher matcher = Patterns.WEB_URL.matcher(text);
         while (matcher.find()) {
+            int start = matcher.start();
+            if (start > 0 && text.charAt(start - 1) == '@') {
+                continue;
+            }
             String url = matcher.group();
             if (!url.startsWith("http")) {
                 url = "http://" + url;
             }
             urls.add(url);
-        }
-        return urls;
-    }
-
-    public static List<String> extractPlainUrl(String text) {
-        List<String> urls = new ArrayList<>();
-        Matcher matcher = Patterns.WEB_URL.matcher(text);
-        while (matcher.find()) {
-            urls.add(matcher.group());
         }
         return urls;
     }

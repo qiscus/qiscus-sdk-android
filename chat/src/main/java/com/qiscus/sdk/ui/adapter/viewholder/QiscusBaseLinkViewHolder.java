@@ -26,6 +26,7 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Patterns;
 import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
@@ -33,8 +34,9 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusLinkPreviewView;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
+
+import java.util.regex.Matcher;
 
 /**
  * Created on : December 09, 2016
@@ -51,6 +53,7 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
                                     OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         linkPreviewView = getLinkPreviewView(itemView);
+        messageTextView.setOnLongClickListener(v -> onLongClick(itemView));
     }
 
     @NonNull
@@ -72,9 +75,16 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
     }
 
     private void setUpLinks(QiscusComment qiscusComment) {
-        for (String link : QiscusAndroidUtil.extractPlainUrl(qiscusComment.getMessage())) {
-            clickify(link, () -> {
-                String url = link;
+        String message = qiscusComment.getMessage();
+        Matcher matcher = Patterns.WEB_URL.matcher(message);
+        while (matcher.find()) {
+            int start = matcher.start();
+            if (start > 0 && message.charAt(start - 1) == '@') {
+                continue;
+            }
+            int end = matcher.end();
+            clickify(start, end, () -> {
+                String url = message.substring(start, end);
                 if (!url.startsWith("http")) {
                     url = "http://" + url;
                 }
@@ -122,13 +132,10 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
         }
     }
 
-    private void clickify(String clickableText, ClickSpan.OnClickListener listener) {
+    private void clickify(int start, int end, ClickSpan.OnClickListener listener) {
         CharSequence text = messageTextView.getText();
-        String string = text.toString();
         ClickSpan span = new ClickSpan(listener);
 
-        int start = string.indexOf(clickableText);
-        int end = start + clickableText.length();
         if (start == -1) {
             return;
         }
