@@ -57,7 +57,7 @@ Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will a
 
 # UI Customization
 ### Theme Customization 
-### UI Source code? 
+### UI Source code
     
 # Push Notifications
 ### (1) Generate FCM Server API Key and FCM Sender ID
