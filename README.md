@@ -59,6 +59,9 @@ Qiscus.setUser("user@email.com", "userKey")
       });
 ```
 ### Disconnecting/logout 
+```java
+Qiscus.clearUser();
+```
 ### Updating a User Profile and Avatar
     
 # Room Types  
