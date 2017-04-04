@@ -16,19 +16,28 @@
 
 package com.qiscus.sdk.filepicker.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.filepicker.FilePickerConst;
 import com.qiscus.sdk.filepicker.PickerManager;
 import com.qiscus.sdk.filepicker.adapter.SectionsPagerAdapter;
+import com.qiscus.sdk.util.QiscusFileUtil;
+
+import java.io.IOException;
 
 /**
  * Created on : March 16, 2017
@@ -36,10 +45,16 @@ import com.qiscus.sdk.filepicker.adapter.SectionsPagerAdapter;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class MediaPickerFragment extends Fragment {
+public class MediaPickerFragment extends Fragment implements ViewPager.OnPageChangeListener {
+
+    protected static final int PICK_IMAGE_REQUEST = 252;
+    protected static final int PICK_VIDEO_REQUEST = 253;
+
+    private int position;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_qiscus_media_picker, container, false);
     }
 
@@ -82,6 +97,71 @@ public class MediaPickerFragment extends Fragment {
         }
 
         viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(this);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.file_picker, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int i = item.getItemId();
+        if (i == R.id.action_choose_manually) {
+            if (position == 0) {
+                addImage();
+            } else {
+                addVideo();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    protected void addImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    protected void addVideo() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");
+        startActivityForResult(intent, PICK_VIDEO_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == PICK_IMAGE_REQUEST || requestCode == PICK_VIDEO_REQUEST) && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                Toast.makeText(getActivity(), "Can not open file", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            try {
+                PickerManager.getInstance()
+                        .add(QiscusFileUtil.from(data.getData()).getAbsolutePath(), FilePickerConst.FILE_TYPE_MEDIA);
+            } catch (IOException e) {
+                Toast.makeText(getActivity(), "Can not read file", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        this.position = position;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }
