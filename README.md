@@ -66,8 +66,10 @@ Qiscus.clearUser();
     
 # Room Types  
 ### Group Room
+A Group Room is a chat for several users. A user can join the chat only through an invitation.
 ### 1 on 1 
-    
+A 1 on 1 Room is a chat for two users. The chat initiator only need to add the target's messaging username
+
 # 1-to-1 Chat
 ### Creating and starting 1-to-1 chat 
 ```java
