@@ -98,6 +98,8 @@
             android:id="@+id/contents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autoLink="email"
+            android:linksClickable="true"
             android:textColor="@color/qiscus_white"
             android:textColorLink="@color/qiscus_white"
             android:textSize="16sp"
