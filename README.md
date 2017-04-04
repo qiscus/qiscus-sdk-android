@@ -178,23 +178,6 @@ Check [CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blo
 # Change Log 
 # API Reference 
 
-# Instalation
-
-# Let's make cools chatting apps!
-#### Init Qiscus
-
-#### Login to Qiscus engine
-
-### Start the chatting
-
-### Customize the chat UI
-
-### Advanced Chat Customizing
-
-
-### RxJava Support
-
-
 License
 -------
     Copyright (c) 2016 Qiscus.
