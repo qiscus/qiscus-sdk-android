@@ -4,9 +4,9 @@ Qiscus SDK [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Qi
 Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.
 
 # Quick Start
-### 1. Create a new SDK application in the Dashboard and get application id 
+### Create a new SDK application in the Dashboard and get application id 
 you can get app ID here [http://sdk.qiscus.com](http://sdk.qiscus.com)
-### 2. Integrating SDK with an existing app 
+### Integrating SDK with an existing app 
 Add to your project build.gradle
 ```groovy
 allprojects {
@@ -23,36 +23,7 @@ dependencies {
     compile 'com.qiscus.sdk:chat:1.16.1'
 }
 ```
-### 3. Rx Java support
-```java
-// Setup qiscus account with rxjava example
-Qiscus.setUser("user@email.com", "password")
-      .withUsername("Tony Stark")
-      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
-      .save()
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe(qiscusAccount -> {
-          DataManager.saveQiscusAccount(qiscusAccount);
-          startActivity(new Intent(this, ConsultationListActivity.class));
-      }, throwable -> {
-          throwable.printStackTrace();
-          showError(throwable.getMessage());
-      });
 
-// Start a chat activity with rxjava example      
-Qiscus.buildChatWith("jhon.doe@gmail.com")
-      .withTitle("Jhon Doe")
-      .build(this)
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe(intent -> {
-          startActivity(intent);
-      }, throwable -> {
-          throwable.printStackTrace();
-          showError(throwable.getMessage());
-      });
-```
 
 Check sample apps -> [DragonGo](https://github.com/qiscus/qiscus-sdk-android-sample)
 
@@ -175,6 +146,36 @@ Check [CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blo
     
 # Caching Data
 # Miscellaneous 
+### Rx Java support
+```java
+// Setup qiscus account with rxjava example
+Qiscus.setUser("user@email.com", "password")
+      .withUsername("Tony Stark")
+      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
+      .save()
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribe(qiscusAccount -> {
+          DataManager.saveQiscusAccount(qiscusAccount);
+          startActivity(new Intent(this, ConsultationListActivity.class));
+      }, throwable -> {
+          throwable.printStackTrace();
+          showError(throwable.getMessage());
+      });
+
+// Start a chat activity with rxjava example      
+Qiscus.buildChatWith("jhon.doe@gmail.com")
+      .withTitle("Jhon Doe")
+      .build(this)
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribe(intent -> {
+          startActivity(intent);
+      }, throwable -> {
+          throwable.printStackTrace();
+          showError(throwable.getMessage());
+      });
+```
 # Change Log 
 # API Reference 
 
