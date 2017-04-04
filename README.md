@@ -4,13 +4,89 @@ Qiscus SDK [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Qi
 Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.
 
 # Quick Start
-### 1. Create a new SDK application in the Dashboard and get app_id 
-### 2. When integrating SDK with an existing app 
-### 3. Rx Java support?
+### 1. Create a new SDK application in the Dashboard and get application id 
+you can get app ID here [http://sdk.qiscus.com](http://sdk.qiscus.com)
+### 2. Integrating SDK with an existing app 
+Add to your project build.gradle
+```groovy
+allprojects {
+    repositories {
+        .....
+        maven { url  "http://dl.bintray.com/qiscustech/maven" }
+    }
+}
+```
+
+Then add to your app module build.gradle
+```groovy
+dependencies {
+    compile 'com.qiscus.sdk:chat:1.16.1'
+}
+```
+### 3. Rx Java support
+```java
+// Setup qiscus account with rxjava example
+Qiscus.setUser("user@email.com", "password")
+      .withUsername("Tony Stark")
+      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
+      .save()
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribe(qiscusAccount -> {
+          DataManager.saveQiscusAccount(qiscusAccount);
+          startActivity(new Intent(this, ConsultationListActivity.class));
+      }, throwable -> {
+          throwable.printStackTrace();
+          showError(throwable.getMessage());
+      });
+
+// Start a chat activity with rxjava example      
+Qiscus.buildChatWith("jhon.doe@gmail.com")
+      .withTitle("Jhon Doe")
+      .build(this)
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribe(intent -> {
+          startActivity(intent);
+      }, throwable -> {
+          throwable.printStackTrace();
+          showError(throwable.getMessage());
+      });
+```
+
+Check sample apps -> [DragonGo](https://github.com/qiscus/qiscus-sdk-android-sample)
 
 # Authentication 
 ### Initializing with APP_ID
+Init Qiscus at your application class with your application ID
+```java
+public class SampleApps extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Qiscus.init(this, "yourQiscusAppId");
+    }
+}
+```
 ### Login or register
+Before user can start chatting each other, they must login to qiscus engine.
+```java
+Qiscus.setUser("user@email.com", "userKey")
+      .withUsername("Tony Stark")
+      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
+      .save(new Qiscus.SetUserListener() {
+          @Override
+          public void onSuccess(QiscusAccount qiscusAccount) {
+              DataManager.saveQiscusAccount(qiscusAccount);
+              startActivity(new Intent(this, ConsultationListActivity.class));
+          }
+          @Override
+          public void onError(Throwable throwable) {
+              throwable.printStackTrace();
+              showError(throwable.getMessage());
+          }
+      });
+```
 ### Disconnecting/logout 
 ### Updating a User Profile and Avatar
     
@@ -20,6 +96,21 @@ Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will a
     
 # 1-to-1 Chat
 ### Creating and starting 1-to-1 chat 
+```java
+Qiscus.buildChatWith("jhon.doe@gmail.com")
+      .withTitle("Jhon Doe")
+      .build(this, new Qiscus.ChatActivityBuilderListener() {
+          @Override
+          public void onSuccess(Intent intent) {
+              startActivity(intent);
+          }
+          @Override
+          public void onError(Throwable throwable) {
+              throwable.printStackTrace();
+              showError(throwable.getMessage());
+          }
+      });
+```
     
 # Group Room 
 ### Creating a Group Room 
@@ -57,7 +148,23 @@ Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will a
 
 # UI Customization
 ### Theme Customization 
+Boring with default template? You can customized it, try it!, we have more items than those below code, its just example.
+```java
+Qiscus.getChatConfig()
+      .setStatusBarColor(R.color.blue)
+      .setAppBarColor(R.color.red)
+      .setTitleColor(R.color.white)
+      .setLeftBubbleColor(R.color.green)
+      .setRightBubbleColor(R.color.yellow)
+      .setRightBubbleTextColor(R.color.white)
+      .setRightBubbleTimeColor(R.color.grey)
+      .setTimeFormat(date -> new SimpleDateFormat("HH:mm").format(date));
+```
+
+
 ### UI Source code
+Check [CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)
+<p align="center"><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232326.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232535.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232714.png" width="33%" /></p>
     
 # Push Notifications
 ### (1) Generate FCM Server API Key and FCM Sender ID
@@ -72,118 +179,21 @@ Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will a
 # API Reference 
 
 # Instalation
-Add to your project build.gradle
-```groovy
-allprojects {
-    repositories {
-        .....
-        maven { url  "http://dl.bintray.com/qiscustech/maven" }
-    }
-}
-```
 
-Then add to your app module build.gradle
-```groovy
-dependencies {
-    compile 'com.qiscus.sdk:chat:1.16.1'
-}
-```
 # Let's make cools chatting apps!
 #### Init Qiscus
-Init Qiscus at your application class with your application ID, you can get app ID here [http://sdk.qiscus.com](http://sdk.qiscus.com)
-```java
-public class SampleApps extends Application {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Qiscus.init(this, "yourQiscusAppId");
-    }
-}
-```
+
 #### Login to Qiscus engine
-Before user can start chatting each other, they must login to qiscus engine.
-```java
-Qiscus.setUser("user@email.com", "userKey")
-      .withUsername("Tony Stark")
-      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
-      .save(new Qiscus.SetUserListener() {
-          @Override
-          public void onSuccess(QiscusAccount qiscusAccount) {
-              DataManager.saveQiscusAccount(qiscusAccount);
-              startActivity(new Intent(this, ConsultationListActivity.class));
-          }
-          @Override
-          public void onError(Throwable throwable) {
-              throwable.printStackTrace();
-              showError(throwable.getMessage());
-          }
-      });
-```
+
 ### Start the chatting
-```java
-Qiscus.buildChatWith("jhon.doe@gmail.com")
-      .withTitle("Jhon Doe")
-      .build(this, new Qiscus.ChatActivityBuilderListener() {
-          @Override
-          public void onSuccess(Intent intent) {
-              startActivity(intent);
-          }
-          @Override
-          public void onError(Throwable throwable) {
-              throwable.printStackTrace();
-              showError(throwable.getMessage());
-          }
-      });
-```
+
 ### Customize the chat UI
-Boring with default template? You can customized it, try it!, we have more items than those below code, its just example.
-```java
-Qiscus.getChatConfig()
-      .setStatusBarColor(R.color.blue)
-      .setAppBarColor(R.color.red)
-      .setTitleColor(R.color.white)
-      .setLeftBubbleColor(R.color.green)
-      .setRightBubbleColor(R.color.yellow)
-      .setRightBubbleTextColor(R.color.white)
-      .setRightBubbleTimeColor(R.color.grey)
-      .setTimeFormat(date -> new SimpleDateFormat("HH:mm").format(date));
-```
+
 ### Advanced Chat Customizing
-Check [CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)
-<p align="center"><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232326.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232535.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232714.png" width="33%" /></p>
+
 
 ### RxJava Support
-```java
-// Setup qiscus account with rxjava example
-Qiscus.setUser("user@email.com", "password")
-      .withUsername("Tony Stark")
-      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
-      .save()
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe(qiscusAccount -> {
-          DataManager.saveQiscusAccount(qiscusAccount);
-          startActivity(new Intent(this, ConsultationListActivity.class));
-      }, throwable -> {
-          throwable.printStackTrace();
-          showError(throwable.getMessage());
-      });
 
-// Start a chat activity with rxjava example      
-Qiscus.buildChatWith("jhon.doe@gmail.com")
-      .withTitle("Jhon Doe")
-      .build(this)
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe(intent -> {
-          startActivity(intent);
-      }, throwable -> {
-          throwable.printStackTrace();
-          showError(throwable.getMessage());
-      });
-```
-
-Check sample apps -> [DragonGo](https://github.com/qiscus/qiscus-sdk-android-sample)
 
 License
 -------
