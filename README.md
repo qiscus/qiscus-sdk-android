@@ -140,8 +140,6 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
           showError(throwable.getMessage());
       });
 ```
-# Change Log 
-# API Reference 
 
 License
 -------
