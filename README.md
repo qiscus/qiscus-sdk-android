@@ -88,39 +88,6 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
       });
 ```
     
-# Group Room 
-### Creating a Group Room 
-### Getting a Group Room instance with room id 
-### Inviting users to an existing room 
-### Leaving a Group Room 
-### Advanced 
-#### Getting a list of all room members 
-#### Getting participants' online statuses 
-#### Typing indicators
-#### Read Receipts 
-#### Admin messages 
-#### Room cover images
-#### Custom room types 
-#### Custom message types 
-#### Message auto-translation 
-#### File Message thumbnails 
-        
-# Messaging
-### Sending messages 
-### Receiving messages 
-### Loading previous messages 
-### Loading messages by timestamp 
-### Getting a list of participants in a room 
-### Getting participants' online statuses 
-### Getting a list of banned or muted users in a room 
-### Deleting messages
-    
-# Room Metadata
-### MetaData 
-### MetaCounter 
-    
-# Event Handler
-### Room Handler 
 
 # UI Customization
 ### Theme Customization 
@@ -142,14 +109,6 @@ Qiscus.getChatConfig()
 Check [CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)
 <p align="center"><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232326.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232535.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232714.png" width="33%" /></p>
     
-# Push Notifications
-### (1) Generate FCM Server API Key and FCM Sender ID
-### (2) Register FCM Server API Key and FCM Sender ID 
-### (3) Set up FCM client code in your Android application 
-### (4) Register FCM Registration Token in the SendBird SDK and parse SendBird FCM messages 
-### Push notification message templates 
-    
-# Caching Data
 # Miscellaneous 
 ### Rx Java support
 ```java
