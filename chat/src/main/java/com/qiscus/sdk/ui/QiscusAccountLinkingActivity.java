@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -39,6 +40,9 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created on : March 04, 2017
  * Author     : zetbaitsu
@@ -46,22 +50,18 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
-    private static final String EXTRA_TITLE = "extra_title";
-    private static final String EXTRA_URL = "extra_url";
-    private static final String EXTRA_FINISH_URL = "extra_finish_url";
-    private static final String EXTRA_SUCCESS_MESSAGE = "extra_success_message";
+    private static final String EXTRA_PAYLOAD = "extra_payload";
 
     private WebView webView;
     private ProgressBar progressBar;
     private boolean success;
+    private String finishUrl;
     private String successMessage;
+    private JSONObject payload;
 
-    public static Intent generateIntent(Context context, String title, String url, String finishUrl, String successMessage) {
+    public static Intent generateIntent(Context context, String payload) {
         Intent intent = new Intent(context, QiscusAccountLinkingActivity.class);
-        intent.putExtra(EXTRA_TITLE, title);
-        intent.putExtra(EXTRA_URL, url);
-        intent.putExtra(EXTRA_FINISH_URL, finishUrl);
-        intent.putExtra(EXTRA_SUCCESS_MESSAGE, successMessage);
+        intent.putExtra(EXTRA_PAYLOAD, payload);
         return intent;
     }
 
@@ -72,12 +72,22 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         setContentView(R.layout.activity_qiscus_account_linking);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        resolvePayload(savedInstanceState);
+        JSONObject params;
+        try {
+            params = payload.getJSONObject("params");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            finish();
+            return;
+        }
+
         TextView titleView = (TextView) findViewById(R.id.title);
-        String title = getIntent().getStringExtra(EXTRA_TITLE);
+        String title = params.optString("view_title");
         title = (title == null || title.isEmpty()) ? "Account Linking" : title;
         titleView.setText(title);
 
-        successMessage = getIntent().getStringExtra(EXTRA_SUCCESS_MESSAGE);
+        successMessage = params.optString("success_message");
         successMessage = (successMessage == null || successMessage.isEmpty()) ? "Account linking successfully." : successMessage;
 
         webView = (WebView) findViewById(R.id.web_view);
@@ -87,7 +97,34 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
 
         toolbar.setBackgroundResource(Qiscus.getChatConfig().getAppBarColor());
 
-        webView.loadUrl(getIntent().getStringExtra(EXTRA_URL));
+        String url;
+        try {
+            url = payload.getString("url");
+            url += "?topic_id=" + params.optString("topic_id");
+            url += "&user_id=" + params.optString("user_id");
+            finishUrl = payload.getString("redirect_url");
+        } catch (JSONException e) {
+            finish();
+            return;
+        }
+
+        webView.loadUrl(url);
+    }
+
+    private void resolvePayload(Bundle savedInstanceState) {
+        try {
+            payload = new JSONObject(getIntent().getStringExtra(EXTRA_PAYLOAD));
+        } catch (JSONException e) {
+            if (savedInstanceState != null) {
+                try {
+                    payload = new JSONObject(savedInstanceState.getString(EXTRA_PAYLOAD));
+                } catch (JSONException e1) {
+                    finish();
+                }
+            } else {
+                finish();
+            }
+        }
     }
 
     protected void onSetStatusBarColor() {
@@ -122,7 +159,7 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
     private class QiscusWebViewClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (url.equals(getIntent().getStringExtra(EXTRA_FINISH_URL))) {
+            if (url.equals(finishUrl)) {
                 success = true;
             }
             return super.shouldOverrideUrlLoading(view, url);
@@ -131,7 +168,7 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            if (request.getUrl().toString().equals(getIntent().getStringExtra(EXTRA_FINISH_URL))) {
+            if (request.getUrl().toString().equals(finishUrl)) {
                 success = true;
             }
             return super.shouldOverrideUrlLoading(view, request);

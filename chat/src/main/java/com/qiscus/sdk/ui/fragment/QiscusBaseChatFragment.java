@@ -587,9 +587,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void accountLinkingClick(QiscusComment qiscusComment) {
         try {
             JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
-            JSONObject params = payload.getJSONObject("params");
-            startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), params.optString("view_title"),
-                    payload.getString("url"), payload.getString("redirect_url"), params.optString("success_message")));
+            startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), payload.toString()));
         } catch (JSONException e) {
             Log.e("Qiscus", e.getMessage());
         }
