@@ -27,6 +27,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
+import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
@@ -48,6 +49,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected SortedList<E> data;
     protected OnItemClickListener itemClickListener;
     protected OnLongItemClickListener longItemClickListener;
+    protected QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener;
 
     protected QiscusAccount qiscusAccount;
     protected int lastDeliveredCommentId;
@@ -185,6 +187,10 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     public void setOnLongItemClickListener(OnLongItemClickListener longItemClickListener) {
         this.longItemClickListener = longItemClickListener;
+    }
+
+    public void setChatButtonClickListener(QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener) {
+        this.chatButtonClickListener = chatButtonClickListener;
     }
 
     public SortedList<E> getData() {
