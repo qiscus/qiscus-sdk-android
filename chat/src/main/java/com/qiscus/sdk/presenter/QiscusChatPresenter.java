@@ -35,6 +35,7 @@ import com.qiscus.sdk.util.QiscusImageUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -647,6 +648,34 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 view.onFileDownloaded(file, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
             }
         }
+    }
+
+    public void clickChatButton(JSONObject jsonButton) {
+        if ("postback".equals(jsonButton.opt("type"))) {
+            sendCommentPostBack(jsonButton.optString("label", "Button"), jsonButton.optJSONObject("payload").toString());
+        }
+    }
+
+    public void sendCommentPostBack(String content, String payload) {
+        QiscusComment qiscusComment = QiscusComment.generateMessage(content, room.getId(), currentTopicId);
+        view.onSendingComment(qiscusComment);
+        QiscusApi.getInstance().postCommentPostBack(qiscusComment, payload)
+                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
     }
 
     @Override

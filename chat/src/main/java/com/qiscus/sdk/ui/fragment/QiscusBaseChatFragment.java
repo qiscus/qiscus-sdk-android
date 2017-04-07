@@ -62,6 +62,7 @@ import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
+import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -92,7 +93,8 @@ import java.util.List;
  */
 public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> extends RxFragment
         implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
-        QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener, QiscusPermissionsUtil.PermissionCallbacks {
+        QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener,
+        QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener {
 
     protected static final int RC_PERMISSIONS = 1;
 
@@ -379,6 +381,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 onItemCommentClick((QiscusComment) chatAdapter.getData().get(position)));
         chatAdapter.setOnLongItemClickListener((view, position) ->
                 onItemCommentLongClick((QiscusComment) chatAdapter.getData().get(position)));
+        chatAdapter.setChatButtonClickListener(this);
         messageRecyclerView.setUpAsBottomList();
         chatLayoutManager = (LinearLayoutManager) messageRecyclerView.getLayoutManager();
         messageRecyclerView.setAdapter(chatAdapter);
@@ -1034,6 +1037,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         QiscusPermissionsUtil.checkDeniedPermissionsNeverAskAgain(this,
                 "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
+    }
+
+    @Override
+    public void onChatButtonClick(JSONObject jsonButton) {
+        qiscusChatPresenter.clickChatButton(jsonButton);
     }
 
     public interface CommentSelectedListener {
