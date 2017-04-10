@@ -96,12 +96,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener,
         QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener {
 
-    protected static final int RC_PERMISSIONS = 1;
+    protected static final int RC_PERMISSIONS = 127;
 
     private static final String[] PERMISSIONS = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.RECORD_AUDIO"
+    };
+
+    private static final String AUDIO_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String[] FILE_PERMISSION = {
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE",
     };
 
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
@@ -663,59 +669,75 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void addImage() {
-        FilePickerBuilder.getInstance(getActivity())
-                .setMaxCount(1)
-                .addVideoPicker()
-                .pickPhoto(this);
-        hideAttachmentPanel();
+        if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+            FilePickerBuilder.getInstance(getActivity())
+                    .setMaxCount(1)
+                    .addVideoPicker()
+                    .pickPhoto(this);
+            hideAttachmentPanel();
+        } else {
+            requestPermissions();
+        }
     }
 
     protected void takeImage() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = QiscusImageUtil.createImageFile();
-            } catch (IOException ex) {
-                showError(getString(R.string.chat_error_failed_write));
-            }
-
-            if (photoFile != null) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                } else {
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                            FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), photoFile));
+        if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                File photoFile = null;
+                try {
+                    photoFile = QiscusImageUtil.createImageFile();
+                } catch (IOException ex) {
+                    showError(getString(R.string.chat_error_failed_write));
                 }
-                startActivityForResult(intent, TAKE_PICTURE_REQUEST);
+
+                if (photoFile != null) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                    } else {
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                FileProvider.getUriForFile(getActivity(), Qiscus.getProviderAuthorities(), photoFile));
+                    }
+                    startActivityForResult(intent, TAKE_PICTURE_REQUEST);
+                }
+                hideAttachmentPanel();
             }
-            hideAttachmentPanel();
+        } else {
+            requestPermissions();
         }
     }
 
     protected void addFile() {
-        FilePickerBuilder.getInstance(getActivity())
-                .setMaxCount(1)
-                .pickFile(this);
-        hideAttachmentPanel();
+        if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+            FilePickerBuilder.getInstance(getActivity())
+                    .setMaxCount(1)
+                    .pickFile(this);
+            hideAttachmentPanel();
+        } else {
+            requestPermissions();
+        }
     }
 
     protected void recordAudio() {
-        if (recordAudioPanel != null) {
-            recordAudioPanel.setVisibility(View.VISIBLE);
-            if (messageInputPanel != null) {
-                messageInputPanel.setVisibility(View.GONE);
+        if (QiscusPermissionsUtil.hasPermissions(getActivity(), AUDIO_PERMISSION)) {
+            if (recordAudioPanel != null) {
+                recordAudioPanel.setVisibility(View.VISIBLE);
+                if (messageInputPanel != null) {
+                    messageInputPanel.setVisibility(View.GONE);
+                }
+                try {
+                    recordAudioPanel.startRecord();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    showError("Failed to record audio!");
+                    recordAudioPanel.cancelRecord();
+                } catch (IllegalStateException e) {
+                    showError("Can not record audio, microphone may be in use!");
+                    recordAudioPanel.cancelRecord();
+                }
             }
-            try {
-                recordAudioPanel.startRecord();
-            } catch (IOException e) {
-                e.printStackTrace();
-                showError("Failed to record audio!");
-                recordAudioPanel.cancelRecord();
-            } catch (IllegalStateException e) {
-                showError("Can not record audio, microphone may be in use!");
-                recordAudioPanel.cancelRecord();
-            }
+        } else {
+            requestPermissions();
         }
     }
 
@@ -1036,7 +1058,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         QiscusPermissionsUtil.checkDeniedPermissionsNeverAskAgain(this,
-                "Please grant permissions to make apps working properly!", R.string.ok, R.string.cancel, perms);
+                "If you not grant permission, the apps may not be working properly. " +
+                        "So please grant the permission for better user experienced.",
+                R.string.qiscus_grant, R.string.qiscus_denny, perms);
     }
 
     @Override
