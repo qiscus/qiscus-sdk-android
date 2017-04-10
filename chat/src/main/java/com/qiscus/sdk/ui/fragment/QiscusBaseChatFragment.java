@@ -1059,7 +1059,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         QiscusPermissionsUtil.checkDeniedPermissionsNeverAskAgain(this,
                 "If you not grant permission, the apps may not be working properly. " +
-                        "So please grant the permission for better user experienced.", R.string.grant, R.string.denny, perms);
+                        "So please grant the permission for better user experienced.",
+                R.string.qiscus_grant, R.string.qiscus_denny, perms);
     }
 
     @Override
