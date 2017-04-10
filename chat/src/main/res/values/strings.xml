@@ -16,6 +16,8 @@
 
 <resources>
     <string name="ok">OK</string>
+    <string name="grant">Grant Permission</string>
+    <string name="denny">Denny Permission</string>
     <string name="cancel">Cancel</string>
     <string name="new_message">New Message</string>
     <string name="desc_empty_chat">Lets start conversation</string>
