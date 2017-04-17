@@ -27,6 +27,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusFileViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusImageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusLinkViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusButtonMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusTextViewHolder;
 
 /**
@@ -49,6 +50,7 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_LINK_ME = 9;
     private static final int TYPE_LINK_OTHER = 10;
     private static final int TYPE_ACCOUNT_LINKING = 11;
+    private static final int TYPE_BUTTONS = 12;
 
     public QiscusChatAdapter(Context context, boolean groupChat) {
         super(context, groupChat);
@@ -78,6 +80,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_FILE_ME;
             case ACCOUNT_LINKING:
                 return TYPE_ACCOUNT_LINKING;
+            case BUTTONS:
+                return TYPE_BUTTONS;
             default:
                 return TYPE_MESSAGE_ME;
         }
@@ -98,6 +102,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_FILE_OTHER;
             case ACCOUNT_LINKING:
                 return TYPE_ACCOUNT_LINKING;
+            case BUTTONS:
+                return TYPE_BUTTONS;
             default:
                 return TYPE_MESSAGE_OTHER;
         }
@@ -128,6 +134,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_file;
             case TYPE_ACCOUNT_LINKING:
                 return R.layout.item_qiscus_chat_linking;
+            case TYPE_BUTTONS:
+                return R.layout.item_qiscus_chat_button;
             default:
                 return R.layout.item_qiscus_chat_text;
         }
@@ -153,6 +161,9 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return new QiscusFileViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_ACCOUNT_LINKING:
                 return new QiscusAccountLinkingViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+            case TYPE_BUTTONS:
+                return new QiscusButtonMessageViewHolder(getView(parent, viewType), itemClickListener,
+                        longItemClickListener, chatButtonClickListener);
             default:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
         }

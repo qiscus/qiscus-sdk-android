@@ -15,8 +15,10 @@
   -->
 
 <resources>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="qiscus_ok">OK</string>
+    <string name="qiscus_grant">Grant Permission</string>
+    <string name="qiscus_denny">Denny Permission</string>
+    <string name="qiscus_cancel">Cancel</string>
     <string name="new_message">New Message</string>
     <string name="desc_empty_chat">Lets start conversation</string>
     <string name="welcome">Welcome!</string>

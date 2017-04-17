@@ -132,7 +132,19 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
         return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
-                qiscusComment.getTopicId(), qiscusComment.getUniqueId())
+                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), null, null)
+                .map(jsonElement -> {
+                    JsonObject jsonComment = jsonElement.getAsJsonObject()
+                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
+                    qiscusComment.setId(jsonComment.get("id").getAsInt());
+                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    return qiscusComment;
+                });
+    }
+
+    public Observable<QiscusComment> postCommentPostBack(QiscusComment qiscusComment, String payload) {
+        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
+                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), "button_postback_response", payload)
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject()
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
@@ -299,7 +311,9 @@ public enum QiscusApi {
         Observable<JsonElement> postComment(@Field("token") String token,
                                             @Field("comment") String message,
                                             @Field("topic_id") int topicId,
-                                            @Field("unique_temp_id") String uniqueId);
+                                            @Field("unique_temp_id") String uniqueId,
+                                            @Field("type") String type,
+                                            @Field("payload") String payload);
 
         @GET("/api/v2/mobile/sync")
         Observable<JsonElement> sync(@Query("token") String token,
