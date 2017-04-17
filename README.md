@@ -1,9 +1,12 @@
-Qiscus SDK [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Qiscus%20SDK-green.svg?style=true)](https://android-arsenal.com/details/1/4438) [![Build Status](https://travis-ci.org/qiscus/qiscus-sdk-android.svg?branch=master)](https://travis-ci.org/qiscus/qiscus-sdk-android)
+Qiscus SDK [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Qiscus%20SDK-green.svg?style=true)](https://android-arsenal.com/details/1/4438) [![Build Status](https://travis-ci.org/qiscus/qiscus-sdk-android.svg?branch=develop)](https://travis-ci.org/qiscus/qiscus-sdk-android)
 ======
 <p align="center"><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-16-102736.png" width="40%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-16-102923.png" width="40%" /></p>
 Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.
 
-# Instalation
+# Quick Start
+### Create a new SDK application in the Dashboard and get application id 
+you can get app ID here [http://sdk.qiscus.com](http://sdk.qiscus.com)
+### Integrating SDK with an existing app 
 Add to your project build.gradle
 ```groovy
 allprojects {
@@ -20,9 +23,13 @@ dependencies {
     compile 'com.qiscus.sdk:chat:1.17.1'
 }
 ```
-# Let's make cools chatting apps!
-#### Init Qiscus
-Init Qiscus at your application class with your application ID, you can get app ID here [http://sdk.qiscus.com](http://sdk.qiscus.com)
+
+
+Check sample apps -> [DragonGo](https://github.com/qiscus/qiscus-sdk-android-sample)
+
+# Authentication 
+### Initializing with APP_ID
+Init Qiscus at your application class with your application ID
 ```java
 public class SampleApps extends Application {
     @Override
@@ -32,7 +39,7 @@ public class SampleApps extends Application {
     }
 }
 ```
-#### Login to Qiscus engine
+### Login or register
 Before user can start chatting each other, they must login to qiscus engine.
 ```java
 Qiscus.setUser("user@email.com", "userKey")
@@ -51,7 +58,19 @@ Qiscus.setUser("user@email.com", "userKey")
           }
       });
 ```
-### Start the chatting
+### Disconnecting/logout 
+```java
+Qiscus.clearUser();
+```
+    
+# Room Types  
+### Group Room
+A Group Room is a chat for several users. A user can join the chat only through an invitation.
+### 1 on 1 
+A 1 on 1 Room is a chat for two users. The chat initiator only need to add the target's messaging username
+
+# 1-to-1 Chat
+### Creating and starting 1-to-1 chat 
 ```java
 Qiscus.buildChatWith("jhon.doe@gmail.com")
       .withTitle("Jhon Doe")
@@ -67,7 +86,10 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
           }
       });
 ```
-### Customize the chat UI
+    
+
+# UI Customization
+### Theme Customization 
 Boring with default template? You can customized it, try it!, we have more items than those below code, its just example.
 ```java
 Qiscus.getChatConfig()
@@ -80,11 +102,14 @@ Qiscus.getChatConfig()
       .setRightBubbleTimeColor(R.color.grey)
       .setTimeFormat(date -> new SimpleDateFormat("HH:mm").format(date));
 ```
-### Advanced Chat Customizing
+
+
+### UI Source code
 Check [CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)
 <p align="center"><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232326.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232535.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232714.png" width="33%" /></p>
-
-### RxJava Support
+    
+# Miscellaneous 
+### Rx Java support
 ```java
 // Setup qiscus account with rxjava example
 Qiscus.setUser("user@email.com", "password")
@@ -114,8 +139,6 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
           showError(throwable.getMessage());
       });
 ```
-
-Check sample apps -> [DragonGo](https://github.com/qiscus/qiscus-sdk-android-sample)
 
 License
 -------
