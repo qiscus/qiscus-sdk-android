@@ -249,9 +249,9 @@ public final class QiscusImageUtil {
     }
 
     public static Bitmap getCircularBitmap(Bitmap bm) {
-        int sice = Math.min((bm.getWidth()), (bm.getHeight()));
+        int size = 192;
 
-        Bitmap bitmap = ThumbnailUtils.extractThumbnail(bm, sice, sice);
+        Bitmap bitmap = ThumbnailUtils.extractThumbnail(bm, size, size);
 
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
