@@ -67,14 +67,15 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     private static final int MAX_PENDING_MESSAGES = 10;
 
     private static DateFormat dateFormat;
+    private static Gson gson;
     private static long reconnectCounter;
 
     static {
         dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
     }
 
-    private final Gson gson;
     private String clientId;
     private String serverUri;
     private MqttAndroidClient mqttAndroidClient;
@@ -97,7 +98,6 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             EventBus.getDefault().register(this);
         }
 
-        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         clientId = Qiscus.getApps().getPackageName() + "-";
         clientId += Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
         serverUri = "ssl://mqtt.qiscus.com:1885";
@@ -333,7 +333,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         if (topic.contains(qiscusAccount.getToken())) {
-            QiscusComment qiscusComment = jsonToComment(gson.fromJson(new String(message.getPayload()), JsonObject.class));
+            QiscusComment qiscusComment = jsonToComment(new String(message.getPayload()));
             if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
                 setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(), qiscusComment.getId(), qiscusComment.getUniqueId());
             }
@@ -441,7 +441,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         }
     }
 
-    private static QiscusComment jsonToComment(JsonObject jsonObject) {
+    public static QiscusComment jsonToComment(JsonObject jsonObject) {
         try {
             QiscusComment qiscusComment = new QiscusComment();
             qiscusComment.setId(jsonObject.get("id").getAsInt());
@@ -470,6 +470,10 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             e.printStackTrace();
         }
         throw new RuntimeException("Unable to parse the JSON QiscusComment");
+    }
+
+    public static QiscusComment jsonToComment(String json) {
+        return jsonToComment(gson.fromJson(json, JsonObject.class));
     }
 
     private static void scheduleUserStatus() {

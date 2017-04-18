@@ -19,7 +19,12 @@ package com.qiscus.sdk.service;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
 
@@ -38,8 +43,20 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
      */
     public static boolean handleMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getData().containsKey("qiscus_sdk")) {
-            if (Qiscus.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
-                QiscusPusherApi.getInstance().restartConnection();
+            if (Qiscus.hasSetupUser()) {
+                if (!QiscusPusherApi.getInstance().isConnected()) {
+                    QiscusPusherApi.getInstance().restartConnection();
+                }
+                if (remoteMessage.getData().containsKey("payload")) {
+                    QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
+                    if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                        QiscusPusherApi.getInstance()
+                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
+                                        qiscusComment.getId(), qiscusComment.getUniqueId());
+                    }
+                    QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault()
+                            .post(new QiscusCommentReceivedEvent(qiscusComment)));
+                }
             }
             return true;
         }
