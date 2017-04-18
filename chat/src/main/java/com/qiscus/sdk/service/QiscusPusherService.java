@@ -157,7 +157,12 @@ public class QiscusPusherService extends Service {
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            pushNotification(comment, finalMessageText, QiscusImageUtil.getCircularBitmap(resource));
+                            try {
+                                pushNotification(comment, finalMessageText, QiscusImageUtil.getCircularBitmap(resource));
+                            } catch (Exception e) {
+                                pushNotification(comment, finalMessageText,
+                                        BitmapFactory.decodeResource(getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
+                            }
                         }
 
                         @Override
