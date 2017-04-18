@@ -51,6 +51,7 @@ import com.qiscus.sdk.util.QiscusImageUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -200,7 +201,11 @@ public class QiscusPusherService extends Service {
         }
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance().getMessageNotifItems(comment.getRoomId());
+        List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance()
+                .getMessageNotifItems(comment.getRoomId());
+        if (notifItems == null) {
+            notifItems = new ArrayList<>();
+        }
         int notifSize = 5;
         if (notifItems.size() < notifSize) {
             notifSize = notifItems.size();
