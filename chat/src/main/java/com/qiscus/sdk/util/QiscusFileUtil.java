@@ -181,6 +181,11 @@ public final class QiscusFileUtil {
         return fileName;
     }
 
+    public static String addTimeStampToFileName(String fileName) {
+        String[] fileNameSplit = splitFileName(fileName);
+        return fileNameSplit[0] + "_" + System.currentTimeMillis() + "" + fileNameSplit[1];
+    }
+
     private static String replaceTopicInFileName(String fileName, int topicId) {
         String[] fileNameSplit = splitFileName(fileName);
         int startTopicIndex = fileNameSplit[0].indexOf("_topic_");

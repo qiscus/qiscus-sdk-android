@@ -160,6 +160,10 @@ public final class QiscusImageUtil {
 
         FileOutputStream out = null;
         String filename = generateFilePath(imageUri, topicId);
+        File outputFile = new File(filename);
+        if (outputFile.exists()) {
+            filename = QiscusFileUtil.addTimeStampToFileName(filename);
+        }
         try {
             out = new FileOutputStream(filename);
 
@@ -249,9 +253,9 @@ public final class QiscusImageUtil {
     }
 
     public static Bitmap getCircularBitmap(Bitmap bm) {
-        int sice = Math.min((bm.getWidth()), (bm.getHeight()));
+        int size = 192;
 
-        Bitmap bitmap = ThumbnailUtils.extractThumbnail(bm, sice, sice);
+        Bitmap bitmap = ThumbnailUtils.extractThumbnail(bm, size, size);
 
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
