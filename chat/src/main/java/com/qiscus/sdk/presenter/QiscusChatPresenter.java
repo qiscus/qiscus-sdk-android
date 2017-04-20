@@ -145,7 +145,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (file.getName().endsWith(".gif")) {
             compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
         } else if (QiscusImageUtil.isImage(file)) {
-            compressedFile = QiscusImageUtil.compressImage(Uri.fromFile(file), currentTopicId);
+            try {
+                compressedFile = QiscusImageUtil.compressImage(Uri.fromFile(file), currentTopicId);
+            } catch (NullPointerException e) {
+                view.showError("Can not read file, please make sure that is not corrupted file!");
+                return;
+            }
+
         } else {
             compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
         }
