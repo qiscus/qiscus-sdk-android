@@ -160,6 +160,10 @@ public final class QiscusImageUtil {
 
         FileOutputStream out = null;
         String filename = generateFilePath(imageUri, topicId);
+        File outputFile = new File(filename);
+        if (outputFile.exists()) {
+            filename = QiscusFileUtil.addTimeStampToFileName(filename);
+        }
         try {
             out = new FileOutputStream(filename);
 
