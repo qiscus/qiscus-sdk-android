@@ -26,6 +26,9 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 
+import java.io.IOException;
+
+import retrofit2.HttpException;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             mLoginButton.setText("Login");
         } else {
             showLoading();
-            Qiscus.setUser("zetra25@gmail.com", "12345678")
+            Qiscus.setUser("zetra255@gmail.com", "12345678")
                     .withUsername("Zetra")
                     .save()
                     .subscribeOn(Schedulers.io())
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChat(View view) {
         showLoading();
-        Qiscus.buildChatWith("rya.meyvriska24@gmail.com")
+        Qiscus.buildChatWith("rya.meyvriska24asasa@gmail.com")
                 .withTitle("Rya Meyvriska")
                 .build(this)
                 .subscribeOn(Schedulers.io())
@@ -76,8 +79,21 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
+                    if (throwable instanceof HttpException) { //Error response from server
+                        HttpException e = (HttpException) throwable;
+                        try {
+                            String errorMessage = e.response().errorBody().string();
+                            Log.e("openChat", errorMessage);
+                            showError(errorMessage);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    } else if (throwable instanceof IOException) { //Error from network
+                        showError("Can not connect to qiscus server!");
+                    } else { //Unknown error
+                        showError("Unexpected error!");
+                    }
                     throwable.printStackTrace();
-                    showError(throwable.getMessage());
                     dismissLoading();
                 });
     }
