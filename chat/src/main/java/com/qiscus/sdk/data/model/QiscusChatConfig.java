@@ -76,18 +76,22 @@ public class QiscusChatConfig {
     private int addPictureIcon = R.drawable.ic_qiscus_add_image;
     private int addPictureBackgroundColor = R.color.qiscus_gallery_background;
     private String addPictureText = "Gallery";
+    private boolean enableAddPicture = true;
 
     private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
     private int takePictureBackgroundColor = R.color.qiscus_camera_background;
     private String takePictureText = "Camera";
+    private boolean enableTakePicture = true;
 
     private int addFileIcon = R.drawable.ic_qiscus_add_file;
     private int addFileBackgroundColor = R.color.qiscus_file_background;
     private String addFileText = "File";
+    private boolean enableAddFile = true;
 
     private int recordAudioIcon = R.drawable.ic_qiscus_add_audio;
     private int recordBackgroundColor = R.color.qiscus_record_background;
     private String recordText = "Record";
+    private boolean enableRecordAudio = true;
 
     private int stopRecordIcon = R.drawable.ic_qiscus_send_on;
     private int cancelRecordIcon = R.drawable.ic_qiscus_cancel_record;
@@ -314,6 +318,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setEnableAddPicture(boolean enableAddPicture) {
+        this.enableAddPicture = enableAddPicture;
+        return this;
+    }
+
     public QiscusChatConfig setTakePictureIcon(@DrawableRes int takePictureIcon) {
         this.takePictureIcon = takePictureIcon;
         return this;
@@ -326,6 +335,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setTakePictureText(String takePictureText) {
         this.takePictureText = takePictureText;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableTakePicture(boolean enableTakePicture) {
+        this.enableTakePicture = enableTakePicture;
         return this;
     }
 
@@ -344,6 +358,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setEnableAddFile(boolean enableAddFile) {
+        this.enableAddFile = enableAddFile;
+        return this;
+    }
+
     public QiscusChatConfig setRecordAudioIcon(@DrawableRes int recordAudioIcon) {
         this.recordAudioIcon = recordAudioIcon;
         return this;
@@ -356,6 +375,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setRecordText(String recordText) {
         this.recordText = recordText;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableRecordAudio(boolean enableRecordAudio) {
+        this.enableRecordAudio = enableRecordAudio;
         return this;
     }
 
@@ -633,6 +657,10 @@ public class QiscusChatConfig {
         return addPictureText;
     }
 
+    public boolean isEnableAddPicture() {
+        return enableAddPicture;
+    }
+
     @DrawableRes
     public int getTakePictureIcon() {
         return takePictureIcon;
@@ -645,6 +673,10 @@ public class QiscusChatConfig {
 
     public String getTakePictureText() {
         return takePictureText;
+    }
+
+    public boolean isEnableTakePicture() {
+        return enableTakePicture;
     }
 
     @DrawableRes
@@ -661,6 +693,10 @@ public class QiscusChatConfig {
         return addFileText;
     }
 
+    public boolean isEnableAddFile() {
+        return enableAddFile;
+    }
+
     @DrawableRes
     public int getRecordAudioIcon() {
         return recordAudioIcon;
@@ -673,6 +709,10 @@ public class QiscusChatConfig {
 
     public String getRecordText() {
         return recordText;
+    }
+
+    public boolean isEnableRecordAudio() {
+        return enableRecordAudio;
     }
 
     @DrawableRes

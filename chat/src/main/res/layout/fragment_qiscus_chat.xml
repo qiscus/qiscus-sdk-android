@@ -160,6 +160,7 @@
                 android:visibility="gone">
 
                 <LinearLayout
+                    android:id="@+id/pick_picture"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -190,6 +191,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/add_image"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -220,6 +222,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/add_file"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -250,6 +253,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/add_audio"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

@@ -130,12 +130,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable protected TextView emptyChatTitleView;
     @Nullable protected TextView emptyChatDescView;
     @Nullable protected ViewGroup attachmentPanel;
+    @Nullable protected View addImageLayout;
     @Nullable protected ImageView addImageButton;
     @Nullable protected TextView addImageTextView;
+    @Nullable protected View takeImageLayout;
     @Nullable protected ImageView takeImageButton;
     @Nullable protected TextView takeImageTextView;
+    @Nullable protected View addFileLayout;
     @Nullable protected ImageView addFileButton;
     @Nullable protected TextView addFileTextView;
+    @Nullable protected View recordAudioLayout;
     @Nullable protected ImageView recordAudioButton;
     @Nullable protected TextView recordAudioTextView;
     @Nullable protected ImageView hideAttachmentButton;
@@ -185,15 +189,19 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         attachmentPanel = getAttachmentPanel(view);
         hideAttachmentButton = getHideAttachmentButton(view);
 
+        addImageLayout = getAddImageLayout(view);
         addImageButton = getAddImageButton(view);
         addImageTextView = getAddImageTextView(view);
 
+        takeImageLayout = getTakeImageLayout(view);
         takeImageButton = getTakeImageButton(view);
         takeImageTextView = getTakeImageTextView(view);
 
+        addFileLayout = getAddFileLayout(view);
         addFileButton = getAddFileButton(view);
         addFileTextView = getAddFileTextView(view);
 
+        recordAudioLayout = getRecordAudioLayout(view);
         recordAudioButton = getRecordAudioButton(view);
         recordAudioTextView = getRecordAudioTextView(view);
 
@@ -305,12 +313,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected abstract ViewGroup getAttachmentPanel(View view);
 
     @Nullable
+    protected abstract View getAddImageLayout(View view);
+
+    @Nullable
     protected abstract ImageView getAddImageButton(View view);
 
     @Nullable
     protected TextView getAddImageTextView(View view) {
         return null;
     }
+
+    @Nullable
+    protected abstract View getTakeImageLayout(View view);
 
     @Nullable
     protected abstract ImageView getTakeImageButton(View view);
@@ -321,12 +335,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Nullable
+    protected abstract View getAddFileLayout(View view);
+
+    @Nullable
     protected abstract ImageView getAddFileButton(View view);
 
     @Nullable
     protected TextView getAddFileTextView(View view) {
         return null;
     }
+
+    @Nullable
+    protected abstract View getRecordAudioLayout(View view);
 
     @Nullable
     protected abstract ImageView getRecordAudioButton(View view);
@@ -545,6 +565,19 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (toggleEmojiButton != null) {
             toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon());
+        }
+
+        if (addImageLayout != null) {
+            addImageLayout.setVisibility(chatConfig.isEnableAddPicture() ? View.VISIBLE : View.GONE);
+        }
+        if (takeImageLayout != null) {
+            takeImageLayout.setVisibility(chatConfig.isEnableTakePicture() ? View.VISIBLE : View.GONE);
+        }
+        if (addFileLayout != null) {
+            addFileLayout.setVisibility(chatConfig.isEnableAddFile() ? View.VISIBLE : View.GONE);
+        }
+        if (recordAudioLayout != null) {
+            recordAudioLayout.setVisibility(chatConfig.isEnableRecordAudio() ? View.VISIBLE : View.GONE);
         }
     }
 
