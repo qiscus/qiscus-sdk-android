@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.remote;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -466,6 +467,13 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             if (jsonObject.has("type")) {
                 qiscusComment.setRawType(jsonObject.get("type").getAsString());
                 qiscusComment.setExtraPayload(jsonObject.get("payload").toString());
+                if (qiscusComment.getType() == QiscusComment.Type.BUTTONS) {
+                    JsonObject payload = jsonObject.get("payload").getAsJsonObject();
+                    String text = payload.get("text").getAsString();
+                    if (text != null && !text.trim().isEmpty()) {
+                        qiscusComment.setMessage(text.trim());
+                    }
+                }
             }
             return qiscusComment;
         } catch (Exception e) {
