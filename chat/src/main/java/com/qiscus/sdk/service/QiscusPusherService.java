@@ -230,7 +230,8 @@ public class QiscusPusherService extends Service {
         inboxStyle.setSummaryText(notifItems.size() + " new message");
         notificationBuilder.setStyle(inboxStyle);
 
-        NotificationManagerCompat.from(this).notify(comment.getRoomId(), notificationBuilder.build());
+        QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(this)
+                .notify(comment.getRoomId(), notificationBuilder.build()));
     }
 
     public boolean isAttachment(String message) {
