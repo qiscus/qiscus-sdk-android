@@ -17,7 +17,6 @@
 package com.qiscus.sdk.data.remote;
 
 import android.support.v4.util.Pair;
-import android.text.TextUtils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
