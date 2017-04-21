@@ -174,6 +174,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected View getAddImageLayout(View view) {
+        return view.findViewById(R.id.add_image);
+    }
+
+    @Nullable
+    @Override
     protected ImageView getAddImageButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_image);
     }
@@ -182,6 +188,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected TextView getAddImageTextView(View view) {
         return (TextView) view.findViewById(R.id.button_add_image_text);
+    }
+
+    @Nullable
+    @Override
+    protected View getTakeImageLayout(View view) {
+        return view.findViewById(R.id.pick_picture);
     }
 
     @Nullable
@@ -198,6 +210,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected View getAddFileLayout(View view) {
+        return view.findViewById(R.id.add_file);
+    }
+
+    @Nullable
+    @Override
     protected ImageView getAddFileButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_file);
     }
@@ -206,6 +224,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected TextView getAddFileTextView(View view) {
         return (TextView) view.findViewById(R.id.button_add_file_text);
+    }
+
+    @Nullable
+    @Override
+    protected View getRecordAudioLayout(View view) {
+        return view.findViewById(R.id.add_audio);
     }
 
     @Nullable

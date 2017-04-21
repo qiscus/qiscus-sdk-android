@@ -183,8 +183,20 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected View getAddImageLayout(View view) {
+        return null;
+    }
+
+    @Nullable
+    @Override
     protected ImageView getAddImageButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_image);
+    }
+
+    @Nullable
+    @Override
+    protected View getTakeImageLayout(View view) {
+        return null;
     }
 
     @Nullable
@@ -195,8 +207,20 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected View getAddFileLayout(View view) {
+        return null;
+    }
+
+    @Nullable
+    @Override
     protected ImageView getAddFileButton(View view) {
         return (ImageView) view.findViewById(R.id.button_add_file);
+    }
+
+    @Nullable
+    @Override
+    protected View getRecordAudioLayout(View view) {
+        return null;
     }
 
     @Nullable
