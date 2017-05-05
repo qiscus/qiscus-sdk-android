@@ -507,9 +507,14 @@ public class Qiscus {
             return QiscusApi.getInstance()
                     .loginOrRegister(email, password, username, avatarUrl)
                     .doOnNext(qiscusAccount -> {
-                        Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
-                        EventBus.getDefault().post(QiscusUserEvent.LOGIN);
-                        configureFcmToken();
+                        if (Qiscus.hasSetupUser()) {
+                            Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
+                            configureFcmToken();
+                        } else {
+                            Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
+                            configureFcmToken();
+                            EventBus.getDefault().post(QiscusUserEvent.LOGIN);
+                        }
                     });
         }
     }

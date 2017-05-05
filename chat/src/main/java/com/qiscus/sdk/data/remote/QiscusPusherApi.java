@@ -466,6 +466,15 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             if (jsonObject.has("type")) {
                 qiscusComment.setRawType(jsonObject.get("type").getAsString());
                 qiscusComment.setExtraPayload(jsonObject.get("payload").toString());
+                if (qiscusComment.getType() == QiscusComment.Type.BUTTONS) {
+                    JsonObject payload = jsonObject.get("payload").getAsJsonObject();
+                    if (payload.has("text")) {
+                        String text = payload.get("text").getAsString();
+                        if (text != null && !text.trim().isEmpty()) {
+                            qiscusComment.setMessage(text.trim());
+                        }
+                    }
+                }
             }
             return qiscusComment;
         } catch (Exception e) {

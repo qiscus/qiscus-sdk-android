@@ -28,6 +28,10 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.util.Date;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 /**
  * Created on : November 24, 2016
  * Author     : zetbaitsu
@@ -86,12 +90,14 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     @Override
     public void onUserTyping(String user, boolean typing) {
         if (typing) {
-            for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-                if (member.getEmail().equals(user)) {
-                    tvSubtitle.setText(String.format("%s is typing...", member.getUsername()));
-                    break;
-                }
-            }
+            Observable.from(qiscusChatRoom.getMember())
+                    .filter(qiscusRoomMember -> qiscusRoomMember.getEmail().equals(user))
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .compose(bindToLifecycle())
+                    .subscribe(qiscusRoomMember -> tvSubtitle.setText(String.format("%s is typing...",
+                            qiscusRoomMember.getUsername())), throwable -> {
+                    });
         } else {
             tvSubtitle.setText(subtitle);
         }

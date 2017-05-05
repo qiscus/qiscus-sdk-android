@@ -51,6 +51,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_LINK_OTHER = 10;
     private static final int TYPE_ACCOUNT_LINKING = 11;
     private static final int TYPE_BUTTONS = 12;
+    private static final int TYPE_MESSAGE_MULTI_LINE_ME = 13;
+    private static final int TYPE_MESSAGE_MULTI_LINE_OTHER = 14;
 
     public QiscusChatAdapter(Context context, boolean groupChat) {
         super(context, groupChat);
@@ -69,7 +71,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     protected int getItemViewTypeMyMessage(QiscusComment qiscusComment, int position) {
         switch (qiscusComment.getType()) {
             case TEXT:
-                return TYPE_MESSAGE_ME;
+                return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+                        ? TYPE_MESSAGE_MULTI_LINE_ME : TYPE_MESSAGE_ME;
             case LINK:
                 return TYPE_LINK_ME;
             case IMAGE:
@@ -91,7 +94,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     protected int getItemViewTypeOthersMessage(QiscusComment qiscusComment, int position) {
         switch (qiscusComment.getType()) {
             case TEXT:
-                return TYPE_MESSAGE_OTHER;
+                return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+                        ? TYPE_MESSAGE_MULTI_LINE_OTHER : TYPE_MESSAGE_OTHER;
             case LINK:
                 return TYPE_LINK_OTHER;
             case IMAGE:
@@ -136,6 +140,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_linking;
             case TYPE_BUTTONS:
                 return R.layout.item_qiscus_chat_button;
+            case TYPE_MESSAGE_MULTI_LINE_ME:
+                return R.layout.item_qiscus_chat_multi_line_text_me;
+            case TYPE_MESSAGE_MULTI_LINE_OTHER:
+                return R.layout.item_qiscus_chat_multi_line_text;
             default:
                 return R.layout.item_qiscus_chat_text;
         }
@@ -146,6 +154,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
         switch (viewType) {
             case TYPE_MESSAGE_ME:
             case TYPE_MESSAGE_OTHER:
+            case TYPE_MESSAGE_MULTI_LINE_ME:
+            case TYPE_MESSAGE_MULTI_LINE_OTHER:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_LINK_ME:
             case TYPE_LINK_OTHER:
