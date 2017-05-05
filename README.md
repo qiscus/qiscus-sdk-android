@@ -20,7 +20,7 @@ allprojects {
 Then add to your app module build.gradle
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:1.18.0'
+    compile 'com.qiscus.sdk:chat:1.19.0'
 }
 ```
 
