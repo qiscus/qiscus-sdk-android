@@ -1,14 +1,27 @@
-Qiscus SDK [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Qiscus%20SDK-green.svg?style=true)](https://android-arsenal.com/details/1/4438) [![Build Status](https://travis-ci.org/qiscus/qiscus-sdk-android.svg?branch=develop)](https://travis-ci.org/qiscus/qiscus-sdk-android)
-======
-<p align="center"><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-16-102736.png" width="40%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-16-102923.png" width="40%" /></p>
-Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.
+# Documentation Qiscus SDK Android
 
-# Quick Start
-### Create a new SDK application in the Dashboard and get application id 
-you can get app ID here [http://sdk.qiscus.com](http://sdk.qiscus.com)
-### Integrating SDK with an existing app 
+
+
+## Quick Start
+
+### Create a new SDK application in the Dashboard and get app_id
+
+Register on [https://dashboard.qiscus.com](https://dashboard.qiscus.com/) using your email and password and then create new application
+
+You should create one application per service, regardless of the platform. For example, an app released in both Android and iOS would require only one application to be created in the Dashboard.
+
+All users within the same Qiscus application are able to communicate with each other, across all platforms. This means users using iOS, Android, web clients, etc. can all chat with one another. However, users in different Qiscus applications cannot talk to each other.
+
+Done! Now you can use the APP_ID into your apps and get chat functionality by implementing Qiscus into your app.
+
+
+
+### integrating SDK with an existing app
+
 Add to your project build.gradle
-```groovy
+
+
+```
 allprojects {
     repositories {
         .....
@@ -18,30 +31,33 @@ allprojects {
 ```
 
 Then add to your app module build.gradle
-```groovy
+
+
+```
 dependencies {
-    compile 'com.qiscus.sdk:chat:1.19.0'
+    compile 'com.qiscus.sdk:chat:1.18.0'
 }
 ```
 
+## Authentication
 
-Check sample apps -> [DragonGo](https://github.com/qiscus/qiscus-sdk-android-sample)
+### Init with APP_ID & Login or register
 
-# Authentication 
-### Initializing with APP_ID
 Init Qiscus at your application class with your application ID
-```java
+
+```
 public class SampleApps extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Qiscus.init(this, "yourQiscusAppId");
+        Qiscus.init(this, "APP_ID");
     }
 }
 ```
-### Login or register
+
 Before user can start chatting each other, they must login to qiscus engine.
-```java
+
+```
 Qiscus.setUser("user@email.com", "userKey")
       .withUsername("Tony Stark")
       .withAvatarUrl("http://avatar.url.com/handsome.jpg")
@@ -58,20 +74,59 @@ Qiscus.setUser("user@email.com", "userKey")
           }
       });
 ```
-### Disconnecting/logout 
-```java
+
+### 
+Updating a User Profile and Avatar
+
+Updating user profile and details is simply by re-init the user using new details :
+
+
+```
+Qiscus.setUser("user@email.com", "userKey")
+      .withUsername("Tony Stark")
+      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
+      .save(new Qiscus.SetUserListener() {
+          @Override
+          public void onSuccess(QiscusAccount qiscusAccount) {
+              DataManager.saveQiscusAccount(qiscusAccount);
+              startActivity(new Intent(this, ConsultationListActivity.class));
+          }
+          @Override
+          public void onError(Throwable throwable) {
+              throwable.printStackTrace();
+              showError(throwable.getMessage());
+          }
+      });
+```
+
+### 
+Disconnect / Logout
+
+Whenever you no longer want the user to receive update 
+
+```
 Qiscus.clearUser();
 ```
-    
-# Room Types  
-### Group Room
-A Group Room is a chat for several users. A user can join the chat only through an invitation.
-### 1 on 1 
-A 1 on 1 Room is a chat for two users. The chat initiator only need to add the target's messaging username
 
-# 1-to-1 Chat
-### Creating and starting 1-to-1 chat 
-```java
+
+
+## Room Types 
+
+### 1-on-1 Chat
+
+1-on-1 messaging is a private channel between two users. You can enable the **distinct property** for the channel in order to reuse a channel for the same members
+
+### Group Room 
+
+ Group messaging is a private channel among multiple users. You can invite up to hundreds of members into a group room
+
+## **1-on-1 Chat**
+
+### Creating and starting 1-to-1 chat
+
+Start chat with target is very easy, all you need is just call
+
+```
 Qiscus.buildChatWith("jhon.doe@gmail.com")
       .withTitle("Jhon Doe")
       .build(this, new Qiscus.ChatActivityBuilderListener() {
@@ -86,12 +141,213 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
           }
       });
 ```
-    
 
-# UI Customization
-### Theme Customization 
+
+
+
+## **Group Room**
+
+### Creating a Group Room
+
+Qiscus also support group chat. To create new group chat, all you need is just call
+
+
+```
+Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@gmail.com", "user3@gmail.com"))
+      .withAvatar("http://avatar.url.com/group.jpg")
+      .build(new Qiscus.ChatBuilderListener() {
+          @Override
+          public void onSuccess(QiscusChatRoom qiscusChatRoom) {
+              startActivity(QiscusGroupChatActivity.generateIntent(MainActivity.this, qiscusChatRoom));
+          }
+    
+          @Override
+          public void onError(Throwable throwable) {
+              throwable.printStackTrace();
+              showError(throwable.getMessage());
+          }
+       });
+```
+
+for accesing room that created by this call, you need to call it with its roomId. This methode is always creating new chat room.
+
+
+### Getting a Group Room instance with room id
+
+
+When you already know your chat room id, you can easily go to that room. Just call
+
+```
+QiscusApi.getChatRoom(int roomId);
+```
+
+For example :
+
+```
+QiscusApi.getInstance()
+        .getChatRoom(123)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .map(qiscusChatRoom -> QiscusGroupChatActivity.generateIntent(this, qiscusChatRoom))
+        .subscribe(this::startActivity, throwable -> {
+            throwable.printStackTrace();
+            showError(throwable.getMessage());
+        });
+```
+
+
+
+### Inviting users to an existing Room
+
+Currently we recommend to invite user into existing room through our **REST API** for simplicity and security reason
+
+### Leaving a Group Room
+
+Currently we recommend to kick user out of specific room through our **REST API** for simplicity and security reason
+
+## **Event Handler **
+
+**Implement QiscusChatPresenter.View to your Activity Or Fragment**
+
+```
+public class MainActivity extends AppCompatActivity implements QiscusChatPresenter.View {
+    private QiscusChatPresenter qiscusChatPresenter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
+    }
+
+    @Override
+    public void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments) {
+        // Do your implementation
+    }
+
+    @Override
+    public void showComments(List<QiscusComment> qiscusComments) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onLoadMore(List<QiscusComment> qiscusComments) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onSendingComment(QiscusComment qiscusComment) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onSuccessSendComment(QiscusComment qiscusComment) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onFailedSendComment(QiscusComment qiscusComment) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onNewComment(QiscusComment qiscusComment) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onCommentDeleted(QiscusComment qiscusComment) {
+        // Do your implementation
+    }
+
+    @Override
+    public void refreshComment(QiscusComment qiscusComment) {
+        // Do your implementation
+    }
+
+    @Override
+    public void updateLastDeliveredComment(int lastDeliveredCommentId) {
+        // Do your implementation
+    }
+
+    @Override
+    public void updateLastReadComment(int lastReadCommentId) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onFileDownloaded(File file, String mimeType) {
+        // Do your implementation
+    }
+
+    @Override
+    public void onUserTyping(String user, boolean typing) {
+        // Do your implementation
+    }
+}
+```
+
+
+**EventBus, so you can listen event from anywhere, It does not matter whether it's an activity or not.**
+For example from your application class
+
+```
+public class SampleApps extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Qiscus.init(this, "APP_ID");
+
+        EventBus.getDefault().register(this);
+    }
+
+    /**
+     * Subscribe anywhere to listen new message if you just got new message from someone
+     */
+    @Subscribe
+    public void onGetNewQiscusComment(QiscusCommentReceivedEvent event) {
+        QiscusComment qiscusComment = event.getQiscusComment();
+        // Do your implementation
+    }
+
+
+    /**
+     * Call QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom); to get room event from anywhere at your application
+     */
+    @Subscribe
+    public void onGetNewQiscusRoomEvent(QiscusChatRoomEvent event) {
+        switch (event.getEvent()) {
+            case TYPING:
+                // Someone is typing on this room event.getRoomId();
+                break;
+            case DELIVERED:
+                // Someone just received your message event.getCommentId()
+                break;
+            case READ:
+                // Someone just read your message event.getCommentId()
+                break;
+        }
+    }
+
+    /**
+     * Call QiscusPusherApi.getInstance().listenUserStatus("user1@gmail.com"); to listen status of user1@gmail.com
+     */
+    @Subscribe
+    public void onUserStatusUpdated(QiscusUserStatusEvent event) {
+        // A user just changed his/her status from (online or offline)
+        // event.getUser() changed to event.isOnline() at event.getLastActive()
+    }
+}
+```
+
+## **UI Customization**
+
+### Theme Customization
+
 Boring with default template? You can customized it, try it!, we have more items than those below code, its just example.
-```java
+
+```
 Qiscus.getChatConfig()
       .setStatusBarColor(R.color.blue)
       .setAppBarColor(R.color.red)
@@ -104,13 +360,20 @@ Qiscus.getChatConfig()
 ```
 
 
+
 ### UI Source code
-Check [CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)
-<p align="center"><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232326.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232535.png" width="33%" /><img src="https://github.com/qiscus/qiscus-sdk-android/raw/develop/screenshot/device-2016-09-28-232714.png" width="33%" /></p>
-    
-# Miscellaneous 
+
+If you want full customisations, you can modify everything on the view by forking our repository or just right away modifying our **[ ](https://github.com/qiscus/qiscus-sdk-ios/blob/master/Qiscus/Qiscus/QiscusChatVC.swift)[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java) **based on your needs.
+
+## Push Notifications 
+
+Currently we recommend to use our Webhook-API to push notification from your own server to client app for simplicity and flexibility handling
+
+## Miscellaneous :
+
 ### Rx Java support
-```java
+
+```
 // Setup qiscus account with rxjava example
 Qiscus.setUser("user@email.com", "password")
       .withUsername("Tony Stark")
@@ -125,7 +388,7 @@ Qiscus.setUser("user@email.com", "password")
           throwable.printStackTrace();
           showError(throwable.getMessage());
       });
-
+      
 // Start a chat activity with rxjava example      
 Qiscus.buildChatWith("jhon.doe@gmail.com")
       .withTitle("Jhon Doe")
@@ -140,18 +403,3 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
       });
 ```
 
-License
--------
-    Copyright (c) 2016 Qiscus.
-    
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
