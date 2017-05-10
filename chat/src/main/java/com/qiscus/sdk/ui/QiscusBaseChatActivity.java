@@ -178,7 +178,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         }
 
         if (actionMode != null) {
-            actionMode.setTitle(selectedComments.size() + " selected");
+            actionMode.setTitle(getString(R.string.qiscus_selected_comment, selectedComments.size()));
         }
     }
 
@@ -219,15 +219,15 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
         if (i == R.id.action_copy) {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(getString(R.string.chat_activity_label_clipboard), text);
+            ClipData clip = ClipData.newPlainText(getString(R.string.qiscus_chat_activity_label_clipboard), text);
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(this, selectedComments.size() + " messages copied!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.qiscus_copied_message, selectedComments.size()), Toast.LENGTH_SHORT).show();
         } else if (i == R.id.action_share) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
             intent.putExtra(Intent.EXTRA_SUBJECT, "Messages");
             intent.putExtra(Intent.EXTRA_TEXT, text);
-            startActivity(Intent.createChooser(intent, "Share"));
+            startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_comments_title)));
         }
         mode.finish();
     }

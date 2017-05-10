@@ -74,11 +74,12 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
 
         TextView titleView = (TextView) findViewById(R.id.title);
         String title = getIntent().getStringExtra(EXTRA_TITLE);
-        title = (title == null || title.isEmpty()) ? "Account Linking" : title;
+        title = (title == null || title.isEmpty()) ? getString(R.string.qiscus_account_linking) : title;
         titleView.setText(title);
 
         successMessage = getIntent().getStringExtra(EXTRA_SUCCESS_MESSAGE);
-        successMessage = (successMessage == null || successMessage.isEmpty()) ? "Account linking successfully." : successMessage;
+        successMessage = (successMessage == null || successMessage.isEmpty()) ?
+                getString(R.string.qiscus_success_linking_account) : successMessage;
 
         webView = (WebView) findViewById(R.id.web_view);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -143,7 +144,7 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setMessage(successMessage)
-                .setPositiveButton("OK", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.qiscus_ok), (dialog, which) -> {
                     dialog.dismiss();
                     finish();
                 })

@@ -102,7 +102,7 @@ public class QiscusAudioRecorderView extends LinearLayout {
     }
 
     private void resetDuration() {
-        textViewDuration.setText("00:00");
+        textViewDuration.setText(R.string.qiscus_audio_duration);
         startTime = System.currentTimeMillis();
     }
 

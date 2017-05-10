@@ -30,12 +30,14 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.util.Pair;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -72,8 +74,8 @@ public class QiscusPusherService extends Service {
     private static SpannableStringBuilder fileMessage;
 
     static {
-        fileMessage = new SpannableStringBuilder("Send a file attachment.");
-        fileMessage.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+        fileMessage = new SpannableStringBuilder(QiscusAndroidUtil.getString(R.string.qiscus_send_attachment));
+        fileMessage.setSpan(new StyleSpan(android.graphics.Typeface.BOLD),
                 0, fileMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
@@ -227,7 +229,7 @@ public class QiscusPusherService extends Service {
         if (notifItems.size() > notifSize) {
             inboxStyle.addLine(".......");
         }
-        inboxStyle.setSummaryText(notifItems.size() + " new message");
+        inboxStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
         notificationBuilder.setStyle(inboxStyle);
 
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(this)

@@ -19,7 +19,9 @@ package com.qiscus.sdk.presenter;
 import android.support.v4.util.Pair;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                 }, throwable -> {
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError("Something went wrong!");
+                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_general_error));
                         view.dismissLoading();
                     }
                 });

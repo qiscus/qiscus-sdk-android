@@ -23,13 +23,13 @@
         android:id="@+id/action_copy"
         android:icon="@drawable/ic_qiscus_copy"
         android:orderInCategory="100"
-        android:title="Copy"
+        android:title="@string/qiscus_copy"
         app:showAsAction="always"/>
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_qiscus_share"
         android:orderInCategory="100"
-        android:title="Share"
+        android:title="@string/qiscus_share"
         app:showAsAction="always"/>
 
 </menu>

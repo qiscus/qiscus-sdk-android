@@ -636,8 +636,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void showFailedCommentDialog(QiscusComment qiscusComment) {
         new AlertDialog.Builder(getActivity())
-                .setTitle("Message send failed")
-                .setItems(new CharSequence[]{"Resend", "Delete"}, (dialog, which) -> {
+                .setTitle(R.string.qiscus_failed_send_message_dialog_title)
+                .setItems(new CharSequence[]{getString(R.string.qiscus_resend),
+                        getString(R.string.qiscus_delete)}, (dialog, which) -> {
                     if (which == 0) {
                         qiscusChatPresenter.resendComment(qiscusComment);
                     } else {
@@ -721,7 +722,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 try {
                     photoFile = QiscusImageUtil.createImageFile();
                 } catch (IOException ex) {
-                    showError(getString(R.string.chat_error_failed_write));
+                    showError(getString(R.string.qiscus_chat_error_failed_write));
                 }
 
                 if (photoFile != null) {
@@ -762,10 +763,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     recordAudioPanel.startRecord();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    showError("Failed to record audio!");
+                    showError(getString(R.string.qiscus_failed_record_audio));
                     recordAudioPanel.cancelRecord();
                 } catch (IllegalStateException e) {
-                    showError("Can not record audio, microphone may be in use!");
+                    showError(getString(R.string.qiscus_microphone_in_use));
                     recordAudioPanel.cancelRecord();
                 }
             }
@@ -916,7 +917,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            showError(getString(R.string.chat_error_no_handler));
+            showError(getString(R.string.qiscus_chat_error_no_handler));
         }
     }
 
@@ -990,7 +991,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FilePickerConst.REQUEST_CODE_PHOTO && resultCode == Activity.RESULT_OK) {
             if (data == null) {
-                showError(getString(R.string.chat_error_failed_open_picture));
+                showError(getString(R.string.qiscus_chat_error_failed_open_picture));
                 return;
             }
             ArrayList<String> paths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
@@ -999,7 +1000,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
         } else if (requestCode == FilePickerConst.REQUEST_CODE_DOC && resultCode == Activity.RESULT_OK) {
             if (data == null) {
-                showError(getString(R.string.chat_error_failed_open_file));
+                showError(getString(R.string.qiscus_chat_error_failed_open_file));
                 return;
             }
             ArrayList<String> paths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS);
@@ -1010,7 +1011,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             try {
                 sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
             } catch (Exception e) {
-                showError(getString(R.string.chat_error_failed_read_picture));
+                showError(getString(R.string.qiscus_chat_error_failed_read_picture));
                 e.printStackTrace();
             }
         }
@@ -1072,7 +1073,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void requestPermissions() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
-            QiscusPermissionsUtil.requestPermissions(this, "Please grant permissions to make apps working properly!",
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
                     RC_PERMISSIONS, PERMISSIONS);
         }
     }
@@ -1090,9 +1091,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-        QiscusPermissionsUtil.checkDeniedPermissionsNeverAskAgain(this,
-                "If you not grant permission, the apps may not be working properly. " +
-                        "So please grant the permission for better user experienced.",
+        QiscusPermissionsUtil.checkDeniedPermissionsNeverAskAgain(this, getString(R.string.qiscus_permission_message),
                 R.string.qiscus_grant, R.string.qiscus_denny, perms);
     }
 

@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="8dp"
-                    android:text="@string/welcome"
+                    android:text="@string/qiscus_welcome"
                     android:textColor="@color/qiscus_divider"
                     android:textSize="24sp"
                     android:textStyle="bold"/>
@@ -64,7 +64,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/desc_empty_chat"
+                    android:text="@string/qiscus_desc_empty_chat"
                     android:textColor="@color/qiscus_divider"/>
             </LinearLayout>
 
@@ -88,7 +88,7 @@
                 android:background="@drawable/qiscus_rounded_accent_bg"
                 android:elevation="1dp"
                 android:padding="8dp"
-                android:text="@string/new_message"
+                android:text="@string/qiscus_new_message"
                 android:textColor="@color/qiscus_white"
                 android:textSize="14sp"
                 android:visibility="gone"/>
@@ -130,7 +130,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
-                    android:hint="@string/hint_message"
+                    android:hint="@string/qiscus_hint_message"
                     android:imeOptions="actionSend|flagNoEnterAction"
                     android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
                     android:maxLines="4"
@@ -184,7 +184,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Camera"
+                        android:text="@string/qiscus_camera"
                         android:textColor="@color/qiscus_secondary_text"
                         android:textSize="16sp"/>
 
@@ -215,7 +215,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Gallery"
+                        android:text="@string/qiscus_gallery"
                         android:textColor="@color/qiscus_secondary_text"
                         android:textSize="16sp"/>
 
@@ -246,7 +246,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="File"
+                        android:text="@string/qiscus_file"
                         android:textColor="@color/qiscus_secondary_text"
                         android:textSize="16sp"/>
 
@@ -277,7 +277,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Record"
+                        android:text="@string/qiscus_record"
                         android:textColor="@color/qiscus_secondary_text"
                         android:textSize="16sp"/>
 

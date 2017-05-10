@@ -18,6 +18,8 @@ package com.qiscus.sdk.util;
 
 import android.text.format.DateUtils;
 
+import com.qiscus.sdk.R;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,7 +42,7 @@ public final class QiscusDateUtil {
     public static String toTodayOrDate(Date date) {
         String currentDateInString = fullDateFormat.format(new Date());
         String dateInString = fullDateFormat.format(date);
-        return currentDateInString.equals(dateInString) ? "Today" : dateInString;
+        return currentDateInString.equals(dateInString) ? QiscusAndroidUtil.getString(R.string.qiscus_today) : dateInString;
     }
 
     public static String toHour(Date date) {
@@ -56,13 +58,13 @@ public final class QiscusDateUtil {
                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString();
 
         if (timeDiff.contains("0 ")) {
-            timeDiff = "in few seconds ago";
+            timeDiff = QiscusAndroidUtil.getString(R.string.qiscus_few_seconds_ago);
         }
 
         return timeDiff;
     }
 
     public static String toFullDateFormat(Date date) {
-        return toTodayOrDate(date) + " at " + toHour(date);
+        return QiscusAndroidUtil.getString(R.string.qiscus_date_and_time, toTodayOrDate(date), toHour(date));
     }
 }

@@ -137,14 +137,14 @@ public class MediaPickerFragment extends Fragment implements ViewPager.OnPageCha
         super.onActivityResult(requestCode, resultCode, data);
         if ((requestCode == PICK_IMAGE_REQUEST || requestCode == PICK_VIDEO_REQUEST) && resultCode == Activity.RESULT_OK) {
             if (data == null) {
-                Toast.makeText(getActivity(), "Can not open file", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.qiscus_can_not_open_file, Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
                 PickerManager.getInstance()
                         .add(QiscusFileUtil.from(data.getData()).getAbsolutePath(), FilePickerConst.FILE_TYPE_MEDIA);
             } catch (IOException e) {
-                Toast.makeText(getActivity(), "Can not read file", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.qiscus_can_not_read_file, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }

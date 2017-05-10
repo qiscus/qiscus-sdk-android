@@ -70,7 +70,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
                 }
             }
         }
-        subtitle += " and you";
+        subtitle += getString(R.string.qiscus_group_member_closing);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
-                    .subscribe(qiscusRoomMember -> tvSubtitle.setText(String.format("%s is typing...",
+                    .subscribe(qiscusRoomMember -> tvSubtitle.setText(getString(R.string.qiscus_group_member_typing,
                             qiscusRoomMember.getUsername())), throwable -> {
                     });
         } else {

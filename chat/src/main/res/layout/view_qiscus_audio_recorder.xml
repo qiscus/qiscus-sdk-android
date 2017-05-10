@@ -50,7 +50,7 @@
             android:id="@+id/record_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00"
+            android:text="@string/qiscus_audio_duration"
             android:textColor="@color/qiscus_primary_text"
             android:textSize="14sp"/>
 

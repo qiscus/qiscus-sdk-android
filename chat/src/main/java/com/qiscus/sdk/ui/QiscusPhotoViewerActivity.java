@@ -125,7 +125,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("image/jpg");
         intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
-        startActivity(Intent.createChooser(intent, "Share"));
+        startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_image_title)));
     }
 
     @Override
@@ -186,7 +186,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
         senderName.setText(qiscusPhoto.first.getSender());
         date.setText(QiscusDateUtil.toFullDateFormat(qiscusPhoto.first.getTime()));
-        tvTitle.setText((position + 1) + " of " + qiscusPhotos.size());
+        tvTitle.setText(getString(R.string.qiscus_photo_viewer_title, (position + 1), qiscusPhotos.size()));
     }
 
     @Override

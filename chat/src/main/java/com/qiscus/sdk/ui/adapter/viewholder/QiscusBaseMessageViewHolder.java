@@ -232,7 +232,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     protected void showTime(QiscusComment qiscusComment) {
         if (timeView != null) {
             if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
-                timeView.setText(R.string.sending_failed);
+                timeView.setText(R.string.qiscus_sending_failed);
                 timeView.setTextColor(failedToSendMessageColor);
             } else {
                 timeView.setText(Qiscus.getChatConfig().getTimeFormat().format(qiscusComment.getTime()));

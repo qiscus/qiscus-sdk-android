@@ -104,8 +104,10 @@ public class QiscusLinkPreviewView extends LinearLayout {
             } else {
                 Glide.with(getContext()).load("clear it").into(image);
             }
-            title.setText(previewData.getTitle().isEmpty() ? "Untitled" : previewData.getTitle());
-            description.setText(previewData.getDescription().isEmpty() ? "No description!" : previewData.getDescription());
+            title.setText(previewData.getTitle().isEmpty() ?
+                    getContext().getString(R.string.qiscus_link_preview_default_title) : previewData.getTitle());
+            description.setText(previewData.getDescription().isEmpty() ?
+                    getContext().getString(R.string.qiscus_link_preview_default_description) : previewData.getDescription());
             setVisibility(VISIBLE);
         }
     }

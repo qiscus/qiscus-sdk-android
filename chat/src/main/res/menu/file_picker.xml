@@ -20,6 +20,6 @@
 
     <item
         android:id="@+id/action_choose_manually"
-        android:title="Choose manually"/>
+        android:title="@string/qiscus_choose_manually"/>
 
 </menu>

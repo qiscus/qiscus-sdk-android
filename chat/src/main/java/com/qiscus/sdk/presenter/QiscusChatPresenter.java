@@ -21,6 +21,7 @@ import android.support.v4.util.Pair;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -148,7 +149,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             try {
                 compressedFile = QiscusImageUtil.compressImage(Uri.fromFile(file), currentTopicId);
             } catch (NullPointerException e) {
-                view.showError("Can not read file, please make sure that is not corrupted file!");
+                view.showError(QiscusAndroidUtil.getString(R.string.qiscus_corrupted_file));
                 return;
             }
 
@@ -393,7 +394,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 }, throwable -> {
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError("Failed to load comments!");
+                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
                         view.dismissLoading();
                     }
                 });
@@ -484,7 +485,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 }, throwable -> {
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError("Failed to load comments!");
+                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
                         view.dismissLoading();
                     }
                 });
@@ -643,7 +644,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     }, throwable -> {
                         throwable.printStackTrace();
                         qiscusComment.setDownloading(false);
-                        view.showError("Failed to download file!");
+                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_download_file));
                     });
         } else {
             if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {

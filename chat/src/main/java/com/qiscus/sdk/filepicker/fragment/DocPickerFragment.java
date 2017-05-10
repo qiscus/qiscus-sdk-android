@@ -183,14 +183,14 @@ public class DocPickerFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_FILE_REQUEST && resultCode == Activity.RESULT_OK) {
             if (data == null) {
-                Toast.makeText(getActivity(), "Can not open file", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.qiscus_can_not_open_file, Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
                 PickerManager.getInstance()
                         .add(QiscusFileUtil.from(data.getData()).getAbsolutePath(), FilePickerConst.FILE_TYPE_DOCUMENT);
             } catch (IOException e) {
-                Toast.makeText(getActivity(), "Can not read file", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.qiscus_can_not_read_file, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }

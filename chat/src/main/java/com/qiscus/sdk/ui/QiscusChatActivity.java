@@ -121,7 +121,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     @Override
     public void onUserTyping(String user, boolean typing) {
         if (qiscusChatRoom.getSubtitle().isEmpty()) {
-            tvSubtitle.setText(typing ? "Typing..." : "Online");
+            tvSubtitle.setText(typing ? getString(R.string.qiscus_typing) : getString(R.string.qiscus_online));
             tvSubtitle.setVisibility(View.VISIBLE);
         }
     }
@@ -130,7 +130,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     public void onUserStatusChanged(String user, boolean online, Date lastActive) {
         if (qiscusChatRoom.getSubtitle().isEmpty()) {
             String last = QiscusDateUtil.getRelativeTimeDiff(lastActive);
-            tvSubtitle.setText(online ? "Online" : "Last seen " + last);
+            tvSubtitle.setText(online ? getString(R.string.qiscus_online) : getString(R.string.qiscus_last_seen, last));
             tvSubtitle.setVisibility(View.VISIBLE);
         }
     }

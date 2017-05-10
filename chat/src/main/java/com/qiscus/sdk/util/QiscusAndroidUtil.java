@@ -19,6 +19,8 @@ package com.qiscus.sdk.util;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.util.Patterns;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -110,5 +112,15 @@ public final class QiscusAndroidUtil {
     public static void hideKeyboard(Context context, View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @NonNull
+    public static String getString(@StringRes int resId) {
+        return Qiscus.getApps().getString(resId);
+    }
+
+    @NonNull
+    public static String getString(@StringRes int resId, Object... formatArgs) {
+        return Qiscus.getApps().getString(resId, formatArgs);
     }
 }
