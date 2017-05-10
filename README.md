@@ -363,7 +363,7 @@ Qiscus.getChatConfig()
 
 ### UI Source code
 
-If you want full customisations, you can modify everything on the view by forking our repository or just right away modifying our **[ ](https://github.com/qiscus/qiscus-sdk-ios/blob/master/Qiscus/Qiscus/QiscusChatVC.swift)[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java) **based on your needs.
+If you want full customisations, you can modify everything on the view by forking our repository or just right away modifying our **[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java) **based on your needs.
 
 ## Push Notifications 
 
