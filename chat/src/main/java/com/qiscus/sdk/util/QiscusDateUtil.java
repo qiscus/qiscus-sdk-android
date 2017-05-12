@@ -31,8 +31,8 @@ public final class QiscusDateUtil {
     private static DateFormat hourDateFormat;
 
     static {
-        fullDateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
-        hourDateFormat = new SimpleDateFormat("hh:mm a", Locale.US);
+        fullDateFormat = new SimpleDateFormat(QiscusAndroidUtil.getString(R.string.qiscus_date_format), Locale.getDefault());
+        hourDateFormat = new SimpleDateFormat(QiscusAndroidUtil.getString(R.string.qiscus_hour_format), Locale.getDefault());
     }
 
     private QiscusDateUtil() {
