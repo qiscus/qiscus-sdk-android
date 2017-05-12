@@ -655,8 +655,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void onItemCommentLongClick(QiscusComment qiscusComment) {
         if (chatAdapter.getSelectedComments().isEmpty()
-                && qiscusComment.getType() == QiscusComment.Type.TEXT
-                || qiscusComment.getType() == QiscusComment.Type.LINK) {
+                && (qiscusComment.getType() == QiscusComment.Type.TEXT
+                || qiscusComment.getType() == QiscusComment.Type.LINK)) {
             toggleSelectComment(qiscusComment);
         }
     }
