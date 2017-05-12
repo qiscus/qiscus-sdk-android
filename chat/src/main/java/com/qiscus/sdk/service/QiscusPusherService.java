@@ -109,9 +109,8 @@ public class QiscusPusherService extends Service {
 
     private void scheduleSync(long period) {
         qiscusAccount = Qiscus.getQiscusAccount();
-        if (timer != null) {
-            stopSync();
-        }
+        stopSync();
+
         timer = new Timer("qiscus_sync", true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -139,7 +138,9 @@ public class QiscusPusherService extends Service {
     }
 
     private void stopSync() {
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 
     private void showPushNotification(QiscusComment comment) {
