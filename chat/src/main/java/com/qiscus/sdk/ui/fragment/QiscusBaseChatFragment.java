@@ -619,7 +619,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 showFailedCommentDialog(qiscusComment);
             }
         } else {
-            toggleSelectComment(qiscusComment);
+            if (qiscusComment.getType() == QiscusComment.Type.TEXT
+                    || qiscusComment.getType() == QiscusComment.Type.LINK) {
+                toggleSelectComment(qiscusComment);
+            }
         }
     }
 
@@ -651,7 +654,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onItemCommentLongClick(QiscusComment qiscusComment) {
-        if (chatAdapter.getSelectedComments().isEmpty()) {
+        if (chatAdapter.getSelectedComments().isEmpty()
+                && qiscusComment.getType() == QiscusComment.Type.TEXT
+                || qiscusComment.getType() == QiscusComment.Type.LINK) {
             toggleSelectComment(qiscusComment);
         }
     }
