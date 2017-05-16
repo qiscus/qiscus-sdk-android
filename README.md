@@ -69,8 +69,20 @@ Qiscus.setUser("user@email.com", "userKey")
           }
           @Override
           public void onError(Throwable throwable) {
-              throwable.printStackTrace();
-              showError(throwable.getMessage());
+              if (throwable instanceof HttpException) { //Error response from server
+                  HttpException e = (HttpException) throwable;
+                  try {
+                      String errorMessage = e.response().errorBody().string();
+                      Log.e(TAG, errorMessage);
+                      showError(errorMessage);
+                  } catch (IOException e1) {
+                      e1.printStackTrace();
+                  }
+              } else if (throwable instanceof IOException) { //Error from network
+                  showError("Can not connect to qiscus server!");
+              } else { //Unknown error
+                  showError("Unexpected error!");
+              }
           }
       });
 ```
@@ -93,8 +105,20 @@ Qiscus.setUser("user@email.com", "userKey")
           }
           @Override
           public void onError(Throwable throwable) {
-              throwable.printStackTrace();
-              showError(throwable.getMessage());
+              if (throwable instanceof HttpException) { //Error response from server
+                  HttpException e = (HttpException) throwable;
+                  try {
+                      String errorMessage = e.response().errorBody().string();
+                      Log.e(TAG, errorMessage);
+                      showError(errorMessage);
+                  } catch (IOException e1) {
+                      e1.printStackTrace();
+                  }
+              } else if (throwable instanceof IOException) { //Error from network
+                  showError("Can not connect to qiscus server!");
+              } else { //Unknown error
+                  showError("Unexpected error!");
+              }
           }
       });
 ```
@@ -136,8 +160,20 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
           }
           @Override
           public void onError(Throwable throwable) {
-              throwable.printStackTrace();
-              showError(throwable.getMessage());
+              if (throwable instanceof HttpException) { //Error response from server
+                  HttpException e = (HttpException) throwable;
+                  try {
+                      String errorMessage = e.response().errorBody().string();
+                      Log.e(TAG, errorMessage);
+                      showError(errorMessage);
+                  } catch (IOException e1) {
+                      e1.printStackTrace();
+                  }
+              } else if (throwable instanceof IOException) { //Error from network
+                  showError("Can not connect to qiscus server!");
+              } else { //Unknown error
+                  showError("Unexpected error!");
+              }
           }
       });
 ```
@@ -163,8 +199,20 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
     
           @Override
           public void onError(Throwable throwable) {
-              throwable.printStackTrace();
-              showError(throwable.getMessage());
+              if (throwable instanceof HttpException) { //Error response from server
+                  HttpException e = (HttpException) throwable;
+                  try {
+                      String errorMessage = e.response().errorBody().string();
+                      Log.e(TAG, errorMessage);
+                      showError(errorMessage);
+                  } catch (IOException e1) {
+                      e1.printStackTrace();
+                  }
+              } else if (throwable instanceof IOException) { //Error from network
+                  showError("Can not connect to qiscus server!");
+              } else { //Unknown error
+                  showError("Unexpected error!");
+              }
           }
        });
 ```
@@ -190,8 +238,20 @@ QiscusApi.getInstance()
         .observeOn(AndroidSchedulers.mainThread())
         .map(qiscusChatRoom -> QiscusGroupChatActivity.generateIntent(this, qiscusChatRoom))
         .subscribe(this::startActivity, throwable -> {
-            throwable.printStackTrace();
-            showError(throwable.getMessage());
+              if (throwable instanceof HttpException) { //Error response from server
+                  HttpException e = (HttpException) throwable;
+                  try {
+                      String errorMessage = e.response().errorBody().string();
+                      Log.e(TAG, errorMessage);
+                      showError(errorMessage);
+                  } catch (IOException e1) {
+                      e1.printStackTrace();
+                  }
+              } else if (throwable instanceof IOException) { //Error from network
+                  showError("Can not connect to qiscus server!");
+              } else { //Unknown error
+                  showError("Unexpected error!");
+              }
         });
 ```
 
@@ -385,8 +445,20 @@ Qiscus.setUser("user@email.com", "password")
           DataManager.saveQiscusAccount(qiscusAccount);
           startActivity(new Intent(this, ConsultationListActivity.class));
       }, throwable -> {
-          throwable.printStackTrace();
-          showError(throwable.getMessage());
+              if (throwable instanceof HttpException) { //Error response from server
+                  HttpException e = (HttpException) throwable;
+                  try {
+                      String errorMessage = e.response().errorBody().string();
+                      Log.e(TAG, errorMessage);
+                      showError(errorMessage);
+                  } catch (IOException e1) {
+                      e1.printStackTrace();
+                  }
+              } else if (throwable instanceof IOException) { //Error from network
+                  showError("Can not connect to qiscus server!");
+              } else { //Unknown error
+                  showError("Unexpected error!");
+              }
       });
       
 // Start a chat activity with rxjava example      
@@ -398,8 +470,20 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
       .subscribe(intent -> {
           startActivity(intent);
       }, throwable -> {
-          throwable.printStackTrace();
-          showError(throwable.getMessage());
+              if (throwable instanceof HttpException) { //Error response from server
+                  HttpException e = (HttpException) throwable;
+                  try {
+                      String errorMessage = e.response().errorBody().string();
+                      Log.e(TAG, errorMessage);
+                      showError(errorMessage);
+                  } catch (IOException e1) {
+                      e1.printStackTrace();
+                  }
+              } else if (throwable instanceof IOException) { //Error from network
+                  showError("Can not connect to qiscus server!");
+              } else { //Unknown error
+                  showError("Unexpected error!");
+              }
       });
 ```
 
