@@ -35,7 +35,7 @@ Then add to your app module build.gradle
 
 ```
 dependencies {
-    compile 'com.qiscus.sdk:chat:1.18.0'
+    compile 'com.qiscus.sdk:chat:1.19.1'
 }
 ```
 
