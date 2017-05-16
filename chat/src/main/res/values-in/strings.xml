@@ -64,7 +64,7 @@
     <string name="qiscus_failed_record_audio">Gagal merekam suara!</string>
     <string name="qiscus_microphone_in_use">Tidak bisa merekam suara, microphone mungkin sedang digunakan!</string>
     <string name="qiscus_permission_request_title">Mohon izinkan permisi untuk membuat aplikasi dapat berjalan dengan baik!</string>
-    <string name="qiscus_permission_message">Jika kamu tidak mengizinkan permisi, aplikasi bisa berjalan tidak sesuai dengan yang diharapkan. Jadi mohon izinkan aplikasi menggunakan permisi tersebut untu pengalaman pengguna yang lebih baik.</string>
+    <string name="qiscus_permission_message">Jika kamu tidak mengizinkan permisi, aplikasi bisa berjalan tidak sesuai dengan yang diharapkan. Jadi mohon izinkan aplikasi menggunakan permisi tersebut untuk pengalaman pengguna yang lebih baik.</string>
     <string name="qiscus_audio_duration">00:00</string>
     <string name="qiscus_link_preview_default_title">Tidak ada judul</string>
     <string name="qiscus_link_preview_default_description">Tidak ada deskripsi</string>
