@@ -19,13 +19,21 @@ package com.qiscus.dragonfly;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.QiscusBaseChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.ui.view.QiscusCircularImageView;
+import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.Date;
 
@@ -33,20 +41,17 @@ import java.util.Date;
  * Created by zetra. on 9/19/16.
  */
 public class ChatActivity extends QiscusBaseChatActivity {
-    private TextView mTitle;
+    private Toolbar toolbar;
+    private TextView tvTitle;
+    private TextView tvSubtitle;
+    private QiscusCircularImageView ivAvatar;
 
-    public static Intent generateIntent(Context context,
-                                        QiscusChatRoom qiscusChatRoom,
-                                        boolean simpleCustom) {
+    private QiscusAccount qiscusAccount;
+
+    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
-        intent.putExtra("simple_custom", simpleCustom);
         return intent;
-    }
-
-    @Override
-    protected void onSetStatusBarColor() {
-
     }
 
     @Override
@@ -56,31 +61,70 @@ public class ChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected void onLoadView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(com.qiscus.sdk.R.id.toolbar);
+        tvTitle = (TextView) findViewById(com.qiscus.sdk.R.id.tv_title);
+        tvSubtitle = (TextView) findViewById(com.qiscus.sdk.R.id.tv_subtitle);
+        ivAvatar = (QiscusCircularImageView) findViewById(com.qiscus.sdk.R.id.profile_picture);
+        findViewById(com.qiscus.sdk.R.id.back).setOnClickListener(v -> onBackPressed());
         setSupportActionBar(toolbar);
-        mTitle = (TextView) findViewById(R.id.tv_title);
     }
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return getIntent().getBooleanExtra("simple_custom", false) ?
-                SimpleCustomChatFragment.newInstance(qiscusChatRoom) :
-                QiscusChatFragment.newInstance(qiscusChatRoom);
+        return QiscusChatFragment.newInstance(qiscusChatRoom);
     }
 
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
+        qiscusAccount = Qiscus.getQiscusAccount();
         super.onViewReady(savedInstanceState);
-        mTitle.setText(qiscusChatRoom.getName());
     }
 
     @Override
-    public void onUserStatusChanged(String user, boolean online, Date lastActive) {
+    protected void applyChatConfig() {
+        toolbar.setBackgroundResource(chatConfig.getAppBarColor());
+        tvTitle.setTextColor(ContextCompat.getColor(this, chatConfig.getTitleColor()));
+        tvSubtitle.setTextColor(ContextCompat.getColor(this, chatConfig.getSubtitleColor()));
+    }
 
+    @Override
+    protected void binRoomData() {
+        super.binRoomData();
+        tvTitle.setText(qiscusChatRoom.getName());
+        if (!qiscusChatRoom.getSubtitle().isEmpty()) {
+            tvSubtitle.setText(qiscusChatRoom.getSubtitle());
+            tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
+        }
+        showRoomImage();
+    }
+
+    protected void showRoomImage() {
+        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+            if (!member.getEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
+                Glide.with(this).load(member.getAvatar())
+                        .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
+                        .placeholder(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
+                        .dontAnimate()
+                        .into(ivAvatar);
+                break;
+            }
+        }
     }
 
     @Override
     public void onUserTyping(String user, boolean typing) {
+        if (qiscusChatRoom.getSubtitle().isEmpty()) {
+            tvSubtitle.setText(typing ? "Typing..." : "Online");
+            tvSubtitle.setVisibility(View.VISIBLE);
+        }
+    }
 
+    @Override
+    public void onUserStatusChanged(String user, boolean online, Date lastActive) {
+        if (qiscusChatRoom.getSubtitle().isEmpty()) {
+            String last = QiscusDateUtil.getRelativeTimeDiff(lastActive);
+            tvSubtitle.setText(online ? "Online" : "Last seen " + last);
+            tvSubtitle.setVisibility(View.VISIBLE);
+        }
     }
 }

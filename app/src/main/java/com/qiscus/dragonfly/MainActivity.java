@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(qiscusChatRoom -> ChatActivity.generateIntent(this, qiscusChatRoom, false))
+                .map(qiscusChatRoom -> ChatActivity.generateIntent(this, qiscusChatRoom))
                 .subscribe(intent -> {
                     revertCustomChatConfig();
                     startActivity(intent);
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(qiscusChatRoom -> ChatActivity.generateIntent(this, qiscusChatRoom, true))
+                .map(qiscusChatRoom -> SimpleCustomChatActivity.generateIntent(this, qiscusChatRoom))
                 .subscribe(intent -> {
                     revertCustomChatConfig();
                     startActivity(intent);
