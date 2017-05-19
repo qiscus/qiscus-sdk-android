@@ -136,15 +136,10 @@ Qiscus.clearUser();
 
 ## Room Types 
 
-### 1-on-1 Chat
+## 1-on-1 Chat
 
 1-on-1 messaging is a private channel between two users. You can enable the **distinct property** for the channel in order to reuse a channel for the same members
 
-### Group Room 
-
- Group messaging is a private channel among multiple users. You can invite up to hundreds of members into a group room
-
-## **1-on-1 Chat**
 
 ### Creating and starting 1-to-1 chat
 
@@ -181,7 +176,10 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
 
 
 
-## **Group Room**
+## Group Room 
+
+ Group messaging is a private channel among multiple users. You can invite up to hundreds of members into a group room
+
 
 ### Creating a Group Room
 
