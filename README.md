@@ -263,7 +263,7 @@ Currently we recommend to invite user into existing room through our **REST API*
 
 Currently we recommend to kick user out of specific room through our **REST API** for simplicity and security reason
 
-## **Event Handler **
+## Event Handler
 
 **Implement QiscusChatPresenter.View to your Activity Or Fragment**
 
@@ -399,7 +399,7 @@ public class SampleApps extends Application {
 }
 ```
 
-## **UI Customization**
+## UI Customization
 
 ### Theme Customization
 
