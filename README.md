@@ -41,7 +41,7 @@ dependencies {
 
 # Authentication
 
-### Init with APP_ID & Login or register
+### Init with APP ID
 
 Init Qiscus at your application class with your application ID
 
