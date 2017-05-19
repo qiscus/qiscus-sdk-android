@@ -4,7 +4,7 @@
 
 # Quick Start
 
-### Create a new SDK application in the Dashboard and get app_id
+### Create a new app
 
 Register on [https://dashboard.qiscus.com](https://dashboard.qiscus.com/) using your email and password and then create new application
 
