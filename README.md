@@ -123,7 +123,7 @@ Qiscus.setUser("user@email.com", "userKey")
       });
 ```
 
-### Disconnect / Logout
+### Disconnect or Logout
 
 Whenever you no longer want the user to receive update 
 
