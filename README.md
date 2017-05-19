@@ -87,8 +87,7 @@ Qiscus.setUser("user@email.com", "userKey")
       });
 ```
 
-### 
-Updating a User Profile and Avatar
+### Updating a User Profile and Avatar
 
 Updating user profile and details is simply by re-init the user using new details :
 
