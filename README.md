@@ -2,7 +2,7 @@
 
 
 
-## Quick Start
+# Quick Start
 
 ### Create a new SDK application in the Dashboard and get app_id
 
@@ -39,7 +39,7 @@ dependencies {
 }
 ```
 
-## Authentication
+# Authentication
 
 ### Init with APP_ID & Login or register
 
@@ -123,8 +123,7 @@ Qiscus.setUser("user@email.com", "userKey")
       });
 ```
 
-### 
-Disconnect / Logout
+### Disconnect / Logout
 
 Whenever you no longer want the user to receive update 
 
@@ -134,7 +133,7 @@ Qiscus.clearUser();
 
 
 
-## Room Types 
+# Room Types 
 
 ### Creating and starting 1-to-1 chat
 
@@ -251,7 +250,7 @@ Currently we recommend to invite user into existing room through our **REST API*
 
 Currently we recommend to kick user out of specific room through our **REST API** for simplicity and security reason
 
-## Event Handler
+# Event Handler
 
 **Implement QiscusChatPresenter.View to your Activity Or Fragment**
 
@@ -387,7 +386,7 @@ public class SampleApps extends Application {
 }
 ```
 
-## UI Customization
+# UI Customization
 
 ### Theme Customization
 
@@ -411,11 +410,11 @@ Qiscus.getChatConfig()
 
 If you want full customisations, you can modify everything on the view by forking our repository or just right away modifying our **[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java) **based on your needs.
 
-## Push Notifications 
+# Push Notifications 
 
 Currently we recommend to use our Webhook-API to push notification from your own server to client app for simplicity and flexibility handling
 
-## Miscellaneous :
+# Miscellaneous
 
 ### Rx Java support
 
