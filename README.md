@@ -413,6 +413,17 @@ If you want full customisations, you can modify everything on the view by forkin
 
 Currently we recommend to use our Webhook-API to push notification from your own server to client app for simplicity and flexibility handling
 
+# Resources
+
+### Video
+
+Here's a video showing how you can set up sample app for qiscus SDK
+[<p align="center"><img src="https://res.cloudinary.com/qiscus/image/upload/c91CeMe08I/Screen%20Shot%202017-05-23%20at%201.57.19%20PM.png" width="50%" /></p>](https://www.youtube.com/watch?v=7tHNliEoths)
+
+### Sample Application
+
+Or you can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
+
 # Miscellaneous
 
 ### Rx Java support
