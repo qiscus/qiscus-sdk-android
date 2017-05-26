@@ -16,20 +16,39 @@
 
 package com.qiscus.sdk.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.RemoteInput;
+import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
 
+import static com.qiscus.sdk.service.QiscusPusherService.KEY_NOTIFICATION_REPLY;
+
 /**
  * Created by zetra. on 9/8/16.
  */
-public class QiscusPusherReceiver extends BroadcastReceiver {
+public class QiscusPusherReceiver extends BroadcastReceiver{
+
     @Override
     public void onReceive(Context context, Intent intent) {
         QiscusComment comment = intent.getParcelableExtra("data");
-        Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
+        Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
+        if (remoteInput != null) {
+            CharSequence message = remoteInput.getCharSequence(KEY_NOTIFICATION_REPLY);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(
+                    Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(comment.getRoomId());
+            QiscusComment qiscusComment = QiscusComment.generateMessage((String) message, comment.getRoomId(), comment.getTopicId());
+            Qiscus.getChatConfig().sendReplyNotificationHandler().onSend(context, qiscusComment);
+        } else {
+            Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
+        }
     }
+
 }

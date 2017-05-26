@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/transparent"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/qiscus_rounded_dark_white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qiscus_rounded_primary_top">
+
+                <TextView
+                    android:id="@+id/textView_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_marginBottom="64dp"
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    android:textColor="@color/qiscus_white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/qiscus_dark_white"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal">
+
+                    <com.qiscus.sdk.ui.view.QiscusCircularImageView
+                        android:id="@+id/image"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:paddingTop="10dp"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/ic_qiscus_avatar"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/qiscus_transparent_black"
+                    android:layout_marginBottom="5dp"
+                    android:textAlignment="center"
+                    android:padding="16dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1.6dp"
+                    android:alpha="0.5"
+                    android:background="@color/qiscus_light_grey"/>
+
+                <LinearLayout
+                    android:id="@+id/field_message_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <ImageView
+                        android:id="@+id/button_add_emoticon"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/bt_qiscus_selector_grey"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:src="@drawable/ic_qiscus_emot"/>
+
+                    <com.vanniktech.emoji.EmojiEditText
+                        android:id="@+id/et_input"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:textColorHint="@color/qiscus_transparent_black"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/qiscus_hint_message"
+                        android:imeOptions="actionSend|flagNoEnterAction"
+                        android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
+                        android:maxLines="4"
+                        android:nextFocusRight="@+id/button_send"
+                        android:padding="8dp"
+                        android:textColor="@color/qiscus_primary_text"
+                        android:textSize="16sp"
+                        app:emojiSize="22sp"/>
+
+                    <ImageView
+                        android:id="@+id/button_send"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:layout_gravity="bottom"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_qiscus_send"/>
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

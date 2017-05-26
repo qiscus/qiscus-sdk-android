@@ -83,4 +83,5 @@
     <string name="qiscus_date_and_time">%1$s at %2$s</string>
     <string name="qiscus_date_format">MMMM dd, yyyy</string>
     <string name="qiscus_hour_format">hh:mm a</string>
+    <string name="qiscus_reply_to">REPLY</string>
 </resources>
