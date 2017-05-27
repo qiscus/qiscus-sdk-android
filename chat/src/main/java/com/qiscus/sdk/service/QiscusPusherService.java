@@ -195,28 +195,6 @@ public class QiscusPusherService extends Service {
         openIntent.putExtra("data", comment);
         pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-//        if (Build.VERSION.SDK_INT < 24) {
-//            detailsIntent = new Intent(QiscusPusherService.this, QiscusQuickReplyActivity.class);
-//            detailsIntent.putExtra("data", comment);
-//            detailsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            openIntent = new Intent("com.qiscus.OPEN_DIALOG_REPLY_PN");
-//            openIntent.putExtra("data", comment);
-//            openIntent.putExtra("reply", "dialog");
-//            pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-//        }
-
-
-//        if (Build.VERSION.SDK_INT < 24) {
-//            Intent openIntent = new Intent("com.qiscus.OPEN_DIALOG_REPLY_PN");
-//            openIntent.putExtra("data", comment);
-//            openIntent.putExtra("reply", "dialog");
-//            pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-//        } else { // Call BroadcastReceiver on platforms supporting DirectReply
-//            Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
-//            openIntent.putExtra("data", comment);
-//            pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-//        }
-
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
                 .setContentIntent(pendingIntent)
