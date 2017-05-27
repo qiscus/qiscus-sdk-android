@@ -3,7 +3,6 @@ package com.qiscus.sdk.util;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -98,7 +97,7 @@ public class QiscusReplyDialog extends DialogFragment {
             return this;
         }
 
-        public QiscusReplyDialog Build() {
+        public QiscusReplyDialog build() {
             return QiscusReplyDialog.newInstance(this);
         }
 
@@ -266,7 +265,7 @@ public class QiscusReplyDialog extends DialogFragment {
         void onSend(String result);
     }
 
-    public interface OnDismissListener{
+    public interface OnDismissListener {
         void onDismissDialog(DialogInterface dialog);
     }
 

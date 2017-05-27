@@ -7,11 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.util.QiscusReplyDialog;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 
 public class QiscusQuickReplyActivity extends AppCompatActivity {
 
@@ -33,9 +31,7 @@ public class QiscusQuickReplyActivity extends AppCompatActivity {
         
         final QiscusReplyDialog customDialog = new QiscusReplyDialog.Builder(getRepliedTo, comment.getMessage(),
                 QiscusReplyDialog.ButtonOrientation.HORIZONTAL)
-                .setNegButton(QiscusAndroidUtil.getString(R.string.qiscus_cancel))
-                .setPosButton(QiscusAndroidUtil.getString(R.string.qiscus_reply_to))
-                .setResImage(getAvatar).Build();
+                .setResImage(getAvatar).build();
         customDialog.setDismissListener(dialog -> finish());
         customDialog.setOnClickSubmitListener(result -> {
             customDialog.dismiss();
