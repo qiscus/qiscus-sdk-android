@@ -17,6 +17,7 @@
 package com.qiscus.sdk.filepicker.fragment;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -174,8 +175,11 @@ public class DocPickerFragment extends Fragment {
                 "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint"};
         intent.setType("*/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, PICK_FILE_REQUEST);
-
+        try {
+            startActivityForResult(intent, PICK_FILE_REQUEST);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(getActivity(), getString(R.string.qiscus_no_file_manager), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

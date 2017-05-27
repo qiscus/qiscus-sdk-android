@@ -79,6 +79,11 @@ public final class QiscusAndroidUtil {
             if (start > 0 && text.charAt(start - 1) == '@') {
                 continue;
             }
+            int end = matcher.end();
+            if (end < text.length() && text.charAt(end) == '@') {
+                continue;
+            }
+
             String url = matcher.group();
             if (!url.startsWith("http")) {
                 url = "http://" + url;

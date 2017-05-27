@@ -84,4 +84,5 @@
     <string name="qiscus_date_format">MMMM dd, yyyy</string>
     <string name="qiscus_hour_format">hh:mm a</string>
     <string name="qiscus_reply_to">REPLY</string>
+    <string name="qiscus_no_file_manager">Sorry, you phone does not have application can handle it!</string>
 </resources>

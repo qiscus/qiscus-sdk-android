@@ -34,6 +34,7 @@
         </activity>
         <activity android:name=".ChatActivity"/>
         <activity android:name=".CustomChatActivity"/>
+        <activity android:name=".SimpleCustomChatActivity"/>
     </application>
 
 </manifest>
