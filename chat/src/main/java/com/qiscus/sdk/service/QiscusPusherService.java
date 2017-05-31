@@ -23,7 +23,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -49,7 +48,6 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
-import com.qiscus.sdk.ui.QiscusQuickReplyActivity;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 
@@ -189,7 +187,6 @@ public class QiscusPusherService extends Service {
 
         // Define PendingIntent for Reply action
         PendingIntent pendingIntent;
-        Intent detailsIntent = null;
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
         pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -211,18 +208,6 @@ public class QiscusPusherService extends Service {
             RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
                     .setLabel(getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
                     .build();
-
-            if (Build.VERSION.SDK_INT < 24) {
-                detailsIntent = new Intent(QiscusPusherService.this, QiscusQuickReplyActivity.class);
-                detailsIntent.putExtra("data", comment);
-                detailsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                pendingIntent = PendingIntent.getActivity(
-                        QiscusPusherService.this,
-                        0,
-                        detailsIntent,
-                        PendingIntent.FLAG_CANCEL_CURRENT
-                );
-            }
 
             NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                     android.R.drawable.ic_menu_send, getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()), pendingIntent)

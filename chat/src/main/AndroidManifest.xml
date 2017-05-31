@@ -55,12 +55,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/QiscusTheme" />
 
-        <activity
-            android:name=".ui.QiscusQuickReplyActivity"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Translucent"/>
-
         <service android:name=".service.QiscusPusherService" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 

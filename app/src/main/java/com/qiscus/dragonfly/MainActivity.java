@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
     private void revertCustomChatConfig() {
         Qiscus.getChatConfig()
                 .setSendButtonIcon(R.drawable.ic_qiscus_send)
+                .setEnableReplyNotification(true)
                 .setShowAttachmentPanelIcon(R.drawable.ic_qiscus_attach);
     }
 
