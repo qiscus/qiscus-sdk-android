@@ -43,7 +43,7 @@ public class QiscusPusherReceiver extends BroadcastReceiver {
                     Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(comment.getRoomId());
             QiscusComment qiscusComment = QiscusComment.generateMessage((String) message, comment.getRoomId(), comment.getTopicId());
-            Qiscus.getChatConfig().sendReplyNotificationHandler().onSend(context, qiscusComment);
+            Qiscus.getChatConfig().getReplyNotificationHandler().onSend(context, qiscusComment);
         } else {
             Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
         }

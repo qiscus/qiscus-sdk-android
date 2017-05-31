@@ -19,8 +19,10 @@ package com.qiscus.sdk.data.model;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
@@ -399,6 +401,7 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public QiscusChatConfig setEnableReplyNotification(boolean enableReplyNotification) {
         this.enableReplyNotification = enableReplyNotification;
         return this;
@@ -493,6 +496,10 @@ public class QiscusChatConfig {
 
     public void setNotificationBuilderInterceptor(QiscusNotificationBuilderInterceptor notificationBuilderInterceptor) {
         this.notificationBuilderInterceptor = notificationBuilderInterceptor;
+    }
+
+    public void setReplyNotificationHandler(ReplyNotificationHandler replyNotificationHandler) {
+        this.replyNotificationHandler = replyNotificationHandler;
     }
 
     public QiscusChatConfig setNotificationTitleHandler(NotificationTitleHandler notificationTitleHandler) {
@@ -839,7 +846,7 @@ public class QiscusChatConfig {
         return notificationClickListener;
     }
 
-    public ReplyNotificationHandler sendReplyNotificationHandler() {
+    public ReplyNotificationHandler getReplyNotificationHandler() {
         return replyNotificationHandler;
     }
 

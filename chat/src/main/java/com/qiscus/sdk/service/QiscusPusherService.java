@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -203,7 +204,7 @@ public class QiscusPusherService extends Service {
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
-        if (Qiscus.getChatConfig().isEnableReplyNotification()) {
+        if (Qiscus.getChatConfig().isEnableReplyNotification() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String getRepliedTo = (comment.isGroupMessage()) ? comment.getRoomName() : comment.getSender();
             RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
                     .setLabel(getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
