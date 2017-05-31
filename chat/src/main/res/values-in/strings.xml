@@ -84,5 +84,6 @@
     <string name="qiscus_date_and_time">%1$s, jam %2$s</string>
     <string name="qiscus_date_format">dd MMMM yyyy</string>
     <string name="qiscus_hour_format">HH:mm</string>
+    <string name="qiscus_reply_to">JAWAB %1$s</string>
     <string name="qiscus_no_file_manager">Maaf, sepertinya ponsel anda tidak memiliki aplikasi yang bisa menangani hal ini!</string>
 </resources>

@@ -19,13 +19,16 @@ package com.qiscus.sdk.data.model;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.QiscusGroupChatActivity;
@@ -124,6 +127,7 @@ public class QiscusChatConfig {
     private int notificationSmallIcon = R.drawable.ic_qiscus_notif_app;
     private int notificationBigIcon = R.drawable.ic_qiscus_notif_app;
     private boolean enableAvatarAsNotificationIcon = true;
+    private boolean enableReplyNotification = false;
     private QiscusNotificationBuilderInterceptor notificationBuilderInterceptor;
 
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
@@ -154,6 +158,19 @@ public class QiscusChatConfig {
                         throwable.printStackTrace();
                         Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     });
+
+    private ReplyNotificationHandler replyNotificationHandler =
+            (context, qiscusComment) -> QiscusApi.getInstance().postComment(qiscusComment)
+                    .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(commentSend -> {
+                        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusComment.getRoomId());
+                    }, throwable -> {
+                        throwable.printStackTrace();
+                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
 
@@ -384,6 +401,12 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public QiscusChatConfig setEnableReplyNotification(boolean enableReplyNotification) {
+        this.enableReplyNotification = enableReplyNotification;
+        return this;
+    }
+
     public QiscusChatConfig setStopRecordIcon(@DrawableRes int stopRecordIcon) {
         this.stopRecordIcon = stopRecordIcon;
         return this;
@@ -473,6 +496,11 @@ public class QiscusChatConfig {
 
     public void setNotificationBuilderInterceptor(QiscusNotificationBuilderInterceptor notificationBuilderInterceptor) {
         this.notificationBuilderInterceptor = notificationBuilderInterceptor;
+    }
+
+    public QiscusChatConfig setReplyNotificationHandler(ReplyNotificationHandler replyNotificationHandler) {
+        this.replyNotificationHandler = replyNotificationHandler;
+        return this;
     }
 
     public QiscusChatConfig setNotificationTitleHandler(NotificationTitleHandler notificationTitleHandler) {
@@ -803,6 +831,10 @@ public class QiscusChatConfig {
         return enableAvatarAsNotificationIcon;
     }
 
+    public boolean isEnableReplyNotification() {
+        return enableReplyNotification;
+    }
+
     public QiscusNotificationBuilderInterceptor getNotificationBuilderInterceptor() {
         return notificationBuilderInterceptor;
     }
@@ -813,6 +845,10 @@ public class QiscusChatConfig {
 
     public NotificationClickListener getNotificationClickListener() {
         return notificationClickListener;
+    }
+
+    public ReplyNotificationHandler getReplyNotificationHandler() {
+        return replyNotificationHandler;
     }
 
     public boolean isEnablePushNotification() {

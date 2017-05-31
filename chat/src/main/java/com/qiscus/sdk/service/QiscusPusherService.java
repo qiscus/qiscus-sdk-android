@@ -23,10 +23,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.RemoteInput;
 import android.support.v4.util.Pair;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -72,6 +74,7 @@ import rx.schedulers.Schedulers;
 public class QiscusPusherService extends Service {
     private static final String TAG = QiscusPusherService.class.getSimpleName();
     private static SpannableStringBuilder fileMessage;
+    public static final String KEY_NOTIFICATION_REPLY = "KEY_NOTIFICATION_REPLY";
 
     static {
         fileMessage = new SpannableStringBuilder(QiscusAndroidUtil.getString(R.string.qiscus_send_attachment));
@@ -182,9 +185,12 @@ public class QiscusPusherService extends Service {
     }
 
     private void pushNotification(QiscusComment comment, String messageText, Bitmap largeIcon) {
+
+        // Define PendingIntent for Reply action
+        PendingIntent pendingIntent;
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        pendingIntent = PendingIntent.getBroadcast(this, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
@@ -197,6 +203,19 @@ public class QiscusPusherService extends Service {
                 .setGroup("CHAT_NOTIF_" + comment.getRoomId())
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+
+        if (Qiscus.getChatConfig().isEnableReplyNotification() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String getRepliedTo = (comment.isGroupMessage()) ? comment.getRoomName() : comment.getSender();
+            RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
+                    .setLabel(getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
+                    .build();
+
+            NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
+                    android.R.drawable.ic_menu_send, getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()), pendingIntent)
+                    .addRemoteInput(remoteInput)
+                    .build();
+            notificationBuilder.addAction(replyAction);
+        }
 
         boolean cancel = false;
         if (Qiscus.getChatConfig().getNotificationBuilderInterceptor() != null) {
@@ -232,6 +251,7 @@ public class QiscusPusherService extends Service {
         }
         inboxStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
         notificationBuilder.setStyle(inboxStyle);
+
 
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(this)
                 .notify(comment.getRoomId(), notificationBuilder.build()));
