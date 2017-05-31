@@ -498,8 +498,9 @@ public class QiscusChatConfig {
         this.notificationBuilderInterceptor = notificationBuilderInterceptor;
     }
 
-    public void setReplyNotificationHandler(ReplyNotificationHandler replyNotificationHandler) {
+    public QiscusChatConfig setReplyNotificationHandler(ReplyNotificationHandler replyNotificationHandler) {
         this.replyNotificationHandler = replyNotificationHandler;
+        return this;
     }
 
     public QiscusChatConfig setNotificationTitleHandler(NotificationTitleHandler notificationTitleHandler) {
