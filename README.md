@@ -1,6 +1,6 @@
 # Qiscus SDK Android
 
-<p align="center"><br/><img src="https://raw.githubusercontent.com/qiscus/qiscus-sdk-android/master/screenshot/device-2017-06-02-093226.png" width="40%" /><br/></p>
+<p align="center"><br/><img src="https://raw.githubusercontent.com/qiscus/qiscus-sdk-android/master/screenshot/device-2017-06-02-093226.png" width="37%" /><br/></p>
 
 # Quick Start
 
