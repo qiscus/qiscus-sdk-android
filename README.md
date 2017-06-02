@@ -243,11 +243,11 @@ QiscusApi.getInstance()
 
 ### Inviting users to an existing Room
 
-Currently we recommend to invite user into existing room through our **REST API** for simplicity and security reason
+Currently we recommend to invite user into existing room through our [**REST API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason
 
 ### Leaving a Group Room
 
-Currently we recommend to kick user out of specific room through our **REST API** for simplicity and security reason
+Currently we recommend to kick user out of specific room through our [**REST API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason
 
 # Event Handler
 
