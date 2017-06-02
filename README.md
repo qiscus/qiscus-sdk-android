@@ -21,7 +21,7 @@ Done! Now you can use the APP_ID into your apps and get chat functionality by im
 Add to your project build.gradle
 
 
-```
+```groovy
 allprojects {
     repositories {
         .....
@@ -33,7 +33,7 @@ allprojects {
 Then add to your app module build.gradle
 
 
-```
+```groovy
 dependencies {
     compile 'com.qiscus.sdk:chat:1.19.1'
 }
@@ -45,7 +45,7 @@ dependencies {
 
 Init Qiscus at your application class with your application ID
 
-```
+```java
 public class SampleApps extends Application {
     @Override
     public void onCreate() {
@@ -57,7 +57,7 @@ public class SampleApps extends Application {
 
 Before user can start chatting each other, they must login to qiscus engine.
 
-```
+```java
 Qiscus.setUser("user@email.com", "userKey")
       .withUsername("Tony Stark")
       .withAvatarUrl("http://avatar.url.com/handsome.jpg")
@@ -92,7 +92,7 @@ Qiscus.setUser("user@email.com", "userKey")
 Updating user profile and details is simply by re-init the user using new details :
 
 
-```
+```java
 Qiscus.setUser("user@email.com", "userKey")
       .withUsername("Tony Stark")
       .withAvatarUrl("http://avatar.url.com/handsome.jpg")
@@ -126,7 +126,7 @@ Qiscus.setUser("user@email.com", "userKey")
 
 Whenever you no longer want the user to receive update 
 
-```
+```java
 Qiscus.clearUser();
 ```
 
@@ -138,7 +138,7 @@ Qiscus.clearUser();
 
 Start chat with target is very easy, all you need is just call
 
-```
+```java
 Qiscus.buildChatWith("jhon.doe@gmail.com")
       .withTitle("Jhon Doe")
       .build(this, new Qiscus.ChatActivityBuilderListener() {
@@ -172,7 +172,7 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
 Qiscus also support group chat. To create new group chat, all you need is just call
 
 
-```
+```java
 Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@gmail.com", "user3@gmail.com"))
       .withAvatar("http://avatar.url.com/group.jpg")
       .build(new Qiscus.ChatBuilderListener() {
@@ -209,13 +209,13 @@ for accesing room that created by this call, you need to call it with its roomId
 
 When you already know your chat room id, you can easily go to that room. Just call
 
-```
+```java
 QiscusApi.getChatRoom(int roomId);
 ```
 
 For example :
 
-```
+```java
 QiscusApi.getInstance()
         .getChatRoom(123)
         .subscribeOn(Schedulers.io())
@@ -253,7 +253,7 @@ Currently we recommend to kick user out of specific room through our [**REST API
 
 **Implement QiscusChatPresenter.View to your Activity Or Fragment**
 
-```
+```java
 public class MainActivity extends AppCompatActivity implements QiscusChatPresenter.View {
     private QiscusChatPresenter qiscusChatPresenter;
 
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements QiscusChatPresent
 **EventBus, so you can listen event from anywhere, It does not matter whether it's an activity or not.**
 For example from your application class
 
-```
+```java
 public class SampleApps extends Application {
 
     @Override
@@ -391,7 +391,7 @@ public class SampleApps extends Application {
 
 Boring with default template? You can customized it, try it!, we have more items than those below code, its just example.
 
-```
+```java
 Qiscus.getChatConfig()
       .setStatusBarColor(R.color.blue)
       .setAppBarColor(R.color.red)
@@ -425,10 +425,28 @@ Here's a video showing how you can set up sample app for qiscus SDK
 Or you can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
 
 # Miscellaneous
+### Android Support Libraries
+Qiscus SDK is using appcompat libraries to support some features. If your apps using appcompat too, we highly recommended to using the latest stable appcompat version, or using the same version with Qiscus SDK. You can check the appcompat version of Qiscus SDK [here](https://github.com/qiscus/qiscus-sdk-android/blob/master/chat/build.gradle#L102). You can also force Qiscus SDK to use your apps appcompat verion. Use "exclude group" at your build.gradle, for example:
+
+```groovy
+//Qiscus sdk without android support libraries
+compile('com.qiscus.sdk:chat:1.19.1') {
+    transitive = true
+    exclude group: 'com.android.support'
+}
+
+//Qiscus sdk needs all of this android support libraries
+//Just add the same version with your apps dependencies
+compile 'com.android.support:support-v4:yourVersion'
+compile 'com.android.support:appcompat-v7:yourVersion'
+compile 'com.android.support:recyclerview-v7:yourVersion'
+compile 'com.android.support:design:yourVersion'
+compile 'com.android.support:customtabs:yourVersion'
+```
 
 ### Rx Java support
 
-```
+```java
 // Setup qiscus account with rxjava example
 Qiscus.setUser("user@email.com", "password")
       .withUsername("Tony Stark")
