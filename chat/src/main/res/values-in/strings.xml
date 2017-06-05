@@ -86,4 +86,5 @@
     <string name="qiscus_hour_format">HH:mm</string>
     <string name="qiscus_reply_to">JAWAB %1$s</string>
     <string name="qiscus_no_file_manager">Maaf, sepertinya ponsel anda tidak memiliki aplikasi yang bisa menangani hal ini!</string>
+    <string name="qiscus_voice_message">Pesan suara</string>
 </resources>
