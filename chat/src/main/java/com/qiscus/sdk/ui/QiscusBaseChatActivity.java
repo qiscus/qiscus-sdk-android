@@ -199,7 +199,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     private boolean onlyTextOrLinkType(List<QiscusComment> selectedComments) {
         for (QiscusComment selectedComment : selectedComments) {
             if (selectedComment.getType() != QiscusComment.Type.TEXT
-                    && selectedComment.getType() != QiscusComment.Type.LINK) {
+                    && selectedComment.getType() != QiscusComment.Type.LINK
+                    &&  selectedComment.getType() != QiscusComment.Type.REPLY) {
                 return false;
             }
         }

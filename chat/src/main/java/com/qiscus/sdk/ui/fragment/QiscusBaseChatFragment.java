@@ -649,7 +649,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     || qiscusComment.getType() == QiscusComment.Type.LINK
                     || qiscusComment.getType() == QiscusComment.Type.IMAGE
                     || qiscusComment.getType() == QiscusComment.Type.AUDIO
-                    || qiscusComment.getType() == QiscusComment.Type.FILE) {
+                    || qiscusComment.getType() == QiscusComment.Type.FILE
+                    || qiscusComment.getType() == QiscusComment.Type.REPLY) {
                 toggleSelectComment(qiscusComment);
             }
         }
@@ -688,7 +689,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 || qiscusComment.getType() == QiscusComment.Type.LINK
                 || qiscusComment.getType() == QiscusComment.Type.IMAGE
                 || qiscusComment.getType() == QiscusComment.Type.AUDIO
-                || qiscusComment.getType() == QiscusComment.Type.FILE)) {
+                || qiscusComment.getType() == QiscusComment.Type.FILE
+                || qiscusComment.getType() == QiscusComment.Type.REPLY)) {
             toggleSelectComment(qiscusComment);
         }
     }
