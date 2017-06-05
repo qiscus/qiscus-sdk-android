@@ -48,7 +48,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private TextView content;
     private ImageView image;
     private ImageView icon;
-    private View close;
+    private View closeView;
     private QiscusComment originComment;
 
     public QiscusReplyPreviewView(Context context) {
@@ -68,7 +68,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
         content = (TextView) findViewById(R.id.origin_content);
         image = (ImageView) findViewById(R.id.origin_image);
         icon = (ImageView) findViewById(R.id.icon);
-        close = findViewById(R.id.cancel_reply);
+        closeView = findViewById(R.id.cancel_reply);
     }
 
     private void applyAttrs(Context context, AttributeSet attrs) {
@@ -77,7 +77,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
 
     private void initLayout() {
         bind(originComment);
-        close.setOnClickListener(v -> close());
+        closeView.setOnClickListener(v -> close());
     }
 
     public QiscusComment getOriginComment() {
