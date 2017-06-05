@@ -50,6 +50,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected OnItemClickListener itemClickListener;
     protected OnLongItemClickListener longItemClickListener;
     protected QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener;
+    protected ReplyItemClickListener replyItemClickListener;
 
     protected QiscusAccount qiscusAccount;
     protected int lastDeliveredCommentId;
@@ -191,6 +192,10 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     public void setChatButtonClickListener(QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener) {
         this.chatButtonClickListener = chatButtonClickListener;
+    }
+
+    public void setReplyItemClickListener(ReplyItemClickListener replyItemClickListener) {
+        this.replyItemClickListener = replyItemClickListener;
     }
 
     public SortedList<E> getData() {

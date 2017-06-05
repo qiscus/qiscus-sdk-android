@@ -89,6 +89,8 @@ public class QiscusComment implements Parcelable {
     private MediaObserver observer;
     private MediaPlayer player;
 
+    private QiscusComment replyTo;
+
     public static QiscusComment generateMessage(String content, int roomId, int topicId) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
         QiscusComment qiscusComment = new QiscusComment();
@@ -128,6 +130,7 @@ public class QiscusComment implements Parcelable {
         selected = in.readByte() != 0;
         rawType = in.readString();
         extraPayload = in.readString();
+        replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
     }
 
     public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
@@ -278,6 +281,14 @@ public class QiscusComment implements Parcelable {
         this.extraPayload = extraPayload;
     }
 
+    public QiscusComment getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(QiscusComment replyTo) {
+        this.replyTo = replyTo;
+    }
+
     public boolean isAttachment() {
         String trimmedMessage = message.trim();
         return trimmedMessage.startsWith("[file]") && trimmedMessage.endsWith("[/file]");
@@ -385,6 +396,9 @@ public class QiscusComment implements Parcelable {
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("buttons")) {
             return Type.BUTTONS;
         } else if (!isAttachment()) {
+            if (replyTo != null) {
+                return Type.REPLY;
+            }
             if (containsUrl()) {
                 return Type.LINK;
             }
@@ -606,10 +620,11 @@ public class QiscusComment implements Parcelable {
         dest.writeByte((byte) (selected ? 1 : 0));
         dest.writeString(rawType);
         dest.writeString(extraPayload);
+        dest.writeParcelable(replyTo, flags);
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS
+        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY
     }
 
     public interface ProgressListener {

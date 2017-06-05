@@ -71,24 +71,26 @@
             android:padding="8dp">
 
             <View
+                android:id="@+id/bar"
                 android:layout_width="4dp"
                 android:layout_height="match_parent"
                 android:background="@color/qiscus_primary"/>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/origin_sender"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginStart="3dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginStart="1dp"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="@color/qiscus_primary"
@@ -102,27 +104,38 @@
                     android:orientation="horizontal">
 
                     <ImageView
+                        android:id="@+id/icon"
                         android:layout_width="14dp"
                         android:layout_height="14dp"
-                        android:layout_marginEnd="2dp"
-                        android:layout_marginRight="2dp"
-                        android:src="@drawable/ic_qiscus_add_audio"
-                        android:tint="@color/qiscus_secondary_text"/>
+                        android:layout_marginEnd="1dp"
+                        android:layout_marginRight="1dp"
+                        android:src="@drawable/ic_qiscus_file"
+                        android:tint="@color/qiscus_secondary_text"
+                        android:visibility="gone"/>
 
-                    <TextView
+                    <com.vanniktech.emoji.EmojiTextView
                         android:id="@+id/origin_content"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginStart="1dp"
                         android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="@string/qiscus_voice_message"
+                        android:maxLines="2"
                         android:textColor="@color/qiscus_secondary_text"
                         android:textSize="12sp"/>
-
                 </LinearLayout>
 
             </LinearLayout>
+
+
+            <ImageView
+                android:id="@+id/origin_image"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                android:scaleType="centerCrop"
+                android:visibility="gone"/>
 
         </LinearLayout>
 
