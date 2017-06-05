@@ -471,7 +471,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (messageEditTextContainer != null) {
                 messageEditTextContainer.setVisibility(View.VISIBLE);
             }
-            if (replyPreviewView != null) {
+            if (replyPreviewView != null && replyPreviewView.getOriginComment() != null) {
                 replyPreviewView.setVisibility(View.VISIBLE);
             }
         }
