@@ -415,6 +415,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 onItemCommentClick((QiscusComment) chatAdapter.getData().get(position)));
         chatAdapter.setOnLongItemClickListener((view, position) ->
                 onItemCommentLongClick((QiscusComment) chatAdapter.getData().get(position)));
+        chatAdapter.setReplyItemClickListener(comment -> scrollToComment(comment.getReplyTo()));
         chatAdapter.setChatButtonClickListener(this);
         messageRecyclerView.setUpAsBottomList();
         chatLayoutManager = (LinearLayoutManager) messageRecyclerView.getLayoutManager();
@@ -940,6 +941,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageRecyclerView.smoothScrollToPosition(0);
         if (newMessageButton != null) {
             newMessageButton.setVisibility(View.GONE);
+        }
+    }
+
+    protected void scrollToComment(QiscusComment comment) {
+        int position = chatAdapter.getData().indexOf(comment);
+        if (position >= 0) {
+            messageRecyclerView.scrollToPosition(position);
         }
     }
 
