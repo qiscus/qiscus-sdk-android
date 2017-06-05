@@ -47,13 +47,13 @@ public class QiscusChatConfig {
     private int titleColor = R.color.qiscus_white;
     private int subtitleColor = R.color.qiscus_dark_white;
     private int rightBubbleColor = R.color.qiscus_primary_light;
-    private int leftBubbleColor = R.color.qiscus_primary;
+    private int leftBubbleColor = R.color.qiscus_left_bubble;
     private int rightBubbleTextColor = R.color.qiscus_primary_text;
-    private int leftBubbleTextColor = R.color.qiscus_white;
+    private int leftBubbleTextColor = R.color.qiscus_primary_text;
     private int rightBubbleTimeColor = R.color.qiscus_secondary_text;
-    private int leftBubbleTimeColor = R.color.qiscus_primary_light;
+    private int leftBubbleTimeColor = R.color.qiscus_secondary_text;
     private int rightLinkTextColor = R.color.qiscus_primary_text;
-    private int leftLinkTextColor = R.color.qiscus_white;
+    private int leftLinkTextColor = R.color.qiscus_primary_text;
     private int failedToSendMessageColor = R.color.qiscus_red;
     private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
@@ -63,11 +63,11 @@ public class QiscusChatConfig {
     private int leftProgressFinishedColor = R.color.qiscus_primary;
 
     private int accountLinkingTextColor = R.color.qiscus_primary;
-    private int accountLinkingBackground = R.color.qiscus_light_grey;
+    private int accountLinkingBackground = R.color.qiscus_account_linking_background;
     private String accountLinkingText = QiscusAndroidUtil.getString(R.string.qiscus_account_linking_text);
 
     private int buttonBubbleTextColor = R.color.qiscus_primary;
-    private int buttonBubbleBackBackground = R.color.qiscus_light_grey;
+    private int buttonBubbleBackBackground = R.color.qiscus_account_linking_background;
 
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;

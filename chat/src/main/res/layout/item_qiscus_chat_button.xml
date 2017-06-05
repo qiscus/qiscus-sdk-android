@@ -68,7 +68,7 @@
         android:layout_marginLeft="42dp"
         android:layout_marginStart="42dp"
         android:src="@drawable/ic_qiscus_arrow_bubble_primary"
-        android:tint="@color/qiscus_primary"/>
+        android:tint="@color/qiscus_left_bubble"/>
 
     <LinearLayout
         android:id="@+id/message"
@@ -92,8 +92,8 @@
             android:layout_marginTop="8dp"
             android:autoLink="web"
             android:linksClickable="true"
-            android:textColor="@color/qiscus_white"
-            android:textColorLink="@color/qiscus_white"
+            android:textColor="@color/qiscus_primary_text"
+            android:textColorLink="@color/qiscus_primary_text"
             android:textSize="16sp"/>
 
         <TextView
@@ -107,7 +107,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="48dp"
             android:gravity="end"
-            android:textColor="@color/qiscus_primary_light"
+            android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"/>
 
         <LinearLayout
