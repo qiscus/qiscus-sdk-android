@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.RequiresApi;
@@ -104,6 +105,10 @@ public class QiscusChatConfig {
     private int showAttachmentPanelIcon = R.drawable.ic_qiscus_attach;
     private int hideAttachmentPanelIcon = R.drawable.ic_qiscus_back_to_keyboard;
     private int hideAttachmentPanelBackgroundColor = R.color.qiscus_keyboard_background;
+
+    private int replyBarColor = R.color.qiscus_primary;
+    private int replySenderColor = R.color.qiscus_primary;
+    private int replyMessageColor = R.color.qiscus_secondary_text;
 
     /**
      * @deprecated please use {@link #sendButtonIcon} instead
@@ -533,6 +538,21 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setReplyBarColor(@ColorRes int replyBarColor) {
+        this.replyBarColor = replyBarColor;
+        return this;
+    }
+
+    public QiscusChatConfig setReplySenderColor(@ColorRes int replySenderColor) {
+        this.replySenderColor = replySenderColor;
+        return this;
+    }
+
+    public QiscusChatConfig setReplyMessageColor(@ColorRes int replyMessageColor) {
+        this.replyMessageColor = replyMessageColor;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -865,5 +885,20 @@ public class QiscusChatConfig {
 
     public QiscusImageCompressionConfig getQiscusImageCompressionConfig() {
         return qiscusImageCompressionConfig;
+    }
+
+    @ColorRes
+    public int getReplyBarColor() {
+        return replyBarColor;
+    }
+
+    @ColorRes
+    public int getReplySenderColor() {
+        return replySenderColor;
+    }
+
+    @ColorRes
+    public int getReplyMessageColor() {
+        return replyMessageColor;
     }
 }

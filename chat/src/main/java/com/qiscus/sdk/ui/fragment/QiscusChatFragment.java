@@ -33,6 +33,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
+import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 
 import java.io.File;
 
@@ -260,6 +261,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected QiscusAudioRecorderView getRecordAudioPanel(View view) {
         return (QiscusAudioRecorderView) view.findViewById(R.id.record_panel);
+    }
+
+    @Nullable
+    @Override
+    protected QiscusReplyPreviewView getReplyPreviewView(View view) {
+        return (QiscusReplyPreviewView) view.findViewById(R.id.reply_preview);
     }
 
     @Override

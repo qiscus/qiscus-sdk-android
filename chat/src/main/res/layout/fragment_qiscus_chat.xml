@@ -94,6 +94,12 @@
                 android:visibility="gone"/>
         </FrameLayout>
 
+        <com.qiscus.sdk.ui.view.QiscusReplyPreviewView
+            android:id="@+id/reply_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
         <LinearLayout
             android:id="@+id/box"
             android:layout_width="match_parent"
