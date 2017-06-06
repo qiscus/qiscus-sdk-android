@@ -434,22 +434,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private boolean isValidChainingComments(List<QiscusComment> qiscusComments) {
-        if (qiscusComments.isEmpty()) return false;
-
         qiscusComments = cleanFailedComments(qiscusComments);
-        boolean containsLastValidComment = qiscusComments.size() <= 0;
         int size = qiscusComments.size();
-
-        if (size == 1) {
-            return qiscusComments.get(0).getCommentBeforeId() == 0;
-        }
-
         for (int i = 0; i < size - 1; i++) {
             if (qiscusComments.get(i).getCommentBeforeId() != qiscusComments.get(i + 1).getId()) {
                 return false;
             }
         }
-        return containsLastValidComment;
+        return true;
     }
 
     public void loadOlderCommentThan(QiscusComment qiscusComment) {

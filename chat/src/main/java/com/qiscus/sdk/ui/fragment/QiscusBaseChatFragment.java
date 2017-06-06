@@ -937,7 +937,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void showCommentsAndScrollToTop(List<QiscusComment> qiscusComments) {
         if (!qiscusComments.isEmpty()) {
             chatAdapter.addOrUpdate(qiscusComments);
-            messageRecyclerView.scrollToPosition(chatAdapter.getItemCount());
+            messageRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
         }
     }
 
