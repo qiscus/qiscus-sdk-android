@@ -933,6 +933,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         chatAdapter.updateLastReadComment(lastReadCommentId);
     }
 
+    @Override
+    public void showCommentsAndScrollToTop(List<QiscusComment> qiscusComments) {
+        if (!qiscusComments.isEmpty()) {
+            chatAdapter.addOrUpdate(qiscusComments);
+            messageRecyclerView.scrollToPosition(chatAdapter.getItemCount());
+        }
+    }
+
     private boolean shouldShowNewMessageButton() {
         return chatLayoutManager.findFirstVisibleItemPosition() > 2;
     }
@@ -957,6 +965,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         int position = chatAdapter.getData().indexOf(comment);
         if (position >= 0) {
             messageRecyclerView.scrollToPosition(position);
+        } else {
+            qiscusChatPresenter.loadUntilComment(comment);
         }
     }
 

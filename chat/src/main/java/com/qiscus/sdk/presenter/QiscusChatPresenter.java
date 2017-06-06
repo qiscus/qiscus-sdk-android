@@ -433,6 +433,25 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         return containsLastValidComment;
     }
 
+    private boolean isValidChainingComments(List<QiscusComment> qiscusComments) {
+        if (qiscusComments.isEmpty()) return false;
+
+        qiscusComments = cleanFailedComments(qiscusComments);
+        boolean containsLastValidComment = qiscusComments.size() <= 0;
+        int size = qiscusComments.size();
+
+        if (size == 1) {
+            return qiscusComments.get(0).getCommentBeforeId() == 0;
+        }
+
+        for (int i = 0; i < size - 1; i++) {
+            if (qiscusComments.get(i).getCommentBeforeId() != qiscusComments.get(i + 1).getId()) {
+                return false;
+            }
+        }
+        return containsLastValidComment;
+    }
+
     public void loadOlderCommentThan(QiscusComment qiscusComment) {
         view.showLoadMoreLoading();
         Qiscus.getDataStore().getObservableOlderCommentsThan(qiscusComment, currentTopicId, 40)
@@ -707,6 +726,42 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    public void loadUntilComment(QiscusComment qiscusComment) {
+        Qiscus.getDataStore().getObservableCommentsAfter(qiscusComment, currentTopicId)
+                .flatMap(Observable::from)
+                .toSortedList(commentComparator)
+                .doOnNext(comments -> {
+                    checkForLastRead(comments);
+                    for (QiscusComment comment : comments) {
+                        if (comment.getState() == QiscusComment.STATE_SENDING) {
+                            comment.setState(QiscusComment.STATE_FAILED);
+                            Qiscus.getDataStore().addOrUpdate(comment);
+                        } else if (comment.getState() != QiscusComment.STATE_FAILED
+                                && comment.getState() != QiscusComment.STATE_READ) {
+                            if (comment.getId() > lastDeliveredCommentId.get()) {
+                                comment.setState(QiscusComment.STATE_ON_QISCUS);
+                            } else if (comment.getId() > lastReadCommentId.get()) {
+                                comment.setState(QiscusComment.STATE_DELIVERED);
+                            } else {
+                                comment.setState(QiscusComment.STATE_READ);
+                            }
+                            Qiscus.getDataStore().addOrUpdate(comment);
+                        }
+                    }
+                })
+                .flatMap(comments -> isValidChainingComments(comments) ?
+                        Observable.from(comments).toSortedList(commentComparator) :
+                        Observable.just(new ArrayList<QiscusComment>()))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(comments -> {
+                    if (view != null) {
+                        view.showCommentsAndScrollToTop(comments);
+                    }
+                }, Throwable::printStackTrace);
+    }
+
     @Override
     public void detachView() {
         super.detachView();
@@ -746,5 +801,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void startPhotoViewer(QiscusComment qiscusComment);
 
         void onUserTyping(String user, boolean typing);
+
+        void showCommentsAndScrollToTop(List<QiscusComment> qiscusComments);
     }
 }
