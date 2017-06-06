@@ -143,6 +143,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         while (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = getChatRoom(QiscusDb.RoomMemberTable.getRoomId(cursor));
             if (qiscusChatRoom == null) {
+                cursor.close();
                 return null;
             }
             if (!qiscusChatRoom.isGroup()) {
