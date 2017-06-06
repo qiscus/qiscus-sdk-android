@@ -21,12 +21,16 @@
     android:layout_height="wrap_content"
     android:background="@color/qiscus_white"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="4dp">
 
     <View
         android:id="@+id/bar"
         android:layout_width="4dp"
         android:layout_height="match_parent"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
         android:background="@color/qiscus_primary"/>
 
     <ImageView
@@ -95,9 +99,11 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="4dp"
+        android:layout_marginRight="8dp"
         android:layout_marginStart="4dp"
         android:scaleType="centerCrop"
-        android:tint="@color/qiscus_secondary_text"
-        android:src="@drawable/ic_qiscus_action_close"/>
+        android:src="@drawable/ic_qiscus_action_close"
+        android:tint="@color/qiscus_secondary_text"/>
 </LinearLayout>
