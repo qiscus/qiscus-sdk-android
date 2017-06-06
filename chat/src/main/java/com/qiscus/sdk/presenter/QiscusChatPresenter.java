@@ -745,6 +745,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     public void loadUntilComment(QiscusComment qiscusComment) {
         Qiscus.getDataStore().getObservableCommentsAfter(qiscusComment, currentTopicId)
+                .map(comments -> comments.contains(qiscusComment) ? comments : new ArrayList<QiscusComment>())
                 .flatMap(Observable::from)
                 .toSortedList(commentComparator)
                 .doOnNext(comments -> {
