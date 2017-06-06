@@ -269,6 +269,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return (QiscusReplyPreviewView) view.findViewById(R.id.reply_preview);
     }
 
+    @Nullable
+    @Override
+    protected View getGotoBottomButton(View view) {
+        return view.findViewById(R.id.button_go_bottom);
+    }
+
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
         return new QiscusChatAdapter(getActivity(), qiscusChatRoom.isGroup());

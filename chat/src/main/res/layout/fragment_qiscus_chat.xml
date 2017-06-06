@@ -92,6 +92,21 @@
                 android:textColor="@color/qiscus_white"
                 android:textSize="14sp"
                 android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/button_go_bottom"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="end|bottom"
+                android:layout_marginBottom="12dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/qiscus_circle_divider"
+                android:elevation="1dp"
+                android:padding="2dp"
+                android:src="@drawable/ic_qiscus_action_bottom"
+                android:tint="@color/qiscus_secondary_text"
+                android:visibility="gone"/>
         </FrameLayout>
 
         <com.qiscus.sdk.ui.view.QiscusReplyPreviewView

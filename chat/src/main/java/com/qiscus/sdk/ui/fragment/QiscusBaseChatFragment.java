@@ -149,6 +149,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable protected ImageView toggleEmojiButton;
     @Nullable protected QiscusAudioRecorderView recordAudioPanel;
     @Nullable protected QiscusReplyPreviewView replyPreviewView;
+    @Nullable protected View goToBottomButton;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -212,6 +213,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         toggleEmojiButton = getToggleEmojiButton(view);
         recordAudioPanel = getRecordAudioPanel(view);
         replyPreviewView = getReplyPreviewView(view);
+        goToBottomButton = getGotoBottomButton(view);
 
         if (toggleEmojiButton != null && !(messageEditText instanceof EmojiEditText)) {
             throw new RuntimeException("Please use EmojiEditText as message text field if you want to using EmojiKeyboard.");
@@ -272,6 +274,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (recordAudioPanel != null) {
             recordAudioPanel.setRecordListener(this);
+        }
+        if (goToBottomButton != null) {
+            goToBottomButton.setOnClickListener(v -> messageRecyclerView.scrollToPosition(0));
         }
     }
 
@@ -372,6 +377,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Nullable
     protected abstract QiscusReplyPreviewView getReplyPreviewView(View view);
+
+    @Nullable
+    protected abstract View getGotoBottomButton(View view);
 
     @Override
     public void onAttach(Context context) {
@@ -1000,12 +1008,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onMiddleOffListMessage() {
+        if (goToBottomButton != null && goToBottomButton.getVisibility() == View.GONE) {
+            goToBottomButton.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onBottomOffListMessage() {
         if (newMessageButton != null) {
             newMessageButton.setVisibility(View.GONE);
+        }
+        if (goToBottomButton != null && goToBottomButton.getVisibility() == View.VISIBLE) {
+            goToBottomButton.setVisibility(View.GONE);
         }
     }
 

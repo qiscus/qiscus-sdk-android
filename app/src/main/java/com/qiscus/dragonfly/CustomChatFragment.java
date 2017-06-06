@@ -254,6 +254,12 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return null;
     }
 
+    @Nullable
+    @Override
+    protected View getGotoBottomButton(View view) {
+        return null;
+    }
+
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
         return new QiscusChatAdapter(getActivity());
