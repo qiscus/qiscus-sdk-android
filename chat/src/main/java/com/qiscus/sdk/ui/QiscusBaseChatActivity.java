@@ -182,10 +182,10 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
         if (actionMode != null) {
             actionMode.setTitle(getString(R.string.qiscus_selected_comment, selectedComments.size()));
-            if (selectedComments.size() > 1) {
-                actionMode.getMenu().findItem(R.id.action_reply).setVisible(false);
-            } else {
+            if (selectedComments.size() == 1 && selectedComments.get(0).getState() >= QiscusComment.STATE_ON_QISCUS) {
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
+            } else {
+                actionMode.getMenu().findItem(R.id.action_reply).setVisible(false);
             }
 
             if (onlyTextOrLinkType(selectedComments)) {
@@ -200,7 +200,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         for (QiscusComment selectedComment : selectedComments) {
             if (selectedComment.getType() != QiscusComment.Type.TEXT
                     && selectedComment.getType() != QiscusComment.Type.LINK
-                    &&  selectedComment.getType() != QiscusComment.Type.REPLY) {
+                    && selectedComment.getType() != QiscusComment.Type.REPLY) {
                 return false;
             }
         }
