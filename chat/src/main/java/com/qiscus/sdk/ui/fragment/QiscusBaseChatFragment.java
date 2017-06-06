@@ -65,6 +65,7 @@ import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
+import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
@@ -147,6 +148,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable protected ImageView hideAttachmentButton;
     @Nullable protected ImageView toggleEmojiButton;
     @Nullable protected QiscusAudioRecorderView recordAudioPanel;
+    @Nullable protected QiscusReplyPreviewView replyPreviewView;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -209,6 +211,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         toggleEmojiButton = getToggleEmojiButton(view);
         recordAudioPanel = getRecordAudioPanel(view);
+        replyPreviewView = getReplyPreviewView(view);
 
         if (toggleEmojiButton != null && !(messageEditText instanceof EmojiEditText)) {
             throw new RuntimeException("Please use EmojiEditText as message text field if you want to using EmojiKeyboard.");
@@ -367,6 +370,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable
     protected abstract QiscusAudioRecorderView getRecordAudioPanel(View view);
 
+    @Nullable
+    protected abstract QiscusReplyPreviewView getReplyPreviewView(View view);
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -409,6 +415,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 onItemCommentClick((QiscusComment) chatAdapter.getData().get(position)));
         chatAdapter.setOnLongItemClickListener((view, position) ->
                 onItemCommentLongClick((QiscusComment) chatAdapter.getData().get(position)));
+        chatAdapter.setReplyItemClickListener(comment -> scrollToComment(comment.getReplyTo()));
         chatAdapter.setChatButtonClickListener(this);
         messageRecyclerView.setUpAsBottomList();
         chatLayoutManager = (LinearLayoutManager) messageRecyclerView.getLayoutManager();
@@ -452,11 +459,21 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
+    public void replyComment(QiscusComment originComment) {
+        if (replyPreviewView != null) {
+            replyPreviewView.bind(originComment);
+            hideAttachmentPanel();
+        }
+    }
+
     protected void hideAttachmentPanel() {
         if (attachmentPanel != null) {
             attachmentPanel.setVisibility(View.GONE);
             if (messageEditTextContainer != null) {
                 messageEditTextContainer.setVisibility(View.VISIBLE);
+            }
+            if (replyPreviewView != null && replyPreviewView.getOriginComment() != null) {
+                replyPreviewView.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -467,6 +484,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (messageEditTextContainer != null) {
                 messageEditTextContainer.setVisibility(View.GONE);
                 QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
+            }
+            if (replyPreviewView != null) {
+                replyPreviewView.setVisibility(View.GONE);
             }
         }
     }
@@ -581,6 +601,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (recordAudioLayout != null) {
             recordAudioLayout.setVisibility(chatConfig.isEnableRecordAudio() ? View.VISIBLE : View.GONE);
         }
+        if (replyPreviewView != null) {
+            replyPreviewView.setBarColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplyBarColor()));
+            replyPreviewView.setSenderColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplySenderColor()));
+            replyPreviewView.setContentColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplyMessageColor()));
+        }
     }
 
     protected Animation onLoadAnimation() {
@@ -622,7 +647,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
         } else {
             if (qiscusComment.getType() == QiscusComment.Type.TEXT
-                    || qiscusComment.getType() == QiscusComment.Type.LINK) {
+                    || qiscusComment.getType() == QiscusComment.Type.LINK
+                    || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                    || qiscusComment.getType() == QiscusComment.Type.AUDIO
+                    || qiscusComment.getType() == QiscusComment.Type.FILE
+                    || qiscusComment.getType() == QiscusComment.Type.REPLY) {
                 toggleSelectComment(qiscusComment);
             }
         }
@@ -658,7 +687,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void onItemCommentLongClick(QiscusComment qiscusComment) {
         if (chatAdapter.getSelectedComments().isEmpty()
                 && (qiscusComment.getType() == QiscusComment.Type.TEXT
-                || qiscusComment.getType() == QiscusComment.Type.LINK)) {
+                || qiscusComment.getType() == QiscusComment.Type.LINK
+                || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                || qiscusComment.getType() == QiscusComment.Type.AUDIO
+                || qiscusComment.getType() == QiscusComment.Type.FILE
+                || qiscusComment.getType() == QiscusComment.Type.REPLY)) {
             toggleSelectComment(qiscusComment);
         }
     }
@@ -700,6 +733,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void sendMessage(String message) {
         message = message.trim();
         if (!message.isEmpty()) {
+            if (replyPreviewView != null) {
+                QiscusComment repliedComment = replyPreviewView.getOriginComment();
+                if (repliedComment != null) {
+                    qiscusChatPresenter.sendReplyComment(message, repliedComment);
+                    messageEditText.setText("");
+                    replyPreviewView.close();
+                    return;
+                }
+            }
             qiscusChatPresenter.sendComment(message);
             messageEditText.setText("");
         }
@@ -891,6 +933,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         chatAdapter.updateLastReadComment(lastReadCommentId);
     }
 
+    @Override
+    public void showCommentsAndScrollToTop(List<QiscusComment> qiscusComments) {
+        if (!qiscusComments.isEmpty()) {
+            chatAdapter.addOrUpdate(qiscusComments);
+            messageRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
+        }
+    }
+
     private boolean shouldShowNewMessageButton() {
         return chatLayoutManager.findFirstVisibleItemPosition() > 2;
     }
@@ -908,6 +958,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageRecyclerView.smoothScrollToPosition(0);
         if (newMessageButton != null) {
             newMessageButton.setVisibility(View.GONE);
+        }
+    }
+
+    protected void scrollToComment(QiscusComment comment) {
+        int position = chatAdapter.getData().indexOf(comment);
+        if (position >= 0) {
+            messageRecyclerView.scrollToPosition(position);
+        } else {
+            qiscusChatPresenter.loadUntilComment(comment);
         }
     }
 

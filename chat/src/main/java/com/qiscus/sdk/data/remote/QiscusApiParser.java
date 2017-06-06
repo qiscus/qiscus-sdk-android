@@ -155,7 +155,8 @@ final class QiscusApiParser {
         if (jsonComment.has("type")) {
             qiscusComment.setRawType(jsonComment.get("type").getAsString());
             qiscusComment.setExtraPayload(jsonComment.get("payload").toString());
-            if (qiscusComment.getType() == QiscusComment.Type.BUTTONS) {
+            if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
+                    || qiscusComment.getType() == QiscusComment.Type.REPLY) {
                 JsonObject payload = jsonComment.get("payload").getAsJsonObject();
                 if (payload.has("text")) {
                     String text = payload.get("text").getAsString();

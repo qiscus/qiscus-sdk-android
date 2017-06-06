@@ -69,7 +69,7 @@
         android:layout_marginLeft="42dp"
         android:layout_marginStart="42dp"
         android:src="@drawable/ic_qiscus_arrow_bubble_primary"
-        android:tint="@color/qiscus_primary"/>
+        android:tint="@color/qiscus_left_bubble"/>
 
     <RelativeLayout
         android:id="@+id/message"
@@ -152,7 +152,7 @@
             android:layout_alignTop="@+id/holder"
             android:layout_centerHorizontal="true"
             android:src="@drawable/bg_qiscus_frame"
-            android:tint="@color/qiscus_primary"
+            android:tint="@color/qiscus_left_bubble"
             android:visibility="visible"/>
 
         <TextView
@@ -164,7 +164,7 @@
             android:layout_below="@+id/holder"
             android:layout_gravity="bottom"
             android:layout_marginTop="8dp"
-            android:textColor="@color/qiscus_primary_light"
+            android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"/>
 
     </RelativeLayout>

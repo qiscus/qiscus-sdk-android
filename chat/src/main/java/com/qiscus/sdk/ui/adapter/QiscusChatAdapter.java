@@ -24,10 +24,11 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusAccountLinkingViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusAudioViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusButtonMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusFileViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusImageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusLinkViewHolder;
-import com.qiscus.sdk.ui.adapter.viewholder.QiscusButtonMessageViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusReplyViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusTextViewHolder;
 
 /**
@@ -53,6 +54,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_BUTTONS = 12;
     private static final int TYPE_MESSAGE_MULTI_LINE_ME = 13;
     private static final int TYPE_MESSAGE_MULTI_LINE_OTHER = 14;
+    private static final int TYPE_MESSAGE_REPLY_ME = 15;
+    private static final int TYPE_MESSAGE_REPLY_OTHER = 16;
 
     public QiscusChatAdapter(Context context, boolean groupChat) {
         super(context, groupChat);
@@ -85,6 +88,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_ACCOUNT_LINKING;
             case BUTTONS:
                 return TYPE_BUTTONS;
+            case REPLY:
+                return TYPE_MESSAGE_REPLY_ME;
             default:
                 return TYPE_MESSAGE_ME;
         }
@@ -108,6 +113,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_ACCOUNT_LINKING;
             case BUTTONS:
                 return TYPE_BUTTONS;
+            case REPLY:
+                return TYPE_MESSAGE_REPLY_OTHER;
             default:
                 return TYPE_MESSAGE_OTHER;
         }
@@ -144,6 +151,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_multi_line_text_me;
             case TYPE_MESSAGE_MULTI_LINE_OTHER:
                 return R.layout.item_qiscus_chat_multi_line_text;
+            case TYPE_MESSAGE_REPLY_ME:
+                return R.layout.item_qiscus_chat_reply_me;
+            case TYPE_MESSAGE_REPLY_OTHER:
+                return R.layout.item_qiscus_chat_reply;
             default:
                 return R.layout.item_qiscus_chat_text;
         }
@@ -174,6 +185,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case TYPE_BUTTONS:
                 return new QiscusButtonMessageViewHolder(getView(parent, viewType), itemClickListener,
                         longItemClickListener, chatButtonClickListener);
+            case TYPE_MESSAGE_REPLY_ME:
+            case TYPE_MESSAGE_REPLY_OTHER:
+                return new QiscusReplyViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener,
+                        replyItemClickListener);
             default:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
         }

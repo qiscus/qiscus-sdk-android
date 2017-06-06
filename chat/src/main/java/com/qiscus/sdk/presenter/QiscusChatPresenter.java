@@ -197,6 +197,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void resendComment(QiscusComment qiscusComment) {
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
+        } else if (qiscusComment.getType() == QiscusComment.Type.REPLY) {
+            resendReplyComment(qiscusComment);
         } else {
             qiscusComment.setState(QiscusComment.STATE_SENDING);
             qiscusComment.setTime(new Date());
@@ -431,6 +433,17 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             }
         }
         return containsLastValidComment;
+    }
+
+    private boolean isValidChainingComments(List<QiscusComment> qiscusComments) {
+        qiscusComments = cleanFailedComments(qiscusComments);
+        int size = qiscusComments.size();
+        for (int i = 0; i < size - 1; i++) {
+            if (qiscusComments.get(i).getCommentBeforeId() != qiscusComments.get(i + 1).getId()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void loadOlderCommentThan(QiscusComment qiscusComment) {
@@ -685,6 +698,88 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    public void sendReplyComment(String content, QiscusComment originComment) {
+        QiscusComment qiscusComment = QiscusComment.generateReplyMessage(content, room.getId(), currentTopicId, originComment);
+        view.onSendingComment(qiscusComment);
+        QiscusApi.getInstance().postReplyComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
+    private void resendReplyComment(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        qiscusComment.setTime(new Date());
+        view.onNewComment(qiscusComment);
+        QiscusApi.getInstance().postReplyComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
+    public void loadUntilComment(QiscusComment qiscusComment) {
+        Qiscus.getDataStore().getObservableCommentsAfter(qiscusComment, currentTopicId)
+                .map(comments -> comments.contains(qiscusComment) ? comments : new ArrayList<QiscusComment>())
+                .flatMap(Observable::from)
+                .toSortedList(commentComparator)
+                .doOnNext(comments -> {
+                    checkForLastRead(comments);
+                    for (QiscusComment comment : comments) {
+                        if (comment.getState() == QiscusComment.STATE_SENDING) {
+                            comment.setState(QiscusComment.STATE_FAILED);
+                            Qiscus.getDataStore().addOrUpdate(comment);
+                        } else if (comment.getState() != QiscusComment.STATE_FAILED
+                                && comment.getState() != QiscusComment.STATE_READ) {
+                            if (comment.getId() > lastDeliveredCommentId.get()) {
+                                comment.setState(QiscusComment.STATE_ON_QISCUS);
+                            } else if (comment.getId() > lastReadCommentId.get()) {
+                                comment.setState(QiscusComment.STATE_DELIVERED);
+                            } else {
+                                comment.setState(QiscusComment.STATE_READ);
+                            }
+                            Qiscus.getDataStore().addOrUpdate(comment);
+                        }
+                    }
+                })
+                .flatMap(comments -> isValidChainingComments(comments) ?
+                        Observable.from(comments).toSortedList(commentComparator) :
+                        Observable.just(new ArrayList<QiscusComment>()))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(comments -> {
+                    if (view != null) {
+                        view.showCommentsAndScrollToTop(comments);
+                    }
+                }, Throwable::printStackTrace);
+    }
+
     @Override
     public void detachView() {
         super.detachView();
@@ -724,5 +819,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void startPhotoViewer(QiscusComment qiscusComment);
 
         void onUserTyping(String user, boolean typing);
+
+        void showCommentsAndScrollToTop(List<QiscusComment> qiscusComments);
     }
 }

@@ -69,7 +69,7 @@
         android:layout_marginLeft="42dp"
         android:layout_marginStart="42dp"
         android:src="@drawable/ic_qiscus_arrow_bubble_primary"
-        android:tint="@color/qiscus_primary"/>
+        android:tint="@color/qiscus_left_bubble"/>
 
     <RelativeLayout
         android:id="@+id/message"
@@ -160,7 +160,7 @@
             android:layout_toStartOf="@+id/time"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/qiscus_primary_light"
+            android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"
             android:visibility="visible"/>
 
@@ -174,7 +174,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="2dp"
-            android:textColor="@color/qiscus_primary_light"
+            android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"/>
 
     </RelativeLayout>

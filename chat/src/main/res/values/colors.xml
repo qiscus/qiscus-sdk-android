@@ -34,4 +34,6 @@
     <color name="qiscus_keyboard_background">#90a4ae</color>
     <color name="qiscus_bg_gray">#ecedef</color>
     <color name="qiscus_transparent_black">#88000000</color>
+    <color name="qiscus_left_bubble">#D0D0D0</color>
+    <color name="qiscus_account_linking_background">#DFDFDF</color>
 </resources>
