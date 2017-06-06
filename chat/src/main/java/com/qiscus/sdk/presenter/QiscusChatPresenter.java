@@ -197,6 +197,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void resendComment(QiscusComment qiscusComment) {
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
+        } else if (qiscusComment.getType() == QiscusComment.Type.REPLY) {
+            resendReplyComment(qiscusComment);
         } else {
             qiscusComment.setState(QiscusComment.STATE_SENDING);
             qiscusComment.setTime(new Date());
@@ -701,6 +703,29 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         view.onSendingComment(qiscusComment);
         QiscusApi.getInstance().postReplyComment(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
+    private void resendReplyComment(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        qiscusComment.setTime(new Date());
+        view.onNewComment(qiscusComment);
+        QiscusApi.getInstance().postReplyComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(this::commentSuccess)
                 .doOnError(throwable -> commentFail(qiscusComment))
                 .subscribeOn(Schedulers.io())
