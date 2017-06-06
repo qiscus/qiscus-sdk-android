@@ -685,6 +685,28 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    public void sendReplyComment(String content, QiscusComment originComment) {
+        QiscusComment qiscusComment = QiscusComment.generateReplyMessage(content, room.getId(), currentTopicId, originComment);
+        view.onSendingComment(qiscusComment);
+        QiscusApi.getInstance().postReplyComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
     @Override
     public void detachView() {
         super.detachView();

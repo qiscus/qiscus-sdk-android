@@ -733,6 +733,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void sendMessage(String message) {
         message = message.trim();
         if (!message.isEmpty()) {
+            if (replyPreviewView != null) {
+                QiscusComment repliedComment = replyPreviewView.getOriginComment();
+                if (repliedComment != null) {
+                    qiscusChatPresenter.sendReplyComment(message, repliedComment);
+                    messageEditText.setText("");
+                    replyPreviewView.close();
+                    return;
+                }
+            }
             qiscusChatPresenter.sendComment(message);
             messageEditText.setText("");
         }

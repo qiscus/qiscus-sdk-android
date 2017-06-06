@@ -156,6 +156,18 @@ public enum QiscusApi {
                 });
     }
 
+    public Observable<QiscusComment> postReplyComment(QiscusComment qiscusComment) {
+        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
+                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), "reply", qiscusComment.getExtraPayload())
+                .map(jsonElement -> {
+                    JsonObject jsonComment = jsonElement.getAsJsonObject()
+                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
+                    qiscusComment.setId(jsonComment.get("id").getAsInt());
+                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    return qiscusComment;
+                });
+    }
+
     public Observable<QiscusComment> sync() {
         QiscusComment latestComment = Qiscus.getDataStore().getLatestComment();
         if (latestComment == null || !QiscusAndroidUtil.getString(R.string.qiscus_today)

@@ -28,7 +28,11 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.schinizer.rxunfurl.model.PreviewData;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,6 +111,25 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setSender(qiscusAccount.getUsername());
         qiscusComment.setSenderAvatar(qiscusAccount.getAvatar());
         qiscusComment.setState(STATE_SENDING);
+
+        return qiscusComment;
+    }
+
+    public static QiscusComment generateReplyMessage(String content, int roomId, int topicId, QiscusComment repliedComment) {
+        QiscusComment qiscusComment = generateMessage(content, roomId, topicId);
+        qiscusComment.setRawType("reply");
+        JSONObject json = new JSONObject();
+        try {
+            json.put("text", qiscusComment.getMessage())
+                    .put("replied_comment_id", repliedComment.getId())
+                    .put("message", repliedComment.getMessage())
+                    .put("username", repliedComment.getSender())
+                    .put("email", repliedComment.getSenderEmail());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
+
 
         return qiscusComment;
     }
@@ -282,6 +305,18 @@ public class QiscusComment implements Parcelable {
     }
 
     public QiscusComment getReplyTo() {
+        if (replyTo == null && getType() == Type.REPLY) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                replyTo = new QiscusComment();
+                replyTo.id = payload.getInt("replied_comment_id");
+                replyTo.message = payload.getString("message");
+                replyTo.sender = payload.getString("username");
+                replyTo.senderEmail = payload.getString("email");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return replyTo;
     }
 
@@ -395,10 +430,9 @@ public class QiscusComment implements Parcelable {
             return Type.ACCOUNT_LINKING;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("buttons")) {
             return Type.BUTTONS;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("reply")) {
+            return Type.REPLY;
         } else if (!isAttachment()) {
-            if (replyTo != null) {
-                return Type.REPLY;
-            }
             if (containsUrl()) {
                 return Type.LINK;
             }
