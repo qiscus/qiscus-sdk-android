@@ -297,6 +297,16 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
         return QiscusApi.getInstance().getChatRoomComments(room.getId())
+                .doOnSubscribe(() -> QiscusAndroidUtil.runOnUIThread(() -> view.showLoadMoreLoading()))
+                .doOnError(throwable -> {
+                    throwable.printStackTrace();
+                    QiscusAndroidUtil.runOnUIThread(() -> {
+                        if (view != null) {
+                            view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
+                            view.dismissLoading();
+                        }
+                    });
+                })
                 .doOnNext(roomData -> {
                     checkForLastRead(roomData.second);
                     for (QiscusComment qiscusComment : roomData.second) {
@@ -318,6 +328,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     roomData.first.setSubtitle(room.getSubtitle());
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
                 })
+                .doOnNext(roomData -> QiscusAndroidUtil.runOnUIThread(() -> view.dismissLoading()))
                 .subscribeOn(Schedulers.io())
                 .onErrorReturn(throwable -> null);
     }
@@ -391,7 +402,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (view != null) {
                         room = roomData.first;
                         view.initRoomData(roomData.first, roomData.second);
-                        view.dismissLoading();
                     }
                 }, throwable -> {
                     throwable.printStackTrace();
