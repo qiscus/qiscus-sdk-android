@@ -649,6 +649,9 @@ public class QiscusComment implements Parcelable {
         dest.writeString(sender);
         dest.writeString(senderEmail);
         dest.writeString(senderAvatar);
+        if (time == null) {
+            time = new Date();
+        }
         dest.writeLong(time.getTime());
         dest.writeInt(state);
         dest.writeByte((byte) (selected ? 1 : 0));
