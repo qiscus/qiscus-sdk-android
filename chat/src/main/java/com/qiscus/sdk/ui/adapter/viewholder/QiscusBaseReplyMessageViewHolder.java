@@ -28,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -57,12 +58,14 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
     protected int originMessageColor;
 
     private ReplyItemClickListener replyItemClickListener;
+    private QiscusAccount qiscusAccount;
 
     public QiscusBaseReplyMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener,
                                             ReplyItemClickListener replyItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         this.replyItemClickListener = replyItemClickListener;
+        qiscusAccount = Qiscus.getQiscusAccount();
         originMessageView = getOriginMessageView(itemView);
         originSenderTextView = getOriginSenderTextView(itemView);
         originMessageTextView = getOriginMessageTextView(itemView);
@@ -117,7 +120,8 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
         });
 
         QiscusComment originComment = qiscusComment.getReplyTo();
-        originSenderTextView.setText(originComment.getSender());
+        originSenderTextView.setText(originComment.getSenderEmail().equals(qiscusAccount.getEmail()) ?
+                QiscusAndroidUtil.getString(R.string.qiscus_you) : originComment.getSender());
         switch (originComment.getType()) {
             case IMAGE:
                 if (originImageView != null) {

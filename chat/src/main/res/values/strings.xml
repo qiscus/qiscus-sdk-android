@@ -87,4 +87,5 @@
     <string name="qiscus_no_file_manager">Sorry, you phone does not have application can handle it!</string>
     <string name="qiscus_voice_message">Voice message</string>
     <string name="qiscus_reply">Reply</string>
+    <string name="qiscus_you">You</string>
 </resources>

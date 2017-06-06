@@ -88,4 +88,5 @@
     <string name="qiscus_no_file_manager">Maaf, sepertinya ponsel anda tidak memiliki aplikasi yang bisa menangani hal ini!</string>
     <string name="qiscus_voice_message">Pesan suara</string>
     <string name="qiscus_reply">Balas</string>
+    <string name="qiscus_you">Kamu</string>
 </resources>
