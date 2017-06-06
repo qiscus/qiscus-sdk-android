@@ -467,11 +467,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .doOnNext(comments -> {
                     checkForLastRead(comments);
                     for (QiscusComment comment : comments) {
-                        if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
-                            qiscusComment.setState(QiscusComment.STATE_FAILED);
+                        if (comment.getState() == QiscusComment.STATE_SENDING) {
+                            comment.setState(QiscusComment.STATE_FAILED);
                             Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                        } else if (qiscusComment.getState() != QiscusComment.STATE_FAILED
-                                && qiscusComment.getState() != QiscusComment.STATE_READ) {
+                        } else if (comment.getState() != QiscusComment.STATE_FAILED
+                                && comment.getState() != QiscusComment.STATE_READ) {
                             if (comment.getId() > lastDeliveredCommentId.get()) {
                                 comment.setState(QiscusComment.STATE_ON_QISCUS);
                             } else if (comment.getId() > lastReadCommentId.get()) {
