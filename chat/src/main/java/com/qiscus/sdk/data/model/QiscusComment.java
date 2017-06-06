@@ -122,9 +122,9 @@ public class QiscusComment implements Parcelable {
         try {
             json.put("text", qiscusComment.getMessage())
                     .put("replied_comment_id", repliedComment.getId())
-                    .put("message", repliedComment.getMessage())
-                    .put("username", repliedComment.getSender())
-                    .put("email", repliedComment.getSenderEmail());
+                    .put("replied_comment_message", repliedComment.getMessage())
+                    .put("replied_comment_sender_username", repliedComment.getSender())
+                    .put("replied_comment_sender_email", repliedComment.getSenderEmail());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -310,9 +310,9 @@ public class QiscusComment implements Parcelable {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(this);
                 replyTo = new QiscusComment();
                 replyTo.id = payload.getInt("replied_comment_id");
-                replyTo.message = payload.getString("message");
-                replyTo.sender = payload.getString("username");
-                replyTo.senderEmail = payload.getString("email");
+                replyTo.message = payload.getString("replied_comment_message");
+                replyTo.sender = payload.getString("replied_comment_sender_username");
+                replyTo.senderEmail = payload.getString("replied_comment_sender_email");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
