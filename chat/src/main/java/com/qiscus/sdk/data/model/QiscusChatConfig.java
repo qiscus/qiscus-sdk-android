@@ -48,12 +48,14 @@ public class QiscusChatConfig {
     private int subtitleColor = R.color.qiscus_dark_white;
     private int rightBubbleColor = R.color.qiscus_primary_light;
     private int leftBubbleColor = R.color.qiscus_left_bubble;
+    private int systemMessageBubbleColor = R.color.qiscus_accent_light;
     private int rightBubbleTextColor = R.color.qiscus_primary_text;
     private int leftBubbleTextColor = R.color.qiscus_primary_text;
     private int rightBubbleTimeColor = R.color.qiscus_secondary_text;
     private int leftBubbleTimeColor = R.color.qiscus_secondary_text;
     private int rightLinkTextColor = R.color.qiscus_primary_text;
     private int leftLinkTextColor = R.color.qiscus_primary_text;
+    private int systemMessageTextColor = R.color.qiscus_primary_text;
     private int failedToSendMessageColor = R.color.qiscus_red;
     private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
@@ -210,6 +212,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setSystemMessageBubbleColor(@ColorRes int systemMessageBubbleColor) {
+        this.systemMessageBubbleColor = systemMessageBubbleColor;
+        return this;
+    }
+
     public QiscusChatConfig setRightBubbleTextColor(@ColorRes int rightBubbleTextColor) {
         this.rightBubbleTextColor = rightBubbleTextColor;
         return this;
@@ -237,6 +244,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setLeftLinkTextColor(@ColorRes int leftLinkTextColor) {
         this.leftLinkTextColor = leftLinkTextColor;
+        return this;
+    }
+
+    public QiscusChatConfig setSystemMessageTextColor(@ColorRes int systemMessageTextColor) {
+        this.systemMessageTextColor = systemMessageTextColor;
         return this;
     }
 
@@ -583,6 +595,11 @@ public class QiscusChatConfig {
     }
 
     @ColorRes
+    public int getSystemMessageBubbleColor() {
+        return systemMessageBubbleColor;
+    }
+
+    @ColorRes
     public int getRightBubbleTextColor() {
         return rightBubbleTextColor;
     }
@@ -610,6 +627,11 @@ public class QiscusChatConfig {
     @ColorRes
     public int getLeftLinkTextColor() {
         return leftLinkTextColor;
+    }
+
+    @ColorRes
+    public int getSystemMessageTextColor() {
+        return systemMessageTextColor;
     }
 
     @ColorRes

@@ -30,21 +30,21 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
-        android:text="Today"
         android:visibility="visible"/>
 
     <LinearLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/date"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="4dp"
         android:layout_marginEnd="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginStart="24dp"
-        android:background="@drawable/qiscus_rounded_primary_light_chat_bg"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/qiscus_rounded_accent_light_chat_bg"
         android:orientation="vertical"
         android:padding="8dp">
 
@@ -55,11 +55,10 @@
             android:layout_marginBottom="4dp"
             android:autoLink="all"
             android:linksClickable="true"
-            android:text="You are admin asasa asasasasasasasasasas sasas sas"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="16sp"
-            app:emojiSize="22sp"/>
+            android:textSize="12sp"
+            app:emojiSize="18sp"/>
     </LinearLayout>
 
     <!-- Add this view because Xiaomi need it -->
