@@ -116,6 +116,7 @@ public abstract class QiscusBaseButtonMessageViewHolder extends QiscusBaseTextMe
             } else {
                 buttonViews.get(i).getButton().setBackgroundColor(buttonsBackgroundColor);
             }
+            buttonViews.get(i).getButton().setTextColor(buttonsTextColor);
             buttonsContainer.addView(buttonViews.get(i));
         }
 

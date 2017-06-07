@@ -34,6 +34,7 @@ import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
+import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 
 /**
  * Created on : September 28, 2016
@@ -245,6 +246,18 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected QiscusAudioRecorderView getRecordAudioPanel(View view) {
         return (QiscusAudioRecorderView) view.findViewById(R.id.record_panel);
+    }
+
+    @Nullable
+    @Override
+    protected QiscusReplyPreviewView getReplyPreviewView(View view) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    protected View getGotoBottomButton(View view) {
+        return null;
     }
 
     @Override

@@ -55,6 +55,10 @@ public interface QiscusCommentStore {
 
     Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count);
 
+    List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, int topicId);
+
+    Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, int topicId);
+
     QiscusComment getLatestComment();
 
     QiscusComment getLatestComment(int roomId);

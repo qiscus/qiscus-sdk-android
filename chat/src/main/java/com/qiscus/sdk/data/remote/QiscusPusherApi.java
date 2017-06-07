@@ -137,7 +137,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
                 mqttAndroidClient.connect(mqttConnectOptions, null, this);
             } catch (MqttException e) {
                 e.printStackTrace();
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | IllegalArgumentException e) {
                 restartConnection();
             }
         }
@@ -207,7 +207,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
         } catch (MqttException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | IllegalArgumentException e) {
             Log.e(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
             connect();
             handler.postDelayed(fallBackListenComment, RETRY_PERIOD);
@@ -224,7 +224,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
         } catch (MqttException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | IllegalArgumentException e) {
             Log.e(TAG, "Failure listen room, try again in " + RETRY_PERIOD + " ms");
             connect();
             handler.postDelayed(fallBackListenRoom, RETRY_PERIOD);
@@ -237,7 +237,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/t");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/d");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/r");
-        } catch (MqttException | NullPointerException e) {
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             e.printStackTrace();
         }
         handler.removeCallbacks(fallBackListenRoom);
@@ -250,7 +250,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             mqttAndroidClient.subscribe("u/" + user + "/s", 2);
         } catch (MqttException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | IllegalArgumentException e) {
             connect();
             handler.postDelayed(fallBackListenUserStatus, RETRY_PERIOD);
         }
@@ -259,7 +259,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     public void unListenUserStatus(String user) {
         try {
             mqttAndroidClient.unsubscribe("u/" + user + "/s");
-        } catch (MqttException | NullPointerException e) {
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             e.printStackTrace();
         }
         handler.removeCallbacks(fallBackListenUserStatus);
@@ -274,7 +274,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             message.setQos(2);
             message.setRetained(true);
             pendingTokens.add(mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message));
-        } catch (MqttException | NullPointerException e) {
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             if (e instanceof MqttException) {
                 e.printStackTrace();
             }
@@ -288,7 +288,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             message.setPayload((typing ? "1" : "0").getBytes());
             pendingTokens.add(mqttAndroidClient.publish("r/" + roomId + "/" + topicId + "/"
                     + qiscusAccount.getEmail() + "/t", message));
-        } catch (MqttException | NullPointerException e) {
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             e.printStackTrace();
         }
     }
@@ -466,7 +466,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             if (jsonObject.has("type")) {
                 qiscusComment.setRawType(jsonObject.get("type").getAsString());
                 qiscusComment.setExtraPayload(jsonObject.get("payload").toString());
-                if (qiscusComment.getType() == QiscusComment.Type.BUTTONS) {
+                if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
+                        || qiscusComment.getType() == QiscusComment.Type.REPLY) {
                     JsonObject payload = jsonObject.get("payload").getAsJsonObject();
                     if (payload.has("text")) {
                         String text = payload.get("text").getAsString();

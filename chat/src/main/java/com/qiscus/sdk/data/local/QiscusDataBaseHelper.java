@@ -143,6 +143,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         while (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = getChatRoom(QiscusDb.RoomMemberTable.getRoomId(cursor));
             if (qiscusChatRoom == null) {
+                cursor.close();
                 return null;
             }
             if (!qiscusChatRoom.isGroup()) {
@@ -608,6 +609,37 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
+    @Override
+    public List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, int topicId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND ("
+                + QiscusDb.CommentTable.COLUMN_ID + " >= " + qiscusComment.getId() + " OR "
+                + QiscusDb.CommentTable.COLUMN_ID + " = -1) "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC ";
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment comment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(comment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                comment.setSender(qiscusRoomMember.getUsername());
+                comment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(comment);
+        }
+        cursor.close();
+        return qiscusComments;
+    }
+
+    @Override
+    public Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, int topicId) {
+        return Observable.create(subscriber -> {
+            subscriber.onNext(getCommentsAfter(qiscusComment, topicId));
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }

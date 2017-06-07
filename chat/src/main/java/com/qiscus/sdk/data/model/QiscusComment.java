@@ -28,7 +28,11 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.schinizer.rxunfurl.model.PreviewData;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,6 +93,8 @@ public class QiscusComment implements Parcelable {
     private MediaObserver observer;
     private MediaPlayer player;
 
+    private QiscusComment replyTo;
+
     public static QiscusComment generateMessage(String content, int roomId, int topicId) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
         QiscusComment qiscusComment = new QiscusComment();
@@ -105,6 +111,25 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setSender(qiscusAccount.getUsername());
         qiscusComment.setSenderAvatar(qiscusAccount.getAvatar());
         qiscusComment.setState(STATE_SENDING);
+
+        return qiscusComment;
+    }
+
+    public static QiscusComment generateReplyMessage(String content, int roomId, int topicId, QiscusComment repliedComment) {
+        QiscusComment qiscusComment = generateMessage(content, roomId, topicId);
+        qiscusComment.setRawType("reply");
+        JSONObject json = new JSONObject();
+        try {
+            json.put("text", qiscusComment.getMessage())
+                    .put("replied_comment_id", repliedComment.getId())
+                    .put("replied_comment_message", repliedComment.getMessage())
+                    .put("replied_comment_sender_username", repliedComment.getSender())
+                    .put("replied_comment_sender_email", repliedComment.getSenderEmail());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
+
 
         return qiscusComment;
     }
@@ -128,6 +153,7 @@ public class QiscusComment implements Parcelable {
         selected = in.readByte() != 0;
         rawType = in.readString();
         extraPayload = in.readString();
+        replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
     }
 
     public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
@@ -278,6 +304,26 @@ public class QiscusComment implements Parcelable {
         this.extraPayload = extraPayload;
     }
 
+    public QiscusComment getReplyTo() {
+        if (replyTo == null && getType() == Type.REPLY) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                replyTo = new QiscusComment();
+                replyTo.id = payload.getInt("replied_comment_id");
+                replyTo.message = payload.getString("replied_comment_message");
+                replyTo.sender = payload.getString("replied_comment_sender_username");
+                replyTo.senderEmail = payload.getString("replied_comment_sender_email");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return replyTo;
+    }
+
+    public void setReplyTo(QiscusComment replyTo) {
+        this.replyTo = replyTo;
+    }
+
     public boolean isAttachment() {
         String trimmedMessage = message.trim();
         return trimmedMessage.startsWith("[file]") && trimmedMessage.endsWith("[/file]");
@@ -384,6 +430,8 @@ public class QiscusComment implements Parcelable {
             return Type.ACCOUNT_LINKING;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("buttons")) {
             return Type.BUTTONS;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("reply")) {
+            return Type.REPLY;
         } else if (!isAttachment()) {
             if (containsUrl()) {
                 return Type.LINK;
@@ -601,15 +649,19 @@ public class QiscusComment implements Parcelable {
         dest.writeString(sender);
         dest.writeString(senderEmail);
         dest.writeString(senderAvatar);
+        if (time == null) {
+            time = new Date();
+        }
         dest.writeLong(time.getTime());
         dest.writeInt(state);
         dest.writeByte((byte) (selected ? 1 : 0));
         dest.writeString(rawType);
         dest.writeString(extraPayload);
+        dest.writeParcelable(replyTo, flags);
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS
+        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY
     }
 
     public interface ProgressListener {
