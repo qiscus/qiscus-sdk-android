@@ -26,8 +26,15 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created on : June 07, 2017
@@ -41,9 +48,12 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
     protected Drawable bubbleDrawable;
     protected int bubbleTextColor;
 
+    private QiscusAccount qiscusAccount;
+
     public QiscusBaseSystemMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                              OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
+        qiscusAccount = Qiscus.getQiscusAccount();
     }
 
     @Override
@@ -91,5 +101,48 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
     @Override
     protected TextView getSenderNameView(View itemView) {
         return null;
+    }
+
+    @Override
+    protected void showMessage(QiscusComment qiscusComment) {
+        try {
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            String message = payload.optString("subject_email").equals(qiscusAccount.getEmail()) ?
+                    QiscusAndroidUtil.getString(R.string.qiscus_you) : payload.optString("subject_username");
+            switch (payload.optString("type")) {
+                case "create_room":
+                    message += " " + QiscusAndroidUtil.getString(R.string.qiscus_created_room);
+                    message += " '" + payload.optString("room_name") + "'";
+                    break;
+                case "add_member":
+                    message += " " + QiscusAndroidUtil.getString(R.string.qiscus_added);
+                    message += " " + (payload.optString("object_email").equals(qiscusAccount.getEmail()) ?
+                            QiscusAndroidUtil.getString(R.string.qiscus_you) : payload.optString("object_username"));
+                    break;
+                case "join_room":
+                    message += " " + QiscusAndroidUtil.getString(R.string.qiscus_joined_room);
+                    break;
+                case "remove_member":
+                    message += " " + QiscusAndroidUtil.getString(R.string.qiscus_removed);
+                    message += " " + (payload.optString("object_email").equals(qiscusAccount.getEmail()) ?
+                            QiscusAndroidUtil.getString(R.string.qiscus_you) : payload.optString("object_username"));
+                    break;
+                case "left_room":
+                    message += " " + QiscusAndroidUtil.getString(R.string.qiscus_left_room);
+                    break;
+                case "change_room_name":
+                    message += " " + QiscusAndroidUtil.getString(R.string.qiscus_changed_room_name);
+                    message += " '" + payload.optString("room_name") + "'";
+                    break;
+                case "change_room_avatar":
+                    message += " " + QiscusAndroidUtil.getString(R.string.qiscus_changed_room_avatar);
+                    break;
+                default:
+                    super.showMessage(qiscusComment);
+            }
+            messageTextView.setText(message);
+        } catch (JSONException e) {
+            super.showMessage(qiscusComment);
+        }
     }
 }
