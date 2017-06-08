@@ -26,7 +26,6 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
 import android.text.style.ClickableSpan;
-import android.util.Patterns;
 import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
@@ -34,6 +33,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusLinkPreviewView;
+import com.qiscus.sdk.util.QiscusPatterns;
 import com.schinizer.rxunfurl.model.PreviewData;
 
 import java.util.regex.Matcher;
@@ -76,7 +76,7 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
 
     private void setUpLinks(QiscusComment qiscusComment) {
         String message = qiscusComment.getMessage();
-        Matcher matcher = Patterns.WEB_URL.matcher(message);
+        Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(message);
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && message.charAt(start - 1) == '@') {
