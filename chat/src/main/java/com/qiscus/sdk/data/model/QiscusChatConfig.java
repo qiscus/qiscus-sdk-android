@@ -109,6 +109,9 @@ public class QiscusChatConfig {
     private int replySenderColor = R.color.qiscus_primary;
     private int replyMessageColor = R.color.qiscus_secondary_text;
 
+    private int cardTitleColor = R.color.qiscus_primary_text;
+    private int cardDescriptionColor = R.color.qiscus_secondary_text;
+
     /**
      * @deprecated please use {@link #sendButtonIcon} instead
      */
@@ -552,6 +555,16 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setCardTitleColor(@ColorRes int cardTitleColor) {
+        this.cardTitleColor = cardTitleColor;
+        return this;
+    }
+
+    public QiscusChatConfig setCardDescriptionColor(@ColorRes int cardDescriptionColor) {
+        this.cardDescriptionColor = cardDescriptionColor;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -899,5 +912,15 @@ public class QiscusChatConfig {
     @ColorRes
     public int getReplyMessageColor() {
         return replyMessageColor;
+    }
+
+    @ColorRes
+    public int getCardTitleColor() {
+        return cardTitleColor;
+    }
+
+    @ColorRes
+    public int getCardDescriptionColor() {
+        return cardDescriptionColor;
     }
 }

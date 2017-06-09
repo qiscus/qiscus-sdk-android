@@ -432,6 +432,8 @@ public class QiscusComment implements Parcelable {
             return Type.BUTTONS;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("reply")) {
             return Type.REPLY;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("card")) {
+            return Type.CARD;
         } else if (!isAttachment()) {
             if (containsUrl()) {
                 return Type.LINK;
@@ -661,7 +663,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY
+        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, CARD
     }
 
     public interface ProgressListener {
