@@ -30,7 +30,7 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <com.qiscus.sdk.ui.view.QiscusCircularImageView
         android:id="@+id/avatar"
@@ -39,7 +39,7 @@
         android:layout_alignTop="@+id/message"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/name"
@@ -59,7 +59,7 @@
         android:maxLines="1"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="12sp"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/bubble"
