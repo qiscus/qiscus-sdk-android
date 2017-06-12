@@ -88,4 +88,11 @@
     <string name="qiscus_voice_message">Voice message</string>
     <string name="qiscus_reply">Reply</string>
     <string name="qiscus_you">You</string>
+    <string name="qiscus_created_room">created room</string>
+    <string name="qiscus_added">added</string>
+    <string name="qiscus_joined_room">joined room</string>
+    <string name="qiscus_removed">removed</string>
+    <string name="qiscus_left_room">left room</string>
+    <string name="qiscus_changed_room_name">changed room name to</string>
+    <string name="qiscus_changed_room_avatar">changed room avatar</string>
 </resources>
