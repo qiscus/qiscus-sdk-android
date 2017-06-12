@@ -21,7 +21,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.util.Patterns;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -68,12 +67,12 @@ public final class QiscusAndroidUtil {
     }
 
     public static boolean isUrl(String s) {
-        return Patterns.WEB_URL.matcher(s).matches();
+        return QiscusPatterns.AUTOLINK_WEB_URL.matcher(s).matches();
     }
 
     public static List<String> extractUrl(String text) {
         List<String> urls = new ArrayList<>();
-        Matcher matcher = Patterns.WEB_URL.matcher(text);
+        Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(text);
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && text.charAt(start - 1) == '@') {
