@@ -96,4 +96,5 @@
     <string name="qiscus_changed_room_name">changed room name to</string>
     <string name="qiscus_changed_room_avatar">changed room avatar</string>
     <string name="qiscus_group_member_only_you">Only you</string>
+    <string name="qiscus_send">Send</string>
 </resources>

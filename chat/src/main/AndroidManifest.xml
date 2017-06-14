@@ -54,6 +54,10 @@
             android:name=".filepicker.MediaDetailsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/QiscusTheme" />
+        <activity
+            android:name=".ui.QiscusSendPhotoConfirmationActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/QiscusTheme" />
 
         <service android:name=".service.QiscusPusherService" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
