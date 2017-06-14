@@ -301,6 +301,17 @@ public class Qiscus {
     }
 
     /**
+     * Use this method to create or join specific room chat with defined unique id.
+     *
+     * @param uniqueId the room unique id.
+     * @return Defined Id Group Chat room builder
+     */
+    public static DefinedIdGroupChatBuilder buildGroupChatRoomWith(String uniqueId) {
+        checkUserSetup();
+        return new DefinedIdGroupChatBuilder(uniqueId);
+    }
+
+    /**
      * Set the heartbeat of qiscus synchronization chat data. Default value is 500ms
      *
      * @param heartBeat Heartbeat duration in milliseconds
@@ -942,6 +953,73 @@ public class Qiscus {
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
                     .createGroupChatRoom(name, new ArrayList<>(emails), avatarUrl, options)
+                    .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
+        }
+    }
+
+    public static class DefinedIdGroupChatBuilder {
+        private String uniqueId;
+        private String name;
+        private String options;
+        private String avatarUrl;
+
+        private DefinedIdGroupChatBuilder(String uniqueId) {
+            this.uniqueId = uniqueId;
+            this.name = uniqueId;
+        }
+
+        /**
+         * If you need to set the room name
+         *
+         * @param name the room name
+         * @return builder
+         */
+        public DefinedIdGroupChatBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * If you need to set the avatar or picture of group chat room
+         *
+         * @param avatarUrl the picture url
+         * @return builder
+         */
+        public DefinedIdGroupChatBuilder withAvatar(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
+            return this;
+        }
+
+        /**
+         * If you need to save options or extra data to this room
+         *
+         * @param options The data need to save
+         * @return builder
+         */
+        public DefinedIdGroupChatBuilder withOptions(String options) {
+            this.options = options;
+            return this;
+        }
+
+        /**
+         * Build the chat room
+         *
+         * @param listener Listener of building chat room process
+         */
+        public void build(ChatBuilderListener listener) {
+            build().subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listener::onSuccess, listener::onError);
+        }
+
+        /**
+         * Build the chat room as Observable
+         *
+         * @return Observable chat room
+         */
+        public Observable<QiscusChatRoom> build() {
+            return QiscusApi.getInstance()
+                    .getGroupChatRoom(uniqueId, name, avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
