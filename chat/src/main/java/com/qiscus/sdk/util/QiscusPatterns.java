@@ -165,7 +165,7 @@ public class QiscusPatterns {
      *
      * @hide
      */
-    static final String IANA_TOP_LEVEL_DOMAINS = "(?:com|net|org|id|co.id)";
+    static final String IANA_TOP_LEVEL_DOMAINS = "(?:com|net|org|biz|id|co.id)";
 
     /**
      * Kept for backward compatibility reasons.
