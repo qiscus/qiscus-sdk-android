@@ -118,24 +118,27 @@ public class QiscusPusherService extends Service {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                QiscusApi.getInstance().sync()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(qiscusComment -> {
-                            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
-                                QiscusPusherApi.getInstance()
-                                        .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
-                                                qiscusComment.getId(), qiscusComment.getUniqueId());
-                            }
-                            QiscusComment savedQiscusComment = Qiscus.getDataStore()
-                                    .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
-                            if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
-                                qiscusComment.setState(savedQiscusComment.getState());
-                            }
-                            Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                            qiscusComment.setRoomName("sync");
-                            EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-                        }, Throwable::printStackTrace);
+                if (Qiscus.isOnForeground()) {
+                    QiscusApi.getInstance().sync()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(qiscusComment -> {
+                                if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+                                    QiscusPusherApi.getInstance()
+                                            .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
+                                                    qiscusComment.getId(), qiscusComment.getUniqueId());
+                                }
+                                QiscusComment savedQiscusComment = Qiscus.getDataStore()
+                                        .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+                                if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
+                                    qiscusComment.setState(savedQiscusComment.getState());
+                                }
+                                Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                                qiscusComment.setRoomName("sync");
+                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
+
+                            }, Throwable::printStackTrace);
+                }
             }
         }, 0, period);
     }
