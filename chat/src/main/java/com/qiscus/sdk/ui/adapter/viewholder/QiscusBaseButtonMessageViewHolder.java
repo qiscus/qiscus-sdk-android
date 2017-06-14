@@ -18,7 +18,9 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +106,11 @@ public abstract class QiscusBaseButtonMessageViewHolder extends QiscusBaseTextMe
                     QiscusChatButtonView button = new QiscusChatButtonView(buttonsContainer.getContext(), jsonButton);
                     button.setChatButtonClickListener(chatButtonClickListener);
                     buttonViews.add(button);
+                } else if ("link".equals(type)) {
+                    QiscusChatButtonView button = new QiscusChatButtonView(buttonsContainer.getContext(), jsonButton);
+                    button.setChatButtonClickListener(jsonButton1 ->
+                            openLink(jsonButton1.optJSONObject("payload").optString("url")));
+                    buttonViews.add(button);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -121,5 +128,15 @@ public abstract class QiscusBaseButtonMessageViewHolder extends QiscusBaseTextMe
         }
 
         buttonsContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void openLink(String url) {
+        new CustomTabsIntent.Builder()
+                .setToolbarColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getAppBarColor()))
+                .setShowTitle(true)
+                .addDefaultShareMenuItem()
+                .enableUrlBarHiding()
+                .build()
+                .launchUrl(messageTextView.getContext(), Uri.parse(url));
     }
 }
