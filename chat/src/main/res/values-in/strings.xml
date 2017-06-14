@@ -89,4 +89,13 @@
     <string name="qiscus_voice_message">Pesan suara</string>
     <string name="qiscus_reply">Balas</string>
     <string name="qiscus_you">Kamu</string>
+    <string name="qiscus_created_room">membuat room</string>
+    <string name="qiscus_added">menambahkan</string>
+    <string name="qiscus_joined_room">bergabung kedalam room</string>
+    <string name="qiscus_removed">mengeluarkan</string>
+    <string name="qiscus_left_room">meninggalkan room</string>
+    <string name="qiscus_changed_room_name">mengubah nama room menjadi</string>
+    <string name="qiscus_changed_room_avatar">mengubah gambar room</string>
+    <string name="qiscus_group_member_only_you">Hanya kamu</string>
+    <string name="qiscus_send">Kirim</string>
 </resources>

@@ -69,8 +69,12 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
                     subtitle += ", ";
                 }
             }
+            if (count >= 10) {
+                break;
+            }
         }
-        subtitle += getString(R.string.qiscus_group_member_closing);
+        subtitle += String.format(" %s", getString(R.string.qiscus_group_member_closing));
+        if (count == 0) subtitle = getString(R.string.qiscus_group_member_only_you);
     }
 
     @Override

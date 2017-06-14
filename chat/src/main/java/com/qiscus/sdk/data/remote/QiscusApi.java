@@ -115,6 +115,11 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
+    public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, String options) {
+        return api.createOrGetGroupChatRoom(Qiscus.getToken(), uniqueId, name, avatarUrl, options)
+                .map(QiscusApiParser::parseQiscusChatRoom);
+    }
+
     public Observable<QiscusChatRoom> getChatRoom(int roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
                 .map(QiscusApiParser::parseQiscusChatRoom);
@@ -311,6 +316,14 @@ public enum QiscusApi {
                                                     @Field("participants[]") List<String> emails,
                                                     @Field("avatar_url") String avatarUrl,
                                                     @Field("options") String options);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/get_or_create_room_with_unique_id")
+        Observable<JsonElement> createOrGetGroupChatRoom(@Field("token") String token,
+                                                         @Field("unique_id") String uniqueId,
+                                                         @Field("name") String name,
+                                                         @Field("avatar_url") String avatarUrl,
+                                                         @Field("options") String options);
 
         @GET("/api/v2/mobile/get_room_by_id")
         Observable<JsonElement> getChatRoom(@Query("token") String token,

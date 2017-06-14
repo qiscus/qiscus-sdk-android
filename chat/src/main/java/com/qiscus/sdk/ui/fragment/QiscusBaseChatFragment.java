@@ -60,6 +60,7 @@ import com.qiscus.sdk.filepicker.FilePickerConst;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
+import com.qiscus.sdk.ui.QiscusSendPhotoConfirmationActivity;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
@@ -118,6 +119,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String EXTRA_SHARE_FILE = "extra_share_file";
     protected static final String COMMENTS_DATA = "saved_comments_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
+    protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 2;
 
     @NonNull protected ViewGroup rootView;
     @Nullable protected ViewGroup emptyChatHolder;
@@ -1077,7 +1079,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
             ArrayList<String> paths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
             if (paths.size() > 0) {
-                sendFile(new File(paths.get(0)));
+                File file = new File(paths.get(0));
+                if (QiscusImageUtil.isImage(file)) {
+                    startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
+                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), file),
+                            SEND_PICTURE_CONFIRMATION_REQUEST);
+                } else {
+                    sendFile(file);
+                }
             }
         } else if (requestCode == FilePickerConst.REQUEST_CODE_DOC && resultCode == Activity.RESULT_OK) {
             if (data == null) {
@@ -1090,10 +1099,24 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
         } else if (requestCode == TAKE_PICTURE_REQUEST && resultCode == Activity.RESULT_OK) {
             try {
-                sendFile(QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath())));
+                startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
+                        qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(),
+                        QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath()))),
+                        SEND_PICTURE_CONFIRMATION_REQUEST);
             } catch (Exception e) {
                 showError(getString(R.string.qiscus_chat_error_failed_read_picture));
                 e.printStackTrace();
+            }
+        } else if (requestCode == SEND_PICTURE_CONFIRMATION_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                showError(getString(R.string.qiscus_chat_error_failed_open_picture));
+                return;
+            }
+            File imageFile = (File) data.getSerializableExtra(QiscusSendPhotoConfirmationActivity.EXTRA_IMAGE_FILE);
+            if (imageFile != null) {
+                sendFile(imageFile);
+            } else {
+                showError(getString(R.string.qiscus_chat_error_failed_read_picture));
             }
         }
     }
