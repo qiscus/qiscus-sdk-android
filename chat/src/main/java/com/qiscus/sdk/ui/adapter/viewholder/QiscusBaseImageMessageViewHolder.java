@@ -141,7 +141,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         }
     }
 
-    private void showOthersImage(final QiscusComment qiscusComment) {
+    protected void showOthersImage(final QiscusComment qiscusComment) {
         File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
         if (localPath == null) {
             if (imageHolderLayout != null) {
@@ -158,7 +158,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         }
     }
 
-    private void showMyImage(final QiscusComment qiscusComment) {
+    protected void showMyImage(final QiscusComment qiscusComment) {
         if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
             if (imageHolderLayout != null) {
                 imageHolderLayout.setVisibility(View.INVISIBLE);

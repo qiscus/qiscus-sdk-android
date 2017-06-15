@@ -135,6 +135,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                 QiscusAndroidUtil.getString(R.string.qiscus_you) : originComment.getSender());
         switch (originComment.getType()) {
             case IMAGE:
+            case VIDEO:
                 if (originImageView != null) {
                     originImageView.setVisibility(View.VISIBLE);
                     File localPath = Qiscus.getDataStore().getLocalPath(originComment.getId());
@@ -186,7 +187,11 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
         if (originImageView != null) {
             Glide.with(originImageView.getContext())
                     .load(file)
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .asBitmap()
+                    .centerCrop()
+                    .dontAnimate()
+                    .thumbnail(0.5f)
+                    .placeholder(R.drawable.qiscus_image_placeholder)
                     .error(R.drawable.qiscus_image_placeholder)
                     .into(originImageView);
         }
@@ -196,8 +201,10 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
         if (originImageView != null) {
             Glide.with(originImageView.getContext())
                     .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                    .asBitmap()
+                    .centerCrop()
                     .dontAnimate()
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .thumbnail(0.5f)
                     .placeholder(R.drawable.qiscus_image_placeholder)
                     .error(R.drawable.qiscus_image_placeholder)
                     .into(originImageView);

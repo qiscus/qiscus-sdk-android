@@ -682,6 +682,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (qiscusComment.getState() > QiscusComment.STATE_SENDING) {
                 if (qiscusComment.getType() == QiscusComment.Type.FILE
                         || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                        || qiscusComment.getType() == QiscusComment.Type.VIDEO
                         || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                     qiscusChatPresenter.downloadFile(qiscusComment);
                 } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING) {
@@ -695,6 +696,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     || qiscusComment.getType() == QiscusComment.Type.LINK
                     || qiscusComment.getType() == QiscusComment.Type.IMAGE
                     || qiscusComment.getType() == QiscusComment.Type.AUDIO
+                    || qiscusComment.getType() == QiscusComment.Type.VIDEO
                     || qiscusComment.getType() == QiscusComment.Type.FILE
                     || qiscusComment.getType() == QiscusComment.Type.REPLY) {
                 toggleSelectComment(qiscusComment);
@@ -735,6 +737,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 || qiscusComment.getType() == QiscusComment.Type.LINK
                 || qiscusComment.getType() == QiscusComment.Type.IMAGE
                 || qiscusComment.getType() == QiscusComment.Type.AUDIO
+                || qiscusComment.getType() == QiscusComment.Type.VIDEO
                 || qiscusComment.getType() == QiscusComment.Type.FILE
                 || qiscusComment.getType() == QiscusComment.Type.REPLY)) {
             toggleSelectComment(qiscusComment);
