@@ -26,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -96,6 +95,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
             sender.setText(originComment.getSender());
             switch (originComment.getType()) {
                 case IMAGE:
+                case VIDEO:
                     image.setVisibility(VISIBLE);
                     icon.setVisibility(GONE);
                     File localPath = Qiscus.getDataStore().getLocalPath(originComment.getId());
@@ -149,7 +149,11 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private void showImage(File file) {
         Glide.with(getContext())
                 .load(file)
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .asBitmap()
+                .centerCrop()
+                .dontAnimate()
+                .thumbnail(0.5f)
+                .placeholder(R.drawable.qiscus_image_placeholder)
                 .error(R.drawable.qiscus_image_placeholder)
                 .into(image);
     }
@@ -157,8 +161,10 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private void showBlurryImage(QiscusComment qiscusComment) {
         Glide.with(getContext())
                 .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                .asBitmap()
+                .centerCrop()
                 .dontAnimate()
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .thumbnail(0.5f)
                 .placeholder(R.drawable.qiscus_image_placeholder)
                 .error(R.drawable.qiscus_image_placeholder)
                 .into(image);

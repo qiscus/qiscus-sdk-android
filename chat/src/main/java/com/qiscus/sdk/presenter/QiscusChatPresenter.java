@@ -661,7 +661,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.refreshComment(qiscusComment);
                         if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                             qiscusComment.playAudio();
-                        } else if (qiscusComment.getType() == QiscusComment.Type.FILE) {
+                        } else if (qiscusComment.getType() == QiscusComment.Type.FILE
+                                || qiscusComment.getType() == QiscusComment.Type.VIDEO) {
                             view.onFileDownloaded(file1, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
                         }
                     }, throwable -> {

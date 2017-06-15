@@ -368,7 +368,6 @@ public class QiscusComment implements Parcelable {
 
     public boolean isImage() {
         if (isAttachment()) {
-
             String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
             if (type == null) {
                 return false;
@@ -379,9 +378,20 @@ public class QiscusComment implements Parcelable {
         return false;
     }
 
+    public boolean isVideo() {
+        if (isAttachment()) {
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
+            if (type == null) {
+                return false;
+            } else if (type.contains("video")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isAudio() {
         if (isAttachment()) {
-
             String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
             if (type == null) {
                 return false;
@@ -441,6 +451,8 @@ public class QiscusComment implements Parcelable {
             return Type.TEXT;
         } else if (isImage()) {
             return Type.IMAGE;
+        } else if (isVideo()) {
+            return Type.VIDEO;
         } else if (isAudio()) {
             return Type.AUDIO;
         } else {
@@ -663,7 +675,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT
+        TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT
     }
 
     public interface ProgressListener {
