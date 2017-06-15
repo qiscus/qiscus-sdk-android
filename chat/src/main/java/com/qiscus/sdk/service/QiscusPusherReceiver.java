@@ -29,7 +29,10 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import static com.qiscus.sdk.service.QiscusPusherService.KEY_NOTIFICATION_REPLY;
 
 /**
- * Created by zetra. on 9/8/16.
+ * Created on : June 15, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusPusherReceiver extends BroadcastReceiver {
 

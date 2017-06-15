@@ -32,13 +32,7 @@ import java.util.List;
  * Created on : May 25, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
- */
-
-/**
- * Cache response from API here, so we can use it to speed up load data to the UI component
  */
 public enum QiscusCacheManager {
     INSTANCE;

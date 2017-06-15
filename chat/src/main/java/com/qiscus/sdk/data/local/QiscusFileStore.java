@@ -22,9 +22,7 @@ import java.io.File;
  * Created on : November 07, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public interface QiscusFileStore {
     void saveLocalPath(int topicId, int commentId, String localPath);

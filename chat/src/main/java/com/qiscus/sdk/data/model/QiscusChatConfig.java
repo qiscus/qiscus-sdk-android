@@ -39,7 +39,10 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by zetra. on 9/5/16.
+ * Created on : June 15, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusChatConfig {
     private int statusBarColor = R.color.qiscus_primary_dark;
@@ -110,18 +113,6 @@ public class QiscusChatConfig {
     private int replyBarColor = R.color.qiscus_primary;
     private int replySenderColor = R.color.qiscus_primary;
     private int replyMessageColor = R.color.qiscus_secondary_text;
-
-    /**
-     * @deprecated please use {@link #sendButtonIcon} instead
-     */
-    @Deprecated
-    private int sendActiveIcon = R.drawable.ic_qiscus_send_on;
-
-    /**
-     * @deprecated please use {@link #sendButtonIcon} instead
-     */
-    @Deprecated
-    private int sendInactiveIcon = R.drawable.ic_qiscus_send_off;
 
     private int playAudioIcon = R.drawable.ic_qiscus_play_audio;
     private int pauseAudioIcon = R.drawable.ic_qiscus_pause_audio;
@@ -450,24 +441,6 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setHideAttachmentPanelBackgroundColor(@ColorRes int hideAttachmentPanelBackgroundColor) {
         this.hideAttachmentPanelBackgroundColor = hideAttachmentPanelBackgroundColor;
-        return this;
-    }
-
-    /**
-     * @deprecated please use {@link #setSendButtonIcon} instead
-     */
-    @Deprecated
-    public QiscusChatConfig setSendActiveIcon(@DrawableRes int sendActiveIcon) {
-        this.sendActiveIcon = sendActiveIcon;
-        return this;
-    }
-
-    /**
-     * @deprecated please use {@link #setSendButtonIcon} instead
-     */
-    @Deprecated
-    public QiscusChatConfig setSendInactiveIcon(@DrawableRes int sendInactiveIcon) {
-        this.sendInactiveIcon = sendInactiveIcon;
         return this;
     }
 
@@ -813,24 +786,6 @@ public class QiscusChatConfig {
     @ColorRes
     public int getHideAttachmentPanelBackgroundColor() {
         return hideAttachmentPanelBackgroundColor;
-    }
-
-    /**
-     * @deprecated please use {@link #getSendButtonIcon} instead
-     */
-    @Deprecated
-    @DrawableRes
-    public int getSendActiveIcon() {
-        return sendActiveIcon;
-    }
-
-    /**
-     * @deprecated please use {@link #getSendButtonIcon} instead
-     */
-    @Deprecated
-    @DrawableRes
-    public int getSendInactiveIcon() {
-        return sendInactiveIcon;
     }
 
     @DrawableRes

@@ -38,9 +38,7 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  * Created on : August 18, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> extends RecyclerView.ViewHolder implements
         View.OnClickListener, View.OnLongClickListener {

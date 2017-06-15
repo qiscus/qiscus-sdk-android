@@ -49,9 +49,7 @@ import rx.schedulers.Schedulers;
  * Created on : August 18, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusComment implements Parcelable {
     public static final int STATE_FAILED = 0;

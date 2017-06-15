@@ -26,9 +26,7 @@ import rx.Observable;
  * Created on : November 07, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public interface QiscusCommentStore {
     void add(QiscusComment qiscusComment);

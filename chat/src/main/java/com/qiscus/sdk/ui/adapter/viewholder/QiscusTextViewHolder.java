@@ -30,9 +30,7 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  * Created on : September 27, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusTextViewHolder extends QiscusBaseTextMessageViewHolder {
     public QiscusTextViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {

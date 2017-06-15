@@ -35,9 +35,7 @@ import java.util.regex.Matcher;
  * Created on : May 31, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public final class QiscusAndroidUtil {
 

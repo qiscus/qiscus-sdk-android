@@ -37,9 +37,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusVideoViewHolder;
  * Created on : May 30, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, QiscusBaseMessageViewHolder<QiscusComment>> {
     private static final int TYPE_MESSAGE_ME = 1;
