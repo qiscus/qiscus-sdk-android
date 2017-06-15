@@ -25,8 +25,7 @@ import android.support.v4.app.RemoteInput;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
-
-import static com.qiscus.sdk.service.QiscusPusherService.KEY_NOTIFICATION_REPLY;
+import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 /**
  * Created on : June 15, 2017
@@ -41,7 +40,7 @@ public class QiscusPusherReceiver extends BroadcastReceiver {
         QiscusComment comment = intent.getParcelableExtra("data");
         Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
         if (remoteInput != null) {
-            CharSequence message = remoteInput.getCharSequence(KEY_NOTIFICATION_REPLY);
+            CharSequence message = remoteInput.getCharSequence(QiscusPushNotificationUtil.KEY_NOTIFICATION_REPLY);
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(
                     Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(comment.getRoomId());

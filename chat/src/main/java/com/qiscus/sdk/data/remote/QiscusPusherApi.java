@@ -32,6 +32,7 @@ import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
+import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -339,6 +340,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
                 setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(), qiscusComment.getId(), qiscusComment.getUniqueId());
             }
+            QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
             EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {
             String[] data = topic.split("/");

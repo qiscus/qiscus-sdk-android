@@ -23,6 +23,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -54,6 +55,7 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
                                 .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
                                         qiscusComment.getId(), qiscusComment.getUniqueId());
                     }
+                    QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
                     QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault()
                             .post(new QiscusCommentReceivedEvent(qiscusComment)));
                 }
