@@ -42,6 +42,7 @@ import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -55,10 +56,14 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         QiscusUserStatusPresenter.View {
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
+    protected static final String EXTRA_SHARING_FILE = "extra_share_file";
+    protected static final String EXTRA_AUTO_SEND = "auto_send";
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
     protected String startingMessage;
+    protected File shareFile;
+    protected boolean autoSendExtra;
 
     protected QiscusBaseChatFragment qiscusChatFragment;
 
@@ -99,6 +104,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
         resolveStartingMessage();
+        resolveShareFile();
+        resolveAutoSendExtra();
 
         binRoomData();
 
@@ -128,6 +135,20 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         if (getIntent().hasExtra(EXTRA_STARTING_MESSAGE)) {
             startingMessage = getIntent().getStringExtra(EXTRA_STARTING_MESSAGE);
             getIntent().removeExtra(EXTRA_STARTING_MESSAGE);
+        }
+    }
+
+    protected void resolveShareFile() {
+        if (getIntent().hasExtra(EXTRA_SHARING_FILE)) {
+            shareFile = (File) getIntent().getSerializableExtra(EXTRA_SHARING_FILE);
+            getIntent().removeExtra(EXTRA_SHARING_FILE);
+        }
+    }
+
+    protected void resolveAutoSendExtra() {
+        if (getIntent().hasExtra(EXTRA_AUTO_SEND)) {
+            autoSendExtra = getIntent().getBooleanExtra(EXTRA_AUTO_SEND, true);
+            getIntent().removeExtra(EXTRA_AUTO_SEND);
         }
     }
 

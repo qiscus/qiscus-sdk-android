@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,7 @@ public class QiscusPhotoFragment extends RxFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         resolveImageFile(savedInstanceState);
+        Log.d("ZETRA", "File: "+imageFile.getAbsolutePath());
         Glide.with(this).load(imageFile).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
     }
 

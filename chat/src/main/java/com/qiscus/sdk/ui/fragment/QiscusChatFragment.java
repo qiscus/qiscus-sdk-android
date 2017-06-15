@@ -57,20 +57,16 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return fragment;
     }
 
-    public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom, String message) {
+    public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom,
+                                                 String startingMessage,
+                                                 File shareFile,
+                                                 boolean autoSendExtra) {
         QiscusChatFragment fragment = new QiscusChatFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
-        bundle.putString(EXTRA_STARTING_MESSAGE, message);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-    public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom, File file) {
-        QiscusChatFragment fragment = new QiscusChatFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
-        bundle.putSerializable(EXTRA_SHARE_FILE, file);
+        bundle.putString(EXTRA_STARTING_MESSAGE, startingMessage);
+        bundle.putSerializable(EXTRA_SHARE_FILE, shareFile);
+        bundle.putBoolean(EXTRA_AUTO_SEND, autoSendExtra);
         fragment.setArguments(bundle);
         return fragment;
     }

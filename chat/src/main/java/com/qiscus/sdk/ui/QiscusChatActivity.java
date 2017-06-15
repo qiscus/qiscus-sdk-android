@@ -35,6 +35,7 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
+import java.io.File;
 import java.util.Date;
 
 public class QiscusChatActivity extends QiscusBaseChatActivity {
@@ -51,10 +52,13 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
         return intent;
     }
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom, String message) {
+    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
+                                        String startingMessage, File shareFile, boolean autoSendExtra) {
         Intent intent = new Intent(context, QiscusChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
-        intent.putExtra(EXTRA_STARTING_MESSAGE, message);
+        intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
+        intent.putExtra(EXTRA_SHARING_FILE, shareFile);
+        intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
         return intent;
     }
 
@@ -112,10 +116,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        if (startingMessage == null || startingMessage.isEmpty()) {
-            return QiscusChatFragment.newInstance(qiscusChatRoom);
-        }
-        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage);
+        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFile, autoSendExtra);
     }
 
     @Override

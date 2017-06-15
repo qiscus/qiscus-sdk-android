@@ -40,6 +40,7 @@ import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -653,11 +654,14 @@ public class Qiscus {
         private String distinctId;
         private String options;
         private String message;
+        private File shareFile;
+        private boolean autoSendExtra;
 
         private ChatActivityBuilder(String email) {
             title = "Chat";
             subtitle = "";
             this.email = email;
+            autoSendExtra = true;
         }
 
         /**
@@ -705,13 +709,35 @@ public class Qiscus {
         }
 
         /**
-         * If you want to automatically send a message after the activity started
+         * If you want to share a message after the activity started
          *
          * @param message The message
          * @return builder
          */
         public ChatActivityBuilder withMessage(String message) {
             this.message = message;
+            return this;
+        }
+
+        /**
+         * If you want to share a file message after the activity started
+         *
+         * @param shareFile The file
+         * @return builder
+         */
+        public ChatActivityBuilder withShareFile(File shareFile) {
+            this.shareFile = shareFile;
+            return this;
+        }
+
+        /**
+         * If you want to automatically send extra message (text or file sharing) after the activity started
+         *
+         * @param autoSendExtra The flag, default is true
+         * @return builder
+         */
+        public ChatActivityBuilder withAutoSendExtra(boolean autoSendExtra) {
+            this.autoSendExtra = autoSendExtra;
             return this;
         }
 
@@ -741,12 +767,8 @@ public class Qiscus {
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
-                    .map(qiscusChatRoom -> {
-                        if (message == null || message.isEmpty()) {
-                            return QiscusChatActivity.generateIntent(context, qiscusChatRoom);
-                        }
-                        return QiscusChatActivity.generateIntent(context, qiscusChatRoom, message);
-                    });
+                    .map(qiscusChatRoom ->
+                            QiscusChatActivity.generateIntent(context, qiscusChatRoom, message, shareFile, autoSendExtra));
         }
     }
 
@@ -773,11 +795,14 @@ public class Qiscus {
         private String distinctId;
         private String options;
         private String message;
+        private File shareFile;
+        private boolean autoSendExtra;
 
         private ChatFragmentBuilder(String email) {
             title = "Chat";
             subtitle = "";
             this.email = email;
+            autoSendExtra = true;
         }
 
         /**
@@ -825,13 +850,35 @@ public class Qiscus {
         }
 
         /**
-         * If you want to automatically send a message after the activity started
+         * If you want to share a message after the activity started
          *
          * @param message The message
          * @return builder
          */
         public ChatFragmentBuilder withMessage(String message) {
             this.message = message;
+            return this;
+        }
+
+        /**
+         * If you want to share a file message after the activity started
+         *
+         * @param shareFile The file
+         * @return builder
+         */
+        public ChatFragmentBuilder withShareFile(File shareFile) {
+            this.shareFile = shareFile;
+            return this;
+        }
+
+        /**
+         * If you want to automatically send extra message (text or file sharing) after the activity started
+         *
+         * @param autoSendExtra The flag, default is true
+         * @return builder
+         */
+        public ChatFragmentBuilder withAutoSendExtra(boolean autoSendExtra) {
+            this.autoSendExtra = autoSendExtra;
             return this;
         }
 
@@ -859,12 +906,8 @@ public class Qiscus {
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
-                    .map(qiscusChatRoom -> {
-                        if (message == null || message.isEmpty()) {
-                            return QiscusChatFragment.newInstance(qiscusChatRoom);
-                        }
-                        return QiscusChatFragment.newInstance(qiscusChatRoom, message);
-                    });
+                    .map(qiscusChatRoom ->
+                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile, autoSendExtra));
         }
     }
 
