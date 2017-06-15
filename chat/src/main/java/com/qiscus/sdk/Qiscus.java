@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -57,9 +58,9 @@ import rx.schedulers.Schedulers;
  */
 public class Qiscus {
 
+    @SuppressLint("StaticFieldLeak")
     private static Application appInstance;
-    private static volatile Context applicationContext;
-    private static volatile Handler appHandler;
+    private static Handler appHandler;
     private static LocalDataManager localDataManager;
     private static QiscusDataStore dataStore;
     private static QiscusChatConfig chatConfig;
@@ -114,8 +115,7 @@ public class Qiscus {
     public static void initWithCustomServer(Application application, String serverBaseUrl) {
         appInstance = application;
         appServer = serverBaseUrl;
-        applicationContext = appInstance.getApplicationContext();
-        appHandler = new Handler(applicationContext.getMainLooper());
+        appHandler = new Handler(appInstance.getApplicationContext().getMainLooper());
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
         chatConfig = new QiscusChatConfig();
@@ -133,7 +133,8 @@ public class Qiscus {
 
     public static void startPusherService() {
         checkAppIdSetup();
-        applicationContext.startService(new Intent(applicationContext, QiscusPusherService.class));
+        appInstance.getApplicationContext()
+                .startService(new Intent(appInstance.getApplicationContext(), QiscusPusherService.class));
     }
 
     /**
