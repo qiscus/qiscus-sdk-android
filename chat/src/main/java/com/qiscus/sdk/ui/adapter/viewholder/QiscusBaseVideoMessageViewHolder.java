@@ -18,13 +18,13 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.view.View;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 
@@ -49,7 +49,7 @@ public abstract class QiscusBaseVideoMessageViewHolder extends QiscusBaseImageMe
                 imageHolderLayout.setVisibility(View.INVISIBLE);
             }
             thumbnailView.setVisibility(View.VISIBLE);
-            Glide.with(thumbnailView.getContext())
+            QiscusGlide.getInstance().get()
                     .load(new File(qiscusComment.getAttachmentUri().toString()))
                     .centerCrop()
                     .dontAnimate()
@@ -82,7 +82,7 @@ public abstract class QiscusBaseVideoMessageViewHolder extends QiscusBaseImageMe
 
     @Override
     protected void showImage(QiscusComment qiscusComment, File file) {
-        Glide.with(thumbnailView.getContext())
+        QiscusGlide.getInstance().get()
                 .load(file)
                 .centerCrop()
                 .dontAnimate()

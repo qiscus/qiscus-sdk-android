@@ -24,12 +24,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
@@ -104,7 +104,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     protected void showRoomImage() {
         for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
             if (!member.getEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
-                Glide.with(this).load(member.getAvatar())
+                QiscusGlide.getInstance().get().load(member.getAvatar())
                         .error(R.drawable.ic_qiscus_avatar)
                         .placeholder(R.drawable.ic_qiscus_avatar)
                         .dontAnimate()

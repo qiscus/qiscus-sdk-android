@@ -37,8 +37,8 @@ import android.support.annotation.DrawableRes;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 
 public class QiscusCircularImageView extends AppCompatImageView {
     private static final ScaleType SCALE_TYPE = ScaleType.CENTER_CROP;
@@ -437,14 +437,14 @@ public class QiscusCircularImageView extends AppCompatImageView {
 
     public void setImageUrl(String url) {
         imageUrl = url;
-        Glide.with(getContext())
+        QiscusGlide.getInstance().get()
                 .load(url)
                 .into(this);
     }
 
     public void setImageUrl(String url, @DrawableRes int placeHolderResourceId) {
         imageUrl = url;
-        Glide.with(getContext())
+        QiscusGlide.getInstance().get()
                 .load(url)
                 .dontAnimate()
                 .placeholder(placeHolderResourceId)
@@ -454,7 +454,7 @@ public class QiscusCircularImageView extends AppCompatImageView {
 
     public void setImageUrl(String url, @DrawableRes int placeHolderResourceId, @DrawableRes int errorResourceId) {
         imageUrl = url;
-        Glide.with(getContext())
+        QiscusGlide.getInstance().get()
                 .load(url)
                 .placeholder(placeHolderResourceId)
                 .error(errorResourceId)

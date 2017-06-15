@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
@@ -31,6 +30,7 @@ import com.bumptech.glide.request.target.Target;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
@@ -162,7 +162,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                 imageHolderLayout.setVisibility(View.INVISIBLE);
             }
             thumbnailView.setVisibility(View.VISIBLE);
-            Glide.with(thumbnailView.getContext())
+            QiscusGlide.getInstance().get()
                     .load(new File(qiscusComment.getAttachmentUri().toString()))
                     .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .error(R.drawable.qiscus_image_placeholder)
@@ -192,7 +192,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     protected void showImage(QiscusComment qiscusComment, File file) {
-        Glide.with(thumbnailView.getContext())
+        QiscusGlide.getInstance().get()
                 .load(file)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .error(R.drawable.qiscus_image_placeholder)
@@ -218,7 +218,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
 
     protected void showBlurryImage(QiscusComment qiscusComment) {
         if (blurryImageView != null) {
-            Glide.with(blurryImageView.getContext())
+            QiscusGlide.getInstance().get()
                     .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
                     .dontAnimate()
                     .diskCacheStrategy(DiskCacheStrategy.SOURCE)

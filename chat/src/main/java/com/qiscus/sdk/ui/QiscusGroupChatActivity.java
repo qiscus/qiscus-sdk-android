@@ -20,11 +20,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 
 import java.util.Date;
 
@@ -79,7 +79,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
 
     @Override
     protected void showRoomImage() {
-        Glide.with(this).load(qiscusChatRoom.getAvatarUrl())
+        QiscusGlide.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
                 .error(R.drawable.ic_qiscus_avatar)
                 .placeholder(R.drawable.ic_qiscus_avatar)
                 .dontAnimate()

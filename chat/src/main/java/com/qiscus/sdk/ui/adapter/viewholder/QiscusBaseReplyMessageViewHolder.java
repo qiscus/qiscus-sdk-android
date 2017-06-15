@@ -32,11 +32,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.adapter.ReplyItemClickListener;
@@ -184,7 +184,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
 
     private void showImage(File file) {
         if (originImageView != null) {
-            Glide.with(originImageView.getContext())
+            QiscusGlide.getInstance().get()
                     .load(file)
                     .asBitmap()
                     .centerCrop()
@@ -198,7 +198,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
 
     private void showBlurryImage(QiscusComment qiscusComment) {
         if (originImageView != null) {
-            Glide.with(originImageView.getContext())
+            QiscusGlide.getInstance().get()
                     .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
                     .asBitmap()
                     .centerCrop()

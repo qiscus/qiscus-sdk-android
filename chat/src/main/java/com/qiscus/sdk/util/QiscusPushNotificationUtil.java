@@ -33,7 +33,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.qiscus.sdk.Qiscus;
@@ -42,6 +41,7 @@ import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +103,7 @@ public final class QiscusPushNotificationUtil {
 
         String finalMessageText = messageText;
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
-            Glide.with(Qiscus.getApps())
+            QiscusGlide.getInstance().get()
                     .load(comment.getRoomAvatar())
                     .asBitmap()
                     .into(new SimpleTarget<Bitmap>() {

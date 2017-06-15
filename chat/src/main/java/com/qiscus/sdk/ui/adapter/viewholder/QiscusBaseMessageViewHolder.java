@@ -27,10 +27,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 
@@ -192,7 +192,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         if (avatarView != null && !messageFromMe) {
             if (needToShowFirstMessageBubbleIndicator) {
                 avatarView.setVisibility(View.VISIBLE);
-                Glide.with(avatarView.getContext())
+                QiscusGlide.getInstance().get()
                         .load(qiscusComment.getSenderAvatar())
                         .dontAnimate()
                         .placeholder(R.drawable.ic_qiscus_avatar)
