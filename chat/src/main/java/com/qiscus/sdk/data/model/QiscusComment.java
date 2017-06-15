@@ -421,6 +421,7 @@ public class QiscusComment implements Parcelable {
             } else {
                 QiscusUrlScraper.getInstance()
                         .generatePreviewData(urls.get(0))
+                        .doOnNext(previewData -> previewData.setUrl(urls.get(0)))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(previewData -> {
