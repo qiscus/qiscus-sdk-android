@@ -35,7 +35,7 @@ Then add to your app module build.gradle
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.3.0'
+    compile 'com.qiscus.sdk:chat:2.4.0'
 }
 ```
 
@@ -430,7 +430,7 @@ Qiscus SDK is using appcompat libraries to support some features. If your apps u
 
 ```groovy
 //Qiscus sdk without android support libraries
-compile('com.qiscus.sdk:chat:2.3.0') {
+compile('com.qiscus.sdk:chat:2.4.0') {
     transitive = true
     exclude group: 'com.android.support'
 }
