@@ -297,7 +297,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
         return QiscusApi.getInstance().getChatRoomComments(room.getId())
-                .doOnSubscribe(() -> QiscusAndroidUtil.runOnUIThread(() -> view.showLoadMoreLoading()))
+                .doOnSubscribe(() -> QiscusAndroidUtil.runOnUIThread(() -> {
+                    if (view != null) {
+                        view.showLoadMoreLoading();
+                    }
+                }))
                 .doOnError(throwable -> {
                     throwable.printStackTrace();
                     QiscusAndroidUtil.runOnUIThread(() -> {
@@ -328,7 +332,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     roomData.first.setSubtitle(room.getSubtitle());
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
                 })
-                .doOnNext(roomData -> QiscusAndroidUtil.runOnUIThread(() -> view.dismissLoading()))
+                .doOnNext(roomData -> QiscusAndroidUtil.runOnUIThread(() -> {
+                    if (view != null) {
+                        view.dismissLoading();
+                    }
+                }))
                 .subscribeOn(Schedulers.io())
                 .onErrorReturn(throwable -> null);
     }
