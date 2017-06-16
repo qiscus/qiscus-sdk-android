@@ -63,6 +63,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     public QiscusChatPresenter(View view, QiscusChatRoom room) {
         super(view);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         this.room = room;
         this.currentTopicId = room.getLastTopicId();
         qiscusAccount = Qiscus.getQiscusAccount();
@@ -72,9 +75,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         updateReadState();
         listenRoomTask = this::listenRoomEvent;
         QiscusAndroidUtil.runOnUIThread(listenRoomTask, 1000);
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
     }
 
     private void doInIo(Runnable runnable) {
@@ -536,7 +536,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (event.getTopicId() == currentTopicId) {
             switch (event.getEvent()) {
                 case TYPING:
-                    view.onUserTyping(event.getUser(), event.isTyping());
+                    QiscusAndroidUtil.runOnUIThread(() -> view.onUserTyping(event.getUser(), event.isTyping()));
                     break;
                 case DELIVERED:
                     QiscusComment deliveredComment = Qiscus.getDataStore()
@@ -544,15 +544,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (deliveredComment != null) {
                         deliveredComment.setId(event.getCommentId());
                         updateLastDeliveredComment(deliveredComment);
-                        doInIo(() -> {
-                            if (QiscusComment.STATE_DELIVERED > deliveredComment.getState()) {
-                                deliveredComment.setState(QiscusComment.STATE_DELIVERED);
-                                Qiscus.getDataStore().update(deliveredComment);
-                            }
-                        });
+                        if (QiscusComment.STATE_DELIVERED > deliveredComment.getState()) {
+                            deliveredComment.setState(QiscusComment.STATE_DELIVERED);
+                            Qiscus.getDataStore().update(deliveredComment);
+                        }
                     } else {
                         lastDeliveredCommentId.set(event.getCommentId());
-                        view.updateLastDeliveredComment(lastDeliveredCommentId.get());
+                        QiscusAndroidUtil.runOnUIThread(() -> view.updateLastDeliveredComment(lastDeliveredCommentId.get()));
                     }
                     break;
                 case READ:
@@ -561,16 +559,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (readComment != null) {
                         readComment.setId(event.getCommentId());
                         updateLastReadComment(readComment);
-                        doInIo(() -> {
-                            if (QiscusComment.STATE_READ > readComment.getState()) {
-                                readComment.setState(QiscusComment.STATE_READ);
-                                Qiscus.getDataStore().update(readComment);
-                            }
-                        });
+                        if (QiscusComment.STATE_READ > readComment.getState()) {
+                            readComment.setState(QiscusComment.STATE_READ);
+                            Qiscus.getDataStore().update(readComment);
+                        }
                     } else {
                         lastReadCommentId.set(event.getCommentId());
                         lastDeliveredCommentId.set(lastReadCommentId.get());
-                        view.updateLastReadComment(lastReadCommentId.get());
+                        QiscusAndroidUtil.runOnUIThread(() -> view.updateLastReadComment(lastReadCommentId.get()));
                     }
                     break;
             }
