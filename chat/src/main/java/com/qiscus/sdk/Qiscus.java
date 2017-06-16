@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -61,6 +62,7 @@ public class Qiscus {
     @SuppressLint("StaticFieldLeak")
     private static Application appInstance;
     private static Handler appHandler;
+    private static ScheduledThreadPoolExecutor taskExecutor;
     private static LocalDataManager localDataManager;
     private static QiscusDataStore dataStore;
     private static QiscusChatConfig chatConfig;
@@ -116,6 +118,7 @@ public class Qiscus {
         appInstance = application;
         appServer = serverBaseUrl;
         appHandler = new Handler(appInstance.getApplicationContext().getMainLooper());
+        taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
         chatConfig = new QiscusChatConfig();
@@ -177,6 +180,16 @@ public class Qiscus {
     public static Handler getAppsHandler() {
         checkAppIdSetup();
         return appHandler;
+    }
+
+    /**
+     * Needed to run something at background thread handler
+     *
+     * @return ScheduledExecutorService instance
+     */
+    public static ScheduledThreadPoolExecutor getTaskExecutor() {
+        checkAppIdSetup();
+        return taskExecutor;
     }
 
     /**

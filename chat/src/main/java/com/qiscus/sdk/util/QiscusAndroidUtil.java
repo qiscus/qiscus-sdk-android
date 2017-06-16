@@ -19,6 +19,8 @@ package com.qiscus.sdk.util;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.View;
@@ -29,7 +31,10 @@ import com.qiscus.sdk.Qiscus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ScheduledFuture;
 import java.util.regex.Matcher;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Created on : May 31, 2016
@@ -58,6 +63,24 @@ public final class QiscusAndroidUtil {
 
     public static void cancelRunOnUIThread(Runnable runnable) {
         Qiscus.getAppsHandler().removeCallbacks(runnable);
+    }
+
+    public static ScheduledFuture<?> runOnBackgroundThread(Runnable runnable) {
+        return runOnBackgroundThread(runnable, 0);
+    }
+
+    public static ScheduledFuture<?> runOnBackgroundThread(Runnable runnable, long delay) {
+        if (delay == 0) {
+            return Qiscus.getTaskExecutor().schedule(runnable, 0, MILLISECONDS);
+        }
+        return Qiscus.getTaskExecutor().schedule(runnable, delay, MILLISECONDS);
+    }
+
+    public static boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager)
+                Qiscus.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     public static int compare(int x, int y) {

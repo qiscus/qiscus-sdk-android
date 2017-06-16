@@ -35,8 +35,8 @@ import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -50,8 +50,8 @@ import rx.schedulers.Schedulers;
 public class QiscusPusherService extends Service {
     private static final String TAG = QiscusPusherService.class.getSimpleName();
 
-    private Timer timer;
     private QiscusAccount qiscusAccount;
+    private ScheduledFuture<?> scheduledSync;
 
     @Override
     public void onCreate() {
@@ -82,39 +82,38 @@ public class QiscusPusherService extends Service {
         qiscusAccount = Qiscus.getQiscusAccount();
         stopSync();
 
-        timer = new Timer("qiscus_sync", true);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (Qiscus.isOnForeground()) {
-                    QiscusApi.getInstance().sync()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(qiscusComment -> {
-                                if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
-                                    QiscusPusherApi.getInstance()
-                                            .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
-                                                    qiscusComment.getId(), qiscusComment.getUniqueId());
-                                }
-                                QiscusComment savedQiscusComment = Qiscus.getDataStore()
-                                        .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
-                                if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
-                                    qiscusComment.setState(savedQiscusComment.getState());
-                                }
-                                Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                                qiscusComment.setRoomName("sync");
-                                QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
-                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
+        scheduledSync = Qiscus.getTaskExecutor()
+                .scheduleWithFixedDelay(() -> {
+                    if (Qiscus.isOnForeground()) {
+                        QiscusApi.getInstance().sync()
+                                .doOnNext(qiscusComment -> {
+                                    if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+                                        QiscusPusherApi.getInstance()
+                                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
+                                                        qiscusComment.getId(), qiscusComment.getUniqueId());
+                                    }
+                                    QiscusComment savedQiscusComment = Qiscus.getDataStore()
+                                            .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+                                    if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
+                                        qiscusComment.setState(savedQiscusComment.getState());
+                                    }
+                                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                                    qiscusComment.setRoomName("sync");
+                                })
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(qiscusComment -> {
+                                    QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
+                                    EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
 
-                            }, Throwable::printStackTrace);
-                }
-            }
-        }, 0, period);
+                                }, Throwable::printStackTrace);
+                    }
+                }, 0, period, TimeUnit.MILLISECONDS);
     }
 
     private void stopSync() {
-        if (timer != null) {
-            timer.cancel();
+        if (scheduledSync != null) {
+            scheduledSync.cancel(true);
         }
     }
 
