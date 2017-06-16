@@ -59,6 +59,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private AtomicInteger lastReadCommentId;
     private Func2<QiscusComment, QiscusComment, Integer> commentComparator = (lhs, rhs) -> lhs.getId() != -1 && rhs.getId() != -1 ?
             QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime());
+    private Runnable listenRoomTask;
 
     public QiscusChatPresenter(View view, QiscusChatRoom room) {
         super(view);
@@ -69,8 +70,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         lastReadCommentId = new AtomicInteger(0);
 
         updateReadState();
-
-        listenRoomEvent();
+        listenRoomTask = this::listenRoomEvent;
+        QiscusAndroidUtil.runOnUIThread(listenRoomTask, 1000);
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
@@ -528,6 +529,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     @Subscribe
     public void onRoomEvent(QiscusChatRoomEvent event) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleEvent(event));
+    }
+
+    private void handleEvent(QiscusChatRoomEvent event) {
         if (event.getTopicId() == currentTopicId) {
             switch (event.getEvent()) {
                 case TYPING:
@@ -802,6 +807,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     @Override
     public void detachView() {
         super.detachView();
+        QiscusAndroidUtil.cancelRunOnUIThread(listenRoomTask);
         QiscusPusherApi.getInstance().unListenRoom(room);
         room = null;
         EventBus.getDefault().unregister(this);
