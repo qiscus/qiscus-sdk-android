@@ -31,6 +31,6 @@ public class SampleApps extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Qiscus.init(this, "dummy");
+        Qiscus.init(this, "dragongo");
     }
 }
