@@ -26,8 +26,8 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.filepicker.model.PhotoDirectory;
 
 import java.io.File;
@@ -57,7 +57,7 @@ public class FolderGridAdapter extends SelectableAdapter<FolderGridAdapter.Photo
     public void onBindViewHolder(final PhotoViewHolder holder, int position) {
         PhotoDirectory photoDirectory = getItems().get(position);
 
-        Glide.with(context)
+        QiscusGlide.getInstance().get()
                 .load(new File(photoDirectory.getCoverPath()))
                 .centerCrop()
                 .dontAnimate()

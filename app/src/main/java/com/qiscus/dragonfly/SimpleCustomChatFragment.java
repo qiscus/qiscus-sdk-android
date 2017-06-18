@@ -29,9 +29,7 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
  * Created on : October 27, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class SimpleCustomChatFragment extends QiscusChatFragment {
     private View mInputPanel;

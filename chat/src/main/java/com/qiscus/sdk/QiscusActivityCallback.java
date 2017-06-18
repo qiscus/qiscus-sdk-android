@@ -20,8 +20,9 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
+
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Created on : February 09, 2017
@@ -34,8 +35,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
 
-    private Timer activityTransitionTimer;
-    private TimerTask activityTransitionTimerTask;
+    private ScheduledFuture<?> activityTransition;
     private boolean foreground;
 
     @Override
@@ -74,23 +74,13 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     }
 
     private void startActivityTransitionTimer() {
-        this.activityTransitionTimer = new Timer();
-        this.activityTransitionTimerTask = new TimerTask() {
-            public void run() {
-                foreground = false;
-            }
-        };
-
-        this.activityTransitionTimer.schedule(activityTransitionTimerTask, MAX_ACTIVITY_TRANSITION_TIME);
+        activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() -> foreground = false,
+                MAX_ACTIVITY_TRANSITION_TIME);
     }
 
     private void stopActivityTransitionTimer() {
-        if (activityTransitionTimerTask != null) {
-            activityTransitionTimerTask.cancel();
-        }
-
-        if (activityTransitionTimer != null) {
-            activityTransitionTimer.cancel();
+        if (activityTransition != null) {
+            activityTransition.cancel(true);
         }
 
         foreground = true;

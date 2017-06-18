@@ -19,7 +19,10 @@ package com.qiscus.sdk.data.model;
 import java.util.Date;
 
 /**
- * Created by zetra. on 9/6/16.
+ * Created on : June 15, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
  */
 public interface DateFormatter {
     String format(Date date);

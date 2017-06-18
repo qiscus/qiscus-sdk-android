@@ -32,9 +32,7 @@ import com.qiscus.sdk.ui.view.QiscusProgressView;
  * Created on : November 02, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusAudioViewHolder extends QiscusBaseAudioMessageViewHolder {
     public QiscusAudioViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {

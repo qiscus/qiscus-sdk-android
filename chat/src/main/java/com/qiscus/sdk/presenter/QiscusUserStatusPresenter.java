@@ -30,9 +30,7 @@ import java.util.Set;
  * Created on : October 31, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusUserStatusPresenter extends QiscusPresenter<QiscusUserStatusPresenter.View> {
     private Set<String> users;

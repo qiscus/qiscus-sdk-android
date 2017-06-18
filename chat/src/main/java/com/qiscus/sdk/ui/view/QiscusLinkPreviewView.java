@@ -27,9 +27,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
@@ -98,11 +98,11 @@ public class QiscusLinkPreviewView extends LinearLayout {
         } else {
             image.setBackgroundColor(QiscusAndroidUtil.getRandomColor());
             if (previewData.getImages().size() > 0) {
-                Glide.with(getContext())
+                QiscusGlide.getInstance().get()
                         .load(previewData.getImages().get(0).getSource())
                         .into(image);
             } else {
-                Glide.with(getContext()).load("clear it").into(image);
+                QiscusGlide.getInstance().get().load("clear it").into(image);
             }
             title.setText(previewData.getTitle().isEmpty() ?
                     getContext().getString(R.string.qiscus_link_preview_default_title) : previewData.getTitle());

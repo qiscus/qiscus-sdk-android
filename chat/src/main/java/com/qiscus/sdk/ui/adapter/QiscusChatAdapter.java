@@ -32,34 +32,35 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusLinkViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusReplyViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusSystemMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusTextViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusVideoViewHolder;
 
 /**
  * Created on : May 30, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, QiscusBaseMessageViewHolder<QiscusComment>> {
     private static final int TYPE_MESSAGE_ME = 1;
     private static final int TYPE_MESSAGE_OTHER = 2;
     private static final int TYPE_IMAGE_ME = 3;
     private static final int TYPE_IMAGE_OTHER = 4;
-    private static final int TYPE_FILE_ME = 5;
-    private static final int TYPE_FILE_OTHER = 6;
-    private static final int TYPE_AUDIO_ME = 7;
-    private static final int TYPE_AUDIO_OTHER = 8;
-    private static final int TYPE_LINK_ME = 9;
-    private static final int TYPE_LINK_OTHER = 10;
-    private static final int TYPE_ACCOUNT_LINKING = 11;
-    private static final int TYPE_BUTTONS = 12;
-    private static final int TYPE_MESSAGE_MULTI_LINE_ME = 13;
-    private static final int TYPE_MESSAGE_MULTI_LINE_OTHER = 14;
-    private static final int TYPE_MESSAGE_REPLY_ME = 15;
-    private static final int TYPE_MESSAGE_REPLY_OTHER = 16;
-    private static final int TYPE_MESSAGE_CARD = 17;
-    private static final int TYPE_SYSTEM_EVENT = 18;
+    private static final int TYPE_VIDEO_ME = 5;
+    private static final int TYPE_VIDEO_OTHER = 6;
+    private static final int TYPE_FILE_ME = 7;
+    private static final int TYPE_FILE_OTHER = 8;
+    private static final int TYPE_AUDIO_ME = 9;
+    private static final int TYPE_AUDIO_OTHER = 10;
+    private static final int TYPE_LINK_ME = 11;
+    private static final int TYPE_LINK_OTHER = 12;
+    private static final int TYPE_ACCOUNT_LINKING = 13;
+    private static final int TYPE_BUTTONS = 14;
+    private static final int TYPE_MESSAGE_MULTI_LINE_ME = 15;
+    private static final int TYPE_MESSAGE_MULTI_LINE_OTHER = 16;
+    private static final int TYPE_MESSAGE_REPLY_ME = 17;
+    private static final int TYPE_MESSAGE_REPLY_OTHER = 18;
+    private static final int TYPE_SYSTEM_EVENT = 19;
+    private static final int TYPE_MESSAGE_CARD = 20;
 
     public QiscusChatAdapter(Context context, boolean groupChat) {
         super(context, groupChat);
@@ -84,6 +85,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_LINK_ME;
             case IMAGE:
                 return TYPE_IMAGE_ME;
+            case VIDEO:
+                return TYPE_VIDEO_ME;
             case AUDIO:
                 return TYPE_AUDIO_ME;
             case FILE:
@@ -113,6 +116,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_LINK_OTHER;
             case IMAGE:
                 return TYPE_IMAGE_OTHER;
+            case VIDEO:
+                return TYPE_VIDEO_OTHER;
             case AUDIO:
                 return TYPE_AUDIO_OTHER;
             case FILE:
@@ -147,6 +152,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_img_me;
             case TYPE_IMAGE_OTHER:
                 return R.layout.item_qiscus_chat_img;
+            case TYPE_VIDEO_ME:
+                return R.layout.item_qiscus_chat_video_me;
+            case TYPE_VIDEO_OTHER:
+                return R.layout.item_qiscus_chat_video;
             case TYPE_AUDIO_ME:
                 return R.layout.item_qiscus_chat_audio_me;
             case TYPE_AUDIO_OTHER:
@@ -190,6 +199,9 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case TYPE_IMAGE_ME:
             case TYPE_IMAGE_OTHER:
                 return new QiscusImageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+            case TYPE_VIDEO_ME:
+            case TYPE_VIDEO_OTHER:
+                return new QiscusVideoViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_AUDIO_ME:
             case TYPE_AUDIO_OTHER:
                 return new QiscusAudioViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);

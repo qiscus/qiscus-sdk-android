@@ -23,9 +23,7 @@ import android.os.Parcelable;
  * Created on : August 18, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusAccount implements Parcelable {
     protected int id;

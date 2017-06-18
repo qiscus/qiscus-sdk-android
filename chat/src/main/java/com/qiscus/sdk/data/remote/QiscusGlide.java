@@ -14,23 +14,32 @@
  * limitations under the License.
  */
 
-package com.qiscus.dragonfly;
+package com.qiscus.sdk.data.remote;
 
-import android.app.Application;
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.qiscus.sdk.Qiscus;
 
 /**
- * Created on : August 18, 2016
+ * Created on : June 15, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class SampleApps extends Application {
+public enum QiscusGlide {
+    INSTANCE;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Qiscus.init(this, "dragongo");
+    private RequestManager requestManager;
+
+    QiscusGlide() {
+        requestManager = Glide.with(Qiscus.getApps().getApplicationContext());
+    }
+
+    public static QiscusGlide getInstance() {
+        return INSTANCE;
+    }
+
+    public RequestManager get() {
+        return requestManager;
     }
 }

@@ -28,9 +28,7 @@ import rx.subjects.BehaviorSubject;
  * Created on : August 18, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public abstract class QiscusPresenter<V extends QiscusPresenter.View> {
     private final BehaviorSubject<QiscusPresenterEvent> lifecycleSubject = BehaviorSubject.create();

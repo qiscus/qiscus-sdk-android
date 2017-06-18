@@ -19,28 +19,61 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.QiscusProgressView;
 
 /**
- * Created on : September 27, 2016
+ * Created on : June 15, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusTextViewHolder extends QiscusBaseTextMessageViewHolder {
-    public QiscusTextViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
+public class QiscusVideoViewHolder extends QiscusBaseVideoMessageViewHolder {
+    public QiscusVideoViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                 OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
     }
 
     @NonNull
     @Override
-    protected TextView getMessageTextView(View itemView) {
-        return (TextView) itemView.findViewById(R.id.contents);
+    protected ImageView getThumbnailView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.thumbnail);
+    }
+
+    @Nullable
+    @Override
+    protected ViewGroup getImageHolderLayout(View itemView) {
+        return (ViewGroup) itemView.findViewById(R.id.holder);
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getBlurryImageView(View view) {
+        return (ImageView) itemView.findViewById(R.id.blurry_thumbnail);
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getImageFrameView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.frame);
+    }
+
+    @Nullable
+    @Override
+    protected QiscusProgressView getProgressView(View itemView) {
+        return (QiscusProgressView) itemView.findViewById(R.id.progress);
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getDownloadIconView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.iv_download);
     }
 
     @Nullable
