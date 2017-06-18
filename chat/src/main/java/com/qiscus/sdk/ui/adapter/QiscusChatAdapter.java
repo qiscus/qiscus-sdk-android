@@ -25,6 +25,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusAccountLinkingViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusAudioViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusButtonMessageViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusCardMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusFileViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusImageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusLinkViewHolder;
@@ -59,6 +60,7 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_MESSAGE_REPLY_ME = 17;
     private static final int TYPE_MESSAGE_REPLY_OTHER = 18;
     private static final int TYPE_SYSTEM_EVENT = 19;
+    private static final int TYPE_MESSAGE_CARD = 20;
 
     public QiscusChatAdapter(Context context, boolean groupChat) {
         super(context, groupChat);
@@ -95,6 +97,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_BUTTONS;
             case REPLY:
                 return TYPE_MESSAGE_REPLY_ME;
+            case CARD:
+                return TYPE_MESSAGE_CARD;
             case SYSTEM_EVENT:
                 return TYPE_SYSTEM_EVENT;
             default:
@@ -124,6 +128,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_BUTTONS;
             case REPLY:
                 return TYPE_MESSAGE_REPLY_OTHER;
+            case CARD:
+                return TYPE_MESSAGE_CARD;
             case SYSTEM_EVENT:
                 return TYPE_SYSTEM_EVENT;
             default:
@@ -170,6 +176,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_reply_me;
             case TYPE_MESSAGE_REPLY_OTHER:
                 return R.layout.item_qiscus_chat_reply;
+            case TYPE_MESSAGE_CARD:
+                return R.layout.item_qiscus_chat_card;
             case TYPE_SYSTEM_EVENT:
                 return R.layout.item_qiscus_chat_system_event;
             default:
@@ -209,6 +217,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case TYPE_MESSAGE_REPLY_OTHER:
                 return new QiscusReplyViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener,
                         replyItemClickListener);
+            case TYPE_MESSAGE_CARD:
+                return new QiscusCardMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_SYSTEM_EVENT:
                 return new QiscusSystemMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             default:
