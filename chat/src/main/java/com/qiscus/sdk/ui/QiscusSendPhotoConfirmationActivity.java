@@ -24,8 +24,8 @@ import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.ui.fragment.QiscusPhotoFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
@@ -64,7 +64,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity {
         setSupportActionBar(toolbar);
 
         tvTitle.setText(getIntent().getStringExtra(EXTRA_ROOM_NAME));
-        Glide.with(this).load(getIntent().getStringExtra(EXTRA_ROOM_AVATAR))
+        QiscusGlide.getInstance().get().load(getIntent().getStringExtra(EXTRA_ROOM_AVATAR))
                 .error(R.drawable.ic_qiscus_avatar)
                 .placeholder(R.drawable.ic_qiscus_avatar)
                 .dontAnimate()

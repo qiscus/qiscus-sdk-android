@@ -20,9 +20,7 @@ package com.qiscus.sdk.event;
  * Created on : October 31, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusChatRoomEvent {
     private int roomId;

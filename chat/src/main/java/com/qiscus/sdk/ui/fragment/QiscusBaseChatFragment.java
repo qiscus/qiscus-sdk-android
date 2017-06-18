@@ -89,9 +89,7 @@ import java.util.List;
  * Created on : September 28, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> extends RxFragment
         implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
@@ -117,6 +115,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
     protected static final String EXTRA_SHARE_FILE = "extra_share_file";
+    protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
     protected static final String COMMENTS_DATA = "saved_comments_data";
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 2;
@@ -157,6 +156,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected QiscusChatRoom qiscusChatRoom;
     protected String startingMessage;
     protected File shareFile;
+    protected boolean autoSendExtra;
     protected T chatAdapter;
     protected QiscusChatPresenter qiscusChatPresenter;
     protected Animation animation;
@@ -409,6 +409,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         resolveChatRoom(savedInstanceState);
         resolveStartingMessage();
         resolveShareFile();
+        resolveAutoSendExtra();
 
         onApplyChatConfig();
 
@@ -450,12 +451,39 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
         }
 
-        if (startingMessage != null && !startingMessage.isEmpty()) {
+        handleExtra();
+    }
+
+    private void handleExtra() {
+        if (startingMessage != null && !startingMessage.isEmpty() && shareFile != null) {
             sendMessage(startingMessage);
+            sendFile(shareFile);
+            return;
         }
 
-        if (shareFile != null) {
-            sendFile(shareFile);
+        if (autoSendExtra) {
+            if (startingMessage != null && !startingMessage.isEmpty()) {
+                sendMessage(startingMessage);
+            }
+
+            if (shareFile != null) {
+                sendFile(shareFile);
+            }
+        } else {
+            if (startingMessage != null && !startingMessage.isEmpty()) {
+                messageEditText.setText(startingMessage);
+                QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
+            }
+
+            if (shareFile != null) {
+                if (QiscusImageUtil.isImage(shareFile)) {
+                    startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
+                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), shareFile),
+                            SEND_PICTURE_CONFIRMATION_REQUEST);
+                } else {
+                    sendFile(shareFile);
+                }
+            }
         }
     }
 
@@ -525,6 +553,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void resolveShareFile() {
         shareFile = (File) getArguments().getSerializable(EXTRA_SHARE_FILE);
         getArguments().remove(EXTRA_SHARE_FILE);
+    }
+
+    protected void resolveAutoSendExtra() {
+        autoSendExtra = getArguments().getBoolean(EXTRA_AUTO_SEND, true);
+        getArguments().remove(EXTRA_AUTO_SEND);
     }
 
     protected void onApplyChatConfig() {
@@ -647,6 +680,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (qiscusComment.getState() > QiscusComment.STATE_SENDING) {
                 if (qiscusComment.getType() == QiscusComment.Type.FILE
                         || qiscusComment.getType() == QiscusComment.Type.IMAGE
+                        || qiscusComment.getType() == QiscusComment.Type.VIDEO
                         || qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                     qiscusChatPresenter.downloadFile(qiscusComment);
                 } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING) {
@@ -660,6 +694,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     || qiscusComment.getType() == QiscusComment.Type.LINK
                     || qiscusComment.getType() == QiscusComment.Type.IMAGE
                     || qiscusComment.getType() == QiscusComment.Type.AUDIO
+                    || qiscusComment.getType() == QiscusComment.Type.VIDEO
                     || qiscusComment.getType() == QiscusComment.Type.FILE
                     || qiscusComment.getType() == QiscusComment.Type.REPLY) {
                 toggleSelectComment(qiscusComment);
@@ -700,6 +735,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 || qiscusComment.getType() == QiscusComment.Type.LINK
                 || qiscusComment.getType() == QiscusComment.Type.IMAGE
                 || qiscusComment.getType() == QiscusComment.Type.AUDIO
+                || qiscusComment.getType() == QiscusComment.Type.VIDEO
                 || qiscusComment.getType() == QiscusComment.Type.FILE
                 || qiscusComment.getType() == QiscusComment.Type.REPLY)) {
             toggleSelectComment(qiscusComment);

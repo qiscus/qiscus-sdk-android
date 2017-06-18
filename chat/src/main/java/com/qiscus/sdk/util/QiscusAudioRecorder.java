@@ -29,9 +29,7 @@ import java.util.Locale;
  * Created on : November 02, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusAudioRecorder {
     private MediaRecorder recorder;

@@ -38,11 +38,8 @@ import java.util.List;
  * Created on : September 27, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
-
 public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends QiscusBaseMessageViewHolder<E>>
         extends RecyclerView.Adapter<H> {
     protected Context context;

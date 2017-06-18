@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -40,11 +41,13 @@ import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -56,9 +59,10 @@ import rx.schedulers.Schedulers;
  */
 public class Qiscus {
 
+    @SuppressLint("StaticFieldLeak")
     private static Application appInstance;
-    private static volatile Context applicationContext;
-    private static volatile Handler appHandler;
+    private static Handler appHandler;
+    private static ScheduledThreadPoolExecutor taskExecutor;
     private static LocalDataManager localDataManager;
     private static QiscusDataStore dataStore;
     private static QiscusChatConfig chatConfig;
@@ -113,8 +117,8 @@ public class Qiscus {
     public static void initWithCustomServer(Application application, String serverBaseUrl) {
         appInstance = application;
         appServer = serverBaseUrl;
-        applicationContext = appInstance.getApplicationContext();
-        appHandler = new Handler(applicationContext.getMainLooper());
+        appHandler = new Handler(appInstance.getApplicationContext().getMainLooper());
+        taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
         chatConfig = new QiscusChatConfig();
@@ -132,7 +136,8 @@ public class Qiscus {
 
     public static void startPusherService() {
         checkAppIdSetup();
-        applicationContext.startService(new Intent(applicationContext, QiscusPusherService.class));
+        appInstance.getApplicationContext()
+                .startService(new Intent(appInstance.getApplicationContext(), QiscusPusherService.class));
     }
 
     /**
@@ -175,6 +180,16 @@ public class Qiscus {
     public static Handler getAppsHandler() {
         checkAppIdSetup();
         return appHandler;
+    }
+
+    /**
+     * Needed to run something at background thread handler
+     *
+     * @return ScheduledExecutorService instance
+     */
+    public static ScheduledThreadPoolExecutor getTaskExecutor() {
+        checkAppIdSetup();
+        return taskExecutor;
     }
 
     /**
@@ -653,11 +668,14 @@ public class Qiscus {
         private String distinctId;
         private String options;
         private String message;
+        private File shareFile;
+        private boolean autoSendExtra;
 
         private ChatActivityBuilder(String email) {
             title = "Chat";
             subtitle = "";
             this.email = email;
+            autoSendExtra = true;
         }
 
         /**
@@ -705,13 +723,35 @@ public class Qiscus {
         }
 
         /**
-         * If you want to automatically send a message after the activity started
+         * If you want to share a message after the activity started
          *
          * @param message The message
          * @return builder
          */
         public ChatActivityBuilder withMessage(String message) {
             this.message = message;
+            return this;
+        }
+
+        /**
+         * If you want to share a file message after the activity started
+         *
+         * @param shareFile The file
+         * @return builder
+         */
+        public ChatActivityBuilder withShareFile(File shareFile) {
+            this.shareFile = shareFile;
+            return this;
+        }
+
+        /**
+         * If you want to automatically send extra message (text or file sharing) after the activity started
+         *
+         * @param autoSendExtra The flag, default is true
+         * @return builder
+         */
+        public ChatActivityBuilder withAutoSendExtra(boolean autoSendExtra) {
+            this.autoSendExtra = autoSendExtra;
             return this;
         }
 
@@ -741,12 +781,8 @@ public class Qiscus {
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
-                    .map(qiscusChatRoom -> {
-                        if (message == null || message.isEmpty()) {
-                            return QiscusChatActivity.generateIntent(context, qiscusChatRoom);
-                        }
-                        return QiscusChatActivity.generateIntent(context, qiscusChatRoom, message);
-                    });
+                    .map(qiscusChatRoom ->
+                            QiscusChatActivity.generateIntent(context, qiscusChatRoom, message, shareFile, autoSendExtra));
         }
     }
 
@@ -773,11 +809,14 @@ public class Qiscus {
         private String distinctId;
         private String options;
         private String message;
+        private File shareFile;
+        private boolean autoSendExtra;
 
         private ChatFragmentBuilder(String email) {
             title = "Chat";
             subtitle = "";
             this.email = email;
+            autoSendExtra = true;
         }
 
         /**
@@ -825,13 +864,35 @@ public class Qiscus {
         }
 
         /**
-         * If you want to automatically send a message after the activity started
+         * If you want to share a message after the activity started
          *
          * @param message The message
          * @return builder
          */
         public ChatFragmentBuilder withMessage(String message) {
             this.message = message;
+            return this;
+        }
+
+        /**
+         * If you want to share a file message after the activity started
+         *
+         * @param shareFile The file
+         * @return builder
+         */
+        public ChatFragmentBuilder withShareFile(File shareFile) {
+            this.shareFile = shareFile;
+            return this;
+        }
+
+        /**
+         * If you want to automatically send extra message (text or file sharing) after the activity started
+         *
+         * @param autoSendExtra The flag, default is true
+         * @return builder
+         */
+        public ChatFragmentBuilder withAutoSendExtra(boolean autoSendExtra) {
+            this.autoSendExtra = autoSendExtra;
             return this;
         }
 
@@ -859,12 +920,8 @@ public class Qiscus {
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
-                    .map(qiscusChatRoom -> {
-                        if (message == null || message.isEmpty()) {
-                            return QiscusChatFragment.newInstance(qiscusChatRoom);
-                        }
-                        return QiscusChatFragment.newInstance(qiscusChatRoom, message);
-                    });
+                    .map(qiscusChatRoom ->
+                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile, autoSendExtra));
         }
     }
 

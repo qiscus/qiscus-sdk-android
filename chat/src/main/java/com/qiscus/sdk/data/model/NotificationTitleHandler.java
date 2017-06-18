@@ -17,7 +17,10 @@
 package com.qiscus.sdk.data.model;
 
 /**
- * Created by zetra. on 9/19/16.
+ * Created on : June 15, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
  */
 public interface NotificationTitleHandler {
     String getTitle(QiscusComment qiscusComment);

@@ -37,9 +37,7 @@ import java.io.IOException;
  * Created on : November 02, 2016
  * Author     : zetbaitsu
  * Name       : Zetra
- * Email      : zetra@mail.ugm.ac.id
  * GitHub     : https://github.com/zetbaitsu
- * LinkedIn   : https://id.linkedin.com/in/zetbaitsu
  */
 public class QiscusAudioRecorderView extends LinearLayout {
     private ImageView buttonStopRecord;
