@@ -76,6 +76,41 @@ public enum QiscusCacheManager {
         }.getType());
     }
 
+    public boolean addRoomNotifItem(String roomId) {
+        List<String> roomNotif = getRoomNotifItems();
+        if (roomNotif == null) {
+            roomNotif = new ArrayList<>();
+        }
+
+        if (!roomNotif.contains(roomId)) {
+            roomNotif.add(roomId);
+            sharedPreferences.edit()
+                    .putString("push_notif_message_room_id", gson.toJson(roomNotif))
+                    .apply();
+            return true;
+        }
+        return false;
+    }
+
+    public List<String> getRoomNotifItems() {
+        String json = sharedPreferences.getString("push_notif_message_room_id", "");
+        return gson.fromJson(json, new TypeToken<List<String>>() {
+        }.getType());
+    }
+
+    public void removeRoomNotif(int roomId) {
+        List<String> json =  getRoomNotifItems();
+        if (getRoomNotifItems() != null) {
+            for (int i = 0; i < getRoomNotifItems().size(); i++) {
+                if (getRoomNotifItems().get(i).equals(String.valueOf(roomId)))
+                    json.remove(i);
+            }
+        }
+        sharedPreferences.edit()
+                .putString("push_notif_message_room_id", gson.toJson(json))
+                .apply();
+    }
+
     public void clearMessageNotifItems(int roomId) {
         sharedPreferences.edit()
                 .putString("push_notif_message_" + roomId, "")

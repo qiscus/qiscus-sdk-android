@@ -48,6 +48,7 @@ public class QiscusChatConfig {
     private int statusBarColor = R.color.qiscus_primary_dark;
     private int appBarColor = R.color.qiscus_primary;
     private int accentColor = R.color.qiscus_accent;
+    private int inlineReplyColor = R.color.qiscus_primary;
     private int titleColor = R.color.qiscus_white;
     private int subtitleColor = R.color.qiscus_dark_white;
     private int rightBubbleColor = R.color.qiscus_primary_light;
@@ -192,6 +193,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setAccentColor(@ColorRes int accentColor) {
         this.accentColor = accentColor;
+        return this;
+    }
+
+    public QiscusChatConfig setInlineReplyColor(@ColorRes int inlineReplyColor) {
+        this.inlineReplyColor = inlineReplyColor;
         return this;
     }
 
@@ -584,6 +590,11 @@ public class QiscusChatConfig {
     @ColorRes
     public int getAccentColor() {
         return accentColor;
+    }
+
+    @ColorRes
+    public int getInlineReplyColor() {
+        return inlineReplyColor;
     }
 
     @ColorRes
