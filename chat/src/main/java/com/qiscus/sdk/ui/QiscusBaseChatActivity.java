@@ -65,8 +65,6 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected File shareFile;
     protected boolean autoSendExtra;
 
-    protected QiscusBaseChatFragment qiscusChatFragment;
-
     private ActionMode actionMode;
     private QiscusUserStatusPresenter userStatusPresenter;
 
@@ -112,9 +110,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         applyChatConfig();
 
         if (savedInstanceState == null) {
-            qiscusChatFragment = onCreateChatFragment();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, qiscusChatFragment, QiscusBaseChatFragment.class.getName())
+                    .replace(R.id.fragment_container, onCreateChatFragment(), QiscusBaseChatFragment.class.getName())
                     .commit();
         }
     }
@@ -276,7 +273,11 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             intent.putExtra(Intent.EXTRA_TEXT, text);
             startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_comments_title)));
         } else if (i == R.id.action_reply) {
-            qiscusChatFragment.replyComment(selectedComments.get(0));
+            QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                    .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+            if (fragment != null) {
+                fragment.replyComment(selectedComments.get(0));
+            }
         }
         mode.finish();
     }
