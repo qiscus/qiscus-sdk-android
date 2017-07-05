@@ -536,7 +536,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (event.getTopicId() == currentTopicId) {
             switch (event.getEvent()) {
                 case TYPING:
-                    QiscusAndroidUtil.runOnUIThread(() -> view.onUserTyping(event.getUser(), event.isTyping()));
+                    QiscusAndroidUtil.runOnUIThread(() -> {
+                        if (view != null) {
+                            view.onUserTyping(event.getUser(), event.isTyping());
+                        }
+                    });
                     break;
                 case DELIVERED:
                     QiscusComment deliveredComment = Qiscus.getDataStore()
@@ -550,7 +554,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         }
                     } else {
                         lastDeliveredCommentId.set(event.getCommentId());
-                        QiscusAndroidUtil.runOnUIThread(() -> view.updateLastDeliveredComment(lastDeliveredCommentId.get()));
+                        QiscusAndroidUtil.runOnUIThread(() -> {
+                            if (view != null) {
+                                view.updateLastDeliveredComment(lastDeliveredCommentId.get());
+                            }
+                        });
                     }
                     break;
                 case READ:
@@ -566,7 +574,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     } else {
                         lastReadCommentId.set(event.getCommentId());
                         lastDeliveredCommentId.set(lastReadCommentId.get());
-                        QiscusAndroidUtil.runOnUIThread(() -> view.updateLastReadComment(lastReadCommentId.get()));
+                        QiscusAndroidUtil.runOnUIThread(() -> {
+                            if (view != null) {
+                                view.updateLastReadComment(lastReadCommentId.get());
+                            }
+                        });
                     }
                     break;
             }
