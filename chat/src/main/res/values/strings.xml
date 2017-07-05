@@ -97,4 +97,6 @@
     <string name="qiscus_changed_room_avatar">changed room avatar</string>
     <string name="qiscus_group_member_only_you">Only you</string>
     <string name="qiscus_send">Send</string>
+    <string name="qiscus_redownload">Redownload</string>
+    <string name="qiscus_error_can_not_delete_file">Something went wrong, can\'t delete file!</string>
 </resources>

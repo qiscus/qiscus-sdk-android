@@ -19,6 +19,7 @@ package com.qiscus.sdk.ui.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 
 import com.qiscus.sdk.ui.fragment.QiscusPhotoFragment;
 
@@ -46,5 +47,14 @@ public class QiscusPhotoPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return fragments.size();
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return PagerAdapter.POSITION_NONE;
+    }
+
+    public List<QiscusPhotoFragment> getFragments() {
+        return fragments;
     }
 }

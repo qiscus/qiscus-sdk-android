@@ -98,4 +98,6 @@
     <string name="qiscus_changed_room_avatar">mengubah gambar room</string>
     <string name="qiscus_group_member_only_you">Hanya kamu</string>
     <string name="qiscus_send">Kirim</string>
+    <string name="qiscus_redownload">Unduh Ulang</string>
+    <string name="qiscus_error_can_not_delete_file">Terjadi kesalahan, tidak bisa menghapus berkas!</string>
 </resources>

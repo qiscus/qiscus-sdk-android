@@ -117,8 +117,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String EXTRA_SHARE_FILE = "extra_share_file";
     protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
     protected static final String COMMENTS_DATA = "saved_comments_data";
+
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 2;
+    protected static final int SHOW_MEDIA_DETAIL = 3;
 
     @NonNull protected ViewGroup rootView;
     @Nullable protected ViewGroup emptyChatHolder;
@@ -1036,7 +1038,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void startPhotoViewer(QiscusComment qiscusComment) {
-        startActivity(QiscusPhotoViewerActivity.generateIntent(getActivity(), qiscusComment));
+        startActivityForResult(QiscusPhotoViewerActivity.generateIntent(getActivity(), qiscusComment),
+                SHOW_MEDIA_DETAIL);
     }
 
     @Override
@@ -1153,6 +1156,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 sendFile(imageFile);
             } else {
                 showError(getString(R.string.qiscus_chat_error_failed_read_picture));
+            }
+        } else if (requestCode == SHOW_MEDIA_DETAIL && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                return;
+            }
+            if (data.getBooleanExtra(QiscusPhotoViewerActivity.EXTRA_MEDIA_DELETED, false)) {
+                chatAdapter.notifyDataSetChanged();
             }
         }
     }

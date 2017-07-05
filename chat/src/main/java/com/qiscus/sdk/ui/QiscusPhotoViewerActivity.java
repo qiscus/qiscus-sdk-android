@@ -23,6 +23,8 @@ import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -53,6 +55,7 @@ import java.util.List;
  */
 public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements QiscusPhotoViewerPresenter.View,
         ViewPager.OnPageChangeListener, QiscusPhotoFragment.ClickListener {
+    public static final String EXTRA_MEDIA_DELETED = "extra_media_deleted";
     private static final String EXTRA_COMMENT = "extra_comment";
     private static final String KEY_POSITION = "last_position";
 
@@ -68,6 +71,9 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     private QiscusComment qiscusComment;
     private int position = -1;
     private List<Pair<QiscusComment, File>> qiscusPhotos;
+    private QiscusPhotoPagerAdapter adapter;
+
+    private boolean mediaDeleted;
 
     public static Intent generateIntent(Context context, QiscusComment qiscusComment) {
         Intent intent = new Intent(context, QiscusPhotoViewerActivity.class);
@@ -121,6 +127,36 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.media_action, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int i = item.getItemId();
+        if (i == R.id.action_redownload) {
+            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+        } else if (i == R.id.action_delete) {
+            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            if (qiscusPhoto.second.delete()) {
+                mediaDeleted = true;
+                if (qiscusPhotos.size() == 1) {
+                    onBackPressed();
+                } else {
+                    qiscusPhotos.remove(position);
+                    adapter.getFragments().remove(position);
+                    adapter.notifyDataSetChanged();
+                    bindInfo();
+                }
+            } else {
+                showError(getString(R.string.qiscus_error_can_not_delete_file));
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void shareImage(File imageFile) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("image/jpg");
@@ -166,7 +202,8 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
                 position = i;
             }
         }
-        viewPager.setAdapter(new QiscusPhotoPagerAdapter(getSupportFragmentManager(), fragments));
+        adapter = new QiscusPhotoPagerAdapter(getSupportFragmentManager(), fragments);
+        viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(position);
         bindInfo();
     }
@@ -207,5 +244,15 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
             infoPanel.setVisibility(View.VISIBLE);
             toolbar.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mediaDeleted) {
+            Intent data = new Intent();
+            data.putExtra(EXTRA_MEDIA_DELETED, mediaDeleted);
+            setResult(RESULT_OK, data);
+        }
+        super.onBackPressed();
     }
 }
