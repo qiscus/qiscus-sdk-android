@@ -503,6 +503,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (replyPreviewView != null) {
             replyPreviewView.bind(originComment);
             hideAttachmentPanel();
+            QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
         }
     }
 
