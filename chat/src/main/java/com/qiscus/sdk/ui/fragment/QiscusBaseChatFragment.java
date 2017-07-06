@@ -1161,7 +1161,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (data == null) {
                 return;
             }
-            if (data.getBooleanExtra(QiscusPhotoViewerActivity.EXTRA_MEDIA_DELETED, false)) {
+            if (data.getBooleanExtra(QiscusPhotoViewerActivity.EXTRA_MEDIA_DELETED, false)
+                    || data.getBooleanExtra(QiscusPhotoViewerActivity.EXTRA_MEDIA_UPDATED, false)) {
                 chatAdapter.notifyDataSetChanged();
             }
         }

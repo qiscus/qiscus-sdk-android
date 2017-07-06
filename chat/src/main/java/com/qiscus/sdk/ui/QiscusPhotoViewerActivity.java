@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -56,6 +57,8 @@ import java.util.List;
 public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements QiscusPhotoViewerPresenter.View,
         ViewPager.OnPageChangeListener, QiscusPhotoFragment.ClickListener {
     public static final String EXTRA_MEDIA_DELETED = "extra_media_deleted";
+    public static final String EXTRA_MEDIA_UPDATED = "extra_media_updated";
+
     private static final String EXTRA_COMMENT = "extra_comment";
     private static final String KEY_POSITION = "last_position";
 
@@ -67,6 +70,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     private TextView date;
     private View infoPanel;
     private Animation fadein, fadeout;
+    private ProgressDialog progressDialog;
 
     private QiscusComment qiscusComment;
     private int position = -1;
@@ -74,6 +78,11 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     private QiscusPhotoPagerAdapter adapter;
 
     private boolean mediaDeleted;
+    private boolean mediaUpdated;
+
+    private QiscusPhotoViewerPresenter presenter;
+
+    private QiscusComment ongoingDownload;
 
     public static Intent generateIntent(Context context, QiscusComment qiscusComment) {
         Intent intent = new Intent(context, QiscusPhotoViewerActivity.class);
@@ -88,6 +97,8 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_qiscus_photo_viewer);
 
+        presenter = new QiscusPhotoViewerPresenter(this);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         tvTitle = (TextView) findViewById(R.id.tv_title);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -99,13 +110,27 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
         fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
 
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.qiscus_downloading));
+        progressDialog.setMax(100);
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setOnCancelListener(dialog -> {
+            presenter.cancelDownloading();
+            showError(getString(R.string.qiscus_redownload_canceled));
+            if (ongoingDownload != null) {
+                ongoingDownload.setDownloadingListener(null);
+                ongoingDownload.setProgressListener(null);
+            }
+        });
+
         findViewById(R.id.back).setOnClickListener(v -> onBackPressed());
         setSupportActionBar(toolbar);
         viewPager.addOnPageChangeListener(this);
 
         resolveData(savedInstanceState);
 
-        QiscusPhotoViewerPresenter presenter = new QiscusPhotoViewerPresenter(this);
         presenter.loadQiscusPhotos(qiscusComment.getTopicId());
 
         shareButton.setOnClickListener(v -> {
@@ -138,6 +163,23 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         int i = item.getItemId();
         if (i == R.id.action_redownload) {
             Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            ongoingDownload = qiscusPhoto.first;
+            ongoingDownload.setDownloadingListener((qiscusComment, downloading) -> {
+                if (qiscusComment.equals(ongoingDownload) && !downloading) {
+                    mediaUpdated = true;
+                    progressDialog.dismiss();
+                    ongoingDownload.setDownloadingListener(null);
+                    ongoingDownload.setProgressListener(null);
+                }
+            });
+            ongoingDownload.setProgressListener((qiscusComment, percentage) -> {
+                if (qiscusComment.equals(ongoingDownload)) {
+                    progressDialog.setProgress(percentage);
+                }
+            });
+            progressDialog.show();
+            progressDialog.setProgress(0);
+            presenter.downloadFile(ongoingDownload);
         } else if (i == R.id.action_delete) {
             Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
             if (qiscusPhoto.second.delete()) {
@@ -174,7 +216,6 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     @Override
     public void showError(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
-        finish();
     }
 
     @Override
@@ -191,6 +232,23 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     public void onLoadQiscusPhotos(List<Pair<QiscusComment, File>> qiscusPhotos) {
         this.qiscusPhotos = qiscusPhotos;
         initPhotos();
+    }
+
+    @Override
+    public void onFileDownloaded(Pair<QiscusComment, File> qiscusPhoto) {
+        for (int i = 0; i < qiscusPhotos.size(); i++) {
+            Pair<QiscusComment, File> qiscusPhoto1 = qiscusPhotos.get(i);
+            if (qiscusPhoto.first.equals(qiscusPhoto1.first)) {
+                adapter.getFragments().set(i, QiscusPhotoFragment.newInstance(qiscusPhoto.second));
+                adapter.notifyDataSetChanged();
+                bindInfo();
+            }
+        }
+    }
+
+    @Override
+    public void closePage() {
+        finish();
     }
 
     private void initPhotos() {
@@ -248,11 +306,18 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
     @Override
     public void onBackPressed() {
-        if (mediaDeleted) {
+        if (mediaDeleted || mediaUpdated) {
             Intent data = new Intent();
             data.putExtra(EXTRA_MEDIA_DELETED, mediaDeleted);
+            data.putExtra(EXTRA_MEDIA_UPDATED, mediaUpdated);
             setResult(RESULT_OK, data);
         }
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.detachView();
     }
 }

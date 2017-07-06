@@ -467,9 +467,11 @@ public class QiscusComment implements Parcelable {
 
     public void setDownloading(boolean downloading) {
         this.downloading = downloading;
-        if (downloadingListener != null) {
-            QiscusAndroidUtil.runOnUIThread(() -> downloadingListener.onDownloading(this, downloading));
-        }
+        QiscusAndroidUtil.runOnUIThread(() -> {
+            if (downloadingListener != null) {
+                downloadingListener.onDownloading(this, downloading);
+            }
+        });
     }
 
     public int getProgress() {
@@ -478,9 +480,11 @@ public class QiscusComment implements Parcelable {
 
     public void setProgress(int percentage) {
         this.progress = percentage;
-        if (progressListener != null) {
-            QiscusAndroidUtil.runOnUIThread(() -> progressListener.onProgress(this, progress));
-        }
+        QiscusAndroidUtil.runOnUIThread(() -> {
+            if (progressListener != null) {
+                progressListener.onProgress(this, progress);
+            }
+        });
     }
 
     private void setupPlayer() {

@@ -21,13 +21,16 @@ import android.support.v4.util.Pair;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusImageUtil;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -38,6 +41,8 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewerPresenter.View> {
+
+    private Subscription downloadSubscription;
 
     public QiscusPhotoViewerPresenter(View view) {
         super(view);
@@ -71,12 +76,49 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                     throwable.printStackTrace();
                     if (view != null) {
                         view.showError(QiscusAndroidUtil.getString(R.string.qiscus_general_error));
+                        view.closePage();
                         view.dismissLoading();
                     }
                 });
     }
 
+    public void downloadFile(QiscusComment qiscusComment) {
+        if (qiscusComment.isDownloading()) {
+            return;
+        }
+        qiscusComment.setDownloading(true);
+        downloadSubscription = QiscusApi.getInstance()
+                .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(),
+                        qiscusComment.getAttachmentName(), percentage -> qiscusComment.setProgress((int) percentage))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .doOnNext(file1 -> {
+                    if (QiscusImageUtil.isImage(file1)) {
+                        QiscusImageUtil.addImageToGallery(file1);
+                    }
+                    qiscusComment.setDownloading(false);
+                    Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
+                            file1.getAbsolutePath());
+                })
+                .subscribe(file1 -> view.onFileDownloaded(Pair.create(qiscusComment, file1)), throwable -> {
+                    throwable.printStackTrace();
+                    qiscusComment.setDownloading(false);
+                    view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_download_file));
+                });
+    }
+
+    public void cancelDownloading() {
+        if (downloadSubscription != null) {
+            downloadSubscription.unsubscribe();
+        }
+    }
+
     public interface View extends QiscusPresenter.View {
         void onLoadQiscusPhotos(List<Pair<QiscusComment, File>> qiscusPhotos);
+
+        void onFileDownloaded(Pair<QiscusComment, File> qiscusPhoto);
+
+        void closePage();
     }
 }
