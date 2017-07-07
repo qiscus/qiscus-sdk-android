@@ -239,7 +239,39 @@ QiscusApi.getInstance()
         });
 ```
 
+### Create or join room with defined unique id
 
+Create room with defined unique id if that room does not exist, or join to the room if that room with defined unique id already exist. Room returned always a group room type.
+
+```java
+Qiscus.buildGroupChatRoomWith("UniqueId")
+        .withName("RoomName")
+        .withAvatar("http://avatar.url.com/group.jpg")
+        .build(new Qiscus.ChatBuilderListener() {
+            @Override
+            public void onSuccess(QiscusChatRoom qiscusChatRoom) {
+                startActivity(QiscusGroupChatActivity.generateIntent(MainActivity.this, qiscusChatRoom));
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                if (throwable instanceof HttpException) { //Error response from server
+                    HttpException e = (HttpException) throwable;
+                    try {
+                        String errorMessage = e.response().errorBody().string();
+                        Log.e(TAG, errorMessage);
+                        showError(errorMessage);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                } else if (throwable instanceof IOException) { //Error from network
+                    showError("Can not connect to qiscus server!");
+                } else { //Unknown error
+                    showError("Unexpected error!");
+                }
+            }
+        });
+```
 
 ### Inviting users to an existing Room
 
