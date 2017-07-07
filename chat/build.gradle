@@ -106,17 +106,17 @@ dependencies {
     compile 'com.android.support:customtabs:25.3.1'
 
     //The core of Reactive Programming
-    compile 'io.reactivex:rxjava:1.2.7'
+    compile 'io.reactivex:rxjava:1.3.0'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.trello:rxlifecycle:1.0'
     compile 'com.trello:rxlifecycle-android:1.0'
     compile 'com.trello:rxlifecycle-components:1.0'
 
     //Network
-    compile 'com.squareup.okhttp3:okhttp:3.6.0'
-    compile 'com.squareup.retrofit2:retrofit:2.2.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
+    compile 'com.squareup.okhttp3:okhttp:3.8.1'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
     compile 'com.schinizer:rxunfurl:0.2.0'
 
     //Mqtt
@@ -131,5 +131,5 @@ dependencies {
 
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.vanniktech:emoji-one:0.4.0'
+    compile 'com.vanniktech:emoji-one:0.5.0'
 }
