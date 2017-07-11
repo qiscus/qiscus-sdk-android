@@ -196,6 +196,12 @@ public final class QiscusPushNotificationUtil {
                     .addRemoteInput(remoteInput)
                     .build();
             builder.addAction(replyAction);
+
+            if (!QiscusCacheManager.getInstance().getRoomNotifItems().contains(String.valueOf(comment.getRoomId()))
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                QiscusCacheManager.getInstance().addRoomNotifItem(String.valueOf(comment.getRoomId()));
+                builder.setPriority(Notification.PRIORITY_HIGH);
+            }
         }
 
         boolean cancel = false;
@@ -206,11 +212,6 @@ public final class QiscusPushNotificationUtil {
 
         if (cancel) {
             return;
-        }
-
-        if (!QiscusCacheManager.getInstance().getRoomNotifItems().contains(String.valueOf(comment.getRoomId()))) {
-            QiscusCacheManager.getInstance().addRoomNotifItem(String.valueOf(comment.getRoomId()));
-            builder.setPriority(Notification.PRIORITY_HIGH);
         }
 
         inboxStyle = new NotificationCompat.InboxStyle();
