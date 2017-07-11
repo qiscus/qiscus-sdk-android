@@ -678,7 +678,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void onClearNotification() {
         NotificationManagerCompat.from(getActivity()).cancel(qiscusChatRoom.getId());
         QiscusCacheManager.getInstance().removeRoomNotif(qiscusChatRoom.getId());
-        if (QiscusCacheManager.getInstance().getRoomNotifItems() != null && QiscusCacheManager.getInstance().getRoomNotifItems().size() == 0) {
+        if (QiscusCacheManager.getInstance().getRoomNotifItems() != null
+                && QiscusCacheManager.getInstance().getRoomNotifItems().size() == 0) {
             NotificationManagerCompat.from(getActivity()).cancel(NOTIFICATION_BUNDLED_BASE_ID);
         }
         QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
