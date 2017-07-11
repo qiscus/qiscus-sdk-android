@@ -812,6 +812,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 }, Throwable::printStackTrace);
     }
 
+    public void forward(List<QiscusComment> forwardComments) {
+        for (QiscusComment forwardComment : forwardComments) {
+            QiscusComment qiscusComment = QiscusComment.generateMessage(forwardComment.getMessage(),
+                    room.getId(), currentTopicId);
+            resendComment(qiscusComment);
+        }
+    }
+
     @Override
     public void detachView() {
         super.detachView();

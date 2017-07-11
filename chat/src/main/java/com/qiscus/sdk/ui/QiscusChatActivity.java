@@ -28,6 +28,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -36,7 +37,9 @@ import com.qiscus.sdk.ui.view.QiscusCircularImageView;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class QiscusChatActivity extends QiscusBaseChatActivity {
     protected Toolbar toolbar;
@@ -53,12 +56,14 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     }
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
-                                        String startingMessage, File shareFile, boolean autoSendExtra) {
+                                        String startingMessage, File shareFile,
+                                        boolean autoSendExtra, List<QiscusComment> comments) {
         Intent intent = new Intent(context, QiscusChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILE, shareFile);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
+        intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
         return intent;
     }
 
@@ -116,7 +121,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFile, autoSendExtra);
+        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFile, autoSendExtra, forwardComments);
     }
 
     @Override

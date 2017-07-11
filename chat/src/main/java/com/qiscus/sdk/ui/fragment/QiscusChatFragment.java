@@ -30,12 +30,15 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created on : September 28, 2016
@@ -58,13 +61,15 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom,
                                                  String startingMessage,
                                                  File shareFile,
-                                                 boolean autoSendExtra) {
+                                                 boolean autoSendExtra,
+                                                 List<QiscusComment> comments) {
         QiscusChatFragment fragment = new QiscusChatFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
         bundle.putString(EXTRA_STARTING_MESSAGE, startingMessage);
         bundle.putSerializable(EXTRA_SHARE_FILE, shareFile);
         bundle.putBoolean(EXTRA_AUTO_SEND, autoSendExtra);
+        bundle.putParcelableArrayList(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
         fragment.setArguments(bundle);
         return fragment;
     }

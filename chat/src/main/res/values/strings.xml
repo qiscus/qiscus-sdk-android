@@ -101,4 +101,5 @@
     <string name="qiscus_error_can_not_delete_file">Something went wrong, can\'t delete file!</string>
     <string name="qiscus_redownload_canceled">Redownload canceled</string>
     <string name="qiscus_downloading">Downloading</string>
+    <string name="qiscus_forward">Forward</string>
 </resources>

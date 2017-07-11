@@ -102,4 +102,5 @@
     <string name="qiscus_error_can_not_delete_file">Terjadi kesalahan, tidak bisa menghapus berkas!</string>
     <string name="qiscus_redownload_canceled">Unduh ulang dibatalkan</string>
     <string name="qiscus_downloading">Sedang Mengunduh</string>
+    <string name="qiscus_forward">Teruskan</string>
 </resources>

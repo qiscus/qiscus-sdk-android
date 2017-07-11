@@ -33,11 +33,19 @@
         android:orderInCategory="100"
         android:title="@string/qiscus_copy"
         app:showAsAction="always"/>
+
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_qiscus_share"
         android:orderInCategory="100"
         android:title="@string/qiscus_share"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_forward"
+        android:icon="@drawable/ic_qiscus_forward"
+        android:orderInCategory="100"
+        android:title="@string/qiscus_forward"
         app:showAsAction="always"/>
 
 </menu>

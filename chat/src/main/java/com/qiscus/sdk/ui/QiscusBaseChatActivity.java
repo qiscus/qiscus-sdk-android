@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
+import com.qiscus.sdk.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -58,12 +59,14 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
     protected static final String EXTRA_SHARING_FILE = "extra_share_file";
     protected static final String EXTRA_AUTO_SEND = "auto_send";
+    protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
     protected String startingMessage;
     protected File shareFile;
     protected boolean autoSendExtra;
+    protected List<QiscusComment> forwardComments;
 
     private ActionMode actionMode;
     private QiscusUserStatusPresenter userStatusPresenter;
@@ -104,6 +107,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         resolveStartingMessage();
         resolveShareFile();
         resolveAutoSendExtra();
+        resolveForwardComments();
 
         binRoomData();
 
@@ -146,6 +150,13 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         if (getIntent().hasExtra(EXTRA_AUTO_SEND)) {
             autoSendExtra = getIntent().getBooleanExtra(EXTRA_AUTO_SEND, true);
             getIntent().removeExtra(EXTRA_AUTO_SEND);
+        }
+    }
+
+    protected void resolveForwardComments() {
+        if (getIntent().hasExtra(EXTRA_FORWARD_COMMENTS)) {
+            forwardComments = getIntent().getParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS);
+            getIntent().removeExtra(EXTRA_FORWARD_COMMENTS);
         }
     }
 
@@ -200,6 +211,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
         if (actionMode != null) {
             actionMode.setTitle(getString(R.string.qiscus_selected_comment, selectedComments.size()));
+            actionMode.getMenu().findItem(R.id.action_forward)
+                    .setVisible(Qiscus.getChatConfig().isEnableForwardComment());
             if (selectedComments.size() == 1 && selectedComments.get(0).getState() >= QiscusComment.STATE_ON_QISCUS) {
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
             } else {
@@ -236,6 +249,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         menu.findItem(R.id.action_reply).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menu.findItem(R.id.action_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menu.findItem(R.id.action_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.findItem(R.id.action_forward).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return true;
     }
 
@@ -278,6 +292,13 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             if (fragment != null) {
                 fragment.replyComment(selectedComments.get(0));
             }
+        } else if (i == R.id.action_forward) {
+            ForwardCommentHandler forwardCommentHandler = Qiscus.getChatConfig().getForwardCommentHandler();
+            if (forwardCommentHandler == null) {
+                throw new NullPointerException("Please set forward handler before.\n" +
+                        "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
+            }
+            forwardCommentHandler.forward(selectedComments);
         }
         mode.finish();
     }

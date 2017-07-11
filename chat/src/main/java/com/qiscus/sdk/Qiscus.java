@@ -31,6 +31,7 @@ import com.qiscus.sdk.data.local.QiscusDataStore;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.service.QiscusPusherService;
@@ -670,6 +671,7 @@ public class Qiscus {
         private String message;
         private File shareFile;
         private boolean autoSendExtra;
+        private List<QiscusComment> comments;
 
         private ChatActivityBuilder(String email) {
             title = "Chat";
@@ -756,6 +758,17 @@ public class Qiscus {
         }
 
         /**
+         * If you want to forward comments after the activity started
+         *
+         * @param comments The list of comment
+         * @return builder
+         */
+        public ChatActivityBuilder withForwardComments(List<QiscusComment> comments) {
+            this.comments = comments;
+            return this;
+        }
+
+        /**
          * Build the Chat activity intent
          *
          * @param context  Context for start the Activity
@@ -782,7 +795,8 @@ public class Qiscus {
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
-                            QiscusChatActivity.generateIntent(context, qiscusChatRoom, message, shareFile, autoSendExtra));
+                            QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
+                                    shareFile, autoSendExtra, comments));
         }
     }
 
@@ -811,6 +825,7 @@ public class Qiscus {
         private String message;
         private File shareFile;
         private boolean autoSendExtra;
+        private List<QiscusComment> comments;
 
         private ChatFragmentBuilder(String email) {
             title = "Chat";
@@ -897,6 +912,17 @@ public class Qiscus {
         }
 
         /**
+         * If you want to forward comments after the activity started
+         *
+         * @param comments The list of comment
+         * @return builder
+         */
+        public ChatFragmentBuilder withForwardComments(List<QiscusComment> comments) {
+            this.comments = comments;
+            return this;
+        }
+
+        /**
          * Build the Chat fragment instance
          *
          * @param listener Listener of building chat fragment
@@ -921,7 +947,7 @@ public class Qiscus {
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
-                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile, autoSendExtra));
+                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile, autoSendExtra, comments));
         }
     }
 

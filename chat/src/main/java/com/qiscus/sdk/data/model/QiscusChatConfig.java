@@ -176,6 +176,9 @@ public class QiscusChatConfig {
 
     private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
 
+    private ForwardCommentHandler forwardCommentHandler;
+    private boolean enableForwardComment = false;
+
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
         return this;
@@ -482,12 +485,14 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public void setEnableAvatarAsNotificationIcon(boolean enableAvatarAsNotificationIcon) {
+    public QiscusChatConfig setEnableAvatarAsNotificationIcon(boolean enableAvatarAsNotificationIcon) {
         this.enableAvatarAsNotificationIcon = enableAvatarAsNotificationIcon;
+        return this;
     }
 
-    public void setNotificationBuilderInterceptor(QiscusNotificationBuilderInterceptor notificationBuilderInterceptor) {
+    public QiscusChatConfig setNotificationBuilderInterceptor(QiscusNotificationBuilderInterceptor notificationBuilderInterceptor) {
         this.notificationBuilderInterceptor = notificationBuilderInterceptor;
+        return this;
     }
 
     public QiscusChatConfig setReplyNotificationHandler(ReplyNotificationHandler replyNotificationHandler) {
@@ -547,6 +552,16 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setCardDescriptionColor(@ColorRes int cardDescriptionColor) {
         this.cardDescriptionColor = cardDescriptionColor;
+        return this;
+    }
+
+    public QiscusChatConfig setForwardCommentHandler(ForwardCommentHandler forwardCommentHandler) {
+        this.forwardCommentHandler = forwardCommentHandler;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableForwardComment(boolean enableForwardComment) {
+        this.enableForwardComment = enableForwardComment;
         return this;
     }
 
@@ -899,5 +914,13 @@ public class QiscusChatConfig {
     @ColorRes
     public int getCardDescriptionColor() {
         return cardDescriptionColor;
+    }
+
+    public ForwardCommentHandler getForwardCommentHandler() {
+        return forwardCommentHandler;
+    }
+
+    public boolean isEnableForwardComment() {
+        return enableForwardComment;
     }
 }

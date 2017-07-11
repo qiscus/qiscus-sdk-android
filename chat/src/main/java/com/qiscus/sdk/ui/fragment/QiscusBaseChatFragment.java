@@ -116,6 +116,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
     protected static final String EXTRA_SHARE_FILE = "extra_share_file";
     protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
+    protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
     protected static final String COMMENTS_DATA = "saved_comments_data";
 
     protected static final int TAKE_PICTURE_REQUEST = 1;
@@ -159,6 +160,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected String startingMessage;
     protected File shareFile;
     protected boolean autoSendExtra;
+    protected List<QiscusComment> forwardComments;
     protected T chatAdapter;
     protected QiscusChatPresenter qiscusChatPresenter;
     protected Animation animation;
@@ -412,6 +414,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         resolveStartingMessage();
         resolveShareFile();
         resolveAutoSendExtra();
+        resolveForwardComments();
 
         onApplyChatConfig();
 
@@ -454,6 +457,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
 
         handleExtra();
+        handleForward();
+    }
+
+    private void handleForward() {
+        if (forwardComments != null) {
+            qiscusChatPresenter.forward(forwardComments);
+        }
     }
 
     private void handleExtra() {
@@ -561,6 +571,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void resolveAutoSendExtra() {
         autoSendExtra = getArguments().getBoolean(EXTRA_AUTO_SEND, true);
         getArguments().remove(EXTRA_AUTO_SEND);
+    }
+
+    protected void resolveForwardComments() {
+        forwardComments = getArguments().getParcelableArrayList(EXTRA_FORWARD_COMMENTS);
+        getArguments().remove(EXTRA_FORWARD_COMMENTS);
     }
 
     protected void onApplyChatConfig() {
