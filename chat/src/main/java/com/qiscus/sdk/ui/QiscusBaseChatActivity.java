@@ -289,7 +289,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         } else if (i == R.id.action_reply) {
             QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
                     .findFragmentByTag(QiscusBaseChatFragment.class.getName());
-            if (fragment != null) {
+            if (fragment != null && selectedComments.size() > 0) {
                 fragment.replyComment(selectedComments.get(0));
             }
         } else if (i == R.id.action_forward) {
