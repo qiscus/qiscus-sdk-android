@@ -59,6 +59,7 @@ public final class QiscusPushNotificationUtil {
     private static final String GROUP_KEY_BUNDLED = "GROUP_KEY_BUNDLED";
     public static final int NOTIFICATION_BUNDLED_BASE_ID = 0;
     private static NotificationCompat.InboxStyle inboxStyle;
+    private static boolean headsUp = false;
 
     static {
         fileMessage = new SpannableStringBuilder(QiscusAndroidUtil.getString(R.string.qiscus_send_attachment));
@@ -103,6 +104,7 @@ public final class QiscusPushNotificationUtil {
             return;
         }
 
+        headsUp = QiscusCacheManager.getInstance().addRoomNotifItem(comment.getRoomId());
         String finalMessageText = messageText;
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
             QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, comment, finalMessageText));
@@ -163,7 +165,8 @@ public final class QiscusPushNotificationUtil {
                     .setGroup(GROUP_KEY_BUNDLED)
                     .setGroupSummary(true)
                     .setSubText(QiscusAndroidUtil.getString(R.string.qiscus_subtext_summary,
-                            QiscusCacheManager.getInstance().getRoomNotifItems().size()));
+                            QiscusCacheManager.getInstance()
+                                    .getRoomNotifItems().size()));
 
             QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
                 .notify(NOTIFICATION_BUNDLED_BASE_ID, summaryBuilder.build()));
@@ -197,11 +200,14 @@ public final class QiscusPushNotificationUtil {
                     .build();
             builder.addAction(replyAction);
 
-            if (!QiscusCacheManager.getInstance().getRoomNotifItems().contains(String.valueOf(comment.getRoomId()))
-                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                QiscusCacheManager.getInstance().addRoomNotifItem(String.valueOf(comment.getRoomId()));
+            if (headsUp) {
                 builder.setPriority(Notification.PRIORITY_HIGH);
             }
+
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                QiscusCacheManager.getInstance().addRoomNotifItem(String.valueOf(comment.getRoomId()));
+//                builder.setPriority(Notification.PRIORITY_HIGH);
+//            }
         }
 
         boolean cancel = false;

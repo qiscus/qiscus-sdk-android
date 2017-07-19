@@ -76,8 +76,8 @@ public enum QiscusCacheManager {
         }.getType());
     }
 
-    public boolean addRoomNotifItem(String roomId) {
-        List<String> roomNotif = getRoomNotifItems();
+    public boolean addRoomNotifItem(int roomId) {
+        List<Integer> roomNotif = getRoomNotifItems();
         if (roomNotif == null) {
             roomNotif = new ArrayList<>();
         }
@@ -92,18 +92,20 @@ public enum QiscusCacheManager {
         return false;
     }
 
-    public List<String> getRoomNotifItems() {
+    public List<Integer> getRoomNotifItems() {
         String json = sharedPreferences.getString("push_notif_message_room_id", "");
-        return gson.fromJson(json, new TypeToken<List<String>>() {
+        return gson.fromJson(json, new TypeToken<List<Integer>>() {
         }.getType());
     }
 
     public void removeRoomNotif(int roomId) {
-        List<String> json =  getRoomNotifItems();
+        List<Integer> json =  getRoomNotifItems();
         if (getRoomNotifItems() != null) {
-            for (int i = 0; i < getRoomNotifItems().size(); i++) {
-                if (getRoomNotifItems().get(i).equals(String.valueOf(roomId)))
+            for (int i = 0; i < json.size(); i++) {
+//                if (String.valueOf(json.get(0)).equals(String.valueOf(roomId))) {
+                if (json.get(0) == roomId) {
                     json.remove(i);
+                }
             }
         }
         sharedPreferences.edit()
