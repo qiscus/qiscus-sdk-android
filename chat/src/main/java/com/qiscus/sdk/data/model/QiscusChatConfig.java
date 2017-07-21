@@ -47,6 +47,7 @@ import rx.schedulers.Schedulers;
 public class QiscusChatConfig {
     private int statusBarColor = R.color.qiscus_primary_dark;
     private int appBarColor = R.color.qiscus_primary;
+    private int accentColor = R.color.qiscus_accent;
     private int titleColor = R.color.qiscus_white;
     private int subtitleColor = R.color.qiscus_dark_white;
     private int rightBubbleColor = R.color.qiscus_primary_light;
@@ -186,6 +187,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setAppBarColor(@ColorRes int appBarColor) {
         this.appBarColor = appBarColor;
+        return this;
+    }
+
+    public QiscusChatConfig setAccentColor(@ColorRes int accentColor) {
+        this.accentColor = accentColor;
         return this;
     }
 
@@ -573,6 +579,11 @@ public class QiscusChatConfig {
     @ColorRes
     public int getAppBarColor() {
         return appBarColor;
+    }
+
+    @ColorRes
+    public int getAccentColor() {
+        return accentColor;
     }
 
     @ColorRes

@@ -55,12 +55,4 @@
         <attr name="qcircle_prefix_text" format="string"/>
         <attr name="qcircle_suffix_text" format="string"/>
     </declare-styleable>
-    <declare-styleable name="QiscusSmoothCheckBox">
-        <attr name="duration" format="integer"/>
-        <attr name="stroke_width" format="dimension"/>
-        <attr name="color_tick" format="color"/>
-        <attr name="color_checked" format="color"/>
-        <attr name="color_unchecked" format="color"/>
-        <attr name="color_unchecked_stroke" format="color"/>
-    </declare-styleable>
 </resources>

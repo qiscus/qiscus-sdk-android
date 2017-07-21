@@ -47,6 +47,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qiscus.jupuk.JupukBuilder;
+import com.qiscus.jupuk.JupukConst;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
@@ -55,8 +57,6 @@ import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.filepicker.FilePickerBuilder;
-import com.qiscus.sdk.filepicker.FilePickerConst;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
@@ -817,9 +817,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void addImage() {
         if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
-            FilePickerBuilder.getInstance(getActivity())
-                    .setMaxCount(1)
-                    .addVideoPicker()
+            new JupukBuilder().setMaxCount(1)
+                    .enableVideoPicker(true)
+                    .setColorPrimary(ContextCompat.getColor(getActivity(), chatConfig.getAppBarColor()))
+                    .setColorPrimaryDark(ContextCompat.getColor(getActivity(), chatConfig.getStatusBarColor()))
+                    .setColorAccent(ContextCompat.getColor(getActivity(), chatConfig.getAccentColor()))
                     .pickPhoto(this);
             hideAttachmentPanel();
         } else {
@@ -857,9 +859,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void addFile() {
         if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
-            FilePickerBuilder.getInstance(getActivity())
-                    .setMaxCount(1)
-                    .pickFile(this);
+            new JupukBuilder().setMaxCount(1)
+                    .setColorPrimary(ContextCompat.getColor(getActivity(), chatConfig.getAppBarColor()))
+                    .setColorPrimaryDark(ContextCompat.getColor(getActivity(), chatConfig.getStatusBarColor()))
+                    .setColorAccent(ContextCompat.getColor(getActivity(), chatConfig.getAccentColor()))
+                    .pickDoc(this);
             hideAttachmentPanel();
         } else {
             requestPermissions();
@@ -1127,12 +1131,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == FilePickerConst.REQUEST_CODE_PHOTO && resultCode == Activity.RESULT_OK) {
+        if (requestCode == JupukConst.REQUEST_CODE_PHOTO && resultCode == Activity.RESULT_OK) {
             if (data == null) {
                 showError(getString(R.string.qiscus_chat_error_failed_open_picture));
                 return;
             }
-            ArrayList<String> paths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
+            ArrayList<String> paths = data.getStringArrayListExtra(JupukConst.KEY_SELECTED_MEDIA);
             if (paths.size() > 0) {
                 File file = new File(paths.get(0));
                 if (QiscusImageUtil.isImage(file)) {
@@ -1143,12 +1147,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     sendFile(file);
                 }
             }
-        } else if (requestCode == FilePickerConst.REQUEST_CODE_DOC && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == JupukConst.REQUEST_CODE_DOC && resultCode == Activity.RESULT_OK) {
             if (data == null) {
                 showError(getString(R.string.qiscus_chat_error_failed_open_file));
                 return;
             }
-            ArrayList<String> paths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS);
+            ArrayList<String> paths = data.getStringArrayListExtra(JupukConst.KEY_SELECTED_DOCS);
             if (paths.size() > 0) {
                 sendFile(new File(paths.get(0)));
             }

@@ -43,12 +43,6 @@
             android:name=".ui.QiscusPhotoViewerActivity"
             android:theme="@style/QiscusTheme"/>
         <activity
-            android:name=".filepicker.FilePickerActivity"
-            android:theme="@style/QiscusTheme"/>
-        <activity
-            android:name=".filepicker.MediaDetailsActivity"
-            android:theme="@style/QiscusTheme"/>
-        <activity
             android:name=".ui.QiscusSendPhotoConfirmationActivity"
             android:theme="@style/QiscusTheme"/>
 

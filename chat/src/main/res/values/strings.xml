@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2016 Qiscus.
   ~
@@ -31,25 +32,14 @@
     <string name="qiscus_chat_error_failed_open_file">Failed to open file!</string>
     <string name="qiscus_chat_activity_label_clipboard">Message</string>
     <string name="qiscus_hint_message">Type a message…</string>
-    <string name="qiscus_no_files_found">No Files Found</string>
-    <string name="qiscus_videos">Videos</string>
-    <string name="qiscus_images">Images</string>
-    <string name="qiscus_all_photos">All Photos</string>
-    <string name="qiscus_all_videos">All Videos</string>
-    <string name="qiscus_all_files">All Files</string>
-    <string name="qiscus_select_media">Select a media</string>
-    <string name="qiscus_select_file">Select a file</string>
     <string name="qiscus_copy">Copy</string>
     <string name="qiscus_share">Share</string>
-    <string name="qiscus_choose_manually">Choose manually</string>
     <string name="qiscus_account_linking">Account Linking</string>
     <string name="qiscus_camera">Camera</string>
     <string name="qiscus_gallery">Gallery</string>
     <string name="qiscus_file">File</string>
     <string name="qiscus_record">Record</string>
     <string name="qiscus_account_linking_text">LOGIN</string>
-    <string name="qiscus_can_not_open_file">Can not open file</string>
-    <string name="qiscus_can_not_read_file">Can not read file</string>
     <string name="qiscus_corrupted_file">Can not read file, please make sure that is not corrupted file!</string>
     <string name="qiscus_failed_load_comments">Failed to load comments!</string>
     <string name="qiscus_failed_download_file">Failed to download file!</string>
@@ -84,7 +74,6 @@
     <string name="qiscus_date_format">MMMM dd, yyyy</string>
     <string name="qiscus_hour_format">hh:mm a</string>
     <string name="qiscus_reply_to">REPLY %1$s</string>
-    <string name="qiscus_no_file_manager">Sorry, you phone does not have application can handle it!</string>
     <string name="qiscus_voice_message">Voice message</string>
     <string name="qiscus_reply">Reply</string>
     <string name="qiscus_you">You</string>
