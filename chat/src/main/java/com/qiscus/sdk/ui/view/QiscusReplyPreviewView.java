@@ -25,10 +25,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 
@@ -147,7 +147,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
 
 
     private void showImage(File file) {
-        QiscusGlide.getInstance().get()
+        Nirmana.getInstance().get()
                 .load(file)
                 .asBitmap()
                 .centerCrop()
@@ -159,7 +159,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
     }
 
     private void showBlurryImage(QiscusComment qiscusComment) {
-        QiscusGlide.getInstance().get()
+        Nirmana.getInstance().get()
                 .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
                 .asBitmap()
                 .centerCrop()

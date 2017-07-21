@@ -25,6 +25,7 @@ import android.os.Handler;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
+import com.qiscus.jupuk.Jupuk;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.local.QiscusDataStore;
@@ -126,6 +127,8 @@ public class Qiscus {
         heartBeat = 60000;
         appInstance.registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
         authorities = appInstance.getPackageName() + ".qiscus.sdk.provider";
+
+        Jupuk.init(application);
 
         startPusherService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);

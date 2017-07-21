@@ -25,8 +25,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.remote.QiscusGlide;
 import com.qiscus.sdk.filepicker.FilePickerConst;
 import com.qiscus.sdk.filepicker.PickerManager;
 import com.qiscus.sdk.filepicker.model.Media;
@@ -54,7 +54,7 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
     public void onBindViewHolder(final PhotoViewHolder holder, int position) {
         Media media = getItems().get(position);
 
-        QiscusGlide.getInstance().get()
+        Nirmana.getInstance().get()
                 .load(new File(media.getPath()))
                 .centerCrop()
                 .dontAnimate()
