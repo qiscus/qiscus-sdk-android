@@ -32,7 +32,7 @@ ext {
     siteUrl = 'https://github.com/qiscus/qiscus-sdk-android'
     gitUrl = 'https://github.com/qiscus/qiscus-sdk-android.git'
 
-    libraryVersion = '2.6.0'
+    libraryVersion = '2.7.0'
 
     developerId = 'qiscustech'
     developerName = 'Qiscus Tech'
@@ -121,7 +121,7 @@ dependencies {
 
     //Mqtt
     compile 'com.qiscus.mqtt:client:1.1.1'
-    compile 'com.qiscus.mqtt:android:1.1.1'
+    compile 'com.qiscus.mqtt:android:1.1.1-q'
 
     //Push notification
     compile 'com.google.firebase:firebase-core:11.0.2'
