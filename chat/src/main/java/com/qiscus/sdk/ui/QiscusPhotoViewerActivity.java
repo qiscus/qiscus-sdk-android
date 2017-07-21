@@ -20,7 +20,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -36,6 +38,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.presenter.QiscusPhotoViewerPresenter;
@@ -202,7 +205,12 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     private void shareImage(File imageFile) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("image/jpg");
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
+        } else {
+            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(this, Qiscus.getProviderAuthorities(), imageFile));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
         startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_image_title)));
     }
 
