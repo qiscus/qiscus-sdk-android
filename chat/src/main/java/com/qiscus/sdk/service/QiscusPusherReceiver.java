@@ -24,8 +24,11 @@ import android.os.Bundle;
 import android.support.v4.app.RemoteInput;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
+
+import static com.qiscus.sdk.util.QiscusPushNotificationUtil.NOTIFICATION_BUNDLED_BASE_ID;
 
 /**
  * Created on : June 15, 2017
@@ -44,6 +47,11 @@ public class QiscusPusherReceiver extends BroadcastReceiver {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(
                     Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(comment.getRoomId());
+            if (QiscusCacheManager.getInstance().getRoomNotifItems().size() == 1) {
+                notificationManager.cancel(NOTIFICATION_BUNDLED_BASE_ID);
+            } else {
+                QiscusCacheManager.getInstance().removeRoomNotif(comment.getRoomId());
+            }
             QiscusComment qiscusComment = QiscusComment.generateMessage((String) message, comment.getRoomId(), comment.getTopicId());
             Qiscus.getChatConfig().getReplyNotificationHandler().onSend(context, qiscusComment);
         } else {
