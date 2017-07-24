@@ -25,7 +25,7 @@ Add to your project build.gradle
 allprojects {
     repositories {
         .....
-        maven { url  "http://dl.bintray.com/qiscustech/maven" }
+        maven { url  "https://dl.bintray.com/qiscustech/maven" }
     }
 }
 ```
