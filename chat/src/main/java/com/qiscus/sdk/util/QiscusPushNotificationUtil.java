@@ -203,11 +203,6 @@ public final class QiscusPushNotificationUtil {
             if (headsUp) {
                 builder.setPriority(Notification.PRIORITY_HIGH);
             }
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                QiscusCacheManager.getInstance().addRoomNotifItem(String.valueOf(comment.getRoomId()));
-//                builder.setPriority(Notification.PRIORITY_HIGH);
-//            }
         }
 
         boolean cancel = false;
