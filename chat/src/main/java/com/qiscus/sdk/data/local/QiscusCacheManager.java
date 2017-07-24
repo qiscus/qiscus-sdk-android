@@ -76,12 +76,14 @@ public enum QiscusCacheManager {
         }.getType());
     }
 
+    public void clearMessageNotifItems(int roomId) {
+        sharedPreferences.edit()
+                .putString("push_notif_message_" + roomId, "")
+                .apply();
+    }
+
     public boolean addRoomNotifItem(int roomId) {
         List<Integer> roomNotif = getRoomNotifItems();
-        if (roomNotif == null) {
-            roomNotif = new ArrayList<>();
-        }
-
         if (!roomNotif.contains(roomId)) {
             roomNotif.add(roomId);
             sharedPreferences.edit()
@@ -94,28 +96,23 @@ public enum QiscusCacheManager {
 
     public List<Integer> getRoomNotifItems() {
         String json = sharedPreferences.getString("push_notif_message_room_id", "");
-        return gson.fromJson(json, new TypeToken<List<Integer>>() {
+        List<Integer> roomNotif = gson.fromJson(json, new TypeToken<List<Integer>>() {
         }.getType());
+        if (roomNotif == null) {
+            roomNotif = new ArrayList<>();
+        }
+        return roomNotif;
     }
 
     public void removeRoomNotif(int roomId) {
-        List<Integer> json =  getRoomNotifItems();
-        if (getRoomNotifItems() != null) {
-            for (int i = 0; i < json.size(); i++) {
-//                if (String.valueOf(json.get(0)).equals(String.valueOf(roomId))) {
-                if (json.get(0) == roomId) {
-                    json.remove(i);
-                }
+        List<Integer> roomNotif = getRoomNotifItems();
+        for (int i = 0; i < roomNotif.size(); i++) {
+            if (roomNotif.get(i) == roomId) {
+                roomNotif.remove(i);
             }
         }
         sharedPreferences.edit()
-                .putString("push_notif_message_room_id", gson.toJson(json))
-                .apply();
-    }
-
-    public void clearMessageNotifItems(int roomId) {
-        sharedPreferences.edit()
-                .putString("push_notif_message_" + roomId, "")
+                .putString("push_notif_message_room_id", gson.toJson(roomNotif))
                 .apply();
     }
 

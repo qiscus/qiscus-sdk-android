@@ -121,7 +121,7 @@ public final class QiscusPushNotificationUtil {
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        QiscusAndroidUtil.runOnBackgroundThread(() ->  {
+                        QiscusAndroidUtil.runOnBackgroundThread(() -> {
                             try {
                                 pushNotification(context, comment, finalMessageText, QiscusImageUtil.getCircularBitmap(resource));
                             } catch (Exception e) {
@@ -165,11 +165,10 @@ public final class QiscusPushNotificationUtil {
                     .setGroup(GROUP_KEY_BUNDLED)
                     .setGroupSummary(true)
                     .setSubText(QiscusAndroidUtil.getString(R.string.qiscus_subtext_summary,
-                            QiscusCacheManager.getInstance()
-                                    .getRoomNotifItems().size()));
+                            QiscusCacheManager.getInstance().getRoomNotifItems().size()));
 
             QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
-                .notify(NOTIFICATION_BUNDLED_BASE_ID, summaryBuilder.build()));
+                    .notify(NOTIFICATION_BUNDLED_BASE_ID, summaryBuilder.build()));
             summaryBuilder.setStyle(inboxStyle);
         }
 
