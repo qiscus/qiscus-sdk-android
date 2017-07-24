@@ -19,7 +19,6 @@ package com.qiscus.sdk.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
