@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.remote;
 
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -354,6 +355,9 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         if (topic.contains(qiscusAccount.getToken())) {
             QiscusComment qiscusComment = jsonToComment(new String(message.getPayload()));
+            if (qiscusComment == null) {
+                return;
+            }
             if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
                 setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(), qiscusComment.getId(), qiscusComment.getUniqueId());
             }
@@ -463,6 +467,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         }
     }
 
+    @Nullable
     public static QiscusComment jsonToComment(JsonObject jsonObject) {
         try {
             QiscusComment qiscusComment = new QiscusComment();
@@ -502,9 +507,10 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        throw new RuntimeException("Unable to parse the JSON QiscusComment");
+        return null;
     }
 
+    @Nullable
     public static QiscusComment jsonToComment(String json) {
         return jsonToComment(gson.fromJson(json, JsonObject.class));
     }

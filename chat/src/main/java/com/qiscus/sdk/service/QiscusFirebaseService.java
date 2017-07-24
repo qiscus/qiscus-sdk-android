@@ -50,6 +50,9 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
                 }
                 if (remoteMessage.getData().containsKey("payload")) {
                     QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
+                    if (qiscusComment == null) {
+                        return true;
+                    }
                     if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
                         QiscusPusherApi.getInstance()
                                 .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
