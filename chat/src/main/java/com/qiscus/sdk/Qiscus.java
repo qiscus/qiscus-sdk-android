@@ -212,7 +212,7 @@ public class Qiscus {
      * @return true if already setup, false if not yet
      */
     public static boolean hasSetupUser() {
-        return localDataManager.isLogged();
+        return appServer != null && localDataManager.isLogged();
     }
 
     /**

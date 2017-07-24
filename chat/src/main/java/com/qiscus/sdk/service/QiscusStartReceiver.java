@@ -19,6 +19,7 @@ package com.qiscus.sdk.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -26,6 +27,8 @@ import com.qiscus.sdk.util.QiscusAndroidUtil;
 public class QiscusStartReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        QiscusAndroidUtil.runOnUIThread(Qiscus::startPusherService);
+        if (Qiscus.hasSetupUser()) {
+            QiscusAndroidUtil.runOnUIThread(Qiscus::startPusherService);
+        }
     }
 }
