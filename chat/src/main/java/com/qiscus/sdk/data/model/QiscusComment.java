@@ -591,6 +591,18 @@ public class QiscusComment implements Parcelable {
             player.release();
             player = null;
         }
+
+        if (progressListener != null) {
+            progressListener = null;
+        }
+
+        if (downloadingListener != null) {
+            downloadingListener = null;
+        }
+
+        if (linkPreviewListener != null) {
+            linkPreviewListener = null;
+        }
     }
 
     @Override
