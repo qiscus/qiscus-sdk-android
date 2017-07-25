@@ -56,8 +56,6 @@ import java.util.List;
 public final class QiscusPushNotificationUtil {
     public static final String KEY_NOTIFICATION_REPLY = "KEY_NOTIFICATION_REPLY";
     private static SpannableStringBuilder fileMessage;
-    private static final String GROUP_KEY = "com.qiscus.sdk.comments.pn";
-    public static final int NOTIFICATION_BUNDLED_BASE_ID = 0;
 
     static {
         fileMessage = new SpannableStringBuilder(QiscusAndroidUtil.getString(R.string.qiscus_send_attachment));
@@ -145,25 +143,21 @@ public final class QiscusPushNotificationUtil {
         openIntent.putExtra("data", comment);
         pendingIntent = PendingIntent.getBroadcast(context, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
+        notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
                 .setContentIntent(pendingIntent)
                 .setContentText(messageText)
                 .setTicker(messageText)
-                .setLargeIcon(largeIcon)
-                .setAutoCancel(true)
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
+                .setLargeIcon(largeIcon)
                 .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(messageText))
-                .setGroup(GROUP_KEY);
+                .setGroupSummary(true)
+                .setGroup("CHAT_NOTIF_" + comment.getRoomId())
+                .setAutoCancel(true)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            builder.setGroupSummary(true);
-        }
-
-        String getRepliedTo = (comment.isGroupMessage()) ? comment.getRoomName() : comment.getSender();
         if (Qiscus.getChatConfig().isEnableReplyNotification() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String getRepliedTo = (comment.isGroupMessage()) ? comment.getRoomName() : comment.getSender();
             RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
                     .setLabel(QiscusAndroidUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
                     .build();
@@ -172,42 +166,17 @@ public final class QiscusPushNotificationUtil {
                     QiscusAndroidUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()), pendingIntent)
                     .addRemoteInput(remoteInput)
                     .build();
-            builder.addAction(replyAction);
-        }
-
-        if (QiscusCacheManager.getInstance().addRoomNotifItem(comment.getRoomId())) {
-            builder.setPriority(Notification.PRIORITY_HIGH);
+            notificationBuilder.addAction(replyAction);
         }
 
         boolean cancel = false;
         if (Qiscus.getChatConfig().getNotificationBuilderInterceptor() != null) {
             cancel = !Qiscus.getChatConfig().getNotificationBuilderInterceptor()
-                    .intercept(builder, comment);
+                    .intercept(notificationBuilder, comment);
         }
 
         if (cancel) {
             return;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            NotificationCompat.Builder summaryBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
-                    .setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
-                    .setContentIntent(pendingIntent)
-                    .setContentText(messageText)
-                    .setTicker(messageText)
-                    .setLargeIcon(largeIcon)
-                    .setAutoCancel(true)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(messageText))
-                    .setGroup(GROUP_KEY)
-                    .setGroupSummary(true)
-                    .setSubText(QiscusAndroidUtil.getString(R.string.qiscus_subtext_summary,
-                            QiscusCacheManager.getInstance().getRoomNotifItems().size()));
-
-            QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
-                    .notify(NOTIFICATION_BUNDLED_BASE_ID, summaryBuilder.build()));
         }
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -232,20 +201,18 @@ public final class QiscusPushNotificationUtil {
         if (notifItems.size() > notifSize) {
             inboxStyle.addLine(".......");
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            inboxStyle.setBigContentTitle(getRepliedTo + ": (" +
-                    QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size())
-                    + ") ");
-        }
         inboxStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
-        builder.setStyle(inboxStyle);
+        notificationBuilder.setStyle(inboxStyle);
+
+        if (notifSize <= 3) {
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+        }
 
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
-                .notify(comment.getRoomId(), builder.build()));
+                .notify(comment.getRoomId(), notificationBuilder.build()));
     }
 
     private static boolean isAttachment(String message) {
         return message.startsWith("[file]") && message.endsWith("[/file]");
     }
-
 }

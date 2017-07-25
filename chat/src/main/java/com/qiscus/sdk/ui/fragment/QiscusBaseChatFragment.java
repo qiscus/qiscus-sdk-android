@@ -84,9 +84,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.qiscus.sdk.util.QiscusPushNotificationUtil.NOTIFICATION_BUNDLED_BASE_ID;
-
-
 /**
  * Created on : September 28, 2016
  * Author     : zetbaitsu
@@ -677,10 +674,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void onClearNotification() {
         NotificationManagerCompat.from(getActivity()).cancel(qiscusChatRoom.getId());
-        QiscusCacheManager.getInstance().removeRoomNotif(qiscusChatRoom.getId());
-        if (QiscusCacheManager.getInstance().getRoomNotifItems().isEmpty()) {
-            NotificationManagerCompat.from(getActivity()).cancel(NOTIFICATION_BUNDLED_BASE_ID);
-        }
         QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
     }
 
