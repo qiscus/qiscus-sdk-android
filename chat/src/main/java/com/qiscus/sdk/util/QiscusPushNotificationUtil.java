@@ -56,10 +56,8 @@ import java.util.List;
 public final class QiscusPushNotificationUtil {
     public static final String KEY_NOTIFICATION_REPLY = "KEY_NOTIFICATION_REPLY";
     private static SpannableStringBuilder fileMessage;
-    private static final String GROUP_KEY_BUNDLED = "GROUP_KEY_BUNDLED";
+    private static final String GROUP_KEY = "com.qiscus.sdk.comments.pn";
     public static final int NOTIFICATION_BUNDLED_BASE_ID = 0;
-    private static NotificationCompat.InboxStyle inboxStyle;
-    private static boolean headsUp = false;
 
     static {
         fileMessage = new SpannableStringBuilder(QiscusAndroidUtil.getString(R.string.qiscus_send_attachment));
@@ -104,7 +102,6 @@ public final class QiscusPushNotificationUtil {
             return;
         }
 
-        headsUp = QiscusCacheManager.getInstance().addRoomNotifItem(comment.getRoomId());
         String finalMessageText = messageText;
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
             QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, comment, finalMessageText));
@@ -143,34 +140,10 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void pushNotification(Context context, QiscusComment comment, String messageText, Bitmap largeIcon) {
-
         PendingIntent pendingIntent;
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
         pendingIntent = PendingIntent.getBroadcast(context, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            NotificationCompat.Builder summaryBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
-                    .setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
-                    .setContentIntent(pendingIntent)
-                    .setContentText(messageText)
-                    .setTicker(messageText)
-                    .setLargeIcon(largeIcon)
-                    .setAutoCancel(true)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(messageText))
-                    .setGroup(GROUP_KEY_BUNDLED)
-                    .setGroupSummary(true)
-                    .setSubText(QiscusAndroidUtil.getString(R.string.qiscus_subtext_summary,
-                            QiscusCacheManager.getInstance().getRoomNotifItems().size()));
-
-            QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
-                    .notify(NOTIFICATION_BUNDLED_BASE_ID, summaryBuilder.build()));
-            summaryBuilder.setStyle(inboxStyle);
-        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
@@ -182,13 +155,15 @@ public final class QiscusPushNotificationUtil {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
                 .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(messageText))
-                .setGroup(GROUP_KEY_BUNDLED);
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(messageText))
+                .setGroup(GROUP_KEY);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            builder.setGroupSummary(true);
+        }
 
         String getRepliedTo = (comment.isGroupMessage()) ? comment.getRoomName() : comment.getSender();
         if (Qiscus.getChatConfig().isEnableReplyNotification() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
             RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
                     .setLabel(QiscusAndroidUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
                     .build();
@@ -198,10 +173,10 @@ public final class QiscusPushNotificationUtil {
                     .addRemoteInput(remoteInput)
                     .build();
             builder.addAction(replyAction);
+        }
 
-            if (headsUp) {
-                builder.setPriority(Notification.PRIORITY_HIGH);
-            }
+        if (QiscusCacheManager.getInstance().addRoomNotifItem(comment.getRoomId())) {
+            builder.setPriority(Notification.PRIORITY_HIGH);
         }
 
         boolean cancel = false;
@@ -214,7 +189,28 @@ public final class QiscusPushNotificationUtil {
             return;
         }
 
-        inboxStyle = new NotificationCompat.InboxStyle();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            NotificationCompat.Builder summaryBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
+                    .setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
+                    .setContentIntent(pendingIntent)
+                    .setContentText(messageText)
+                    .setTicker(messageText)
+                    .setLargeIcon(largeIcon)
+                    .setAutoCancel(true)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(messageText))
+                    .setGroup(GROUP_KEY)
+                    .setGroupSummary(true)
+                    .setSubText(QiscusAndroidUtil.getString(R.string.qiscus_subtext_summary,
+                            QiscusCacheManager.getInstance().getRoomNotifItems().size()));
+
+            QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
+                    .notify(NOTIFICATION_BUNDLED_BASE_ID, summaryBuilder.build()));
+        }
+
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance()
                 .getMessageNotifItems(comment.getRoomId());
         if (notifItems == null) {
@@ -236,11 +232,13 @@ public final class QiscusPushNotificationUtil {
         if (notifItems.size() > notifSize) {
             inboxStyle.addLine(".......");
         }
-        inboxStyle.setBigContentTitle(getRepliedTo + ": (" +
-                QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size())
-                + ") ");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            inboxStyle.setBigContentTitle(getRepliedTo + ": (" +
+                    QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size())
+                    + ") ");
+        }
+        inboxStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
         builder.setStyle(inboxStyle);
-
 
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
                 .notify(comment.getRoomId(), builder.build()));
