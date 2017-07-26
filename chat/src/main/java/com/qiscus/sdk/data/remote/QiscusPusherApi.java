@@ -35,11 +35,10 @@ import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -48,9 +47,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
@@ -59,13 +56,11 @@ import java.util.concurrent.TimeUnit;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
+public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener {
 
     INSTANCE;
     private static final String TAG = QiscusPusherApi.class.getSimpleName();
     private static final long RETRY_PERIOD = 2000;
-    private static final long FALLBACK_PERIOD = 5000;
-    private static final int MAX_PENDING_MESSAGES = 10;
 
     private static DateFormat dateFormat;
     private static Gson gson;
@@ -94,9 +89,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     private boolean connecting;
 
-    private ScheduledFuture<?> scheduledChecker;
     private ScheduledFuture<?> scheduledUserStatus;
-    private List<IMqttDeliveryToken> pendingTokens;
 
     private int setOfflineCounter;
 
@@ -121,10 +114,9 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     private void buildClient() {
         mqttAndroidClient = null;
-        pendingTokens = new ArrayList<>();
         mqttAndroidClient = new MqttAndroidClient(Qiscus.getApps().getApplicationContext(), serverUri, clientId);
         mqttAndroidClient.setCallback(this);
-        mqttAndroidClient.setTraceEnabled(true);
+        mqttAndroidClient.setTraceEnabled(false);
     }
 
     public void connect() {
@@ -150,24 +142,6 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     public boolean isConnected() {
         return mqttAndroidClient != null && mqttAndroidClient.isConnected();
-    }
-
-    private void startFallbackChecker(long period) {
-        if (scheduledChecker != null) {
-            stopFallbackChecker();
-        }
-
-        scheduledChecker = Qiscus.getTaskExecutor().scheduleWithFixedDelay(() -> {
-            if (pendingTokens.size() >= MAX_PENDING_MESSAGES) {
-                restartConnection();
-            }
-        }, 0, period, TimeUnit.MILLISECONDS);
-    }
-
-    private void stopFallbackChecker() {
-        if (scheduledChecker != null) {
-            scheduledChecker.cancel(true);
-        }
     }
 
     public void restartConnection() {
@@ -215,7 +189,6 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             //Do nothing
         }
         clearTasks();
-        stopFallbackChecker();
         stopUserStatus();
     }
 
@@ -297,7 +270,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             message.setPayload(online ? "1".getBytes() : "0".getBytes());
             message.setQos(2);
             message.setRetained(true);
-            pendingTokens.add(mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message));
+            mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message);
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
         }
@@ -308,8 +281,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload((typing ? "1" : "0").getBytes());
-            pendingTokens.add(mqttAndroidClient.publish("r/" + roomId + "/" + topicId + "/"
-                    + qiscusAccount.getEmail() + "/t", message));
+            mqttAndroidClient.publish("r/" + roomId + "/" + topicId + "/"
+                    + qiscusAccount.getEmail() + "/t", message);
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
         }
@@ -415,21 +388,15 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-        pendingTokens.remove(token);
+
     }
 
     @Override
-    public void onSuccess(IMqttToken asyncActionToken) {
+    public void connectComplete(boolean reconnect, String serverUri) {
         Log.i(TAG, "Connected...");
         try {
             connecting = false;
             reconnectCounter = 0;
-            DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
-            disconnectedBufferOptions.setBufferEnabled(true);
-            disconnectedBufferOptions.setBufferSize(100);
-            disconnectedBufferOptions.setPersistBuffer(true);
-            disconnectedBufferOptions.setDeleteOldestMessages(true);
-            mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
             listenComment();
             if (fallBackListenRoom != null) {
                 scheduledListenRoom = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenRoom);
@@ -437,16 +404,18 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
             if (fallBackListenUserStatus != null) {
                 scheduledListenUserStatus = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenUserStatus);
             }
-            pendingTokens.clear();
             if (scheduledConnect != null) {
                 scheduledConnect.cancel(true);
                 scheduledConnect = null;
             }
-            startFallbackChecker(FALLBACK_PERIOD);
             scheduleUserStatus();
         } catch (NullPointerException | IllegalArgumentException ignored) {
             //Do nothing
         }
+    }
+
+    @Override
+    public void onSuccess(IMqttToken asyncActionToken) {
 
     }
 
@@ -518,7 +487,7 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
     private void scheduleUserStatus() {
         scheduledUserStatus = Qiscus.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
-                    if (Qiscus.hasSetupUser()) {
+                    if (Qiscus.hasSetupUser() && isConnected()) {
                         if (Qiscus.isOnForeground()) {
                             setOfflineCounter = 0;
                             setUserStatus(true);
@@ -528,6 +497,8 @@ public enum QiscusPusherApi implements MqttCallback, IMqttActionListener {
                                 setOfflineCounter++;
                             }
                         }
+                    } else {
+                        stopUserStatus();
                     }
                 }, 0, 10, TimeUnit.SECONDS);
     }
