@@ -113,7 +113,7 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             progressBar.setVisibility(newProgress == 0 || newProgress == 100 ? View.GONE : View.VISIBLE);
-            if (success && newProgress >= 95) {
+            if (success && newProgress >= 95 && !isFinishing()) {
                 showSuccessDialog();
             }
             super.onProgressChanged(view, newProgress);
