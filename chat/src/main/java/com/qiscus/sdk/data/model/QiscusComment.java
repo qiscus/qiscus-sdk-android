@@ -22,6 +22,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
@@ -308,6 +309,7 @@ public class QiscusComment implements Parcelable {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(this);
                 replyTo = new QiscusComment();
                 replyTo.id = payload.getInt("replied_comment_id");
+                replyTo.uniqueId = replyTo.id + "";
                 replyTo.message = payload.getString("replied_comment_message");
                 replyTo.sender = payload.getString("replied_comment_sender_username");
                 replyTo.senderEmail = payload.getString("replied_comment_sender_email");

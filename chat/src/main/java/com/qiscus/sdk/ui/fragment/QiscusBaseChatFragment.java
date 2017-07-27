@@ -1029,7 +1029,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void scrollToComment(QiscusComment comment) {
-        int position = chatAdapter.getData().indexOf(comment);
+        int position = chatAdapter.findPosition(comment);
         if (position >= 0) {
             messageRecyclerView.scrollToPosition(position);
         } else {
