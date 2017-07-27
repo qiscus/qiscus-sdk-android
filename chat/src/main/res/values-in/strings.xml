@@ -92,5 +92,4 @@
     <string name="qiscus_downloading">Sedang Mengunduh</string>
     <string name="qiscus_forward">Teruskan</string>
     <string name="qiscus_subtext_summary">Kamu memiliki %1$s chat</string>
-    <string name="qiscus_can_not_forward">Tidak bisa meneruskan pesan ini sebelum pesan diterima oleh server.</string>
 </resources>
