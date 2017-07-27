@@ -20,14 +20,17 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
@@ -215,8 +218,16 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                     .setVisible(Qiscus.getChatConfig().isEnableForwardComment());
             if (selectedComments.size() == 1 && selectedComments.get(0).getState() >= QiscusComment.STATE_ON_QISCUS) {
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
+                QiscusComment qiscusComment = selectedComments.get(0);
+                File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+                if (localPath != null) {
+                    actionMode.getMenu().findItem(R.id.action_share).setVisible(true);
+                } else {
+                    actionMode.getMenu().findItem(R.id.action_share).setVisible(false);
+                }
             } else {
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(false);
+                actionMode.getMenu().findItem(R.id.action_share).setVisible(false);
             }
 
             if (onlyTextOrLinkType(selectedComments)) {
@@ -281,11 +292,21 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, getString(R.string.qiscus_copied_message, selectedComments.size()), Toast.LENGTH_SHORT).show();
         } else if (i == R.id.action_share) {
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Messages");
-            intent.putExtra(Intent.EXTRA_TEXT, text);
-            startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_comments_title)));
+            if (selectedComments.size() > 0) {
+                QiscusComment qiscusComment = selectedComments.get(0);
+                String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension());
+                File file = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType(mime);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                } else {
+                    intent.putExtra(Intent.EXTRA_STREAM,
+                            FileProvider.getUriForFile(this, Qiscus.getProviderAuthorities(), file));
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_image_title)));
+            }
         } else if (i == R.id.action_reply) {
             QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
                     .findFragmentByTag(QiscusBaseChatFragment.class.getName());
