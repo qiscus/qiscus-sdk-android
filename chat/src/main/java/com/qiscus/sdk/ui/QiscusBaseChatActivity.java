@@ -291,6 +291,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             ClipData clip = ClipData.newPlainText(getString(R.string.qiscus_chat_activity_label_clipboard), text);
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, getString(R.string.qiscus_copied_message, selectedComments.size()), Toast.LENGTH_SHORT).show();
+            mode.finish();
         } else if (i == R.id.action_share) {
             if (selectedComments.size() > 0) {
                 QiscusComment qiscusComment = selectedComments.get(0);
@@ -307,21 +308,36 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                 }
                 startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_image_title)));
             }
+            mode.finish();
         } else if (i == R.id.action_reply) {
             QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
                     .findFragmentByTag(QiscusBaseChatFragment.class.getName());
             if (fragment != null && selectedComments.size() > 0) {
                 fragment.replyComment(selectedComments.get(0));
             }
+            mode.finish();
         } else if (i == R.id.action_forward) {
+            boolean canNotForward = false;
+            for (QiscusComment selectedComment : selectedComments) {
+                if (selectedComment.getState() < QiscusComment.STATE_ON_QISCUS) {
+                    canNotForward = true;
+                    break;
+                }
+            }
+
+            if (canNotForward) {
+                showError(getString(R.string.qiscus_can_not_forward));
+                return;
+            }
+
             ForwardCommentHandler forwardCommentHandler = Qiscus.getChatConfig().getForwardCommentHandler();
             if (forwardCommentHandler == null) {
                 throw new NullPointerException("Please set forward handler before.\n" +
                         "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
             }
             forwardCommentHandler.forward(selectedComments);
+            mode.finish();
         }
-        mode.finish();
     }
 
     @Override
@@ -336,7 +352,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     @Override
     public void showError(String errorMessage) {
-
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
 
     @Override

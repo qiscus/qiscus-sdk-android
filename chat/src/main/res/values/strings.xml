@@ -92,4 +92,5 @@
     <string name="qiscus_downloading">Downloading</string>
     <string name="qiscus_forward">Forward</string>
     <string name="qiscus_subtext_summary">You have %1$s chat</string>
+    <string name="qiscus_can_not_forward">Can\'t forward this message until the server has received it.</string>
 </resources>
