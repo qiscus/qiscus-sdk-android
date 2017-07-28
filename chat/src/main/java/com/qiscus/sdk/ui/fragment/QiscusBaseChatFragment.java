@@ -61,6 +61,7 @@ import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
 import com.qiscus.sdk.ui.QiscusSendPhotoConfirmationActivity;
+import com.qiscus.sdk.ui.adapter.CommentChainingListener;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
@@ -93,7 +94,7 @@ import java.util.List;
 public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> extends RxFragment
         implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
         QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener,
-        QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener {
+        QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener, CommentChainingListener {
 
     protected static final int RC_PERMISSIONS = 127;
 
@@ -432,6 +433,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 onItemCommentLongClick((QiscusComment) chatAdapter.getData().get(position)));
         chatAdapter.setReplyItemClickListener(comment -> scrollToComment(comment.getReplyTo()));
         chatAdapter.setChatButtonClickListener(this);
+        chatAdapter.setCommentChainingListener(this);
         messageRecyclerView.setUpAsBottomList();
         chatLayoutManager = (LinearLayoutManager) messageRecyclerView.getLayoutManager();
         messageRecyclerView.setAdapter(chatAdapter);
@@ -1268,6 +1270,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onChatButtonClick(JSONObject jsonButton) {
         qiscusChatPresenter.clickChatButton(jsonButton);
+    }
+
+    @Override
+    public void onCommentChainingBreak(QiscusComment insertedComment, QiscusComment commentBefore) {
+        qiscusChatPresenter.loadCommentsAfter(commentBefore);
     }
 
     public interface CommentSelectedListener {

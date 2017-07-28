@@ -48,6 +48,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected OnLongItemClickListener longItemClickListener;
     protected QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener;
     protected ReplyItemClickListener replyItemClickListener;
+    protected CommentChainingListener commentChainingListener;
 
     protected QiscusAccount qiscusAccount;
     protected int lastDeliveredCommentId;
@@ -65,6 +66,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
             @Override
             public void onInserted(int position, int count) {
+                checkChaining(position);
             }
 
             @Override
@@ -79,6 +81,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
             @Override
             public void onChanged(int position, int count) {
+                checkChaining(position);
             }
 
             @Override
@@ -92,6 +95,20 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             }
         });
         qiscusAccount = Qiscus.getQiscusAccount();
+    }
+
+    private void checkChaining(int position) {
+        if (position < data.size() - 1) {
+            QiscusComment comment = data.get(position);
+            QiscusComment before = data.get(position + 1);
+            if (comment.getState() >= QiscusComment.STATE_ON_QISCUS
+                    && before.getState() >= QiscusComment.STATE_ON_QISCUS
+                    && comment.getCommentBeforeId() != before.getId()) {
+                if (commentChainingListener != null) {
+                    commentChainingListener.onCommentChainingBreak(comment, before);
+                }
+            }
+        }
     }
 
     public QiscusBaseChatAdapter(Context context) {
@@ -193,6 +210,10 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     public void setReplyItemClickListener(ReplyItemClickListener replyItemClickListener) {
         this.replyItemClickListener = replyItemClickListener;
+    }
+
+    public void setCommentChainingListener(CommentChainingListener commentChainingListener) {
+        this.commentChainingListener = commentChainingListener;
     }
 
     public SortedList<E> getData() {

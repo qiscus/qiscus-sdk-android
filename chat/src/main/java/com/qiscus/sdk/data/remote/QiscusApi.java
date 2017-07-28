@@ -126,7 +126,14 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> getComments(int roomId, int topicId, int lastCommentId) {
-        return api.getComments(Qiscus.getToken(), topicId, lastCommentId)
+        return api.getComments(Qiscus.getToken(), topicId, lastCommentId, false)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId, topicId));
+    }
+
+    public Observable<QiscusComment> getCommentsAfter(int roomId, int topicId, int lastCommentId) {
+        return api.getComments(Qiscus.getToken(), topicId, lastCommentId, true)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId, topicId));
@@ -168,13 +175,8 @@ public enum QiscusApi {
                 });
     }
 
-    public Observable<QiscusComment> sync() {
-        QiscusComment latestComment = Qiscus.getDataStore().getLatestComment();
-        if (latestComment == null || !QiscusAndroidUtil.getString(R.string.qiscus_today)
-                .equals(QiscusDateUtil.toTodayOrDate(latestComment.getTime()))) {
-            return Observable.empty();
-        }
-        return api.sync(Qiscus.getToken(), latestComment.getId())
+    public Observable<QiscusComment> sync(int lastCommentId) {
+        return api.sync(Qiscus.getToken(), lastCommentId)
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
                     return null;
@@ -187,6 +189,15 @@ public enum QiscusApi {
                     return QiscusApiParser.parseQiscusComment(jsonElement,
                             jsonComment.get("room_id").getAsInt(), jsonComment.get("topic_id").getAsInt());
                 });
+    }
+
+    public Observable<QiscusComment> sync() {
+        QiscusComment latestComment = Qiscus.getDataStore().getLatestComment();
+        if (latestComment == null || !QiscusAndroidUtil.getString(R.string.qiscus_today)
+                .equals(QiscusDateUtil.toTodayOrDate(latestComment.getTime()))) {
+            return Observable.empty();
+        }
+        return sync(latestComment.getId());
     }
 
     public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
@@ -327,7 +338,8 @@ public enum QiscusApi {
         @GET("/api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(@Query("token") String token,
                                             @Query("topic_id") int topicId,
-                                            @Query("last_comment_id") int lastCommentId);
+                                            @Query("last_comment_id") int lastCommentId,
+                                            @Query("after") boolean after);
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/post_comment")

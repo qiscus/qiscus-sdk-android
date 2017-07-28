@@ -524,6 +524,32 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    public void loadCommentsAfter(QiscusComment comment) {
+        QiscusApi.getInstance().getCommentsAfter(room.getId(), currentTopicId, comment.getId())
+                .doOnNext(qiscusComment -> {
+                    qiscusComment.setRoomId(room.getId());
+                    if (qiscusComment.getId() > lastDeliveredCommentId.get()) {
+                        qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+                    } else if (qiscusComment.getId() > lastReadCommentId.get()) {
+                        qiscusComment.setState(QiscusComment.STATE_DELIVERED);
+                    } else {
+                        qiscusComment.setState(QiscusComment.STATE_READ);
+                    }
+                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                })
+                .toSortedList(commentComparator)
+                .doOnNext(this::checkForLastRead)
+                .doOnNext(Collections::reverse)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(comments -> {
+                    if (view != null) {
+                        view.onLoadMore(comments);
+                    }
+                }, Throwable::printStackTrace);
+    }
+
     private void listenRoomEvent() {
         QiscusPusherApi.getInstance().listenRoom(room);
     }
