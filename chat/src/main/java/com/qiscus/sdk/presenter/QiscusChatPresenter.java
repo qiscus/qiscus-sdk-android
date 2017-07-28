@@ -30,6 +30,7 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
@@ -524,6 +525,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    @Subscribe
+    public void onMqttEvent(QiscusMqttStatusEvent event) {
+        view.onRealtimeStatusChanged(event == QiscusMqttStatusEvent.CONNECTED);
+    }
+
     public void loadCommentsAfter(QiscusComment comment) {
         QiscusApi.getInstance().getCommentsAfter(room.getId(), currentTopicId, comment.getId())
                 .doOnNext(qiscusComment -> {
@@ -889,5 +895,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void onUserTyping(String user, boolean typing);
 
         void showCommentsAndScrollToTop(List<QiscusComment> qiscusComments);
+
+        void onRealtimeStatusChanged(boolean connected);
     }
 }

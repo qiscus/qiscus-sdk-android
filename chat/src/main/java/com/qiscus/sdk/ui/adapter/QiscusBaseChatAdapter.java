@@ -103,10 +103,9 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             QiscusComment before = data.get(position + 1);
             if (comment.getState() >= QiscusComment.STATE_ON_QISCUS
                     && before.getState() >= QiscusComment.STATE_ON_QISCUS
-                    && comment.getCommentBeforeId() != before.getId()) {
-                if (commentChainingListener != null) {
-                    commentChainingListener.onCommentChainingBreak(comment, before);
-                }
+                    && comment.getCommentBeforeId() != before.getId()
+                    && commentChainingListener != null) {
+                commentChainingListener.onCommentChainingBreak(comment, before);
             }
         }
     }
@@ -345,6 +344,17 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             }
         }
         notifyDataSetChanged();
+    }
+
+    public QiscusComment getLatestSentComment() {
+        int size = data.size();
+        for (int i = 0; i < size; i++) {
+            QiscusComment comment = data.get(i);
+            if (comment.getState() >= QiscusComment.STATE_ON_QISCUS) {
+                return comment;
+            }
+        }
+        return null;
     }
 
     public void detachView() {

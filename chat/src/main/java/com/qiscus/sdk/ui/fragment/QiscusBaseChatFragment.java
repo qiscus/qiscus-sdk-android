@@ -1277,6 +1277,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         qiscusChatPresenter.loadCommentsAfter(commentBefore);
     }
 
+    @Override
+    public void onRealtimeStatusChanged(boolean connected) {
+        if (connected) {
+            QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
+            if (qiscusComment != null) {
+                qiscusChatPresenter.loadCommentsAfter(qiscusComment);
+            }
+        }
+    }
+
     public interface CommentSelectedListener {
         void onCommentSelected(List<QiscusComment> selectedComments);
     }

@@ -29,6 +29,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -318,6 +319,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void connectionLost(Throwable cause) {
+        if (reconnectCounter == 0) {
+            EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
+        }
         reconnectCounter++;
         Log.e(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * reconnectCounter + " ms");
         connecting = false;
@@ -394,6 +398,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     @Override
     public void connectComplete(boolean reconnect, String serverUri) {
         Log.i(TAG, "Connected...");
+        EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
         try {
             connecting = false;
             reconnectCounter = 0;
@@ -421,6 +426,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+        if (reconnectCounter == 0) {
+            EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
+        }
         reconnectCounter++;
         Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms");
         connecting = false;
