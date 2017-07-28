@@ -439,7 +439,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         int size = qiscusComments.size();
 
         if (size == 1) {
-            return qiscusComments.get(0).getCommentBeforeId() == 0;
+            return qiscusComments.get(0).getCommentBeforeId() == 0
+                    && lastQiscusComment.getCommentBeforeId() == qiscusComments.get(0).getId();
         }
 
         for (int i = 0; i < size - 1; i++) {
