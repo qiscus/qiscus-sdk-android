@@ -144,6 +144,14 @@ final class QiscusApiParser {
             e.printStackTrace();
         }
 
+        if (jsonComment.has("room_name")) {
+            qiscusComment.setRoomName(jsonComment.get("room_name").getAsString());
+        }
+
+        if (jsonComment.has("chat_type")) {
+            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("chat_type").getAsString()));
+        }
+
         if (jsonComment.has("unique_id")) {
             qiscusComment.setUniqueId(jsonComment.get("unique_id").getAsString());
         } else if (jsonComment.has("unique_temp_id")) {

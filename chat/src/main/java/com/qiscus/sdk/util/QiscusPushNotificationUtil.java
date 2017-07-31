@@ -40,7 +40,6 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
-import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
 
@@ -68,16 +67,6 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void handlePN(Context context, QiscusComment qiscusComment) {
-        if ("sync".equals(qiscusComment.getRoomName())) {
-            QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
-            if (chatRoom == null) {
-                return;
-            }
-            if (chatRoom.isGroup()) {
-                qiscusComment.setGroupMessage(true);
-                qiscusComment.setRoomName(chatRoom.getName());
-            }
-        }
         if (Qiscus.getChatConfig().isEnablePushNotification()
                 && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
             if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {

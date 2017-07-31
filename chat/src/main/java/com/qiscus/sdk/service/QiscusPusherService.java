@@ -98,7 +98,6 @@ public class QiscusPusherService extends Service {
                                         qiscusComment.setState(savedQiscusComment.getState());
                                     }
                                     Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                                    qiscusComment.setRoomName("sync");
                                 })
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
