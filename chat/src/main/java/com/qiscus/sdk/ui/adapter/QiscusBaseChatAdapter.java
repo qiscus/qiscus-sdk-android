@@ -172,6 +172,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
         if (h.isNeedToShowDate()) {
             h.setNeedToShowFirstMessageBubbleIndicator(true);
+        } else if (data.get(position + 1).getType() == QiscusComment.Type.CARD) {
+            h.setNeedToShowFirstMessageBubbleIndicator(true);
         } else if (data.get(position).getSenderEmail().equals(data.get(position + 1).getSenderEmail())) {
             h.setNeedToShowFirstMessageBubbleIndicator(false);
         } else {
