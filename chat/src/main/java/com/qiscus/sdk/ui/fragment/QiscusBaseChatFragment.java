@@ -282,7 +282,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             recordAudioPanel.setRecordListener(this);
         }
         if (goToBottomButton != null) {
-            goToBottomButton.setOnClickListener(v -> messageRecyclerView.scrollToPosition(0));
+            goToBottomButton.setOnClickListener(v -> {
+                messageRecyclerView.scrollToPosition(0);
+                QiscusAndroidUtil.runOnUIThread(() -> {
+                    if (goToBottomButton != null) {
+                        goToBottomButton.setVisibility(View.GONE);
+                    }
+                }, 320);
+            });
         }
     }
 
