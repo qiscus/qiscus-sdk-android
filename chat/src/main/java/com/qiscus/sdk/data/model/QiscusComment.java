@@ -74,6 +74,7 @@ public class QiscusComment implements Parcelable {
     protected boolean groupMessage;
 
     protected boolean selected;
+    protected boolean highlighted;
     protected boolean downloading;
     protected int progress;
 
@@ -284,6 +285,14 @@ public class QiscusComment implements Parcelable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
     }
 
     public void setRawType(String rawType) {

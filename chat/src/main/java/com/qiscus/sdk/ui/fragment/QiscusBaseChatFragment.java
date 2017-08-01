@@ -172,6 +172,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     private RoomChangedListener roomChangedListener;
     private EmojiPopup emojiPopup;
 
+    private Runnable commentHighlightTask;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -798,6 +800,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         chatAdapter.clearSelectedComments();
     }
 
+    protected void highlightComment(QiscusComment qiscusComment) {
+        qiscusComment.setHighlighted(true);
+        refreshComment(qiscusComment);
+        commentHighlightTask = () -> {
+            qiscusComment.setHighlighted(false);
+            refreshComment(qiscusComment);
+        };
+        QiscusAndroidUtil.runOnUIThread(commentHighlightTask, 2000);
+    }
+
     protected void onMessageEditTextChanged(CharSequence message) {
         if (message == null || message.toString().trim().isEmpty()) {
             if (!fieldMessageEmpty) {
@@ -1028,6 +1040,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (!qiscusComments.isEmpty()) {
             chatAdapter.addOrUpdate(qiscusComments);
             messageRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
+            highlightComment((QiscusComment) chatAdapter.getData().get(chatAdapter.getItemCount() - 1));
         }
     }
 
@@ -1055,6 +1068,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         int position = chatAdapter.findPosition(comment);
         if (position >= 0) {
             messageRecyclerView.scrollToPosition(position);
+            highlightComment((QiscusComment) chatAdapter.getData().get(position));
         } else {
             qiscusChatPresenter.loadUntilComment(comment);
         }
@@ -1255,6 +1269,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (commentHighlightTask != null) {
+            QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
+        }
         QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
         QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
         chatAdapter.detachView();
