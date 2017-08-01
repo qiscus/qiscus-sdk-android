@@ -26,6 +26,7 @@ import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
@@ -94,6 +95,24 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             updateLastReadComment(Qiscus.getDataStore().getLatestReadComment(currentTopicId));
             updateLastDeliveredComment(Qiscus.getDataStore().getLatestDeliveredComment(currentTopicId));
         });
+    }
+
+    private boolean updateLastDeliveredCommentId(int id) {
+        if (id > lastDeliveredCommentId.get()) {
+            lastDeliveredCommentId.set(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean updateLastReadCommentId(int id) {
+        if (id > lastReadCommentId.get()) {
+            lastReadCommentId.set(id);
+            updateLastDeliveredCommentId(id);
+            return true;
+        }
+        return false;
     }
 
     private void commentSuccess(QiscusComment qiscusComment) {
@@ -314,6 +333,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     });
                 })
                 .doOnNext(roomData -> {
+                    updateRoomState(roomData.first.getMember());
                     checkForLastRead(roomData.second);
                     for (QiscusComment qiscusComment : roomData.second) {
                         if (qiscusComment.getId() > lastDeliveredCommentId.get()) {
@@ -343,11 +363,19 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .onErrorReturn(throwable -> null);
     }
 
+    private void updateRoomState(List<QiscusRoomMember> members) {
+        for (QiscusRoomMember qiscusRoomMember : members) {
+            if (!qiscusRoomMember.getEmail().equals(qiscusAccount.getEmail())) {
+                updateLastReadCommentId(qiscusRoomMember.getLastReadCommentId());
+                updateLastDeliveredCommentId(qiscusRoomMember.getLastDeliveredCommentId());
+            }
+        }
+    }
+
     private void checkForLastRead(List<QiscusComment> qiscusComments) {
         for (QiscusComment qiscusComment : qiscusComments) {
-            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail()) && qiscusComment.getId() > lastReadCommentId.get()) {
-                lastReadCommentId.set(qiscusComment.getId());
-                lastDeliveredCommentId.set(lastReadCommentId.get());
+            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+                updateLastReadCommentId(qiscusComment.getId());
             }
         }
     }
@@ -586,12 +614,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             Qiscus.getDataStore().update(deliveredComment);
                         }
                     } else {
-                        lastDeliveredCommentId.set(event.getCommentId());
-                        QiscusAndroidUtil.runOnUIThread(() -> {
-                            if (view != null) {
-                                view.updateLastDeliveredComment(lastDeliveredCommentId.get());
-                            }
-                        });
+                        if (updateLastDeliveredCommentId(event.getCommentId())) {
+                            QiscusAndroidUtil.runOnUIThread(() -> {
+                                if (view != null) {
+                                    view.updateLastDeliveredComment(lastDeliveredCommentId.get());
+                                }
+                            });
+                        }
                     }
                     break;
                 case READ:
@@ -605,13 +634,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             Qiscus.getDataStore().update(readComment);
                         }
                     } else {
-                        lastReadCommentId.set(event.getCommentId());
-                        lastDeliveredCommentId.set(lastReadCommentId.get());
-                        QiscusAndroidUtil.runOnUIThread(() -> {
-                            if (view != null) {
-                                view.updateLastReadComment(lastReadCommentId.get());
-                            }
-                        });
+                        if (updateLastReadCommentId(event.getCommentId())) {
+                            QiscusAndroidUtil.runOnUIThread(() -> {
+                                if (view != null) {
+                                    view.updateLastReadComment(lastReadCommentId.get());
+                                }
+                            });
+                        }
                     }
                     break;
             }
@@ -619,9 +648,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void updateLastReadComment(QiscusComment qiscusComment) {
-        if (qiscusComment != null && qiscusComment.getId() > lastReadCommentId.get()) {
-            lastReadCommentId.set(qiscusComment.getId());
-            lastDeliveredCommentId.set(lastReadCommentId.get());
+        if (qiscusComment != null && updateLastReadCommentId(qiscusComment.getId())) {
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
                     view.updateLastReadComment(lastReadCommentId.get());
@@ -631,8 +658,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void updateLastDeliveredComment(QiscusComment qiscusComment) {
-        if (qiscusComment != null && qiscusComment.getId() > lastDeliveredCommentId.get()) {
-            lastDeliveredCommentId.set(qiscusComment.getId());
+        if (qiscusComment != null && updateLastDeliveredCommentId(qiscusComment.getId())) {
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
                     view.updateLastDeliveredComment(lastDeliveredCommentId.get());
