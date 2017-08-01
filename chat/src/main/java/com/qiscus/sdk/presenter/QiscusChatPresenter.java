@@ -508,6 +508,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     return comments;
                 })
                 .doOnNext(comments -> {
+                    updateRepliedSender(comments);
                     checkForLastRead(comments);
                     for (QiscusComment comment : comments) {
                         if (comment.getState() == QiscusComment.STATE_SENDING) {
@@ -551,6 +552,23 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.dismissLoading();
                     }
                 });
+    }
+
+    private void updateRepliedSender(List<QiscusComment> comments) {
+        for (QiscusComment comment : comments) {
+            if (comment.getType() == QiscusComment.Type.REPLY) {
+                QiscusComment repliedComment = comment.getReplyTo();
+                if (repliedComment != null) {
+                    for (QiscusRoomMember qiscusRoomMember : room.getMember()) {
+                        if (repliedComment.getSenderEmail().equals(qiscusRoomMember.getEmail())) {
+                            repliedComment.setSender(qiscusRoomMember.getUsername());
+                            comment.setReplyTo(repliedComment);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Subscribe
