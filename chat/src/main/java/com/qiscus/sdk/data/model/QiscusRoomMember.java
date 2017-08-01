@@ -23,6 +23,8 @@ public class QiscusRoomMember implements Parcelable {
     private String email;
     private String username;
     private String avatar;
+    private int lastDeliveredCommentId;
+    private int lastReadCommentId;
 
     public QiscusRoomMember() {
 
@@ -32,6 +34,8 @@ public class QiscusRoomMember implements Parcelable {
         email = in.readString();
         username = in.readString();
         avatar = in.readString();
+        lastDeliveredCommentId = in.readInt();
+        lastReadCommentId = in.readInt();
     }
 
     public static final Creator<QiscusRoomMember> CREATOR = new Creator<QiscusRoomMember>() {
@@ -70,12 +74,30 @@ public class QiscusRoomMember implements Parcelable {
         this.avatar = avatar;
     }
 
+    public int getLastDeliveredCommentId() {
+        return lastDeliveredCommentId;
+    }
+
+    public void setLastDeliveredCommentId(int lastDeliveredCommentId) {
+        this.lastDeliveredCommentId = lastDeliveredCommentId;
+    }
+
+    public int getLastReadCommentId() {
+        return lastReadCommentId;
+    }
+
+    public void setLastReadCommentId(int lastReadCommentId) {
+        this.lastReadCommentId = lastReadCommentId;
+    }
+
     @Override
     public String toString() {
         return "QiscusRoomMember{" +
                 "email='" + email + '\'' +
                 ", username='" + username + '\'' +
                 ", avatar='" + avatar + '\'' +
+                ", lastDeliveredCommentId=" + lastDeliveredCommentId +
+                ", lastReadCommentId=" + lastReadCommentId +
                 '}';
     }
 
@@ -102,5 +124,7 @@ public class QiscusRoomMember implements Parcelable {
         dest.writeString(email);
         dest.writeString(username);
         dest.writeString(avatar);
+        dest.writeInt(lastDeliveredCommentId);
+        dest.writeInt(lastReadCommentId);
     }
 }
