@@ -76,7 +76,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/name"
-        android:layout_marginBottom="4dp"
         android:layout_marginEnd="32dp"
         android:layout_marginLeft="54dp"
         android:layout_marginRight="32dp"
@@ -113,15 +112,16 @@
     <include
         android:id="@+id/card_view"
         layout="@layout/view_qiscus_card"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/message"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="50dp"
         android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="2dp"/>
+        android:layout_marginStart="50dp"
+        android:maxWidth="480dp"
+        android:minWidth="320dp"/>
 
     <!-- Add this view because Xiaomi need it -->
     <View

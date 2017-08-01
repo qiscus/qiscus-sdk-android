@@ -19,12 +19,14 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 
 /**
  * Created on : June 09, 2017
@@ -33,9 +35,11 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusCardMessageViewHolder extends QiscusBaseCardMessageViewHolder {
+
     public QiscusCardMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
-                                       OnLongItemClickListener longItemClickListener) {
-        super(itemView, itemClickListener, longItemClickListener);
+                                       OnLongItemClickListener longItemClickListener,
+                                       QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener) {
+        super(itemView, itemClickListener, longItemClickListener, chatButtonClickListener);
     }
 
     @NonNull
@@ -60,6 +64,12 @@ public class QiscusCardMessageViewHolder extends QiscusBaseCardMessageViewHolder
     @Override
     protected TextView getDescriptionView(View itemView) {
         return (TextView) itemView.findViewById(R.id.description);
+    }
+
+    @Nullable
+    @Override
+    protected ViewGroup getButtonsContainer(View itemView) {
+        return (ViewGroup) itemView.findViewById(R.id.buttons_container);
     }
 
     @NonNull

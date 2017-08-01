@@ -118,6 +118,8 @@ public class QiscusChatConfig {
 
     private int cardTitleColor = R.color.qiscus_primary_text;
     private int cardDescriptionColor = R.color.qiscus_secondary_text;
+    private int cardButtonTextColor = R.color.qiscus_primary;
+    private int cardButtonBackground = R.color.qiscus_white;
 
     private int playAudioIcon = R.drawable.ic_qiscus_play_audio;
     private int pauseAudioIcon = R.drawable.ic_qiscus_pause_audio;
@@ -567,6 +569,16 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setCardButtonTextColor(@ColorRes int cardButtonTextColor) {
+        this.cardButtonTextColor = cardButtonTextColor;
+        return this;
+    }
+
+    public QiscusChatConfig setCardButtonBackground(@ColorRes int cardButtonBackground) {
+        this.cardButtonBackground = cardButtonBackground;
+        return this;
+    }
+
     public QiscusChatConfig setForwardCommentHandler(ForwardCommentHandler forwardCommentHandler) {
         this.forwardCommentHandler = forwardCommentHandler;
         return this;
@@ -936,6 +948,16 @@ public class QiscusChatConfig {
     @ColorRes
     public int getCardDescriptionColor() {
         return cardDescriptionColor;
+    }
+
+    @ColorRes
+    public int getCardButtonTextColor() {
+        return cardButtonTextColor;
+    }
+
+    @ColorRes
+    public int getCardButtonBackground() {
+        return cardButtonBackground;
     }
 
     public ForwardCommentHandler getForwardCommentHandler() {

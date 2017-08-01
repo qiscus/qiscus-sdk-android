@@ -218,7 +218,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return new QiscusReplyViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener,
                         replyItemClickListener);
             case TYPE_MESSAGE_CARD:
-                return new QiscusCardMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+                return new QiscusCardMessageViewHolder(getView(parent, viewType), itemClickListener,
+                        longItemClickListener, chatButtonClickListener);
             case TYPE_SYSTEM_EVENT:
                 return new QiscusSystemMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             default:

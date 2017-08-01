@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,10 +33,15 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created on : June 09, 2017
@@ -49,17 +55,26 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
     @Nullable protected ImageView imageView;
     @Nullable protected TextView titleView;
     @Nullable protected TextView descriptionView;
+    @Nullable protected ViewGroup buttonsContainer;
 
     protected int titleTextColor;
     protected int descriptionTextColor;
 
+    protected int buttonsTextColor;
+    protected int buttonsBackgroundColor;
+
+    private QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener;
+
     public QiscusBaseCardMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
-                                           OnLongItemClickListener longItemClickListener) {
+                                           OnLongItemClickListener longItemClickListener,
+                                           QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
+        this.chatButtonClickListener = chatButtonClickListener;
         cardView = getCardView(itemView);
         imageView = getImageView(itemView);
         titleView = getTitleView(itemView);
         descriptionView = getDescriptionView(itemView);
+        buttonsContainer = getButtonsContainer(itemView);
     }
 
     @NonNull
@@ -74,11 +89,16 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
     @Nullable
     protected abstract TextView getDescriptionView(View itemView);
 
+    @Nullable
+    protected abstract ViewGroup getButtonsContainer(View itemView);
+
     @Override
     protected void loadChatConfig() {
         super.loadChatConfig();
         titleTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getCardTitleColor());
         descriptionTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getCardDescriptionColor());
+        buttonsTextColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getCardButtonTextColor());
+        buttonsBackgroundColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getCardButtonBackground());
     }
 
     @Override
@@ -128,5 +148,61 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
         if (descriptionView != null) {
             descriptionView.setText(payload.optString("description", ""));
         }
+
+        try {
+            setUpButtons(payload.getJSONArray("buttons"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void setUpButtons(JSONArray buttons) {
+        if (buttonsContainer == null || buttons == null) {
+            return;
+        }
+
+        buttonsContainer.removeAllViews();
+
+        int size = buttons.length();
+        if (size < 1) {
+            return;
+        }
+        List<QiscusChatButtonView> buttonViews = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            try {
+                JSONObject jsonButton = buttons.getJSONObject(i);
+                String type = jsonButton.optString("type", "");
+                if ("postback".equals(type)) {
+                    QiscusChatButtonView button = new QiscusChatButtonView(buttonsContainer.getContext(), jsonButton);
+                    button.setChatButtonClickListener(chatButtonClickListener);
+                    buttonViews.add(button);
+                } else if ("link".equals(type)) {
+                    QiscusChatButtonView button = new QiscusChatButtonView(buttonsContainer.getContext(), jsonButton);
+                    button.setChatButtonClickListener(jsonButton1 ->
+                            openLink(jsonButton1.optJSONObject("payload").optString("url")));
+                    buttonViews.add(button);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (int i = 0; i < buttonViews.size(); i++) {
+            buttonViews.get(i).getButton().setBackgroundColor(buttonsBackgroundColor);
+            buttonViews.get(i).getButton().setTextColor(buttonsTextColor);
+            buttonsContainer.addView(buttonViews.get(i));
+        }
+
+        buttonsContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void openLink(String url) {
+        new CustomTabsIntent.Builder()
+                .setToolbarColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getAppBarColor()))
+                .setShowTitle(true)
+                .addDefaultShareMenuItem()
+                .enableUrlBarHiding()
+                .build()
+                .launchUrl(messageTextView.getContext(), Uri.parse(url));
     }
 }
