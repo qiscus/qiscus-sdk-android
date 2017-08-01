@@ -138,7 +138,7 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
                     message += " " + QiscusAndroidUtil.getString(R.string.qiscus_changed_room_avatar);
                     break;
                 default:
-                    super.showMessage(qiscusComment);
+                    message = qiscusComment.getMessage();
             }
             messageTextView.setText(message);
         } catch (JSONException e) {
