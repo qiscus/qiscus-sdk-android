@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -241,6 +242,19 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
             }
         });
+
+        messageEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                String message = messageEditText.getText().toString().trim();
+                if (!message.isEmpty()) {
+                    sendMessage(message);
+                    QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
+                }
+                return true;
+            }
+            return false;
+        });
+
 
         messageEditText.setOnClickListener(v -> {
             if (emojiPopup != null && emojiPopup.isShowing()) {
