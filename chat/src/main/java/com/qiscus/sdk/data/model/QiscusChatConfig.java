@@ -136,8 +136,7 @@ public class QiscusChatConfig {
 
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
 
-    private NotificationTitleHandler notificationTitleHandler = qiscusComment -> qiscusComment.isGroupMessage() ?
-            qiscusComment.getRoomName() : qiscusComment.getSender();
+    private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
 
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
