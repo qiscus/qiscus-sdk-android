@@ -174,7 +174,6 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         showMessage(qiscusComment);
 
         onCommentSelected(qiscusComment);
-        onCommentHighlighted(qiscusComment);
     }
 
     private void showSenderName(E qiscusComment) {
@@ -279,11 +278,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     }
 
     protected void onCommentSelected(E qiscusComment) {
-        itemView.setBackground(qiscusComment.isSelected() ? selectionBackground : null);
-    }
-
-    protected void onCommentHighlighted(E qiscusComment) {
-        itemView.setBackground(qiscusComment.isHighlighted() ? selectionBackground : null);
+        itemView.setBackground(qiscusComment.isSelected() || qiscusComment.isHighlighted() ? selectionBackground : null);
     }
 
     @Override
