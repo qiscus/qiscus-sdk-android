@@ -6,7 +6,7 @@
 
 ### Create a new app
 
-Register on [https://dashboard.qiscus.com](https://dashboard.qiscus.com/) using your email and password and then create new application
+Register on [https://www.qiscus.com/dashboard](https://www.qiscus.com/dashboard) using your email and password and then create new application
 
 You should create one application per service, regardless of the platform. For example, an app released in both Android and iOS would require only one application to be created in the Dashboard.
 
