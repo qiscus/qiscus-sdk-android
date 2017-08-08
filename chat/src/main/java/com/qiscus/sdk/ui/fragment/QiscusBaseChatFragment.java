@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -131,7 +132,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @NonNull protected QiscusRecyclerView messageRecyclerView;
     @Nullable protected ViewGroup messageInputPanel;
     @Nullable protected ViewGroup messageEditTextContainer;
-    @NonNull protected QiscusEditText messageEditText;
+    @NonNull protected EditText messageEditText;
     @NonNull protected ImageView sendButton;
     @Nullable protected View newMessageButton;
     @NonNull protected View loadMoreProgressBar;
@@ -192,7 +193,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageRecyclerView = getMessageRecyclerView(view);
         messageInputPanel = getMessageInputPanel(view);
         messageEditTextContainer = getMessageEditTextContainer(view);
-        messageEditText = (QiscusEditText) getMessageEditText(view);
+        messageEditText = getMessageEditText(view);
         sendButton = getSendButton(view);
         newMessageButton = getNewMessageButton(view);
         loadMoreProgressBar = getLoadMoreProgressBar(view);
@@ -258,18 +259,23 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             return false;
         });
 
-        messageEditText.setCommitListener(infoCompat -> {
-            try {
-                File imageFile = QiscusFileUtil.from(infoCompat.getContentUri());
-                String imageName = QiscusFileUtil.getFileName(infoCompat.getLinkUri());
-                imageFile = QiscusFileUtil.rename(imageFile, imageName);
-                startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                        qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), imageFile),
-                        SEND_PICTURE_CONFIRMATION_REQUEST);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        if (messageEditText instanceof QiscusEditText) {
+            ((QiscusEditText) messageEditText).setCommitListener(new QiscusEditText.CommitListener() {
+                @Override
+                public void onCommitContent(InputContentInfoCompat infoCompat) {
+                    try {
+                        File imageFile = QiscusFileUtil.from(infoCompat.getContentUri());
+                        String imageName = QiscusFileUtil.getFileName(infoCompat.getLinkUri());
+                        imageFile = QiscusFileUtil.rename(imageFile, imageName);
+                        startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
+                                qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), imageFile),
+                                SEND_PICTURE_CONFIRMATION_REQUEST);
+                    } catch (IOException e) {
+                        showError(getString(R.string.qiscus_error_gif));
+                    }
+                }
+            });
+        }
 
         messageEditText.setOnClickListener(v -> {
             if (emojiPopup != null && emojiPopup.isShowing()) {
@@ -537,12 +543,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void setupEmojiPopup() {
-        if (toggleEmojiButton != null) {
+        if (messageEditText instanceof EmojiEditText && toggleEmojiButton != null) {
             emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
                     .setOnSoftKeyboardCloseListener(this::dismissEmoji)
                     .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
                     .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
-                    .build(messageEditText);
+                    .build((EmojiEditText) messageEditText);
         }
     }
 
