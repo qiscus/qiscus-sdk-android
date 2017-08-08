@@ -70,6 +70,7 @@ import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.ui.view.QiscusEditText;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
@@ -257,6 +258,21 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             return false;
         });
 
+        if (messageEditText instanceof QiscusEditText) {
+            ((QiscusEditText) messageEditText).setCommitListener(infoCompat -> {
+                Log.d("test", "onLoadView: " );
+                try {
+                    File imageFile = QiscusFileUtil.from(infoCompat.getContentUri());
+                    String imageName = QiscusFileUtil.getFileName(infoCompat.getLinkUri());
+                    imageFile = QiscusFileUtil.rename(imageFile, imageName);
+                    startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
+                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), imageFile),
+                            SEND_PICTURE_CONFIRMATION_REQUEST);
+                } catch (IOException e) {
+                    showError(getString(R.string.qiscus_error_gif));
+                }
+            });
+        }
 
         messageEditText.setOnClickListener(v -> {
             if (emojiPopup != null && emojiPopup.isShowing()) {
