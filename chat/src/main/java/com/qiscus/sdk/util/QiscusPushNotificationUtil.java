@@ -185,12 +185,12 @@ public final class QiscusPushNotificationUtil {
         if (notifItems.size() < notifSize) {
             notifSize = notifItems.size();
         }
+        if (notifItems.size() > notifSize) {
+            inboxStyle.addLine(".......");
+        }
         int start = notifItems.size() - notifSize;
         for (int i = start; i < notifItems.size(); i++) {
             inboxStyle.addLine(notifItems.get(i).getMessage());
-        }
-        if (notifItems.size() > notifSize) {
-            inboxStyle.addLine(".......");
         }
         inboxStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
         notificationBuilder.setStyle(inboxStyle);
