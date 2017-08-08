@@ -5,16 +5,17 @@ import android.support.v13.view.inputmethod.EditorInfoCompat;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.os.BuildCompat;
-import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+
+import com.vanniktech.emoji.EmojiEditText;
 
 /**
  * Created by rajapulau on 8/8/17.
  */
 
-public class QiscusEditText extends AppCompatEditText {
+public class QiscusEditText extends EmojiEditText {
     private CommitListener commitListener;
 
     public QiscusEditText(Context context) {
