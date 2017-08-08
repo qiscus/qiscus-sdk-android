@@ -175,7 +175,7 @@ public final class QiscusPushNotificationUtil {
             return;
         }
 
-        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance()
                 .getMessageNotifItems(comment.getRoomId());
         if (notifItems == null) {
@@ -186,19 +186,14 @@ public final class QiscusPushNotificationUtil {
             notifSize = notifItems.size();
         }
         int start = notifItems.size() - notifSize;
-        String pnMessage = "";
-        if (notifItems.size() > notifSize) {
-            pnMessage += ".......\n";
-        }
         for (int i = start; i < notifItems.size(); i++) {
-            pnMessage += notifItems.get(i).getMessage();
-            if (i < notifItems.size() - 1) {
-                pnMessage += "\n";
-            }
+            inboxStyle.addLine(notifItems.get(i).getMessage());
         }
-        bigTextStyle.bigText(pnMessage);
-        bigTextStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
-        notificationBuilder.setStyle(bigTextStyle);
+        if (notifItems.size() > notifSize) {
+            inboxStyle.addLine(".......");
+        }
+        inboxStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
+        notificationBuilder.setStyle(inboxStyle);
 
         if (notifSize <= 3) {
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
