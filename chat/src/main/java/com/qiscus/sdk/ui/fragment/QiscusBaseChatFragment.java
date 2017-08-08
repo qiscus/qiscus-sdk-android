@@ -722,6 +722,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         super.onResume();
         onClearNotification();
         QiscusCacheManager.getInstance().setLastChatActivity(true, qiscusChatRoom.getId());
+        notifyLatestRead();
+    }
+
+    private void notifyLatestRead() {
+        QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
+        if (qiscusComment != null) {
+            QiscusPusherApi.getInstance()
+                    .setUserRead(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(),
+                            qiscusComment.getId(), qiscusComment.getUniqueId());
+        }
     }
 
     @Override
@@ -1282,6 +1292,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        notifyLatestRead();
         if (commentHighlightTask != null) {
             QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
         }

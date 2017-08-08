@@ -136,8 +136,7 @@ public class QiscusChatConfig {
 
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
 
-    private NotificationTitleHandler notificationTitleHandler = qiscusComment -> qiscusComment.isGroupMessage() ?
-            qiscusComment.getRoomName() : qiscusComment.getSender();
+    private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
 
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
@@ -166,6 +165,14 @@ public class QiscusChatConfig {
     private ReplyNotificationHandler replyNotificationHandler =
             (context, qiscusComment) -> QiscusApi.getInstance().postComment(qiscusComment)
                     .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                    .doOnNext(comment -> {
+                        comment.setState(QiscusComment.STATE_ON_QISCUS);
+                        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getId(), comment.getUniqueId());
+                        if (savedQiscusComment != null && savedQiscusComment.getState() > comment.getState()) {
+                            comment.setState(savedQiscusComment.getState());
+                        }
+                        Qiscus.getDataStore().addOrUpdate(comment);
+                    })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(commentSend -> {

@@ -6,7 +6,7 @@
 
 ### Create a new app
 
-Register on [https://dashboard.qiscus.com](https://dashboard.qiscus.com/) using your email and password and then create new application
+Register on [https://www.qiscus.com/dashboard](https://www.qiscus.com/dashboard) using your email and password and then create new application
 
 You should create one application per service, regardless of the platform. For example, an app released in both Android and iOS would require only one application to be created in the Dashboard.
 
@@ -35,7 +35,7 @@ Then add to your app module build.gradle
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.7.1'
+    compile 'com.qiscus.sdk:chat:2.7.3'
 }
 ```
 
@@ -462,7 +462,7 @@ Qiscus SDK is using appcompat libraries to support some features. If your apps u
 
 ```groovy
 //Qiscus sdk without android support libraries
-compile('com.qiscus.sdk:chat:2.7.1') {
+compile('com.qiscus.sdk:chat:2.7.3') {
     transitive = true
     exclude group: 'com.android.support'
 }

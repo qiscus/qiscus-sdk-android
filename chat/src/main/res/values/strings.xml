@@ -44,7 +44,6 @@
     <string name="qiscus_failed_load_comments">Failed to load comments!</string>
     <string name="qiscus_failed_download_file">Failed to download file!</string>
     <string name="qiscus_general_error">Something went wrong!</string>
-    <string name="qiscus_send_attachment">Send a file attachment.</string>
     <string name="qiscus_notif_count">%d new message</string>
     <string name="qiscus_file_type">%s File</string>
     <string name="qiscus_failed_send_message_dialog_title">Message send failed</string>
@@ -92,4 +91,8 @@
     <string name="qiscus_downloading">Downloading</string>
     <string name="qiscus_forward">Forward</string>
     <string name="qiscus_subtext_summary">You have %1$s chat</string>
+    <string name="qiscus_send_attachment">Send a file attachment.</string>
+    <string name="qiscus_send_a_photo">Send a photo.</string>
+    <string name="qiscus_send_a_video">Send a video.</string>
+    <string name="qiscus_send_a_audio">Send a audio.</string>
 </resources>

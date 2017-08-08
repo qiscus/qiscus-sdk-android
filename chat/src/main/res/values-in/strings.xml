@@ -44,7 +44,6 @@
     <string name="qiscus_failed_load_comments">Gagal memuat pesan!</string>
     <string name="qiscus_failed_download_file">Gagal mengunduh berkas!</string>
     <string name="qiscus_general_error">Terjadi suatu kesalahan!</string>
-    <string name="qiscus_send_attachment">Mengirimkan sebuah lampiran.</string>
     <string name="qiscus_notif_count">%d pesan baru</string>
     <string name="qiscus_file_type">Berkas %s</string>
     <string name="qiscus_failed_send_message_dialog_title">Gagal mengirim pesan</string>
@@ -92,4 +91,8 @@
     <string name="qiscus_downloading">Sedang Mengunduh</string>
     <string name="qiscus_forward">Teruskan</string>
     <string name="qiscus_subtext_summary">Kamu memiliki %1$s chat</string>
+    <string name="qiscus_send_attachment">Mengirimkan sebuah lampiran.</string>
+    <string name="qiscus_send_a_photo">Mengirimkan sebuah foto.</string>
+    <string name="qiscus_send_a_video">Mengirimkan sebuah video.</string>
+    <string name="qiscus_send_a_audio">Mengirimkan sebuah audio.</string>
 </resources>
