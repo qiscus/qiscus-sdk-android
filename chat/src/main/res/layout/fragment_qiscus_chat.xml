@@ -144,7 +144,7 @@
                     android:padding="8dp"
                     android:src="@drawable/ic_qiscus_emot"/>
 
-                <com.qiscus.sdk.util.QiscusEditText
+                <com.qiscus.sdk.ui.view.QiscusEditText
                     android:id="@+id/field_message"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

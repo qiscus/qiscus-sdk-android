@@ -70,7 +70,7 @@ import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusEditText;
+import com.qiscus.sdk.ui.view.QiscusEditText;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;

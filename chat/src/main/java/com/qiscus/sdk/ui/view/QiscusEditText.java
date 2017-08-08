@@ -1,4 +1,4 @@
-package com.qiscus.sdk.util;
+package com.qiscus.sdk.ui.view;
 
 import android.content.Context;
 import android.support.v13.view.inputmethod.EditorInfoCompat;
