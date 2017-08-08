@@ -70,6 +70,7 @@ import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusEditText;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
@@ -130,7 +131,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @NonNull protected QiscusRecyclerView messageRecyclerView;
     @Nullable protected ViewGroup messageInputPanel;
     @Nullable protected ViewGroup messageEditTextContainer;
-    @NonNull protected EditText messageEditText;
+    @NonNull protected QiscusEditText messageEditText;
     @NonNull protected ImageView sendButton;
     @Nullable protected View newMessageButton;
     @NonNull protected View loadMoreProgressBar;
@@ -191,7 +192,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageRecyclerView = getMessageRecyclerView(view);
         messageInputPanel = getMessageInputPanel(view);
         messageEditTextContainer = getMessageEditTextContainer(view);
-        messageEditText = getMessageEditText(view);
+        messageEditText = (QiscusEditText) getMessageEditText(view);
         sendButton = getSendButton(view);
         newMessageButton = getNewMessageButton(view);
         loadMoreProgressBar = getLoadMoreProgressBar(view);
@@ -257,6 +258,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             return false;
         });
 
+        messageEditText.setCommitListener(infoCompat -> {
+            try {
+                File imageFile = QiscusFileUtil.from(infoCompat.getContentUri());
+                String imageName = QiscusFileUtil.getFileName(infoCompat.getLinkUri());
+                imageFile = QiscusFileUtil.rename(imageFile, imageName);
+                startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
+                        qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), imageFile),
+                        SEND_PICTURE_CONFIRMATION_REQUEST);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         messageEditText.setOnClickListener(v -> {
             if (emojiPopup != null && emojiPopup.isShowing()) {
@@ -524,12 +537,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void setupEmojiPopup() {
-        if (messageEditText instanceof EmojiEditText && toggleEmojiButton != null) {
+        if (toggleEmojiButton != null) {
             emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
                     .setOnSoftKeyboardCloseListener(this::dismissEmoji)
                     .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
                     .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
-                    .build((EmojiEditText) messageEditText);
+                    .build(messageEditText);
         }
     }
 

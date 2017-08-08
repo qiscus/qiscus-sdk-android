@@ -24,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,6 +34,7 @@ import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
+import com.qiscus.sdk.util.QiscusEditText;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -126,8 +126,8 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @NonNull
     @Override
-    protected EditText getMessageEditText(View view) {
-        return (EditText) view.findViewById(R.id.field_message);
+    protected QiscusEditText getMessageEditText(View view) {
+        return (QiscusEditText) view.findViewById(R.id.field_message);
     }
 
     @NonNull
