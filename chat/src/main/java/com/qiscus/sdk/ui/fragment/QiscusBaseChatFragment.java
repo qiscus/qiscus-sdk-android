@@ -68,6 +68,7 @@ import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
+import com.qiscus.sdk.ui.view.QiscusEditText;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -258,7 +259,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
             return false;
         });
-
 
         messageEditText.setOnClickListener(v -> {
             if (emojiPopup != null && emojiPopup.isShowing()) {
@@ -464,6 +464,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageRecyclerView.setAdapter(chatAdapter);
         messageRecyclerView.addOnScrollListener(new QiscusChatScrollListener(chatLayoutManager, this));
 
+        setupGifKeyboard();
         setupEmojiPopup();
 
         qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
@@ -523,6 +524,24 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     sendFile(shareFile);
                 }
             }
+        }
+    }
+
+    protected void setupGifKeyboard() {
+        if (messageEditText instanceof QiscusEditText) {
+            ((QiscusEditText) messageEditText).setCommitListener(infoCompat -> {
+                try {
+                    File imageFile = QiscusFileUtil.from(infoCompat.getContentUri());
+                    String imageName = QiscusFileUtil.createTimestampFileName("gif");
+                    List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
+                    qiscusPhotos.add(new QiscusPhoto(QiscusFileUtil.rename(imageFile, imageName)));
+                    startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
+                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
+                            SEND_PICTURE_CONFIRMATION_REQUEST);
+                } catch (IOException e) {
+                    showError(getString(R.string.qiscus_error_gif));
+                }
+            });
         }
     }
 
@@ -1207,9 +1226,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         } else if (requestCode == TAKE_PICTURE_REQUEST && resultCode == Activity.RESULT_OK) {
             try {
                 File imageFile = QiscusFileUtil.from(Uri.parse(QiscusCacheManager.getInstance().getLastImagePath()));
+                List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
+                qiscusPhotos.add(new QiscusPhoto(imageFile));
                 startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                        qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(),
-                        Collections.singletonList(new QiscusPhoto(imageFile))),
+                        qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
                         SEND_PICTURE_CONFIRMATION_REQUEST);
             } catch (Exception e) {
                 showError(getString(R.string.qiscus_chat_error_failed_read_picture));

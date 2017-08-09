@@ -97,4 +97,5 @@
     <string name="qiscus_send_a_audio">Send a audio.</string>
     <string name="qiscus_add_a_caption">Add a caption…</string>
     <string name="qiscus_add_images">Add Images</string>
+    <string name="qiscus_error_gif">There was an error sending a GIF image or your!</string>
 </resources>
