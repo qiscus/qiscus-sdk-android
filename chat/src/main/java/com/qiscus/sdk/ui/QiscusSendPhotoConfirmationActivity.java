@@ -19,6 +19,7 @@ package com.qiscus.sdk.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -30,6 +31,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -93,14 +96,17 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        chatConfig = Qiscus.getChatConfig();
+        onSetStatusBarColor();
         setContentView(R.layout.activity_qiscus_send_photo_confirmation);
 
-        chatConfig = Qiscus.getChatConfig();
         rootView = (ViewGroup) findViewById(R.id.root_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         TextView tvTitle = (TextView) findViewById(R.id.tv_title);
         ImageView ivAvatar = (QiscusCircularImageView) findViewById(R.id.profile_picture);
         findViewById(R.id.back).setOnClickListener(v -> onBackPressed());
+
+        toolbar.setBackgroundResource(chatConfig.getAppBarColor());
         setSupportActionBar(toolbar);
 
         tvTitle.setText(getIntent().getStringExtra(EXTRA_ROOM_NAME));
@@ -133,6 +139,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         });
 
         toggleEmojiButton = (ImageView) findViewById(R.id.button_add_emoticon);
+        toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon());
         toggleEmojiButton.setOnClickListener(v -> toggleEmoji());
 
         setupEmojiPopup();
@@ -153,7 +160,17 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
             return;
         }
 
-        findViewById(R.id.button_send).setOnClickListener(v -> confirm());
+        ImageView sendButton = (ImageView) findViewById(R.id.button_send);
+        sendButton.setImageResource(chatConfig.getSendButtonIcon());
+        sendButton.setOnClickListener(v -> confirm());
+    }
+
+    protected void onSetStatusBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(ContextCompat.getColor(this, chatConfig.getStatusBarColor()));
+        }
     }
 
     private void confirm() {
