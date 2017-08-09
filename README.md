@@ -35,7 +35,7 @@ Then add to your app module build.gradle
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.7.3'
+    compile 'com.qiscus.sdk:chat:2.8.0'
 }
 ```
 
@@ -462,7 +462,7 @@ Qiscus SDK is using appcompat libraries to support some features. If your apps u
 
 ```groovy
 //Qiscus sdk without android support libraries
-compile('com.qiscus.sdk:chat:2.7.3') {
+compile('com.qiscus.sdk:chat:2.8.0') {
     transitive = true
     exclude group: 'com.android.support'
 }
@@ -475,6 +475,7 @@ compile 'com.android.support:recyclerview-v7:yourVersion'
 compile 'com.android.support:cardview-v7:yourVersion'
 compile 'com.android.support:design:yourVersion'
 compile 'com.android.support:customtabs:yourVersion'
+compile 'com.android.support:support-v13:yourVersion'
 ```
 
 ### Rx Java support
