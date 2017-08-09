@@ -39,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qiscus.jupuk.Jupuk;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
 import com.qiscus.nirmana.Nirmana;
@@ -193,7 +194,11 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     public boolean onOptionsItemSelected(MenuItem item) {
         int i = item.getItemId();
         if (i == R.id.action_add_images) {
-            new JupukBuilder().enableVideoPicker(true)
+            JupukBuilder jupukBuilder = new JupukBuilder().setMaxCount(10);
+            for (QiscusPhoto qiscusPhoto : qiscusPhotos) {
+                Jupuk.getInstance().add(qiscusPhoto.getPhotoFile().getAbsolutePath(), JupukConst.FILE_TYPE_MEDIA);
+            }
+            jupukBuilder.enableVideoPicker(true)
                     .setColorPrimary(ContextCompat.getColor(this, chatConfig.getAppBarColor()))
                     .setColorPrimaryDark(ContextCompat.getColor(this, chatConfig.getStatusBarColor()))
                     .setColorAccent(ContextCompat.getColor(this, chatConfig.getAccentColor()))
