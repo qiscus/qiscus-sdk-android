@@ -44,7 +44,8 @@
             android:theme="@style/QiscusTheme"/>
         <activity
             android:name=".ui.QiscusSendPhotoConfirmationActivity"
-            android:theme="@style/QiscusTheme"/>
+            android:theme="@style/QiscusTheme"
+            android:windowSoftInputMode="adjustResize"/>
 
         <service android:name=".service.QiscusPusherService"/>
         <service android:name="org.eclipse.paho.android.service.MqttService"/>

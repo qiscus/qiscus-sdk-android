@@ -31,6 +31,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public final class QiscusFileUtil {
     public static final String FILES_PATH = Qiscus.getAppsName() + File.separator + "Files";
@@ -252,5 +255,10 @@ public final class QiscusFileUtil {
             count += n;
         }
         return count;
+    }
+
+    public static String createTimestampFileName(String extension) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        return timeStamp + "." + extension;
     }
 }

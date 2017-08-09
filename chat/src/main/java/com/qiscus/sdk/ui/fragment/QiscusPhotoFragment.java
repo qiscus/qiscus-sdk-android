@@ -28,6 +28,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.view.QiscusTouchImageView;
+import com.qiscus.sdk.util.QiscusImageUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import java.io.File;
@@ -70,7 +71,11 @@ public class QiscusPhotoFragment extends RxFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         resolveImageFile(savedInstanceState);
-        Nirmana.getInstance().get().load(imageFile).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
+        if (QiscusImageUtil.isImage(imageFile)) {
+            Nirmana.getInstance().get().load(imageFile).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
+        } else {
+            Nirmana.getInstance().get().load(imageFile).into(imageView);
+        }
     }
 
     @Override
