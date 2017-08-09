@@ -86,7 +86,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -516,9 +515,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
             if (shareFile != null) {
                 if (QiscusImageUtil.isImage(shareFile)) {
+                    List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
+                    qiscusPhotos.add(new QiscusPhoto(shareFile));
                     startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(),
-                            Collections.singletonList(new QiscusPhoto(shareFile))),
+                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
                             SEND_PICTURE_CONFIRMATION_REQUEST);
                 } else {
                     sendFile(shareFile);
