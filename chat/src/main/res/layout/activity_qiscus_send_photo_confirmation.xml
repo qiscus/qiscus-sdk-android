@@ -18,9 +18,11 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
@@ -81,58 +83,67 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:background="#000"/>
+
+    <LinearLayout
+        android:id="@+id/field_message_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/qiscus_white"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <ImageView
+            android:id="@+id/button_add_emoticon"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bt_qiscus_selector_grey"
+            android:padding="8dp"
+            android:src="@drawable/ic_qiscus_emot"/>
+
+        <com.vanniktech.emoji.EmojiEditText
+            android:id="@+id/field_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="@string/qiscus_add_a_caption"
+            android:imeOptions="actionSend"
+            android:inputType="textLongMessage|textAutoCorrect|textCapSentences|textMultiLine"
+            android:maxLines="4"
+            android:nextFocusRight="@+id/button_send"
+            android:padding="8dp"
+            android:textColor="@color/qiscus_primary_text"
+            android:textSize="16sp"
+            app:emojiSize="22sp"/>
+
+        <ImageView
+            android:id="@+id/button_send"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_gravity="bottom"
+            android:padding="8dp"
+            android:src="@drawable/ic_qiscus_send"/>
+
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1.2dp"
-        android:background="@color/qiscus_white"/>
+        android:layout_height="0.5dp"
+        android:background="@color/qiscus_light_grey"/>
 
-    <LinearLayout
-        android:id="@+id/button_container"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/cancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bt_qiscus_selector_grey"
-            android:gravity="center"
-            android:text="@string/qiscus_cancel"
-            android:textAllCaps="true"
-            android:textColor="@color/qiscus_white"
-            android:textSize="16sp"/>
-
-        <View
-            android:layout_width="1.2dp"
-            android:layout_height="match_parent"
-            android:background="@color/qiscus_white"/>
-
-        <TextView
-            android:id="@+id/submit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bt_qiscus_selector_grey"
-            android:gravity="center"
-            android:text="@string/qiscus_send"
-            android:textAllCaps="true"
-            android:textColor="@color/qiscus_white"
-            android:textSize="16sp"/>
-
-    </LinearLayout>
+        android:background="@color/qiscus_white"
+        android:visibility="gone"/>
 
 </LinearLayout>
