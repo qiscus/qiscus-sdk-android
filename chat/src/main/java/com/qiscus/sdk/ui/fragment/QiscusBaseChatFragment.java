@@ -488,7 +488,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private void handleForward() {
         if (forwardComments != null) {
-            QiscusAndroidUtil.runOnUIThread(() ->  qiscusChatPresenter.forward(forwardComments), 800);
+            QiscusAndroidUtil.runOnUIThread(() -> qiscusChatPresenter.forward(forwardComments), 800);
         }
     }
 
@@ -640,6 +640,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (emptyChatDescView != null) {
             emptyChatDescView.setText(chatConfig.getEmptyRoomSubtitle());
+        }
+        if (newMessageButton != null) {
+            int accentColor = ContextCompat.getColor(Qiscus.getApps(), chatConfig.getAccentColor());
+            Drawable drawable = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_rounded_accent_bg);
+            drawable.setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
+            newMessageButton.setBackground(drawable);
         }
         if (addImageButton != null) {
             addImageButton.setImageResource(chatConfig.getAddPictureIcon());
