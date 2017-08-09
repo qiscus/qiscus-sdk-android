@@ -488,7 +488,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private void handleForward() {
         if (forwardComments != null) {
-            qiscusChatPresenter.forward(forwardComments);
+            QiscusAndroidUtil.runOnUIThread(() ->  qiscusChatPresenter.forward(forwardComments), 800);
         }
     }
 

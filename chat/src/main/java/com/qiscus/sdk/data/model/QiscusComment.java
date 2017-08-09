@@ -102,6 +102,7 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setTopicId(topicId);
         qiscusComment.setUniqueId("android_"
                 + System.currentTimeMillis()
+                + QiscusAndroidUtil.getRandomString(8)
                 + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
                 Settings.Secure.ANDROID_ID));
         qiscusComment.setMessage(content);
