@@ -136,6 +136,22 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
+    public static QiscusComment generateContactMessage(QiscusContact contact, int roomId, int topicId) {
+        QiscusComment qiscusComment = generateMessage(contact.getName() + "\n" + contact.getValue(), roomId, topicId);
+        qiscusComment.setRawType("contact");
+        qiscusComment.setContact(contact);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("name", contact.getName()).put("value", contact.getValue());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
+
+
+        return qiscusComment;
+    }
+
     public QiscusComment() {
 
     }
@@ -448,7 +464,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public QiscusContact getContact() {
-        if (contact == null && getType() == Type.CONTACT){
+        if (contact == null && getType() == Type.CONTACT) {
             try {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(this);
                 contact = new QiscusContact(payload.optString("name"), payload.optString("value"));
@@ -457,6 +473,10 @@ public class QiscusComment implements Parcelable {
             }
         }
         return contact;
+    }
+
+    public void setContact(QiscusContact contact) {
+        this.contact = contact;
     }
 
     public Type getType() {

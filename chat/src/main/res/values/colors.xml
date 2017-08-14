@@ -32,6 +32,7 @@
     <color name="qiscus_gallery_background">#ba68c8</color>
     <color name="qiscus_file_background">#64b5f6</color>
     <color name="qiscus_record_background">#4db6ac</color>
+    <color name="qiscus_contact_background">#7986cb</color>
     <color name="qiscus_keyboard_background">#90a4ae</color>
     <color name="qiscus_transparent_black">#88000000</color>
     <color name="qiscus_left_bubble">#D0D0D0</color>

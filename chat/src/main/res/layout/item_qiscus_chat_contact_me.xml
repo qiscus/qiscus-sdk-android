@@ -69,14 +69,16 @@
             android:background="@drawable/qiscus_rounded_dark_white"
             android:padding="8dp">
 
-            <com.qiscus.sdk.ui.view.QiscusCircularImageView
+            <ImageView
                 android:id="@+id/ic_contact"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:src="@drawable/ic_qiscus_avatar"/>
+                android:padding="8dp"
+                android:src="@drawable/ic_qiscus_add_contact"
+                android:tint="@color/qiscus_divider"/>
 
             <TextView
                 android:id="@+id/contact_name"
@@ -87,7 +89,6 @@
                 android:layout_toRightOf="@+id/ic_contact"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Delta Purna Widyangga"
                 android:textColor="@color/qiscus_primary_text"
                 android:textSize="16sp"/>
 
@@ -99,10 +100,7 @@
                 android:layout_marginTop="2dp"
                 android:layout_toEndOf="@+id/ic_contact"
                 android:layout_toRightOf="@+id/ic_contact"
-                android:autoLink="all"
                 android:ellipsize="end"
-                android:text="+6281377668034"
-                android:textColor="@color/qiscus_secondary_text"
                 android:textColorLink="@color/qiscus_secondary_text"
                 android:textSize="14sp"/>
         </RelativeLayout>
@@ -118,7 +116,6 @@
             android:layout_marginTop="2dp"
             android:layout_toLeftOf="@+id/icon_read"
             android:layout_toStartOf="@+id/icon_read"
-            android:text="12:30 pm"
             android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"/>
 
@@ -132,7 +129,6 @@
             android:layout_gravity="bottom"
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
-            android:src="@drawable/ic_qiscus_read"
             android:layout_marginTop="2dp"/>
     </RelativeLayout>
 
