@@ -100,4 +100,7 @@
     <string name="qiscus_error_gif">Terjadi kesalahan dalam mengirim gambar GIF!</string>
     <string name="qiscus_contact">Kontak</string>
     <string name="qiscus_chat_error_failed_read_contact">Gagal membaca data kontak!</string>
+    <string name="qiscus_add_contact_confirmation">Buat kontak baru atau tambahkan ke kontak yang sudah ada?</string>
+    <string name="qiscus_new_contact">Baru</string>
+    <string name="qiscus_existing_contact">Tambah ke kontak</string>
 </resources>

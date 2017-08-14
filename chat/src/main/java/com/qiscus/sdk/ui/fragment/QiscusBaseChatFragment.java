@@ -28,6 +28,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
@@ -803,6 +804,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     qiscusChatPresenter.downloadFile(qiscusComment);
                 } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING) {
                     accountLinkingClick(qiscusComment);
+                } else if (qiscusComment.getType() == QiscusComment.Type.CONTACT) {
+                    addToPhoneContact(qiscusComment.getContact());
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 showFailedCommentDialog(qiscusComment);
@@ -818,6 +821,37 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 toggleSelectComment(qiscusComment);
             }
         }
+    }
+
+    protected void addToPhoneContact(QiscusContact contact) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.qiscus_add_contact_confirmation)
+                .setPositiveButton(R.string.qiscus_new_contact, (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_INSERT);
+                    intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
+                    intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.getName());
+                    intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getValue());
+                    startActivity(intent);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.qiscus_existing_contact, (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_INSERT_OR_EDIT);
+                    intent.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
+                    intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.getName());
+                    intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getValue());
+                    startActivity(intent);
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .create();
+
+        alertDialog.setOnShowListener(dialog -> {
+            @ColorInt int accent = ContextCompat.getColor(getActivity(), chatConfig.getAccentColor());
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(accent);
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(accent);
+        });
+
+        alertDialog.show();
     }
 
     protected void accountLinkingClick(QiscusComment qiscusComment) {
