@@ -124,10 +124,8 @@
                 android:layout_marginTop="2dp"
                 android:layout_toEndOf="@+id/ic_contact"
                 android:layout_toRightOf="@+id/ic_contact"
-                android:autoLink="all"
                 android:ellipsize="end"
                 android:textColor="@color/qiscus_secondary_text"
-                android:textColorLink="@color/qiscus_secondary_text"
                 android:textSize="14sp"/>
         </RelativeLayout>
 
