@@ -81,6 +81,8 @@ public class QiscusComment implements Parcelable {
     private List<String> urls;
     private PreviewData previewData;
 
+    private QiscusContact contact;
+
     private String rawType;
     private String extraPayload;
 
@@ -445,6 +447,18 @@ public class QiscusComment implements Parcelable {
         }
     }
 
+    public QiscusContact getContact() {
+        if (contact == null && getType() == Type.CONTACT){
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                contact = new QiscusContact(payload.optString("name"), payload.optString("value"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return contact;
+    }
+
     public Type getType() {
         if (!TextUtils.isEmpty(rawType) && rawType.equals("account_linking")) {
             return Type.ACCOUNT_LINKING;
@@ -456,6 +470,8 @@ public class QiscusComment implements Parcelable {
             return Type.CARD;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("system_event")) {
             return Type.SYSTEM_EVENT;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("contact")) {
+            return Type.CONTACT;
         } else if (!isAttachment()) {
             if (containsUrl()) {
                 return Type.LINK;
@@ -703,7 +719,8 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD
+        TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
+        CONTACT
     }
 
     public interface ProgressListener {
