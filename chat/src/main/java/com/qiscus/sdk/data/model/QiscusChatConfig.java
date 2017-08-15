@@ -104,6 +104,11 @@ public class QiscusChatConfig {
     private String recordText = QiscusAndroidUtil.getString(R.string.qiscus_record);
     private boolean enableRecordAudio = true;
 
+    private int addContactIcon = R.drawable.ic_qiscus_add_contact;
+    private int addContactBackgroundColor = R.color.qiscus_contact_background;
+    private String addContactText = QiscusAndroidUtil.getString(R.string.qiscus_contact);
+    private boolean enableAddContact = true;
+
     private int stopRecordIcon = R.drawable.ic_qiscus_send_on;
     private int cancelRecordIcon = R.drawable.ic_qiscus_cancel_record;
 
@@ -432,6 +437,26 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setEnableRecordAudio(boolean enableRecordAudio) {
         this.enableRecordAudio = enableRecordAudio;
+        return this;
+    }
+
+    public QiscusChatConfig setAddContactIcon(@DrawableRes int addContactIcon) {
+        this.addContactIcon = addContactIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setAddContactBackgroundColor(@ColorRes int addContactBackgroundColor) {
+        this.addContactBackgroundColor = addContactBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setAddContactText(String addContactText) {
+        this.addContactText = addContactText;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableAddContact(boolean enableAddContact) {
+        this.enableAddContact = enableAddContact;
         return this;
     }
 
@@ -835,6 +860,24 @@ public class QiscusChatConfig {
     @DrawableRes
     public int getCancelRecordIcon() {
         return cancelRecordIcon;
+    }
+
+    @DrawableRes
+    public int getAddContactIcon() {
+        return addContactIcon;
+    }
+
+    @ColorRes
+    public int getAddContactBackgroundColor() {
+        return addContactBackgroundColor;
+    }
+
+    public String getAddContactText() {
+        return addContactText;
+    }
+
+    public boolean isEnableAddContact() {
+        return enableAddContact;
     }
 
     @DrawableRes

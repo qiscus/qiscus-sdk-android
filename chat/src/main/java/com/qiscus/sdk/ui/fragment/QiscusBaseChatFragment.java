@@ -20,12 +20,15 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
@@ -57,6 +60,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusContact;
 import com.qiscus.sdk.data.model.QiscusPhoto;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
@@ -123,8 +127,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String COMMENTS_DATA = "saved_comments_data";
 
     protected static final int TAKE_PICTURE_REQUEST = 1;
-    protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 2;
-    protected static final int SHOW_MEDIA_DETAIL = 3;
+    protected static final int PICK_CONTACT_REQUEST = 2;
+    protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 3;
+    protected static final int SHOW_MEDIA_DETAIL = 4;
 
     @NonNull protected ViewGroup rootView;
     @Nullable protected ViewGroup emptyChatHolder;
@@ -152,6 +157,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable protected View recordAudioLayout;
     @Nullable protected ImageView recordAudioButton;
     @Nullable protected TextView recordAudioTextView;
+    @Nullable protected View addContactLayout;
+    @Nullable protected ImageView addContactButton;
+    @Nullable protected TextView addContactTextView;
     @Nullable protected ImageView hideAttachmentButton;
     @Nullable protected ImageView toggleEmojiButton;
     @Nullable protected QiscusAudioRecorderView recordAudioPanel;
@@ -221,6 +229,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         recordAudioButton = getRecordAudioButton(view);
         recordAudioTextView = getRecordAudioTextView(view);
 
+        addContactLayout = getAddContactLayout(view);
+        addContactButton = getAddContactButton(view);
+        addContactTextView = getAddContactTextView(view);
+
         toggleEmojiButton = getToggleEmojiButton(view);
         recordAudioPanel = getRecordAudioPanel(view);
         replyPreviewView = getReplyPreviewView(view);
@@ -288,6 +300,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (recordAudioButton != null) {
             recordAudioButton.setOnClickListener(v -> recordAudio());
+        }
+        if (addContactButton != null) {
+            addContactButton.setOnClickListener(v -> addContact());
         }
         if (toggleEmojiButton != null) {
             toggleEmojiButton.setOnClickListener(v -> toggleEmoji());
@@ -393,6 +408,17 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Nullable
     protected TextView getRecordAudioTextView(View view) {
+        return null;
+    }
+
+    @Nullable
+    protected abstract View getAddContactLayout(View view);
+
+    @Nullable
+    protected abstract ImageView getAddContactButton(View view);
+
+    @Nullable
+    protected TextView getAddContactTextView(View view) {
         return null;
     }
 
@@ -687,6 +713,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (recordAudioTextView != null) {
             recordAudioTextView.setText(chatConfig.getRecordText());
         }
+        if (addContactButton != null) {
+            addContactButton.setImageResource(chatConfig.getAddContactIcon());
+            buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_contact_button_bg);
+            buttonBg.setColorFilter(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getAddContactBackgroundColor()), PorterDuff.Mode.SRC_ATOP);
+            addContactButton.setBackground(buttonBg);
+        }
+        if (addContactTextView != null) {
+            addContactTextView.setText(chatConfig.getAddContactText());
+        }
         if (hideAttachmentButton != null) {
             hideAttachmentButton.setImageResource(chatConfig.getHideAttachmentPanelIcon());
             buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_keyboard_button_bg);
@@ -713,6 +749,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (recordAudioLayout != null) {
             recordAudioLayout.setVisibility(chatConfig.isEnableRecordAudio() ? View.VISIBLE : View.GONE);
+        }
+        if (addContactLayout != null) {
+            addContactLayout.setVisibility(chatConfig.isEnableAddContact() ? View.VISIBLE : View.GONE);
         }
         if (replyPreviewView != null) {
             replyPreviewView.setBarColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplyBarColor()));
@@ -765,6 +804,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     qiscusChatPresenter.downloadFile(qiscusComment);
                 } else if (qiscusComment.getType() == QiscusComment.Type.ACCOUNT_LINKING) {
                     accountLinkingClick(qiscusComment);
+                } else if (qiscusComment.getType() == QiscusComment.Type.CONTACT) {
+                    addToPhoneContact(qiscusComment.getContact());
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 showFailedCommentDialog(qiscusComment);
@@ -776,10 +817,42 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     || qiscusComment.getType() == QiscusComment.Type.AUDIO
                     || qiscusComment.getType() == QiscusComment.Type.VIDEO
                     || qiscusComment.getType() == QiscusComment.Type.FILE
-                    || qiscusComment.getType() == QiscusComment.Type.REPLY) {
+                    || qiscusComment.getType() == QiscusComment.Type.REPLY
+                    || qiscusComment.getType() == QiscusComment.Type.CONTACT) {
                 toggleSelectComment(qiscusComment);
             }
         }
+    }
+
+    protected void addToPhoneContact(QiscusContact contact) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.qiscus_add_contact_confirmation)
+                .setPositiveButton(R.string.qiscus_new_contact, (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_INSERT);
+                    intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
+                    intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.getName());
+                    intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getValue());
+                    startActivity(intent);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.qiscus_existing_contact, (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_INSERT_OR_EDIT);
+                    intent.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
+                    intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.getName());
+                    intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getValue());
+                    startActivity(intent);
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .create();
+
+        alertDialog.setOnShowListener(dialog -> {
+            @ColorInt int accent = ContextCompat.getColor(getActivity(), chatConfig.getAccentColor());
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(accent);
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(accent);
+        });
+
+        alertDialog.show();
     }
 
     protected void accountLinkingClick(QiscusComment qiscusComment) {
@@ -817,7 +890,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 || qiscusComment.getType() == QiscusComment.Type.AUDIO
                 || qiscusComment.getType() == QiscusComment.Type.VIDEO
                 || qiscusComment.getType() == QiscusComment.Type.FILE
-                || qiscusComment.getType() == QiscusComment.Type.REPLY)) {
+                || qiscusComment.getType() == QiscusComment.Type.REPLY
+                || qiscusComment.getType() == QiscusComment.Type.CONTACT)) {
             toggleSelectComment(qiscusComment);
         }
     }
@@ -885,6 +959,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     public void sendFile(File file) {
         qiscusChatPresenter.sendFile(file);
+    }
+
+    public void sendContact(QiscusContact contact) {
+        qiscusChatPresenter.sendContact(contact);
     }
 
     protected void addImage() {
@@ -963,6 +1041,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         } else {
             requestPermissions();
         }
+    }
+
+    protected void addContact() {
+        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(contactPickerIntent, PICK_CONTACT_REQUEST);
+        hideAttachmentPanel();
     }
 
     protected void toggleEmoji() {
@@ -1267,6 +1351,27 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (data.getBooleanExtra(QiscusPhotoViewerActivity.EXTRA_MEDIA_DELETED, false)
                     || data.getBooleanExtra(QiscusPhotoViewerActivity.EXTRA_MEDIA_UPDATED, false)) {
                 chatAdapter.notifyDataSetChanged();
+            }
+        } else if (requestCode == PICK_CONTACT_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                showError(getString(R.string.qiscus_chat_error_failed_read_contact));
+                return;
+            }
+            Uri contactUri = data.getData();
+            String[] projection = new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
+            Cursor cursor = getContext().getContentResolver().query(contactUri, projection, null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                String name = cursor.getString(nameIndex);
+                String number = cursor.getString(numberIndex);
+                sendContact(new QiscusContact(name, number));
+            }
+
+            if (cursor != null) {
+                cursor.close();
             }
         }
     }

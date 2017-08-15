@@ -81,6 +81,8 @@ public class QiscusComment implements Parcelable {
     private List<String> urls;
     private PreviewData previewData;
 
+    private QiscusContact contact;
+
     private String rawType;
     private String extraPayload;
 
@@ -125,6 +127,22 @@ public class QiscusComment implements Parcelable {
                     .put("replied_comment_message", repliedComment.getMessage())
                     .put("replied_comment_sender_username", repliedComment.getSender())
                     .put("replied_comment_sender_email", repliedComment.getSenderEmail());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
+
+
+        return qiscusComment;
+    }
+
+    public static QiscusComment generateContactMessage(QiscusContact contact, int roomId, int topicId) {
+        QiscusComment qiscusComment = generateMessage(contact.getName() + "\n" + contact.getValue(), roomId, topicId);
+        qiscusComment.setRawType("contact_person");
+        qiscusComment.setContact(contact);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("name", contact.getName()).put("value", contact.getValue());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -322,6 +340,8 @@ public class QiscusComment implements Parcelable {
                 replyTo.message = payload.getString("replied_comment_message");
                 replyTo.sender = payload.getString("replied_comment_sender_username");
                 replyTo.senderEmail = payload.getString("replied_comment_sender_email");
+                replyTo.setRawType(payload.optString("replied_comment_type"));
+                replyTo.setExtraPayload(payload.optString("replied_comment_payload"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -445,6 +465,22 @@ public class QiscusComment implements Parcelable {
         }
     }
 
+    public QiscusContact getContact() {
+        if (contact == null && getType() == Type.CONTACT) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                contact = new QiscusContact(payload.optString("name"), payload.optString("value"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return contact;
+    }
+
+    public void setContact(QiscusContact contact) {
+        this.contact = contact;
+    }
+
     public Type getType() {
         if (!TextUtils.isEmpty(rawType) && rawType.equals("account_linking")) {
             return Type.ACCOUNT_LINKING;
@@ -456,6 +492,8 @@ public class QiscusComment implements Parcelable {
             return Type.CARD;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("system_event")) {
             return Type.SYSTEM_EVENT;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("contact_person")) {
+            return Type.CONTACT;
         } else if (!isAttachment()) {
             if (containsUrl()) {
                 return Type.LINK;
@@ -703,7 +741,8 @@ public class QiscusComment implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD
+        TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
+        CONTACT
     }
 
     public interface ProgressListener {

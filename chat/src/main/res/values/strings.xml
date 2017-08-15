@@ -98,4 +98,9 @@
     <string name="qiscus_add_a_caption">Add a caption…</string>
     <string name="qiscus_add_images">Add Images</string>
     <string name="qiscus_error_gif">There was an error sending a GIF image or your!</string>
+    <string name="qiscus_contact">Contact</string>
+    <string name="qiscus_chat_error_failed_read_contact">Failed to read contact data!</string>
+    <string name="qiscus_add_contact_confirmation">Create a new contact or add to an existing contact?</string>
+    <string name="qiscus_new_contact">New</string>
+    <string name="qiscus_existing_contact">Existing</string>
 </resources>

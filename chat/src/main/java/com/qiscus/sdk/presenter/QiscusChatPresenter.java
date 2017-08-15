@@ -26,6 +26,7 @@ import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusContact;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
@@ -204,11 +205,35 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    public void sendContact(QiscusContact contact) {
+        QiscusComment qiscusComment = QiscusComment.generateContactMessage(contact, room.getId(), currentTopicId);
+        view.onSendingComment(qiscusComment);
+        QiscusApi.getInstance().postContactComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
     public void resendComment(QiscusComment qiscusComment) {
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
         } else if (qiscusComment.getType() == QiscusComment.Type.REPLY) {
             resendReplyComment(qiscusComment);
+        } else if (qiscusComment.getType() == QiscusComment.Type.CONTACT) {
+            resendContact(qiscusComment);
         } else {
             qiscusComment.setState(QiscusComment.STATE_SENDING);
             qiscusComment.setTime(new Date());
@@ -298,6 +323,29 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         }
                     });
         }
+    }
+
+    private void resendContact(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        qiscusComment.setTime(new Date());
+        view.onSendingComment(qiscusComment);
+        QiscusApi.getInstance().postContactComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
     }
 
     public void deleteComment(QiscusComment qiscusComment) {

@@ -242,7 +242,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         for (QiscusComment selectedComment : selectedComments) {
             if (selectedComment.getType() != QiscusComment.Type.TEXT
                     && selectedComment.getType() != QiscusComment.Type.LINK
-                    && selectedComment.getType() != QiscusComment.Type.REPLY) {
+                    && selectedComment.getType() != QiscusComment.Type.REPLY
+                    && selectedComment.getType() != QiscusComment.Type.CONTACT) {
                 return false;
             }
         }
