@@ -138,7 +138,7 @@ public class QiscusComment implements Parcelable {
 
     public static QiscusComment generateContactMessage(QiscusContact contact, int roomId, int topicId) {
         QiscusComment qiscusComment = generateMessage(contact.getName() + "\n" + contact.getValue(), roomId, topicId);
-        qiscusComment.setRawType("contact");
+        qiscusComment.setRawType("contact_person");
         qiscusComment.setContact(contact);
         JSONObject json = new JSONObject();
         try {
@@ -490,7 +490,7 @@ public class QiscusComment implements Parcelable {
             return Type.CARD;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("system_event")) {
             return Type.SYSTEM_EVENT;
-        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("contact")) {
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("contact_person")) {
             return Type.CONTACT;
         } else if (!isAttachment()) {
             if (containsUrl()) {
