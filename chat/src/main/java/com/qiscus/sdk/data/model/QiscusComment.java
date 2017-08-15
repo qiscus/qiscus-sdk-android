@@ -340,6 +340,8 @@ public class QiscusComment implements Parcelable {
                 replyTo.message = payload.getString("replied_comment_message");
                 replyTo.sender = payload.getString("replied_comment_sender_username");
                 replyTo.senderEmail = payload.getString("replied_comment_sender_email");
+                replyTo.setRawType(payload.optString("replied_comment_type"));
+                replyTo.setExtraPayload(payload.optString("replied_comment_payload"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

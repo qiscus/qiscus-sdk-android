@@ -118,6 +118,13 @@ public class QiscusReplyPreviewView extends LinearLayout {
                     icon.setImageResource(R.drawable.ic_qiscus_file);
                     content.setText(originComment.getAttachmentName());
                     break;
+                case CONTACT:
+                    image.setVisibility(GONE);
+                    icon.setVisibility(VISIBLE);
+                    icon.setImageResource(R.drawable.ic_qiscus_add_contact);
+                    content.setText(QiscusAndroidUtil.getString(R.string.qiscus_contact) + ": "
+                            + originComment.getContact().getName());
+                    break;
                 default:
                     image.setVisibility(GONE);
                     icon.setVisibility(GONE);
