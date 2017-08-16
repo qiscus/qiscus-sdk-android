@@ -865,6 +865,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     accountLinkingClick(qiscusComment);
                 } else if (qiscusComment.getType() == QiscusComment.Type.CONTACT) {
                     addToPhoneContact(qiscusComment.getContact());
+                } else if (qiscusComment.getType() == QiscusComment.Type.LOCATION){
+                    openMap(qiscusComment.getLocation());
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 showFailedCommentDialog(qiscusComment);
@@ -881,6 +883,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 toggleSelectComment(qiscusComment);
             }
         }
+    }
+
+    protected void openMap(QiscusLocation location) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(location.getMapUrl()));
+        startActivity(intent);
     }
 
     protected void addToPhoneContact(QiscusContact contact) {
