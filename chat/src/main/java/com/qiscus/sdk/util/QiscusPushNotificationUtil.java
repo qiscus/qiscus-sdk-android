@@ -85,6 +85,10 @@ public final class QiscusPushNotificationUtil {
             case AUDIO:
                 messageText += "\uD83D\uDD0A " + QiscusAndroidUtil.getString(R.string.qiscus_send_a_audio);
                 break;
+            case CONTACT:
+                messageText += "\u260E " + QiscusAndroidUtil.getString(R.string.qiscus_contact) + ": " +
+                        comment.getContact().getName();
+                break;
             default:
                 messageText += comment.isAttachment() ? "\uD83D\uDCC4 " +
                         QiscusAndroidUtil.getString(R.string.qiscus_send_attachment) : comment.getMessage();
