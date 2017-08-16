@@ -51,6 +51,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
 import com.qiscus.sdk.Qiscus;
@@ -61,6 +65,7 @@ import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusContact;
+import com.qiscus.sdk.data.model.QiscusLocation;
 import com.qiscus.sdk.data.model.QiscusPhoto;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
@@ -109,15 +114,21 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.RECORD_AUDIO",
-            "android.permission.CAMERA"
+            "android.permission.CAMERA",
+            "android.permission.ACCESS_COARSE_LOCATION",
+            "android.permission.ACCESS_FINE_LOCATION",
     };
 
     private static final String AUDIO_PERMISSION = "android.permission.RECORD_AUDIO";
     private static final String[] FILE_PERMISSION = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
-            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE"
     };
     private static final String CAMERA_PERMISSION = "android.permission.CAMERA";
+    private static final String[] LOCATION_PERMISSION = {
+            "android.permission.ACCESS_COARSE_LOCATION",
+            "android.permission.ACCESS_FINE_LOCATION"
+    };
 
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
@@ -128,8 +139,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int PICK_CONTACT_REQUEST = 2;
-    protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 3;
-    protected static final int SHOW_MEDIA_DETAIL = 4;
+    protected static final int PICK_LOCATION_REQUEST = 3;
+    protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 4;
+    protected static final int SHOW_MEDIA_DETAIL = 5;
 
     @NonNull protected ViewGroup rootView;
     @Nullable protected ViewGroup emptyChatHolder;
@@ -1012,6 +1024,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         qiscusChatPresenter.sendContact(contact);
     }
 
+    public void sendLocation(QiscusLocation location) {
+        qiscusChatPresenter.sendLocation(location);
+    }
+
     protected void addImage() {
         if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
             new JupukBuilder().setMaxCount(10)
@@ -1097,7 +1113,17 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void addLocation() {
-        hideAttachmentPanel();
+        if (QiscusPermissionsUtil.hasPermissions(getActivity(), LOCATION_PERMISSION)) {
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            try {
+                startActivityForResult(builder.build(getActivity()), PICK_LOCATION_REQUEST);
+            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            }
+            hideAttachmentPanel();
+        } else {
+            requestPermissions();
+        }
     }
 
     protected void toggleEmoji() {
@@ -1424,6 +1450,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (cursor != null) {
                 cursor.close();
             }
+        } else if (requestCode == PICK_LOCATION_REQUEST && resultCode == Activity.RESULT_OK) {
+            Place place = PlacePicker.getPlace(getActivity(), data);
+            QiscusLocation location = new QiscusLocation();
+            location.setName(place.getName().toString());
+            location.setAddress(place.getAddress().toString());
+            location.setLatitude(place.getLatLng().latitude);
+            location.setLongitude(place.getLatLng().longitude);
+            sendLocation(location);
         }
     }
 

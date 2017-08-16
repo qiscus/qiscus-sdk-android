@@ -82,6 +82,7 @@ public class QiscusComment implements Parcelable {
     private PreviewData previewData;
 
     private QiscusContact contact;
+    private QiscusLocation location;
 
     private String rawType;
     private String extraPayload;
@@ -146,6 +147,25 @@ public class QiscusComment implements Parcelable {
         JSONObject json = new JSONObject();
         try {
             json.put("name", contact.getName()).put("value", contact.getValue());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
+
+
+        return qiscusComment;
+    }
+
+    public static QiscusComment generateLocationMessage(QiscusLocation location, int roomId, int topicId) {
+        QiscusComment qiscusComment = generateMessage(location.getName() + " - " + location.getAddress()
+                + "\n" + location.getMapUrl(), roomId, topicId);
+        qiscusComment.setRawType("location");
+        qiscusComment.setLocation(location);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("name", location.getName()).put("address", location.getAddress())
+                    .put("latitude", location.getLatitude()).put("longitude", location.getLongitude())
+                    .put("map_url", location.getMapUrl());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -484,6 +504,27 @@ public class QiscusComment implements Parcelable {
         this.contact = contact;
     }
 
+    public QiscusLocation getLocation() {
+        if (location == null && getType() == Type.LOCATION) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                location = new QiscusLocation();
+                location.setName(payload.optString("name"));
+                location.setAddress(payload.optString("address"));
+                location.setLatitude(payload.optDouble("latitude"));
+                location.setLongitude(payload.optDouble("longitude"));
+                location.setMapUrl(payload.optString("map_url"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return location;
+    }
+
+    public void setLocation(QiscusLocation location) {
+        this.location = location;
+    }
+
     public Type getType() {
         if (!TextUtils.isEmpty(rawType) && rawType.equals("account_linking")) {
             return Type.ACCOUNT_LINKING;
@@ -497,6 +538,8 @@ public class QiscusComment implements Parcelable {
             return Type.SYSTEM_EVENT;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("contact_person")) {
             return Type.CONTACT;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("location")) {
+            return Type.LOCATION;
         } else if (!isAttachment()) {
             if (containsUrl()) {
                 return Type.LINK;
@@ -745,7 +788,7 @@ public class QiscusComment implements Parcelable {
 
     public enum Type {
         TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
-        CONTACT
+        CONTACT, LOCATION
     }
 
     public interface ProgressListener {
