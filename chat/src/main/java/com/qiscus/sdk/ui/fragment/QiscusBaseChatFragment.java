@@ -135,35 +135,51 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable protected ViewGroup emptyChatHolder;
     @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
     @NonNull protected QiscusRecyclerView messageRecyclerView;
+
     @Nullable protected ViewGroup messageInputPanel;
     @Nullable protected ViewGroup messageEditTextContainer;
     @NonNull protected EditText messageEditText;
     @NonNull protected ImageView sendButton;
+
     @Nullable protected View newMessageButton;
     @NonNull protected View loadMoreProgressBar;
+
     @Nullable protected ImageView emptyChatImageView;
     @Nullable protected TextView emptyChatTitleView;
     @Nullable protected TextView emptyChatDescView;
+
     @Nullable protected ViewGroup attachmentPanel;
+
     @Nullable protected View addImageLayout;
     @Nullable protected ImageView addImageButton;
     @Nullable protected TextView addImageTextView;
+
     @Nullable protected View takeImageLayout;
     @Nullable protected ImageView takeImageButton;
     @Nullable protected TextView takeImageTextView;
+
     @Nullable protected View addFileLayout;
     @Nullable protected ImageView addFileButton;
     @Nullable protected TextView addFileTextView;
+
     @Nullable protected View recordAudioLayout;
     @Nullable protected ImageView recordAudioButton;
     @Nullable protected TextView recordAudioTextView;
+
     @Nullable protected View addContactLayout;
     @Nullable protected ImageView addContactButton;
     @Nullable protected TextView addContactTextView;
+
+    @Nullable protected View addLocationLayout;
+    @Nullable protected ImageView addLocationButton;
+    @Nullable protected TextView addLocationTextView;
+
     @Nullable protected ImageView hideAttachmentButton;
     @Nullable protected ImageView toggleEmojiButton;
+
     @Nullable protected QiscusAudioRecorderView recordAudioPanel;
     @Nullable protected QiscusReplyPreviewView replyPreviewView;
+
     @Nullable protected View goToBottomButton;
 
     protected QiscusChatConfig chatConfig;
@@ -232,6 +248,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         addContactLayout = getAddContactLayout(view);
         addContactButton = getAddContactButton(view);
         addContactTextView = getAddContactTextView(view);
+
+        addLocationLayout = getAddLocationLayout(view);
+        addLocationButton = getAddLocationButton(view);
+        addLocationTextView = getAddLocationTextView(view);
 
         toggleEmojiButton = getToggleEmojiButton(view);
         recordAudioPanel = getRecordAudioPanel(view);
@@ -303,6 +323,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (addContactButton != null) {
             addContactButton.setOnClickListener(v -> addContact());
+        }
+        if (addLocationButton != null) {
+            addLocationButton.setOnClickListener(v -> addLocation());
         }
         if (toggleEmojiButton != null) {
             toggleEmojiButton.setOnClickListener(v -> toggleEmoji());
@@ -419,6 +442,17 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Nullable
     protected TextView getAddContactTextView(View view) {
+        return null;
+    }
+
+    @Nullable
+    protected abstract View getAddLocationLayout(View view);
+
+    @Nullable
+    protected abstract ImageView getAddLocationButton(View view);
+
+    @Nullable
+    protected TextView getAddLocationTextView(View view) {
         return null;
     }
 
@@ -723,6 +757,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (addContactTextView != null) {
             addContactTextView.setText(chatConfig.getAddContactText());
         }
+        if (addLocationButton != null) {
+            addLocationButton.setImageResource(chatConfig.getAddLocationIcon());
+            buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_location_button_bg);
+            buttonBg.setColorFilter(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getAddLocationBackgroundColor()), PorterDuff.Mode.SRC_ATOP);
+            addLocationButton.setBackground(buttonBg);
+        }
+        if (addLocationTextView != null) {
+            addLocationTextView.setText(chatConfig.getAddLocationText());
+        }
         if (hideAttachmentButton != null) {
             hideAttachmentButton.setImageResource(chatConfig.getHideAttachmentPanelIcon());
             buttonBg = ContextCompat.getDrawable(Qiscus.getApps(), R.drawable.qiscus_keyboard_button_bg);
@@ -752,6 +796,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (addContactLayout != null) {
             addContactLayout.setVisibility(chatConfig.isEnableAddContact() ? View.VISIBLE : View.GONE);
+        }
+        if (addLocationLayout != null) {
+            addLocationLayout.setVisibility(chatConfig.isEnableAddLocation() ? View.VISIBLE : View.GONE);
         }
         if (replyPreviewView != null) {
             replyPreviewView.setBarColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplyBarColor()));
@@ -1046,6 +1093,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void addContact() {
         Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
         startActivityForResult(contactPickerIntent, PICK_CONTACT_REQUEST);
+        hideAttachmentPanel();
+    }
+
+    protected void addLocation() {
         hideAttachmentPanel();
     }
 

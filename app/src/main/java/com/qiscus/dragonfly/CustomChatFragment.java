@@ -242,6 +242,18 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected View getAddLocationLayout(View view) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getAddLocationButton(View view) {
+        return null;
+    }
+
+    @Nullable
+    @Override
     public ImageView getHideAttachmentButton(View view) {
         return null;
     }
