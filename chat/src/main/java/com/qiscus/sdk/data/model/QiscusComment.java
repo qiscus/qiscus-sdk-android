@@ -120,13 +120,16 @@ public class QiscusComment implements Parcelable {
     public static QiscusComment generateReplyMessage(String content, int roomId, int topicId, QiscusComment repliedComment) {
         QiscusComment qiscusComment = generateMessage(content, roomId, topicId);
         qiscusComment.setRawType("reply");
+        qiscusComment.setReplyTo(repliedComment);
         JSONObject json = new JSONObject();
         try {
             json.put("text", qiscusComment.getMessage())
                     .put("replied_comment_id", repliedComment.getId())
                     .put("replied_comment_message", repliedComment.getMessage())
                     .put("replied_comment_sender_username", repliedComment.getSender())
-                    .put("replied_comment_sender_email", repliedComment.getSenderEmail());
+                    .put("replied_comment_sender_email", repliedComment.getSenderEmail())
+                    .put("replied_comment_type", repliedComment.getRawType())
+                    .put("replied_comment_payload", repliedComment.getExtraPayload());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -340,8 +343,8 @@ public class QiscusComment implements Parcelable {
                 replyTo.message = payload.getString("replied_comment_message");
                 replyTo.sender = payload.getString("replied_comment_sender_username");
                 replyTo.senderEmail = payload.getString("replied_comment_sender_email");
-                replyTo.setRawType(payload.optString("replied_comment_type"));
-                replyTo.setExtraPayload(payload.optString("replied_comment_payload"));
+                replyTo.rawType = payload.optString("replied_comment_type");
+                replyTo.extraPayload = payload.optString("replied_comment_payload");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
