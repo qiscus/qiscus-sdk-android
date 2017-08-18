@@ -19,6 +19,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/action_forward"
+        android:title="@string/qiscus_forward"/>
+
+    <item
         android:id="@+id/action_redownload"
         android:title="@string/qiscus_redownload"/>
 

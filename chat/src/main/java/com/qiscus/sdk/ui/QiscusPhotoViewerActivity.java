@@ -40,6 +40,7 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.presenter.QiscusPhotoViewerPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusPhotoPagerAdapter;
@@ -158,6 +159,8 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.media_action, menu);
+        menu.findItem(R.id.action_forward)
+                .setVisible(Qiscus.getChatConfig().isEnableForwardComment());
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -198,6 +201,16 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
             } else {
                 showError(getString(R.string.qiscus_error_can_not_delete_file));
             }
+        } else if (i == R.id.action_forward) {
+            ForwardCommentHandler forwardCommentHandler = Qiscus.getChatConfig().getForwardCommentHandler();
+            if (forwardCommentHandler == null) {
+                throw new NullPointerException("Please set forward handler before.\n" +
+                        "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
+            }
+            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            List<QiscusComment> comments = new ArrayList<>();
+            comments.add(qiscusPhoto.first);
+            forwardCommentHandler.forward(comments);
         }
         return super.onOptionsItemSelected(item);
     }
