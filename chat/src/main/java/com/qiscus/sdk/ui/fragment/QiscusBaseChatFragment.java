@@ -573,11 +573,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         if (autoSendExtra) {
             if (startingMessage != null && !startingMessage.isEmpty()) {
-                sendMessage(startingMessage);
+                QiscusAndroidUtil.runOnUIThread(() -> sendMessage(startingMessage), 800);
             }
 
             if (shareFile != null) {
-                sendFile(shareFile);
+                QiscusAndroidUtil.runOnUIThread(() -> sendFile(shareFile), 800);
             }
         } else {
             if (startingMessage != null && !startingMessage.isEmpty()) {
@@ -593,7 +593,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                             qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
                             SEND_PICTURE_CONFIRMATION_REQUEST);
                 } else {
-                    sendFile(shareFile);
+                    QiscusAndroidUtil.runOnUIThread(() -> sendFile(shareFile), 800);
                 }
             }
         }

@@ -417,9 +417,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         }
                     });
                 })
-                .flatMap(roomData -> getLocalComments(20).map(comments -> {
+                .flatMap(roomData -> getLocalComments(20, false).map(comments -> {
                     for (QiscusComment comment : comments) {
-                        if (!roomData.second.contains(comment)) {
+                        if (comment.getState() != QiscusComment.STATE_SENDING && !roomData.second.contains(comment)) {
                             roomData.second.add(comment);
                         }
                     }
@@ -482,7 +482,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .subscribeOn(Schedulers.io());
     }
 
-    private Observable<List<QiscusComment>> getLocalComments(int count) {
+    private Observable<List<QiscusComment>> getLocalComments(int count, boolean forceFailedSendingComment) {
         return Qiscus.getDataStore().getObservableComments(currentTopicId, 2 * count)
                 .flatMap(Observable::from)
                 .toSortedList(commentComparator)
@@ -494,7 +494,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 })
                 .doOnNext(comments -> {
                     checkForLastRead(comments);
-                    updateCommentState(comments, true);
+                    updateCommentState(comments, forceFailedSendingComment);
                 })
                 .subscribeOn(Schedulers.io());
     }
@@ -510,6 +510,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             qiscusComment.setState(QiscusComment.STATE_FAILED);
             Qiscus.getDataStore().addOrUpdate(qiscusComment);
         } else if (qiscusComment.getState() != QiscusComment.STATE_FAILED
+                && qiscusComment.getState() != QiscusComment.STATE_SENDING
                 && qiscusComment.getState() != QiscusComment.STATE_READ) {
             if (qiscusComment.getId() > lastDeliveredCommentId.get()) {
                 qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
@@ -523,7 +524,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void loadComments(int count) {
-        Observable.merge(getInitRoomData(), getLocalComments(count).map(comments -> Pair.create(room, comments)))
+        Observable.merge(getInitRoomData(), getLocalComments(count, true).map(comments -> Pair.create(room, comments)))
                 .filter(qiscusChatRoomListPair -> qiscusChatRoomListPair != null)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

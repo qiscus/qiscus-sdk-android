@@ -259,7 +259,14 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     }
 
     public void refreshWithData(List<E> es) {
-        data.clear();
+        int size = data.size();
+        for (int i = 0; i < size; i++) {
+            if (i >= 0 && i < data.size() && data.get(i).getState() != QiscusComment.STATE_SENDING) {
+                data.removeItemAt(i);
+                size = data.size();
+                i--;
+            }
+        }
         data.addAll(es);
         notifyDataSetChanged();
     }
