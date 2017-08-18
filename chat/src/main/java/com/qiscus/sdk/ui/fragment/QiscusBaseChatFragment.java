@@ -865,7 +865,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     accountLinkingClick(qiscusComment);
                 } else if (qiscusComment.getType() == QiscusComment.Type.CONTACT) {
                     addToPhoneContact(qiscusComment.getContact());
-                } else if (qiscusComment.getType() == QiscusComment.Type.LOCATION){
+                } else if (qiscusComment.getType() == QiscusComment.Type.LOCATION) {
                     openMap(qiscusComment.getLocation());
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
