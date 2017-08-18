@@ -244,8 +244,8 @@ public final class QiscusImageUtil {
     }
 
     public static File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
+        String imageFileName = "JPEG-" + timeStamp + "-";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         QiscusCacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());

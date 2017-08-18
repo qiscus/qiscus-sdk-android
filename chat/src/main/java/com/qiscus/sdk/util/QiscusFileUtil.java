@@ -176,7 +176,7 @@ public final class QiscusFileUtil {
         int existedTopicId = getTopicFromFileName(fileName);
         if (existedTopicId == -1) {
             String[] fileNameSplit = splitFileName(fileName);
-            return fileNameSplit[0] + "_topic_" + topicId + "_topic" + fileNameSplit[1];
+            return fileNameSplit[0] + "-topic-" + topicId + "-topic" + fileNameSplit[1];
         } else if (existedTopicId != topicId) {
             return replaceTopicInFileName(fileName, topicId);
         }
@@ -186,18 +186,18 @@ public final class QiscusFileUtil {
 
     public static String addTimeStampToFileName(String fileName) {
         String[] fileNameSplit = splitFileName(fileName);
-        return fileNameSplit[0] + "_" + System.currentTimeMillis() + "" + fileNameSplit[1];
+        return fileNameSplit[0] + "-" + System.currentTimeMillis() + "" + fileNameSplit[1];
     }
 
     private static String replaceTopicInFileName(String fileName, int topicId) {
         String[] fileNameSplit = splitFileName(fileName);
-        int startTopicIndex = fileNameSplit[0].indexOf("_topic_");
-        return fileNameSplit[0].substring(0, startTopicIndex) + "_topic_" + topicId + "_topic" + fileNameSplit[1];
+        int startTopicIndex = fileNameSplit[0].indexOf("-topic-");
+        return fileNameSplit[0].substring(0, startTopicIndex) + "-topic-" + topicId + "-topic" + fileNameSplit[1];
     }
 
     public static int getTopicFromFileName(String fileName) {
-        int startTopicIndex = fileName.indexOf("topic_");
-        int lastTopicIndex = fileName.lastIndexOf("_topic");
+        int startTopicIndex = fileName.indexOf("topic-");
+        int lastTopicIndex = fileName.lastIndexOf("-topic");
         if (startTopicIndex >= 0 && lastTopicIndex >= 0) {
             try {
                 return Integer.parseInt(fileName.substring(startTopicIndex + 6, lastTopicIndex));
@@ -258,7 +258,7 @@ public final class QiscusFileUtil {
     }
 
     public static String createTimestampFileName(String extension) {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
         return timeStamp + "." + extension;
     }
 }
