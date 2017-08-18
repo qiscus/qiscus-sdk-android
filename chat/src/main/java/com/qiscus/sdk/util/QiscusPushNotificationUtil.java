@@ -89,6 +89,9 @@ public final class QiscusPushNotificationUtil {
                 messageText += "\u260E " + QiscusAndroidUtil.getString(R.string.qiscus_contact) + ": " +
                         comment.getContact().getName();
                 break;
+            case LOCATION:
+                messageText += "\uD83D\uDCCD " + comment.getMessage();
+                break;
             default:
                 messageText += comment.isAttachment() ? "\uD83D\uDCC4 " +
                         QiscusAndroidUtil.getString(R.string.qiscus_send_attachment) : comment.getMessage();

@@ -109,6 +109,11 @@ public class QiscusChatConfig {
     private String addContactText = QiscusAndroidUtil.getString(R.string.qiscus_contact);
     private boolean enableAddContact = true;
 
+    private int addLocationIcon = R.drawable.ic_qiscus_location;
+    private int addLocationBackgroundColor = R.color.qiscus_location_background;
+    private String addLocationText = QiscusAndroidUtil.getString(R.string.qiscus_location);
+    private boolean enableAddLocation = false;
+
     private int stopRecordIcon = R.drawable.ic_qiscus_send_on;
     private int cancelRecordIcon = R.drawable.ic_qiscus_cancel_record;
 
@@ -457,6 +462,26 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setEnableAddContact(boolean enableAddContact) {
         this.enableAddContact = enableAddContact;
+        return this;
+    }
+
+    public QiscusChatConfig setAddLocationIcon(@DrawableRes int addLocationIcon) {
+        this.addLocationIcon = addLocationIcon;
+        return this;
+    }
+
+    public QiscusChatConfig setAddLocationBackgroundColor(@ColorRes int addLocationBackgroundColor) {
+        this.addLocationBackgroundColor = addLocationBackgroundColor;
+        return this;
+    }
+
+    public QiscusChatConfig setAddLocationText(String addLocationText) {
+        this.addLocationText = addLocationText;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableAddLocation(boolean enableAddLocation) {
+        this.enableAddLocation = enableAddLocation;
         return this;
     }
 
@@ -878,6 +903,24 @@ public class QiscusChatConfig {
 
     public boolean isEnableAddContact() {
         return enableAddContact;
+    }
+
+    @DrawableRes
+    public int getAddLocationIcon() {
+        return addLocationIcon;
+    }
+
+    @ColorRes
+    public int getAddLocationBackgroundColor() {
+        return addLocationBackgroundColor;
+    }
+
+    public String getAddLocationText() {
+        return addLocationText;
+    }
+
+    public boolean isEnableAddLocation() {
+        return enableAddLocation;
     }
 
     @DrawableRes

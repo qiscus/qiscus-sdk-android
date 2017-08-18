@@ -27,6 +27,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusContact;
+import com.qiscus.sdk.data.model.QiscusLocation;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
@@ -227,6 +228,28 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 });
     }
 
+    public void sendLocation(QiscusLocation location) {
+        QiscusComment qiscusComment = QiscusComment.generateLocationMessage(location, room.getId(), currentTopicId);
+        view.onSendingComment(qiscusComment);
+        QiscusApi.getInstance().postLocationComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
     public void resendComment(QiscusComment qiscusComment) {
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
@@ -234,6 +257,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             resendReplyComment(qiscusComment);
         } else if (qiscusComment.getType() == QiscusComment.Type.CONTACT) {
             resendContact(qiscusComment);
+        } else if (qiscusComment.getType() == QiscusComment.Type.LOCATION) {
+            resendLocation(qiscusComment);
         } else {
             qiscusComment.setState(QiscusComment.STATE_SENDING);
             qiscusComment.setTime(new Date());
@@ -330,6 +355,29 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         qiscusComment.setTime(new Date());
         view.onSendingComment(qiscusComment);
         QiscusApi.getInstance().postContactComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
+    private void resendLocation(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        qiscusComment.setTime(new Date());
+        view.onSendingComment(qiscusComment);
+        QiscusApi.getInstance().postLocationComment(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
                 .doOnNext(this::commentSuccess)
                 .doOnError(throwable -> commentFail(qiscusComment))

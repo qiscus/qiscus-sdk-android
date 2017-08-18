@@ -187,6 +187,18 @@ public enum QiscusApi {
                 });
     }
 
+    public Observable<QiscusComment> postLocationComment(QiscusComment qiscusComment) {
+        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
+                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), "location", qiscusComment.getExtraPayload())
+                .map(jsonElement -> {
+                    JsonObject jsonComment = jsonElement.getAsJsonObject()
+                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
+                    qiscusComment.setId(jsonComment.get("id").getAsInt());
+                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    return qiscusComment;
+                });
+    }
+
     public Observable<QiscusComment> sync(int lastCommentId) {
         return api.sync(Qiscus.getToken(), lastCommentId)
                 .onErrorReturn(throwable -> {

@@ -103,4 +103,5 @@
     <string name="qiscus_add_contact_confirmation">Create a new contact or add to an existing contact?</string>
     <string name="qiscus_new_contact">New</string>
     <string name="qiscus_existing_contact">Existing</string>
+    <string name="qiscus_location">Location</string>
 </resources>

@@ -30,6 +30,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusContactViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusFileViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusImageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusLinkViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusLocationMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusReplyViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusSystemMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusTextViewHolder;
@@ -64,6 +65,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_MESSAGE_CARD = 20;
     private static final int TYPE_CONTACT_ME = 21;
     private static final int TYPE_CONTACT_OTHER = 22;
+    private static final int TYPE_LOCATION_ME = 23;
+    private static final int TYPE_LOCATION_OTHER = 24;
 
     public QiscusChatAdapter(Context context, boolean groupChat) {
         super(context, groupChat);
@@ -106,6 +109,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_SYSTEM_EVENT;
             case CONTACT:
                 return TYPE_CONTACT_ME;
+            case LOCATION:
+                return TYPE_LOCATION_ME;
             default:
                 return TYPE_MESSAGE_ME;
         }
@@ -139,6 +144,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_SYSTEM_EVENT;
             case CONTACT:
                 return TYPE_CONTACT_OTHER;
+            case LOCATION:
+                return TYPE_LOCATION_OTHER;
             default:
                 return TYPE_MESSAGE_OTHER;
         }
@@ -191,6 +198,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_contact_me;
             case TYPE_CONTACT_OTHER:
                 return R.layout.item_qiscus_chat_contact;
+            case TYPE_LOCATION_ME:
+                return R.layout.item_qiscus_chat_location_me;
+            case TYPE_LOCATION_OTHER:
+                return R.layout.item_qiscus_chat_location;
             default:
                 return R.layout.item_qiscus_chat_text;
         }
@@ -236,6 +247,9 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case TYPE_CONTACT_ME:
             case TYPE_CONTACT_OTHER:
                 return new QiscusContactViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+            case TYPE_LOCATION_ME:
+            case TYPE_LOCATION_OTHER:
+                return new QiscusLocationMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             default:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
         }

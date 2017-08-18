@@ -264,6 +264,24 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
+    protected View getAddLocationLayout(View view) {
+        return view.findViewById(R.id.add_location);
+    }
+
+    @Nullable
+    @Override
+    protected ImageView getAddLocationButton(View view) {
+        return (ImageView) view.findViewById(R.id.button_add_location);
+    }
+
+    @Nullable
+    @Override
+    protected TextView getAddLocationTextView(View view) {
+        return (TextView) view.findViewById(R.id.button_add_location_text);
+    }
+
+    @Nullable
+    @Override
     public ImageView getHideAttachmentButton(View view) {
         return (ImageView) view.findViewById(R.id.button_keyboard);
     }

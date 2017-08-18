@@ -180,6 +180,16 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                 originMessageTextView.setText(QiscusAndroidUtil.getString(R.string.qiscus_contact)
                         + ": " + originComment.getContact().getName());
                 break;
+            case LOCATION:
+                if (originImageView != null) {
+                    originImageView.setVisibility(View.GONE);
+                }
+                if (originIconView != null) {
+                    originIconView.setVisibility(View.VISIBLE);
+                    originIconView.setImageResource(R.drawable.ic_qiscus_location);
+                }
+                originMessageTextView.setText(originComment.getMessage());
+                break;
             default:
                 if (originImageView != null) {
                     originImageView.setVisibility(View.GONE);
