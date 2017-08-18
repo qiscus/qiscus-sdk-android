@@ -950,8 +950,17 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             int finalI = i;
             QiscusAndroidUtil.runOnUIThread(() -> {
                 QiscusComment forwardComment = forwardComments.get(finalI);
-                QiscusComment qiscusComment = QiscusComment.generateMessage(forwardComment.getMessage(),
-                        room.getId(), currentTopicId);
+                QiscusComment qiscusComment;
+                if (forwardComment.getType() == QiscusComment.Type.CONTACT) {
+                    qiscusComment = QiscusComment.generateContactMessage(forwardComment.getContact(),
+                            room.getId(), currentTopicId);
+                } else if (forwardComment.getType() == QiscusComment.Type.LOCATION) {
+                    qiscusComment = QiscusComment.generateLocationMessage(forwardComment.getLocation(),
+                            room.getId(), currentTopicId);
+                } else {
+                    qiscusComment = QiscusComment.generateMessage(forwardComment.getMessage(),
+                            room.getId(), currentTopicId);
+                }
                 resendComment(qiscusComment);
             }, i * 100);
         }
