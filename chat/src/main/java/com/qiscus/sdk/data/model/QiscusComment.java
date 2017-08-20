@@ -513,7 +513,6 @@ public class QiscusComment implements Parcelable {
                 location.setAddress(payload.optString("address"));
                 location.setLatitude(payload.optDouble("latitude"));
                 location.setLongitude(payload.optDouble("longitude"));
-                location.setMapUrl(payload.optString("map_url"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

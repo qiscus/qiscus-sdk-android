@@ -99,11 +99,7 @@ public class QiscusLocation implements Parcelable {
     }
 
     private void generateMapUrl() {
-        mapUrl = "http://maps.google.com/maps?daddr=" + latitude + "," + longitude;
-    }
-
-    public void setMapUrl(String mapUrl) {
-        this.mapUrl = mapUrl;
+        mapUrl = "http://maps.google.com/?q=" + latitude + "," + longitude;
     }
 
     public String getThumbnailUrl() {
