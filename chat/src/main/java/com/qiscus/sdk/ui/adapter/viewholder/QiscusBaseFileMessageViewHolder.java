@@ -89,7 +89,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
 
     protected void setUpDownloadIcon(QiscusComment qiscusComment) {
         if (downloadIconView != null) {
-            if (qiscusComment.getState() == QiscusComment.STATE_FAILED || qiscusComment.getState() == QiscusComment.STATE_SENDING) {
+            if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_upload);
             } else {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_download);
