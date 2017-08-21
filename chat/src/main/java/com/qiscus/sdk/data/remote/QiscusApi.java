@@ -141,55 +141,8 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
         return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
-                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), null, null)
-                .map(jsonElement -> {
-                    JsonObject jsonComment = jsonElement.getAsJsonObject()
-                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
-                    qiscusComment.setId(jsonComment.get("id").getAsInt());
-                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
-                    return qiscusComment;
-                });
-    }
-
-    public Observable<QiscusComment> postCommentPostBack(QiscusComment qiscusComment, String payload) {
-        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
-                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), "button_postback_response", payload)
-                .map(jsonElement -> {
-                    JsonObject jsonComment = jsonElement.getAsJsonObject()
-                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
-                    qiscusComment.setId(jsonComment.get("id").getAsInt());
-                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
-                    return qiscusComment;
-                });
-    }
-
-    public Observable<QiscusComment> postReplyComment(QiscusComment qiscusComment) {
-        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
-                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), "reply", qiscusComment.getExtraPayload())
-                .map(jsonElement -> {
-                    JsonObject jsonComment = jsonElement.getAsJsonObject()
-                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
-                    qiscusComment.setId(jsonComment.get("id").getAsInt());
-                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
-                    return qiscusComment;
-                });
-    }
-
-    public Observable<QiscusComment> postContactComment(QiscusComment qiscusComment) {
-        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
-                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), "contact_person", qiscusComment.getExtraPayload())
-                .map(jsonElement -> {
-                    JsonObject jsonComment = jsonElement.getAsJsonObject()
-                            .get("results").getAsJsonObject().get("comment").getAsJsonObject();
-                    qiscusComment.setId(jsonComment.get("id").getAsInt());
-                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
-                    return qiscusComment;
-                });
-    }
-
-    public Observable<QiscusComment> postLocationComment(QiscusComment qiscusComment) {
-        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
-                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), "location", qiscusComment.getExtraPayload())
+                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
+                qiscusComment.getExtraPayload())
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject()
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();

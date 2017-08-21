@@ -136,7 +136,6 @@ public class QiscusComment implements Parcelable {
         }
         qiscusComment.setExtraPayload(json.toString());
 
-
         return qiscusComment;
     }
 
@@ -151,7 +150,6 @@ public class QiscusComment implements Parcelable {
             e.printStackTrace();
         }
         qiscusComment.setExtraPayload(json.toString());
-
 
         return qiscusComment;
     }
@@ -171,7 +169,13 @@ public class QiscusComment implements Parcelable {
         }
         qiscusComment.setExtraPayload(json.toString());
 
+        return qiscusComment;
+    }
 
+    public static QiscusComment generatePostBackMessage(String content, String payload, int roomId, int topicId) {
+        QiscusComment qiscusComment = generateMessage(content, roomId, topicId);
+        qiscusComment.setRawType("button_postback_response");
+        qiscusComment.setExtraPayload(payload);
         return qiscusComment;
     }
 
