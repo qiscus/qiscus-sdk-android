@@ -733,6 +733,35 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public List<QiscusComment> getFailedComments() {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_FAILED + " "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " ASC";
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
+        }
+        cursor.close();
+        return qiscusComments;
+    }
+
+    @Override
+    public Observable<List<QiscusComment>> getObservableFailedComments() {
+        return Observable.create(subscriber -> {
+            subscriber.onNext(getFailedComments());
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
+    @Override
     public void clear() {
         sqLiteDatabase.beginTransaction();
         try {

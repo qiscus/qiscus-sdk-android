@@ -116,7 +116,19 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void commentFail(QiscusComment qiscusComment) {
-        //Do nothing
+        qiscusComment.setState(QiscusComment.STATE_FAILED);
+        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        if (savedQiscusComment != null) {
+            if (savedQiscusComment.getState() < qiscusComment.getState()) {
+                qiscusComment.setState(QiscusComment.STATE_FAILED);
+                Qiscus.getDataStore().addOrUpdate(qiscusComment);
+            } else {
+                qiscusComment.setState(savedQiscusComment.getState());
+            }
+        } else {
+            qiscusComment.setState(QiscusComment.STATE_FAILED);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        }
     }
 
     private void sendComment(QiscusComment qiscusComment) {
@@ -313,7 +325,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         }
                     });
                 })
-                .flatMap(roomData -> getLocalComments(20).map(comments -> {
+                .flatMap(roomData -> getLocalComments(20, false).map(comments -> {
                     for (QiscusComment comment : comments) {
                         if (comment.getState() != QiscusComment.STATE_SENDING && !roomData.second.contains(comment)) {
                             roomData.second.add(comment);
@@ -324,7 +336,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .doOnNext(roomData -> {
                     updateRoomState(roomData.first.getMember());
                     checkForLastRead(roomData.second);
-                    updateCommentState(roomData.second);
+                    updateCommentState(roomData.second, false);
 
                     Collections.sort(roomData.second, (lhs, rhs) -> lhs.getId() != -1 && rhs.getId() != -1 ?
                             QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime()));
@@ -371,14 +383,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         return QiscusApi.getInstance().getComments(room.getId(), currentTopicId, lastCommentId)
                 .doOnNext(qiscusComment -> {
                     qiscusComment.setRoomId(room.getId());
-                    updateCommentState(qiscusComment);
+                    updateCommentState(qiscusComment, false);
                 })
                 .toSortedList(commentComparator)
                 .doOnNext(this::checkForLastRead)
                 .subscribeOn(Schedulers.io());
     }
 
-    private Observable<List<QiscusComment>> getLocalComments(int count) {
+    private Observable<List<QiscusComment>> getLocalComments(int count, boolean forceFailedSendingComment) {
         return Qiscus.getDataStore().getObservableComments(currentTopicId, 2 * count)
                 .flatMap(Observable::from)
                 .toSortedList(commentComparator)
@@ -390,19 +402,23 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 })
                 .doOnNext(comments -> {
                     checkForLastRead(comments);
-                    updateCommentState(comments);
+                    updateCommentState(comments, forceFailedSendingComment);
                 })
                 .subscribeOn(Schedulers.io());
     }
 
-    private void updateCommentState(List<QiscusComment> comments) {
+    private void updateCommentState(List<QiscusComment> comments, boolean fromLocal) {
         for (QiscusComment qiscusComment : comments) {
-            updateCommentState(qiscusComment);
+            updateCommentState(qiscusComment, fromLocal);
         }
     }
 
-    private void updateCommentState(QiscusComment qiscusComment) {
-        if (qiscusComment.getState() != QiscusComment.STATE_SENDING
+    private void updateCommentState(QiscusComment qiscusComment, boolean fromLocal) {
+        if (fromLocal && qiscusComment.getState() == QiscusComment.STATE_SENDING) {
+            qiscusComment.setState(QiscusComment.STATE_FAILED);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        } else if (qiscusComment.getState() != QiscusComment.STATE_FAILED
+                && qiscusComment.getState() != QiscusComment.STATE_SENDING
                 && qiscusComment.getState() != QiscusComment.STATE_READ) {
             if (qiscusComment.getId() > lastDeliveredCommentId.get()) {
                 qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
@@ -416,7 +432,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void loadComments(int count) {
-        Observable.merge(getInitRoomData(), getLocalComments(count).map(comments -> Pair.create(room, comments)))
+        Observable.merge(getInitRoomData(), getLocalComments(count, true).map(comments -> Pair.create(room, comments)))
                 .filter(qiscusChatRoomListPair -> qiscusChatRoomListPair != null)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -495,7 +511,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .doOnNext(comments -> {
                     updateRepliedSender(comments);
                     checkForLastRead(comments);
-                    updateCommentState(comments);
+                    updateCommentState(comments, true);
                 })
                 .flatMap(comments -> isValidOlderComments(comments, qiscusComment) ?
                         Observable.from(comments).toSortedList(commentComparator) :
@@ -550,7 +566,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         QiscusApi.getInstance().getCommentsAfter(room.getId(), currentTopicId, comment.getId())
                 .doOnNext(qiscusComment -> {
                     qiscusComment.setRoomId(room.getId());
-                    updateCommentState(qiscusComment);
+                    updateCommentState(qiscusComment, false);
                 })
                 .toSortedList(commentComparator)
                 .doOnNext(this::checkForLastRead)
@@ -755,7 +771,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .toSortedList(commentComparator)
                 .doOnNext(comments -> {
                     checkForLastRead(comments);
-                    updateCommentState(comments);
+                    updateCommentState(comments, true);
                 })
                 .flatMap(comments -> isValidChainingComments(comments) ?
                         Observable.from(comments).toSortedList(commentComparator) :
