@@ -20,10 +20,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created on : October 27, 2016
@@ -65,18 +69,11 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
         lockChatAfter(2000);
     }
 
-    @Override
-    public void sendMessage(String message) {
-        if (chatAdapter.isEmpty()) {
-            Toast.makeText(getActivity(), "First message sent!", Toast.LENGTH_SHORT).show();
-        }
-        super.sendMessage(message);
-    }
-
     private void lockChatAfter(int duration) {
         new Handler().postDelayed(() -> {
             mInputPanel.setVisibility(View.GONE);
             mLockedView.setVisibility(View.VISIBLE);
+            sendLockedMessage(true);
         }, duration);
     }
 
@@ -84,5 +81,25 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
         mInputPanel.setVisibility(View.VISIBLE);
         mLockedView.setVisibility(View.GONE);
         lockChatAfter(2000);
+        sendLockedMessage(false);
+    }
+
+    private void sendLockedMessage(boolean locked) {
+        String message = locked ? "Locked" : "Lock Opened";
+        String description = locked ? "This chat room is locked" : "This chat room opened";
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("locked", locked).put("description", description);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        QiscusComment comment = QiscusComment.generateCustomMessage(message, "lock_message", payload,
+                qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId());
+        sendQiscusComment(comment);
+    }
+
+    @Override
+    protected QiscusChatAdapter onCreateChatAdapter() {
+        return new CustomChatAdapter(getActivity(), qiscusChatRoom.isGroup());
     }
 }

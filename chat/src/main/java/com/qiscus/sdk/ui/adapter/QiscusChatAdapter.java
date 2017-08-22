@@ -82,6 +82,16 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     }
 
     @Override
+    protected int getItemViewTypeCustomMessage(QiscusComment qiscusComment, int position) {
+        if (qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+            return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+                    ? TYPE_MESSAGE_MULTI_LINE_ME : TYPE_MESSAGE_ME;
+        }
+        return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+                ? TYPE_MESSAGE_MULTI_LINE_OTHER : TYPE_MESSAGE_OTHER;
+    }
+
+    @Override
     protected int getItemViewTypeMyMessage(QiscusComment qiscusComment, int position) {
         switch (qiscusComment.getType()) {
             case TEXT:
