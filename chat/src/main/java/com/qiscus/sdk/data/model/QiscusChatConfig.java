@@ -64,6 +64,7 @@ public class QiscusChatConfig {
     private int failedToSendMessageColor = R.color.qiscus_red;
     private int readIconColor = R.color.qiscus_primary;
     private int dateColor = R.color.qiscus_secondary_text;
+    private int senderNameColor = R.color.qiscus_secondary_text;
     private int selectedBubbleBackgroundColor = R.color.qiscus_primary;
 
     private int rightProgressFinishedColor = R.color.qiscus_primary_light;
@@ -292,6 +293,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setDateColor(@ColorRes int dateColor) {
         this.dateColor = dateColor;
+        return this;
+    }
+
+    public QiscusChatConfig setSenderNameColor(@ColorRes int senderNameColor) {
+        this.senderNameColor = senderNameColor;
         return this;
     }
 
@@ -739,6 +745,11 @@ public class QiscusChatConfig {
     @ColorRes
     public int getDateColor() {
         return dateColor;
+    }
+
+    @ColorRes
+    public int getSenderNameColor() {
+        return senderNameColor;
     }
 
     @ColorRes
