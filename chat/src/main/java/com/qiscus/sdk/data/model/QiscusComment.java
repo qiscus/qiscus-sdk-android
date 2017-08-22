@@ -189,7 +189,7 @@ public class QiscusComment implements Parcelable {
      * @param topicId topic id for these comment
      * @return QiscusComment
      */
-    public static QiscusComment generateCustomMessage(String text, String type, String content, int roomId, int topicId) {
+    public static QiscusComment generateCustomMessage(String text, String type, JSONObject content, int roomId, int topicId) {
         QiscusComment qiscusComment = generateMessage(text, roomId, topicId);
         qiscusComment.setRawType("custom");
         JSONObject json = new JSONObject();
