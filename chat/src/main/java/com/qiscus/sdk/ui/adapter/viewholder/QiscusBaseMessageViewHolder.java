@@ -72,6 +72,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     protected int failedToSendMessageColor;
     protected int readIconColor;
     protected int dateColor;
+    protected int senderNameColor;
     protected Drawable selectionBackground;
 
     public QiscusBaseMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
@@ -111,6 +112,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         failedToSendMessageColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getFailedToSendMessageColor());
         readIconColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getReadIconColor());
         dateColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getDateColor());
+        senderNameColor = ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getSenderNameColor());
         selectionBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(),
                 Qiscus.getChatConfig().getSelectedBubbleBackgroundColor()));
         selectionBackground.setAlpha(51);
@@ -224,6 +226,10 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
 
         if (dateView != null) {
             dateView.setTextColor(dateColor);
+        }
+
+        if (senderNameView != null) {
+            senderNameView.setTextColor(senderNameColor);
         }
     }
 
