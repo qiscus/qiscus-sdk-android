@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -101,5 +102,10 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
         return new CustomChatAdapter(getActivity(), qiscusChatRoom.isGroup());
+    }
+
+    @Override
+    protected void onCustomCommentClick(QiscusComment qiscusComment) {
+        Toast.makeText(getActivity(), qiscusComment.getMessage(), Toast.LENGTH_SHORT).show();
     }
 }
