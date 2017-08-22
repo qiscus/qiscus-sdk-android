@@ -179,6 +179,29 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
+    /**
+     * Helper method to generate custom comment with your defined payload
+     *
+     * @param text    default text message for older apps
+     * @param type    your custom type
+     * @param content your custom payload
+     * @param roomId  room id for these comment
+     * @param topicId topic id for these comment
+     * @return QiscusComment
+     */
+    public static QiscusComment generateCustomMessage(String text, String type, String content, int roomId, int topicId) {
+        QiscusComment qiscusComment = generateMessage(text, roomId, topicId);
+        qiscusComment.setRawType("custom");
+        JSONObject json = new JSONObject();
+        try {
+            json.put("type", type).put("content", content);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
+        return qiscusComment;
+    }
+
     public QiscusComment() {
 
     }
@@ -543,6 +566,8 @@ public class QiscusComment implements Parcelable {
             return Type.CONTACT;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("location")) {
             return Type.LOCATION;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("custom")) {
+            return Type.CUSTOM;
         } else if (!isAttachment()) {
             if (containsUrl()) {
                 return Type.LINK;
@@ -791,7 +816,7 @@ public class QiscusComment implements Parcelable {
 
     public enum Type {
         TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
-        CONTACT, LOCATION
+        CONTACT, LOCATION, CUSTOM
     }
 
     public interface ProgressListener {
