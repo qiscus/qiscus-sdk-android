@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import retrofit2.HttpException;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
@@ -115,18 +116,24 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
     }
 
-    private void commentFail(QiscusComment qiscusComment) {
-        qiscusComment.setState(QiscusComment.STATE_FAILED);
+    private void commentFail(Throwable throwable, QiscusComment qiscusComment) {
+        int state = QiscusComment.STATE_PENDING;
+        if (throwable instanceof HttpException) { //Error response from server
+            //Means something wrong with server, e.g user is not member of these room anymore
+            state = QiscusComment.STATE_FAILED;
+        }
+
+        qiscusComment.setState(state);
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
             if (savedQiscusComment.getState() < qiscusComment.getState()) {
-                qiscusComment.setState(QiscusComment.STATE_FAILED);
+                qiscusComment.setState(state);
                 Qiscus.getDataStore().addOrUpdate(qiscusComment);
             } else {
                 qiscusComment.setState(savedQiscusComment.getState());
             }
         } else {
-            qiscusComment.setState(QiscusComment.STATE_FAILED);
+            qiscusComment.setState(state);
             Qiscus.getDataStore().addOrUpdate(qiscusComment);
         }
     }
@@ -136,7 +143,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         QiscusApi.getInstance().postComment(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
                 .doOnNext(this::commentSuccess)
-                .doOnError(throwable -> commentFail(qiscusComment))
+                .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
@@ -220,7 +227,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 })
                 .doOnError(throwable -> {
                     qiscusComment.setDownloading(false);
-                    commentFail(qiscusComment);
+                    commentFail(throwable, qiscusComment);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -255,7 +262,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     })
                     .doOnError(throwable -> {
                         qiscusComment.setDownloading(false);
-                        commentFail(qiscusComment);
+                        commentFail(throwable, qiscusComment);
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -286,7 +293,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     })
                     .doOnError(throwable -> {
                         qiscusComment.setDownloading(false);
-                        commentFail(qiscusComment);
+                        commentFail(throwable, qiscusComment);
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -415,9 +422,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void updateCommentState(QiscusComment qiscusComment, boolean fromLocal) {
         if (fromLocal && qiscusComment.getState() == QiscusComment.STATE_SENDING) {
-            qiscusComment.setState(QiscusComment.STATE_FAILED);
+            qiscusComment.setState(QiscusComment.STATE_PENDING);
             Qiscus.getDataStore().addOrUpdate(qiscusComment);
         } else if (qiscusComment.getState() != QiscusComment.STATE_FAILED
+                && qiscusComment.getState() != QiscusComment.STATE_PENDING
                 && qiscusComment.getState() != QiscusComment.STATE_SENDING
                 && qiscusComment.getState() != QiscusComment.STATE_READ) {
             if (qiscusComment.getId() > lastDeliveredCommentId.get()) {

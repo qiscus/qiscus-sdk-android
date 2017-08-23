@@ -235,15 +235,20 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
 
     protected void showTime(QiscusComment qiscusComment) {
         if (timeView != null) {
-            timeView.setText(Qiscus.getChatConfig().getTimeFormat().format(qiscusComment.getTime()));
-            timeView.setTextColor(messageFromMe ? rightBubbleTimeColor : leftBubbleTimeColor);
+            if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+                timeView.setText(R.string.qiscus_sending_failed);
+                timeView.setTextColor(failedToSendMessageColor);
+            } else {
+                timeView.setText(Qiscus.getChatConfig().getTimeFormat().format(qiscusComment.getTime()));
+                timeView.setTextColor(messageFromMe ? rightBubbleTimeColor : leftBubbleTimeColor);
+            }
         }
     }
 
     protected void showIconReadOrNot(QiscusComment qiscusComment) {
         if (messageStateIndicatorView != null) {
             switch (qiscusComment.getState()) {
-                case QiscusComment.STATE_FAILED:
+                case QiscusComment.STATE_PENDING:
                 case QiscusComment.STATE_SENDING:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_info_time);
@@ -259,6 +264,10 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
                 case QiscusComment.STATE_READ:
                     messageStateIndicatorView.setColorFilter(readIconColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_read);
+                    break;
+                case QiscusComment.STATE_FAILED:
+                    messageStateIndicatorView.setColorFilter(failedToSendMessageColor);
+                    messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending_failed);
                     break;
             }
         }

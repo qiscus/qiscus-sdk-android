@@ -65,7 +65,7 @@ public interface QiscusCommentStore {
 
     QiscusComment getLatestReadComment(int topicId);
 
-    List<QiscusComment> getFailedComments();
+    List<QiscusComment> getPendingComments();
 
-    Observable<List<QiscusComment>> getObservableFailedComments();
+    Observable<List<QiscusComment>> getObservablePendingComments();
 }

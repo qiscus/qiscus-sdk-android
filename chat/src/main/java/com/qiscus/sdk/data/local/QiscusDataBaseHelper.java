@@ -733,10 +733,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getFailedComments() {
+    public List<QiscusComment> getPendingComments() {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_FAILED + " "
+                + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_PENDING + " "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " ASC";
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
@@ -754,9 +754,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableFailedComments() {
+    public Observable<List<QiscusComment>> getObservablePendingComments() {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getFailedComments());
+            subscriber.onNext(getPendingComments());
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }
