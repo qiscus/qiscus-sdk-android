@@ -1177,7 +1177,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void showComments(List<QiscusComment> qiscusComments) {
         if (!qiscusComments.isEmpty()) {
-            chatAdapter.refreshWithData(qiscusComments);
+            chatAdapter.addOrUpdate(qiscusComments);
         }
         if (chatAdapter.isEmpty() && qiscusComments.isEmpty()) {
             if (emptyChatHolder != null) {

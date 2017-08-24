@@ -143,8 +143,18 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected abstract int getItemViewTypeOthersMessage(E qiscusComment, int position);
 
     protected int compare(E lhs, E rhs) {
-        return lhs.getId() != -1 && rhs.getId() != -1 ?
-                QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime());
+        if (rhs.equals(lhs)) {//Same comments
+            return 0;
+        } else if (rhs.getId() == -1 && lhs.getId() == -1) {//Not completed comments
+            return rhs.getTime().compareTo(lhs.getTime());
+        } else if (rhs.getId() != -1 && rhs.getId() != -1) {//Completed comments
+            return QiscusAndroidUtil.compare(rhs.getId(), lhs.getId());
+        } else if (rhs.getId() == -1) {
+            return 1;
+        } else if (lhs.getId() == -1) {
+            return -1;
+        }
+        return rhs.getTime().compareTo(lhs.getTime());
     }
 
     protected View getView(ViewGroup parent, int viewType) {
@@ -270,14 +280,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     }
 
     public void refreshWithData(List<E> es) {
-        int size = data.size();
-        for (int i = 0; i < size; i++) {
-            if (i >= 0 && i < data.size() && data.get(i).getState() != QiscusComment.STATE_SENDING) {
-                data.removeItemAt(i);
-                size = data.size();
-                i--;
-            }
-        }
+        data.clear();
         data.addAll(es);
         notifyDataSetChanged();
     }

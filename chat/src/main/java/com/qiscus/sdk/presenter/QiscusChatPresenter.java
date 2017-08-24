@@ -338,14 +338,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         }
                     });
                 })
-                .flatMap(roomData -> getLocalComments(20, false).map(comments -> {
-                    for (QiscusComment comment : comments) {
-                        if (comment.getState() != QiscusComment.STATE_SENDING && !roomData.second.contains(comment)) {
-                            roomData.second.add(comment);
-                        }
-                    }
-                    return roomData;
-                }))
                 .doOnNext(roomData -> {
                     updateRoomState(roomData.first.getMember());
                     checkForLastRead(roomData.second);
@@ -359,12 +351,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     }
                     roomData.first.setSubtitle(room.getSubtitle());
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
-                })
-                .map(roomData -> {
-                    if (roomData.second.size() > 20) {
-                        return Pair.create(roomData.first, roomData.second.subList(0, 20));
-                    }
-                    return roomData;
                 })
                 .doOnNext(roomData -> QiscusAndroidUtil.runOnUIThread(() -> {
                     if (view != null) {
