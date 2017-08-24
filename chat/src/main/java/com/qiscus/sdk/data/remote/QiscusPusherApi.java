@@ -33,6 +33,7 @@ import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -294,7 +295,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
-                }, Throwable::printStackTrace);
+                }, QiscusErrorLogger::print);
     }
 
     public void setUserDelivery(int roomId, int topicId, int commentId, String commentUniqueId) {
@@ -302,7 +303,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
-                }, Throwable::printStackTrace);
+                }, QiscusErrorLogger::print);
     }
 
     private void checkAndConnect() {

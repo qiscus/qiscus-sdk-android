@@ -35,6 +35,7 @@ import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 
@@ -152,6 +153,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.onSuccessSendComment(commentSend);
                     }
                 }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (qiscusComment.getTopicId() == currentTopicId) {
                         view.onFailedSendComment(qiscusComment);
@@ -237,6 +239,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.onSuccessSendComment(commentSend);
                     }
                 }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (qiscusComment.getTopicId() == currentTopicId) {
                         view.onFailedSendComment(qiscusComment);
@@ -272,6 +275,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             view.onSuccessSendComment(commentSend);
                         }
                     }, throwable -> {
+                        QiscusErrorLogger.print(throwable);
                         throwable.printStackTrace();
                         if (qiscusComment.getTopicId() == currentTopicId) {
                             view.onFailedSendComment(qiscusComment);
@@ -303,6 +307,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             view.onSuccessSendComment(commentSend);
                         }
                     }, throwable -> {
+                        QiscusErrorLogger.print(throwable);
                         throwable.printStackTrace();
                         if (qiscusComment.getTopicId() == currentTopicId) {
                             view.onFailedSendComment(qiscusComment);
@@ -324,6 +329,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     }
                 }))
                 .doOnError(throwable -> {
+                    QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     QiscusAndroidUtil.runOnUIThread(() -> {
                         if (view != null) {
@@ -451,6 +457,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.initRoomData(roomData.first, roomData.second);
                     }
                 }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
                         view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
@@ -540,6 +547,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         view.dismissLoading();
                     }
                 }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
                         view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
@@ -751,6 +759,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             view.onFileDownloaded(file1, MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension()));
                         }
                     }, throwable -> {
+                        QiscusErrorLogger.print(throwable);
                         throwable.printStackTrace();
                         qiscusComment.setDownloading(false);
                         view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_download_file));

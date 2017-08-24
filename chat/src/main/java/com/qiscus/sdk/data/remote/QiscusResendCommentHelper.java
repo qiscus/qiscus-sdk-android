@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.remote;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -46,9 +47,7 @@ final class QiscusResendCommentHelper {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
 
-                }, throwable -> {
-                    //Do nothing
-                });
+                }, QiscusErrorLogger::print);
     }
 
     private static void resendComment(QiscusComment qiscusComment) {
@@ -66,9 +65,7 @@ final class QiscusResendCommentHelper {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
 
-                }, throwable -> {
-                    //Do nothing
-                });
+                }, QiscusErrorLogger::print);
     }
 
     private static void resendFile(QiscusComment qiscusComment) {
@@ -93,9 +90,7 @@ final class QiscusResendCommentHelper {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(commentSend -> {
-                    }, throwable -> {
-                        //Do nothing
-                    });
+                    }, QiscusErrorLogger::print);
         } else {
             qiscusComment.setProgress(0);
             QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
@@ -118,9 +113,7 @@ final class QiscusResendCommentHelper {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(commentSend -> {
 
-                    }, throwable -> {
-                        //Do nothing
-                    });
+                    }, QiscusErrorLogger::print);
         }
     }
 
