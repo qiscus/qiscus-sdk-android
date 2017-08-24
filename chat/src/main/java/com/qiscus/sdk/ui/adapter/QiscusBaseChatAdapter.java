@@ -32,6 +32,7 @@ import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -147,7 +148,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             return 0;
         } else if (rhs.getId() == -1 && lhs.getId() == -1) { //Not completed comments
             return rhs.getTime().compareTo(lhs.getTime());
-        } else if (rhs.getId() != -1 && rhs.getId() != -1) { //Completed comments
+        } else if (rhs.getId() != -1 && lhs.getId() != -1) { //Completed comments
             return QiscusAndroidUtil.compare(rhs.getId(), lhs.getId());
         } else if (rhs.getId() == -1) {
             return 1;
@@ -277,6 +278,45 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             }
         }
         notifyDataSetChanged();
+    }
+
+    public void mergeLocalAndRemoteData(List<E> es) {
+        if (es == null || es.isEmpty()) {
+            return;
+        }
+        if (data.size() == 0) {
+            addOrUpdate(es);
+            return;
+        }
+
+        Date minDate = es.get(0).getTime();
+        Date maxDate = es.get(0).getTime();
+        for (E e : es) {
+            if (minDate.compareTo(e.getTime()) < 0) {
+                minDate = e.getTime();
+            }
+
+            if (maxDate.compareTo(e.getTime()) > 0) {
+                maxDate = e.getTime();
+            }
+        }
+        List<E> keep = new ArrayList<>();
+        for (int i = 0; i < data.size(); i++) {
+            //Keep not complete comment but in still range of remote comment
+            if (data.get(i).getId() == -1 && data.get(i).getTime().compareTo(minDate) >= 0) {
+                keep.add(data.get(i));
+            }
+
+            //Keep all comment with date more than latest comment
+            if (data.get(i).getTime().compareTo(maxDate) >= 0) {
+                keep.add(data.get(i));
+            }
+        }
+        //Clear old comments
+        data.clear();
+        //Add all new comments to keep
+        keep.addAll(es);
+        addOrUpdate(keep);
     }
 
     public void refreshWithData(List<E> es) {
