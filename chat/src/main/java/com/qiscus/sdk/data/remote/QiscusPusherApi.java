@@ -400,9 +400,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public void connectComplete(boolean reconnect, String serverUri) {
         Log.i(TAG, "Connected...");
         EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
-        if (Qiscus.isOnForeground()) {
-            QiscusResendCommentHelper.tryResendFailedComment();
-        }
         try {
             connecting = false;
             reconnectCounter = 0;
