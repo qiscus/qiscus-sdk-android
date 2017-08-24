@@ -17,9 +17,9 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/qiscus_dark_white">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/date"
@@ -32,65 +32,34 @@
         android:textSize="14sp"
         android:visibility="visible"/>
 
-    <ImageView
-        android:id="@+id/bubble"
-        android:layout_width="42dp"
-        android:layout_height="27dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/message"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:scaleType="fitStart"
-        android:src="@drawable/ic_qiscus_arrow_bubble_primary_light"
-        android:tint="@color/qiscus_primary_light"/>
-
-    <org.apmem.tools.layouts.FlowLayout
+    <LinearLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/date"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="4dp"
-        android:layout_marginEnd="19dp"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="19dp"
-        android:layout_marginStart="64dp"
-        android:background="@drawable/qiscus_rounded_primary_light_chat_bg"
-        android:gravity="end"
-        android:orientation="horizontal"
+        android:layout_marginEnd="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/qiscus_rounded_accent_light_chat_bg"
+        android:orientation="vertical"
         android:padding="8dp">
 
-        <TextView
+        <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/contents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:autoLink="web"
+            android:autoLink="all"
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:textColor="@color/qiscus_secondary_text"
-            android:textSize="12sp"/>
-
-        <ImageView
-            android:id="@+id/icon_read"
-            android:layout_width="18dp"
-            android:layout_height="16dp"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp"/>
-    </org.apmem.tools.layouts.FlowLayout>
+            android:textSize="12sp"
+            app:emojiSize="18sp"/>
+    </LinearLayout>
 
     <!-- Add this view because Xiaomi need it -->
     <View

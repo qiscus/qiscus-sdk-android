@@ -867,6 +867,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     addToPhoneContact(qiscusComment.getContact());
                 } else if (qiscusComment.getType() == QiscusComment.Type.LOCATION) {
                     openMap(qiscusComment.getLocation());
+                } else if (qiscusComment.getType() == QiscusComment.Type.CUSTOM) {
+                    onCustomCommentClick(qiscusComment);
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 showFailedCommentDialog(qiscusComment);
@@ -882,8 +884,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     || qiscusComment.getType() == QiscusComment.Type.CONTACT
                     || qiscusComment.getType() == QiscusComment.Type.LOCATION) {
                 toggleSelectComment(qiscusComment);
+            } else if (qiscusComment.getType() == QiscusComment.Type.CUSTOM) {
+                onCustomCommentLongClick(qiscusComment);
             }
         }
+    }
+
+    protected void onCustomCommentLongClick(QiscusComment qiscusComment) {
+
+    }
+
+    protected void onCustomCommentClick(QiscusComment qiscusComment) {
+
     }
 
     protected void openMap(QiscusLocation location) {
@@ -1006,6 +1018,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), true);
             }
         }
+    }
+
+    public void sendQiscusComment(QiscusComment qiscusComment) {
+        qiscusChatPresenter.resendComment(qiscusComment);
     }
 
     public void sendMessage(String message) {
