@@ -23,6 +23,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusImageUtil;
 
 import java.io.File;
@@ -102,6 +103,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                             file1.getAbsolutePath());
                 })
                 .subscribe(file1 -> view.onFileDownloaded(Pair.create(qiscusComment, file1)), throwable -> {
+                    QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     qiscusComment.setDownloading(false);
                     view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_download_file));

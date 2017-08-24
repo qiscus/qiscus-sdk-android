@@ -52,7 +52,8 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusComment implements Parcelable {
-    public static final int STATE_FAILED = 0;
+    public static final int STATE_FAILED = -1;
+    public static final int STATE_PENDING = 0;
     public static final int STATE_SENDING = 1;
     public static final int STATE_ON_QISCUS = 2;
     public static final int STATE_DELIVERED = 3;

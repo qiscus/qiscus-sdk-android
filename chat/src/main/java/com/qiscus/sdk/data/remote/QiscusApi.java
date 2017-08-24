@@ -28,6 +28,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
 
 import org.json.JSONException;
@@ -155,7 +156,7 @@ public enum QiscusApi {
     public Observable<QiscusComment> sync(int lastCommentId) {
         return api.sync(Qiscus.getToken(), lastCommentId)
                 .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
+                    QiscusErrorLogger.print("Sync", throwable);
                     return null;
                 })
                 .filter(jsonElement -> jsonElement != null)
@@ -203,7 +204,7 @@ public enum QiscusApi {
                 subscriber.onNext(Uri.parse(result));
                 subscriber.onCompleted();
             } catch (IOException | JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print("UploadFile", e);
                 subscriber.onError(e);
             }
         }, Emitter.BackpressureMode.BUFFER);

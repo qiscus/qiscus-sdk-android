@@ -30,6 +30,7 @@ import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -105,7 +106,7 @@ public class QiscusPusherService extends Service {
                                     QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
                                     EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
 
-                                }, Throwable::printStackTrace);
+                                }, QiscusErrorLogger::print);
                     }
                 }, 0, period, TimeUnit.MILLISECONDS);
     }

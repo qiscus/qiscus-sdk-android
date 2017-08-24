@@ -30,6 +30,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.QiscusGroupChatActivity;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -169,8 +170,8 @@ public class QiscusChatConfig {
                         context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                                 | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     }, throwable -> {
-                        throwable.printStackTrace();
-                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        QiscusErrorLogger.print("NotificationClick", throwable);
+                        Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
                     });
 
     private ReplyNotificationHandler replyNotificationHandler =
@@ -189,8 +190,8 @@ public class QiscusChatConfig {
                     .subscribe(commentSend -> {
                         QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusComment.getRoomId());
                     }, throwable -> {
-                        throwable.printStackTrace();
-                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        QiscusErrorLogger.print("ReplyNotification", throwable);
+                        Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
                     });
 
     private boolean enablePushNotification = true;

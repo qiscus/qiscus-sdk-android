@@ -248,6 +248,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     protected void showIconReadOrNot(QiscusComment qiscusComment) {
         if (messageStateIndicatorView != null) {
             switch (qiscusComment.getState()) {
+                case QiscusComment.STATE_PENDING:
                 case QiscusComment.STATE_SENDING:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_info_time);

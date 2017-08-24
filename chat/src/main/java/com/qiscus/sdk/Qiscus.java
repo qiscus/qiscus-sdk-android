@@ -38,6 +38,7 @@ import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
@@ -360,7 +361,7 @@ public class Qiscus {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(aVoid -> {
-                    }, Throwable::printStackTrace);
+                    }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
         }
 
         localDataManager.setFcmToken(fcmToken);
