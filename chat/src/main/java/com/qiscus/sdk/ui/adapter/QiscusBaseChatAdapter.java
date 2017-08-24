@@ -143,11 +143,11 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected abstract int getItemViewTypeOthersMessage(E qiscusComment, int position);
 
     protected int compare(E lhs, E rhs) {
-        if (rhs.equals(lhs)) {//Same comments
+        if (rhs.equals(lhs)) { //Same comments
             return 0;
-        } else if (rhs.getId() == -1 && lhs.getId() == -1) {//Not completed comments
+        } else if (rhs.getId() == -1 && lhs.getId() == -1) { //Not completed comments
             return rhs.getTime().compareTo(lhs.getTime());
-        } else if (rhs.getId() != -1 && rhs.getId() != -1) {//Completed comments
+        } else if (rhs.getId() != -1 && rhs.getId() != -1) { //Completed comments
             return QiscusAndroidUtil.compare(rhs.getId(), lhs.getId());
         } else if (rhs.getId() == -1) {
             return 1;
