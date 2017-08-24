@@ -127,11 +127,16 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     @Override
     public int getItemViewType(int position) {
         E qiscusComment = data.get(position);
+        if (qiscusComment.getType() == QiscusComment.Type.CUSTOM) {
+            return getItemViewTypeCustomMessage(qiscusComment, position);
+        }
         if (qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
             return getItemViewTypeMyMessage(qiscusComment, position);
         }
         return getItemViewTypeOthersMessage(qiscusComment, position);
     }
+
+    protected abstract int getItemViewTypeCustomMessage(E qiscusComment, int position);
 
     protected abstract int getItemViewTypeMyMessage(E qiscusComment, int position);
 
@@ -155,32 +160,41 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     public abstract H onCreateViewHolder(ViewGroup parent, int viewType);
 
     @Override
-    public void onBindViewHolder(H h, int position) {
-        h.setGroupChat(groupChat);
+    public void onBindViewHolder(H holder, int position) {
+        holder.setGroupChat(groupChat);
 
-        if (position == getItemCount() - 1) {
-            h.setNeedToShowDate(true);
-        } else {
-            h.setNeedToShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTime(), data.get(position + 1).getTime()));
-        }
+        determineIsNeedToShowDate(holder, position);
+        determineIsCommentFromMe(holder, position);
+        determineIsNeedToShowFirstMessageIndicator(holder, position);
 
-        if (!qiscusAccount.getEmail().equals(data.get(position).getSenderEmail())) {
-            h.setMessageFromMe(false);
-        } else {
-            h.setMessageFromMe(true);
-        }
+        holder.bind(data.get(position));
+    }
 
-        if (h.isNeedToShowDate()) {
-            h.setNeedToShowFirstMessageBubbleIndicator(true);
-        } else if (data.get(position + 1).getType() == QiscusComment.Type.CARD) {
-            h.setNeedToShowFirstMessageBubbleIndicator(true);
+    protected void determineIsNeedToShowFirstMessageIndicator(H holder, int position) {
+        if (holder.isNeedToShowDate() || data.get(position + 1).getType() == QiscusComment.Type.CARD) {
+            holder.setNeedToShowFirstMessageBubbleIndicator(true);
         } else if (data.get(position).getSenderEmail().equals(data.get(position + 1).getSenderEmail())) {
-            h.setNeedToShowFirstMessageBubbleIndicator(false);
+            holder.setNeedToShowFirstMessageBubbleIndicator(false);
         } else {
-            h.setNeedToShowFirstMessageBubbleIndicator(true);
+            holder.setNeedToShowFirstMessageBubbleIndicator(true);
         }
+    }
 
-        h.bind(data.get(position));
+    protected void determineIsNeedToShowDate(H holder, int position) {
+        if (position == getItemCount() - 1) {
+            holder.setNeedToShowDate(true);
+        } else {
+            holder.setNeedToShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTime(),
+                    data.get(position + 1).getTime()));
+        }
+    }
+
+    protected void determineIsCommentFromMe(H holder, int position) {
+        if (!qiscusAccount.getEmail().equals(data.get(position).getSenderEmail())) {
+            holder.setMessageFromMe(false);
+        } else {
+            holder.setMessageFromMe(true);
+        }
     }
 
     @Override
