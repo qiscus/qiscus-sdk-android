@@ -47,6 +47,7 @@
     <string name="qiscus_notif_count">%d new message</string>
     <string name="qiscus_file_type">%s File</string>
     <string name="qiscus_failed_send_message_dialog_title">Message send failed</string>
+    <string name="qiscus_sending_message_dialog_title">Sending message</string>
     <string name="qiscus_resend">Resend</string>
     <string name="qiscus_delete">Delete</string>
     <string name="qiscus_failed_record_audio">Failed to record audio!</string>

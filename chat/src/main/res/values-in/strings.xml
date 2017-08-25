@@ -47,6 +47,7 @@
     <string name="qiscus_notif_count">%d pesan baru</string>
     <string name="qiscus_file_type">Berkas %s</string>
     <string name="qiscus_failed_send_message_dialog_title">Gagal mengirim pesan</string>
+    <string name="qiscus_sending_message_dialog_title">Sedang mengirim pesan</string>
     <string name="qiscus_resend">Kirim ulang</string>
     <string name="qiscus_delete">Hapus</string>
     <string name="qiscus_failed_record_audio">Gagal merekam suara!</string>

@@ -885,6 +885,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 }
             } else if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
                 showFailedCommentDialog(qiscusComment);
+            } else if (qiscusComment.getState() == QiscusComment.STATE_SENDING
+                    || qiscusComment.getState() == QiscusComment.STATE_PENDING) {
+                showPendingCommentDialog(qiscusComment);
             }
         } else {
             if (qiscusComment.getType() == QiscusComment.Type.TEXT
@@ -961,6 +964,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         } catch (JSONException e) {
             Log.e("Qiscus", e.getMessage());
         }
+    }
+
+    protected void showPendingCommentDialog(QiscusComment qiscusComment) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.qiscus_sending_message_dialog_title)
+                .setItems(new CharSequence[]{getString(R.string.qiscus_delete)},
+                        (dialog, which) -> qiscusChatPresenter.deleteComment(qiscusComment))
+                .setCancelable(true)
+                .create()
+                .show();
     }
 
     protected void showFailedCommentDialog(QiscusComment qiscusComment) {
