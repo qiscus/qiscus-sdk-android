@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -121,6 +122,13 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
         } catch (JSONException | NullPointerException e) {
             e.printStackTrace();
             cardView.setVisibility(View.GONE);
+        }
+
+        if (TextUtils.isEmpty(qiscusComment.getMessage().trim())) {
+            messageBubbleView.setVisibility(View.GONE);
+            if (firstMessageBubbleIndicatorView != null) {
+                firstMessageBubbleIndicatorView.setVisibility(View.GONE);
+            }
         }
     }
 
