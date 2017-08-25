@@ -139,6 +139,10 @@ public final class QiscusFileUtil {
 
     public static File saveFile(File file, int topicId) {
         String path = generateFilePath(Uri.fromFile(file), topicId);
+        File outputFile = new File(path);
+        if (outputFile.exists()) {
+            path = QiscusFileUtil.addTimeStampToFileName(path);
+        }
         File newFile = new File(path);
         try {
             FileInputStream in = new FileInputStream(file);
