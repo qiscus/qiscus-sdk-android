@@ -520,7 +520,8 @@ public class QiscusComment implements Parcelable {
         if (contact == null && getType() == Type.CONTACT) {
             try {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(this);
-                contact = new QiscusContact(payload.optString("name"), payload.optString("value"));
+                contact = new QiscusContact(payload.optString("name"), payload.optString("value"),
+                        payload.optString("type", "phone"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

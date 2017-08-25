@@ -28,15 +28,18 @@ import android.os.Parcelable;
 public class QiscusContact implements Parcelable {
     private String name;
     private String value;
+    private String type;
 
-    public QiscusContact(String name, String value) {
+    public QiscusContact(String name, String value, String type) {
         this.name = name;
         this.value = value;
+        this.type = type;
     }
 
     protected QiscusContact(Parcel in) {
         name = in.readString();
         value = in.readString();
+        type = in.readString();
     }
 
     public static final Creator<QiscusContact> CREATOR = new Creator<QiscusContact>() {
@@ -67,11 +70,20 @@ public class QiscusContact implements Parcelable {
         this.value = value;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "QiscusContact{" +
                 "name='" + name + '\'' +
                 ", value='" + value + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 
@@ -84,5 +96,6 @@ public class QiscusContact implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeString(value);
+        dest.writeString(type);
     }
 }

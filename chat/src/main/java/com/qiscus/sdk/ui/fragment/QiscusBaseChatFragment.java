@@ -904,13 +904,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void addToPhoneContact(QiscusContact contact) {
+        String type = ContactsContract.Intents.Insert.PHONE;
+        if ("email".equals(contact.getType())) {
+            type = ContactsContract.Intents.Insert.EMAIL;
+        }
+        String finalType = type;
         AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.qiscus_add_contact_confirmation)
                 .setPositiveButton(R.string.qiscus_new_contact, (dialog, which) -> {
                     Intent intent = new Intent(Intent.ACTION_INSERT);
                     intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
                     intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.getName());
-                    intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getValue());
+                    intent.putExtra(finalType, contact.getValue());
                     startActivity(intent);
                     dialog.dismiss();
                 })
@@ -918,7 +923,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     Intent intent = new Intent(Intent.ACTION_INSERT_OR_EDIT);
                     intent.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
                     intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.getName());
-                    intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getValue());
+                    intent.putExtra(finalType, contact.getValue());
                     startActivity(intent);
                     dialog.dismiss();
                 })
@@ -1469,7 +1474,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 String name = cursor.getString(nameIndex);
                 String number = cursor.getString(numberIndex);
-                sendContact(new QiscusContact(name, number));
+                sendContact(new QiscusContact(name, number, "phone"));
             }
 
             if (cursor != null) {
