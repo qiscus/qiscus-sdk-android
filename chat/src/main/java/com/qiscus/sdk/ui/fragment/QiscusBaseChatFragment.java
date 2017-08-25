@@ -212,6 +212,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private Runnable commentHighlightTask;
 
+    private boolean typing;
+    private Runnable stopTypingNotifyTask;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -283,11 +286,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 onMessageEditTextChanged(s);
+                if (!typing) {
+                    typing = true;
+                    notifyServerTyping(true);
+                }
+                QiscusAndroidUtil.cancelRunOnUIThread(stopTypingNotifyTask);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                QiscusAndroidUtil.runOnUIThread(stopTypingNotifyTask, 800);
             }
         });
 
@@ -537,6 +545,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         setupGifKeyboard();
         setupEmojiPopup();
+
+        stopTypingNotifyTask = () -> {
+            typing = false;
+            notifyServerTyping(false);
+        };
 
         qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
         if (savedInstanceState == null) {
@@ -1013,16 +1026,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 fieldMessageEmpty = true;
                 sendButton.startAnimation(animation);
                 sendButton.setImageResource(chatConfig.getShowAttachmentPanelIcon());
-                QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
             }
         } else {
             if (fieldMessageEmpty) {
                 fieldMessageEmpty = false;
                 sendButton.startAnimation(animation);
                 sendButton.setImageResource(chatConfig.getSendButtonIcon());
-                QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), true);
             }
         }
+    }
+
+    private void notifyServerTyping(boolean typing) {
+        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), typing);
     }
 
     public void sendQiscusComment(QiscusComment qiscusComment) {
