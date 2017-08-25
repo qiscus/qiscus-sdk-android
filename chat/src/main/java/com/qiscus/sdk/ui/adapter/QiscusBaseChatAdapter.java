@@ -312,6 +312,20 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
                 keep.add(data.get(i));
             }
         }
+
+        if (es.size() < 20) {
+            int need = 20 - es.size();
+            int size = data.size();
+            for (int i = size - 1; i >= 0; i--) {
+                if (!es.contains(data.get(i))) {
+                    es.add(data.get(i));
+                    need--;
+                }
+                if (need <= 0) {
+                    break;
+                }
+            }
+        }
         //Clear old comments
         data.clear();
         //Add all new comments to keep
