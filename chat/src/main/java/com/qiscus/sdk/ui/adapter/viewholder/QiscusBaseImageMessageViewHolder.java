@@ -108,9 +108,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
 
     protected void setUpDownloadIcon(QiscusComment qiscusComment) {
         if (downloadIconView != null) {
-            if (qiscusComment.getState() == QiscusComment.STATE_FAILED
-                    || qiscusComment.getState() == QiscusComment.STATE_SENDING
-                    || qiscusComment.getState() == QiscusComment.STATE_PENDING) {
+            if (qiscusComment.getState() <= QiscusComment.STATE_SENDING) {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_upload_big);
             } else {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_download_big);
@@ -163,7 +161,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     protected void showMyImage(final QiscusComment qiscusComment) {
-        if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
+        if (qiscusComment.getState() <= QiscusComment.STATE_SENDING) {
             if (imageHolderLayout != null) {
                 imageHolderLayout.setVisibility(View.INVISIBLE);
             }

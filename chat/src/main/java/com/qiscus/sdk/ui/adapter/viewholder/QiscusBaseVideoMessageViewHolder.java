@@ -44,7 +44,7 @@ public abstract class QiscusBaseVideoMessageViewHolder extends QiscusBaseImageMe
 
     @Override
     protected void showMyImage(final QiscusComment qiscusComment) {
-        if (qiscusComment.getState() == QiscusComment.STATE_SENDING) {
+        if (qiscusComment.getState() <= QiscusComment.STATE_SENDING) {
             if (imageHolderLayout != null) {
                 imageHolderLayout.setVisibility(View.INVISIBLE);
             }
