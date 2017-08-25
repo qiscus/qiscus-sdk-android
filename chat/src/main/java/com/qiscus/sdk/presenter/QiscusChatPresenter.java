@@ -33,6 +33,7 @@ import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -212,6 +213,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             compressedFile = QiscusFileUtil.saveFile(compressedFile, currentTopicId);
         }
 
+        if (!file.exists()) { //File have been removed, so we can not upload it anymore
+            view.showError(QiscusAndroidUtil.getString(R.string.qiscus_corrupted_file));
+            return;
+        }
+
         QiscusComment qiscusComment = QiscusComment.generateMessage(String.format("[file] %s [/file]", compressedFile.getPath()),
                 room.getId(), currentTopicId);
         qiscusComment.setDownloading(true);
@@ -252,71 +258,45 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void resendFile(QiscusComment qiscusComment) {
         File file = new File(qiscusComment.getAttachmentUri().toString());
-        qiscusComment.setDownloading(true);
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
-        qiscusComment.setTime(new Date());
-        view.onNewComment(qiscusComment);
-        if (!file.exists()) { //Not exist because the uri is not local
-            qiscusComment.setProgress(100);
-            QiscusApi.getInstance().postComment(qiscusComment)
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                    .doOnNext(commentSend -> {
-                        Qiscus.getDataStore()
-                                .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
-                        qiscusComment.setDownloading(false);
-                        commentSuccess(commentSend);
-                    })
-                    .doOnError(throwable -> {
-                        qiscusComment.setDownloading(false);
-                        commentFail(throwable, qiscusComment);
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .compose(bindToLifecycle())
-                    .subscribe(commentSend -> {
-                        if (commentSend.getTopicId() == currentTopicId) {
-                            view.onSuccessSendComment(commentSend);
-                        }
-                    }, throwable -> {
-                        QiscusErrorLogger.print(throwable);
-                        throwable.printStackTrace();
-                        if (qiscusComment.getTopicId() == currentTopicId) {
-                            view.onFailedSendComment(qiscusComment);
-                        }
-                    });
-        } else {
-            qiscusComment.setProgress(0);
-            QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                    .flatMap(uri -> {
-                        qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
-                        return QiscusApi.getInstance().postComment(qiscusComment);
-                    })
-                    .doOnNext(commentSend -> {
-                        Qiscus.getDataStore()
-                                .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
-                        qiscusComment.setDownloading(false);
-                        commentSuccess(commentSend);
-                    })
-                    .doOnError(throwable -> {
-                        qiscusComment.setDownloading(false);
-                        commentFail(throwable, qiscusComment);
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .compose(bindToLifecycle())
-                    .subscribe(commentSend -> {
-                        if (commentSend.getTopicId() == currentTopicId) {
-                            view.onSuccessSendComment(commentSend);
-                        }
-                    }, throwable -> {
-                        QiscusErrorLogger.print(throwable);
-                        throwable.printStackTrace();
-                        if (qiscusComment.getTopicId() == currentTopicId) {
-                            view.onFailedSendComment(qiscusComment);
-                        }
-                    });
+        if (!file.exists()) { //File have been removed, so we can not upload it anymore
+            qiscusComment.setDownloading(false);
+            qiscusComment.setState(QiscusComment.STATE_FAILED);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+            view.onFailedSendComment(qiscusComment);
+            return;
         }
+
+        qiscusComment.setProgress(0);
+        QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                .flatMap(uri -> {
+                    qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
+                    return QiscusApi.getInstance().postComment(qiscusComment);
+                })
+                .doOnNext(commentSend -> {
+                    Qiscus.getDataStore()
+                            .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
+                    qiscusComment.setDownloading(false);
+                    commentSuccess(commentSend);
+                })
+                .doOnError(throwable -> {
+                    qiscusComment.setDownloading(false);
+                    commentFail(throwable, qiscusComment);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
     }
 
     public void deleteComment(QiscusComment qiscusComment) {
@@ -664,6 +644,17 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
                     view.updateLastDeliveredComment(lastDeliveredCommentId.get());
+                }
+            });
+        }
+    }
+
+    @Subscribe
+    public void handleRetryCommentEvent(QiscusCommentResendEvent event) {
+        if (event.getQiscusComment().getTopicId() == currentTopicId) {
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.onNewComment(event.getQiscusComment());
                 }
             });
         }

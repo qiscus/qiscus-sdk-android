@@ -18,7 +18,7 @@ package com.qiscus.sdk.data.remote;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -71,51 +71,38 @@ final class QiscusResendCommentHelper {
 
     private static void resendFile(QiscusComment qiscusComment) {
         File file = new File(qiscusComment.getAttachmentUri().toString());
+        if (!file.exists()) { //File have been removed, so we can not upload it anymore
+            qiscusComment.setDownloading(false);
+            qiscusComment.setState(QiscusComment.STATE_FAILED);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+            EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+            return;
+        }
+
         qiscusComment.setDownloading(true);
         qiscusComment.setState(QiscusComment.STATE_SENDING);
-        EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-        if (!file.exists()) { //Not exist because the uri is not local
-            qiscusComment.setProgress(100);
-            QiscusApi.getInstance().postComment(qiscusComment)
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                    .doOnNext(commentSend -> {
-                        Qiscus.getDataStore()
-                                .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
-                        qiscusComment.setDownloading(false);
-                        commentSuccess(commentSend);
-                    })
-                    .doOnError(throwable -> {
-                        qiscusComment.setDownloading(false);
-                        commentFail(throwable, qiscusComment);
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(commentSend -> {
-                    }, QiscusErrorLogger::print);
-        } else {
-            qiscusComment.setProgress(0);
-            QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                    .flatMap(uri -> {
-                        qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
-                        return QiscusApi.getInstance().postComment(qiscusComment);
-                    })
-                    .doOnNext(commentSend -> {
-                        Qiscus.getDataStore()
-                                .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
-                        qiscusComment.setDownloading(false);
-                        commentSuccess(commentSend);
-                    })
-                    .doOnError(throwable -> {
-                        qiscusComment.setDownloading(false);
-                        commentFail(throwable, qiscusComment);
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(commentSend -> {
+        qiscusComment.setProgress(0);
+        QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                .flatMap(uri -> {
+                    qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
+                    return QiscusApi.getInstance().postComment(qiscusComment);
+                })
+                .doOnNext(commentSend -> {
+                    Qiscus.getDataStore()
+                            .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
+                    qiscusComment.setDownloading(false);
+                    commentSuccess(commentSend);
+                })
+                .doOnError(throwable -> {
+                    qiscusComment.setDownloading(false);
+                    commentFail(throwable, qiscusComment);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(commentSend -> {
 
-                    }, QiscusErrorLogger::print);
-        }
+                }, QiscusErrorLogger::print);
     }
 
     private static void commentSuccess(QiscusComment qiscusComment) {
