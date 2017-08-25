@@ -45,7 +45,7 @@ public final class QiscusErrorLogger {
             try {
                 ResponseBody responseBody = e.response().errorBody();
                 if (responseBody != null) {
-                    return responseBody.string();
+                    return e.code() + ": " + responseBody.string();
                 }
             } catch (IOException e1) {
                 return e1.getMessage();
