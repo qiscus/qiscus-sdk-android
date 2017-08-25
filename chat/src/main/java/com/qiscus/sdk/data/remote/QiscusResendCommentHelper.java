@@ -38,7 +38,8 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  */
 final class QiscusResendCommentHelper {
-    static void tryResendFailedComment() {
+
+    static void tryResendPendingComment() {
         Qiscus.getDataStore()
                 .getObservablePendingComments()
                 .flatMap(Observable::from)

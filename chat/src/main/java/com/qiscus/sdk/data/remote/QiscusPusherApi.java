@@ -500,15 +500,19 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private void scheduleUserStatus() {
         scheduledUserStatus = Qiscus.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
-                    if (Qiscus.hasSetupUser() && isConnected()) {
+                    if (Qiscus.hasSetupUser()) {
                         if (Qiscus.isOnForeground()) {
-                            setOfflineCounter = 0;
-                            setUserStatus(true);
-                            QiscusResendCommentHelper.tryResendFailedComment();
-                        } else {
-                            if (setOfflineCounter <= 2) {
-                                setUserStatus(false);
-                                setOfflineCounter++;
+                            QiscusResendCommentHelper.tryResendPendingComment();
+                        }
+                        if (isConnected()) {
+                            if (Qiscus.isOnForeground()) {
+                                setOfflineCounter = 0;
+                                setUserStatus(true);
+                            } else {
+                                if (setOfflineCounter <= 2) {
+                                    setUserStatus(false);
+                                    setOfflineCounter++;
+                                }
                             }
                         }
                     } else {
