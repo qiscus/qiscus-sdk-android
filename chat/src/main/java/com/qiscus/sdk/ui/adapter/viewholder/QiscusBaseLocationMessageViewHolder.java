@@ -58,6 +58,13 @@ public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMess
     public abstract TextView getLocationAddressView(View itemView);
 
     @Override
+    protected void setUpColor() {
+        super.setUpColor();
+        locationNameView.setTextColor(messageFromMe ? rightBubbleTextColor : leftBubbleTextColor);
+        locationAddressView.setTextColor(messageFromMe ? rightBubbleTextColor : leftBubbleTextColor);
+    }
+
+    @Override
     protected void showMessage(QiscusComment qiscusComment) {
         Nirmana.getInstance().get()
                 .load(qiscusComment.getLocation().getThumbnailUrl())
