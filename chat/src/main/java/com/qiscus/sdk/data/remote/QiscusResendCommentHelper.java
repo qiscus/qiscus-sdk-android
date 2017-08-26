@@ -73,7 +73,7 @@ final class QiscusResendCommentHelper {
     }
 
     private static void resendFile(QiscusComment qiscusComment) {
-        if (QiscusAndroidUtil.isUrl(qiscusComment.getAttachmentUri().toString())) {//We forward file message
+        if (QiscusAndroidUtil.isUrl(qiscusComment.getAttachmentUri().toString())) { //We forward file message
             forwardFile(qiscusComment);
             return;
         }
