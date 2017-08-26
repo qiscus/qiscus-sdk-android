@@ -18,13 +18,14 @@ package com.qiscus.sdk.data.remote;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.util.Date;
 
 import retrofit2.HttpException;
 import rx.Observable;
@@ -47,29 +48,36 @@ final class QiscusResendCommentHelper {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
-
                 }, QiscusErrorLogger::print);
     }
 
     private static void resendComment(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
             return;
         }
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
-        qiscusComment.setTime(new Date());
+
+        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+
         QiscusApi.getInstance().postComment(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
                 .doOnNext(QiscusResendCommentHelper::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(commentSend -> {
-
-                }, QiscusErrorLogger::print);
+                .subscribe(commentSend ->
+                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
+                        QiscusErrorLogger::print);
     }
 
     private static void resendFile(QiscusComment qiscusComment) {
+        if (QiscusAndroidUtil.isUrl(qiscusComment.getAttachmentUri().toString())) {//We forward file message
+            forwardFile(qiscusComment);
+            return;
+        }
+
         File file = new File(qiscusComment.getAttachmentUri().toString());
         if (!file.exists()) { //File have been removed, so we can not upload it anymore
             qiscusComment.setDownloading(false);
@@ -80,8 +88,9 @@ final class QiscusResendCommentHelper {
         }
 
         qiscusComment.setDownloading(true);
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
         qiscusComment.setProgress(0);
+        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+
         QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
@@ -94,15 +103,31 @@ final class QiscusResendCommentHelper {
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
                 })
-                .doOnError(throwable -> {
-                    qiscusComment.setDownloading(false);
-                    commentFail(throwable, qiscusComment);
-                })
+                .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(commentSend -> {
+                .subscribe(commentSend ->
+                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
+                        QiscusErrorLogger::print);
+    }
 
-                }, QiscusErrorLogger::print);
+    private static void forwardFile(QiscusComment qiscusComment) {
+        qiscusComment.setDownloading(true);
+        qiscusComment.setProgress(100);
+        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+
+        QiscusApi.getInstance().postComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                .doOnNext(commentSend -> {
+                    qiscusComment.setDownloading(false);
+                    commentSuccess(commentSend);
+                })
+                .doOnError(throwable -> commentFail(throwable, qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(commentSend ->
+                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
+                        QiscusErrorLogger::print);
     }
 
     private static void commentSuccess(QiscusComment qiscusComment) {
@@ -120,6 +145,7 @@ final class QiscusResendCommentHelper {
             //Means something wrong with server, e.g user is not member of these room anymore
             HttpException httpException = (HttpException) throwable;
             if (httpException.code() >= 400 && httpException.code() < 500) {
+                qiscusComment.setDownloading(false);
                 state = QiscusComment.STATE_FAILED;
             }
         }

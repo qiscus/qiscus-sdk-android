@@ -124,6 +124,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             //Means something wrong with server, e.g user is not member of these room anymore
             HttpException httpException = (HttpException) throwable;
             if (httpException.code() >= 400 && httpException.code() < 500) {
+                qiscusComment.setDownloading(false);
                 state = QiscusComment.STATE_FAILED;
             }
         }
@@ -191,11 +192,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void resendComment(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        qiscusComment.setTime(new Date());
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
         } else {
-            qiscusComment.setState(QiscusComment.STATE_SENDING);
-            qiscusComment.setTime(new Date());
             sendComment(qiscusComment);
         }
     }
@@ -236,10 +237,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
                 })
-                .doOnError(throwable -> {
-                    qiscusComment.setDownloading(false);
-                    commentFail(throwable, qiscusComment);
-                })
+                .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
@@ -257,6 +255,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void resendFile(QiscusComment qiscusComment) {
+        if (QiscusAndroidUtil.isUrl(qiscusComment.getAttachmentUri().toString())) {//We forward file message
+            forwardFile(qiscusComment);
+            return;
+        }
+
         File file = new File(qiscusComment.getAttachmentUri().toString());
         if (!file.exists()) { //File have been removed, so we can not upload it anymore
             qiscusComment.setDownloading(false);
@@ -276,6 +279,31 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .doOnNext(commentSend -> {
                     Qiscus.getDataStore()
                             .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
+                    qiscusComment.setDownloading(false);
+                    commentSuccess(commentSend);
+                })
+                .doOnError(throwable -> commentFail(throwable, qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getTopicId() == currentTopicId) {
+                        view.onSuccessSendComment(commentSend);
+                    }
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    throwable.printStackTrace();
+                    if (qiscusComment.getTopicId() == currentTopicId) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                });
+    }
+
+    private void forwardFile(QiscusComment qiscusComment) {
+        qiscusComment.setProgress(100);
+        QiscusApi.getInstance().postComment(qiscusComment)
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                .doOnNext(commentSend -> {
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
                 })
@@ -654,7 +682,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (event.getQiscusComment().getTopicId() == currentTopicId) {
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
-                    view.onNewComment(event.getQiscusComment());
+                    view.refreshComment(event.getQiscusComment());
                 }
             });
         }
