@@ -35,8 +35,7 @@
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="120dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_qiscus_avatar"/>
+            android:scaleType="centerCrop"/>
 
         <TextView
             android:id="@+id/title"
