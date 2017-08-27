@@ -19,7 +19,6 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,18 +42,6 @@ public class QiscusImageViewHolder extends QiscusBaseImageMessageViewHolder {
     @Override
     protected ImageView getThumbnailView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.thumbnail);
-    }
-
-    @Nullable
-    @Override
-    protected ViewGroup getImageHolderLayout(View itemView) {
-        return (ViewGroup) itemView.findViewById(R.id.holder);
-    }
-
-    @Nullable
-    @Override
-    protected ImageView getBlurryImageView(View view) {
-        return (ImageView) itemView.findViewById(R.id.blurry_thumbnail);
     }
 
     @Nullable

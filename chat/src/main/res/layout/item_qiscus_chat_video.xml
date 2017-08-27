@@ -38,8 +38,7 @@
         android:layout_height="38dp"
         android:layout_alignTop="@+id/message"
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:visibility="gone"/>
+        android:layout_marginStart="8dp"/>
 
     <TextView
         android:id="@+id/name"
@@ -88,86 +87,70 @@
 
         <ImageView
             android:id="@+id/thumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/holder"
-            android:layout_alignEnd="@+id/holder"
-            android:layout_alignLeft="@+id/holder"
-            android:layout_alignRight="@+id/holder"
-            android:layout_alignStart="@+id/holder"
-            android:layout_alignTop="@+id/holder"
-            android:layout_centerHorizontal="true"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            android:visibility="gone"/>
-
-        <RelativeLayout
-            android:id="@+id/holder"
             android:layout_width="192dp"
             android:layout_height="192dp"
-            android:layout_margin="4dp">
+            android:layout_margin="4dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"/>
 
-            <ImageView
-                android:id="@+id/blurry_thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"/>
+        <ImageView
+            android:id="@+id/iv_download"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_margin="10dp"
+            android:background="@drawable/qiscus_circle_divider"
+            android:padding="4dp"
+            android:src="@drawable/ic_qiscus_download"
+            android:tint="@color/qiscus_secondary_text"/>
 
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_margin="10dp"
-                android:background="@drawable/qiscus_circle_divider"
-                android:padding="4dp"
-                android:src="@drawable/ic_qiscus_download"
-                android:tint="@color/qiscus_secondary_text"/>
-
-            <com.qiscus.sdk.ui.view.QiscusCircleProgress
-                android:id="@+id/progress"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_margin="10dp"
-                android:visibility="gone"
-                app:qcircle_finished_color="@color/qiscus_primary"
-                app:qcircle_text_size="12sp"/>
-        </RelativeLayout>
+        <com.qiscus.sdk.ui.view.QiscusCircleProgress
+            android:id="@+id/progress"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_margin="10dp"
+            app:qcircle_finished_color="@color/qiscus_primary"
+            app:qcircle_text_size="12sp"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_alignBottom="@+id/thumbnail"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignLeft="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignStart="@+id/thumbnail"
+            android:layout_alignTop="@+id/thumbnail"
+            android:padding="64dp"
             android:src="@drawable/ic_qiscus_play_icon"/>
 
         <ImageView
             android:id="@+id/frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/holder"
-            android:layout_alignEnd="@+id/holder"
-            android:layout_alignLeft="@+id/holder"
-            android:layout_alignRight="@+id/holder"
-            android:layout_alignStart="@+id/holder"
-            android:layout_alignTop="@+id/holder"
-            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@+id/thumbnail"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignLeft="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignStart="@+id/thumbnail"
+            android:layout_alignTop="@+id/thumbnail"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
             android:src="@drawable/bg_qiscus_frame"
-            android:tint="@color/qiscus_left_bubble"
-            android:visibility="visible"/>
+            android:tint="@color/qiscus_left_bubble"/>
 
         <TextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/holder"
-            android:layout_alignRight="@+id/holder"
-            android:layout_below="@+id/holder"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_below="@+id/thumbnail"
             android:layout_gravity="bottom"
             android:layout_marginTop="8dp"
             android:textColor="@color/qiscus_secondary_text"
