@@ -30,7 +30,6 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 
 import java.io.File;
@@ -127,7 +126,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     protected void showImage(QiscusComment qiscusComment) {
-        if (QiscusAndroidUtil.isUrl(qiscusComment.getAttachmentUri().toString())) { //We have sent it
+        if (qiscusComment.getAttachmentUri().toString().startsWith("http")) { //We have sent it
             showSentImage(qiscusComment);
         } else { //Still uploading the image
             showSendingImage(qiscusComment);
