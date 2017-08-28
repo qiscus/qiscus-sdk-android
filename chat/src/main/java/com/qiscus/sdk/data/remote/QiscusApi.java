@@ -277,6 +277,22 @@ public enum QiscusApi {
                 .map(jsonElement -> null);
     }
 
+    public Observable<List<QiscusComment>> searchComments(String query, int lastCommentId) {
+        return searchComments(query, 0, lastCommentId);
+    }
+
+    public Observable<List<QiscusComment>> searchComments(String query, int roomId, int lastCommentId) {
+        return api.searchComments(Qiscus.getToken(), query, roomId, lastCommentId)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> {
+                    JsonObject jsonComment = jsonElement.getAsJsonObject();
+                    return QiscusApiParser.parseQiscusComment(jsonElement,
+                            jsonComment.get("room_id").getAsInt(), jsonComment.get("topic_id").getAsInt());
+                })
+                .toList();
+    }
+
     private interface Api {
 
         @FormUrlEncoded
@@ -352,6 +368,12 @@ public enum QiscusApi {
         Observable<JsonElement> registerFcmToken(@Field("token") String token,
                                                  @Field("device_platform") String devicePlatform,
                                                  @Field("device_token") String fcmToken);
+
+        @POST("/api/v2/mobile/search_messages")
+        Observable<JsonElement> searchComments(@Query("token") String token,
+                                               @Query("query") String query,
+                                               @Query("room_id") int roomId,
+                                               @Query("last_comment_id") int lastCommentId);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
