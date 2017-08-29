@@ -52,7 +52,7 @@ final class QiscusApiParser {
 
     static QiscusNonce parseNonce(JsonElement jsonElement) {
         JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
-        return new QiscusNonce(new Date(result.get("expired_at").getAsLong()),
+        return new QiscusNonce(new Date(result.get("expired_at").getAsLong() * 1000L),
                 result.get("nonce").getAsString());
     }
 
