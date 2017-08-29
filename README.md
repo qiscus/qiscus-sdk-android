@@ -544,7 +544,7 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
 
 # Sample Application
 
-Or you can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
+You can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
 
 
 
