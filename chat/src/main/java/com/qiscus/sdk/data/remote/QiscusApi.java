@@ -26,6 +26,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -94,6 +95,14 @@ public enum QiscusApi {
 
     public static QiscusApi getInstance() {
         return INSTANCE;
+    }
+
+    public Observable<QiscusNonce> requestNonce() {
+        return api.requestNonce().map(QiscusApiParser::parseNonce);
+    }
+
+    public Observable<QiscusAccount> login(String token) {
+        return api.login(token).map(QiscusApiParser::parseQiscusAccount);
     }
 
     public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
@@ -294,6 +303,13 @@ public enum QiscusApi {
     }
 
     private interface Api {
+
+        @POST("/api/v2/auth/nonce")
+        Observable<JsonElement> requestNonce();
+
+        @FormUrlEncoded
+        @POST("/api/v2/auth/verify_identity_token")
+        Observable<JsonElement> login(@Field("identity_token") String token);
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/login_or_register")
