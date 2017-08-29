@@ -463,10 +463,6 @@ During post message, if you dont have any internet connection, message will be s
 Messages are stored locally so you can still access the messages when you dont have internet conenction. However any new messages will not being received after you have your internet connection back.
 
 
-### Sample Application
-
-Or you can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
-
 # Miscellaneous
 
 ### Android Support Libraries
@@ -545,4 +541,10 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
               }
       });
 ```
+
+# Sample Application
+
+Or you can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
+
+
 
