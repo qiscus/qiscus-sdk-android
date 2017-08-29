@@ -277,6 +277,12 @@ public enum QiscusApi {
                 .map(jsonElement -> null);
     }
 
+    public Observable<List<QiscusChatRoom>> getRoomsInfo(List<String> roomId, List<String> uniqueId) {
+        return api.getRoomsInfo(Qiscus.getToken(), roomId, uniqueId, false)
+                .map(QiscusApiParser::parseQiscusChatRoomInfo);
+    }
+
+
     private interface Api {
 
         @FormUrlEncoded
@@ -352,6 +358,13 @@ public enum QiscusApi {
         Observable<JsonElement> registerFcmToken(@Field("token") String token,
                                                  @Field("device_platform") String devicePlatform,
                                                  @Field("device_token") String fcmToken);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/get_rooms_info")
+        Observable<JsonElement> getRoomsInfo(@Field("token") String token,
+                                             @Field("room_id[]") List<String> roomId,
+                                             @Field("room_unique_id[]") List<String> roomUniqueId,
+                                             @Field("show_participants") boolean showParticipants);
     }
 
     private static class CountingFileRequestBody extends RequestBody {

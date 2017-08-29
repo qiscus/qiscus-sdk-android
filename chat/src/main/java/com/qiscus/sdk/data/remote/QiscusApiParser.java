@@ -115,6 +115,32 @@ final class QiscusApiParser {
         return null;
     }
 
+    static List<QiscusChatRoom> parseQiscusChatRoomInfo(JsonElement jsonElement) {
+
+        if (jsonElement != null) {
+            JsonArray jsonRoomInfo = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("rooms_info").getAsJsonArray();
+            List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
+            for (JsonElement jsonMember : jsonRoomInfo) {
+                QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+                qiscusChatRoom.setLastCommentId(jsonMember.getAsJsonObject().get("last_comment_id").getAsInt());
+                qiscusChatRoom.setAvatarUrl(jsonMember.getAsJsonObject().get("room_avatar_url").getAsString());
+                qiscusChatRoom.setId(jsonMember.getAsJsonObject().get("room_id").getAsInt());
+                qiscusChatRoom.setName(jsonMember.getAsJsonObject().get("room_name").getAsString());
+                qiscusChatRoom.setLastCommentMessage(jsonMember.getAsJsonObject().get("last_comment_message").getAsString());
+                qiscusChatRoom.setUnreadCount(jsonMember.getAsJsonObject().get("unread_count").getAsInt());
+
+                try {
+                    qiscusChatRoom.setLastCommentTime(dateFormat.parse(jsonMember.getAsJsonObject().get("last_comment_timestamp").getAsString()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                qiscusChatRooms.add(qiscusChatRoom);
+            }
+            return qiscusChatRooms;
+        }
+        return null;
+    }
+
     static Pair<QiscusChatRoom, List<QiscusComment>> parseQiscusChatRoomWithComments(JsonElement jsonElement) {
         if (jsonElement != null) {
             QiscusChatRoom qiscusChatRoom = parseQiscusChatRoom(jsonElement);

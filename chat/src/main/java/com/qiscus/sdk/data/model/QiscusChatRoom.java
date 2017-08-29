@@ -43,6 +43,8 @@ public class QiscusChatRoom implements Parcelable {
     protected boolean group;
     protected String avatarUrl;
     protected List<QiscusRoomMember> member;
+    protected int unreadCount;
+
 
     public QiscusChatRoom() {
         lastCommentTime = new Date(0L);
@@ -63,6 +65,7 @@ public class QiscusChatRoom implements Parcelable {
         group = in.readByte() != 0;
         avatarUrl = in.readString();
         member = in.createTypedArrayList(QiscusRoomMember.CREATOR);
+        unreadCount = in.readInt();
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -205,7 +208,16 @@ public class QiscusChatRoom implements Parcelable {
         result = 31 * result + (group ? 1 : 0);
         result = 31 * result + (avatarUrl != null ? avatarUrl.hashCode() : 0);
         result = 31 * result + (member != null ? member.hashCode() : 0);
+        result = 31 * result + unreadCount;
         return result;
+    }
+
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
     }
 
     @Override
@@ -229,7 +241,8 @@ public class QiscusChatRoom implements Parcelable {
                 ", options='" + options + '\'' +
                 ", group=" + group +
                 ", avatarUrl='" + avatarUrl + '\'' +
-                ", member=" + member +
+                ", member=" + member + '\'' +
+                ", unreadCount=" + unreadCount +
                 '}';
     }
 
@@ -254,5 +267,6 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeByte((byte) (group ? 1 : 0));
         dest.writeString(avatarUrl);
         dest.writeTypedList(member);
+        dest.writeInt(unreadCount);
     }
 }
