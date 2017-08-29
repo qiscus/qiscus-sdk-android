@@ -452,12 +452,23 @@ If you want full customisations, you can modify everything on the view by forkin
 
 Currently we recommend to use our Webhook-API to push notification from your own server to client app for simplicity and flexibility handling
 
+# Offline Messages
+
+## Post Messages
+
+During post message, if you dont have any internet connection, message will be store locally and will be automatically being send once your internet connection is back. 
+
+## Get Messages
+
+Messages are stored locally so you can still access the messages when you dont have internet conenction. However any new messages will not being received after you have your internet connection back.
+
 
 ### Sample Application
 
 Or you can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
 
 # Miscellaneous
+
 ### Android Support Libraries
 Qiscus SDK is using appcompat libraries to support some features. If your apps using appcompat too, we highly recommended to using the latest stable appcompat version, or using the same version with Qiscus SDK. You can check the appcompat version of Qiscus SDK [here](https://github.com/qiscus/qiscus-sdk-android/blob/master/chat/build.gradle#L102). You can also force Qiscus SDK to use your apps appcompat verion. Use "exclude group" at your build.gradle, for example:
 
