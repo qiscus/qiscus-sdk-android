@@ -204,7 +204,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
 for accesing room that created by this call, you need to call it with its roomId. This methode is always creating new chat room.
 
 
-### Get a Group Room instance with room id
+### Get a room by room id
 
 
 When you already know your chat room id, you can easily go to that room. Just call
@@ -239,7 +239,7 @@ QiscusApi.getInstance()
         });
 ```
 
-### Create or join room with defined unique id
+### Create or join room by client defined id
 
 Create room with defined unique id if that room does not exist, or join to the room if that room with defined unique id already exist. Room returned always a group room type.
 
