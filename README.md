@@ -132,9 +132,9 @@ Qiscus.clearUser();
 
 
 
-# Room Types 
+# Chat Rooms 
 
-### Creating and starting 1-to-1 chat
+### Creating 1-to-1 chat
 
 Start chat with target is very easy, all you need is just call
 
@@ -204,7 +204,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
 for accesing room that created by this call, you need to call it with its roomId. This methode is always creating new chat room.
 
 
-### Getting a Group Room instance with room id
+### Get a Group Room instance with room id
 
 
 When you already know your chat room id, you can easily go to that room. Just call
@@ -445,12 +445,6 @@ If you want full customisations, you can modify everything on the view by forkin
 
 Currently we recommend to use our Webhook-API to push notification from your own server to client app for simplicity and flexibility handling
 
-# Resources
-
-### Video
-
-Here's a video showing how you can set up sample app for qiscus SDK
-[<p align="center"><img src="https://res.cloudinary.com/qiscus/image/upload/c91CeMe08I/Screen%20Shot%202017-05-23%20at%201.57.19%20PM.png" width="50%" /></p>](https://www.youtube.com/watch?v=7tHNliEoths)
 
 ### Sample Application
 
