@@ -17,6 +17,7 @@
 package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,6 +40,7 @@ public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMess
     @NonNull protected ImageView mapImageView;
     @NonNull protected TextView locationNameView;
     @NonNull protected TextView locationAddressView;
+    @Nullable protected ImageView imageFrameView;
 
     public QiscusBaseLocationMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                                OnLongItemClickListener longItemClickListener) {
@@ -46,6 +48,7 @@ public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMess
         mapImageView = getMapImageView(itemView);
         locationNameView = getLocationNameView(itemView);
         locationAddressView = getLocationAddressView(itemView);
+        imageFrameView = getImageFrameView(itemView);
     }
 
     @NonNull
@@ -57,11 +60,17 @@ public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMess
     @NonNull
     public abstract TextView getLocationAddressView(View itemView);
 
+    @Nullable
+    protected abstract ImageView getImageFrameView(View itemView);
+
     @Override
     protected void setUpColor() {
         super.setUpColor();
         locationNameView.setTextColor(messageFromMe ? rightBubbleTextColor : leftBubbleTextColor);
         locationAddressView.setTextColor(messageFromMe ? rightBubbleTextColor : leftBubbleTextColor);
+        if (imageFrameView != null) {
+            imageFrameView.setColorFilter(messageFromMe ? rightBubbleColor : leftBubbleColor);
+        }
     }
 
     @Override

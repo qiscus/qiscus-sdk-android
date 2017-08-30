@@ -24,12 +24,14 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -46,6 +48,12 @@ final class QiscusApiParser {
     static {
         dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    static QiscusNonce parseNonce(JsonElement jsonElement) {
+        JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
+        return new QiscusNonce(new Date(result.get("expired_at").getAsLong() * 1000L),
+                result.get("nonce").getAsString());
     }
 
     static QiscusAccount parseQiscusAccount(JsonElement jsonElement) {

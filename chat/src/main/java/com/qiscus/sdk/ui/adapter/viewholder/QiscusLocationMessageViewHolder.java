@@ -58,6 +58,12 @@ public class QiscusLocationMessageViewHolder extends QiscusBaseLocationMessageVi
 
     @Nullable
     @Override
+    protected ImageView getImageFrameView(View itemView) {
+        return (ImageView) itemView.findViewById(R.id.frame);
+    }
+
+    @Nullable
+    @Override
     protected ImageView getFirstMessageBubbleIndicatorView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.bubble);
     }

@@ -157,6 +157,41 @@ public class Qiscus {
         return new SetUserBuilder(userEmail, userKey);
     }
 
+
+    /**
+     * Use this method to set qiscus user with jwt token from your apps backend
+     *
+     * @param token the jwt token
+     * @return observable of qiscus account
+     */
+    public static Observable<QiscusAccount> setUserAsObservable(String token) {
+        return QiscusApi.getInstance()
+                .login(token)
+                .doOnNext(qiscusAccount -> {
+                    if (Qiscus.hasSetupUser()) {
+                        Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
+                        configureFcmToken();
+                    } else {
+                        Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
+                        configureFcmToken();
+                        EventBus.getDefault().post(QiscusUserEvent.LOGIN);
+                    }
+                });
+    }
+
+    /**
+     * Use this method to set qiscus user with jwt token from your apps backend
+     *
+     * @param token    the jwt token
+     * @param listener completion listener
+     */
+    public static void setUser(String token, SetUserListener listener) {
+        setUserAsObservable(token)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listener::onSuccess, listener::onError);
+    }
+
     /**
      * Use this method if we need application context instance
      *
