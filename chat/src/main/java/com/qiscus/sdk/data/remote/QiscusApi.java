@@ -302,8 +302,8 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusChatRoom>> getRoomsInfo(List<String> roomId, List<String> uniqueId) {
-        return api.getRoomsInfo(Qiscus.getToken(), roomId, uniqueId, false)
+    public Observable<List<QiscusChatRoom>> getRoomsInfo(List<Integer> roomIds, List<Integer> uniqueIds) {
+        return api.getRoomsInfo(Qiscus.getToken(), roomIds, uniqueIds, false)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
@@ -400,8 +400,8 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/get_rooms_info")
         Observable<JsonElement> getRoomsInfo(@Field("token") String token,
-                                             @Field("room_id[]") List<String> roomId,
-                                             @Field("room_unique_id[]") List<String> roomUniqueId,
+                                             @Field("room_id[]") List<Integer> roomIds,
+                                             @Field("room_unique_id[]") List<Integer> roomUniqueIds,
                                              @Field("show_participants") boolean showParticipants);
     }
 
