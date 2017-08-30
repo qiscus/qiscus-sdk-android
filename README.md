@@ -132,9 +132,9 @@ Qiscus.clearUser();
 
 
 
-# Room Types 
+# Chat Rooms 
 
-### Creating and starting 1-to-1 chat
+### Creating 1-to-1 chat
 
 Start chat with target is very easy, all you need is just call
 
@@ -204,7 +204,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
 for accesing room that created by this call, you need to call it with its roomId. This methode is always creating new chat room.
 
 
-### Getting a Group Room instance with room id
+### Get a room by room id
 
 
 When you already know your chat room id, you can easily go to that room. Just call
@@ -239,9 +239,16 @@ QiscusApi.getInstance()
         });
 ```
 
-### Create or join room with defined unique id
+### Create or join room by defined id
 
-Create room with defined unique id if that room does not exist, or join to the room if that room with defined unique id already exist. Room returned always a group room type.
+You probably want to set defined id for the room you are creating so that the id can be reference for users to get into.
+
+Usual usage for this is when user create common room or channel which expecting other users can join to the same channel by knowing the channel name or id, you can use the channel name or id as qiscus room defined id.
+
+Additional note: 
+If room with predefined unique id is not exist then it will create a new one with requester as the only one participant. Otherwise, if room with predefined unique id is already exist, it will return that room and add requester as a participant.
+
+When first call (room is not exist), if requester did not send avatar_url and/or room name it will use default value. But, after the second call (room is exist) and user (requester) send avatar_url and/or room name, it will be updated to that value. Object changed will be true in first call and when avatar_url or room name is updated.
 
 ```java
 Qiscus.buildGroupChatRoomWith("UniqueId")
@@ -445,18 +452,19 @@ If you want full customisations, you can modify everything on the view by forkin
 
 Currently we recommend to use our Webhook-API to push notification from your own server to client app for simplicity and flexibility handling
 
-# Resources
+# Offline Messages
 
-### Video
+## Post Messages
 
-Here's a video showing how you can set up sample app for qiscus SDK
-[<p align="center"><img src="https://res.cloudinary.com/qiscus/image/upload/c91CeMe08I/Screen%20Shot%202017-05-23%20at%201.57.19%20PM.png" width="50%" /></p>](https://www.youtube.com/watch?v=7tHNliEoths)
+During post message, if you dont have any internet connection, message will be store locally and will be automatically being send once your internet connection is back. 
 
-### Sample Application
+## Get Messages
 
-Or you can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
+Messages are stored locally so you can still access the messages when you dont have internet conenction. However any new messages will not being received after you have your internet connection back.
+
 
 # Miscellaneous
+
 ### Android Support Libraries
 Qiscus SDK is using appcompat libraries to support some features. If your apps using appcompat too, we highly recommended to using the latest stable appcompat version, or using the same version with Qiscus SDK. You can check the appcompat version of Qiscus SDK [here](https://github.com/qiscus/qiscus-sdk-android/blob/master/chat/build.gradle#L102). You can also force Qiscus SDK to use your apps appcompat verion. Use "exclude group" at your build.gradle, for example:
 
@@ -533,4 +541,10 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
               }
       });
 ```
+
+# Sample Application
+
+You can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
+
+
 
