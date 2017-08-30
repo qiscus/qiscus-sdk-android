@@ -130,7 +130,8 @@ final class QiscusApiParser {
                 qiscusChatRoom.setUnreadCount(jsonMember.getAsJsonObject().get("unread_count").getAsInt());
 
                 try {
-                    qiscusChatRoom.setLastCommentTime(dateFormat.parse(jsonMember.getAsJsonObject().get("last_comment_timestamp").getAsString()));
+                    qiscusChatRoom.setLastCommentTime(dateFormat.parse(jsonMember.getAsJsonObject()
+                            .get("last_comment_timestamp").getAsString()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
