@@ -155,11 +155,6 @@ public class QiscusChatConfig {
                     .getChatRoom(qiscusComment.getRoomId())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(qiscusChatRoom -> {
-                        if (!qiscusChatRoom.isGroup()) {
-                            qiscusChatRoom.setName(qiscusComment.getSender());
-                        }
-                    })
                     .map(qiscusChatRoom -> {
                         if (qiscusChatRoom.isGroup()) {
                             return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom);

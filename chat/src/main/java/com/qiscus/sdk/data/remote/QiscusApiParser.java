@@ -76,8 +76,8 @@ final class QiscusApiParser {
             //TODO minta server ngasih tau distinctId biar bisa disimpen
             //qiscusChatRoom.setDistinctId("default");
             qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
+            qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
             if (qiscusChatRoom.isGroup()) {
-                qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
                 qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
             }
             qiscusChatRoom.setLastCommentId(jsonChatRoom.get("last_comment_id").getAsInt());

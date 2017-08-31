@@ -357,9 +357,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     Collections.sort(roomData.second, (lhs, rhs) -> lhs.getId() != -1 && rhs.getId() != -1 ?
                             QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime()));
 
-                    if (!roomData.first.isGroup()) {
-                        roomData.first.setName(room.getName());
-                    }
                     roomData.first.setSubtitle(room.getSubtitle());
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
                 })
