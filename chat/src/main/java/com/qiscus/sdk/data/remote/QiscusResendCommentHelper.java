@@ -25,9 +25,12 @@ import com.qiscus.sdk.util.QiscusErrorLogger;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import retrofit2.HttpException;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -37,17 +40,30 @@ import rx.schedulers.Schedulers;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-final class QiscusResendCommentHelper {
+public final class QiscusResendCommentHelper {
 
-    static void tryResendPendingComment() {
+    private static Map<QiscusComment, Subscription> pendingTask = new HashMap<>();
+
+    public static void tryResendPendingComment() {
         Qiscus.getDataStore()
                 .getObservablePendingComments()
                 .flatMap(Observable::from)
+                .filter(qiscusComment -> !pendingTask.containsKey(qiscusComment))
                 .doOnNext(QiscusResendCommentHelper::resendComment)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
                 }, QiscusErrorLogger::print);
+    }
+
+    public static void cancelPendingComment(QiscusComment qiscusComment) {
+        if (pendingTask.containsKey(qiscusComment)) {
+            Subscription subscription = pendingTask.get(qiscusComment);
+            if (!subscription.isUnsubscribed()) {
+                subscription.unsubscribe();
+            }
+            pendingTask.remove(qiscusComment);
+        }
     }
 
     private static void resendComment(QiscusComment qiscusComment) {
@@ -61,7 +77,7 @@ final class QiscusResendCommentHelper {
 
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        QiscusApi.getInstance().postComment(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
                 .doOnNext(QiscusResendCommentHelper::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
@@ -69,6 +85,8 @@ final class QiscusResendCommentHelper {
                 .subscribe(commentSend ->
                                 EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
                         QiscusErrorLogger::print);
+
+        pendingTask.put(qiscusComment, subscription);
     }
 
     private static void resendFile(QiscusComment qiscusComment) {
@@ -90,7 +108,8 @@ final class QiscusResendCommentHelper {
         qiscusComment.setProgress(0);
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
+        Subscription subscription = QiscusApi.getInstance()
+                .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .flatMap(uri -> {
                     qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
                     return QiscusApi.getInstance().postComment(qiscusComment);
@@ -107,6 +126,8 @@ final class QiscusResendCommentHelper {
                 .subscribe(commentSend ->
                                 EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
                         QiscusErrorLogger::print);
+
+        pendingTask.put(qiscusComment, subscription);
     }
 
     private static void forwardFile(QiscusComment qiscusComment) {
@@ -114,7 +135,7 @@ final class QiscusResendCommentHelper {
         qiscusComment.setProgress(100);
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        QiscusApi.getInstance().postComment(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
                 .doOnNext(commentSend -> {
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
@@ -125,9 +146,12 @@ final class QiscusResendCommentHelper {
                 .subscribe(commentSend ->
                                 EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
                         QiscusErrorLogger::print);
+
+        pendingTask.put(qiscusComment, subscription);
     }
 
     private static void commentSuccess(QiscusComment qiscusComment) {
+        pendingTask.remove(qiscusComment);
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
@@ -137,6 +161,7 @@ final class QiscusResendCommentHelper {
     }
 
     private static void commentFail(Throwable throwable, QiscusComment qiscusComment) {
+        pendingTask.remove(qiscusComment);
         if (!Qiscus.getDataStore().isContains(qiscusComment)) { //Have been deleted
             return;
         }

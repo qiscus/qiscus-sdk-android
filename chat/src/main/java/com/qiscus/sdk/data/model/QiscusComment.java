@@ -731,35 +731,6 @@ public class QiscusComment implements Parcelable {
     }
 
     @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + roomId;
-        result = 31 * result + topicId;
-        result = 31 * result + (uniqueId != null ? uniqueId.hashCode() : 0);
-        result = 31 * result + commentBeforeId;
-        result = 31 * result + (message != null ? message.hashCode() : 0);
-        result = 31 * result + (sender != null ? sender.hashCode() : 0);
-        result = 31 * result + (senderEmail != null ? senderEmail.hashCode() : 0);
-        result = 31 * result + (senderAvatar != null ? senderAvatar.hashCode() : 0);
-        result = 31 * result + (time != null ? time.hashCode() : 0);
-        result = 31 * result + state;
-        result = 31 * result + (roomName != null ? roomName.hashCode() : 0);
-        result = 31 * result + (groupMessage ? 1 : 0);
-        result = 31 * result + (selected ? 1 : 0);
-        result = 31 * result + (downloading ? 1 : 0);
-        result = 31 * result + progress;
-        result = 31 * result + (urls != null ? urls.hashCode() : 0);
-        result = 31 * result + (previewData != null ? previewData.hashCode() : 0);
-        result = 31 * result + (progressListener != null ? progressListener.hashCode() : 0);
-        result = 31 * result + (downloadingListener != null ? downloadingListener.hashCode() : 0);
-        result = 31 * result + (playingAudioListener != null ? playingAudioListener.hashCode() : 0);
-        result = 31 * result + (linkPreviewListener != null ? linkPreviewListener.hashCode() : 0);
-        result = 31 * result + (observer != null ? observer.hashCode() : 0);
-        result = 31 * result + (player != null ? player.hashCode() : 0);
-        return result;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o instanceof QiscusComment) {
             QiscusComment qiscusComment = (QiscusComment) o;
@@ -770,6 +741,11 @@ public class QiscusComment implements Parcelable {
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return uniqueId.hashCode();
     }
 
     @Override
