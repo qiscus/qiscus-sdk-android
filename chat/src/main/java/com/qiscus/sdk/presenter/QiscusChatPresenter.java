@@ -119,6 +119,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void commentFail(Throwable throwable, QiscusComment qiscusComment) {
+        if (!Qiscus.getDataStore().isContains(qiscusComment)) { //Have been deleted
+            return;
+        }
+
         int state = QiscusComment.STATE_PENDING;
         if (throwable instanceof HttpException) { //Error response from server
             //Means something wrong with server, e.g user is not member of these room anymore
@@ -147,7 +151,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private void sendComment(QiscusComment qiscusComment) {
         view.onSendingComment(qiscusComment);
         QiscusApi.getInstance().postComment(qiscusComment)
-                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(this::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
@@ -226,7 +230,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         File finalCompressedFile = compressedFile;
         QiscusApi.getInstance().uploadFile(compressedFile, percentage -> qiscusComment.setProgress((int) percentage))
-                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
+                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
                     qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
                     return QiscusApi.getInstance().postComment(qiscusComment);

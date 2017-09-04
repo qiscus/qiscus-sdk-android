@@ -52,6 +52,7 @@ final class QiscusResendCommentHelper {
 
     private static void resendComment(QiscusComment qiscusComment) {
         qiscusComment.setState(QiscusComment.STATE_SENDING);
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
 
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
@@ -61,7 +62,6 @@ final class QiscusResendCommentHelper {
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
         QiscusApi.getInstance().postComment(qiscusComment)
-                .doOnSubscribe(() -> Qiscus.getDataStore().add(qiscusComment))
                 .doOnNext(QiscusResendCommentHelper::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
@@ -91,7 +91,6 @@ final class QiscusResendCommentHelper {
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
         QiscusApi.getInstance().uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
-                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
                     qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
                     return QiscusApi.getInstance().postComment(qiscusComment);
@@ -116,7 +115,6 @@ final class QiscusResendCommentHelper {
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
         QiscusApi.getInstance().postComment(qiscusComment)
-                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(commentSend -> {
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
@@ -139,6 +137,9 @@ final class QiscusResendCommentHelper {
     }
 
     private static void commentFail(Throwable throwable, QiscusComment qiscusComment) {
+        if (!Qiscus.getDataStore().isContains(qiscusComment)) { //Have been deleted
+            return;
+        }
         int state = QiscusComment.STATE_PENDING;
         if (throwable instanceof HttpException) { //Error response from server
             //Means something wrong with server, e.g user is not member of these room anymore
