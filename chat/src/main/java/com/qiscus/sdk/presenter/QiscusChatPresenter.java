@@ -123,7 +123,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (throwable instanceof HttpException) { //Error response from server
             //Means something wrong with server, e.g user is not member of these room anymore
             HttpException httpException = (HttpException) throwable;
-            if (httpException.code() >= 400 && httpException.code() < 500) {
+            if (httpException.code() >= 400) {
                 qiscusComment.setDownloading(false);
                 state = QiscusComment.STATE_FAILED;
             }
