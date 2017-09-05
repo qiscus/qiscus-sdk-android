@@ -63,6 +63,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected static final String EXTRA_SHARING_FILE = "extra_share_file";
     protected static final String EXTRA_AUTO_SEND = "auto_send";
     protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
+    protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -70,6 +71,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected File shareFile;
     protected boolean autoSendExtra;
     protected List<QiscusComment> forwardComments;
+    protected QiscusComment scrollToComment;
 
     private ActionMode actionMode;
     private QiscusUserStatusPresenter userStatusPresenter;
@@ -111,6 +113,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         resolveShareFile();
         resolveAutoSendExtra();
         resolveForwardComments();
+        resolveScrollToComment();
 
         binRoomData();
 
@@ -160,6 +163,13 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         if (getIntent().hasExtra(EXTRA_FORWARD_COMMENTS)) {
             forwardComments = getIntent().getParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS);
             getIntent().removeExtra(EXTRA_FORWARD_COMMENTS);
+        }
+    }
+
+    protected void resolveScrollToComment() {
+        if (getIntent().hasExtra(EXTRA_SCROLL_TO_COMMENT)) {
+            scrollToComment = getIntent().getParcelableExtra(EXTRA_SCROLL_TO_COMMENT);
+            getIntent().removeExtra(EXTRA_SCROLL_TO_COMMENT);
         }
     }
 

@@ -62,7 +62,8 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
                                                  String startingMessage,
                                                  File shareFile,
                                                  boolean autoSendExtra,
-                                                 List<QiscusComment> comments) {
+                                                 List<QiscusComment> comments,
+                                                 QiscusComment scrollToComment) {
         QiscusChatFragment fragment = new QiscusChatFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
@@ -70,6 +71,7 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         bundle.putSerializable(EXTRA_SHARE_FILE, shareFile);
         bundle.putBoolean(EXTRA_AUTO_SEND, autoSendExtra);
         bundle.putParcelableArrayList(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
+        bundle.putParcelable(EXTRA_SCROLL_TO_COMMENT, scrollToComment);
         fragment.setArguments(bundle);
         return fragment;
     }

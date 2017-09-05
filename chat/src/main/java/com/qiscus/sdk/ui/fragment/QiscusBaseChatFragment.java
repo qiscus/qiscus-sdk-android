@@ -135,6 +135,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String EXTRA_SHARE_FILE = "extra_share_file";
     protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
     protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
+    protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
     protected static final String COMMENTS_DATA = "saved_comments_data";
 
     protected static final int TAKE_PICTURE_REQUEST = 1;
@@ -709,6 +710,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         getArguments().remove(EXTRA_FORWARD_COMMENTS);
     }
 
+    protected void resolveScrollToComment() {
+        QiscusComment comment = getArguments().getParcelable(EXTRA_SCROLL_TO_COMMENT);
+        getArguments().remove(EXTRA_FORWARD_COMMENTS);
+        if (comment != null) {
+            scrollToComment(comment);
+        }
+    }
+
     protected void onApplyChatConfig() {
         Drawable buttonBg;
 
@@ -1205,6 +1214,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             roomChangedListener.onRoomUpdated(qiscusChatRoom);
         }
         showComments(comments);
+        resolveScrollToComment();
     }
 
     @Override

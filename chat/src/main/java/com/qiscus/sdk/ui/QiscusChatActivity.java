@@ -57,13 +57,15 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
                                         String startingMessage, File shareFile,
-                                        boolean autoSendExtra, List<QiscusComment> comments) {
+                                        boolean autoSendExtra, List<QiscusComment> comments,
+                                        QiscusComment scrollToComment) {
         Intent intent = new Intent(context, QiscusChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILE, shareFile);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
         intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
+        intent.putExtra(EXTRA_SCROLL_TO_COMMENT, scrollToComment);
         return intent;
     }
 
@@ -121,7 +123,8 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFile, autoSendExtra, forwardComments);
+        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFile,
+                autoSendExtra, forwardComments, scrollToComment);
     }
 
     @Override

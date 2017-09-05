@@ -711,6 +711,7 @@ public class Qiscus {
         private File shareFile;
         private boolean autoSendExtra;
         private List<QiscusComment> comments;
+        private QiscusComment scrollToComment;
 
         private ChatActivityBuilder(String email) {
             title = "Chat";
@@ -808,6 +809,18 @@ public class Qiscus {
         }
 
         /**
+         * If you want to auto scroll to specific comment after the activity started
+         * for example click comment from searching page
+         *
+         * @param comment The comment
+         * @return builder
+         */
+        public ChatActivityBuilder withScrollToComment(QiscusComment comment) {
+            this.scrollToComment = comment;
+            return this;
+        }
+
+        /**
          * Build the Chat activity intent
          *
          * @param context  Context for start the Activity
@@ -835,7 +848,7 @@ public class Qiscus {
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
-                                    shareFile, autoSendExtra, comments));
+                                    shareFile, autoSendExtra, comments, scrollToComment));
         }
     }
 
@@ -865,6 +878,7 @@ public class Qiscus {
         private File shareFile;
         private boolean autoSendExtra;
         private List<QiscusComment> comments;
+        private QiscusComment scrollToComment;
 
         private ChatFragmentBuilder(String email) {
             title = "Chat";
@@ -962,6 +976,18 @@ public class Qiscus {
         }
 
         /**
+         * If you want to auto scroll to specific comment after the activity started
+         * for example click comment from searching page
+         *
+         * @param comment The comment
+         * @return builder
+         */
+        public ChatFragmentBuilder withScrollToComment(QiscusComment comment) {
+            this.scrollToComment = comment;
+            return this;
+        }
+
+        /**
          * Build the Chat fragment instance
          *
          * @param listener Listener of building chat fragment
@@ -986,7 +1012,8 @@ public class Qiscus {
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
-                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile, autoSendExtra, comments));
+                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile,
+                                    autoSendExtra, comments, scrollToComment));
         }
     }
 
