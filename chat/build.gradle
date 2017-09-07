@@ -138,7 +138,7 @@ dependencies {
     compile 'com.google.android:flexbox:0.3.0'
 
     //File picker
-    compile 'com.qiscus.jupuk:jupuk:1.0.0'
+    compile 'com.qiscus.utils:jupuk:1.0.1'
 
     //Place picker
     compile 'com.google.android.gms:play-services-places:11.0.4'
