@@ -582,14 +582,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private void handleExtra() {
         if (startingMessage != null && !startingMessage.isEmpty() && shareFile != null) {
-            sendMessage(startingMessage);
+            qiscusChatPresenter.sendComment(startingMessage);
             sendFile(shareFile);
             return;
         }
 
         if (autoSendExtra) {
             if (startingMessage != null && !startingMessage.isEmpty()) {
-                QiscusAndroidUtil.runOnUIThread(() -> sendMessage(startingMessage), 800);
+                QiscusAndroidUtil.runOnUIThread(() -> qiscusChatPresenter.sendComment(startingMessage), 800);
             }
 
             if (shareFile != null) {
@@ -598,6 +598,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         } else {
             if (startingMessage != null && !startingMessage.isEmpty()) {
                 messageEditText.setText(startingMessage);
+                messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
                 QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
             }
 
@@ -864,12 +865,17 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void showCommentDraft() {
+        if (startingMessage != null && !startingMessage.trim().isEmpty() && !autoSendExtra) {
+            return;
+        }
         QiscusCommentDraft draftComment = QiscusCacheManager.getInstance().getDraftComment(qiscusChatRoom.getId());
         if (draftComment != null) {
             messageEditText.setText(draftComment.getMessage());
+            messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
             if (draftComment instanceof QiscusReplyCommentDraft && replyPreviewView != null) {
                 replyPreviewView.bind(((QiscusReplyCommentDraft) draftComment).getRepliedComment());
             }
+            QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
         }
     }
 
@@ -903,6 +909,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
             QiscusCacheManager.getInstance()
                     .setDraftComment(qiscusChatRoom.getId(), new QiscusCommentDraft(message));
+        } else {
+            QiscusCacheManager.getInstance().clearDraftComment(qiscusChatRoom.getId());
         }
     }
 

@@ -126,6 +126,12 @@ public enum QiscusCacheManager {
         return null;
     }
 
+    public void clearDraftComment(int roomId) {
+        sharedPreferences.edit()
+                .remove("draft_comment_" + roomId)
+                .apply();
+    }
+
     public void clearData() {
         sharedPreferences.edit().clear().apply();
     }
