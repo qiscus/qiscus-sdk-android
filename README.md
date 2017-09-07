@@ -542,7 +542,7 @@ compile 'com.android.support:customtabs:yourVersion'
 compile 'com.android.support:support-v13:yourVersion'
 ```
 
-### Rx Java support
+### RxJava support
 
 ```java
 // Setup qiscus account with rxjava example
@@ -596,6 +596,23 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
                   showError("Unexpected error!");
               }
       });
+```
+
+### Doesn't like RxJava
+For you who doesn't comport with RxJava method, we provide utility class to execute RxJava method.
+Here sample code how to get specific qiscus chat room by id.
+```java
+QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom(123), new QiscusRxExecutor.Listener<QiscusChatRoom>() {
+        @Override
+        public void onSuccess(QiscusChatRoom result) {
+            //Success getting the room
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            //Something went wrong
+        }
+    });
 ```
 
 # Sample Application
