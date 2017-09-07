@@ -23,7 +23,12 @@ import android.support.v4.util.Pair;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusCommentDraft;
 import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
+import com.qiscus.sdk.data.model.QiscusReplyCommentDraft;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +101,35 @@ public enum QiscusCacheManager {
     public Pair<Boolean, Integer> getLastChatActivity() {
         return Pair.create(sharedPreferences.getBoolean("last_chat_status", false),
                 sharedPreferences.getInt("last_active_chat", 0));
+    }
+
+    public void setDraftComment(int roomId, QiscusCommentDraft draft) {
+        sharedPreferences.edit()
+                .putString("draft_comment_" + roomId, gson.toJson(draft))
+                .apply();
+    }
+
+    public QiscusCommentDraft getDraftComment(int roomId) {
+        String json = sharedPreferences.getString("draft_comment_" + roomId, null);
+        if (json != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                if (jsonObject.has("repliedPayload")) {
+                    return new QiscusReplyCommentDraft(jsonObject.optString("message", ""),
+                            jsonObject.optString("repliedPayload", ""));
+                }
+                return new QiscusCommentDraft(jsonObject.optString("message", ""));
+            } catch (JSONException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public void clearDraftComment(int roomId) {
+        sharedPreferences.edit()
+                .remove("draft_comment_" + roomId)
+                .apply();
     }
 
     public void clearData() {
