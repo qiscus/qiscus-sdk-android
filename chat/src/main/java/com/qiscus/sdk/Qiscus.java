@@ -418,7 +418,7 @@ public class Qiscus {
      * @param fcmToken the token
      */
     public static void setFcmToken(String fcmToken) {
-        if (hasSetupUser()) {
+        if (hasSetupUser() && getChatConfig().isEnableFcmPushNotification()) {
             QiscusApi.getInstance().registerFcmToken(fcmToken)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -437,7 +437,7 @@ public class Qiscus {
     }
 
     private static void configureFcmToken() {
-        if (hasSetupUser()) {
+        if (hasSetupUser() && getChatConfig().isEnableFcmPushNotification()) {
             String fcmToken = getFcmToken();
             if (fcmToken != null) {
                 setFcmToken(fcmToken);

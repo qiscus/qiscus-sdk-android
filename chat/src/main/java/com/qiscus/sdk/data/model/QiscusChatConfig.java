@@ -191,6 +191,7 @@ public class QiscusChatConfig {
 
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
+    private boolean enableFcmPushNotification = false;
 
     private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
 
@@ -590,6 +591,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setOnlyEnablePushNotificationOutsideChatRoom(boolean onlyEnablePushNotificationOutsideChatRoom) {
         this.onlyEnablePushNotificationOutsideChatRoom = onlyEnablePushNotificationOutsideChatRoom;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableFcmPushNotification(boolean enableFcmPushNotification) {
+        this.enableFcmPushNotification = enableFcmPushNotification;
         return this;
     }
 
@@ -1015,6 +1021,10 @@ public class QiscusChatConfig {
 
     public boolean isOnlyEnablePushNotificationOutsideChatRoom() {
         return onlyEnablePushNotificationOutsideChatRoom;
+    }
+
+    public boolean isEnableFcmPushNotification() {
+        return enableFcmPushNotification;
     }
 
     public Drawable getChatRoomBackground() {
