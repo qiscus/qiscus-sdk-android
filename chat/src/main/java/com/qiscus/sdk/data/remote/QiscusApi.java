@@ -135,6 +135,16 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
 
+    public Observable<List<QiscusChatRoom>> getChatRooms(int page, int limit, boolean showMembers) {
+        return api.getChatRooms(Qiscus.getToken(), page, limit, showMembers)
+                .map(QiscusApiParser::parseQiscusChatRoomInfo);
+    }
+
+    public Observable<List<QiscusChatRoom>> getChatRooms(List<Integer> roomIds, List<String> uniqueIds, boolean showMembers) {
+        return api.getChatRooms(Qiscus.getToken(), roomIds, uniqueIds, showMembers)
+                .map(QiscusApiParser::parseQiscusChatRoomInfo);
+    }
+
     public Observable<QiscusComment> getComments(int roomId, int topicId, int lastCommentId) {
         return api.getComments(Qiscus.getToken(), topicId, lastCommentId, false)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
@@ -302,12 +312,6 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusChatRoom>> getRoomsInfo(List<Integer> roomIds, List<String> uniqueIds) {
-        return api.getRoomsInfo(Qiscus.getToken(), roomIds, uniqueIds, false)
-                .map(QiscusApiParser::parseQiscusChatRoomInfo);
-    }
-
-
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -397,12 +401,17 @@ public enum QiscusApi {
                                                @Query("room_id") int roomId,
                                                @Query("last_comment_id") int lastCommentId);
 
-        @FormUrlEncoded
-        @POST("/api/v2/mobile/get_rooms_info")
-        Observable<JsonElement> getRoomsInfo(@Field("token") String token,
-                                             @Field("room_id[]") List<Integer> roomIds,
-                                             @Field("room_unique_id[]") List<String> roomUniqueIds,
-                                             @Field("show_participants") boolean showParticipants);
+        @GET("/api/v2/mobile/user_rooms")
+        Observable<JsonElement> getChatRooms(@Query("token") String token,
+                                             @Query("page") int page,
+                                             @Query("limit") int limit,
+                                             @Query("show_participants") boolean showParticipants);
+
+        @GET("/api/v2/mobile/rooms_info")
+        Observable<JsonElement> getChatRooms(@Query("token") String token,
+                                             @Query("room_id[]") List<Integer> roomIds,
+                                             @Query("room_unique_id[]") List<String> roomUniqueIds,
+                                             @Query("show_participants") boolean showParticipants);
     }
 
     private static class CountingFileRequestBody extends RequestBody {

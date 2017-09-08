@@ -111,11 +111,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusChatRoom.setMember(getRoomMembers(id));
             QiscusComment latestComment = getLatestComment(id);
             if (latestComment != null) {
-                qiscusChatRoom.setLastCommentId(latestComment.getId());
-                qiscusChatRoom.setLastCommentMessage(latestComment.getMessage());
-                qiscusChatRoom.setLastCommentSender(latestComment.getSender());
-                qiscusChatRoom.setLastCommentSenderEmail(latestComment.getSenderEmail());
-                qiscusChatRoom.setLastCommentTime(latestComment.getTime());
+                qiscusChatRoom.setLastComment(latestComment);
             }
             cursor.close();
             return qiscusChatRoom;
@@ -166,6 +162,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         while (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qiscusChatRoom.setMember(getRoomMembers(qiscusChatRoom.getId()));
+            QiscusComment latestComment = getLatestComment(qiscusChatRoom.getId());
+            if (latestComment != null) {
+                qiscusChatRoom.setLastComment(latestComment);
+            }
             qiscusChatRooms.add(qiscusChatRoom);
         }
         cursor.close();

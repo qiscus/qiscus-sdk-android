@@ -33,39 +33,32 @@ public class QiscusChatRoom implements Parcelable {
     protected String distinctId;
     protected String name;
     protected String subtitle = "";
-    protected int lastCommentId;
-    protected String lastCommentMessage;
-    protected String lastCommentSender;
-    protected String lastCommentSenderEmail;
-    protected Date lastCommentTime;
     protected int lastTopicId;
     protected String options;
     protected boolean group;
     protected String avatarUrl;
     protected List<QiscusRoomMember> member;
     protected int unreadCount;
+    protected QiscusComment lastComment;
 
 
     public QiscusChatRoom() {
-        lastCommentTime = new Date(0L);
+
     }
+
 
     protected QiscusChatRoom(Parcel in) {
         id = in.readInt();
         distinctId = in.readString();
         name = in.readString();
         subtitle = in.readString();
-        lastCommentId = in.readInt();
-        lastCommentMessage = in.readString();
-        lastCommentSender = in.readString();
-        lastCommentSenderEmail = in.readString();
-        lastCommentTime = new Date(in.readLong());
         lastTopicId = in.readInt();
         options = in.readString();
         group = in.readByte() != 0;
         avatarUrl = in.readString();
         member = in.createTypedArrayList(QiscusRoomMember.CREATOR);
         unreadCount = in.readInt();
+        lastComment = in.readParcelable(QiscusComment.class.getClassLoader());
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -112,46 +105,6 @@ public class QiscusChatRoom implements Parcelable {
         this.subtitle = subtitle;
     }
 
-    public int getLastCommentId() {
-        return lastCommentId;
-    }
-
-    public void setLastCommentId(int lastCommentId) {
-        this.lastCommentId = lastCommentId;
-    }
-
-    public String getLastCommentMessage() {
-        return lastCommentMessage;
-    }
-
-    public void setLastCommentMessage(String lastCommentMessage) {
-        this.lastCommentMessage = lastCommentMessage;
-    }
-
-    public String getLastCommentSender() {
-        return lastCommentSender;
-    }
-
-    public void setLastCommentSender(String lastCommentSender) {
-        this.lastCommentSender = lastCommentSender;
-    }
-
-    public String getLastCommentSenderEmail() {
-        return lastCommentSenderEmail;
-    }
-
-    public void setLastCommentSenderEmail(String lastCommentSenderEmail) {
-        this.lastCommentSenderEmail = lastCommentSenderEmail;
-    }
-
-    public Date getLastCommentTime() {
-        return lastCommentTime;
-    }
-
-    public void setLastCommentTime(Date lastCommentTime) {
-        this.lastCommentTime = lastCommentTime;
-    }
-
     public int getLastTopicId() {
         return lastTopicId;
     }
@@ -192,26 +145,6 @@ public class QiscusChatRoom implements Parcelable {
         this.member = member;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (distinctId != null ? distinctId.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (subtitle != null ? subtitle.hashCode() : 0);
-        result = 31 * result + lastCommentId;
-        result = 31 * result + (lastCommentMessage != null ? lastCommentMessage.hashCode() : 0);
-        result = 31 * result + (lastCommentSender != null ? lastCommentSender.hashCode() : 0);
-        result = 31 * result + (lastCommentSenderEmail != null ? lastCommentSenderEmail.hashCode() : 0);
-        result = 31 * result + (lastCommentTime != null ? lastCommentTime.hashCode() : 0);
-        result = 31 * result + lastTopicId;
-        result = 31 * result + (options != null ? options.hashCode() : 0);
-        result = 31 * result + (group ? 1 : 0);
-        result = 31 * result + (avatarUrl != null ? avatarUrl.hashCode() : 0);
-        result = 31 * result + (member != null ? member.hashCode() : 0);
-        result = 31 * result + unreadCount;
-        return result;
-    }
-
     public int getUnreadCount() {
         return unreadCount;
     }
@@ -220,30 +153,22 @@ public class QiscusChatRoom implements Parcelable {
         this.unreadCount = unreadCount;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
+    public QiscusComment getLastComment() {
+        return lastComment;
+    }
+
+    public void setLastComment(QiscusComment lastComment) {
+        this.lastComment = lastComment;
     }
 
     @Override
-    public String toString() {
-        return "QiscusChatRoom{" +
-                "id=" + id +
-                ", distinctId='" + distinctId + '\'' +
-                ", name='" + name + '\'' +
-                ", subtitle='" + subtitle + '\'' +
-                ", lastCommentId=" + lastCommentId +
-                ", lastCommentMessage='" + lastCommentMessage + '\'' +
-                ", lastCommentSender='" + lastCommentSender + '\'' +
-                ", lastCommentSenderEmail='" + lastCommentSenderEmail + '\'' +
-                ", lastCommentTime=" + lastCommentTime +
-                ", lastTopicId=" + lastTopicId +
-                ", options='" + options + '\'' +
-                ", group=" + group +
-                ", avatarUrl='" + avatarUrl + '\'' +
-                ", member=" + member + '\'' +
-                ", unreadCount=" + unreadCount +
-                '}';
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
     }
 
     @Override
@@ -257,16 +182,29 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(distinctId);
         dest.writeString(name);
         dest.writeString(subtitle);
-        dest.writeInt(lastCommentId);
-        dest.writeString(lastCommentMessage);
-        dest.writeString(lastCommentSender);
-        dest.writeString(lastCommentSenderEmail);
-        dest.writeLong(lastCommentTime.getTime());
         dest.writeInt(lastTopicId);
         dest.writeString(options);
         dest.writeByte((byte) (group ? 1 : 0));
         dest.writeString(avatarUrl);
         dest.writeTypedList(member);
         dest.writeInt(unreadCount);
+        dest.writeParcelable(lastComment, flags);
+    }
+
+    @Override
+    public String toString() {
+        return "QiscusChatRoom{" +
+                "id=" + id +
+                ", distinctId='" + distinctId + '\'' +
+                ", name='" + name + '\'' +
+                ", subtitle='" + subtitle + '\'' +
+                ", lastTopicId=" + lastTopicId +
+                ", options='" + options + '\'' +
+                ", group=" + group +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", member=" + member +
+                ", unreadCount=" + unreadCount +
+                ", lastComment=" + lastComment +
+                '}';
     }
 }
