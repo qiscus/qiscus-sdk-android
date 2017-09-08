@@ -83,7 +83,7 @@ public enum QiscusCacheManager {
 
     public void clearMessageNotifItems(int roomId) {
         sharedPreferences.edit()
-                .putString("push_notif_message_" + roomId, "")
+                .remove("push_notif_message_" + roomId)
                 .apply();
     }
 
