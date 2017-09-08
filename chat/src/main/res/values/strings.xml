@@ -105,4 +105,5 @@
     <string name="qiscus_new_contact">New</string>
     <string name="qiscus_existing_contact">Existing</string>
     <string name="qiscus_location">Location</string>
+    <string name="qiscus_message_too_far">Sorry, Message too far to load it!</string>
 </resources>

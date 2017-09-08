@@ -823,6 +823,15 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void loadUntilComment(QiscusComment qiscusComment) {
         Qiscus.getDataStore().getObservableCommentsAfter(qiscusComment, currentTopicId)
                 .map(comments -> comments.contains(qiscusComment) ? comments : new ArrayList<QiscusComment>())
+                .doOnNext(qiscusComments -> {
+                    if (qiscusComments.isEmpty()) {
+                        QiscusAndroidUtil.runOnUIThread(() -> {
+                            if (view != null) {
+                                view.showError(QiscusAndroidUtil.getString(R.string.qiscus_message_too_far));
+                            }
+                        });
+                    }
+                })
                 .flatMap(Observable::from)
                 .toSortedList(commentComparator)
                 .doOnNext(comments -> {
