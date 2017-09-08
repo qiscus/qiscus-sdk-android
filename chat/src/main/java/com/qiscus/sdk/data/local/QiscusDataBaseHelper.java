@@ -21,6 +21,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
@@ -123,7 +124,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public QiscusChatRoom getChatRoom(String email) {
-        return getChatRoom(email, "default");
+        QiscusAccount account = Qiscus.getQiscusAccount();
+        QiscusChatRoom room = getChatRoom(email, account.getEmail() + " " + email);
+        if (room == null) {
+            room = getChatRoom(email, email + " " + account.getEmail());
+        }
+        return room;
     }
 
     @Override

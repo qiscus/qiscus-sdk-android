@@ -74,13 +74,15 @@ final class QiscusApiParser {
             JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("room").getAsJsonObject();
             QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
             qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-            //TODO minta server ngasih tau distinctId biar bisa disimpen
-            //qiscusChatRoom.setDistinctId("default");
             qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
             qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+
             if (qiscusChatRoom.isGroup()) {
-                qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
+                qiscusChatRoom.setDistinctId(jsonChatRoom.get("unique_id").getAsString());
+            } else {
+                qiscusChatRoom.setDistinctId(jsonChatRoom.get("raw_room_name").getAsString());
             }
+
             qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
             qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null : jsonChatRoom.get("options").getAsString());
             qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
@@ -126,13 +128,15 @@ final class QiscusApiParser {
                 JsonObject jsonChatRoom = item.getAsJsonObject();
                 QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
                 qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
-                //TODO minta server ngasih tau distinctId biar bisa disimpen
-                //qiscusChatRoom.setDistinctId("default");
                 qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                 qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
+
                 if (qiscusChatRoom.isGroup()) {
-                    qiscusChatRoom.setDistinctId(qiscusChatRoom.getId() + "");
+                    qiscusChatRoom.setDistinctId(jsonChatRoom.get("unique_id").getAsString());
+                } else {
+                    qiscusChatRoom.setDistinctId(jsonChatRoom.get("raw_room_name").getAsString());
                 }
+
                 qiscusChatRoom.setLastTopicId(jsonChatRoom.get("id").getAsInt());
                 qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null : jsonChatRoom.get("options").getAsString());
                 qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
