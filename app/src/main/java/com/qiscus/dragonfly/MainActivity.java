@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(qiscusChatRoom -> {
                     Log.d(MainActivity.class.getSimpleName(), "Room: " + qiscusChatRoom.toString());
                     Log.d(MainActivity.class.getSimpleName(),
-                            "Last message: " + qiscusChatRoom.getLastCommentMessage());
+                            "Last message: " + qiscusChatRoom.getLastComment().getMessage());
                 }, throwable -> {
                     throwable.printStackTrace();
                     showError(throwable.getMessage());
