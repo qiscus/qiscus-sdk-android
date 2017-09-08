@@ -193,6 +193,33 @@ public class Qiscus {
     }
 
     /**
+     * Use this method to update qiscus user data such as name and avatar
+     *
+     * @param name      user name
+     * @param avatarUrl user avatar url
+     * @return observable of qiscus account
+     */
+    public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
+        return QiscusApi.getInstance().updateProfile(name, avatarUrl)
+                .doOnNext(qiscusAccount -> Qiscus.localDataManager.saveAccountInfo(qiscusAccount));
+    }
+
+    /**
+     * Use this method to update qiscus user data such as name and avatar
+     *
+     * @param name      user name
+     * @param avatarUrl user avatar url
+     * @param listener  completion listener
+     */
+    public static void updateUser(String name, String avatarUrl, SetUserListener listener) {
+        checkUserSetup();
+        updateUserAsObservable(name, avatarUrl)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listener::onSuccess, listener::onError);
+    }
+
+    /**
      * Use this method if we need application context instance
      *
      * @return Your application instance

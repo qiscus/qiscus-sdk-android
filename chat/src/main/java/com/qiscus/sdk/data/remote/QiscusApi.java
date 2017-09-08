@@ -59,6 +59,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 import rx.Emitter;
@@ -107,6 +108,11 @@ public enum QiscusApi {
 
     public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
         return api.loginOrRegister(email, password, username, avatarUrl)
+                .map(QiscusApiParser::parseQiscusAccount);
+    }
+
+    public Observable<QiscusAccount> updateProfile(String username, String avatarUrl) {
+        return api.updateProfile(Qiscus.getToken(), username, avatarUrl)
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
@@ -327,6 +333,12 @@ public enum QiscusApi {
                                                 @Field("password") String password,
                                                 @Field("username") String username,
                                                 @Field("avatar_url") String avatarUrl);
+
+        @FormUrlEncoded
+        @PATCH("/api/v2/mobile/my_profile")
+        Observable<JsonElement> updateProfile(@Field("token") String token,
+                                              @Field("name") String name,
+                                              @Field("avatar_url") String avatarUrl);
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/get_or_create_room_with_target")
