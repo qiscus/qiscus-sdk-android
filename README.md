@@ -145,37 +145,34 @@ QiscusApi.getInstance().requestNonce() //Request nonce from qiscus api
 
 ### Updating a User Profile and Avatar
 
-Updating user profile and details is simply by re-init the user using new details :
-
+Updating user profile calls Qiscus.updateUser(name, avatar, listener) :
 
 ```java
-Qiscus.setUser("user@email.com", "userKey")
-      .withUsername("Tony Stark")
-      .withAvatarUrl("http://avatar.url.com/handsome.jpg")
-      .save(new Qiscus.SetUserListener() {
-          @Override
-          public void onSuccess(QiscusAccount qiscusAccount) {
-              DataManager.saveQiscusAccount(qiscusAccount);
-              startActivity(new Intent(this, ConsultationListActivity.class));
-          }
-          @Override
-          public void onError(Throwable throwable) {
-              if (throwable instanceof HttpException) { //Error response from server
-                  HttpException e = (HttpException) throwable;
-                  try {
-                      String errorMessage = e.response().errorBody().string();
-                      Log.e(TAG, errorMessage);
-                      showError(errorMessage);
-                  } catch (IOException e1) {
-                      e1.printStackTrace();
-                  }
-              } else if (throwable instanceof IOException) { //Error from network
-                  showError("Can not connect to qiscus server!");
-              } else { //Unknown error
-                  showError("Unexpected error!");
-              }
-          }
-      });
+Qiscus.updateUser("Tony Stark", "http://avatar.url.com/handsome.jpg", new Qiscus.SetUserListener() {
+            @Override
+            public void onSuccess(QiscusAccount qiscusAccount) {
+                DataManager.saveQiscusAccount(qiscusAccount);
+                startActivity(new Intent(this, ConsultationListActivity.class));
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                if (throwable instanceof HttpException) { //Error response from server
+                    HttpException e = (HttpException) throwable;
+                    try {
+                        String errorMessage = e.response().errorBody().string();
+                        Log.e(TAG, errorMessage);
+                        showError(errorMessage);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                } else if (throwable instanceof IOException) { //Error from network
+                    showError("Can not connect to qiscus server!");
+                } else { //Unknown error
+                    showError("Unexpected error!");
+                }
+            }
+        });
 ```
 
 ### Disconnect or Logout
