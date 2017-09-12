@@ -30,11 +30,11 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.QiscusGroupChatActivity;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -73,7 +73,7 @@ public class QiscusChatConfig {
 
     private int accountLinkingTextColor = R.color.qiscus_primary;
     private int accountLinkingBackground = R.color.qiscus_account_linking_background;
-    private String accountLinkingText = QiscusAndroidUtil.getString(R.string.qiscus_account_linking_text);
+    private String accountLinkingText = QiscusTextUtil.getString(R.string.qiscus_account_linking_text);
 
     private int buttonBubbleTextColor = R.color.qiscus_primary;
     private int buttonBubbleBackBackground = R.color.qiscus_account_linking_background;
@@ -81,39 +81,39 @@ public class QiscusChatConfig {
     private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
 
-    private String emptyRoomTitle = QiscusAndroidUtil.getString(R.string.qiscus_welcome);
-    private String emptyRoomSubtitle = QiscusAndroidUtil.getString(R.string.qiscus_desc_empty_chat);
+    private String emptyRoomTitle = QiscusTextUtil.getString(R.string.qiscus_welcome);
+    private String emptyRoomSubtitle = QiscusTextUtil.getString(R.string.qiscus_desc_empty_chat);
     private int emptyRoomImageResource = R.drawable.ic_qiscus_chat_empty;
-    private String messageFieldHint = QiscusAndroidUtil.getString(R.string.qiscus_hint_message);
+    private String messageFieldHint = QiscusTextUtil.getString(R.string.qiscus_hint_message);
 
     private int addPictureIcon = R.drawable.ic_qiscus_add_image;
     private int addPictureBackgroundColor = R.color.qiscus_gallery_background;
-    private String addPictureText = QiscusAndroidUtil.getString(R.string.qiscus_gallery);
+    private String addPictureText = QiscusTextUtil.getString(R.string.qiscus_gallery);
     private boolean enableAddPicture = true;
 
     private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
     private int takePictureBackgroundColor = R.color.qiscus_camera_background;
-    private String takePictureText = QiscusAndroidUtil.getString(R.string.qiscus_camera);
+    private String takePictureText = QiscusTextUtil.getString(R.string.qiscus_camera);
     private boolean enableTakePicture = true;
 
     private int addFileIcon = R.drawable.ic_qiscus_add_file;
     private int addFileBackgroundColor = R.color.qiscus_file_background;
-    private String addFileText = QiscusAndroidUtil.getString(R.string.qiscus_file);
+    private String addFileText = QiscusTextUtil.getString(R.string.qiscus_file);
     private boolean enableAddFile = true;
 
     private int recordAudioIcon = R.drawable.ic_qiscus_add_audio;
     private int recordBackgroundColor = R.color.qiscus_record_background;
-    private String recordText = QiscusAndroidUtil.getString(R.string.qiscus_record);
+    private String recordText = QiscusTextUtil.getString(R.string.qiscus_record);
     private boolean enableRecordAudio = true;
 
     private int addContactIcon = R.drawable.ic_qiscus_add_contact;
     private int addContactBackgroundColor = R.color.qiscus_contact_background;
-    private String addContactText = QiscusAndroidUtil.getString(R.string.qiscus_contact);
+    private String addContactText = QiscusTextUtil.getString(R.string.qiscus_contact);
     private boolean enableAddContact = true;
 
     private int addLocationIcon = R.drawable.ic_qiscus_location;
     private int addLocationBackgroundColor = R.color.qiscus_location_background;
-    private String addLocationText = QiscusAndroidUtil.getString(R.string.qiscus_location);
+    private String addLocationText = QiscusTextUtil.getString(R.string.qiscus_location);
     private boolean enableAddLocation = false;
 
     private int stopRecordIcon = R.drawable.ic_qiscus_send_on;

@@ -29,8 +29,8 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
 
@@ -110,7 +110,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
                     image.setVisibility(GONE);
                     icon.setVisibility(VISIBLE);
                     icon.setImageResource(R.drawable.ic_qiscus_add_audio);
-                    content.setText(QiscusAndroidUtil.getString(R.string.qiscus_voice_message));
+                    content.setText(QiscusTextUtil.getString(R.string.qiscus_voice_message));
                     break;
                 case FILE:
                     image.setVisibility(GONE);
@@ -122,7 +122,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
                     image.setVisibility(GONE);
                     icon.setVisibility(VISIBLE);
                     icon.setImageResource(R.drawable.ic_qiscus_add_contact);
-                    content.setText(QiscusAndroidUtil.getString(R.string.qiscus_contact) + ": "
+                    content.setText(QiscusTextUtil.getString(R.string.qiscus_contact) + ": "
                             + originComment.getContact().getName());
                     break;
                 case LOCATION:

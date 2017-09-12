@@ -29,6 +29,7 @@ import com.qiscus.sdk.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.util.QiscusTextUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
 
 import org.json.JSONException;
@@ -106,7 +107,7 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setTopicId(topicId);
         qiscusComment.setUniqueId("android_"
                 + System.currentTimeMillis()
-                + QiscusAndroidUtil.getRandomString(8)
+                + QiscusTextUtil.getRandomString(8)
                 + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
                 Settings.Secure.ANDROID_ID));
         qiscusComment.setMessage(content);
@@ -484,14 +485,14 @@ public class QiscusComment implements Parcelable {
 
     private boolean containsUrl() {
         if (urls == null) {
-            urls = QiscusAndroidUtil.extractUrl(message);
+            urls = QiscusTextUtil.extractUrl(message);
         }
         return !urls.isEmpty();
     }
 
     public List<String> getUrls() {
         if (urls == null) {
-            urls = QiscusAndroidUtil.extractUrl(message);
+            urls = QiscusTextUtil.extractUrl(message);
         }
         return urls;
     }

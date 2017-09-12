@@ -27,10 +27,10 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -196,7 +196,7 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> sync() {
         QiscusComment latestComment = Qiscus.getDataStore().getLatestComment();
-        if (latestComment == null || !QiscusAndroidUtil.getString(R.string.qiscus_today)
+        if (latestComment == null || !QiscusTextUtil.getString(R.string.qiscus_today)
                 .equals(QiscusDateUtil.toTodayOrDate(latestComment.getTime()))) {
             return Observable.empty();
         }

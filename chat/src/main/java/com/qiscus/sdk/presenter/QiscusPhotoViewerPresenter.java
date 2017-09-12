@@ -22,9 +22,9 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                 }, throwable -> {
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_general_error));
+                        view.showError(QiscusTextUtil.getString(R.string.qiscus_general_error));
                         view.closePage();
                         view.dismissLoading();
                     }
@@ -106,7 +106,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     qiscusComment.setDownloading(false);
-                    view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_download_file));
+                    view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_download_file));
                 });
     }
 

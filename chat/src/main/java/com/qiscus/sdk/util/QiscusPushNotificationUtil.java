@@ -77,16 +77,16 @@ public final class QiscusPushNotificationUtil {
         }
         switch (comment.getType()) {
             case IMAGE:
-                messageText += "\uD83D\uDCF7 " + QiscusAndroidUtil.getString(R.string.qiscus_send_a_photo);
+                messageText += "\uD83D\uDCF7 " + QiscusTextUtil.getString(R.string.qiscus_send_a_photo);
                 break;
             case VIDEO:
-                messageText += "\uD83C\uDFA5 " + QiscusAndroidUtil.getString(R.string.qiscus_send_a_video);
+                messageText += "\uD83C\uDFA5 " + QiscusTextUtil.getString(R.string.qiscus_send_a_video);
                 break;
             case AUDIO:
-                messageText += "\uD83D\uDD0A " + QiscusAndroidUtil.getString(R.string.qiscus_send_a_audio);
+                messageText += "\uD83D\uDD0A " + QiscusTextUtil.getString(R.string.qiscus_send_a_audio);
                 break;
             case CONTACT:
-                messageText += "\u260E " + QiscusAndroidUtil.getString(R.string.qiscus_contact) + ": " +
+                messageText += "\u260E " + QiscusTextUtil.getString(R.string.qiscus_contact) + ": " +
                         comment.getContact().getName();
                 break;
             case LOCATION:
@@ -94,7 +94,7 @@ public final class QiscusPushNotificationUtil {
                 break;
             default:
                 messageText += comment.isAttachment() ? "\uD83D\uDCC4 " +
-                        QiscusAndroidUtil.getString(R.string.qiscus_send_attachment) : comment.getMessage();
+                        QiscusTextUtil.getString(R.string.qiscus_send_attachment) : comment.getMessage();
                 break;
         }
 
@@ -162,11 +162,11 @@ public final class QiscusPushNotificationUtil {
         if (Qiscus.getChatConfig().isEnableReplyNotification() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String getRepliedTo = comment.getRoomName();
             RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
-                    .setLabel(QiscusAndroidUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
+                    .setLabel(QiscusTextUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
                     .build();
 
             NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(android.R.drawable.ic_menu_send,
-                    QiscusAndroidUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()), pendingIntent)
+                    QiscusTextUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()), pendingIntent)
                     .addRemoteInput(remoteInput)
                     .build();
             notificationBuilder.addAction(replyAction);
@@ -199,7 +199,7 @@ public final class QiscusPushNotificationUtil {
         for (int i = start; i < notifItems.size(); i++) {
             inboxStyle.addLine(notifItems.get(i).getMessage());
         }
-        inboxStyle.setSummaryText(QiscusAndroidUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
+        inboxStyle.setSummaryText(QiscusTextUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
         notificationBuilder.setStyle(inboxStyle);
 
         if (notifSize <= 3) {

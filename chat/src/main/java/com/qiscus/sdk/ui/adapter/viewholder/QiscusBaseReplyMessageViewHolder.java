@@ -40,9 +40,9 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.adapter.ReplyItemClickListener;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPatterns;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -131,7 +131,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
 
         QiscusComment originComment = qiscusComment.getReplyTo();
         originSenderTextView.setText(originComment.getSenderEmail().equals(qiscusAccount.getEmail()) ?
-                QiscusAndroidUtil.getString(R.string.qiscus_you) : originComment.getSender());
+                QiscusTextUtil.getString(R.string.qiscus_you) : originComment.getSender());
         switch (originComment.getType()) {
             case IMAGE:
             case VIDEO:
@@ -157,7 +157,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                     originIconView.setVisibility(View.VISIBLE);
                     originIconView.setImageResource(R.drawable.ic_qiscus_add_audio);
                 }
-                originMessageTextView.setText(QiscusAndroidUtil.getString(R.string.qiscus_voice_message));
+                originMessageTextView.setText(QiscusTextUtil.getString(R.string.qiscus_voice_message));
                 break;
             case FILE:
                 if (originImageView != null) {
@@ -177,7 +177,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                     originIconView.setVisibility(View.VISIBLE);
                     originIconView.setImageResource(R.drawable.ic_qiscus_add_contact);
                 }
-                originMessageTextView.setText(QiscusAndroidUtil.getString(R.string.qiscus_contact)
+                originMessageTextView.setText(QiscusTextUtil.getString(R.string.qiscus_contact)
                         + ": " + originComment.getContact().getName());
                 break;
             case LOCATION:
