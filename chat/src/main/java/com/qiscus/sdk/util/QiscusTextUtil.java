@@ -16,13 +16,24 @@
 
 package com.qiscus.sdk.util;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 
@@ -97,5 +108,49 @@ public final class QiscusTextUtil {
             urls.add(url);
         }
         return urls;
+    }
+
+    public static Spannable createQiscusSpannableText(String message, Map<String, QiscusRoomMember> members,
+                                                      MentionClickListener mentionClickListener) {
+        SpannableStringBuilder spannable = new SpannableStringBuilder();
+        int length = message.length();
+        int lastNotMention = 0;
+        int startPosition = 0;
+        boolean ongoing = false;
+        for (int i = 0; i < length; i++) {
+            if (!ongoing && i < length - 1 && message.charAt(i) == '@' && message.charAt(i + 1) == '[') {
+                ongoing = true;
+                startPosition = i;
+            }
+
+            if (ongoing && message.charAt(i) == ']') {
+                String mentionedUserId = message.substring(startPosition + 2, i);
+                QiscusRoomMember mentionedUser = members.get(mentionedUserId);
+                if (mentionedUser != null) {
+                    SpannableString mention = new SpannableString("@" + mentionedUser.getUsername());
+                    mention.setSpan(new ClickableSpan() {
+                        @Override
+                        public void onClick(View widget) {
+                            mentionClickListener.onMentionClick(mentionedUser);
+                        }
+
+                        @Override
+                        public void updateDrawState(TextPaint ds) {
+                            ds.setColor(Color.BLUE);
+                        }
+                    }, 0, mention.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    if (lastNotMention != startPosition) {
+                        spannable.append(message.substring(lastNotMention, startPosition));
+                    }
+                    spannable.append(mention);
+                    lastNotMention = i + 1;
+                }
+                ongoing = false;
+            }
+        }
+        if (lastNotMention < length) {
+            spannable.append(message.substring(lastNotMention, length));
+        }
+        return spannable;
     }
 }

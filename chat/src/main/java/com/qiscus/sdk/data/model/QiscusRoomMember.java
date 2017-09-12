@@ -103,10 +103,7 @@ public class QiscusRoomMember implements Parcelable {
 
     @Override
     public int hashCode() {
-        int result = email != null ? email.hashCode() : 0;
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
-        return result;
+        return email.hashCode();
     }
 
     @Override
