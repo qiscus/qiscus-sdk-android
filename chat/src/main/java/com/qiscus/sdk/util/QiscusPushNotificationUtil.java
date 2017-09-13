@@ -30,6 +30,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -77,10 +78,12 @@ public final class QiscusPushNotificationUtil {
         }
         switch (comment.getType()) {
             case IMAGE:
-                messageText += "\uD83D\uDCF7 " + QiscusAndroidUtil.getString(R.string.qiscus_send_a_photo);
+                messageText += "\uD83D\uDCF7 " + (TextUtils.isEmpty(comment.getCaption()) ?
+                        QiscusAndroidUtil.getString(R.string.qiscus_send_a_photo) : comment.getCaption());
                 break;
             case VIDEO:
-                messageText += "\uD83C\uDFA5 " + QiscusAndroidUtil.getString(R.string.qiscus_send_a_video);
+                messageText += "\uD83C\uDFA5 " + (TextUtils.isEmpty(comment.getCaption()) ?
+                        QiscusAndroidUtil.getString(R.string.qiscus_send_a_video) : comment.getCaption());
                 break;
             case AUDIO:
                 messageText += "\uD83D\uDD0A " + QiscusAndroidUtil.getString(R.string.qiscus_send_a_audio);
