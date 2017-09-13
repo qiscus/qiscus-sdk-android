@@ -1520,7 +1520,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 return;
             }
 
-            Map<String, String> captions = (Map<String, String>) data.getSerializableExtra(QiscusSendPhotoConfirmationActivity.EXTRA_CAPTIONS);
+            Map<String, String> captions = (Map<String, String>)
+                    data.getSerializableExtra(QiscusSendPhotoConfirmationActivity.EXTRA_CAPTIONS);
             List<QiscusPhoto> qiscusPhotos = data.getParcelableArrayListExtra(QiscusSendPhotoConfirmationActivity.EXTRA_QISCUS_PHOTOS);
             if (qiscusPhotos != null) {
                 for (QiscusPhoto qiscusPhoto : qiscusPhotos) {
