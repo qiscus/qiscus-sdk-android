@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     public void openChat(View view) {
         showLoading();
         Qiscus.buildChatWith("rya.meyvriska24@gmail.com")
-                .withTitle("Rya Meyvriska")
                 .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -121,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
     public void openSimpleCustomChat(View view) {
         showLoading();
         Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
-                .withTitle("Rya Meyvriska")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -140,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
     public void openAdvanceCustomChat(View view) {
         showLoading();
         Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
-                .withTitle("Rya Meyvriska")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
