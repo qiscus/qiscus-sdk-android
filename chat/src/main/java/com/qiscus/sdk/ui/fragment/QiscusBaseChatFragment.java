@@ -98,6 +98,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on : September 28, 2016
@@ -1126,6 +1127,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         qiscusChatPresenter.sendFile(file);
     }
 
+    public void sendFile(File file, String caption) {
+        qiscusChatPresenter.sendFile(file, caption);
+    }
+
     public void sendContact(QiscusContact contact) {
         qiscusChatPresenter.sendContact(contact);
     }
@@ -1515,15 +1520,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 return;
             }
 
-            String caption = data.getStringExtra(QiscusSendPhotoConfirmationActivity.EXTRA_CAPTION);
-            if (caption != null && !caption.trim().isEmpty()) {
-                qiscusChatPresenter.sendComment(caption);
-            }
-
+            Map<String, String> captions = (Map<String, String>) data.getSerializableExtra(QiscusSendPhotoConfirmationActivity.EXTRA_CAPTIONS);
             List<QiscusPhoto> qiscusPhotos = data.getParcelableArrayListExtra(QiscusSendPhotoConfirmationActivity.EXTRA_QISCUS_PHOTOS);
             if (qiscusPhotos != null) {
                 for (QiscusPhoto qiscusPhoto : qiscusPhotos) {
-                    sendFile(qiscusPhoto.getPhotoFile());
+                    sendFile(qiscusPhoto.getPhotoFile(), captions.get(qiscusPhoto.getPhotoFile().getAbsolutePath()));
                 }
             } else {
                 showError(getString(R.string.qiscus_chat_error_failed_read_picture));

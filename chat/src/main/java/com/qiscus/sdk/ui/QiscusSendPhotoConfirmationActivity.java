@@ -73,7 +73,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     private static final String EXTRA_ROOM_NAME = "room_name";
     private static final String EXTRA_ROOM_AVATAR = "room_avatar";
     public static final String EXTRA_QISCUS_PHOTOS = "qiscus_photos";
-    public static final String EXTRA_CAPTION = "caption";
+    public static final String EXTRA_CAPTIONS = "captions";
 
     private ViewGroup rootView;
     private EditText messageEditText;
@@ -208,10 +208,9 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     private void confirm() {
         dismissEmoji();
-        String caption = messageEditText.getText().toString();
         Intent data = new Intent();
         data.putParcelableArrayListExtra(EXTRA_QISCUS_PHOTOS, (ArrayList<QiscusPhoto>) qiscusPhotos);
-        data.putExtra(EXTRA_CAPTION, caption);
+        data.putExtra(EXTRA_CAPTIONS, (HashMap<String, String>) captions);
         setResult(RESULT_OK, data);
         finish();
     }
