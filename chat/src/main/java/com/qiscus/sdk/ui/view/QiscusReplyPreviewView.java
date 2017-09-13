@@ -19,6 +19,7 @@ package com.qiscus.sdk.ui.view;
 import android.content.Context;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -104,7 +105,8 @@ public class QiscusReplyPreviewView extends LinearLayout {
                     } else {
                         showImage(localPath);
                     }
-                    content.setText(originComment.getAttachmentName());
+                    content.setText(TextUtils.isEmpty(originComment.getCaption()) ?
+                            originComment.getAttachmentName() : originComment.getCaption());
                     break;
                 case AUDIO:
                     image.setVisibility(GONE);

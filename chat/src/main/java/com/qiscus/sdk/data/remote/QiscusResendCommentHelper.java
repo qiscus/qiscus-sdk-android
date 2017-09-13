@@ -111,7 +111,7 @@ public final class QiscusResendCommentHelper {
         Subscription subscription = QiscusApi.getInstance()
                 .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .flatMap(uri -> {
-                    qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
+                    qiscusComment.updateAttachmentUrl(uri.toString());
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
                 .doOnNext(commentSend -> {

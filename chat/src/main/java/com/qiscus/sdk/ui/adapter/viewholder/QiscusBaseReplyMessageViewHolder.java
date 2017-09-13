@@ -24,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
 import android.text.style.ClickableSpan;
@@ -147,7 +148,8 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                 if (originIconView != null) {
                     originIconView.setVisibility(View.GONE);
                 }
-                originMessageTextView.setText(originComment.getAttachmentName());
+                originMessageTextView.setText(TextUtils.isEmpty(originComment.getCaption()) ?
+                        originComment.getAttachmentName() : originComment.getCaption());
                 break;
             case AUDIO:
                 if (originImageView != null) {
