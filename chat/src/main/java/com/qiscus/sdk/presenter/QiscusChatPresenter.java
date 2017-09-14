@@ -227,6 +227,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void sendFile(File file) {
+        sendFile(file, null);
+    }
+
+    public void sendFile(File file, String caption) {
         File compressedFile = file;
         if (QiscusImageUtil.isImage(file) && !file.getName().endsWith(".gif")) {
             try {
@@ -244,8 +248,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             return;
         }
 
-        QiscusComment qiscusComment = QiscusComment.generateMessage(String.format("[file] %s [/file]", compressedFile.getPath()),
-                room.getId(), currentTopicId);
+        QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(compressedFile.getPath(),
+                caption, room.getId(), currentTopicId);
         qiscusComment.setDownloading(true);
         view.onSendingComment(qiscusComment);
 
@@ -254,7 +258,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .uploadFile(compressedFile, percentage -> qiscusComment.setProgress((int) percentage))
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
-                    qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
+                    qiscusComment.updateAttachmentUrl(uri.toString());
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
                 .doOnNext(commentSend -> {
@@ -302,7 +306,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
-                    qiscusComment.setMessage(String.format("[file] %s [/file]", uri.toString()));
+                    qiscusComment.updateAttachmentUrl(uri.toString());
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
                 .doOnNext(commentSend -> {

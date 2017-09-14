@@ -47,6 +47,12 @@ public class QiscusVideoViewHolder extends QiscusBaseVideoMessageViewHolder {
 
     @Nullable
     @Override
+    protected TextView getCaptionView(View itemView) {
+        return (TextView) itemView.findViewById(R.id.caption);
+    }
+
+    @Nullable
+    @Override
     protected ImageView getImageFrameView(View itemView) {
         return (ImageView) itemView.findViewById(R.id.frame);
     }

@@ -27,6 +27,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,7 +59,9 @@ import com.vanniktech.emoji.EmojiPopup;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on : June 14, 2017
@@ -69,13 +73,14 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     private static final String EXTRA_ROOM_NAME = "room_name";
     private static final String EXTRA_ROOM_AVATAR = "room_avatar";
     public static final String EXTRA_QISCUS_PHOTOS = "qiscus_photos";
-    public static final String EXTRA_CAPTION = "caption";
+    public static final String EXTRA_CAPTIONS = "captions";
 
     private ViewGroup rootView;
     private EditText messageEditText;
 
     private ViewPager viewPager;
     private List<QiscusPhoto> qiscusPhotos;
+    private Map<String, String> captions;
     private int position = -1;
 
     private ImageView toggleEmojiButton;
@@ -125,10 +130,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         photoAdapter = new QiscusPhotoAdapter(this);
-        photoAdapter.setOnItemClickListener((view, position) -> {
-            updateRecycleViewPosition(position);
-            viewPager.setCurrentItem(position);
-        });
+        photoAdapter.setOnItemClickListener((view, position) -> viewPager.setCurrentItem(position));
         recyclerView.setAdapter(photoAdapter);
 
         messageEditText.setOnEditorActionListener((v, actionId, event) -> {
@@ -137,6 +139,28 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
                 return true;
             }
             return false;
+        });
+
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (position >= 0 && position < qiscusPhotos.size()) {
+                    QiscusPhoto currentPhoto = qiscusPhotos.get(position);
+                    if (currentPhoto != null) {
+                        captions.put(currentPhoto.getPhotoFile().getAbsolutePath(), s.toString());
+                    }
+                }
+            }
         });
 
         toggleEmojiButton = (ImageView) findViewById(R.id.button_add_emoticon);
@@ -152,6 +176,14 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         });
 
         viewPager.addOnPageChangeListener(this);
+
+        if (savedInstanceState != null) {
+            captions = (Map<String, String>) savedInstanceState.getSerializable("saved_captions");
+        }
+
+        if (captions == null) {
+            captions = new HashMap<>();
+        }
 
         qiscusPhotos = getIntent().getParcelableArrayListExtra(EXTRA_QISCUS_PHOTOS);
         if (qiscusPhotos != null) {
@@ -176,10 +208,9 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     private void confirm() {
         dismissEmoji();
-        String caption = messageEditText.getText().toString();
         Intent data = new Intent();
         data.putParcelableArrayListExtra(EXTRA_QISCUS_PHOTOS, (ArrayList<QiscusPhoto>) qiscusPhotos);
-        data.putExtra(EXTRA_CAPTION, caption);
+        data.putExtra(EXTRA_CAPTIONS, (HashMap<String, String>) captions);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -243,6 +274,17 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     private void updateRecycleViewPosition(int position) {
         photoAdapter.updateSelected(position);
         recyclerView.smoothScrollToPosition(position);
+        updateCaption(position);
+    }
+
+    private void updateCaption(int position) {
+        if (position >= 0 && position < qiscusPhotos.size()) {
+            QiscusPhoto currentPhoto = qiscusPhotos.get(position);
+            if (currentPhoto != null) {
+                messageEditText.setText(captions.get(currentPhoto.getPhotoFile().getAbsolutePath()));
+                messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
+            }
+        }
     }
 
     protected void setupEmojiPopup() {
@@ -293,5 +335,11 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     public void showError(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("saved_captions", (HashMap<String, String>) captions);
     }
 }

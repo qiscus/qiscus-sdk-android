@@ -67,6 +67,10 @@
             android:layout_width="192dp"
             android:layout_height="192dp"
             android:layout_margin="4dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"/>
 
@@ -121,13 +125,30 @@
             android:padding="64dp"
             android:src="@drawable/ic_qiscus_play_icon"/>
 
+        <com.vanniktech.emoji.EmojiTextView
+            android:id="@+id/caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignLeft="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignStart="@+id/thumbnail"
+            android:layout_below="@+id/thumbnail"
+            android:layout_marginBottom="4dp"
+            android:autoLink="all"
+            android:linksClickable="true"
+            android:textColor="@color/qiscus_primary_text"
+            android:textColorLink="@color/qiscus_primary_text"
+            android:textSize="16sp"
+            android:visibility="visible"
+            app:emojiSize="22sp"/>
+
         <TextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/thumbnail"
+            android:layout_below="@+id/caption"
             android:layout_gravity="bottom"
-            android:layout_marginTop="8dp"
             android:layout_toLeftOf="@+id/icon_read"
             android:layout_toStartOf="@+id/icon_read"
             android:textColor="@color/qiscus_secondary_text"
@@ -137,13 +158,12 @@
             android:id="@+id/icon_read"
             android:layout_width="18dp"
             android:layout_height="16dp"
-            android:layout_alignEnd="@+id/thumbnail"
-            android:layout_alignRight="@+id/thumbnail"
-            android:layout_below="@+id/thumbnail"
+            android:layout_alignEnd="@+id/caption"
+            android:layout_alignRight="@+id/caption"
+            android:layout_below="@+id/caption"
             android:layout_gravity="bottom"
             android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginStart="4dp"/>
     </RelativeLayout>
 
 

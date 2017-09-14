@@ -19,8 +19,10 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.nirmana.Nirmana;
@@ -44,6 +46,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
 
     @NonNull protected ImageView thumbnailView;
+    @Nullable protected TextView captionView;
     @Nullable protected ImageView imageFrameView;
     @Nullable protected QiscusProgressView progressView;
     @Nullable protected ImageView downloadIconView;
@@ -55,6 +58,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                                             OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         thumbnailView = getThumbnailView(itemView);
+        captionView = getCaptionView(itemView);
         imageFrameView = getImageFrameView(itemView);
         progressView = getProgressView(itemView);
         downloadIconView = getDownloadIconView(itemView);
@@ -69,6 +73,9 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
 
     @NonNull
     protected abstract ImageView getThumbnailView(View itemView);
+
+    @Nullable
+    protected abstract TextView getCaptionView(View itemView);
 
     @Nullable
     protected abstract ImageView getImageFrameView(View itemView);
@@ -123,6 +130,14 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
         showImage(qiscusComment);
+        showCaption(qiscusComment);
+    }
+
+    protected void showCaption(QiscusComment qiscusComment) {
+        if (captionView != null) {
+            captionView.setVisibility(TextUtils.isEmpty(qiscusComment.getCaption()) ? View.GONE : View.VISIBLE);
+            captionView.setText(qiscusComment.getCaption());
+        }
     }
 
     protected void showImage(QiscusComment qiscusComment) {

@@ -98,6 +98,7 @@ public class QiscusComment implements Parcelable {
     private MediaPlayer player;
 
     private QiscusComment replyTo;
+    private String caption;
 
     public static QiscusComment generateMessage(String content, int roomId, int topicId) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
@@ -117,6 +118,19 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setSenderAvatar(qiscusAccount.getAvatar());
         qiscusComment.setState(STATE_SENDING);
 
+        return qiscusComment;
+    }
+
+    public static QiscusComment generateFileAttachmentMessage(String fileUrl, String caption, int roomId, int topicId) {
+        QiscusComment qiscusComment = generateMessage(String.format("[file] %s [/file]", fileUrl), roomId, topicId);
+        qiscusComment.setRawType("file_attachment");
+        JSONObject json = new JSONObject();
+        try {
+            json.put("url", fileUrl).put("caption", caption);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
         return qiscusComment;
     }
 
@@ -405,9 +419,21 @@ public class QiscusComment implements Parcelable {
         this.replyTo = replyTo;
     }
 
+    public void updateAttachmentUrl(String url) {
+        setMessage(String.format("[file] %s [/file]", url));
+        try {
+            JSONObject json = new JSONObject(getExtraPayload());
+            json.put("url", url);
+            setExtraPayload(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean isAttachment() {
         String trimmedMessage = message.trim();
-        return trimmedMessage.startsWith("[file]") && trimmedMessage.endsWith("[/file]");
+        return (trimmedMessage.startsWith("[file]") && trimmedMessage.endsWith("[/file]"))
+                || (!TextUtils.isEmpty(rawType) && rawType.equals("file_attachment"));
     }
 
     public Uri getAttachmentUri() {
@@ -419,6 +445,21 @@ public class QiscusComment implements Parcelable {
         return Uri.parse(uriStr);
     }
 
+    public String getCaption() {
+        if (!isAttachment()) {
+            return getMessage();
+        }
+        if (caption == null) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                caption = payload.optString("caption", "");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return caption;
+    }
+
     public String getAttachmentName() {
         if (!isAttachment()) {
             throw new RuntimeException("Current comment is not an attachment");
@@ -427,16 +468,14 @@ public class QiscusComment implements Parcelable {
         int fileNameEndIndex = message.lastIndexOf(" [/file]");
         int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
 
-        String fileName = message.substring(fileNameBeginIndex,
-                fileNameEndIndex);
+        String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
         try {
             return URLDecoder.decode(fileName, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
-        throw new RuntimeException("The filename '" + fileName
-                + "' is not valid UTF-8");
+        throw new RuntimeException("The filename '" + fileName + "' is not valid UTF-8");
     }
 
     public String getExtension() {

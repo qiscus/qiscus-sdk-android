@@ -128,12 +128,13 @@
 
             </LinearLayout>
 
-
             <ImageView
                 android:id="@+id/origin_image"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:scaleType="centerCrop"
                 android:visibility="gone"/>
 
