@@ -18,8 +18,11 @@ package com.qiscus.sdk.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-public class QiscusRoomMember implements Parcelable {
+import com.qiscus.manggil.mention.Mentionable;
+
+public class QiscusRoomMember implements Parcelable, Mentionable {
     private String email;
     private String username;
     private String avatar;
@@ -123,5 +126,31 @@ public class QiscusRoomMember implements Parcelable {
         dest.writeString(avatar);
         dest.writeInt(lastDeliveredCommentId);
         dest.writeInt(lastReadCommentId);
+    }
+
+    @NonNull
+    @Override
+    public String getTextForDisplayMode(MentionDisplayMode mode) {
+        return "@" + username;
+    }
+
+    @Override
+    public String getTextForEncodeMode() {
+        return "@[" + email + "]";
+    }
+
+    @Override
+    public MentionDeleteStyle getDeleteStyle() {
+        return MentionDeleteStyle.FULL_DELETE;
+    }
+
+    @Override
+    public int getSuggestibleId() {
+        return email.hashCode();
+    }
+
+    @Override
+    public String getSuggestiblePrimaryText() {
+        return username;
     }
 }

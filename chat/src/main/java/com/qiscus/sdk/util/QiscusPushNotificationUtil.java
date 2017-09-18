@@ -38,11 +38,15 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on : June 15, 2017
@@ -72,6 +76,14 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void showPushNotification(Context context, QiscusComment comment) {
+        QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(comment.getRoomId());
+        Map<String, QiscusRoomMember> members = new HashMap<>();
+        if (room != null) {
+            for (QiscusRoomMember member : room.getMember()) {
+                members.put(member.getEmail(), member);
+            }
+        }
+
         String messageText = comment.isGroupMessage() ? comment.getSender().split(" ")[0] + ": " : "";
         if (comment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
             messageText = "";
@@ -79,11 +91,13 @@ public final class QiscusPushNotificationUtil {
         switch (comment.getType()) {
             case IMAGE:
                 messageText += "\uD83D\uDCF7 " + (TextUtils.isEmpty(comment.getCaption()) ?
-                        QiscusTextUtil.getString(R.string.qiscus_send_a_photo) : comment.getCaption());
+                        QiscusTextUtil.getString(R.string.qiscus_send_a_photo) :
+                        new QiscusSpannableBuilder(comment.getCaption(), members).build().toString());
                 break;
             case VIDEO:
                 messageText += "\uD83C\uDFA5 " + (TextUtils.isEmpty(comment.getCaption()) ?
-                        QiscusTextUtil.getString(R.string.qiscus_send_a_video) : comment.getCaption());
+                        QiscusTextUtil.getString(R.string.qiscus_send_a_video) :
+                        new QiscusSpannableBuilder(comment.getCaption(), members).build().toString());
                 break;
             case AUDIO:
                 messageText += "\uD83D\uDD0A " + QiscusTextUtil.getString(R.string.qiscus_send_a_audio);
@@ -97,7 +111,8 @@ public final class QiscusPushNotificationUtil {
                 break;
             default:
                 messageText += comment.isAttachment() ? "\uD83D\uDCC4 " +
-                        QiscusTextUtil.getString(R.string.qiscus_send_attachment) : comment.getMessage();
+                        QiscusTextUtil.getString(R.string.qiscus_send_attachment) :
+                        new QiscusSpannableBuilder(comment.getMessage(), members).build().toString();
                 break;
         }
 

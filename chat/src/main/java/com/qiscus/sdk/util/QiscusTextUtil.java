@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.util;
 
-import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.text.Spannable;
@@ -25,10 +25,11 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.MentionClickHandler;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.util.ArrayList;
@@ -110,8 +111,14 @@ public final class QiscusTextUtil {
         return urls;
     }
 
-    public static Spannable createQiscusSpannableText(String message, Map<String, QiscusRoomMember> members,
-                                                      MentionClickListener mentionClickListener) {
+    public static Spannable createQiscusSpannableText(
+            String message,
+            Map<String, QiscusRoomMember> members,
+            @ColorInt int mentionAllColor, @ColorInt int mentionOtherColor,
+            @ColorInt int mentionMeColor, MentionClickHandler mentionClickListener) {
+
+        QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
+
         SpannableStringBuilder spannable = new SpannableStringBuilder();
         int length = message.length();
         int lastNotMention = 0;
@@ -136,7 +143,13 @@ public final class QiscusTextUtil {
 
                         @Override
                         public void updateDrawState(TextPaint ds) {
-                            ds.setColor(Color.BLUE);
+                            if (mentionedUserId.equals("all")) {
+                                ds.setColor(mentionAllColor);
+                            } else if (mentionedUserId.equals(qiscusAccount.getEmail())) {
+                                ds.setColor(mentionMeColor);
+                            } else {
+                                ds.setColor(mentionOtherColor);
+                            }
                         }
                     }, 0, mention.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     if (lastNotMention != startPosition) {

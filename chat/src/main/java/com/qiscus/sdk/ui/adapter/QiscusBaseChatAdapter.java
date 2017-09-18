@@ -25,7 +25,9 @@ import android.view.ViewGroup;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -33,7 +35,9 @@ import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on : September 27, 2016
@@ -51,10 +55,13 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected ReplyItemClickListener replyItemClickListener;
     protected CommentChainingListener commentChainingListener;
 
+    protected QiscusChatRoom qiscusChatRoom;
     protected QiscusAccount qiscusAccount;
     protected int lastDeliveredCommentId;
     protected int lastReadCommentId;
     protected boolean groupChat;
+
+    private Map<String, QiscusRoomMember> members;
 
     public QiscusBaseChatAdapter(Context context, boolean groupChat) {
         this.context = context;
@@ -96,6 +103,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             }
         });
         qiscusAccount = Qiscus.getQiscusAccount();
+        members = new HashMap<>();
     }
 
     private void checkChaining(int position) {
@@ -111,16 +119,28 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         }
     }
 
-    public QiscusBaseChatAdapter(Context context) {
-        this(context, false);
-    }
-
     public boolean isGroupChat() {
         return groupChat;
     }
 
     public void setGroupChat(boolean groupChat) {
         this.groupChat = groupChat;
+    }
+
+    public QiscusChatRoom getQiscusChatRoom() {
+        return qiscusChatRoom;
+    }
+
+    public void setQiscusChatRoom(QiscusChatRoom qiscusChatRoom) {
+        this.qiscusChatRoom = qiscusChatRoom;
+        updateMember();
+    }
+
+    private void updateMember() {
+        members.clear();
+        for (QiscusRoomMember roomMember : qiscusChatRoom.getMember()) {
+            members.put(roomMember.getEmail(), roomMember);
+        }
     }
 
     protected abstract Class<E> getItemClass();
@@ -170,6 +190,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     @Override
     public void onBindViewHolder(H holder, int position) {
         holder.setGroupChat(groupChat);
+        holder.setRoomMembers(members);
 
         determineIsNeedToShowDate(holder, position);
         determineIsCommentFromMe(holder, position);

@@ -30,10 +30,15 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusSpannableBuilder;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created on : December 09, 2016
@@ -50,6 +55,8 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private ImageView icon;
     private View closeView;
     private QiscusComment originComment;
+
+    private Map<String, QiscusRoomMember> members = new HashMap<>();
 
     public QiscusReplyPreviewView(Context context) {
         super(context);
@@ -80,6 +87,13 @@ public class QiscusReplyPreviewView extends LinearLayout {
         closeView.setOnClickListener(v -> close());
     }
 
+    public void updateMember(List<QiscusRoomMember> roomMembers) {
+        members.clear();
+        for (QiscusRoomMember roomMember : roomMembers) {
+            members.put(roomMember.getEmail(), roomMember);
+        }
+    }
+
     public QiscusComment getOriginComment() {
         return originComment;
     }
@@ -106,7 +120,8 @@ public class QiscusReplyPreviewView extends LinearLayout {
                         showImage(localPath);
                     }
                     content.setText(TextUtils.isEmpty(originComment.getCaption()) ?
-                            originComment.getAttachmentName() : originComment.getCaption());
+                            originComment.getAttachmentName() :
+                            new QiscusSpannableBuilder(originComment.getCaption(), members).build().toString());
                     break;
                 case AUDIO:
                     image.setVisibility(GONE);
@@ -136,7 +151,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
                 default:
                     image.setVisibility(GONE);
                     icon.setVisibility(GONE);
-                    content.setText(originComment.getMessage());
+                    content.setText(new QiscusSpannableBuilder(originComment.getMessage(), members).build().toString());
                     break;
 
             }

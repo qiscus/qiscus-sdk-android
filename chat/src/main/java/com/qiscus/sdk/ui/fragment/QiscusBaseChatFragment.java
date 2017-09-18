@@ -57,6 +57,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
+import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
@@ -80,6 +81,7 @@ import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusEditText;
+import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -156,6 +158,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Nullable protected ViewGroup messageEditTextContainer;
     @NonNull protected EditText messageEditText;
     @NonNull protected ImageView sendButton;
+    @Nullable protected QiscusMentionSuggestionView mentionSuggestionView;
 
     @Nullable protected View newMessageButton;
     @NonNull protected View loadMoreProgressBar;
@@ -231,13 +234,17 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void onLoadView(View view) {
         rootView = getRootView(view);
+
         emptyChatHolder = getEmptyChatHolder(view);
         swipeRefreshLayout = getSwipeRefreshLayout(view);
         messageRecyclerView = getMessageRecyclerView(view);
+
         messageInputPanel = getMessageInputPanel(view);
         messageEditTextContainer = getMessageEditTextContainer(view);
         messageEditText = getMessageEditText(view);
         sendButton = getSendButton(view);
+        mentionSuggestionView = getMentionSuggestionView(view);
+
         newMessageButton = getNewMessageButton(view);
         loadMoreProgressBar = getLoadMoreProgressBar(view);
 
@@ -289,7 +296,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                onMessageEditTextChanged(s);
                 if (!typing) {
                     typing = true;
                     notifyServerTyping(true);
@@ -299,6 +305,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
             @Override
             public void afterTextChanged(Editable s) {
+                onMessageEditTextChanged(s);
                 QiscusAndroidUtil.runOnUIThread(stopTypingNotifyTask, 800);
             }
         });
@@ -306,6 +313,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 String message = messageEditText.getText().toString().trim();
+                if (messageEditText instanceof MentionsEditText) {
+                    message = ((MentionsEditText) messageEditText).getMentionsTextEncoded().toString().trim();
+                }
                 if (!message.isEmpty()) {
                     sendMessage(message);
                     QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
@@ -323,6 +333,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         sendButton.setOnClickListener(v -> {
             String message = messageEditText.getText().toString().trim();
+            if (messageEditText instanceof MentionsEditText) {
+                message = ((MentionsEditText) messageEditText).getMentionsTextEncoded().toString().trim();
+            }
             if (message.isEmpty()) {
                 showAttachmentPanel();
             } else {
@@ -395,6 +408,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @NonNull
     protected abstract ImageView getSendButton(View view);
+
+    @NonNull
+    protected abstract QiscusMentionSuggestionView getMentionSuggestionView(View view);
 
     @Nullable
     protected abstract View getNewMessageButton(View view);
@@ -549,6 +565,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         setupGifKeyboard();
         setupEmojiPopup();
+        setupMentionEditText();
 
         stopTypingNotifyTask = () -> {
             typing = false;
@@ -642,6 +659,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
                     .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
                     .build((EmojiEditText) messageEditText);
+        }
+    }
+
+    protected void setupMentionEditText() {
+        if (messageEditText instanceof MentionsEditText && mentionSuggestionView != null && qiscusChatRoom.isGroup()) {
+            mentionSuggestionView.bind((MentionsEditText) messageEditText);
         }
     }
 
@@ -1251,12 +1274,23 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
+    protected void updateMentionSuggestionData() {
+        if (mentionSuggestionView != null && qiscusChatRoom.isGroup()) {
+            mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
+        }
+    }
+
     @Override
     public void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments) {
         this.qiscusChatRoom = qiscusChatRoom;
         if (roomChangedListener != null) {
             roomChangedListener.onRoomUpdated(qiscusChatRoom);
         }
+        chatAdapter.setQiscusChatRoom(qiscusChatRoom);
+        if (replyPreviewView != null) {
+            replyPreviewView.updateMember(qiscusChatRoom.getMember());
+        }
+        updateMentionSuggestionData();
         showComments(comments);
         resolveScrollToComment();
     }

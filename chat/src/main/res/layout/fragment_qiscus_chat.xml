@@ -109,6 +109,11 @@
                 android:visibility="gone"/>
         </FrameLayout>
 
+        <com.qiscus.sdk.ui.view.QiscusMentionSuggestionView
+            android:id="@+id/mention_suggestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
         <com.qiscus.sdk.ui.view.QiscusReplyPreviewView
             android:id="@+id/reply_preview"
             android:layout_width="match_parent"

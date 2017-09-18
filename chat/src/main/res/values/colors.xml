@@ -38,4 +38,7 @@
     <color name="qiscus_transparent_black">#88000000</color>
     <color name="qiscus_left_bubble">#D0D0D0</color>
     <color name="qiscus_account_linking_background">#DFDFDF</color>
+    <color name="qiscus_mention_all">#1a237e</color>
+    <color name="qiscus_mention_other">#009688</color>
+    <color name="qiscus_mention_me">#af2412</color>
 </resources>

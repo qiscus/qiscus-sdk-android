@@ -31,8 +31,11 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+
+import java.util.Map;
 
 /**
  * Created on : August 18, 2016
@@ -74,6 +77,8 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     protected int dateColor;
     protected int senderNameColor;
     protected Drawable selectionBackground;
+
+    protected Map<String, QiscusRoomMember> roomMembers;
 
     public QiscusBaseMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                        OnLongItemClickListener longItemClickListener) {
@@ -157,6 +162,10 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
 
     public void setGroupChat(boolean groupChat) {
         this.groupChat = groupChat;
+    }
+
+    public void setRoomMembers(Map<String, QiscusRoomMember> roomMembers) {
+        this.roomMembers = roomMembers;
     }
 
     public void bind(E qiscusComment) {

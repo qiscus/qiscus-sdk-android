@@ -149,7 +149,14 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                     originIconView.setVisibility(View.GONE);
                 }
                 originMessageTextView.setText(TextUtils.isEmpty(originComment.getCaption()) ?
-                        originComment.getAttachmentName() : originComment.getCaption());
+                        originComment.getAttachmentName() : QiscusTextUtil.createQiscusSpannableText(
+                        originComment.getCaption(),
+                        roomMembers,
+                        originMessageColor,
+                        originMessageColor,
+                        originMessageColor,
+                        null
+                ));
                 break;
             case AUDIO:
                 if (originImageView != null) {
@@ -199,7 +206,14 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                 if (originIconView != null) {
                     originIconView.setVisibility(View.GONE);
                 }
-                originMessageTextView.setText(originComment.getMessage());
+                originMessageTextView.setText(QiscusTextUtil.createQiscusSpannableText(
+                        originComment.getMessage(),
+                        roomMembers,
+                        originMessageColor,
+                        originMessageColor,
+                        originMessageColor,
+                        null
+                ));
                 break;
 
         }

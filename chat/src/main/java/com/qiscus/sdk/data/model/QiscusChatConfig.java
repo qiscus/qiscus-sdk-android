@@ -198,6 +198,8 @@ public class QiscusChatConfig {
     private ForwardCommentHandler forwardCommentHandler;
     private boolean enableForwardComment = false;
 
+    private MentionConfig mentionConfig = new MentionConfig();
+
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
         return this;
@@ -654,6 +656,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setMentionConfig(MentionConfig mentionConfig) {
+        this.mentionConfig = mentionConfig;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1076,5 +1083,9 @@ public class QiscusChatConfig {
 
     public boolean isEnableForwardComment() {
         return enableForwardComment;
+    }
+
+    public MentionConfig getMentionConfig() {
+        return mentionConfig;
     }
 }

@@ -33,6 +33,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
+import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 
@@ -136,6 +137,12 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected ImageView getSendButton(View view) {
         return (ImageView) view.findViewById(R.id.button_send);
+    }
+
+    @NonNull
+    @Override
+    protected QiscusMentionSuggestionView getMentionSuggestionView(View view) {
+        return (QiscusMentionSuggestionView) view.findViewById(R.id.mention_suggestion);
     }
 
     @Nullable

@@ -33,6 +33,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
+import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 
@@ -142,6 +143,12 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     @Override
     protected ImageView getSendButton(View view) {
         return (ImageView) view.findViewById(R.id.button_send);
+    }
+
+    @NonNull
+    @Override
+    protected QiscusMentionSuggestionView getMentionSuggestionView(View view) {
+        return null;
     }
 
     @Nullable
@@ -284,7 +291,7 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
-        return new QiscusChatAdapter(getActivity());
+        return new QiscusChatAdapter(getActivity(), qiscusChatRoom.isGroup());
     }
 
     @Override

@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.util;
-
-import com.qiscus.sdk.data.model.QiscusRoomMember;
+package com.qiscus.sdk.data.model;
 
 /**
  * Created on : September 12, 2017
@@ -24,6 +22,6 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public interface MentionClickListener {
+public interface MentionClickHandler {
     void onMentionClick(QiscusRoomMember member);
 }
