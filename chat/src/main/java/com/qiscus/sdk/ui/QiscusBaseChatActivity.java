@@ -44,10 +44,13 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.util.QiscusSpannableBuilder;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on : December 08, 2016
@@ -73,6 +76,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected List<QiscusComment> forwardComments;
     protected QiscusComment scrollToComment;
 
+    private Map<String, QiscusRoomMember> roomMembers;
     private ActionMode actionMode;
     private QiscusUserStatusPresenter userStatusPresenter;
 
@@ -291,14 +295,29 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     protected void onSelectedCommentsAction(ActionMode mode, MenuItem item, List<QiscusComment> selectedComments) {
         int i = item.getItemId();
-        String text = "";
-        for (QiscusComment qiscusComment : selectedComments) {
-            text += qiscusComment.getSender() + ": ";
-            text += qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() : qiscusComment.getMessage();
-            text += "\n";
-        }
-
         if (i == R.id.action_copy) {
+            if (roomMembers == null) {
+                roomMembers = new HashMap<>();
+                for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+                    roomMembers.put(member.getEmail(), member);
+                }
+            }
+            String text = "";
+            if (selectedComments.size() == 1) {
+                QiscusComment qiscusComment = selectedComments.get(0);
+                text = qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
+                        new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
+                                .build().toString();
+            } else {
+                for (QiscusComment qiscusComment : selectedComments) {
+                    text += qiscusComment.getSender() + ": ";
+                    text += qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
+                            new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
+                                    .build().toString();
+                    text += "\n";
+                }
+            }
+
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText(getString(R.string.qiscus_chat_activity_label_clipboard), text);
             clipboard.setPrimaryClip(clip);

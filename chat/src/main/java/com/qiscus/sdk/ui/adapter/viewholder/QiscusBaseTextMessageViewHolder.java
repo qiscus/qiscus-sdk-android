@@ -17,12 +17,17 @@
 package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
+import android.text.Spannable;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
+import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 /**
  * Created on : September 27, 2016
@@ -38,6 +43,7 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageTextView = getMessageTextView(itemView);
+        messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @NonNull
@@ -52,6 +58,15 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
 
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
-        messageTextView.setText(qiscusComment.getMessage());
+        QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
+        Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
+                qiscusComment.getMessage(),
+                roomMembers,
+                messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
+                messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
+                messageFromMe ? mentionConfig.getRightMentionMeColor() : mentionConfig.getLeftMentionMeColor(),
+                mentionConfig.getMentionClickHandler()
+        );
+        messageTextView.setText(spannable);
     }
 }

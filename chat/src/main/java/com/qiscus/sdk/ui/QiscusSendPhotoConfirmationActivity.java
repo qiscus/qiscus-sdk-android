@@ -36,7 +36,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,17 +43,19 @@ import android.widget.Toast;
 import com.qiscus.jupuk.Jupuk;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
+import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusPhoto;
 import com.qiscus.sdk.ui.adapter.QiscusPhotoAdapter;
 import com.qiscus.sdk.ui.adapter.QiscusPhotoPagerAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusPhotoFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
+import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
 
 import java.io.File;
@@ -70,15 +71,16 @@ import java.util.Map;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity implements ViewPager.OnPageChangeListener {
-    private static final String EXTRA_ROOM_NAME = "room_name";
-    private static final String EXTRA_ROOM_AVATAR = "room_avatar";
+    private static final String EXTRA_ROOM = "room_data";
     public static final String EXTRA_QISCUS_PHOTOS = "qiscus_photos";
     public static final String EXTRA_CAPTIONS = "captions";
 
     private ViewGroup rootView;
-    private EditText messageEditText;
+    private MentionsEditText messageEditText;
 
     private ViewPager viewPager;
+    private QiscusMentionSuggestionView mentionSuggestionView;
+    private QiscusChatRoom qiscusChatRoom;
     private List<QiscusPhoto> qiscusPhotos;
     private Map<String, String> captions;
     private int position = -1;
@@ -91,10 +93,9 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     private QiscusChatConfig chatConfig;
 
-    public static Intent generateIntent(Context context, String roomName, String roomAvatar, List<QiscusPhoto> qiscusPhotos) {
+    public static Intent generateIntent(Context context, QiscusChatRoom room, List<QiscusPhoto> qiscusPhotos) {
         Intent intent = new Intent(context, QiscusSendPhotoConfirmationActivity.class);
-        intent.putExtra(EXTRA_ROOM_NAME, roomName);
-        intent.putExtra(EXTRA_ROOM_AVATAR, roomAvatar);
+        intent.putExtra(EXTRA_ROOM, room);
         intent.putParcelableArrayListExtra(EXTRA_QISCUS_PHOTOS, (ArrayList<QiscusPhoto>) qiscusPhotos);
         return intent;
     }
@@ -115,15 +116,21 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         toolbar.setBackgroundResource(chatConfig.getAppBarColor());
         setSupportActionBar(toolbar);
 
-        tvTitle.setText(getIntent().getStringExtra(EXTRA_ROOM_NAME));
-        Nirmana.getInstance().get().load(getIntent().getStringExtra(EXTRA_ROOM_AVATAR))
+        qiscusChatRoom = getIntent().getParcelableExtra(EXTRA_ROOM);
+        if (qiscusChatRoom == null) {
+            finish();
+            return;
+        }
+
+        tvTitle.setText(qiscusChatRoom.getName());
+        Nirmana.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
                 .error(R.drawable.ic_qiscus_avatar)
                 .placeholder(R.drawable.ic_qiscus_avatar)
                 .dontAnimate()
                 .into(ivAvatar);
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
-        messageEditText = (EditText) findViewById(R.id.field_message);
+        messageEditText = (MentionsEditText) findViewById(R.id.field_message);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
@@ -157,7 +164,8 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
                 if (position >= 0 && position < qiscusPhotos.size()) {
                     QiscusPhoto currentPhoto = qiscusPhotos.get(position);
                     if (currentPhoto != null) {
-                        captions.put(currentPhoto.getPhotoFile().getAbsolutePath(), s.toString());
+                        captions.put(currentPhoto.getPhotoFile().getAbsolutePath(),
+                                messageEditText.getMentionsTextEncoded().toString());
                     }
                 }
             }
@@ -174,6 +182,12 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
                 toggleEmoji();
             }
         });
+
+        mentionSuggestionView = (QiscusMentionSuggestionView) findViewById(R.id.mention_suggestion);
+        if (qiscusChatRoom.isGroup() && Qiscus.getChatConfig().getMentionConfig().isEnableMention()) {
+            mentionSuggestionView.bind(messageEditText);
+            mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
+        }
 
         viewPager.addOnPageChangeListener(this);
 
@@ -281,19 +295,23 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         if (position >= 0 && position < qiscusPhotos.size()) {
             QiscusPhoto currentPhoto = qiscusPhotos.get(position);
             if (currentPhoto != null) {
-                messageEditText.setText(captions.get(currentPhoto.getPhotoFile().getAbsolutePath()));
+                String caption = captions.get(currentPhoto.getPhotoFile().getAbsolutePath());
+                if (caption == null) {
+                    caption = "";
+                }
+                messageEditText.setMentionsTextEncoded(caption, qiscusChatRoom.getMember());
                 messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
             }
         }
     }
 
     protected void setupEmojiPopup() {
-        if (messageEditText instanceof EmojiEditText && toggleEmojiButton != null) {
+        if (messageEditText != null && toggleEmojiButton != null) {
             emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
                     .setOnSoftKeyboardCloseListener(this::dismissEmoji)
                     .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
                     .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
-                    .build((EmojiEditText) messageEditText);
+                    .build(messageEditText);
         }
     }
 

@@ -71,11 +71,11 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
         super.showMessage(qiscusComment);
-        setUpLinks(qiscusComment);
+        setUpLinks();
     }
 
-    private void setUpLinks(QiscusComment qiscusComment) {
-        String message = qiscusComment.getMessage();
+    private void setUpLinks() {
+        String message = messageTextView.getText().toString();
         Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(message);
         while (matcher.find()) {
             int start = matcher.start();

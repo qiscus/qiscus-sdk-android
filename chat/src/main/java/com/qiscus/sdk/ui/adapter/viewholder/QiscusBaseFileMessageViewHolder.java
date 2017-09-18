@@ -29,7 +29,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
 
@@ -133,7 +133,8 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
             if (qiscusComment.getExtension().isEmpty()) {
                 fileTypeView.setText(R.string.qiscus_unknown_type);
             } else {
-                fileTypeView.setText(QiscusAndroidUtil.getString(R.string.qiscus_file_type, qiscusComment.getExtension().toUpperCase()));
+                fileTypeView.setText(QiscusTextUtil.getString(R.string.qiscus_file_type,
+                        qiscusComment.getExtension().toUpperCase()));
             }
         }
     }

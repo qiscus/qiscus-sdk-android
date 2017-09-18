@@ -40,6 +40,7 @@ import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -235,7 +236,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             try {
                 compressedFile = QiscusImageUtil.compressImage(Uri.fromFile(file), currentTopicId);
             } catch (NullPointerException e) {
-                view.showError(QiscusAndroidUtil.getString(R.string.qiscus_corrupted_file));
+                view.showError(QiscusTextUtil.getString(R.string.qiscus_corrupted_file));
                 return;
             }
         } else {
@@ -243,7 +244,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         if (!file.exists()) { //File have been removed, so we can not upload it anymore
-            view.showError(QiscusAndroidUtil.getString(R.string.qiscus_corrupted_file));
+            view.showError(QiscusTextUtil.getString(R.string.qiscus_corrupted_file));
             return;
         }
 
@@ -382,7 +383,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     throwable.printStackTrace();
                     QiscusAndroidUtil.runOnUIThread(() -> {
                         if (view != null) {
-                            view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
+                            view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_load_comments));
                             view.dismissLoading();
                         }
                     });
@@ -492,7 +493,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
+                        view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_load_comments));
                         view.dismissLoading();
                     }
                 });
@@ -582,7 +583,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_load_comments));
+                        view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_load_comments));
                         view.dismissLoading();
                     }
                 });
@@ -805,7 +806,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         QiscusErrorLogger.print(throwable);
                         throwable.printStackTrace();
                         qiscusComment.setDownloading(false);
-                        view.showError(QiscusAndroidUtil.getString(R.string.qiscus_failed_download_file));
+                        view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_download_file));
                     });
         } else {
             if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
@@ -831,7 +832,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (qiscusComments.isEmpty()) {
                         QiscusAndroidUtil.runOnUIThread(() -> {
                             if (view != null) {
-                                view.showError(QiscusAndroidUtil.getString(R.string.qiscus_message_too_far));
+                                view.showError(QiscusTextUtil.getString(R.string.qiscus_message_too_far));
                             }
                         });
                     }

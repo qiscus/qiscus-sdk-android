@@ -21,18 +21,13 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.qiscus.sdk.Qiscus;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
-import java.util.regex.Matcher;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -45,18 +40,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public final class QiscusAndroidUtil {
 
     private static final Random random = new Random();
-    private static final char[] symbols;
-
-    static {
-        StringBuilder tmp = new StringBuilder();
-        for (char ch = '0'; ch <= '9'; ch++) {
-            tmp.append(ch);
-        }
-        for (char ch = 'a'; ch <= 'z'; ch++) {
-            tmp.append(ch);
-        }
-        symbols = tmp.toString().toCharArray();
-    }
 
     private QiscusAndroidUtil() {
     }
@@ -99,32 +82,6 @@ public final class QiscusAndroidUtil {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 
-    public static boolean isUrl(String s) {
-        return QiscusPatterns.AUTOLINK_WEB_URL.matcher(s).matches();
-    }
-
-    public static List<String> extractUrl(String text) {
-        List<String> urls = new ArrayList<>();
-        Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(text);
-        while (matcher.find()) {
-            int start = matcher.start();
-            if (start > 0 && text.charAt(start - 1) == '@') {
-                continue;
-            }
-            int end = matcher.end();
-            if (end < text.length() && text.charAt(end) == '@') {
-                continue;
-            }
-
-            String url = matcher.group();
-            if (!url.startsWith("http")) {
-                url = "http://" + url;
-            }
-            urls.add(url);
-        }
-        return urls;
-    }
-
     public static int getRandomColor() {
         return Color.argb(100, random.nextInt(256), random.nextInt(256), random.nextInt(256));
     }
@@ -149,23 +106,5 @@ public final class QiscusAndroidUtil {
     public static void hideKeyboard(Context context, View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    @NonNull
-    public static String getString(@StringRes int resId) {
-        return Qiscus.getApps().getString(resId);
-    }
-
-    @NonNull
-    public static String getString(@StringRes int resId, Object... formatArgs) {
-        return Qiscus.getApps().getString(resId, formatArgs);
-    }
-
-    public static String getRandomString(int length) {
-        char[] buf = new char[length];
-        for (int i = 0; i < buf.length; i++) {
-            buf[i] = symbols[random.nextInt(symbols.length)];
-        }
-        return new String(buf);
     }
 }

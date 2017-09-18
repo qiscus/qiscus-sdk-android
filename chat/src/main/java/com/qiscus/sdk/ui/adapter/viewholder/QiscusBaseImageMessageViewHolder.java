@@ -19,6 +19,7 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.text.Spannable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,11 +29,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
 
@@ -136,7 +139,16 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected void showCaption(QiscusComment qiscusComment) {
         if (captionView != null) {
             captionView.setVisibility(TextUtils.isEmpty(qiscusComment.getCaption()) ? View.GONE : View.VISIBLE);
-            captionView.setText(qiscusComment.getCaption());
+            QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
+            Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
+                    qiscusComment.getCaption(),
+                    roomMembers,
+                    messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
+                    messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
+                    messageFromMe ? mentionConfig.getRightMentionMeColor() : mentionConfig.getLeftMentionMeColor(),
+                    mentionConfig.getMentionClickHandler()
+            );
+            captionView.setText(spannable);
         }
     }
 

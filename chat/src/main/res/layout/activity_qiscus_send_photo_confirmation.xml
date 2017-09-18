@@ -90,6 +90,11 @@
         android:layout_weight="1"
         android:background="#000"/>
 
+    <com.qiscus.sdk.ui.view.QiscusMentionSuggestionView
+        android:id="@+id/mention_suggestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <LinearLayout
         android:id="@+id/field_message_container"
         android:layout_width="match_parent"
@@ -107,7 +112,7 @@
             android:padding="8dp"
             android:src="@drawable/ic_qiscus_emot"/>
 
-        <com.vanniktech.emoji.EmojiEditText
+        <com.qiscus.manggil.ui.MentionsEditText
             android:id="@+id/field_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
