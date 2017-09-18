@@ -10,7 +10,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
 import com.qiscus.manggil.ui.MentionsEditText;
-import com.vanniktech.emoji.EmojiEditText;
 
 /**
  * Created by rajapulau on 8/8/17.
