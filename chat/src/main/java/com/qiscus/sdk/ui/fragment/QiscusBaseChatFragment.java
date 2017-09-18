@@ -894,7 +894,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         QiscusCommentDraft draftComment = QiscusCacheManager.getInstance().getDraftComment(qiscusChatRoom.getId());
         if (draftComment != null) {
-            messageEditText.setText(draftComment.getMessage());
+            if (messageEditText instanceof MentionsEditText) {
+                ((MentionsEditText) messageEditText).setMentionsTextEncoded(draftComment.getMessage(),
+                        qiscusChatRoom.getMember());
+            } else {
+                messageEditText.setText(draftComment.getMessage());
+            }
             messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
             if (draftComment instanceof QiscusReplyCommentDraft && replyPreviewView != null) {
                 replyPreviewView.bind(((QiscusReplyCommentDraft) draftComment).getRepliedComment());
@@ -921,6 +926,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private void saveCommentDraft() {
         String message = messageEditText.getText().toString();
+        if (messageEditText instanceof MentionsEditText) {
+            message = ((MentionsEditText) messageEditText).getMentionsTextEncoded().toString();
+        }
         if (!message.trim().isEmpty()) {
             if (replyPreviewView != null) {
                 QiscusComment repliedComment = replyPreviewView.getOriginComment();
