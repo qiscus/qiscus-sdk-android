@@ -198,7 +198,7 @@ public class QiscusChatConfig {
     private ForwardCommentHandler forwardCommentHandler;
     private boolean enableForwardComment = false;
 
-    private MentionConfig mentionConfig = new MentionConfig();
+    private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
@@ -656,7 +656,7 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusChatConfig setMentionConfig(MentionConfig mentionConfig) {
+    public QiscusChatConfig setMentionConfig(QiscusMentionConfig mentionConfig) {
         this.mentionConfig = mentionConfig;
         return this;
     }
@@ -1085,7 +1085,7 @@ public class QiscusChatConfig {
         return enableForwardComment;
     }
 
-    public MentionConfig getMentionConfig() {
+    public QiscusMentionConfig getMentionConfig() {
         return mentionConfig;
     }
 }

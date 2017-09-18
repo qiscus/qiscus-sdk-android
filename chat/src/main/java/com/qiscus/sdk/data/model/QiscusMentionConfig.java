@@ -28,7 +28,7 @@ import com.qiscus.sdk.R;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class MentionConfig {
+public class QiscusMentionConfig {
     private int leftMentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
     private int leftMentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
     private int leftMentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
@@ -42,12 +42,13 @@ public class MentionConfig {
     private int editTextMentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
 
     private MentionClickHandler mentionClickHandler;
+    private boolean enableMention = false;
 
     public int getLeftMentionAllColor() {
         return leftMentionAllColor;
     }
 
-    public MentionConfig setLeftMentionAllColor(@ColorInt int leftMentionAllColor) {
+    public QiscusMentionConfig setLeftMentionAllColor(@ColorInt int leftMentionAllColor) {
         this.leftMentionAllColor = leftMentionAllColor;
         return this;
     }
@@ -57,7 +58,7 @@ public class MentionConfig {
         return leftMentionOtherColor;
     }
 
-    public MentionConfig setLeftMentionOtherColor(@ColorInt int leftMentionOtherColor) {
+    public QiscusMentionConfig setLeftMentionOtherColor(@ColorInt int leftMentionOtherColor) {
         this.leftMentionOtherColor = leftMentionOtherColor;
         return this;
     }
@@ -67,7 +68,7 @@ public class MentionConfig {
         return leftMentionMeColor;
     }
 
-    public MentionConfig setLeftMentionMeColor(@ColorInt int leftMentionMeColor) {
+    public QiscusMentionConfig setLeftMentionMeColor(@ColorInt int leftMentionMeColor) {
         this.leftMentionMeColor = leftMentionMeColor;
         return this;
     }
@@ -77,7 +78,7 @@ public class MentionConfig {
         return rightMentionAllColor;
     }
 
-    public MentionConfig setRightMentionAllColor(@ColorInt int rightMentionAllColor) {
+    public QiscusMentionConfig setRightMentionAllColor(@ColorInt int rightMentionAllColor) {
         this.rightMentionAllColor = rightMentionAllColor;
         return this;
     }
@@ -87,7 +88,7 @@ public class MentionConfig {
         return rightMentionOtherColor;
     }
 
-    public MentionConfig setRightMentionOtherColor(@ColorInt int rightMentionOtherColor) {
+    public QiscusMentionConfig setRightMentionOtherColor(@ColorInt int rightMentionOtherColor) {
         this.rightMentionOtherColor = rightMentionOtherColor;
         return this;
     }
@@ -97,7 +98,7 @@ public class MentionConfig {
         return rightMentionMeColor;
     }
 
-    public MentionConfig setRightMentionMeColor(@ColorInt int rightMentionMeColor) {
+    public QiscusMentionConfig setRightMentionMeColor(@ColorInt int rightMentionMeColor) {
         this.rightMentionMeColor = rightMentionMeColor;
         return this;
     }
@@ -107,7 +108,7 @@ public class MentionConfig {
         return editTextMentionAllColor;
     }
 
-    public MentionConfig setEditTextMentionAllColor(@ColorInt int editTextMentionAllColor) {
+    public QiscusMentionConfig setEditTextMentionAllColor(@ColorInt int editTextMentionAllColor) {
         this.editTextMentionAllColor = editTextMentionAllColor;
         return this;
     }
@@ -117,7 +118,7 @@ public class MentionConfig {
         return editTextMentionOtherColor;
     }
 
-    public MentionConfig setEditTextMentionOtherColor(@ColorInt int editTextMentionOtherColor) {
+    public QiscusMentionConfig setEditTextMentionOtherColor(@ColorInt int editTextMentionOtherColor) {
         this.editTextMentionOtherColor = editTextMentionOtherColor;
         return this;
     }
@@ -127,7 +128,7 @@ public class MentionConfig {
         return editTextMentionMeColor;
     }
 
-    public MentionConfig setEditTextMentionMeColor(@ColorInt int editTextMentionMeColor) {
+    public QiscusMentionConfig setEditTextMentionMeColor(@ColorInt int editTextMentionMeColor) {
         this.editTextMentionMeColor = editTextMentionMeColor;
         return this;
     }
@@ -136,8 +137,17 @@ public class MentionConfig {
         return mentionClickHandler;
     }
 
-    public MentionConfig setMentionClickHandler(MentionClickHandler mentionClickHandler) {
+    public QiscusMentionConfig setMentionClickHandler(MentionClickHandler mentionClickHandler) {
         this.mentionClickHandler = mentionClickHandler;
+        return this;
+    }
+
+    public boolean isEnableMention() {
+        return enableMention;
+    }
+
+    public QiscusMentionConfig setEnableMention(boolean enableMention) {
+        this.enableMention = enableMention;
         return this;
     }
 }

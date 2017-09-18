@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.model.MentionConfig;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -58,7 +58,7 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
 
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
-        MentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
+        QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
         Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
                 qiscusComment.getMessage(),
                 roomMembers,

@@ -1285,7 +1285,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void updateMentionSuggestionData() {
-        if (mentionSuggestionView != null && qiscusChatRoom.isGroup()) {
+        if (mentionSuggestionView != null && qiscusChatRoom.isGroup()
+                && Qiscus.getChatConfig().getMentionConfig().isEnableMention()) {
             mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
         }
         if (replyPreviewView != null) {

@@ -184,7 +184,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         });
 
         mentionSuggestionView = (QiscusMentionSuggestionView) findViewById(R.id.mention_suggestion);
-        if (qiscusChatRoom.isGroup()) {
+        if (qiscusChatRoom.isGroup() && Qiscus.getChatConfig().getMentionConfig().isEnableMention()) {
             mentionSuggestionView.bind(messageEditText);
             mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
         }

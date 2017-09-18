@@ -29,7 +29,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.MentionConfig;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -139,7 +139,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected void showCaption(QiscusComment qiscusComment) {
         if (captionView != null) {
             captionView.setVisibility(TextUtils.isEmpty(qiscusComment.getCaption()) ? View.GONE : View.VISIBLE);
-            MentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
+            QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
             Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
                     qiscusComment.getCaption(),
                     roomMembers,
