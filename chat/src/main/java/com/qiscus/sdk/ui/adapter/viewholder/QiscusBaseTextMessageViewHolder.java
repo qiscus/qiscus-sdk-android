@@ -18,6 +18,7 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
 import android.text.Spannable;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageTextView = getMessageTextView(itemView);
+        messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @NonNull
