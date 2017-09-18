@@ -625,7 +625,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
                     qiscusPhotos.add(new QiscusPhoto(shareFile));
                     startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
+                            qiscusChatRoom, qiscusPhotos),
                             SEND_PICTURE_CONFIRMATION_REQUEST);
                 } else {
                     QiscusAndroidUtil.runOnUIThread(() -> sendFile(shareFile), 800);
@@ -643,7 +643,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
                     qiscusPhotos.add(new QiscusPhoto(QiscusFileUtil.rename(imageFile, imageName)));
                     startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                            qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
+                            qiscusChatRoom, qiscusPhotos),
                             SEND_PICTURE_CONFIRMATION_REQUEST);
                 } catch (IOException e) {
                     showError(getString(R.string.qiscus_error_gif));
@@ -1524,7 +1524,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     qiscusPhotos.add(new QiscusPhoto(new File(path)));
                 }
                 startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                        qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
+                        qiscusChatRoom, qiscusPhotos),
                         SEND_PICTURE_CONFIRMATION_REQUEST);
             }
         } else if (requestCode == JupukConst.REQUEST_CODE_DOC && resultCode == Activity.RESULT_OK) {
@@ -1542,7 +1542,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
                 qiscusPhotos.add(new QiscusPhoto(imageFile));
                 startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                        qiscusChatRoom.getName(), qiscusChatRoom.getAvatarUrl(), qiscusPhotos),
+                        qiscusChatRoom, qiscusPhotos),
                         SEND_PICTURE_CONFIRMATION_REQUEST);
             } catch (Exception e) {
                 showError(getString(R.string.qiscus_chat_error_failed_read_picture));
