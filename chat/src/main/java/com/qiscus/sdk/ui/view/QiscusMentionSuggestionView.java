@@ -36,6 +36,7 @@ import com.qiscus.manggil.tokenization.interfaces.QueryTokenReceiver;
 import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.model.MentionConfig;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.QiscusMentionSuggestionBuilder;
@@ -90,9 +91,11 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
         editText.setAvoidPrefixOnTap(true);
         editText.setSuggestionsVisibilityManager(this);
 
+        MentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
+
         MentionSpanConfig.Builder builder = new MentionSpanConfig.Builder();
-        builder.setMentionTextColor(Color.parseColor("#009688"));
-        builder.setSelectedMentionTextBackgroundColor(Color.parseColor("#009688"));
+        builder.setMentionTextColor(mentionConfig.getEditTextMentionOtherColor());
+        builder.setSelectedMentionTextBackgroundColor(mentionConfig.getEditTextMentionOtherColor());
         editText.setMentionSpanConfig(builder.build());
 
         // Set the suggestions adapter
