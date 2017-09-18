@@ -122,8 +122,8 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
             return;
         }
 
-        tvTitle.setText(getIntent().getStringExtra(qiscusChatRoom.getName()));
-        Nirmana.getInstance().get().load(getIntent().getStringExtra(qiscusChatRoom.getAvatarUrl()))
+        tvTitle.setText(qiscusChatRoom.getName());
+        Nirmana.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
                 .error(R.drawable.ic_qiscus_avatar)
                 .placeholder(R.drawable.ic_qiscus_avatar)
                 .dontAnimate()
