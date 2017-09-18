@@ -17,7 +17,6 @@
 package com.qiscus.sdk.ui.view;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -40,6 +39,7 @@ import com.qiscus.sdk.data.model.MentionConfig;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.QiscusMentionSuggestionBuilder;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -159,5 +159,12 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
     @Override
     public boolean isDisplayingSuggestions() {
         return listView.getVisibility() == VISIBLE;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) QiscusAndroidUtil.dp2px(getResources(), 160),
+                MeasureSpec.AT_MOST);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 }
