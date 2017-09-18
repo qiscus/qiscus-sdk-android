@@ -117,6 +117,10 @@ public final class QiscusTextUtil {
             @ColorInt int mentionAllColor, @ColorInt int mentionOtherColor,
             @ColorInt int mentionMeColor, MentionClickHandler mentionClickListener) {
 
+        if (message == null) {
+            return new SpannableString("");
+        }
+
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
 
         SpannableStringBuilder spannable = new SpannableStringBuilder();
@@ -138,7 +142,9 @@ public final class QiscusTextUtil {
                     mention.setSpan(new ClickableSpan() {
                         @Override
                         public void onClick(View widget) {
-                            mentionClickListener.onMentionClick(mentionedUser);
+                            if (mentionClickListener != null) {
+                                mentionClickListener.onMentionClick(mentionedUser);
+                            }
                         }
 
                         @Override
