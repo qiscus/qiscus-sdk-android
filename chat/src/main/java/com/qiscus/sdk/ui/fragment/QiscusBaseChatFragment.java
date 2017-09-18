@@ -581,6 +581,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 qiscusChatPresenter.loadComments(20);
             } else {
                 showComments(comments);
+                chatAdapter.setQiscusChatRoom(qiscusChatRoom);
+                updateMentionSuggestionData();
             }
         }
 
@@ -1286,6 +1288,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (mentionSuggestionView != null && qiscusChatRoom.isGroup()) {
             mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
         }
+        if (replyPreviewView != null) {
+            replyPreviewView.updateMember(qiscusChatRoom.getMember());
+        }
     }
 
     @Override
@@ -1295,9 +1300,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             roomChangedListener.onRoomUpdated(qiscusChatRoom);
         }
         chatAdapter.setQiscusChatRoom(qiscusChatRoom);
-        if (replyPreviewView != null) {
-            replyPreviewView.updateMember(qiscusChatRoom.getMember());
-        }
         updateMentionSuggestionData();
         showComments(comments);
         resolveScrollToComment();
