@@ -341,6 +341,19 @@ Currently we recommend to invite user into existing room through our [**REST API
 
 Currently we recommend to kick user out of specific room through our [**REST API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason
 
+# Get room list
+To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
+```java
+QiscusApi.getInstance().getChatRooms(1, 20, true)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(qiscusChatRooms -> {
+            //qiscusChatRooms is list of rooms result.
+        }, throwable -> {
+            //Something went wrong
+        });
+```
+
 # Event Handler
 
 **Implement QiscusChatPresenter.View to your Activity Or Fragment**
@@ -514,6 +527,32 @@ During post message, if you dont have any internet connection, message will be s
 ## Get Messages
 
 Messages are stored locally so you can still access the messages when you dont have internet conenction. However any new messages will not being received after you have your internet connection back.
+
+# Search Messages
+For searching message you can call QiscusApi.getInstance().searchComments(query, roomId, lastCommentId) method for searching message on specific room or QiscusApi.getInstance().searchComments(query, lastCommentId) without roomId. Here sample code:
+```java
+QiscusApi.getInstance().searchComments("some query", 123, 0)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(qiscusComments -> {
+            //qiscusComments is list of messages result.
+        }, throwable -> {
+            //Something went wrong
+        });
+```
+And if user click the comment, you can open the chat room using Qiscus Api get room by Id, and start with passing the comment to make activity automatically scroll to it. Here sample code:
+```java
+QiscusApi.getInstance()
+        .getChatRoom(commentSearchClicked.getRoomId())
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .map(qiscusChatRoom ->
+                QiscusChatActivity.generateIntent(this, qiscusChatRoom, null,
+                        null, false, null, commentSearchClicked))
+        .subscribe(this::startActivity, throwable -> {
+            //Something went wrong
+        });
+```
 
 
 # Miscellaneous
