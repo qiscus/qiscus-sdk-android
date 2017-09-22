@@ -127,6 +127,10 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         if (progressView != null) {
             progressView.setFinishedColor(messageFromMe ? rightProgressFinishedColor : leftProgressFinishedColor);
         }
+        if (captionView != null) {
+            captionView.setTextColor(messageFromMe ? rightBubbleTextColor : leftBubbleTextColor);
+            captionView.setLinkTextColor(messageFromMe ? rightLinkTextColor : leftLinkTextColor);
+        }
         super.setUpColor();
     }
 
