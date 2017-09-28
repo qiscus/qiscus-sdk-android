@@ -7,6 +7,7 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.account.AuthenticateWithKey
 import com.qiscus.sdk.chat.domain.interactor.room.GetRoomWithUserId
+import com.qiscus.sdk.chat.domain.interactor.room.GetRooms
 import com.qiscus.sdk.chat.sample.chat.chatIntent
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -14,6 +15,10 @@ class MainActivity : AppCompatActivity() {
     private val useCaseFactory = Qiscus.instance.useCaseFactory
 
     private val listenNewComment = useCaseFactory.listenNewComment()
+
+    private val getRooms = useCaseFactory.getRooms()
+    private val listenRoomAdded = useCaseFactory.listenRoomAdded()
+    private val listenRoomUpdated = useCaseFactory.listenRoomUpdated()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +38,25 @@ class MainActivity : AppCompatActivity() {
 
         startChatButton.setOnClickListener { openChatWith("rya.meyvriska244@gmail.com") }
 
+        startChatButton.setOnLongClickListener {
+            loadRooms(1)
+            true
+        }
+
         listenNewComment.execute(null, Action { Log.d("ZETRA", "Comment added: $it") })
+
+        listenRoomAdded.execute(null, Action { Log.d("ZETRA", "Room ${it.name} added") })
+
+        listenRoomUpdated.execute(null, Action { Log.d("ZETRA", "Room ${it.name} updated") })
+    }
+
+    private fun loadRooms(page: Int) {
+        Log.d("ZETRA", "loadRooms")
+        getRooms.execute(GetRooms.Params(page, 20), Action {
+            if (it.isNotEmpty()) {
+                loadRooms(page + 1)
+            }
+        })
     }
 
     private fun authenticate() {
@@ -60,5 +83,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         listenNewComment.dispose()
+        listenRoomAdded.dispose()
+        listenRoomUpdated.dispose()
     }
 }
