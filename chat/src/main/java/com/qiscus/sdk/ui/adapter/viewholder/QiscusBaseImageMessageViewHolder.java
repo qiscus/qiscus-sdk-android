@@ -16,11 +16,16 @@
 
 package com.qiscus.sdk.ui.adapter.viewholder;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,9 +41,11 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.ClickableMovementMethod;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusPatterns;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
+import java.util.regex.Matcher;
 
 /**
  * Created on : September 27, 2016
@@ -105,6 +112,9 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         if (qiscusComment.getState() == QiscusComment.STATE_PENDING
                 || qiscusComment.getState() == QiscusComment.STATE_SENDING) {
             qiscusComment.setDownloading(true);
+        }
+        if (captionView != null) {
+            setUpLinks();
         }
     }
 
@@ -231,6 +241,67 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     public void onDownloading(QiscusComment qiscusComment, boolean downloading) {
         if (progressView != null) {
             progressView.setVisibility(downloading ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void setUpLinks() {
+        String message = captionView.getText().toString();
+        Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(message);
+        while (matcher.find()) {
+            int start = matcher.start();
+            if (start > 0 && message.charAt(start - 1) == '@') {
+                continue;
+            }
+            int end = matcher.end();
+            clickify(start, end, () -> {
+                String url = message.substring(start, end);
+                if (!url.startsWith("http")) {
+                    url = "http://" + url;
+                }
+                new CustomTabsIntent.Builder()
+                        .setToolbarColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig().getAppBarColor()))
+                        .setShowTitle(true)
+                        .addDefaultShareMenuItem()
+                        .enableUrlBarHiding()
+                        .build()
+                        .launchUrl(captionView.getContext(), Uri.parse(url));
+            });
+        }
+    }
+
+    private static class ClickSpan extends ClickableSpan {
+        private OnClickListener listener;
+
+        public ClickSpan(OnClickListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onClick(View widget) {
+            if (listener != null) {
+                listener.onClick();
+            }
+        }
+
+        public interface OnClickListener {
+            void onClick();
+        }
+    }
+
+    private void clickify(int start, int end, ClickSpan.OnClickListener listener) {
+        CharSequence text = captionView.getText();
+        ClickSpan span = new ClickSpan(listener);
+
+        if (start == -1) {
+            return;
+        }
+
+        if (text instanceof Spannable) {
+            ((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            SpannableString s = SpannableString.valueOf(text);
+            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            captionView.setText(s);
         }
     }
 }

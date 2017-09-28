@@ -135,7 +135,7 @@
             android:layout_alignStart="@+id/thumbnail"
             android:layout_below="@+id/thumbnail"
             android:layout_marginBottom="4dp"
-            android:autoLink="all"
+            android:autoLink="email"
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
