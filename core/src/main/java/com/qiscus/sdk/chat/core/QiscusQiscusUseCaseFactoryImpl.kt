@@ -116,6 +116,30 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
         )
     }
 
+    override fun listenRoomAdded(): ListenRoomAdded {
+        return ListenRoomAdded(
+                component.dataComponent.roomObserver,
+                component.executorComponent.threadExecutor,
+                component.executorComponent.postExecutionThread
+        )
+    }
+
+    override fun listenRoomUpdated(): ListenRoomUpdated {
+        return ListenRoomUpdated(
+                component.dataComponent.roomObserver,
+                component.executorComponent.threadExecutor,
+                component.executorComponent.postExecutionThread
+        )
+    }
+
+    override fun listenRoomDeleted(): ListenRoomDeleted {
+        return ListenRoomDeleted(
+                component.dataComponent.roomObserver,
+                component.executorComponent.threadExecutor,
+                component.executorComponent.postExecutionThread
+        )
+    }
+
     override fun listenUserTyping(): ListenUserTyping {
         return ListenUserTyping(
                 component.dataComponent.roomObserver,

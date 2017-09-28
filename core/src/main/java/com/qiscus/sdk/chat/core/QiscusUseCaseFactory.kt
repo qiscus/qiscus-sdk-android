@@ -22,6 +22,7 @@ interface QiscusUseCaseFactory {
 
     fun logout(): Logout
 
+
     fun getRoom(): GetRoom
 
     fun getRoomWithUserId(): GetRoomWithUserId
@@ -36,9 +37,17 @@ interface QiscusUseCaseFactory {
 
     fun getRoomsWithSpecificIds(): GetRoomsWithSpecificIds
 
+    fun listenRoomAdded(): ListenRoomAdded
+
+    fun listenRoomUpdated(): ListenRoomUpdated
+
+    fun listenRoomDeleted(): ListenRoomDeleted
+
+
     fun listenUserTyping(): ListenUserTyping
 
     fun publishTyping(): PublishTyping
+
 
     fun listenNewComment(): ListenNewComment
 
@@ -57,6 +66,7 @@ interface QiscusUseCaseFactory {
     fun getComments(): GetComments
 
     fun getMoreComments(): GetMoreComments
+
 
     fun listenUserStatus(): ListenUserStatus
 }
