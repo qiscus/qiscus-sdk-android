@@ -10,7 +10,7 @@ interface CommentRemote {
 
     fun getComments(roomId: String): Single<List<CommentEntity>>
 
-    fun getComments(roomId: String, lastCommentId: CommentIdEntity): Single<List<CommentEntity>>
+    fun getComments(roomId: String, lastCommentId: CommentIdEntity, limit: Int): Single<List<CommentEntity>>
 
     fun updateLastDeliveredComment(roomId: String, commentId: CommentIdEntity): Completable
 

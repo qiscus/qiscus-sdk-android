@@ -83,6 +83,7 @@ interface QiscusRestApi {
     fun getComments(@Query("token") token: String,
                     @Query("topic_id") roomId: String,
                     @Query("last_comment_id") lastCommentId: String,
+                    @Query("limit") limit: Int,
                     @Query("after") afterCommentId: Boolean): Single<ListCommentResponseModel>
 
     @FormUrlEncoded

@@ -20,7 +20,7 @@ interface CommentRepository {
 
     fun getComments(roomId: String): Single<List<Comment>>
 
-    fun getComments(roomId: String, lastCommentId: CommentId): Single<List<Comment>>
+    fun getComments(roomId: String, lastCommentId: CommentId, limit: Int): Single<List<Comment>>
 
     fun updateCommentState(roomId: String, commentId: CommentId, commentState: CommentState): Completable
 

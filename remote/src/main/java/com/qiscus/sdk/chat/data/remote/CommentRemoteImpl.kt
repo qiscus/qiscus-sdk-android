@@ -28,8 +28,8 @@ class CommentRemoteImpl(private val accountLocal: AccountLocal,
                 .map { it.results.comments.map { it.toEntity() } }
     }
 
-    override fun getComments(roomId: String, lastCommentId: CommentIdEntity): Single<List<CommentEntity>> {
-        return qiscusRestApi.getComments(accountLocal.getAccount().token, roomId, lastCommentId.id, false)
+    override fun getComments(roomId: String, lastCommentId: CommentIdEntity, limit: Int): Single<List<CommentEntity>> {
+        return qiscusRestApi.getComments(accountLocal.getAccount().token, roomId, lastCommentId.id, limit, false)
                 .map { it.results.comments.map { it.toEntity() } }
     }
 

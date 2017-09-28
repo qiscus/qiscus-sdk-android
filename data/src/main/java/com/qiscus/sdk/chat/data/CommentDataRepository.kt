@@ -118,18 +118,18 @@ class CommentDataRepository(private val commentLocal: CommentLocal,
                 }.map { it.map { it.toDomainModel() } }
     }
 
-    override fun getComments(roomId: String, lastCommentId: CommentId): Single<List<Comment>> {
+    override fun getComments(roomId: String, lastCommentId: CommentId, limit: Int): Single<List<Comment>> {
         val lastComment = lastCommentId.toEntity()
 
-        commentRemote.getComments(roomId, lastComment)
+        commentRemote.getComments(roomId, lastComment, limit)
                 .doOnSuccess { it.forEach { commentLocal.addOrUpdateComment(it) } }
                 .subscribeOn(Schedulers.io())
                 .subscribe({}, {})
 
-        return Single.defer { Single.fromCallable { commentLocal.getComments(roomId, lastComment, 20) } }
+        return Single.defer { Single.fromCallable { commentLocal.getComments(roomId, lastComment, limit) } }
                 .flatMap {
                     if (it.isEmpty() || !isValidOlderComments(it, lastComment)) {
-                        return@flatMap commentRemote.getComments(roomId, lastComment)
+                        return@flatMap commentRemote.getComments(roomId, lastComment, limit)
                                 .doOnSuccess {
                                     it.forEach {
                                         determineCommentState(it)
