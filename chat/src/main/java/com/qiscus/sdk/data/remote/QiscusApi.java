@@ -419,11 +419,12 @@ public enum QiscusApi {
                                              @Query("limit") int limit,
                                              @Query("show_participants") boolean showParticipants);
 
-        @GET("/api/v2/mobile/rooms_info")
-        Observable<JsonElement> getChatRooms(@Query("token") String token,
-                                             @Query("room_id[]") List<Integer> roomIds,
-                                             @Query("room_unique_id[]") List<String> roomUniqueIds,
-                                             @Query("show_participants") boolean showParticipants);
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/rooms_info")
+        Observable<JsonElement> getChatRooms(@Field("token") String token,
+                                             @Field("room_id[]") List<Integer> roomIds,
+                                             @Field("room_unique_id[]") List<String> roomUniqueIds,
+                                             @Field("show_participants") boolean showParticipants);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
