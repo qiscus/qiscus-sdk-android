@@ -13,5 +13,5 @@ import io.reactivex.Observable
 interface RoomObserver {
     fun listenUserTyping(roomId: String): Observable<UserTyping>
 
-    fun setTyping(roomId: String, typing: Boolean) : Completable
+    fun setTyping(roomId: String, typing: Boolean): Completable
 }

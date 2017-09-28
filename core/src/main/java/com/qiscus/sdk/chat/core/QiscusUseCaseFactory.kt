@@ -57,4 +57,6 @@ interface QiscusUseCaseFactory {
     fun getComments(): GetComments
 
     fun getMoreComments(): GetMoreComments
+
+    fun listenUserStatus(): ListenUserStatus
 }

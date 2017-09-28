@@ -16,6 +16,7 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.common.getAttachmentName
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.comment.*
+import com.qiscus.sdk.chat.domain.interactor.room.ListenUserStatus
 import com.qiscus.sdk.chat.domain.interactor.room.ListenUserTyping
 import com.qiscus.sdk.chat.domain.interactor.room.PublishTyping
 import com.qiscus.sdk.chat.domain.model.CommentState
@@ -58,6 +59,8 @@ class ChatActivity : AppCompatActivity() {
 
     private val publishTyping = useCaseFactory.publishTyping()
     private val listenUserTyping = useCaseFactory.listenUserTyping()
+
+    private val listenUserStatus = useCaseFactory.listenUserStatus()
 
     private val commentFactory = Qiscus.instance.commentFactory
 
@@ -111,6 +114,13 @@ class ChatActivity : AppCompatActivity() {
         loadComments()
         listenComment()
         listenTyping()
+        listenOnlinePresence()
+    }
+
+    private fun listenOnlinePresence() {
+        listenUserStatus.execute(ListenUserStatus.Params("rya.meyvriska244@gmail.com"), Action {
+            Log.d("ZETRA", "${it.user.name} is ${if (it.online) "Online" else "Offline"} at ${it.lastActive}")
+        })
     }
 
     private fun tryDownloadAnAttachment() {
@@ -204,13 +214,10 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        postComment.dispose()
-        getComments.dispose()
-        getMoreComments.dispose()
         listenNewComment.dispose()
         listenCommentState.dispose()
         listenCommentProgress.dispose()
         listenUserTyping.dispose()
-        publishTyping.dispose()
+        listenUserStatus.dispose()
     }
 }

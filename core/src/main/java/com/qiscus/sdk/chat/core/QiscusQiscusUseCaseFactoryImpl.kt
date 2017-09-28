@@ -203,4 +203,12 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
                 component.executorComponent.postExecutionThread
         )
     }
+
+    override fun listenUserStatus(): ListenUserStatus {
+        return ListenUserStatus(
+                component.dataComponent.userObserver,
+                component.executorComponent.threadExecutor,
+                component.executorComponent.postExecutionThread
+        )
+    }
 }

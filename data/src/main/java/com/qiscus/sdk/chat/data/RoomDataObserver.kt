@@ -1,6 +1,7 @@
 package com.qiscus.sdk.chat.data
 
 import com.qiscus.sdk.chat.data.pubsub.room.RoomSubscriber
+import com.qiscus.sdk.chat.domain.model.UserStatus
 import com.qiscus.sdk.chat.domain.model.UserTyping
 import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
 import com.qiscus.sdk.chat.domain.pubsub.RoomObserver

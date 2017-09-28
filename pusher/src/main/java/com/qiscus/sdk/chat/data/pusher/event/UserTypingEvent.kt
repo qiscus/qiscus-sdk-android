@@ -6,4 +6,4 @@ package com.qiscus.sdk.chat.data.pusher.event
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class UserTypingEvent(val roomId: String, val userId: String, val typing: Boolean)
+internal data class UserTypingEvent(val roomId: String, val userId: String, val typing: Boolean)

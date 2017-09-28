@@ -12,10 +12,9 @@ import com.qiscus.sdk.chat.data.pubsub.file.FilePublisher
 import com.qiscus.sdk.chat.data.pubsub.file.FileSubscriber
 import com.qiscus.sdk.chat.data.pubsub.room.RoomPublisher
 import com.qiscus.sdk.chat.data.pubsub.room.RoomSubscriber
-import com.qiscus.sdk.chat.data.pusher.CommentDataPusher
-import com.qiscus.sdk.chat.data.pusher.FileDataPusher
-import com.qiscus.sdk.chat.data.pusher.QiscusMqttClient
-import com.qiscus.sdk.chat.data.pusher.RoomDataPusher
+import com.qiscus.sdk.chat.data.pubsub.user.UserPublisher
+import com.qiscus.sdk.chat.data.pubsub.user.UserSubscriber
+import com.qiscus.sdk.chat.data.pusher.*
 import com.qiscus.sdk.chat.data.pusher.mapper.CommentPayloadMapper
 import com.qiscus.sdk.chat.data.remote.*
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
@@ -28,10 +27,7 @@ import com.qiscus.sdk.chat.data.source.room.RoomLocal
 import com.qiscus.sdk.chat.data.source.room.RoomRemote
 import com.qiscus.sdk.chat.data.source.user.UserLocal
 import com.qiscus.sdk.chat.data.util.*
-import com.qiscus.sdk.chat.domain.pubsub.CommentObserver
-import com.qiscus.sdk.chat.domain.pubsub.FileObserver
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
-import com.qiscus.sdk.chat.domain.pubsub.RoomObserver
+import com.qiscus.sdk.chat.domain.pubsub.*
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
 import com.qiscus.sdk.chat.domain.repository.CommentRepository
 import com.qiscus.sdk.chat.domain.repository.RoomRepository
@@ -91,6 +87,10 @@ data class DataComponent
         var roomRemote: RoomRemote = RoomRemoteImpl(accountLocal, qiscusRestApi, roomLocal, commentLocal),
         var roomRepository: RoomRepository = RoomDataRepository(roomLocal, roomRemote),
 
+        private val userDataPusher: UserDataPusher = UserDataPusher(publishSubject, userLocal),
+        var userPublisher: UserPublisher = userDataPusher,
+        var userSubscriber: UserSubscriber = userDataPusher,
+
         var commentRemote: CommentRemote = CommentRemoteImpl(accountLocal, qiscusRestApi),
         var postCommentHandler: PostCommentHandler = PostCommentHandlerImpl(commentLocal, commentRemote, fileRemote, filePublisher),
         var commentRepository: CommentRepository = CommentDataRepository(commentLocal, commentRemote,
@@ -98,8 +98,10 @@ data class DataComponent
 
         var pubSubClient: QiscusPubSubClient = QiscusMqttClient(context, applicationWatcher = applicationWatcher,
                 accountLocal = accountLocal, commentLocal = commentLocal, commentPayloadMapper = CommentPayloadMapper(),
-                roomPublisher = roomPublisher, postCommentHandler = postCommentHandler, commentRemote = commentRemote),
+                roomPublisher = roomPublisher, postCommentHandler = postCommentHandler, commentRemote = commentRemote,
+                userPublisher = userPublisher),
 
         var roomObserver: RoomObserver = RoomDataObserver(pubSubClient, roomSubscriber),
-        var commentObserver: CommentObserver = CommentDataObserver(pubSubClient, commentSubscriber)
+        var commentObserver: CommentObserver = CommentDataObserver(pubSubClient, commentSubscriber),
+        var userObserver: UserObserver = UserDataObserver(pubSubClient, userSubscriber)
 )

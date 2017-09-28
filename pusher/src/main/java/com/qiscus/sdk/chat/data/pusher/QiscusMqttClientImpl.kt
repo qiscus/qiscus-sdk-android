@@ -8,6 +8,7 @@ import com.qiscus.sdk.chat.data.model.AccountEntity
 import com.qiscus.sdk.chat.data.model.CommentEntity
 import com.qiscus.sdk.chat.data.model.CommentIdEntity
 import com.qiscus.sdk.chat.data.pubsub.room.RoomPublisher
+import com.qiscus.sdk.chat.data.pubsub.user.UserPublisher
 import com.qiscus.sdk.chat.data.pusher.mapper.CommentPayloadMapper
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
 import com.qiscus.sdk.chat.data.source.comment.CommentLocal
@@ -41,7 +42,8 @@ class QiscusMqttClient(
         private val commentLocal: CommentLocal,
         private val commentRemote: CommentRemote,
         private val commentPayloadMapper: CommentPayloadMapper,
-        private val roomPublisher: RoomPublisher)
+        private val roomPublisher: RoomPublisher,
+        private val userPublisher: UserPublisher)
     : QiscusPubSubClient, MqttCallbackExtended, IMqttActionListener {
 
     private val TAG = "QiscusPusher"
@@ -416,6 +418,12 @@ class QiscusMqttClient(
             if (data[3] != account.user.id) {
                 val payload = String(message.payload).split(":")
                 commentLocal.updateLastReadComment(data[1], data[3], CommentIdEntity(payload[0], uniqueId = payload[1]))
+            }
+        } else if (topic.startsWith("u/") && topic.endsWith("/s")) {//online status
+            val data = topic.split("/")
+            if (data[1] != account.user.id) {
+                val payload = String(message.payload).split(":")
+                userPublisher.onUserStatusChanged(data[1], "1" == payload[0], Date(payload[1].substring(0, 13).toLong()))
             }
         }
     }
