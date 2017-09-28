@@ -450,7 +450,6 @@ class QiscusMqttClient(
     }
 
     override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-        exception?.printStackTrace()
         reconnectCounter++
         Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms")
         connecting = false
