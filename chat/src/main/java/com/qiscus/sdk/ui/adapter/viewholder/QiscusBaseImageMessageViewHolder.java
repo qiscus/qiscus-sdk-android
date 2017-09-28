@@ -33,6 +33,7 @@ import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.ClickableMovementMethod;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusTextUtil;
@@ -65,6 +66,11 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         imageFrameView = getImageFrameView(itemView);
         progressView = getProgressView(itemView);
         downloadIconView = getDownloadIconView(itemView);
+        if (captionView != null) {
+            captionView.setMovementMethod(ClickableMovementMethod.getInstance());
+            captionView.setClickable(false);
+            captionView.setLongClickable(false);
+        }
     }
 
     @Override

@@ -25,8 +25,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.method.MovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.view.ViewGroup;
@@ -305,11 +303,6 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
             SpannableString s = SpannableString.valueOf(text);
             s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             messageTextView.setText(s);
-        }
-
-        MovementMethod m = messageTextView.getMovementMethod();
-        if (m == null || !(m instanceof LinkMovementMethod)) {
-            messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
         }
     }
 }

@@ -18,15 +18,15 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.support.annotation.NonNull;
 import android.text.Spannable;
-import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.view.ClickableMovementMethod;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
 /**
@@ -43,7 +43,9 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageTextView = getMessageTextView(itemView);
-        messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        messageTextView.setMovementMethod(ClickableMovementMethod.getInstance());
+        messageTextView.setClickable(false);
+        messageTextView.setLongClickable(false);
     }
 
     @NonNull
