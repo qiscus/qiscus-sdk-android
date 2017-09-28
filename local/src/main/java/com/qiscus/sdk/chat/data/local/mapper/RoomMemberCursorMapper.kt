@@ -15,11 +15,10 @@ import com.qiscus.sdk.chat.data.model.UserEntity
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-fun RoomMemberEntity.toContentValues(roomId: String, roomUniqueId: String): ContentValues {
+fun RoomMemberEntity.toContentValues(roomId: String): ContentValues {
     return ContentValues().apply {
         put(Db.RoomMemberTable.COLUMN_ROOM_ID, roomId)
         put(Db.RoomMemberTable.COLUMN_USER_ID, userEntity.id)
-        put(Db.RoomMemberTable.COLUMN_ROOM_UNIQUE_ID, roomUniqueId)
         put(Db.RoomMemberTable.COLUMN_LAST_DELIVERED, memberStateEntity.lastDeliveredCommentId)
         put(Db.RoomMemberTable.COLUMN_LAST_READ, memberStateEntity.lastReadCommentId)
     }

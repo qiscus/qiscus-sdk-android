@@ -23,8 +23,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
         return qiscusRestApi.getChatRoom(accountLocal.getAccount().token, roomId)
                 .doOnSuccess {
                     val participants = it.results.room.participants
-                    roomLocal.updateRoomMembers(it.results.room.idStr, it.results.room.uniqueId,
-                            participants.map { it.toEntity() })
+                    roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
                             .forEach { commentLocal.addOrUpdateComment(it) }
@@ -36,8 +35,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
         return qiscusRestApi.createOrGetChatRoom(accountLocal.getAccount().token, userId)
                 .doOnSuccess {
                     val participants = it.results.room.participants
-                    roomLocal.updateRoomMembers(it.results.room.idStr, it.results.room.uniqueId,
-                            participants.map { it.toEntity() })
+                    roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
                             .forEach { commentLocal.addOrUpdateComment(it) }
@@ -49,8 +47,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
         return qiscusRestApi.createGroupChatRoom(accountLocal.getAccount().token, roomName, userIds, roomAvatarUrl, "")
                 .doOnSuccess {
                     val participants = it.results.room.participants
-                    roomLocal.updateRoomMembers(it.results.room.idStr, it.results.room.uniqueId,
-                            participants.map { it.toEntity() })
+                    roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
                             .forEach { commentLocal.addOrUpdateComment(it) }
@@ -62,8 +59,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
         return qiscusRestApi.createOrGetGroupChatRoom(accountLocal.getAccount().token, channelId, "", roomAvatarUrl, "")
                 .doOnSuccess {
                     val participants = it.results.room.participants
-                    roomLocal.updateRoomMembers(it.results.room.idStr, it.results.room.uniqueId,
-                            participants.map { it.toEntity() })
+                    roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
                             .forEach { commentLocal.addOrUpdateComment(it) }
@@ -81,7 +77,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                 .doOnSuccess {
                     it.results.roomsInfo.forEach {
                         val participants = it.participants
-                        roomLocal.updateRoomMembers(it.idStr, it.uniqueId, participants.map { it.toEntity() })
+                        roomLocal.updateRoomMembers(it.idStr, participants.map { it.toEntity() })
 
                         commentLocal.addOrUpdateComment(it.lastComment.toEntity(accountLocal.getAccount(), participants))
                     }
@@ -94,7 +90,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                 .doOnSuccess {
                     it.results.roomsInfo.forEach {
                         val participants = it.participants
-                        roomLocal.updateRoomMembers(it.idStr, it.uniqueId, participants.map { it.toEntity() })
+                        roomLocal.updateRoomMembers(it.idStr, participants.map { it.toEntity() })
 
                         commentLocal.addOrUpdateComment(it.lastComment.toEntity(accountLocal.getAccount(), participants))
                     }

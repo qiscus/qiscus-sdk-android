@@ -30,13 +30,13 @@ interface RoomLocal {
 
     fun getRoomWithChannelId(channelId: String): RoomEntity?
 
-    fun addRoomMember(roomId: String, roomUniqueId: String = "default", roomMemberEntity: RoomMemberEntity)
+    fun addRoomMember(roomId: String, roomMemberEntity: RoomMemberEntity)
 
     fun updateRoomMemberDeliveredState(roomId: String, userId: String, commentIdEntity: CommentIdEntity)
 
     fun updateRoomMemberReadState(roomId: String, userId: String, commentIdEntity: CommentIdEntity)
 
-    fun updateRoomMembers(roomId: String, roomUniqueId: String = "default", roomMemberEntities: List<RoomMemberEntity>)
+    fun updateRoomMembers(roomId: String, roomMemberEntities: List<RoomMemberEntity>)
 
     fun deleteRoomMember(roomId: String, userId: String)
 

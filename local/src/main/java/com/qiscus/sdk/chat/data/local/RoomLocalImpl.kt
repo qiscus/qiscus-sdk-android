@@ -130,11 +130,11 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
         return getRoomByUniqueId(channelId)
     }
 
-    override fun addRoomMember(roomId: String, roomUniqueId: String, roomMemberEntity: RoomMemberEntity) {
+    override fun addRoomMember(roomId: String, roomMemberEntity: RoomMemberEntity) {
         if (!isExistRoomMember(roomId, roomMemberEntity.userEntity.id)) {
             database.transaction {
                 database.insert(Db.RoomMemberTable.TABLE_NAME, null,
-                        roomMemberEntity.toContentValues(roomId, roomUniqueId))
+                        roomMemberEntity.toContentValues(roomId))
             }
         }
         userLocal.addOrUpdateUser(roomMemberEntity.userEntity)
@@ -160,10 +160,10 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
         }
     }
 
-    override fun updateRoomMembers(roomId: String, roomUniqueId: String, roomMemberEntities: List<RoomMemberEntity>) {
+    override fun updateRoomMembers(roomId: String, roomMemberEntities: List<RoomMemberEntity>) {
         deleteRoomMembers(roomId)
         for (member in roomMemberEntities) {
-            addRoomMember(roomId, roomUniqueId, member)
+            addRoomMember(roomId, member)
         }
     }
 

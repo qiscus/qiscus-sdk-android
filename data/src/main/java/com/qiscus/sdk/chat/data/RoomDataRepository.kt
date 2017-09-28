@@ -126,12 +126,12 @@ class RoomDataRepository(private val roomLocal: RoomLocal,
     private fun updateLocalRoomMembers(roomId: String, members: List<RoomMemberEntity>) {
         val savedRoom = roomLocal.getRoom(roomId)
         if (savedRoom != null) {
-            roomLocal.updateRoomMembers(savedRoom.id, savedRoom.uniqueId, members)
+            roomLocal.updateRoomMembers(savedRoom.id, members)
         } else {
             roomRemote.getRoom(roomId)
                     .doOnSuccess { room ->
                         roomLocal.addOrUpdateRoom(room)
-                        roomLocal.updateRoomMembers(room.id, room.uniqueId, members)
+                        roomLocal.updateRoomMembers(room.id, members)
                     }
                     .subscribeOn(Schedulers.io())
                     .subscribe({}, {})

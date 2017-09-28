@@ -48,14 +48,12 @@ object Db {
         const val TABLE_NAME = "room_members"
         const val COLUMN_ROOM_ID = "room_id"
         const val COLUMN_USER_ID = "user_id"
-        const val COLUMN_ROOM_UNIQUE_ID = "room_unique_id"
         const val COLUMN_LAST_DELIVERED = "last_delivered_comment"
         const val COLUMN_LAST_READ = "last_read_comment"
 
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_ROOM_ID + " TEXT," +
                 COLUMN_USER_ID + " TEXT," +
-                COLUMN_ROOM_UNIQUE_ID + " TEXT DEFAULT 'default'," +
                 COLUMN_LAST_DELIVERED + " TEXT," +
                 COLUMN_LAST_READ + " TEXT" +
                 " ); "
