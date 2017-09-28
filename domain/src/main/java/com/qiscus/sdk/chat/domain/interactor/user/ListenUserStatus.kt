@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.domain.interactor.room
+package com.qiscus.sdk.chat.domain.interactor.user
 
 import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.interactor.ObservableUseCase
 import com.qiscus.sdk.chat.domain.model.UserStatus
-import com.qiscus.sdk.chat.domain.model.UserTyping
-import com.qiscus.sdk.chat.domain.pubsub.RoomObserver
 import com.qiscus.sdk.chat.domain.pubsub.UserObserver
 import io.reactivex.Observable
 

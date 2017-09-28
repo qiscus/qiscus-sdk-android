@@ -16,7 +16,7 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.common.getAttachmentName
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.comment.*
-import com.qiscus.sdk.chat.domain.interactor.room.ListenUserStatus
+import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
 import com.qiscus.sdk.chat.domain.interactor.room.ListenUserTyping
 import com.qiscus.sdk.chat.domain.interactor.room.PublishTyping
 import com.qiscus.sdk.chat.domain.model.CommentState

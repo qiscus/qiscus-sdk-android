@@ -4,6 +4,7 @@ import com.qiscus.sdk.chat.domain.interactor.account.*
 import com.qiscus.sdk.chat.domain.interactor.comment.*
 import com.qiscus.sdk.chat.domain.interactor.file.ListenFileAttachmentProgress
 import com.qiscus.sdk.chat.domain.interactor.room.*
+import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
 
 /**
  * Created on : September 24, 2017
