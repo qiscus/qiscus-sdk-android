@@ -22,7 +22,7 @@ object Db {
         const val COLUMN_AVATAR_URL = "avatar_url"
 
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_ID + " TEXT," +
+                COLUMN_ID + " TEXT PRIMARY KEY," +
                 COLUMN_UNIQUE_ID + " TEXT DEFAULT 'default'," +
                 COLUMN_NAME + " TEXT," +
                 COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
@@ -38,7 +38,7 @@ object Db {
         const val COLUMN_USER_AVATAR = "user_avatar"
 
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_USER_ID + " TEXT," +
+                COLUMN_USER_ID + " TEXT PRIMARY KEY," +
                 COLUMN_USER_NAME + " TEXT," +
                 COLUMN_USER_AVATAR + " TEXT" +
                 " ); "
@@ -79,7 +79,7 @@ object Db {
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_ID + " TEXT," +
                 COLUMN_ROOM_ID + " TEXT," +
-                COLUMN_UNIQUE_ID + " TEXT," +
+                COLUMN_UNIQUE_ID + " TEXT unique," +
                 COLUMN_COMMENT_BEFORE_ID + " TEXT," +
                 COLUMN_MESSAGE + " TEXT," +
                 COLUMN_SENDER_ID + " TEXT NOT NULL," +
@@ -98,7 +98,7 @@ object Db {
         const val COLUMN_LOCAL_PATH = "local_path"
 
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_COMMENT_UNIQUE_ID + " TEXT NOT NULL," +
+                COLUMN_COMMENT_UNIQUE_ID + " TEXT PRIMARY KEY," +
                 COLUMN_LOCAL_PATH + " TEXT NOT NULL" +
                 " ); "
     }
