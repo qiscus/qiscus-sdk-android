@@ -9,7 +9,6 @@ import com.qiscus.sdk.chat.data.local.database.stringValue
 import com.qiscus.sdk.chat.data.mapper.transformToTypedCommentEntity
 import com.qiscus.sdk.chat.data.model.*
 import org.json.JSONObject
-import java.util.*
 
 /**
  * Created on : September 05, 2017
