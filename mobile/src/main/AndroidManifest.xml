@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.qiscus.sdk.chat.presentation.mobile">
+
+    <application android:largeHeap="true">
+        <activity
+            android:name=".chatroom.ChatRoomActivity"/>
+
+    </application>
+</manifest>

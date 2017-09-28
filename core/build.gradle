@@ -1,0 +1,60 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+    buildToolsVersion globalConfiguration["androidBuildToolsVersion"]
+
+    defaultConfig {
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    }
+}
+
+dependencies {
+    def coreDependencies = rootProject.ext.coreDependencies
+    def coreTestDependencies = rootProject.ext.coreTestDependencies
+    
+    compile project(':domain')
+    compile project(':data')
+    compile project(':local')
+    compile project(':remote')
+    compile project(':pusher')
+    compile coreDependencies.kotlin
+    compile coreDependencies.rxKotlin
+    compile coreDependencies.rxAndroid
+
+    testImplementation coreTestDependencies.junit
+    testImplementation coreTestDependencies.kotlinJUnit
+    testImplementation coreTestDependencies.mockito
+    testImplementation coreTestDependencies.assertj
+    testImplementation coreTestDependencies.robolectric
+}

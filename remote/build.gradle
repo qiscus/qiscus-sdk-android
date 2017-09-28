@@ -1,0 +1,29 @@
+apply plugin: 'kotlin'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+configurations.all {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    }
+}
+
+dependencies {
+    def remoteDependencies = rootProject.ext.remoteDependencies
+    def remoteTestDependencies = rootProject.ext.remoteTestDependencies
+
+    compile project(':data')
+    compile remoteDependencies.rxKotlin
+    compile remoteDependencies.kotlin
+    compile remoteDependencies.gson
+    compile remoteDependencies.okHttp
+    compile remoteDependencies.okHttpLogger
+    compile remoteDependencies.retrofit
+    compile remoteDependencies.retrofitConverter
+    compile remoteDependencies.retrofitAdapter
+
+    testImplementation remoteTestDependencies.junit
+    testImplementation remoteTestDependencies.mockito
+    testImplementation remoteTestDependencies.assertj
+}

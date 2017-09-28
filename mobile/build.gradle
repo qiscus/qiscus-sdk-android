@@ -1,0 +1,88 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+    buildToolsVersion globalConfiguration["androidBuildToolsVersion"]
+
+    defaultConfig {
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    }
+}
+
+dependencies {
+    def mobileDependencies = rootProject.ext.mobileDependencies
+    def mobileTestDependencies = rootProject.ext.mobileTestDependencies
+
+    compile project(':core')
+    compile project(':presentation')
+
+    compile mobileDependencies.kotlin
+    compile mobileDependencies.rxKotlin
+    compile mobileDependencies.androidAnnotations
+    compile mobileDependencies.androidSupportV4
+    compile mobileDependencies.androidSupportV13
+    compile mobileDependencies.appCompatV7
+    compile mobileDependencies.supportRecyclerView
+    compile mobileDependencies.supportDesign
+    compile mobileDependencies.rxAndroid
+    compile mobileDependencies.glide
+
+    testImplementation mobileTestDependencies.kotlinJUnit
+
+    // Instrumentation test dependencies
+    androidTestImplementation mobileTestDependencies.junit
+    androidTestImplementation mobileTestDependencies.mockito
+    androidTestImplementation mobileTestDependencies.mockitoAndroid
+    androidTestImplementation (mobileTestDependencies.espressoCore) {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestImplementation (mobileTestDependencies.androidRunner) {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestImplementation (mobileTestDependencies.androidRules) {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestImplementation (mobileTestDependencies.espressoIntents) {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestImplementation(mobileTestDependencies.espressoContrib) {
+        exclude module: 'appcompat'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-v4'
+        exclude module: 'support-v13'
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'design'
+    }
+}

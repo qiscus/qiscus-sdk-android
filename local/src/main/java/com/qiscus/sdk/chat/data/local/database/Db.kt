@@ -1,0 +1,105 @@
+package com.qiscus.sdk.chat.data.local.database
+
+/**
+ * Created on : September 05, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
+ */
+object Db {
+    private const val MAJOR_VERSION = 3
+    private const val MINOR_VERSION = 1
+    const val DATABASE_NAME = "qiscus_sdk_chat.db"
+    const val DATABASE_VERSION = MAJOR_VERSION * 10 + MINOR_VERSION
+
+    object RoomTable {
+        const val TABLE_NAME = "rooms"
+        const val COLUMN_ID = "id"
+        const val COLUMN_UNIQUE_ID = "unique_id"
+        const val COLUMN_NAME = "name"
+        const val COLUMN_IS_GROUP = "is_group"
+        const val COLUMN_OPTIONS = "options"
+        const val COLUMN_AVATAR_URL = "avatar_url"
+
+        const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " TEXT," +
+                COLUMN_UNIQUE_ID + " TEXT DEFAULT 'default'," +
+                COLUMN_NAME + " TEXT," +
+                COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
+                COLUMN_OPTIONS + " TEXT," +
+                COLUMN_AVATAR_URL + " TEXT" +
+                " ); "
+    }
+
+    object UserTable {
+        const val TABLE_NAME = "users"
+        const val COLUMN_USER_ID = "user_id"
+        const val COLUMN_USER_NAME = "user_name"
+        const val COLUMN_USER_AVATAR = "user_avatar"
+
+        const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_USER_ID + " TEXT," +
+                COLUMN_USER_NAME + " TEXT," +
+                COLUMN_USER_AVATAR + " TEXT" +
+                " ); "
+    }
+
+    object RoomMemberTable {
+        const val TABLE_NAME = "room_members"
+        const val COLUMN_ROOM_ID = "room_id"
+        const val COLUMN_USER_ID = "user_id"
+        const val COLUMN_ROOM_UNIQUE_ID = "room_unique_id"
+        const val COLUMN_LAST_DELIVERED = "last_delivered_comment"
+        const val COLUMN_LAST_READ = "last_read_comment"
+
+        const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ROOM_ID + " TEXT," +
+                COLUMN_USER_ID + " TEXT," +
+                COLUMN_ROOM_UNIQUE_ID + " TEXT DEFAULT 'default'," +
+                COLUMN_LAST_DELIVERED + " TEXT," +
+                COLUMN_LAST_READ + " TEXT" +
+                " ); "
+    }
+
+    object CommentTable {
+        const val TABLE_NAME = "comments"
+        const val COLUMN_ID = "id"
+        const val COLUMN_ROOM_ID = "room_id"
+        const val COLUMN_UNIQUE_ID = "unique_id"
+        const val COLUMN_COMMENT_BEFORE_ID = "comment_before_id"
+        const val COLUMN_MESSAGE = "message"
+        const val COLUMN_SENDER_ID = "sender_id"
+        const val COLUMN_SENDER_NAME = "sender_name"
+        const val COLUMN_SENDER_AVATAR = "sender_avatar"
+        const val COLUMN_TIME = "time"
+        const val COLUMN_STATE = "state"
+        const val COLUMN_TYPE = "type"
+        const val COLUMN_PAYLOAD = "payload"
+
+        const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " TEXT," +
+                COLUMN_ROOM_ID + " TEXT," +
+                COLUMN_UNIQUE_ID + " TEXT," +
+                COLUMN_COMMENT_BEFORE_ID + " TEXT," +
+                COLUMN_MESSAGE + " TEXT," +
+                COLUMN_SENDER_ID + " TEXT NOT NULL," +
+                COLUMN_SENDER_NAME + " TEXT," +
+                COLUMN_SENDER_AVATAR + " TEXT," +
+                COLUMN_TIME + " LONG NOT NULL," +
+                COLUMN_STATE + " INTEGER NOT NULL," +
+                COLUMN_TYPE + " TEXT," +
+                COLUMN_PAYLOAD + " TEXT" +
+                " ); "
+    }
+
+    object FileTable {
+        const val TABLE_NAME = "files"
+        const val COLUMN_COMMENT_UNIQUE_ID = "unique_id"
+        const val COLUMN_LOCAL_PATH = "local_path"
+
+        const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_COMMENT_UNIQUE_ID + " TEXT NOT NULL," +
+                COLUMN_LOCAL_PATH + " TEXT NOT NULL" +
+                " ); "
+    }
+}
