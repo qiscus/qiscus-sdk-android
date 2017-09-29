@@ -16,8 +16,32 @@
 
 apply plugin: 'kotlin'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'chatsdk'
+
+    publishedGroupId = 'com.qiscus.sdk.chat'
+    libraryName = 'domain'
+    artifact = 'domain'
+
+    libraryDescription = 'Domain layer of qiscus chat sdk'
+
+    siteUrl = 'https://qiscus.com'
+    gitUrl = 'https://github.com/qiscus/qiscus-sdk-android'
+
+    libraryVersion = '3.0.0-beta1'
+
+    developerId = 'qiscustech'
+    developerName = 'Qiscus Tech'
+    developerEmail = 'developer@qiscus.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 configurations.all {
     resolutionStrategy {
@@ -37,3 +61,17 @@ dependencies {
     testImplementation domainTestDependencies.mockito
     testImplementation domainTestDependencies.assertj
 }
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+    }
+}
+
+apply from: '../buildsystem/bintrayv2.gradle'
+apply from: '../buildsystem/installv2.gradle'
