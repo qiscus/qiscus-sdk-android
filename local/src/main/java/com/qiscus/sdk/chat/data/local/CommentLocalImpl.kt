@@ -32,6 +32,7 @@ import com.qiscus.sdk.chat.data.source.comment.CommentLocal
 import com.qiscus.sdk.chat.data.source.file.FileLocal
 import com.qiscus.sdk.chat.data.source.room.RoomLocal
 import com.qiscus.sdk.chat.data.source.user.UserLocal
+import com.qiscus.sdk.chat.data.util.SyncHandler
 
 
 /**
@@ -48,6 +49,8 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
                        private val commentPublisher: CommentPublisher) : CommentLocal {
 
     private val database = dbOpenHelper.readableDatabase
+
+    private var syncHandler: SyncHandler? = null
 
     override fun addComment(commentEntity: CommentEntity) {
         if (!isExistComment(commentEntity.commentId)) {
@@ -371,6 +374,23 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
         return comments
     }
 
+    override fun getLastOnServerCommentId(): CommentIdEntity? {
+        val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " +
+                Db.CommentTable.COLUMN_STATE + " >= " + CommentStateEntity.ON_SERVER.intValue +
+                " ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC LIMIT 1"
+
+        val cursor = database.rawQuery(query, null)
+
+        if (cursor.moveToNext()) {
+            val comment = cursor.toCommentEntity()
+            cursor.close()
+            return comment.commentId
+        }
+
+        cursor.close()
+        return null
+    }
+
     override fun getLastDeliveredCommentId(roomId: String): CommentIdEntity? {
         val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " +
                 Db.CommentTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
@@ -407,6 +427,24 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
 
         cursor.close()
         return null
+    }
+
+    override fun getOnServerComments(roomId: String, lastCommentIdEntity: CommentIdEntity, limit: Int): List<CommentEntity> {
+        val lastComment = getComment(lastCommentIdEntity) ?: return arrayListOf()
+
+        val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " +
+                Db.CommentTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
+                Db.CommentTable.COLUMN_TIME + " <= " + lastComment.nanoTimeStamp +
+                Db.CommentTable.COLUMN_STATE + " >= " + CommentStateEntity.ON_SERVER.intValue +
+                " ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC LIMIT $limit"
+
+        val cursor = database.rawQuery(query, null)
+        val comments = ArrayList<CommentEntity>()
+        while (cursor.moveToNext()) {
+            comments.add(cursor.toCommentEntity())
+        }
+        cursor.close()
+        return comments
     }
 
     override fun clearData() {

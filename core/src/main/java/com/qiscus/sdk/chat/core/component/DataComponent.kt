@@ -98,7 +98,8 @@ data class DataComponent
         var commentPublisher: CommentPublisher = commentDataPusher,
         var commentSubscriber: CommentSubscriber = commentDataPusher,
 
-        var commentLocal: CommentLocal = CommentLocalImpl(dbOpenHelper, accountLocal, roomLocal, userLocal, fileLocal, commentPublisher),
+        var commentLocal: CommentLocal = CommentLocalImpl(dbOpenHelper, accountLocal, roomLocal,
+                userLocal, fileLocal, commentPublisher),
 
         var roomRemote: RoomRemote = RoomRemoteImpl(accountLocal, qiscusRestApi, roomLocal, commentLocal),
         var roomRepository: RoomRepository = RoomDataRepository(roomLocal, roomRemote),
@@ -112,10 +113,13 @@ data class DataComponent
         var commentRepository: CommentRepository = CommentDataRepository(commentLocal, commentRemote,
                 fileLocal, fileRemote, fileManager, filePublisher, postCommentHandler),
 
+        var syncHandler: SyncHandler = SyncHandlerImpl(commentLocal, commentRemote, commentSubscriber),
+
         internal val commentPayloadMapper: CommentPayloadMapper = CommentPayloadMapper(),
         var pubSubClient: QiscusPubSubClient = QiscusMqttClient(context, applicationWatcher = applicationWatcher,
                 accountLocal = accountLocal, commentLocal = commentLocal, commentPayloadMapper = commentPayloadMapper,
-                postCommentHandler = postCommentHandler, commentRemote = commentRemote, userPublisher = userPublisher),
+                postCommentHandler = postCommentHandler, commentRemote = commentRemote, userPublisher = userPublisher,
+                syncHandler = syncHandler),
 
         var roomObserver: RoomObserver = RoomDataObserver(roomSubscriber),
         var commentObserver: CommentObserver = CommentDataObserver(pubSubClient, commentSubscriber),

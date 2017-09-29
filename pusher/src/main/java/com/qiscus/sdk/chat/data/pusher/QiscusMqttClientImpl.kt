@@ -30,6 +30,7 @@ import com.qiscus.sdk.chat.data.source.comment.CommentLocal
 import com.qiscus.sdk.chat.data.source.comment.CommentRemote
 import com.qiscus.sdk.chat.data.util.ApplicationWatcher
 import com.qiscus.sdk.chat.data.util.PostCommentHandler
+import com.qiscus.sdk.chat.data.util.SyncHandler
 import com.qiscus.sdk.chat.domain.common.runOnBackgroundThread
 import com.qiscus.sdk.chat.domain.common.scheduleOnBackgroundThread
 import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
@@ -53,6 +54,7 @@ class QiscusMqttClient(
                 Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID),
         private val applicationWatcher: ApplicationWatcher,
         private val postCommentHandler: PostCommentHandler,
+        private val syncHandler: SyncHandler,
         private val accountLocal: AccountLocal,
         private val commentLocal: CommentLocal,
         private val commentRemote: CommentRemote,
@@ -382,6 +384,7 @@ class QiscusMqttClient(
 
     override fun connectComplete(reconnect: Boolean, serverURI: String?) {
         Log.i(TAG, "Connected...")
+        syncHandler.sync()
         try {
             connecting = false
             reconnectCounter = 0

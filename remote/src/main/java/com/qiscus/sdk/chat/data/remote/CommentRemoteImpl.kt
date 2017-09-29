@@ -56,4 +56,14 @@ class CommentRemoteImpl(private val accountLocal: AccountLocal,
     override fun updateLastReadComment(roomId: String, commentId: CommentIdEntity): Completable {
         return qiscusRestApi.updateCommentStatus(accountLocal.getAccount().token, roomId, "", commentId.id)
     }
+
+    override fun sync(lastCommentId: CommentIdEntity): Single<List<CommentEntity>> {
+        return qiscusRestApi.sync(accountLocal.getAccount().token, lastCommentId.id)
+                .map { it.results.comments.map { it.toEntity() } }
+    }
+
+    override fun sync(roomId: String, lastCommentId: CommentIdEntity): Single<List<CommentEntity>> {
+        return qiscusRestApi.getComments(accountLocal.getAccount().token, roomId, lastCommentId.id, 20, true)
+                .map { it.results.comments.map { it.toEntity() } }
+    }
 }

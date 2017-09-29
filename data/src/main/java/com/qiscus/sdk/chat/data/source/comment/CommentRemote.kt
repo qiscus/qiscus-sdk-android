@@ -31,4 +31,8 @@ interface CommentRemote {
     fun updateLastDeliveredComment(roomId: String, commentId: CommentIdEntity): Completable
 
     fun updateLastReadComment(roomId: String, commentId: CommentIdEntity): Completable
+
+    fun sync(lastCommentId: CommentIdEntity):  Single<List<CommentEntity>>
+
+    fun sync(roomId: String, lastCommentId: CommentIdEntity):  Single<List<CommentEntity>>
 }

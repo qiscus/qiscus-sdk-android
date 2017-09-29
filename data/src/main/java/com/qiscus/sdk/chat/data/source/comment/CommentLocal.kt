@@ -42,9 +42,13 @@ interface CommentLocal {
 
     fun updateLastReadComment(roomId: String, userId: String, commentId: CommentIdEntity)
 
+    fun getLastOnServerCommentId(): CommentIdEntity?
+
     fun getLastDeliveredCommentId(roomId: String): CommentIdEntity?
 
     fun getLastReadCommentId(roomId: String): CommentIdEntity?
+
+    fun getOnServerComments(roomId: String, lastCommentIdEntity: CommentIdEntity, limit: Int = 20): List<CommentEntity>
 
     fun clearData()
 }
