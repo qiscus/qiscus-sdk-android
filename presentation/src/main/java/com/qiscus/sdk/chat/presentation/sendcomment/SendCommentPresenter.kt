@@ -37,7 +37,7 @@ class SendCommentPresenter(val view: SendCommentContract.View,
 
     override fun sendComment(message: String) {
         useCase.execute(PostComment.Params(Comment(CommentId(), message, User("zetra"), Date(),
-                Room(1, name = "Room"), CommentState.SENDING, CommentType("text"))))
+                Room("1", name = "Room"), CommentState.SENDING, CommentType("text"))))
         view.clearTextField()
     }
 }

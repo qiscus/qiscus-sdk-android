@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.presentation.listencomment
 
-import com.qiscus.sdk.chat.domain.interactor.BaseObserver
+import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.comment.ListenNewComment
 import com.qiscus.sdk.chat.domain.model.Comment
 import com.qiscus.sdk.chat.presentation.mapper.CommentMapper
@@ -36,7 +36,7 @@ class ListenCommentPresenter(val view: ListenCommentContract.View,
     }
 
     override fun listenNewComment() {
-        useCase.execute(Subscriber())
+        useCase.execute(null, Action { handleNewComment(it) })
     }
 
     private fun handleNewComment(comment: Comment) {
@@ -45,11 +45,5 @@ class ListenCommentPresenter(val view: ListenCommentContract.View,
 
     override fun stop() {
         useCase.dispose()
-    }
-
-    inner class Subscriber : BaseObserver<Comment>() {
-        override fun onNext(t: Comment) {
-            handleNewComment(t)
-        }
     }
 }
