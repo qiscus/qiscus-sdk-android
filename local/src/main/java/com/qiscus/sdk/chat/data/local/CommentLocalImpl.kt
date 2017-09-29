@@ -250,8 +250,10 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
     }
 
     override fun getPendingComments(): List<CommentEntity> {
-        val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " + Db.CommentTable.COLUMN_STATE +
-                " = " + CommentStateEntity.PENDING.intValue + " ORDER BY " + Db.CommentTable.COLUMN_TIME + " ASC"
+        val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " +
+                Db.CommentTable.COLUMN_STATE + " >= " + CommentStateEntity.PENDING.intValue + " AND " +
+                Db.CommentTable.COLUMN_STATE + " <= " + CommentStateEntity.SENDING.intValue +
+                " ORDER BY " + Db.CommentTable.COLUMN_TIME + " ASC"
         val cursor = database.rawQuery(query, null)
         val comments = ArrayList<CommentEntity>()
         while (cursor.moveToNext()) {
