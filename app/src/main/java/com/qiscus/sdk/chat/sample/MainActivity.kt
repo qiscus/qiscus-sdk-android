@@ -14,8 +14,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
     private val useCaseFactory = Qiscus.instance.useCaseFactory
 
-    private val listenNewComment = useCaseFactory.listenNewComment()
-
     private val getRooms = useCaseFactory.getRooms()
     private val listenRoomAdded = useCaseFactory.listenRoomAdded()
     private val listenRoomUpdated = useCaseFactory.listenRoomUpdated()
@@ -42,8 +40,6 @@ class MainActivity : AppCompatActivity() {
             loadRooms(1)
             true
         }
-
-        listenNewComment.execute(null, Action { Log.d("ZETRA", "Comment added: $it") })
 
         listenRoomAdded.execute(null, Action { Log.d("ZETRA", "Room ${it.name} added") })
 
@@ -82,7 +78,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        listenNewComment.dispose()
         listenRoomAdded.dispose()
         listenRoomUpdated.dispose()
     }

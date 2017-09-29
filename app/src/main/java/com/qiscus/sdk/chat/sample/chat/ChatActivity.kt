@@ -13,7 +13,6 @@ import android.view.View
 import com.qiscus.jupuk.JupukBuilder
 import com.qiscus.jupuk.JupukConst
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.common.getAttachmentName
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.comment.*
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
@@ -21,7 +20,6 @@ import com.qiscus.sdk.chat.domain.interactor.user.ListenUserTyping
 import com.qiscus.sdk.chat.domain.interactor.user.PublishTyping
 import com.qiscus.sdk.chat.domain.model.CommentState
 import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
-import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.sample.R
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -139,7 +137,6 @@ class ChatActivity : AppCompatActivity() {
 
     private fun listenTyping() {
         listenUserTyping.execute(ListenUserTyping.Params(roomId!!), Action {
-            Log.d("ZETRA", String.format("%s is typing...", it.user.name))
             userTypingText.text = String.format("%s is typing...", it.user.name)
             userTypingText.visibility = if (it.typing) View.VISIBLE else View.GONE
         })
@@ -155,30 +152,11 @@ class ChatActivity : AppCompatActivity() {
         })
 
         listenCommentState.execute(ListenCommentState.Params(roomId!!), Action {
-            if (it is FileAttachmentComment) {
-                var msg = if (it.file == null) {
-                    it.getAttachmentUrl().getAttachmentName()
-                } else {
-                    it.file!!.name
-                }
-                msg += " Changed to ${it.state}"
-                Log.d("ZETRA", msg)
-            } else {
-                Log.d("ZETRA", "${it.message} Changed to ${it.state}")
-            }
             adapter.addOrUpdate(it)
         })
 
         listenCommentProgress.execute(null, Action {
-            var msg = it.state.name
-            msg += if (it.state == FileAttachmentProgress.State.DOWNLOADING) {
-                " " + it.fileAttachmentComment.getAttachmentUrl().getAttachmentName()
-            } else {
-                " " + it.fileAttachmentComment.file!!.name
-            }
-
-            msg += " Progress ${it.progress}"
-
+            val msg = "${it.state.name} ${it.fileAttachmentComment.getAttachmentName()} Progress ${it.progress}"
             Log.d("ZETRA", msg)
         })
     }

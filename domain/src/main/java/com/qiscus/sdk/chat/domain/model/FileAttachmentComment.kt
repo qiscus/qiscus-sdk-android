@@ -51,6 +51,11 @@ class FileAttachmentComment(
         if (attachmentName.isBlank()) {
             attachmentName = getAttachmentUrl().getAttachmentName()
         }
+
+        if (attachmentName.isBlank() && file != null) {
+            attachmentName = file!!.name
+        }
+
         return attachmentName
     }
 
