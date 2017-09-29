@@ -45,5 +45,9 @@ class GetMoreComments(private val commentRepository: CommentRepository,
 
     data class Params(val roomId: String, val lastCommentId: CommentId, val limit: Int = 20)
 
-    data class Result(val comments: List<Comment>, val hasMoreMessages: Boolean)
+    data class Result(val comments: List<Comment>, private val moreMessages: Boolean) {
+        fun hasMoreMessages(): Boolean {
+            return moreMessages
+        }
+    }
 }
