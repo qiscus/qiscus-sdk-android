@@ -10,9 +10,9 @@ import com.qiscus.sdk.chat.domain.model.Room
  * GitHub     : https://github.com/zetbaitsu
  */
 fun RoomEntity.toDomainModel(): Room {
-    return Room(id, uniqueId, name, avatar, group, options)
+    return Room(id, name, avatar, group, options)
 }
 
 fun Room.toEntity(): RoomEntity {
-    return RoomEntity(id, uniqueId, name, avatar, group, options)
+    return RoomEntity(id, "", name, avatar, group, options)
 }

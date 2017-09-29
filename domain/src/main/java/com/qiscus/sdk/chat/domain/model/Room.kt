@@ -8,7 +8,6 @@ package com.qiscus.sdk.chat.domain.model
  */
 data class Room(
         val id: String,
-        val uniqueId: String = "default",
         var name: String,
         var avatar: String = "",
         val group: Boolean = false,
