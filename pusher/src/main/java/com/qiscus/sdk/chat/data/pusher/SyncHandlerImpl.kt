@@ -1,6 +1,5 @@
 package com.qiscus.sdk.chat.data.pusher
 
-import android.util.Log
 import com.qiscus.sdk.chat.data.model.CommentIdEntity
 import com.qiscus.sdk.chat.data.model.CommentStateEntity
 import com.qiscus.sdk.chat.data.pubsub.comment.CommentSubscriber
@@ -21,7 +20,6 @@ class SyncHandlerImpl(private val commentLocal: CommentLocal,
 
     init {
         commentSubscriber.listenCommentAdded()
-                .doOnNext { Log.d("ZETRA", "New comment: ${it.message}") }
                 .filter { it.state.intValue >= CommentStateEntity.ON_SERVER.intValue }
                 .doOnNext {
                     val comments = commentLocal.getOnServerComments(it.room.id, it.commentId, 10)
@@ -37,7 +35,6 @@ class SyncHandlerImpl(private val commentLocal: CommentLocal,
     }
 
     override fun sync() {
-        Log.d("ZETRA", "sync")
         val lastId = commentLocal.getLastOnServerCommentId()
         if (lastId != null) {
             sync(lastId)
@@ -45,7 +42,6 @@ class SyncHandlerImpl(private val commentLocal: CommentLocal,
     }
 
     override fun sync(lastCommentId: CommentIdEntity) {
-        Log.d("ZETRA", "sync(${lastCommentId.id})")
         commentRemote.sync(lastCommentId)
                 .doOnSuccess {
                     if (it.size > 20) {
@@ -59,7 +55,6 @@ class SyncHandlerImpl(private val commentLocal: CommentLocal,
     }
 
     override fun sync(roomId: String, lastCommentId: CommentIdEntity) {
-        Log.d("ZETRA", "sync($roomId, ${lastCommentId.id}")
         commentRemote.sync(roomId, lastCommentId)
                 .doOnSuccess {
                     if (it.size > 20) {
