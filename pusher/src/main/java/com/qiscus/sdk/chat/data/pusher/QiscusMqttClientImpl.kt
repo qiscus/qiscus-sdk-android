@@ -7,7 +7,6 @@ import android.util.Log
 import com.qiscus.sdk.chat.data.model.AccountEntity
 import com.qiscus.sdk.chat.data.model.CommentEntity
 import com.qiscus.sdk.chat.data.model.CommentIdEntity
-import com.qiscus.sdk.chat.data.pubsub.room.RoomPublisher
 import com.qiscus.sdk.chat.data.pubsub.user.UserPublisher
 import com.qiscus.sdk.chat.data.pusher.mapper.CommentPayloadMapper
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
@@ -42,7 +41,6 @@ class QiscusMqttClient(
         private val commentLocal: CommentLocal,
         private val commentRemote: CommentRemote,
         private val commentPayloadMapper: CommentPayloadMapper,
-        private val roomPublisher: RoomPublisher,
         private val userPublisher: UserPublisher)
     : QiscusPubSubClient, MqttCallbackExtended, IMqttActionListener {
 
@@ -405,7 +403,7 @@ class QiscusMqttClient(
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {//typing
             val data = topic.split("/")
             if (data[3] != account.user.id) {
-                roomPublisher.onUserTyping(data[1], data[3], "1" == String(message.payload))
+                userPublisher.onUserTyping(data[1], data[3], "1" == String(message.payload))
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/d")) {//delivered
             val data = topic.split("/")

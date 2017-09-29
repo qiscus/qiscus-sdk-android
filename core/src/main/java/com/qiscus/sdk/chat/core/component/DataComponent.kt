@@ -72,7 +72,7 @@ data class DataComponent
         var fileSubscriber: FileSubscriber = fileDataPusher,
         var fileObserver: FileObserver = FileDataObserver(fileSubscriber),
 
-        private val roomDataPusher: RoomDataPusher = RoomDataPusher(publishSubject, userLocal),
+        private val roomDataPusher: RoomDataPusher = RoomDataPusher(publishSubject),
         var roomPublisher: RoomPublisher = roomDataPusher,
         var roomSubscriber: RoomSubscriber = roomDataPusher,
 
@@ -98,10 +98,9 @@ data class DataComponent
 
         var pubSubClient: QiscusPubSubClient = QiscusMqttClient(context, applicationWatcher = applicationWatcher,
                 accountLocal = accountLocal, commentLocal = commentLocal, commentPayloadMapper = CommentPayloadMapper(),
-                roomPublisher = roomPublisher, postCommentHandler = postCommentHandler, commentRemote = commentRemote,
-                userPublisher = userPublisher),
+                postCommentHandler = postCommentHandler, commentRemote = commentRemote, userPublisher = userPublisher),
 
-        var roomObserver: RoomObserver = RoomDataObserver(pubSubClient, roomSubscriber),
+        var roomObserver: RoomObserver = RoomDataObserver(roomSubscriber),
         var commentObserver: CommentObserver = CommentDataObserver(pubSubClient, commentSubscriber),
         var userObserver: UserObserver = UserDataObserver(pubSubClient, userSubscriber)
 )

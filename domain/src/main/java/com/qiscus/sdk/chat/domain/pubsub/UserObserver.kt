@@ -17,6 +17,8 @@
 package com.qiscus.sdk.chat.domain.pubsub
 
 import com.qiscus.sdk.chat.domain.model.UserStatus
+import com.qiscus.sdk.chat.domain.model.UserTyping
+import io.reactivex.Completable
 import io.reactivex.Observable
 
 /**
@@ -27,4 +29,8 @@ import io.reactivex.Observable
  */
 interface UserObserver {
     fun listenUserStatus(userId: String): Observable<UserStatus>
+
+    fun listenUserTyping(roomId: String): Observable<UserTyping>
+
+    fun setTyping(roomId: String, typing: Boolean): Completable
 }

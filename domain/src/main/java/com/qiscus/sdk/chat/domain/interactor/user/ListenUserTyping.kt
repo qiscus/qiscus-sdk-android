@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.data.pubsub.user
+package com.qiscus.sdk.chat.domain.interactor.user
 
-import com.qiscus.sdk.chat.domain.model.UserStatus
+import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
+import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
+import com.qiscus.sdk.chat.domain.interactor.ObservableUseCase
 import com.qiscus.sdk.chat.domain.model.UserTyping
+import com.qiscus.sdk.chat.domain.pubsub.UserObserver
 import io.reactivex.Observable
 
 /**
- * Created on : September 28, 2017
+ * Created on : September 22, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-interface UserSubscriber {
-    fun listenUserStatus(userId: String): Observable<UserStatus>
+class ListenUserTyping(private val userObserver: UserObserver,
+                       threadExecutor: ThreadExecutor, postExecutionThread: PostExecutionThread)
+    : ObservableUseCase<UserTyping, ListenUserTyping.Params>(threadExecutor, postExecutionThread) {
 
-    fun listenUserTyping(roomId: String): Observable<UserTyping>
+    override fun buildUseCaseObservable(params: Params?): Observable<UserTyping> {
+        return userObserver.listenUserTyping(params!!.roomId)
+    }
+
+    data class Params(val roomId: String)
 }

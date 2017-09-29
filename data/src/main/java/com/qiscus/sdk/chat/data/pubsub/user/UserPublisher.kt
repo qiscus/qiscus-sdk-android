@@ -26,4 +26,6 @@ import java.util.*
  */
 interface UserPublisher {
     fun onUserStatusChanged(userId: String, online: Boolean, lastActive: Date)
+
+    fun onUserTyping(roomId: String, userId: String, typing: Boolean)
 }

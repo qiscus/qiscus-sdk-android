@@ -1,8 +1,6 @@
 package com.qiscus.sdk.chat.data.pubsub.room
 
 import com.qiscus.sdk.chat.data.model.RoomEntity
-import com.qiscus.sdk.chat.data.model.UserEntity
-import com.qiscus.sdk.chat.domain.model.UserTyping
 import io.reactivex.Observable
 
 /**
@@ -17,6 +15,4 @@ interface RoomSubscriber {
     fun listenRoomUpdated(): Observable<RoomEntity>
 
     fun listenRoomDeleted(): Observable<RoomEntity>
-
-    fun listenUserTyping(roomId: String): Observable<UserTyping>
 }

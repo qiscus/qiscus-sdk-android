@@ -14,6 +14,4 @@ interface RoomPublisher {
     fun onRoomUpdated(roomEntity: RoomEntity)
 
     fun onRoomDeleted(roomEntity: RoomEntity)
-
-    fun onUserTyping(roomId: String, userId: String, typing: Boolean)
 }

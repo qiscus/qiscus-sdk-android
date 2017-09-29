@@ -20,8 +20,10 @@ import com.qiscus.sdk.chat.data.mapper.toDomainModel
 import com.qiscus.sdk.chat.data.pubsub.user.UserPublisher
 import com.qiscus.sdk.chat.data.pubsub.user.UserSubscriber
 import com.qiscus.sdk.chat.data.pusher.event.UserStatusEvent
+import com.qiscus.sdk.chat.data.pusher.event.UserTypingEvent
 import com.qiscus.sdk.chat.data.source.user.UserLocal
 import com.qiscus.sdk.chat.domain.model.UserStatus
+import com.qiscus.sdk.chat.domain.model.UserTyping
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
@@ -39,6 +41,10 @@ class UserDataPusher(private val publisher: PublishSubject<Any>,
         publisher.onNext(UserStatusEvent(userId, online, lastActive))
     }
 
+    override fun onUserTyping(roomId: String, userId: String, typing: Boolean) {
+        publisher.onNext(UserTypingEvent(roomId, userId, typing))
+    }
+
     override fun listenUserStatus(userId: String): Observable<UserStatus> {
         return publisher.filter { it is UserStatusEvent }
                 .map { it as UserStatusEvent }
@@ -48,6 +54,18 @@ class UserDataPusher(private val publisher: PublishSubject<Any>,
                             return@flatMap Observable.empty<UserStatus>()
 
                     return@flatMap Observable.just(UserStatus(user.toDomainModel(), it.online, it.lastActive))
+                }
+    }
+
+    override fun listenUserTyping(roomId: String): Observable<UserTyping> {
+        return publisher.filter { it is UserTypingEvent }
+                .map { it as UserTypingEvent }
+                .filter { it.roomId == roomId }
+                .flatMap {
+                    val user = userLocal.getUser(it.userId) ?:
+                            return@flatMap Observable.empty<UserTyping>()
+
+                    return@flatMap Observable.just(UserTyping(it.roomId, user.toDomainModel(), it.typing))
                 }
     }
 }

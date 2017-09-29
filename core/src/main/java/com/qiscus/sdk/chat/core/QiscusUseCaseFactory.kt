@@ -5,6 +5,8 @@ import com.qiscus.sdk.chat.domain.interactor.comment.*
 import com.qiscus.sdk.chat.domain.interactor.file.ListenFileAttachmentProgress
 import com.qiscus.sdk.chat.domain.interactor.room.*
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
+import com.qiscus.sdk.chat.domain.interactor.user.ListenUserTyping
+import com.qiscus.sdk.chat.domain.interactor.user.PublishTyping
 
 /**
  * Created on : September 24, 2017
@@ -45,11 +47,6 @@ interface QiscusUseCaseFactory {
     fun listenRoomDeleted(): ListenRoomDeleted
 
 
-    fun listenUserTyping(): ListenUserTyping
-
-    fun publishTyping(): PublishTyping
-
-
     fun listenNewComment(): ListenNewComment
 
     fun listenCommentState(): ListenCommentState
@@ -70,4 +67,8 @@ interface QiscusUseCaseFactory {
 
 
     fun listenUserStatus(): ListenUserStatus
+
+    fun listenUserTyping(): ListenUserTyping
+
+    fun publishTyping(): PublishTyping
 }

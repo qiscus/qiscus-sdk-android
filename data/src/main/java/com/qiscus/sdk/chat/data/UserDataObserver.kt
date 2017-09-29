@@ -18,8 +18,10 @@ package com.qiscus.sdk.chat.data
 
 import com.qiscus.sdk.chat.data.pubsub.user.UserSubscriber
 import com.qiscus.sdk.chat.domain.model.UserStatus
+import com.qiscus.sdk.chat.domain.model.UserTyping
 import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
 import com.qiscus.sdk.chat.domain.pubsub.UserObserver
+import io.reactivex.Completable
 import io.reactivex.Observable
 
 /**
@@ -35,5 +37,16 @@ class UserDataObserver(private val pubSubClient: QiscusPubSubClient,
         return userSubscriber.listenUserStatus(userId)
                 .doOnSubscribe { pubSubClient.listenUserStatus(userId) }
                 .doOnDispose { pubSubClient.unlistenUserStatus(userId) }
+    }
+
+    override fun listenUserTyping(roomId: String): Observable<UserTyping> {
+        return userSubscriber.listenUserTyping(roomId)
+                .doOnSubscribe { pubSubClient.listenUserTyping(roomId) }
+                .doOnDispose { pubSubClient.unlistenUserTyping(roomId) }
+    }
+
+    override fun setTyping(roomId: String, typing: Boolean): Completable {
+        return Completable.defer { Completable.complete() }
+                .doOnSubscribe { pubSubClient.publishTypingStatus(roomId, typing) }
     }
 }

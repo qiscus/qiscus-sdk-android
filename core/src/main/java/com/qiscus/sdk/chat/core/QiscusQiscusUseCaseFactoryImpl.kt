@@ -6,6 +6,8 @@ import com.qiscus.sdk.chat.domain.interactor.comment.*
 import com.qiscus.sdk.chat.domain.interactor.file.ListenFileAttachmentProgress
 import com.qiscus.sdk.chat.domain.interactor.room.*
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
+import com.qiscus.sdk.chat.domain.interactor.user.ListenUserTyping
+import com.qiscus.sdk.chat.domain.interactor.user.PublishTyping
 
 /**
  * Created on : September 20, 2017
@@ -141,22 +143,6 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
         )
     }
 
-    override fun listenUserTyping(): ListenUserTyping {
-        return ListenUserTyping(
-                component.dataComponent.roomObserver,
-                component.executorComponent.threadExecutor,
-                component.executorComponent.postExecutionThread
-        )
-    }
-
-    override fun publishTyping(): PublishTyping {
-        return PublishTyping(
-                component.dataComponent.roomObserver,
-                component.executorComponent.threadExecutor,
-                component.executorComponent.postExecutionThread
-        )
-    }
-
     override fun listenNewComment(): ListenNewComment {
         return ListenNewComment(
                 component.dataComponent.commentObserver,
@@ -231,6 +217,22 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
 
     override fun listenUserStatus(): ListenUserStatus {
         return ListenUserStatus(
+                component.dataComponent.userObserver,
+                component.executorComponent.threadExecutor,
+                component.executorComponent.postExecutionThread
+        )
+    }
+
+    override fun listenUserTyping(): ListenUserTyping {
+        return ListenUserTyping(
+                component.dataComponent.userObserver,
+                component.executorComponent.threadExecutor,
+                component.executorComponent.postExecutionThread
+        )
+    }
+
+    override fun publishTyping(): PublishTyping {
+        return PublishTyping(
                 component.dataComponent.userObserver,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
