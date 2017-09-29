@@ -341,7 +341,7 @@ Currently we recommend to invite user into existing room through our [**REST API
 
 Currently we recommend to kick user out of specific room through our [**REST API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason
 
-# Get room list
+### Get room list
 To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
 ```java
 QiscusApi.getInstance().getChatRooms(1, 20, true)
