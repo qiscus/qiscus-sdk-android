@@ -18,8 +18,13 @@ package com.qiscus.sdk.chat.core
 
 import android.app.Application
 import com.qiscus.sdk.chat.core.component.QiscusComponent
+import com.qiscus.sdk.chat.data.pubsub.FcmHandler
+import com.qiscus.sdk.chat.data.pusher.FcmHandlerImpl
 import com.qiscus.sdk.chat.domain.common.CommentFactory
 import com.qiscus.sdk.chat.domain.common.QiscusCommentFactory
+import com.qiscus.sdk.chat.domain.interactor.Action
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created on : August 30, 2017
@@ -30,6 +35,16 @@ import com.qiscus.sdk.chat.domain.common.QiscusCommentFactory
 class Qiscus private constructor(val component: QiscusComponent) {
     val useCaseFactory: QiscusUseCaseFactory = QiscusQiscusUseCaseFactoryImpl(component)
     val commentFactory: CommentFactory = QiscusCommentFactory(component.dataComponent.accountRepository)
+
+    val fcmHandler: FcmHandler by lazy {
+        FcmHandlerImpl(
+                component.dataComponent.accountLocal,
+                component.dataComponent.commentLocal,
+                component.dataComponent.commentRemote,
+                component.dataComponent.pubSubClient,
+                component.dataComponent.commentPayloadMapper
+        )
+    }
 
     companion object {
         @Volatile private var INSTANCE: Qiscus? = null
@@ -69,5 +84,21 @@ class Qiscus private constructor(val component: QiscusComponent) {
         if (component.dataComponent.accountLocal.isAuthenticate()) {
             component.dataComponent.pubSubClient.restartConnection()
         }
+    }
+
+    fun registerFcmToken(fcmToken: String) {
+        registerFcmToken(fcmToken, null, null)
+    }
+
+    fun registerFcmToken(fcmToken: String, onError: Action<Throwable>?) {
+        registerFcmToken(fcmToken, null, onError)
+    }
+
+    fun registerFcmToken(fcmToken: String, onComplete: Action<Void?>?, onError: Action<Throwable>?) {
+        component.dataComponent.qiscusRestApi
+                .registerFcmToken(component.dataComponent.accountLocal.getAccount().token, "android", fcmToken)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ onComplete?.call(null) }, { onError?.call(it) })
     }
 }

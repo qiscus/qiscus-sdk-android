@@ -112,8 +112,9 @@ data class DataComponent
         var commentRepository: CommentRepository = CommentDataRepository(commentLocal, commentRemote,
                 fileLocal, fileRemote, fileManager, filePublisher, postCommentHandler),
 
+        internal val commentPayloadMapper: CommentPayloadMapper = CommentPayloadMapper(),
         var pubSubClient: QiscusPubSubClient = QiscusMqttClient(context, applicationWatcher = applicationWatcher,
-                accountLocal = accountLocal, commentLocal = commentLocal, commentPayloadMapper = CommentPayloadMapper(),
+                accountLocal = accountLocal, commentLocal = commentLocal, commentPayloadMapper = commentPayloadMapper,
                 postCommentHandler = postCommentHandler, commentRemote = commentRemote, userPublisher = userPublisher),
 
         var roomObserver: RoomObserver = RoomDataObserver(roomSubscriber),
