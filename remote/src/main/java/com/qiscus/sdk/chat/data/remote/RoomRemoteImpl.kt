@@ -95,7 +95,10 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                         val participants = it.participants
                         roomLocal.updateRoomMembers(it.idStr, participants.map { it.toEntity() })
 
-                        commentLocal.addOrUpdateComment(it.lastComment.toEntity(accountLocal.getAccount(), participants))
+                        val lastComment = it.lastComment.toEntity(accountLocal.getAccount(), participants)
+                        if (lastComment.commentId.id != "0" && lastComment.commentId.commentBeforeId != "0") {
+                            commentLocal.addOrUpdateComment(lastComment)
+                        }
                     }
                 }
                 .map { it.results.roomsInfo.map { it.toEntity() } }
@@ -108,7 +111,10 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                         val participants = it.participants
                         roomLocal.updateRoomMembers(it.idStr, participants.map { it.toEntity() })
 
-                        commentLocal.addOrUpdateComment(it.lastComment.toEntity(accountLocal.getAccount(), participants))
+                        val lastComment = it.lastComment.toEntity(accountLocal.getAccount(), participants)
+                        if (lastComment.commentId.id != "0" && lastComment.commentId.commentBeforeId != "0") {
+                            commentLocal.addOrUpdateComment(lastComment)
+                        }
                     }
                 }
                 .map { it.results.roomsInfo.map { it.toEntity() } }
