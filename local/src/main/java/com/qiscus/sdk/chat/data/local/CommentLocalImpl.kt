@@ -32,7 +32,6 @@ import com.qiscus.sdk.chat.data.source.comment.CommentLocal
 import com.qiscus.sdk.chat.data.source.file.FileLocal
 import com.qiscus.sdk.chat.data.source.room.RoomLocal
 import com.qiscus.sdk.chat.data.source.user.UserLocal
-import com.qiscus.sdk.chat.data.util.SyncHandler
 
 
 /**
@@ -49,8 +48,6 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
                        private val commentPublisher: CommentPublisher) : CommentLocal {
 
     private val database = dbOpenHelper.readableDatabase
-
-    private var syncHandler: SyncHandler? = null
 
     override fun addComment(commentEntity: CommentEntity) {
         if (!isExistComment(commentEntity.commentId)) {
