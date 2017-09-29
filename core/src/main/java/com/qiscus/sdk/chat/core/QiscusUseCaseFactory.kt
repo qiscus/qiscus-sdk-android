@@ -69,6 +69,8 @@ interface QiscusUseCaseFactory {
 
     fun listenFileAttachmentProgress(): ListenFileAttachmentProgress
 
+    fun listenCommentDeleted(): ListenCommentDeleted
+
     fun postComment(): PostComment
 
     fun updateCommentState(): UpdateCommentState

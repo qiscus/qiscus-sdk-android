@@ -17,8 +17,6 @@
 package com.qiscus.sdk.chat.domain.pubsub
 
 import com.qiscus.sdk.chat.domain.model.Comment
-import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
-import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
 import io.reactivex.Observable
 
 /**
@@ -31,4 +29,6 @@ interface CommentObserver {
     fun listenNewComment(): Observable<Comment>
 
     fun listenCommentState(roomId: String): Observable<Comment>
+
+    fun listenCommentDeleted(roomId: String): Observable<Comment>
 }

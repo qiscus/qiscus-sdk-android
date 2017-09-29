@@ -43,4 +43,10 @@ class CommentDataObserver(private val pubSubClient: QiscusPubSubClient,
                 .filter { it.room.id == roomId }
                 .map { it.toDomainModel() }
     }
+
+    override fun listenCommentDeleted(roomId: String): Observable<Comment> {
+        return commentSubscriber.listenCommentDeleted()
+                .filter { it.room.id == roomId }
+                .map { it.toDomainModel() }
+    }
 }

@@ -183,6 +183,14 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
         )
     }
 
+    override fun listenCommentDeleted(): ListenCommentDeleted {
+        return ListenCommentDeleted(
+                component.dataComponent.commentObserver,
+                component.executorComponent.threadExecutor,
+                component.executorComponent.postExecutionThread
+        )
+    }
+
     override fun postComment(): PostComment {
         return PostComment(
                 component.dataComponent.commentRepository,
