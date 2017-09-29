@@ -41,4 +41,10 @@ class QiscusCommentFactory(private val accountRepository: AccountRepository) : C
                 accountRepository.getAccount().blockingGet().user, Date(), Room(roomId, name = ""),
                 CommentState.SENDING, CommentType("file_attachment", payload))
     }
+
+    override fun createCustomComment(roomId: String, defaultTextMessage: String, type: String, content: JSONObject): Comment {
+        return Comment(CommentId(), defaultTextMessage, accountRepository.getAccount().blockingGet().user,
+                Date(), Room(roomId, name = ""), CommentState.SENDING,
+                CommentType("custom", JSONObject().put("type", type).put("content", content)))
+    }
 }

@@ -18,6 +18,7 @@ package com.qiscus.sdk.chat.domain.common
 
 import com.qiscus.sdk.chat.domain.model.Comment
 import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
+import org.json.JSONObject
 import java.io.File
 
 /**
@@ -30,4 +31,6 @@ interface CommentFactory {
     fun createTextComment(roomId: String, message: String): Comment
 
     fun createFileAttachmentComment(roomId: String, file: File, caption: String): FileAttachmentComment
+
+    fun createCustomComment(roomId: String, defaultTextMessage: String, type: String, content: JSONObject): Comment
 }
