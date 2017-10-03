@@ -178,6 +178,7 @@ class CommentDataRepository(private val commentLocal: CommentLocal,
 
     override fun clearData(): Completable {
         return Completable.defer {
+            fileLocal.clearData()
             commentLocal.clearData()
             Completable.complete()
         }

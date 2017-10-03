@@ -69,4 +69,10 @@ class FileLocalImpl(dbOpenHelper: DbOpenHelper) : FileLocal {
         cursor.close()
         return null
     }
+
+    override fun clearData() {
+        database.transaction {
+            database.delete(Db.FileTable.TABLE_NAME, null, null)
+        }
+    }
 }

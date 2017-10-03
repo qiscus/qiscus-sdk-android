@@ -29,4 +29,6 @@ interface FileLocal {
     fun saveLocalPath(commentIdEntity: CommentIdEntity, file: File)
 
     fun getLocalPath(commentIdEntity: CommentIdEntity): File?
+
+    fun clearData()
 }
