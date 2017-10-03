@@ -1,0 +1,28 @@
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'chatsdk'
+
+    siteUrl = 'https://qiscus.com'
+    gitUrl = 'https://github.com/qiscus/qiscus-sdk-android'
+
+    libraryVersion = '3.0.0-beta1'
+
+    developerId = 'qiscustech'
+    developerName = 'Qiscus Tech'
+    developerEmail = 'developer@qiscus.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
+}

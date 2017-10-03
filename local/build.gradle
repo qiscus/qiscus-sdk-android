@@ -16,29 +16,14 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply from: '../buildsystem/bintrayConfig.gradle'
 
 ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'chatsdk'
-
     publishedGroupId = 'com.qiscus.sdk.chat.data'
     libraryName = 'local'
     artifact = 'local'
 
     libraryDescription = 'Local data layer of qiscus chat sdk'
-
-    siteUrl = 'https://qiscus.com'
-    gitUrl = 'https://github.com/qiscus/qiscus-sdk-android'
-
-    libraryVersion = '3.0.0-beta1'
-
-    developerId = 'qiscustech'
-    developerName = 'Qiscus Tech'
-    developerEmail = 'developer@qiscus.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
 }
 
 android {
@@ -99,8 +84,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
