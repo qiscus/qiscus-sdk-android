@@ -36,5 +36,5 @@ data class ChatRoomActivityComponent
         ListenCommentPresenter(listenCommentView, useCaseFactory.listenNewComment(), CommentMapper()),
 
         val sendCommentPresenter: SendCommentContract.Presenter =
-        SendCommentPresenter(sendCommentView, useCaseFactory.postComment())
+        SendCommentPresenter(sendCommentView, useCaseFactory.postComment(), Qiscus.instance.commentFactory)
 )

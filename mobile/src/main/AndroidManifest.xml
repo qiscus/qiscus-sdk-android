@@ -18,8 +18,8 @@
     package="com.qiscus.sdk.chat.presentation.mobile">
 
     <application android:largeHeap="true">
-        <activity
-            android:name=".chatroom.ChatRoomActivity"/>
+        <activity android:name=".chatroom.ChatRoomActivity" />
+        <activity android:name=".listconversation.ListConversationActivity" />
 
     </application>
 </manifest>

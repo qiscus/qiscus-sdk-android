@@ -41,7 +41,7 @@ class ChatRoomActivity : AppCompatActivity(), ListenCommentContract.View, SendCo
         setContentView(R.layout.activity_chat_room)
         init()
         sendMessageButton.setOnClickListener({
-            sendCommentPresenter.sendComment("Halo ini pesan ku...")
+            sendCommentPresenter.sendComment("", "Halo ini pesan ku...")
         })
     }
 

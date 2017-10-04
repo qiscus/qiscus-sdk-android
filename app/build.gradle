@@ -58,8 +58,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:25.4.0'
-    implementation project(':core')
+    implementation project(':mobile')
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.qiscus.utils:jupuk:1.0.1'
 

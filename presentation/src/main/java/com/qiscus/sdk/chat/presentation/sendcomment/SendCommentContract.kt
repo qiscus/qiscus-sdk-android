@@ -18,6 +18,7 @@ package com.qiscus.sdk.chat.presentation.sendcomment
 
 import com.qiscus.sdk.chat.presentation.BasePresenter
 import com.qiscus.sdk.chat.presentation.BaseView
+import java.io.File
 
 /**
  * Created on : August 19, 2017
@@ -31,6 +32,8 @@ interface SendCommentContract {
     }
 
     interface Presenter : BasePresenter {
-        fun sendComment(message: String)
+        fun sendComment(roomId: String, message: String)
+
+        fun sendFileComment(roomId: String, file: File, caption: String)
     }
 }

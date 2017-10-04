@@ -16,9 +16,9 @@
 
 package com.qiscus.sdk.chat.presentation.sendcomment
 
+import com.qiscus.sdk.chat.domain.common.CommentFactory
 import com.qiscus.sdk.chat.domain.interactor.comment.PostComment
-import com.qiscus.sdk.chat.domain.model.*
-import java.util.*
+import java.io.File
 
 /**
  * Created on : August 19, 2017
@@ -27,7 +27,8 @@ import java.util.*
  * GitHub     : https://github.com/zetbaitsu
  */
 class SendCommentPresenter(val view: SendCommentContract.View,
-                           private val useCase: PostComment) : SendCommentContract.Presenter {
+                           private val useCase: PostComment,
+                           private val commentFactory: CommentFactory) : SendCommentContract.Presenter {
 
     override fun start() {}
 
@@ -35,9 +36,12 @@ class SendCommentPresenter(val view: SendCommentContract.View,
         useCase.dispose()
     }
 
-    override fun sendComment(message: String) {
-        useCase.execute(PostComment.Params(Comment(CommentId(), message, User("zetra"), Date(),
-                Room("1", name = "Room"), CommentState.SENDING, CommentType("text"))))
+    override fun sendComment(roomId: String, message: String) {
+        useCase.execute(PostComment.Params(commentFactory.createTextComment(roomId, message)))
         view.clearTextField()
+    }
+
+    override fun sendFileComment(roomId: String, file: File, caption: String) {
+        useCase.execute(PostComment.Params(commentFactory.createFileAttachmentComment(roomId, file, caption)))
     }
 }
