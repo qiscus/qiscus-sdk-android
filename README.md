@@ -626,6 +626,11 @@ QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom(123), new QiscusRxE
     });
 ```
 
+### Proguard
+
+If you are using Proguard in your application, make sure you add Proguard rules of Qiscus from
+[Qiscus Proguard Rules](https://github.com/qiscus/qiscus-sdk-android/blob/master/app/proguard-rules.pro) to your Proguard rules.
+
 # Sample Application
 
 You can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
