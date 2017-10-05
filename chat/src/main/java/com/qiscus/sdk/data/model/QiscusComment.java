@@ -453,7 +453,7 @@ public class QiscusComment implements Parcelable {
             try {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(this);
                 caption = payload.optString("caption", "");
-            } catch (JSONException ignored) {
+            } catch (Exception ignored) {
                 //Do nothing
             }
         }
