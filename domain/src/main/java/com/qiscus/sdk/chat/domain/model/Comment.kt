@@ -26,7 +26,8 @@ import java.util.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class CommentId(val id: String = "", val commentBeforeId: String = "", val uniqueId: String = generateUniqueId()) {
+data class CommentId
+@JvmOverloads constructor(val id: String = "", val commentBeforeId: String = "", val uniqueId: String = generateUniqueId()) {
     override fun equals(other: Any?): Boolean {
         if (other !is CommentId) {
             return false

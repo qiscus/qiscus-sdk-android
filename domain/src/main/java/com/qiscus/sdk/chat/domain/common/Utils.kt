@@ -36,6 +36,7 @@ private val symbols = '0'.rangeTo('9').toMutableList().apply {
 
 private val taskExecutor = ScheduledThreadPoolExecutor(5)
 
+@JvmOverloads
 fun randomString(length: Int = 64): String {
     val buf = CharArray(length)
     for (i in buf.indices) {
@@ -48,6 +49,7 @@ fun generateUniqueId(): String {
     return "${System.currentTimeMillis()}_${randomString()}"
 }
 
+@JvmOverloads
 fun runOnBackgroundThread(runnable: Runnable, delay: Long = 0): ScheduledFuture<*> {
     return taskExecutor.schedule(runnable, delay, TimeUnit.MILLISECONDS)
 }

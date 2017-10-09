@@ -22,4 +22,4 @@ package com.qiscus.sdk.chat.domain.model
 * Name       : Zetra
 * GitHub     : https://github.com/zetbaitsu
 */
-data class User(val id: String, var name: String = id, var avatar: String = "")
+data class User @JvmOverloads constructor(val id: String, var name: String = id, var avatar: String = "")

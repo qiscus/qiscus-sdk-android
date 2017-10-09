@@ -37,7 +37,5 @@ class GetRoomWithChannelId(private val roomRepository: RoomRepository,
         return roomRepository.getRoomWithChannelId(params!!.channelId, params.roomAvatarUrl)
     }
 
-    data class Params(val channelId: String, val roomAvatarUrl: String) {
-        constructor(channelId: String) : this(channelId, "")
-    }
+    data class Params @JvmOverloads constructor(val channelId: String, val roomAvatarUrl: String = "")
 }

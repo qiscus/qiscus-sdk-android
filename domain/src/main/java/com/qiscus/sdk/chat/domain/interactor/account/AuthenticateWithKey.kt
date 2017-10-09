@@ -39,8 +39,7 @@ class AuthenticateWithKey(private val accountRepository: AccountRepository, priv
                 .doOnSuccess { pubSubClient.restartConnection() }
     }
 
-    data class Params(val userId: String, val userKey: String, val name: String = userId, val avatarUrl: String = "") {
-        constructor(userId: String, userKey: String, name: String) : this(userId, userKey, name, "")
-        constructor(userId: String, userKey: String) : this(userId, userKey, userId)
-    }
+    data class Params
+    @JvmOverloads
+    constructor(val userId: String, val userKey: String, val name: String = userId, val avatarUrl: String = "")
 }
