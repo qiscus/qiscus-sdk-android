@@ -25,7 +25,6 @@ import com.qiscus.sdk.chat.data.pubsub.file.FilePublisher
 import com.qiscus.sdk.chat.data.source.comment.CommentLocal
 import com.qiscus.sdk.chat.data.source.comment.CommentRemote
 import com.qiscus.sdk.chat.data.source.file.FileRemote
-import com.qiscus.sdk.chat.data.source.file.ProgressListener
 import com.qiscus.sdk.chat.data.util.PostCommentHandler
 import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
 import io.reactivex.Observable
@@ -103,11 +102,9 @@ class PostCommentHandlerImpl(private val commentLocal: CommentLocal,
 
         //Reuploading the file
         val progress = FileAttachmentProgress(comment.toDomainModel(), FileAttachmentProgress.State.UPLOADING, 0)
-        val disposable = fileRemote.upload(comment.file!!, object : ProgressListener {
-            override fun onProgress(total: Int) {
-                progress.progress = total
-                filePublisher.onFileProgressUpdated(progress)
-            }
+        val disposable = fileRemote.upload(comment.file!!, {
+            progress.progress = it
+            filePublisher.onFileProgressUpdated(progress)
         })
                 .doOnSuccess { comment.updateAttachmentUrl(it) }
                 .doOnError { onErrorSendingComment(comment, it) }

@@ -18,7 +18,6 @@ package com.qiscus.sdk.chat.data.remote
 
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
 import com.qiscus.sdk.chat.data.source.file.FileRemote
-import com.qiscus.sdk.chat.data.source.file.ProgressListener
 import com.qiscus.sdk.chat.data.util.FilePathGenerator
 import io.reactivex.Single
 import okhttp3.*
@@ -45,7 +44,7 @@ class FileRemoteImpl(private val accountLocal: AccountLocal,
                      private val httpClient: OkHttpClient,
                      private val filePathGenerator: FilePathGenerator) : FileRemote {
 
-    override fun upload(file: File, progressListener: ProgressListener): Single<String> {
+    override fun upload(file: File, onProgress: (total: Int) -> Unit): Single<String> {
         return Single.defer {
             Single.fromCallable {
                 val fileLength = file.length()
@@ -54,11 +53,9 @@ class FileRemoteImpl(private val accountLocal: AccountLocal,
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("token", accountLocal.getAccount().token)
                         .addFormDataPart("file", file.name,
-                                CountingFileRequestBody(file, object : ProgressListener {
-                                    override fun onProgress(total: Int) {
-                                        val progress = total * 100 / fileLength
-                                        progressListener.onProgress(progress.toInt())
-                                    }
+                                CountingFileRequestBody(file, {
+                                    val progress = it * 100 / fileLength
+                                    onProgress(progress.toInt())
                                 }))
                         .build()
 
@@ -72,7 +69,7 @@ class FileRemoteImpl(private val accountLocal: AccountLocal,
         }
     }
 
-    override fun download(attachmentUrl: String, progressListener: ProgressListener): Single<File> {
+    override fun download(attachmentUrl: String, onProgress: (total: Int) -> Unit): Single<File> {
         return Single.defer {
             Single.fromCallable {
                 val inputStream: InputStream?
@@ -103,7 +100,7 @@ class FileRemoteImpl(private val accountLocal: AccountLocal,
                     total += count.toLong()
                     val totalCurrent = total
                     if (fileLength > 0) {
-                        progressListener.onProgress((totalCurrent * 100 / fileLength).toInt())
+                        onProgress((totalCurrent * 100 / fileLength).toInt())
                     }
                     fos.write(buffer, 0, count)
                     count = inputStream.read(buffer)
@@ -116,7 +113,7 @@ class FileRemoteImpl(private val accountLocal: AccountLocal,
         }
     }
 
-    private class CountingFileRequestBody(private val file: File, private val progressListener: ProgressListener) : RequestBody() {
+    private class CountingFileRequestBody(private val file: File, private val onProgress: (total: Int) -> Unit) : RequestBody() {
 
         override fun contentType(): MediaType? {
             return MediaType.parse("application/octet-stream")
@@ -138,7 +135,7 @@ class FileRemoteImpl(private val accountLocal: AccountLocal,
                 while (read != -1L) {
                     total += read
                     sink.flush()
-                    progressListener.onProgress(total.toInt())
+                    onProgress(total.toInt())
                     read = source.read(sink.buffer(), SEGMENT_SIZE)
 
                 }

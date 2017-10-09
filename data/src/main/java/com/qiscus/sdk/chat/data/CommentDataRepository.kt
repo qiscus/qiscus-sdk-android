@@ -26,7 +26,6 @@ import com.qiscus.sdk.chat.data.source.comment.CommentLocal
 import com.qiscus.sdk.chat.data.source.comment.CommentRemote
 import com.qiscus.sdk.chat.data.source.file.FileLocal
 import com.qiscus.sdk.chat.data.source.file.FileRemote
-import com.qiscus.sdk.chat.data.source.file.ProgressListener
 import com.qiscus.sdk.chat.data.util.FileManager
 import com.qiscus.sdk.chat.data.util.PostCommentHandler
 import com.qiscus.sdk.chat.domain.model.*
@@ -69,11 +68,9 @@ class CommentDataRepository(private val commentLocal: CommentLocal,
         val progress = FileAttachmentProgress(attachmentComment.toDomainModel(),
                 FileAttachmentProgress.State.UPLOADING, 0)
 
-        return fileRemote.upload(comment.file!!, object : ProgressListener {
-            override fun onProgress(total: Int) {
-                progress.progress = total
-                filePublisher.onFileProgressUpdated(progress)
-            }
+        return fileRemote.upload(comment.file!!, {
+            progress.progress = it
+            filePublisher.onFileProgressUpdated(progress)
         })
                 .doOnSubscribe {
                     fileLocal.saveLocalPath(attachmentComment.commentId, comment.file!!)
@@ -99,11 +96,9 @@ class CommentDataRepository(private val commentLocal: CommentLocal,
         val progress = FileAttachmentProgress(attachmentComment.toDomainModel(),
                 FileAttachmentProgress.State.DOWNLOADING, 0)
 
-        return fileRemote.download(attachmentComment.getAttachmentUrl(), object : ProgressListener {
-            override fun onProgress(total: Int) {
-                progress.progress = total
-                filePublisher.onFileProgressUpdated(progress)
-            }
+        return fileRemote.download(attachmentComment.getAttachmentUrl(), {
+            progress.progress = it
+            filePublisher.onFileProgressUpdated(progress)
         })
                 .doOnSuccess {
                     attachmentComment.file = it

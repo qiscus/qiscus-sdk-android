@@ -26,7 +26,7 @@ import java.io.File
  * GitHub     : https://github.com/zetbaitsu
  */
 interface FileRemote {
-    fun upload(file: File, progressListener: ProgressListener): Single<String>
+    fun upload(file: File, onProgress: (total: Int) -> Unit): Single<String>
 
-    fun download(attachmentUrl: String, progressListener: ProgressListener): Single<File>
+    fun download(attachmentUrl: String, onProgress: (total: Int) -> Unit): Single<File>
 }
