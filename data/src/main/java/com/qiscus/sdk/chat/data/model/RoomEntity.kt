@@ -22,7 +22,7 @@ package com.qiscus.sdk.chat.data.model
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class RoomEntity(
+data class RoomEntity @JvmOverloads constructor(
         val id: String,
         val uniqueId: String = "default",
         var name: String,

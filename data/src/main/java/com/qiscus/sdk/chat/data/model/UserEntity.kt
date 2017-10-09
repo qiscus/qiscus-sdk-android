@@ -22,4 +22,4 @@ package com.qiscus.sdk.chat.data.model
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class UserEntity(val id: String, var name: String = id, var avatar: String = "")
+data class UserEntity @JvmOverloads constructor(val id: String, var name: String = id, var avatar: String = "")

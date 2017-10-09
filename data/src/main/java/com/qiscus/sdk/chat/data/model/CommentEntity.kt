@@ -25,7 +25,8 @@ import org.json.JSONObject
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class CommentIdEntity(val id: String = "", val commentBeforeId: String = "", val uniqueId: String = generateUniqueId()) {
+data class CommentIdEntity
+@JvmOverloads constructor(val id: String = "", val commentBeforeId: String = "", val uniqueId: String = generateUniqueId()) {
     override fun equals(other: Any?): Boolean {
         if (other !is CommentIdEntity) {
             return false
