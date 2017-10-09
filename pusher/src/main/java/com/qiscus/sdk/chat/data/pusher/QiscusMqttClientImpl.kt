@@ -47,7 +47,7 @@ import java.util.concurrent.ScheduledFuture
  * GitHub     : https://github.com/zetbaitsu
  */
 @SuppressLint("HardwareIds")
-class QiscusMqttClient(
+class QiscusMqttClient @JvmOverloads constructor(
         private val context: Context,
         private val serverUri: String = "ssl://mqtt.qiscus.com:1885",
         private val clientId: String = "${context.packageName}-" +
