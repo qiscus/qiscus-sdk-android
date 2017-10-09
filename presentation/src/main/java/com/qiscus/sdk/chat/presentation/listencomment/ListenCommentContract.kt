@@ -18,7 +18,7 @@ package com.qiscus.sdk.chat.presentation.listencomment
 
 import com.qiscus.sdk.chat.presentation.BasePresenter
 import com.qiscus.sdk.chat.presentation.BaseView
-import com.qiscus.sdk.chat.presentation.model.CommentView
+import com.qiscus.sdk.chat.presentation.model.CommentViewModel
 
 /**
  * Created on : August 19, 2017
@@ -29,7 +29,7 @@ import com.qiscus.sdk.chat.presentation.model.CommentView
 interface ListenCommentContract {
 
     interface View : BaseView {
-        fun onNewComment(commentView: CommentView)
+        fun onNewComment(commentViewModel: CommentViewModel)
     }
 
     interface Presenter : BasePresenter {

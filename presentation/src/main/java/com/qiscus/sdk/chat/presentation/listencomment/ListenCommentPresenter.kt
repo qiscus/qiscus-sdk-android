@@ -16,10 +16,12 @@
 
 package com.qiscus.sdk.chat.presentation.listencomment
 
+import android.support.annotation.ColorInt
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.comment.ListenNewComment
 import com.qiscus.sdk.chat.domain.model.Comment
-import com.qiscus.sdk.chat.presentation.mapper.CommentMapper
+import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.mapper.toViewModel
 
 /**
  * Created on : August 19, 2017
@@ -29,7 +31,10 @@ import com.qiscus.sdk.chat.presentation.mapper.CommentMapper
  */
 class ListenCommentPresenter(val view: ListenCommentContract.View,
                              private val useCase: ListenNewComment,
-                             private val mapper: CommentMapper) : ListenCommentContract.Presenter {
+                             private @ColorInt val mentionAllColor: Int,
+                             private @ColorInt val mentionOtherColor: Int,
+                             private @ColorInt val mentionMeColor: Int,
+                             private val mentionClickHandler: MentionClickHandler? = null) : ListenCommentContract.Presenter {
 
     override fun start() {
         listenNewComment()
@@ -40,7 +45,9 @@ class ListenCommentPresenter(val view: ListenCommentContract.View,
     }
 
     private fun handleNewComment(comment: Comment) {
-        view.onNewComment(mapper.mapToView(comment))
+        view.onNewComment(comment.toViewModel(
+                mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler
+        ))
     }
 
     override fun stop() {

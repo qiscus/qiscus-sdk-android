@@ -17,6 +17,7 @@ import com.qiscus.sdk.chat.presentation.util.getString
  */
 open class CommentVideoViewModel
 @JvmOverloads constructor(comment: FileAttachmentComment,
+                          mimeType: String,
                           account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
                           userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
                           @ColorInt mentionAllColor: Int,
@@ -24,7 +25,8 @@ open class CommentVideoViewModel
                           @ColorInt mentionMeColor: Int,
                           mentionClickListener: MentionClickHandler? = null)
 
-    : CommentFileViewModel(comment, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
+    : CommentFileViewModel(comment, mimeType, account, userRepository, mentionAllColor, mentionOtherColor,
+        mentionMeColor, mentionClickListener) {
 
     override fun determineReadableMessage(): String {
         return if ((comment as FileAttachmentComment).caption.isBlank()) {

@@ -22,7 +22,7 @@ import android.util.Log
 import com.qiscus.sdk.chat.presentation.listencomment.ListenCommentContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.component.ChatRoomActivityComponent
-import com.qiscus.sdk.chat.presentation.model.CommentView
+import com.qiscus.sdk.chat.presentation.model.CommentViewModel
 import com.qiscus.sdk.chat.presentation.sendcomment.SendCommentContract
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
@@ -56,8 +56,8 @@ class ChatRoomActivity : AppCompatActivity(), ListenCommentContract.View, SendCo
         listenCommentPresenter.start()
     }
 
-    override fun onNewComment(commentView: CommentView) {
-        Log.d("ZETRA", "new comment: $commentView")
+    override fun onNewComment(commentViewModel: CommentViewModel) {
+        Log.d("ZETRA", "new comment: ${commentViewModel.readableMessage}")
     }
 
     override fun clearTextField() {

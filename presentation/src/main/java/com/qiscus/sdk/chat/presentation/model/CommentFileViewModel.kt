@@ -20,6 +20,7 @@ import com.qiscus.sdk.chat.presentation.util.toSpannable
  */
 open class CommentFileViewModel
 @JvmOverloads constructor(comment: FileAttachmentComment,
+                          val mimeType: String,
                           account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
                           userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
                           @ColorInt mentionAllColor: Int,

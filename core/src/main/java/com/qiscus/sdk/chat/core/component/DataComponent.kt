@@ -74,7 +74,7 @@ data class DataComponent(
         var userLocal: UserLocal = UserLocalImpl(dbOpenHelper),
         var userRepository: UserRepository = UserDataRepository(userLocal),
 
-        private val mimeTypeGuesser: MimeTypeGuesser = MimeTypeGuesserImpl(),
+        val mimeTypeGuesser: MimeTypeGuesser = MimeTypeGuesserImpl(),
         private val fileUtil: FileUtil = FileUtil(context, mimeTypeGuesser),
         private val filePathGenerator: FilePathGenerator = fileUtil,
         private val fileManager: FileManager = fileUtil,
