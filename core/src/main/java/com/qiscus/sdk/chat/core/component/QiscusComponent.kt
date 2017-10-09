@@ -27,7 +27,7 @@ import com.qiscus.sdk.chat.data.util.ApplicationWatcher
  * GitHub     : https://github.com/zetbaitsu
  */
 class QiscusComponent
-(
+@JvmOverloads constructor(
         val application: Application,
         private val serverBaseUrl: String,
         val appWatcher: ApplicationWatcher = AppWatcher(),

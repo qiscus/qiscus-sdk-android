@@ -28,7 +28,7 @@ import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
  * GitHub     : https://github.com/zetbaitsu
  */
 data class ExecutorComponent
-(
+@JvmOverloads constructor(
         var threadExecutor: ThreadExecutor = JobExecutor(),
         var postExecutionThread: PostExecutionThread = UiThread()
 )

@@ -58,7 +58,7 @@ import okhttp3.OkHttpClient
  * GitHub     : https://github.com/zetbaitsu
  */
 data class DataComponent
-(
+@JvmOverloads constructor(
         private val context: Context,
         private val applicationWatcher: ApplicationWatcher,
         private val restApiServerBaseUrl: String,

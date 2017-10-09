@@ -86,15 +86,8 @@ class Qiscus private constructor(val component: QiscusComponent) {
         }
     }
 
-    fun registerFcmToken(fcmToken: String) {
-        registerFcmToken(fcmToken, null, null)
-    }
-
-    fun registerFcmToken(fcmToken: String, onError: Action<Throwable>?) {
-        registerFcmToken(fcmToken, null, onError)
-    }
-
-    fun registerFcmToken(fcmToken: String, onComplete: Action<Void?>?, onError: Action<Throwable>?) {
+    @JvmOverloads
+    fun registerFcmToken(fcmToken: String, onComplete: Action<Void?>? = null, onError: Action<Throwable>? = null) {
         component.dataComponent.qiscusRestApi
                 .registerFcmToken(component.dataComponent.accountLocal.getAccount().token, "android", fcmToken)
                 .subscribeOn(Schedulers.io())
