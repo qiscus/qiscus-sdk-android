@@ -1,17 +1,16 @@
-package com.qiscus.sdk.chat.presentation.android.model
+package com.qiscus.sdk.chat.presentation.model
 
 import android.support.annotation.ColorInt
 import android.text.Spannable
-import android.text.SpannableString
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.android.MentionClickHandler
-import com.qiscus.sdk.chat.presentation.android.R
-import com.qiscus.sdk.chat.presentation.android.util.getString
-import com.qiscus.sdk.chat.presentation.android.util.toReadableText
-import com.qiscus.sdk.chat.presentation.android.util.toSpannable
+import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.R
+import com.qiscus.sdk.chat.presentation.util.getString
+import com.qiscus.sdk.chat.presentation.util.toReadableText
+import com.qiscus.sdk.chat.presentation.util.toSpannable
 
 /**
  * Created on : October 05, 2017

@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.android.util
+package com.qiscus.sdk.chat.presentation.util
 
 import android.content.Context
 import android.support.annotation.ColorInt
@@ -9,7 +9,7 @@ import android.view.View
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.android.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.MentionClickHandler
 
 /**
  * Created on : October 05, 2017

@@ -55,7 +55,6 @@ dependencies {
     def androidDependencies = rootProject.ext.androidDependencies
     def androidTestDependencies = rootProject.ext.androidTestDependencies
 
-    compile project(':core')
     compile project(':presentation')
 
     compile androidDependencies.kotlin

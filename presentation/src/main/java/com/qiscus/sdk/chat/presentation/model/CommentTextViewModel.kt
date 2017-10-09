@@ -1,10 +1,10 @@
-package com.qiscus.sdk.chat.presentation.android.model
+package com.qiscus.sdk.chat.presentation.model
 
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Comment
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.android.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.MentionClickHandler
 
 /**
  * Created on : October 05, 2017
@@ -12,7 +12,7 @@ import com.qiscus.sdk.chat.presentation.android.MentionClickHandler
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-open class CommentAccountLinkingViewModel
+open class CommentTextViewModel
 @JvmOverloads constructor(comment: Comment,
                           account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
                           userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
@@ -20,10 +20,4 @@ open class CommentAccountLinkingViewModel
                           mentionOtherColor: Int,
                           mentionMeColor: Int,
                           mentionClickListener: MentionClickHandler? = null)
-    : CommentViewModel(comment, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
-
-    val button by lazy {
-        val payload = comment.type.payload.optJSONObject("params")
-        ButtonAccountLinkingViewModel(payload.optString("button_text"), comment.type.rawType, payload)
-    }
-}
+    : CommentViewModel(comment, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)

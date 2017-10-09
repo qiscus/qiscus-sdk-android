@@ -55,8 +55,7 @@ dependencies {
     def mobileDependencies = rootProject.ext.mobileDependencies
     def mobileTestDependencies = rootProject.ext.mobileTestDependencies
 
-    compile project(':core')
-    compile project(':presentation')
+    compile project(':android')
 
     compile mobileDependencies.kotlin
     compile mobileDependencies.rxKotlin

@@ -1,9 +1,9 @@
-package com.qiscus.sdk.chat.presentation.android.model
+package com.qiscus.sdk.chat.presentation.model
 
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.*
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.android.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.MentionClickHandler
 import java.util.*
 
 /**

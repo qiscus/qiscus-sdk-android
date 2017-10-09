@@ -14,10 +14,39 @@
  * limitations under the License.
  */
 
-apply plugin: 'kotlin'
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+android {
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+    buildToolsVersion globalConfiguration["androidBuildToolsVersion"]
+
+    defaultConfig {
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+        disable 'InvalidPackage'            //Some libraries have issues with this.
+        disable 'OldTargetApi'              //Lint gives this warning but SDK 20 would be Android L Beta.
+        disable 'IconDensities'             //For testing purpose. This is safe to remove.
+        disable 'IconMissingDensityFolder'  //For testing purpose. This is safe to remove.
+    }
+}
 
 configurations.all {
     resolutionStrategy {
@@ -27,13 +56,16 @@ configurations.all {
 
 dependencies {
     def presentationDependencies = rootProject.ext.presentationDependencies
-    def presentationTestDependencies = rootProject.ext.dataTestDependencies
+    def presentationTestDependencies = rootProject.ext.presentationTestDependencies
 
-    compile project(':domain')
+    compile project(':core')
     compile presentationDependencies.rxKotlin
     compile presentationDependencies.kotlin
+    compile presentationDependencies.androidAnnotations
 
     testImplementation presentationTestDependencies.junit
+    testImplementation presentationTestDependencies.kotlinJUnit
     testImplementation presentationTestDependencies.mockito
     testImplementation presentationTestDependencies.assertj
+    testImplementation presentationTestDependencies.robolectric
 }
