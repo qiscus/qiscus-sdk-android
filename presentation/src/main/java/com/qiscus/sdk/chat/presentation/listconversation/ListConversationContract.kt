@@ -2,7 +2,7 @@ package com.qiscus.sdk.chat.presentation.listconversation
 
 import com.qiscus.sdk.chat.presentation.BasePresenter
 import com.qiscus.sdk.chat.presentation.BaseView
-import com.qiscus.sdk.chat.presentation.model.ConversationView
+import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
 
 /**
  * Created on : October 04, 2017
@@ -12,9 +12,9 @@ import com.qiscus.sdk.chat.presentation.model.ConversationView
  */
 interface ListConversationContract {
     interface View : BaseView {
-        fun addOrUpdateConversation(conversationView: ConversationView)
+        fun addOrUpdateConversation(conversationViewModel: ConversationViewModel)
 
-        fun removeConversation(conversationView: ConversationView)
+        fun removeConversation(conversationViewModel: ConversationViewModel)
     }
 
     interface Presenter : BasePresenter {

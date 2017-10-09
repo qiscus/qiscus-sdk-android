@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.model.ConversationView
+import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
 
 /**
  * Created on : October 04, 2017
@@ -17,20 +17,20 @@ import com.qiscus.sdk.chat.presentation.model.ConversationView
  * GitHub     : https://github.com/zetbaitsu
  */
 class ConversationAdapter(private val context: Context) : RecyclerView.Adapter<ConversationAdapter.VH>() {
-    val data: MutableList<ConversationView> = mutableListOf()
+    val data: MutableList<ConversationViewModel> = mutableListOf()
 
-    fun addOrUpdate(conversationView: ConversationView) {
-        val pos = data.indexOfFirst { it.room.id == conversationView.room.id }
+    fun addOrUpdate(conversationViewModel: ConversationViewModel) {
+        val pos = data.indexOfFirst { it.room.id == conversationViewModel.room.id }
         if (pos >= 0) {
-            data[pos] = conversationView
+            data[pos] = conversationViewModel
         } else {
-            data.add(conversationView)
+            data.add(conversationViewModel)
         }
         notifyDataSetChanged()
     }
 
-    fun removeConversation(conversationView: ConversationView){
-        val pos = data.indexOfFirst { it.room.id == conversationView.room.id }
+    fun removeConversation(conversationViewModel: ConversationViewModel){
+        val pos = data.indexOfFirst { it.room.id == conversationViewModel.room.id }
         if (pos >= 0) {
             data.removeAt(pos)
         }
@@ -54,9 +54,9 @@ class ConversationAdapter(private val context: Context) : RecyclerView.Adapter<C
         private val roomNameView: TextView = view.findViewById(R.id.roomName) as TextView
         private val lastMessageView: TextView = view.findViewById(R.id.lastMessage) as TextView
 
-        fun bind(conversationView: ConversationView) {
-            roomNameView.text = conversationView.room.name
-            lastMessageView.text = conversationView.lastComment?.message
+        fun bind(conversationViewModel: ConversationViewModel) {
+            roomNameView.text = conversationViewModel.room.name
+            lastMessageView.text = conversationViewModel.lastComment?.spannableMessage
         }
     }
 }

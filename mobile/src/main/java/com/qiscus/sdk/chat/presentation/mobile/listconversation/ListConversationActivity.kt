@@ -6,7 +6,7 @@ import android.support.v7.widget.LinearLayoutManager
 import com.qiscus.sdk.chat.presentation.listconversation.ListConversationContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.component.ListConversationActivityComponent
-import com.qiscus.sdk.chat.presentation.model.ConversationView
+import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
 import kotlinx.android.synthetic.main.activity_list_conversation.*
 
 /**
@@ -40,12 +40,12 @@ class ListConversationActivity : AppCompatActivity(), ListConversationContract.V
         listConversationPresenter.start()
     }
 
-    override fun addOrUpdateConversation(conversationView: ConversationView) {
-        adapter.addOrUpdate(conversationView)
+    override fun addOrUpdateConversation(conversationViewModel: ConversationViewModel) {
+        adapter.addOrUpdate(conversationViewModel)
     }
 
-    override fun removeConversation(conversationView: ConversationView) {
-        adapter.removeConversation(conversationView)
+    override fun removeConversation(conversationViewModel: ConversationViewModel) {
+        adapter.removeConversation(conversationViewModel)
     }
 
     override fun onStop() {

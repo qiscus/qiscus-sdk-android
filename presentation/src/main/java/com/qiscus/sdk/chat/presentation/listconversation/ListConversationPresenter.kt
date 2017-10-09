@@ -1,10 +1,13 @@
 package com.qiscus.sdk.chat.presentation.listconversation
 
+import android.support.annotation.ColorInt
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.comment.GetComments
 import com.qiscus.sdk.chat.domain.interactor.comment.ListenNewComment
 import com.qiscus.sdk.chat.domain.interactor.room.*
-import com.qiscus.sdk.chat.presentation.model.ConversationView
+import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.mapper.toViewModel
+import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
 
 /**
  * Created on : October 04, 2017
@@ -19,7 +22,11 @@ class ListConversationPresenter(val view: ListConversationContract.View,
                                 private val listenNewComment: ListenNewComment,
                                 private val listenRoomAdded: ListenRoomAdded,
                                 private val listenRoomUpdated: ListenRoomUpdated,
-                                private val listenRoomDeleted: ListenRoomDeleted) : ListConversationContract.Presenter {
+                                private val listenRoomDeleted: ListenRoomDeleted,
+                                private @ColorInt val mentionAllColor: Int,
+                                private @ColorInt val mentionOtherColor: Int,
+                                private @ColorInt val mentionMeColor: Int,
+                                private val mentionClickHandler: MentionClickHandler? = null) : ListConversationContract.Presenter {
 
     override fun start() {
         listenNewComment()
@@ -29,24 +36,26 @@ class ListConversationPresenter(val view: ListConversationContract.View,
         loadConversations()
     }
 
-    private fun loadLastComment(conversationView: ConversationView, onSuccess: Action<ConversationView>) {
-        getComments.execute(GetComments.Params(conversationView.room.id), Action {
+    private fun loadLastComment(conversationViewModel: ConversationViewModel, onSuccess: Action<ConversationViewModel>) {
+        getComments.execute(GetComments.Params(conversationViewModel.room.id), Action {
             if (it.isNotEmpty()) {
-                conversationView.lastComment = it.last()
+                conversationViewModel.lastComment = it.first()
+                        .toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)
             }
-            onSuccess.call(conversationView)
+            onSuccess.call(conversationViewModel)
         })
     }
 
     private fun listenNewComment() {
         listenNewComment.execute(null, Action {
-            view.addOrUpdateConversation(ConversationView(it.room, it))
+            view.addOrUpdateConversation(ConversationViewModel(it.room,
+                    it.toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)))
         })
     }
 
     override fun loadConversations(page: Int, limit: Int) {
         getRooms.execute(GetRooms.Params(page, limit), Action {
-            val conversations = it.map { ConversationView(it, null) }
+            val conversations = it.map { ConversationViewModel(it, null) }
             conversations.forEach {
                 loadLastComment(it, Action {
                     if (it.lastComment != null) {
@@ -59,7 +68,7 @@ class ListConversationPresenter(val view: ListConversationContract.View,
 
     override fun listenConversationAdded() {
         listenRoomAdded.execute(null, Action {
-            loadLastComment(ConversationView(it), Action {
+            loadLastComment(ConversationViewModel(it), Action {
                 if (it.lastComment != null) {
                     view.addOrUpdateConversation(it)
                 }
@@ -69,7 +78,7 @@ class ListConversationPresenter(val view: ListConversationContract.View,
 
     override fun listenConversationUpdated() {
         listenRoomUpdated.execute(null, Action {
-            loadLastComment(ConversationView(it), Action {
+            loadLastComment(ConversationViewModel(it), Action {
                 if (it.lastComment != null) {
                     view.addOrUpdateConversation(it)
                 }
@@ -79,7 +88,7 @@ class ListConversationPresenter(val view: ListConversationContract.View,
 
     override fun listenConversationDeleted() {
         listenRoomUpdated.execute(null, Action {
-            loadLastComment(ConversationView(it), Action {
+            loadLastComment(ConversationViewModel(it), Action {
                 view.removeConversation(it)
             })
         })

@@ -1,6 +1,5 @@
 package com.qiscus.sdk.chat.presentation.model
 
-import com.qiscus.sdk.chat.domain.model.Comment
 import com.qiscus.sdk.chat.domain.model.Room
 
 /**
@@ -9,4 +8,4 @@ import com.qiscus.sdk.chat.domain.model.Room
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class ConversationView(var room: Room, var lastComment: Comment? = null)
+data class ConversationViewModel(var room: Room, var lastComment: CommentViewModel? = null)
