@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-include ':app', ':domain', ':data', ':presentation', ':mobile', ':remote', ':local', ':pusher', ':core'
+include ':app', ':domain', ':data', ':presentation', ':mobile', ':remote', ':local', ':pusher', ':core', ':android'

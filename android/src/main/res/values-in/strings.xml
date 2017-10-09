@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="qiscus_send_attachment">Mengirimkan sebuah lampiran.</string>
+    <string name="qiscus_send_a_photo">Mengirimkan sebuah foto.</string>
+    <string name="qiscus_send_a_video">Mengirimkan sebuah video.</string>
+    <string name="qiscus_send_a_audio">Mengirimkan sebuah audio.</string>
+
+    <string name="qiscus_you">Kamu</string>
+    <string name="qiscus_created_room">membuat room</string>
+    <string name="qiscus_added">menambahkan</string>
+    <string name="qiscus_joined_room">bergabung kedalam room</string>
+    <string name="qiscus_removed">mengeluarkan</string>
+    <string name="qiscus_left_room">meninggalkan room</string>
+    <string name="qiscus_changed_room_name">mengubah nama room menjadi</string>
+    <string name="qiscus_changed_room_avatar">mengubah gambar room</string>
+</resources>
