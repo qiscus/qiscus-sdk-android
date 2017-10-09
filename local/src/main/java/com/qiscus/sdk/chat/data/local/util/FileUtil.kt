@@ -50,7 +50,7 @@ class FileUtil(private val context: Context, private val mimeTypeGuesser: MimeTy
             type == null -> File(Environment.getExternalStorageDirectory().path, filesPath)
             type.contains("image") -> File(Environment.getExternalStorageDirectory().path, imagesPath)
             type.contains("video") -> File(Environment.getExternalStorageDirectory().path, videosPath)
-            type.contains("image") -> File(Environment.getExternalStorageDirectory().path, audiosPath)
+            type.contains("audio") -> File(Environment.getExternalStorageDirectory().path, audiosPath)
             else -> File(Environment.getExternalStorageDirectory().path, filesPath)
         }
 
