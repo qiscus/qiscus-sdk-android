@@ -57,8 +57,7 @@ import okhttp3.OkHttpClient
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class DataComponent
-@JvmOverloads constructor(
+data class DataComponent(
         private val context: Context,
         private val applicationWatcher: ApplicationWatcher,
         private val restApiServerBaseUrl: String,
@@ -84,7 +83,7 @@ data class DataComponent
                 filePathGenerator),
 
         private val fileDataPusher: FileDataPusher = FileDataPusher(publishSubject),
-        var filePublisher: FilePublisher= fileDataPusher,
+        var filePublisher: FilePublisher = fileDataPusher,
         var fileSubscriber: FileSubscriber = fileDataPusher,
         var fileObserver: FileObserver = FileDataObserver(fileSubscriber),
 
