@@ -393,8 +393,8 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
     override fun getLastDeliveredCommentId(roomId: String): CommentIdEntity? {
         val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " +
                 Db.CommentTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
-                Db.CommentTable.COLUMN_STATE + " == " + CommentStateEntity.DELIVERED.intValue + " AND " +
-                Db.CommentTable.COLUMN_SENDER_ID + " == " + DatabaseUtils.sqlEscapeString(accountLocal.getAccount().user.id) +
+                Db.CommentTable.COLUMN_STATE + " = " + CommentStateEntity.DELIVERED.intValue + " AND " +
+                Db.CommentTable.COLUMN_SENDER_ID + " = " + DatabaseUtils.sqlEscapeString(accountLocal.getAccount().user.id) +
                 " ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC LIMIT 1"
 
         val cursor = database.rawQuery(query, null)
@@ -412,8 +412,8 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
     override fun getLastReadCommentId(roomId: String): CommentIdEntity? {
         val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " +
                 Db.CommentTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
-                Db.CommentTable.COLUMN_STATE + " == " + CommentStateEntity.READ.intValue + " AND " +
-                Db.CommentTable.COLUMN_SENDER_ID + " == " + DatabaseUtils.sqlEscapeString(accountLocal.getAccount().user.id) +
+                Db.CommentTable.COLUMN_STATE + " = " + CommentStateEntity.READ.intValue + " AND " +
+                Db.CommentTable.COLUMN_SENDER_ID + " = " + DatabaseUtils.sqlEscapeString(accountLocal.getAccount().user.id) +
                 " ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC LIMIT 1"
 
         val cursor = database.rawQuery(query, null)
@@ -433,7 +433,7 @@ class CommentLocalImpl(dbOpenHelper: DbOpenHelper,
 
         val query = "SELECT * FROM " + Db.CommentTable.TABLE_NAME + " WHERE " +
                 Db.CommentTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
-                Db.CommentTable.COLUMN_TIME + " <= " + lastComment.nanoTimeStamp +
+                Db.CommentTable.COLUMN_TIME + " <= " + lastComment.nanoTimeStamp + " AND " +
                 Db.CommentTable.COLUMN_STATE + " >= " + CommentStateEntity.ON_SERVER.intValue +
                 " ORDER BY " + Db.CommentTable.COLUMN_TIME + " DESC LIMIT $limit"
 
