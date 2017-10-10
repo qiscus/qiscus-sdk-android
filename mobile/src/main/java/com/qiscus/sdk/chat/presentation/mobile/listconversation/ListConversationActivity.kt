@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import com.qiscus.sdk.chat.presentation.listconversation.ListConversationContract
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.mobile.component.ListConversationActivityComponent
 import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
 import kotlinx.android.synthetic.main.activity_list_conversation.*
 

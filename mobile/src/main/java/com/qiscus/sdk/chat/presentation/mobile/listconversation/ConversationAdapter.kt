@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.qiscus.sdk.chat.presentation.mobile.R
+import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
 import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
 
 /**
@@ -29,7 +30,7 @@ class ConversationAdapter(private val context: Context) : RecyclerView.Adapter<C
         notifyDataSetChanged()
     }
 
-    fun removeConversation(conversationViewModel: ConversationViewModel){
+    fun removeConversation(conversationViewModel: ConversationViewModel) {
         val pos = data.indexOfFirst { it.room.id == conversationViewModel.room.id }
         if (pos >= 0) {
             data.removeAt(pos)
@@ -57,6 +58,10 @@ class ConversationAdapter(private val context: Context) : RecyclerView.Adapter<C
         fun bind(conversationViewModel: ConversationViewModel) {
             roomNameView.text = conversationViewModel.room.name
             lastMessageView.text = conversationViewModel.lastComment?.spannableMessage
+
+            roomAvatarView.setOnClickListener {
+                it.context.startActivity(it.context.chatRoomIntent(conversationViewModel.room))
+            }
         }
     }
 }

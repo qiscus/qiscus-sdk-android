@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.component
+package com.qiscus.sdk.chat.presentation.mobile.listconversation
 
 import android.support.annotation.ColorInt
 import android.support.v4.content.ContextCompat
@@ -7,7 +7,6 @@ import com.qiscus.sdk.chat.core.QiscusUseCaseFactory
 import com.qiscus.sdk.chat.presentation.listconversation.ListConversationContract
 import com.qiscus.sdk.chat.presentation.listconversation.ListConversationPresenter
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.mobile.listconversation.ListConversationActivity
 
 /**
  * Created on : October 04, 2017

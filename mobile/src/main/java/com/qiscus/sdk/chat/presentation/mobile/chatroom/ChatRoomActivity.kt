@@ -16,12 +16,15 @@
 
 package com.qiscus.sdk.chat.presentation.mobile.chatroom
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
-import com.qiscus.sdk.chat.presentation.listencomment.ListenCommentContract
+import com.qiscus.sdk.chat.domain.model.Room
+import com.qiscus.sdk.chat.presentation.listcomment.ListCommentContract
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.mobile.component.ChatRoomActivityComponent
 import com.qiscus.sdk.chat.presentation.model.CommentViewModel
 import com.qiscus.sdk.chat.presentation.sendcomment.SendCommentContract
 import kotlinx.android.synthetic.main.activity_chat_room.*
@@ -32,32 +35,69 @@ import kotlinx.android.synthetic.main.activity_chat_room.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class ChatRoomActivity : AppCompatActivity(), ListenCommentContract.View, SendCommentContract.View {
-    private lateinit var listenCommentPresenter: ListenCommentContract.Presenter
+fun Context.chatRoomIntent(room: Room): Intent {
+    return Intent(this, ChatRoomActivity::class.java).apply {
+        putExtra(INTENT_ROOM_ID, room.id)
+    }
+}
+
+fun Context.chatRoomIntent(roomId: String): Intent {
+    return Intent(this, ChatRoomActivity::class.java).apply {
+        putExtra(INTENT_ROOM_ID, roomId)
+    }
+}
+
+private const val INTENT_ROOM_ID = "room_id"
+
+class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendCommentContract.View {
+
+    private lateinit var listCommentPresenter: ListCommentContract.Presenter
     private lateinit var sendCommentPresenter: SendCommentContract.Presenter
+
+    private val adapter = CommentAdapter(this)
+
+    private var roomId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_room)
+
+        roomId = intent.getStringExtra(INTENT_ROOM_ID)
+        if (roomId == null) {
+            throw RuntimeException("Please provide room id!")
+        }
+
+        commentRecyclerView.adapter = adapter
+        commentRecyclerView.layoutManager = LinearLayoutManager(this)
+        commentRecyclerView.setHasFixedSize(true)
+
         init()
-        sendMessageButton.setOnClickListener({
-            sendCommentPresenter.sendComment("", "Halo ini pesan ku...")
-        })
     }
 
     private fun init() {
         val chatRoomActivityComponent = ChatRoomActivityComponent(this)
-        listenCommentPresenter = chatRoomActivityComponent.listenCommentPresenter
+        listCommentPresenter = chatRoomActivityComponent.listCommentPresenter
         sendCommentPresenter = chatRoomActivityComponent.sendCommentPresenter
+
+        listCommentPresenter.setRoomId(roomId!!)
     }
 
     override fun onStart() {
         super.onStart()
-        listenCommentPresenter.start()
+        listCommentPresenter.start()
     }
 
-    override fun onNewComment(commentViewModel: CommentViewModel) {
-        Log.d("ZETRA", "new comment: ${commentViewModel.readableMessage}")
+    override fun addComment(commentViewModel: CommentViewModel) {
+        adapter.addOrUpdate(commentViewModel)
+        commentRecyclerView.smoothScrollToPosition(adapter.itemCount)
+    }
+
+    override fun updateComment(commentViewModel: CommentViewModel) {
+        adapter.addOrUpdate(commentViewModel)
+    }
+
+    override fun removeComment(commentViewModel: CommentViewModel) {
+        adapter.addOrUpdate(commentViewModel)
     }
 
     override fun clearTextField() {
@@ -66,6 +106,7 @@ class ChatRoomActivity : AppCompatActivity(), ListenCommentContract.View, SendCo
 
     override fun onStop() {
         super.onStop()
-        listenCommentPresenter.stop()
+        listCommentPresenter.stop()
+        sendCommentPresenter.stop()
     }
 }
