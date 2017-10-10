@@ -16,7 +16,6 @@
 
 package com.qiscus.sdk.chat.sample
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -25,7 +24,6 @@ import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.account.AuthenticateWithKey
 import com.qiscus.sdk.chat.domain.interactor.room.GetRoomWithUserId
 import com.qiscus.sdk.chat.domain.interactor.room.GetRooms
-import com.qiscus.sdk.chat.presentation.mobile.listconversation.ListConversationActivity
 import com.qiscus.sdk.chat.sample.chat.chatIntent
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         startChatButton.setOnClickListener {
-            startActivity(Intent(this, ListConversationActivity::class.java))
+            openChatWith("rya.meyvriska244@gmail.com")
         }
 
         startChatButton.setOnLongClickListener {

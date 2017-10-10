@@ -20,6 +20,8 @@ import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.interactor.SingleUseCase
 import com.qiscus.sdk.chat.domain.model.Comment
+import com.qiscus.sdk.chat.domain.model.CommentId
+import com.qiscus.sdk.chat.domain.model.CommentState
 import com.qiscus.sdk.chat.domain.repository.CommentRepository
 import io.reactivex.Single
 
@@ -31,11 +33,28 @@ import io.reactivex.Single
  */
 class GetComments(private val commentRepository: CommentRepository,
                   threadExecutor: ThreadExecutor, postExecutionThread: PostExecutionThread)
-    : SingleUseCase<List<Comment>, GetComments.Params>(threadExecutor, postExecutionThread) {
+    : SingleUseCase<GetComments.Result, GetComments.Params>(threadExecutor, postExecutionThread) {
 
-    public override fun buildUseCaseObservable(params: Params?): Single<List<Comment>> {
-        return commentRepository.getComments(params!!.roomId)
+    public override fun buildUseCaseObservable(params: Params?): Single<GetComments.Result> {
+        if (params!!.lastCommentId != null) {
+            return commentRepository.getComments(params.roomId, params.lastCommentId!!, params.limit)
+                    .map {
+                        Result(it, it.isNotEmpty() && it.filter { it.state.intValue > CommentState.SENDING.intValue }
+                                .none { it.commentId.commentBeforeId == "0" })
+                    }
+        }
+
+        return commentRepository.getComments(params.roomId).map {
+            Result(it, it.isNotEmpty() && it.filter { it.state.intValue > CommentState.SENDING.intValue }
+                    .none { it.commentId.commentBeforeId == "0" })
+        }
     }
 
-    data class Params(val roomId: String)
+    data class Params @JvmOverloads constructor(val roomId: String, val lastCommentId: CommentId? = null, val limit: Int = 20)
+
+    data class Result(val comments: List<Comment>, private val moreMessages: Boolean) {
+        fun hasMoreMessages(): Boolean {
+            return moreMessages
+        }
+    }
 }

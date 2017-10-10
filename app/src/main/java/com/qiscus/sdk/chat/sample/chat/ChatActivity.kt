@@ -34,6 +34,7 @@ import com.qiscus.sdk.chat.domain.interactor.comment.*
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserTyping
 import com.qiscus.sdk.chat.domain.interactor.user.PublishTyping
+import com.qiscus.sdk.chat.domain.model.CommentId
 import com.qiscus.sdk.chat.domain.model.CommentState
 import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
 import com.qiscus.sdk.chat.domain.model.Room
@@ -63,7 +64,6 @@ class ChatActivity : AppCompatActivity() {
     private val downloadAttachmentComment = useCaseFactory.downloadAttachmentComment()
 
     private val getComments = useCaseFactory.getComments()
-    private val getMoreComments = useCaseFactory.getMoreComments()
 
     private val listenNewComment = useCaseFactory.listenNewComment()
 
@@ -179,8 +179,25 @@ class ChatActivity : AppCompatActivity() {
 
     private fun loadComments() {
         getComments.execute(GetComments.Params(roomId!!), Action {
-            it.reversed().forEach { adapter.addOrUpdate(it) }
+            Log.d("ZETRA", "loadComments: ${it.comments.size}")
+            Log.d("ZETRA", "Has more: ${it.hasMoreMessages()}")
+            it.comments.reversed().forEach { adapter.addOrUpdate(it) }
             recyclerView.smoothScrollToPosition(adapter.itemCount)
+            if (it.hasMoreMessages()) {
+                loadMoreComments(it.comments.last().commentId)
+            }
+        })
+    }
+
+    private fun loadMoreComments(lastCommentId: CommentId) {
+        getComments.execute(GetComments.Params(roomId!!, lastCommentId), Action {
+            Log.d("ZETRA", "loadMoreComments: ${it.comments.size}")
+            Log.d("ZETRA", "Has more comments: ${it.hasMoreMessages()}")
+            it.comments.reversed().forEach { adapter.addOrUpdate(it) }
+            recyclerView.smoothScrollToPosition(adapter.itemCount)
+            if (it.hasMoreMessages()) {
+                loadMoreComments(it.comments.last().commentId)
+            }
         })
     }
 

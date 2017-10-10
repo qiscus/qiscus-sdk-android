@@ -38,8 +38,8 @@ class ListConversationPresenter(val view: ListConversationContract.View,
 
     private fun loadLastComment(conversationViewModel: ConversationViewModel, onSuccess: Action<ConversationViewModel>) {
         getComments.execute(GetComments.Params(conversationViewModel.room.id), Action {
-            if (it.isNotEmpty()) {
-                conversationViewModel.lastComment = it.first()
+            if (it.comments.isNotEmpty()) {
+                conversationViewModel.lastComment = it.comments.first()
                         .toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)
             }
             onSuccess.call(conversationViewModel)

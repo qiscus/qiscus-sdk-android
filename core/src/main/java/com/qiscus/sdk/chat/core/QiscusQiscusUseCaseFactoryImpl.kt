@@ -231,14 +231,6 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
         )
     }
 
-    override fun getMoreComments(): GetMoreComments {
-        return GetMoreComments(
-                component.dataComponent.commentRepository,
-                component.executorComponent.threadExecutor,
-                component.executorComponent.postExecutionThread
-        )
-    }
-
     override fun listenUserStatus(): ListenUserStatus {
         return ListenUserStatus(
                 component.dataComponent.userObserver,
