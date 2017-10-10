@@ -37,7 +37,7 @@ class ListConversationPresenter(val view: ListConversationContract.View,
     }
 
     private fun loadLastComment(conversationViewModel: ConversationViewModel, onSuccess: Action<ConversationViewModel>) {
-        getComments.execute(GetComments.Params(conversationViewModel.room.id), Action {
+        getComments.execute(GetComments.Params(conversationViewModel.room.id, limit = 1), Action {
             if (it.comments.isNotEmpty()) {
                 conversationViewModel.lastComment = it.comments.first()
                         .toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)
