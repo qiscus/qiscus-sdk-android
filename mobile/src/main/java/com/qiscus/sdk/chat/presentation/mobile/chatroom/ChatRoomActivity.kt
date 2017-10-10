@@ -80,11 +80,12 @@ class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendComm
         sendCommentPresenter = chatRoomActivityComponent.sendCommentPresenter
 
         listCommentPresenter.setRoomId(roomId!!)
+        listCommentPresenter.start()
     }
 
     override fun onStart() {
         super.onStart()
-        listCommentPresenter.start()
+        init()
     }
 
     override fun addComment(commentViewModel: CommentViewModel) {

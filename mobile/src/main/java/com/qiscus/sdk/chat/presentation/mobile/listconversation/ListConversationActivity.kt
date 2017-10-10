@@ -22,7 +22,6 @@ class ListConversationActivity : AppCompatActivity(), ListConversationContract.V
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_conversation)
-        init()
 
         conversationRecyclerView.adapter = adapter
         conversationRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -32,11 +31,12 @@ class ListConversationActivity : AppCompatActivity(), ListConversationContract.V
     private fun init() {
         val activityComponent = ListConversationActivityComponent(this)
         listConversationPresenter = activityComponent.listConversationPresenter
+        listConversationPresenter.start()
     }
 
     override fun onStart() {
         super.onStart()
-        listConversationPresenter.start()
+        init()
     }
 
     override fun addOrUpdateConversation(conversationViewModel: ConversationViewModel) {
