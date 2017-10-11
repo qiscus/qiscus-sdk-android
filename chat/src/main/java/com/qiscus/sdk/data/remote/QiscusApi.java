@@ -149,8 +149,8 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<List<QiscusChatRoom>> getChatRooms(List<Integer> roomIds, List<String> uniqueIds, boolean showMembers) {
-        return api.getChatRooms(Qiscus.getToken(), roomIds, uniqueIds, showMembers)
+    public Observable<List<QiscusChatRoom>> getChatRooms(List<String> uniqueIds, boolean showMembers) {
+        return api.getChatRooms(Qiscus.getToken(), uniqueIds, showMembers)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
@@ -425,7 +425,6 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/rooms_info")
         Observable<JsonElement> getChatRooms(@Field("token") String token,
-                                             @Field("room_id[]") List<Integer> roomIds,
                                              @Field("room_unique_id[]") List<String> roomUniqueIds,
                                              @Field("show_participants") boolean showParticipants);
     }
