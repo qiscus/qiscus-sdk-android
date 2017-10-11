@@ -98,7 +98,7 @@ class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendComm
     }
 
     override fun removeComment(commentViewModel: CommentViewModel) {
-        adapter.addOrUpdate(commentViewModel)
+        adapter.removeComment(commentViewModel)
     }
 
     override fun clearTextField() {

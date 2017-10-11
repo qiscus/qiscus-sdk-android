@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.qiscus.sdk.chat.presentation.android.SortedAdapter
+import com.qiscus.sdk.chat.presentation.android.util.indexOfFirst
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.CommentViewModel
 
@@ -16,13 +18,21 @@ import com.qiscus.sdk.chat.presentation.model.CommentViewModel
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class CommentAdapter(private val context: Context) : RecyclerView.Adapter<CommentAdapter.VH>() {
-    val data: MutableList<CommentViewModel> = mutableListOf()
+class CommentAdapter(private val context: Context) : SortedAdapter<CommentViewModel, CommentAdapter.VH>() {
+
+    override fun getItemClass(): Class<CommentViewModel> {
+        return CommentViewModel::class.java
+    }
+
+    override fun compare(lhs: CommentViewModel, rhs: CommentViewModel): Int {
+        return lhs.comment.date.compareTo(rhs.comment.date)
+    }
+
 
     fun addOrUpdate(commentViewModel: CommentViewModel) {
         val pos = data.indexOfFirst { it.comment.commentId == commentViewModel.comment.commentId }
         if (pos >= 0) {
-            data[pos] = commentViewModel
+            data.updateItemAt(pos, commentViewModel)
         } else {
             data.add(commentViewModel)
         }
@@ -32,13 +42,13 @@ class CommentAdapter(private val context: Context) : RecyclerView.Adapter<Commen
     fun removeComment(commentViewModel: CommentViewModel) {
         val pos = data.indexOfFirst { it.comment.commentId == commentViewModel.comment.commentId }
         if (pos >= 0) {
-            data.removeAt(pos)
+            data.removeItemAt(pos)
         }
         notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return data.size()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): VH {

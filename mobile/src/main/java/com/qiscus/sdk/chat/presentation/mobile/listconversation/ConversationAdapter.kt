@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.qiscus.sdk.chat.presentation.android.SortedAdapter
+import com.qiscus.sdk.chat.presentation.android.util.indexOfFirst
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
 import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
@@ -17,13 +19,12 @@ import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class ConversationAdapter(private val context: Context) : RecyclerView.Adapter<ConversationAdapter.VH>() {
-    val data: MutableList<ConversationViewModel> = mutableListOf()
+class ConversationAdapter(private val context: Context) : SortedAdapter<ConversationViewModel, ConversationAdapter.VH>() {
 
     fun addOrUpdate(conversationViewModel: ConversationViewModel) {
         val pos = data.indexOfFirst { it.room.id == conversationViewModel.room.id }
         if (pos >= 0) {
-            data[pos] = conversationViewModel
+            data.updateItemAt(pos, conversationViewModel)
         } else {
             data.add(conversationViewModel)
         }
@@ -33,13 +34,37 @@ class ConversationAdapter(private val context: Context) : RecyclerView.Adapter<C
     fun removeConversation(conversationViewModel: ConversationViewModel) {
         val pos = data.indexOfFirst { it.room.id == conversationViewModel.room.id }
         if (pos >= 0) {
-            data.removeAt(pos)
+            data.removeItemAt(pos)
         }
         notifyDataSetChanged()
     }
 
+    override fun getItemClass(): Class<ConversationViewModel> {
+        return ConversationViewModel::class.java
+    }
+
+    override fun compare(lhs: ConversationViewModel, rhs: ConversationViewModel): Int {
+        return if (lhs.lastComment == null) {
+            1
+        } else if (rhs.lastComment == null) {
+            -1
+        } else if (lhs.lastComment == null && rhs.lastComment == null) {
+            0
+        } else {
+            rhs.lastComment!!.comment.date.compareTo(lhs.lastComment!!.comment.date)
+        }
+    }
+
+    override fun areContentsTheSame(oldE: ConversationViewModel, newE: ConversationViewModel): Boolean {
+        return oldE.room == newE.room
+    }
+
+    override fun areItemsTheSame(oldE: ConversationViewModel, newE: ConversationViewModel): Boolean {
+        return oldE.room == newE.room
+    }
+
     override fun getItemCount(): Int {
-        return data.size
+        return data.size()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): VH {
