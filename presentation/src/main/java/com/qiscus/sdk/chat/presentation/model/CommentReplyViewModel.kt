@@ -1,9 +1,12 @@
 package com.qiscus.sdk.chat.presentation.model
 
+import android.text.Spannable
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.*
 import com.qiscus.sdk.chat.domain.repository.UserRepository
 import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.util.toReadableText
+import com.qiscus.sdk.chat.presentation.util.toSpannable
 import java.util.*
 
 /**
@@ -33,5 +36,15 @@ open class CommentReplyViewModel
                                 payload.optJSONObject("replied_comment_payload"))),
                 account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener
         )
+    }
+
+    override fun determineReadableMessage(): String {
+        return comment.type.payload.optString("text", comment.message).toReadableText(userRepository)
+    }
+
+    override fun determineSpannableMessage(): Spannable {
+        return comment.type.payload.optString("text", comment.message)
+                .toSpannable(account, userRepository, mentionAllColor, mentionOtherColor,
+                        mentionMeColor, mentionClickListener)
     }
 }
