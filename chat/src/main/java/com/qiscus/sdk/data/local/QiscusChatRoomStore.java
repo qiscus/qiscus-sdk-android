@@ -44,9 +44,13 @@ public interface QiscusChatRoomStore {
 
     QiscusChatRoom getChatRoom(String email, String distinctId);
 
+    QiscusChatRoom getChatRoomWithUniqueId(String uniqueId);
+
     List<QiscusChatRoom> getChatRooms(int count);
 
     Observable<List<QiscusChatRoom>> getObservableChatRooms(int count);
+
+    List<QiscusChatRoom> getChatRooms(List<Integer> roomIds, List<String> uniqueIds);
 
     void deleteChatRoom(int roomId);
 
