@@ -630,12 +630,10 @@ public class Qiscus {
 
     public static class ChatBuilder {
         private String email;
-        private String subtitle;
         private String distinctId;
         private String options;
 
         private ChatBuilder(String email) {
-            subtitle = "";
             this.email = email;
         }
 
@@ -656,9 +654,10 @@ public class Qiscus {
          *
          * @param subtitle The subtitle of chat
          * @return builder
+         * @deprecated to create sub title, please create your won toolbar
          */
+        @Deprecated
         public ChatBuilder withSubtitle(String subtitle) {
-            this.subtitle = subtitle;
             return this;
         }
 
@@ -703,9 +702,6 @@ public class Qiscus {
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
-                    .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setSubtitle(subtitle);
-                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -728,7 +724,6 @@ public class Qiscus {
 
     public static class ChatActivityBuilder {
         private String email;
-        private String subtitle;
         private String distinctId;
         private String options;
         private String message;
@@ -738,7 +733,6 @@ public class Qiscus {
         private QiscusComment scrollToComment;
 
         private ChatActivityBuilder(String email) {
-            subtitle = "";
             this.email = email;
             autoSendExtra = true;
         }
@@ -760,9 +754,10 @@ public class Qiscus {
          *
          * @param subtitle The subtitle of chat
          * @return builder
+         * @deprecated to create sub title, please create your won toolbar
          */
+        @Deprecated
         public ChatActivityBuilder withSubtitle(String subtitle) {
-            this.subtitle = subtitle;
             return this;
         }
 
@@ -865,9 +860,6 @@ public class Qiscus {
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
-                    .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setSubtitle(subtitle);
-                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
@@ -893,7 +885,6 @@ public class Qiscus {
 
     public static class ChatFragmentBuilder {
         private String email;
-        private String subtitle;
         private String distinctId;
         private String options;
         private String message;
@@ -903,7 +894,6 @@ public class Qiscus {
         private QiscusComment scrollToComment;
 
         private ChatFragmentBuilder(String email) {
-            subtitle = "";
             this.email = email;
             autoSendExtra = true;
         }
@@ -925,9 +915,10 @@ public class Qiscus {
          *
          * @param subtitle The subtitle of chat
          * @return builder
+         * @deprecated to create sub title, please create your won toolbar
          */
+        @Deprecated
         public ChatFragmentBuilder withSubtitle(String subtitle) {
-            this.subtitle = subtitle;
             return this;
         }
 
@@ -1028,9 +1019,6 @@ public class Qiscus {
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
-                    .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setSubtitle(subtitle);
-                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile,

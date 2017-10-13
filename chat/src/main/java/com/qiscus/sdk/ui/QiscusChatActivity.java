@@ -101,10 +101,6 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     protected void binRoomData() {
         super.binRoomData();
         tvTitle.setText(qiscusChatRoom.getName());
-        if (!qiscusChatRoom.getSubtitle().isEmpty()) {
-            tvSubtitle.setText(qiscusChatRoom.getSubtitle());
-            tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
-        }
         showRoomImage();
     }
 
@@ -129,18 +125,14 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     public void onUserTyping(String user, boolean typing) {
-        if (qiscusChatRoom.getSubtitle().isEmpty()) {
-            tvSubtitle.setText(typing ? getString(R.string.qiscus_typing) : getString(R.string.qiscus_online));
-            tvSubtitle.setVisibility(View.VISIBLE);
-        }
+        tvSubtitle.setText(typing ? getString(R.string.qiscus_typing) : getString(R.string.qiscus_online));
+        tvSubtitle.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onUserStatusChanged(String user, boolean online, Date lastActive) {
-        if (qiscusChatRoom.getSubtitle().isEmpty()) {
-            String last = QiscusDateUtil.getRelativeTimeDiff(lastActive);
-            tvSubtitle.setText(online ? getString(R.string.qiscus_online) : getString(R.string.qiscus_last_seen, last));
-            tvSubtitle.setVisibility(View.VISIBLE);
-        }
+        String last = QiscusDateUtil.getRelativeTimeDiff(lastActive);
+        tvSubtitle.setText(online ? getString(R.string.qiscus_online) : getString(R.string.qiscus_last_seen, last));
+        tvSubtitle.setVisibility(View.VISIBLE);
     }
 }

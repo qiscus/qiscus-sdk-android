@@ -31,7 +31,7 @@ public class QiscusChatRoom implements Parcelable {
     protected int id;
     protected String distinctId;
     protected String name;
-    protected String subtitle = "";
+    @Deprecated protected String subtitle = "";
     protected int lastTopicId;
     protected String options;
     protected boolean group;
@@ -96,10 +96,12 @@ public class QiscusChatRoom implements Parcelable {
         this.name = name;
     }
 
+    @Deprecated
     public String getSubtitle() {
         return subtitle;
     }
 
+    @Deprecated
     public void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
     }
