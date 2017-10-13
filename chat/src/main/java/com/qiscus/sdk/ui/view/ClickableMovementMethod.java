@@ -31,13 +31,13 @@ import android.widget.TextView;
  */
 public class ClickableMovementMethod extends BaseMovementMethod {
 
-    private static ClickableMovementMethod INSTANCE;
+    private static ClickableMovementMethod instance;
 
     public static ClickableMovementMethod getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ClickableMovementMethod();
+        if (instance == null) {
+            instance = new ClickableMovementMethod();
         }
-        return INSTANCE;
+        return instance;
     }
 
     @Override
