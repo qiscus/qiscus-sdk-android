@@ -6,6 +6,10 @@ During post message, if you don't have any internet connection, message will be 
 ```java
 QiscusApi.getInstance().postComment(qiscusComment)
         .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+        .doOnError(throwable -> {
+            qiscusComment.setState(QiscusComment.STATE_PENDING);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        })
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(commentSend -> {
