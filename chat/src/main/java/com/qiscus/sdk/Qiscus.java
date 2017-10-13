@@ -630,13 +630,11 @@ public class Qiscus {
 
     public static class ChatBuilder {
         private String email;
-        private String title;
         private String subtitle;
         private String distinctId;
         private String options;
 
         private ChatBuilder(String email) {
-            title = "Chat";
             subtitle = "";
             this.email = email;
         }
@@ -646,9 +644,10 @@ public class Qiscus {
          *
          * @param title The title of chat room
          * @return builder
+         * @deprecated 1-1 chat title will always the opponent user name
          */
+        @Deprecated
         public ChatBuilder withTitle(String title) {
-            this.title = title;
             return this;
         }
 
@@ -705,7 +704,6 @@ public class Qiscus {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setName(title);
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
@@ -730,7 +728,6 @@ public class Qiscus {
 
     public static class ChatActivityBuilder {
         private String email;
-        private String title;
         private String subtitle;
         private String distinctId;
         private String options;
@@ -741,7 +738,6 @@ public class Qiscus {
         private QiscusComment scrollToComment;
 
         private ChatActivityBuilder(String email) {
-            title = "Chat";
             subtitle = "";
             this.email = email;
             autoSendExtra = true;
@@ -752,9 +748,10 @@ public class Qiscus {
          *
          * @param title The title of chat room
          * @return builder
+         * @deprecated 1-1 chat title will always the opponent user name
          */
+        @Deprecated
         public ChatActivityBuilder withTitle(String title) {
-            this.title = title;
             return this;
         }
 
@@ -869,7 +866,6 @@ public class Qiscus {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setName(title);
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
@@ -897,7 +893,6 @@ public class Qiscus {
 
     public static class ChatFragmentBuilder {
         private String email;
-        private String title;
         private String subtitle;
         private String distinctId;
         private String options;
@@ -908,7 +903,6 @@ public class Qiscus {
         private QiscusComment scrollToComment;
 
         private ChatFragmentBuilder(String email) {
-            title = "Chat";
             subtitle = "";
             this.email = email;
             autoSendExtra = true;
@@ -919,9 +913,10 @@ public class Qiscus {
          *
          * @param title The title of chat room
          * @return builder
+         * @deprecated 1-1 chat title will always the opponent user name
          */
+        @Deprecated
         public ChatFragmentBuilder withTitle(String title) {
-            this.title = title;
             return this;
         }
 
@@ -1034,7 +1029,6 @@ public class Qiscus {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setName(title);
                         qiscusChatRoom.setSubtitle(subtitle);
                     })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
