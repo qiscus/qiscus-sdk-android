@@ -19,7 +19,6 @@ package com.qiscus.sdk.chat.data.pusher
 import android.annotation.SuppressLint
 import android.content.Context
 import android.provider.Settings
-import android.util.Log
 import com.qiscus.sdk.chat.data.model.AccountEntity
 import com.qiscus.sdk.chat.data.model.CommentEntity
 import com.qiscus.sdk.chat.data.model.CommentIdEntity
@@ -62,9 +61,7 @@ class QiscusMqttClient @JvmOverloads constructor(
         private val userPublisher: UserPublisher)
     : QiscusPubSubClient, MqttCallbackExtended, IMqttActionListener {
 
-    private val TAG = "QiscusPusher"
-
-    private val RETRY_PERIOD = 2000L
+    private val retryPeriod = 2000L
 
     private lateinit var mqttAndroidClient: MqttAndroidClient
     private lateinit var account: AccountEntity
@@ -88,7 +85,6 @@ class QiscusMqttClient @JvmOverloads constructor(
     private var setOfflineCounter = 0
 
     init {
-        Log.i(TAG, "Creating...")
         buildClient()
     }
 
@@ -100,7 +96,6 @@ class QiscusMqttClient @JvmOverloads constructor(
 
     override fun connect() {
         if (accountLocal.isAuthenticate() && !connecting) {
-            Log.i(TAG, "Connecting...")
             connecting = true
             account = accountLocal.getAccount()
             val mqttConnectOptions = MqttConnectOptions()
@@ -126,7 +121,6 @@ class QiscusMqttClient @JvmOverloads constructor(
     }
 
     override fun restartConnection() {
-        Log.i(TAG, "Restart connection...")
         try {
             connecting = false
             mqttAndroidClient.disconnect()
@@ -158,7 +152,6 @@ class QiscusMqttClient @JvmOverloads constructor(
     }
 
     override fun disconnect() {
-        Log.i(TAG, "Disconnecting...")
         setUserStatus(false)
         try {
             connecting = false
@@ -200,19 +193,16 @@ class QiscusMqttClient @JvmOverloads constructor(
     }
 
     override fun listenNewComment() {
-        Log.i(TAG, "Listening comment...")
         try {
             mqttAndroidClient.subscribe("${account.token}/c", 2)
         } catch (e: MqttException) {
             //Do nothing
         } catch (e: NullPointerException) {
-            Log.e(TAG, "Failure listen comment, try again in $RETRY_PERIOD ms")
             connect()
-            scheduledListenComment = runOnBackgroundThread(fallBackListenComment, RETRY_PERIOD)
+            scheduledListenComment = runOnBackgroundThread(fallBackListenComment, retryPeriod)
         } catch (e: IllegalArgumentException) {
-            Log.e(TAG, "Failure listen comment, try again in $RETRY_PERIOD ms")
             connect()
-            scheduledListenComment = runOnBackgroundThread(fallBackListenComment, RETRY_PERIOD)
+            scheduledListenComment = runOnBackgroundThread(fallBackListenComment, retryPeriod)
         }
     }
 
@@ -224,13 +214,11 @@ class QiscusMqttClient @JvmOverloads constructor(
         } catch (e: MqttException) {
             //Do nothing
         } catch (e: NullPointerException) {
-            Log.e(TAG, "Failure listen room, try again in $RETRY_PERIOD ms")
             connect()
-            scheduledListenCommentState = runOnBackgroundThread(fallBackListenCommentState!!, RETRY_PERIOD)
+            scheduledListenCommentState = runOnBackgroundThread(fallBackListenCommentState!!, retryPeriod)
         } catch (e: IllegalArgumentException) {
-            Log.e(TAG, "Failure listen room, try again in $RETRY_PERIOD ms")
             connect()
-            scheduledListenCommentState = runOnBackgroundThread(fallBackListenCommentState!!, RETRY_PERIOD)
+            scheduledListenCommentState = runOnBackgroundThread(fallBackListenCommentState!!, retryPeriod)
         }
     }
 
@@ -308,10 +296,10 @@ class QiscusMqttClient @JvmOverloads constructor(
             //Do nothing
         } catch (e: NullPointerException) {
             connect()
-            scheduledListenUserStatus = runOnBackgroundThread(fallBackListenUserStatus!!, RETRY_PERIOD)
+            scheduledListenUserStatus = runOnBackgroundThread(fallBackListenUserStatus!!, retryPeriod)
         } catch (e: IllegalArgumentException) {
             connect()
-            scheduledListenUserStatus = runOnBackgroundThread(fallBackListenUserStatus!!, RETRY_PERIOD)
+            scheduledListenUserStatus = runOnBackgroundThread(fallBackListenUserStatus!!, retryPeriod)
         }
     }
 
@@ -356,10 +344,10 @@ class QiscusMqttClient @JvmOverloads constructor(
             //Do nothing
         } catch (e: NullPointerException) {
             connect()
-            scheduledListenUserTyping = runOnBackgroundThread(fallBackListenUserTyping!!, RETRY_PERIOD)
+            scheduledListenUserTyping = runOnBackgroundThread(fallBackListenUserTyping!!, retryPeriod)
         } catch (e: IllegalArgumentException) {
             connect()
-            scheduledListenUserTyping = runOnBackgroundThread(fallBackListenUserTyping!!, RETRY_PERIOD)
+            scheduledListenUserTyping = runOnBackgroundThread(fallBackListenUserTyping!!, retryPeriod)
         }
     }
 
@@ -383,7 +371,6 @@ class QiscusMqttClient @JvmOverloads constructor(
     }
 
     override fun connectComplete(reconnect: Boolean, serverURI: String?) {
-        Log.i(TAG, "Connected...")
         syncHandler.sync()
         try {
             connecting = false
@@ -459,15 +446,13 @@ class QiscusMqttClient @JvmOverloads constructor(
 
     override fun connectionLost(cause: Throwable?) {
         reconnectCounter++
-        Log.e(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * reconnectCounter + " ms")
         connecting = false
-        scheduledConnect = runOnBackgroundThread(fallbackConnect, RETRY_PERIOD * reconnectCounter)
+        scheduledConnect = runOnBackgroundThread(fallbackConnect, retryPeriod * reconnectCounter)
     }
 
     override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
         reconnectCounter++
-        Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms")
         connecting = false
-        scheduledConnect = runOnBackgroundThread(fallbackConnect, RETRY_PERIOD * reconnectCounter)
+        scheduledConnect = runOnBackgroundThread(fallbackConnect, retryPeriod * reconnectCounter)
     }
 }
