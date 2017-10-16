@@ -28,15 +28,16 @@ data class RoomEntity @JvmOverloads constructor(
         var name: String,
         var avatar: String = "",
         val group: Boolean = false,
-        var options: String = ""
+        var options: String = "",
+        var unreadCount: Int = 0
 ) {
     override fun equals(other: Any?): Boolean {
         if (other !is RoomEntity) {
             return false
         }
 
-        return id == other.id && uniqueId == other.uniqueId && name == other.name
-                && avatar == other.avatar && options == other.options && group == other.group
+        return id == other.id && uniqueId == other.uniqueId && name == other.name && avatar == other.avatar
+                && options == other.options && group == other.group && unreadCount == other.unreadCount
     }
 
     override fun hashCode(): Int {
@@ -46,6 +47,7 @@ data class RoomEntity @JvmOverloads constructor(
         result = 31 * result + avatar.hashCode()
         result = 31 * result + group.hashCode()
         result = 31 * result + options.hashCode()
+        result = 31 * result + unreadCount.hashCode()
         return result
     }
 }

@@ -220,11 +220,12 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
         val commentsTable = Db.CommentTable.TABLE_NAME
         val query = "SELECT DISTINCT ${Db.RoomTable.COLUMN_ID}, ${Db.RoomTable.COLUMN_UNIQUE_ID}, " +
                 "${Db.RoomTable.COLUMN_NAME}, ${Db.RoomTable.COLUMN_IS_GROUP}, ${Db.RoomTable.COLUMN_OPTIONS}, " +
-                "${Db.RoomTable.COLUMN_AVATAR_URL} FROM (SELECT $roomsTable.${Db.RoomTable.COLUMN_ID}, " +
+                "${Db.RoomTable.COLUMN_AVATAR_URL}, ${Db.RoomTable.COLUMN_UNREAD_COUNT}" +
+                " FROM (SELECT $roomsTable.${Db.RoomTable.COLUMN_ID}, " +
                 "$roomsTable.${Db.RoomTable.COLUMN_UNIQUE_ID}, $roomsTable.${Db.RoomTable.COLUMN_NAME}, " +
                 "$roomsTable.${Db.RoomTable.COLUMN_IS_GROUP}, $roomsTable.${Db.RoomTable.COLUMN_OPTIONS}, " +
-                "$roomsTable.${Db.RoomTable.COLUMN_AVATAR_URL}, $commentsTable.${Db.CommentTable.COLUMN_TIME} " +
-                "FROM $roomsTable, $commentsTable WHERE " +
+                "$roomsTable.${Db.RoomTable.COLUMN_AVATAR_URL}, $roomsTable.${Db.RoomTable.COLUMN_UNREAD_COUNT}," +
+                "$commentsTable.${Db.CommentTable.COLUMN_TIME} FROM $roomsTable, $commentsTable WHERE " +
                 "$roomsTable.${Db.RoomTable.COLUMN_ID} = $commentsTable.${Db.CommentTable.COLUMN_ROOM_ID} " +
                 "ORDER BY $commentsTable.${Db.CommentTable.COLUMN_TIME} DESC) " +
                 "ORDER BY ${Db.CommentTable.COLUMN_TIME} DESC LIMIT ${(page - 1) * limit},$limit"

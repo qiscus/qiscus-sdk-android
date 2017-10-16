@@ -18,10 +18,7 @@ package com.qiscus.sdk.chat.data.local.mapper
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.qiscus.sdk.chat.data.local.database.Db
-import com.qiscus.sdk.chat.data.local.database.booleanValue
-import com.qiscus.sdk.chat.data.local.database.longValue
-import com.qiscus.sdk.chat.data.local.database.stringValue
+import com.qiscus.sdk.chat.data.local.database.*
 import com.qiscus.sdk.chat.data.model.RoomEntity
 
 /**
@@ -38,6 +35,7 @@ fun RoomEntity.toContentValues(): ContentValues {
         put(Db.RoomTable.COLUMN_IS_GROUP, group)
         put(Db.RoomTable.COLUMN_OPTIONS, options)
         put(Db.RoomTable.COLUMN_AVATAR_URL, avatar)
+        put(Db.RoomTable.COLUMN_UNREAD_COUNT, unreadCount)
     }
 }
 
@@ -48,6 +46,7 @@ fun Cursor.toRoomEntity(): RoomEntity {
             stringValue(Db.RoomTable.COLUMN_NAME),
             stringValue(Db.RoomTable.COLUMN_AVATAR_URL),
             booleanValue(Db.RoomTable.COLUMN_IS_GROUP),
-            stringValue(Db.RoomTable.COLUMN_OPTIONS)
+            stringValue(Db.RoomTable.COLUMN_OPTIONS),
+            intValue(Db.RoomTable.COLUMN_UNREAD_COUNT)
     )
 }

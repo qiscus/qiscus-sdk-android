@@ -1,6 +1,7 @@
 package com.qiscus.sdk.chat.presentation.mobile.listconversation
 
 import android.content.Context
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -8,11 +9,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.qiscus.sdk.chat.presentation.uikit.SortedAdapter
-import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
 import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
+import com.qiscus.sdk.chat.presentation.uikit.SortedAdapter
+import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
 import java.text.SimpleDateFormat
 
 /**
@@ -86,12 +87,23 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
 
         private val dateFormat = SimpleDateFormat.getDateInstance()
 
+        private val normalColor = ContextCompat.getColor(view.context, R.color.qiscus_conversation_last_message_date)
+        private val unreadColor = ContextCompat.getColor(view.context, R.color.qiscus_conversation_last_message_date_active)
+
         fun bind(conversationViewModel: ConversationViewModel) {
             Glide.with(roomAvatarView).load(conversationViewModel.room.avatar).into(roomAvatarView)
             roomNameView.text = conversationViewModel.room.name
             lastMessageView.text = conversationViewModel.lastComment?.spannableMessage
             lastMessageDateView.text = dateFormat.format(conversationViewModel.lastComment?.comment?.date)
-            unreadCountView.text = if (adapterPosition % 2 == 0) "23" else "8"
+            unreadCountView.text = "${conversationViewModel.room.unreadCount}"
+
+            if (conversationViewModel.room.unreadCount > 0) {
+                unreadCountView.visibility = View.VISIBLE
+                lastMessageDateView.setTextColor(unreadColor)
+            } else {
+                unreadCountView.visibility = View.GONE
+                lastMessageDateView.setTextColor(normalColor)
+            }
 
             roomAvatarView.setOnClickListener {
                 it.context.startActivity(it.context.chatRoomIntent(conversationViewModel.room))

@@ -27,5 +27,6 @@ data class Room @JvmOverloads constructor(
         var name: String,
         var avatar: String = "",
         val group: Boolean = false,
-        var options: String = ""
+        var options: String = "",
+        var unreadCount: Int = 0
 )

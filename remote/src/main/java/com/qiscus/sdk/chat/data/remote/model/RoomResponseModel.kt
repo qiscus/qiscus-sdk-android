@@ -106,12 +106,13 @@ data class RoomResponseModel(var results: Results, var status: Int) {
             var participants: List<Participant>,
             var roomName: String,
             var rawRoomName: String,
-            var uniqueId: String
+            var uniqueId: String,
+            var unreadCount: Int
     ) {
         fun toEntity(): RoomEntity {
             return RoomEntity(
                     idStr, if (chatType == "single") rawRoomName else uniqueId, roomName, avatarUrl,
-                    chatType != "single", if (options != null) options!! else ""
+                    chatType != "single", if (options != null) options!! else "", unreadCount
             )
         }
     }

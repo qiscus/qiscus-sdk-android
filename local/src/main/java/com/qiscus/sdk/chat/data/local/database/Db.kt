@@ -36,6 +36,7 @@ object Db {
         const val COLUMN_IS_GROUP = "is_group"
         const val COLUMN_OPTIONS = "options"
         const val COLUMN_AVATAR_URL = "avatar_url"
+        const val COLUMN_UNREAD_COUNT = "unread_count"
 
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_ID + " TEXT PRIMARY KEY," +
@@ -43,7 +44,8 @@ object Db {
                 COLUMN_NAME + " TEXT," +
                 COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
                 COLUMN_OPTIONS + " TEXT," +
-                COLUMN_AVATAR_URL + " TEXT" +
+                COLUMN_AVATAR_URL + " TEXT," +
+                COLUMN_UNREAD_COUNT + " INTEGER DEFAULT 0" +
                 " ); "
     }
 

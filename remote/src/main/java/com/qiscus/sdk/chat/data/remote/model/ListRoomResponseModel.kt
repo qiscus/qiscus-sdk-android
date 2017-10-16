@@ -58,7 +58,7 @@ data class RoomsInfo(
     fun toEntity(): RoomEntity {
         return RoomEntity(
                 idStr, if (chatType == "single") rawRoomName else uniqueId, roomName, avatarUrl,
-                chatType != "single", options
+                chatType != "single", options, unreadCount
         )
     }
 }
