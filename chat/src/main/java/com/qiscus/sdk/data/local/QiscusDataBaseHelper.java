@@ -143,7 +143,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 QiscusDb.RoomTable.COLUMN_IS_GROUP
         );
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-        if (cursor.moveToNext()) qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
+        if (cursor.moveToNext()) {
+            qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
+            qiscusChatRoom.setMember(getRoomMembers(qiscusChatRoom.getId()));
+            QiscusComment latestComment = getLatestComment(qiscusChatRoom.getId());
+            if (latestComment != null) qiscusChatRoom.setLastComment(latestComment);
+        }
         cursor.close();
         return qiscusChatRoom;
     }
