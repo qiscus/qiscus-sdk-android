@@ -52,41 +52,41 @@ configurations.all {
 }
 
 dependencies {
-    def mobileDependencies = rootProject.ext.mobileDependencies
-    def mobileTestDependencies = rootProject.ext.mobileTestDependencies
+    def uikitDependencies = rootProject.ext.uikitDependencies
+    def uikitTestDependencies = rootProject.ext.uikitTestDependencies
 
-    compile project(':uikit')
+    compile project(':presentation')
 
-    compile mobileDependencies.kotlin
-    compile mobileDependencies.rxKotlin
-    compile mobileDependencies.androidAnnotations
-    compile mobileDependencies.androidSupportV4
-    compile mobileDependencies.androidSupportV13
-    compile mobileDependencies.appCompatV7
-    compile mobileDependencies.supportRecyclerView
-    compile mobileDependencies.supportDesign
-    compile mobileDependencies.rxAndroid
-    compile mobileDependencies.glide
+    compile uikitDependencies.kotlin
+    compile uikitDependencies.rxKotlin
+    compile uikitDependencies.androidAnnotations
+    compile uikitDependencies.androidSupportV4
+    compile uikitDependencies.androidSupportV13
+    compile uikitDependencies.appCompatV7
+    compile uikitDependencies.supportRecyclerView
+    compile uikitDependencies.supportDesign
+    compile uikitDependencies.rxAndroid
+    compile uikitDependencies.glide
 
-    testImplementation mobileTestDependencies.kotlinJUnit
+    testImplementation uikitTestDependencies.kotlinJUnit
 
     // Instrumentation test dependencies
-    androidTestImplementation mobileTestDependencies.junit
-    androidTestImplementation mobileTestDependencies.mockito
-    androidTestImplementation mobileTestDependencies.mockitoAndroid
-    androidTestImplementation (mobileTestDependencies.espressoCore) {
+    androidTestImplementation uikitTestDependencies.junit
+    androidTestImplementation uikitTestDependencies.mockito
+    androidTestImplementation uikitTestDependencies.mockitoAndroid
+    androidTestImplementation (uikitTestDependencies.espressoCore) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation (mobileTestDependencies.androidRunner) {
+    androidTestImplementation (uikitTestDependencies.androidRunner) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation (mobileTestDependencies.androidRules) {
+    androidTestImplementation (uikitTestDependencies.androidRules) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation (mobileTestDependencies.espressoIntents) {
+    androidTestImplementation (uikitTestDependencies.espressoIntents) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation(mobileTestDependencies.espressoContrib) {
+    androidTestImplementation(uikitTestDependencies.espressoContrib) {
         exclude module: 'appcompat'
         exclude module: 'appcompat-v7'
         exclude module: 'support-v4'

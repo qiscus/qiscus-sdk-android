@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.qiscus.sdk.chat.presentation.android.SortedAdapter
-import com.qiscus.sdk.chat.presentation.android.util.indexOfFirst
+import com.qiscus.sdk.chat.presentation.uikit.SortedAdapter
+import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.CommentViewModel
 
