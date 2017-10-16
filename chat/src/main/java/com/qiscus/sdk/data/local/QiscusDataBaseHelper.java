@@ -147,7 +147,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qiscusChatRoom.setMember(getRoomMembers(qiscusChatRoom.getId()));
             QiscusComment latestComment = getLatestComment(qiscusChatRoom.getId());
-            if (latestComment != null) qiscusChatRoom.setLastComment(latestComment);
+            if (latestComment != null) {
+                qiscusChatRoom.setLastComment(latestComment);
+            }
         }
         cursor.close();
         return qiscusChatRoom;
