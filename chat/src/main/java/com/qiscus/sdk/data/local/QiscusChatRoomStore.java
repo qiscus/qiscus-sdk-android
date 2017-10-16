@@ -42,6 +42,8 @@ public interface QiscusChatRoomStore {
 
     QiscusChatRoom getChatRoom(String email);
 
+    QiscusChatRoom getChatRoomByUniqueId(String uniqueId);
+
     QiscusChatRoom getChatRoom(String email, String distinctId);
 
     List<QiscusChatRoom> getChatRooms(int count);
