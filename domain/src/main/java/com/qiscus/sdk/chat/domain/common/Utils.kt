@@ -36,11 +36,15 @@ private val symbols = '0'.rangeTo('9').toMutableList().apply {
 
 private val taskExecutor = ScheduledThreadPoolExecutor(5)
 
+fun randomInt(n: Int): Int {
+    return random.nextInt(n)
+}
+
 @JvmOverloads
 fun randomString(length: Int = 64): String {
     val buf = CharArray(length)
     for (i in buf.indices) {
-        buf[i] = symbols[random.nextInt(symbols.size)]
+        buf[i] = symbols[randomInt(symbols.size)]
     }
     return String(buf)
 }
@@ -55,5 +59,5 @@ fun runOnBackgroundThread(runnable: Runnable, delay: Long = 0): ScheduledFuture<
 }
 
 fun scheduleOnBackgroundThread(runnable: Runnable, delay: Long): ScheduledFuture<*> {
-     return taskExecutor.scheduleWithFixedDelay(runnable, 0, delay, TimeUnit.MILLISECONDS)
+    return taskExecutor.scheduleWithFixedDelay(runnable, 0, delay, TimeUnit.MILLISECONDS)
 }
