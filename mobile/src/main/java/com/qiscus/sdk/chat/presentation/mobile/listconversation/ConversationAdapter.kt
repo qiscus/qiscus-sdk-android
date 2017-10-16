@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.qiscus.sdk.chat.presentation.uikit.SortedAdapter
 import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
 import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
+import java.text.SimpleDateFormat
 
 /**
  * Created on : October 04, 2017
@@ -79,10 +81,17 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
         private val roomAvatarView: ImageView = view.findViewById(R.id.roomAvatar) as ImageView
         private val roomNameView: TextView = view.findViewById(R.id.roomName) as TextView
         private val lastMessageView: TextView = view.findViewById(R.id.lastMessage) as TextView
+        private val lastMessageDateView: TextView = view.findViewById(R.id.lastMessageDate) as TextView
+        private val unreadCountView: TextView = view.findViewById(R.id.unreadCount) as TextView
+
+        private val dateFormat = SimpleDateFormat.getDateInstance()
 
         fun bind(conversationViewModel: ConversationViewModel) {
+            Glide.with(roomAvatarView).load(conversationViewModel.room.avatar).into(roomAvatarView)
             roomNameView.text = conversationViewModel.room.name
             lastMessageView.text = conversationViewModel.lastComment?.spannableMessage
+            lastMessageDateView.text = dateFormat.format(conversationViewModel.lastComment?.comment?.date)
+            unreadCountView.text = if (adapterPosition % 2 == 0) "23" else "8"
 
             roomAvatarView.setOnClickListener {
                 it.context.startActivity(it.context.chatRoomIntent(conversationViewModel.room))
