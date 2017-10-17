@@ -149,6 +149,7 @@ public class QiscusChatConfig {
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
 
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
+    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
 
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
@@ -661,6 +662,12 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setRoomSenderNameInterceptor(QiscusRoomSenderNameInterceptor
+                                                                 qiscusRoomSenderNameInterceptor) {
+        this.qiscusRoomSenderNameInterceptor = qiscusRoomSenderNameInterceptor;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1087,5 +1094,9 @@ public class QiscusChatConfig {
 
     public QiscusMentionConfig getMentionConfig() {
         return mentionConfig;
+    }
+
+    public QiscusRoomSenderNameInterceptor getRoomSenderNameInterceptor() {
+        return qiscusRoomSenderNameInterceptor;
     }
 }
