@@ -27,6 +27,7 @@ import com.qiscus.sdk.chat.presentation.listcomment.ListCommentContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.CommentViewModel
 import com.qiscus.sdk.chat.presentation.sendcomment.SendCommentContract
+import com.qiscus.sdk.chat.presentation.uikit.comment.CommentAdapter
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
 /**
@@ -54,7 +55,7 @@ class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendComm
     private lateinit var listCommentPresenter: ListCommentContract.Presenter
     private lateinit var sendCommentPresenter: SendCommentContract.Presenter
 
-    private val adapter = CommentAdapter(this)
+    private val adapter = CommentAdapter()
 
     private var roomId: String? = null
 
@@ -66,6 +67,11 @@ class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendComm
         if (roomId == null) {
             throw RuntimeException("Please provide room id!")
         }
+
+
+        adapter.registerViewHolderFactory(TextViewHolderFactory(this))
+        adapter.registerViewHolderFactory(ImageViewHolderFactory(this))
+        adapter.registerViewHolderFactory(DefaultViewHolderFactory(this))
 
         commentRecyclerView.adapter = adapter
         commentRecyclerView.layoutManager = LinearLayoutManager(this)
