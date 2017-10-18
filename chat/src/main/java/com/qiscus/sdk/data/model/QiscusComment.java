@@ -396,12 +396,8 @@ public class QiscusComment implements Parcelable {
         this.extraPayload = extraPayload;
     }
 
-    public boolean isMe() {
+    public boolean isMyComment() {
         return getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail());
-    }
-
-    public boolean isOther() {
-        return !getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail());
     }
 
     public QiscusComment getReplyTo() {
