@@ -60,4 +60,16 @@
     <!-- card comment -->
     <color name="qiscus_comment_card_title">#212121</color>
     <color name="qiscus_comment_card_description">#212121</color>
+
+    <!-- reply comment -->
+    <color name="qiscus_my_comment_reply_bubble">#51B6B6B6</color>
+    <color name="qiscus_opponents_comment_reply_bubble">#51B6B6B6</color>
+    <color name="qiscus_my_comment_reply_bar">#009688</color>
+    <color name="qiscus_opponents_comment_reply_bar">#009688</color>
+    <color name="qiscus_my_comment_reply_sender">#009688</color>
+    <color name="qiscus_opponents_comment_reply_sender">#009688</color>
+    <color name="qiscus_my_comment_reply_text">#727272</color>
+    <color name="qiscus_opponents_comment_reply_text">#727272</color>
+    <color name="qiscus_my_comment_reply_icon_tint">#727272</color>
+    <color name="qiscus_opponents_comment_reply_icon_tint">#727272</color>
 </resources>
