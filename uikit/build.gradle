@@ -67,6 +67,7 @@ dependencies {
     compile uikitDependencies.supportDesign
     compile uikitDependencies.rxAndroid
     compile uikitDependencies.glide
+    compile uikitDependencies.manggil
 
     testImplementation uikitTestDependencies.kotlinJUnit
 

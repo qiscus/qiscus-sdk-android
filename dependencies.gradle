@@ -49,6 +49,8 @@ ext {
 
     glideVersion = '4.0.0'
 
+    manggilVersion = '1.0.1'
+
     //Testing
     robolectricVersion = '3.4.2'
     jUnitVersion = '4.12'
@@ -169,7 +171,8 @@ ext {
             androidSupportV13  : "com.android.support:support-v13:${supportLibraryVersion}",
             appCompatV7        : "com.android.support:appcompat-v7:${supportLibraryVersion}",
             supportRecyclerView: "com.android.support:recyclerview-v7:${supportLibraryVersion}",
-            supportDesign      : "com.android.support:design:${supportLibraryVersion}"
+            supportDesign      : "com.android.support:design:${supportLibraryVersion}",
+            manggil            : "com.qiscus.utils:manggil:${manggilVersion}"
     ]
 
     uikitTestDependencies = [
