@@ -20,4 +20,40 @@
     <color name="qiscus_mention_all">#1a237e</color>
     <color name="qiscus_mention_other">#009688</color>
     <color name="qiscus_mention_me">#af2412</color>
+
+    <!-- comment bubble -->
+    <color name="qiscus_my_comment_bubble">#B2DFDB</color>
+    <color name="qiscus_opponents_comment_bubble">#D0D0D0</color>
+    <color name="qiscus_system_comment_bubble">#FFCCBC</color>
+
+    <color name="qiscus_comment_date">#727272</color>
+    <color name="qiscus_comment_sender_name">#727272</color>
+
+    <color name="qiscus_my_comment_text">#212121</color>
+    <color name="qiscus_opponents_comment_text">#212121</color>
+    <color name="qiscus_system_comment_text">#212121</color>
+
+    <color name="qiscus_my_comment_time">#727272</color>
+    <color name="qiscus_opponents_comment_time">#727272</color>
+
+    <color name="qiscus_my_comment_link">#212121</color>
+    <color name="qiscus_opponents_comment_link">#212121</color>
+
+    <color name="qiscus_comment_sending_tint">#727272</color>
+    <color name="qiscus_comment_sent_tint">#727272</color>
+    <color name="qiscus_comment_delivered_tint">#727272</color>
+    <color name="qiscus_comment_read_tint">#009688</color>
+    <color name="qiscus_comment_failed_tint">#d32f2f</color>
+
+    <color name="qiscus_my_comment_unfinished_progress">#B2DFDB</color>
+    <color name="qiscus_my_comment_finished_progress">#B2DFDB</color>
+    <color name="qiscus_opponents_comment_unfinished_progress">#009688</color>
+    <color name="qiscus_opponents_comment_finished_progress">#009688</color>
+
+    <!-- audio player -->
+    <color name="qiscus_audio_player_icon_tint">#212121</color>
+    <color name="qiscus_audio_progress_unfilled">#B6B6B6</color>
+    <color name="qiscus_audio_progress_filled">#212121</color>
+    <color name="qiscus_audio_progress_thumb">#212121</color>
+    <color name="qiscus_audio_duration">#212121</color>
 </resources>
