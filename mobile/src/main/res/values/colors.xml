@@ -87,6 +87,10 @@
     <color name="qiscus_my_comment_image_icon_tint">#727272</color>
     <color name="qiscus_opponents_comment_image_icon_tint">#727272</color>
 
+    <!-- video comment -->
+    <color name="qiscus_my_comment_video_icon_tint">#727272</color>
+    <color name="qiscus_opponents_comment_video_icon_tint">#727272</color>
+
     <!-- location comment -->
     <color name="qiscus_my_comment_location_name">#212121</color>
     <color name="qiscus_opponents_comment_location_name">#212121</color>
