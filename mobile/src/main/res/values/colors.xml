@@ -82,4 +82,8 @@
     <color name="qiscus_opponents_comment_contact_name">#212121</color>
     <color name="qiscus_my_comment_contact_id">#727272</color>
     <color name="qiscus_opponents_comment_contact_id">#727272</color>
+
+    <!-- image comment -->
+    <color name="qiscus_my_comment_image_icon_tint">#727272</color>
+    <color name="qiscus_opponents_comment_image_icon_tint">#727272</color>
 </resources>

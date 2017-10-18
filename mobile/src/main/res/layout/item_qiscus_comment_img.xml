@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2016 Qiscus.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/qiscus_comment_date"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <com.qiscus.sdk.chat.presentation.uikit.view.CircularImageView
+        android:id="@+id/avatar"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignTop="@+id/message"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/message"
+        android:layout_alignLeft="@+id/bubble"
+        android:layout_alignRight="@+id/message"
+        android:layout_alignStart="@+id/bubble"
+        android:layout_below="@+id/date"
+        android:layout_marginEnd="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/qiscus_comment_sender_name"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/bubble"
+        android:layout_width="42dp"
+        android:layout_height="27dp"
+        android:layout_alignTop="@+id/message"
+        android:layout_marginLeft="42dp"
+        android:layout_marginStart="42dp"
+        android:src="@drawable/ic_qiscus_opponent_first_bubble"
+        android:tint="@color/qiscus_opponents_comment_bubble" />
+
+    <RelativeLayout
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginLeft="54dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginStart="54dp"
+        android:background="@drawable/qiscus_opponents_comment_bubble"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="192dp"
+            android:layout_height="192dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop" />
+
+        <ImageView
+            android:id="@+id/iv_download"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_margin="10dp"
+            android:background="@drawable/qiscus_download_upload_bg"
+            android:padding="4dp"
+            android:src="@drawable/ic_qiscus_download"
+            android:tint="@color/qiscus_opponents_comment_image_icon_tint" />
+
+        <com.qiscus.sdk.chat.presentation.uikit.view.CircleProgress
+            android:id="@+id/progress"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_margin="10dp"
+            app:circle_finished_color="@color/qiscus_opponents_comment_finished_progress"
+            app:circle_text_size="12sp" />
+
+        <ImageView
+            android:id="@+id/frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/thumbnail"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignLeft="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignStart="@+id/thumbnail"
+            android:layout_alignTop="@+id/thumbnail"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/bg_qiscus_frame"
+            android:tint="@color/qiscus_opponents_comment_bubble" />
+
+        <com.vanniktech.emoji.EmojiTextView
+            android:id="@+id/caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignLeft="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_alignStart="@+id/thumbnail"
+            android:layout_below="@+id/thumbnail"
+            android:layout_marginBottom="4dp"
+            android:autoLink="email"
+            android:linksClickable="true"
+            android:textColor="@color/qiscus_opponents_comment_text"
+            android:textColorLink="@color/qiscus_opponents_comment_text"
+            android:textSize="16sp"
+            app:emojiSize="22sp" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/thumbnail"
+            android:layout_alignRight="@+id/thumbnail"
+            android:layout_below="@+id/caption"
+            android:layout_gravity="bottom"
+            android:textColor="@color/qiscus_opponents_comment_time"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+    <!-- Add this view because Xiaomi need it -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@+id/message" />
+</RelativeLayout>
