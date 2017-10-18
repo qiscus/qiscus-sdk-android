@@ -588,7 +588,6 @@ public class Qiscus {
         public void save(SetUserListener listener) {
             save().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(qiscusAccount -> Qiscus.localDataManager.saveAccountInfo(qiscusAccount))
                     .subscribe(listener::onSuccess, listener::onError);
         }
 
