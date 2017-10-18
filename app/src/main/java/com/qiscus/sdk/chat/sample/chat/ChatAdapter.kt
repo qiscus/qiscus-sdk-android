@@ -63,7 +63,7 @@ class ChatAdapter(private val context: Context) : RecyclerView.Adapter<ChatAdapt
         fun bind(comment: Comment) {
             if (comment is FileAttachmentComment) {
                 messageTextView.text = String.format("%s: (%s)[%s] -%s-", comment.sender.name,
-                        comment.caption, comment.getAttachmentName(), comment.state)
+                        comment.caption, comment.attachmentName, comment.state)
             } else {
                 messageTextView.text = String.format("%s: %s -%s-", comment.sender.name, comment.message, comment.state)
             }

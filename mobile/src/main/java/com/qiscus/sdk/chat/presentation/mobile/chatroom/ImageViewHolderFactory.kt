@@ -40,7 +40,7 @@ class ImageViewHolder(view: View) : CommentViewHolder(view) {
         senderNameView.text = commentViewModel.comment.sender.name
         captionView.text = (commentViewModel as CommentImageViewModel).spannableCaption
         Glide.with(imageView)
-                .load((commentViewModel.comment as FileAttachmentComment).getAttachmentUrl())
+                .load((commentViewModel.comment as FileAttachmentComment).attachmentUrl)
                 .into(imageView)
     }
 }

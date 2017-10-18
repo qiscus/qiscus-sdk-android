@@ -76,7 +76,7 @@ class CommentDataRepository(private val commentLocal: CommentLocal,
                     fileLocal.saveLocalPath(attachmentComment.commentId, comment.file!!)
                     commentLocal.saveAndNotify(attachmentComment)
                 }
-                .doOnSuccess { attachmentComment.updateAttachmentUrl(it) }
+                .doOnSuccess { attachmentComment.attachmentUrl = it }
                 .doOnError { handleErrorPostComment(attachmentComment) }
                 .flatMap {
                     commentRemote.postComment(attachmentComment)
@@ -96,7 +96,7 @@ class CommentDataRepository(private val commentLocal: CommentLocal,
         val progress = FileAttachmentProgress(attachmentComment.toDomainModel(),
                 FileAttachmentProgress.State.DOWNLOADING, 0)
 
-        return fileRemote.download(attachmentComment.getAttachmentUrl(), {
+        return fileRemote.download(attachmentComment.attachmentUrl, {
             progress.progress = it
             filePublisher.onFileProgressUpdated(progress)
         })

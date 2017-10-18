@@ -37,42 +37,26 @@ class FileAttachmentComment(
         state: CommentState,
         type: CommentType
 ) : Comment(commentId, defaultMessage, sender, date, room, state, type) {
-    private var attachmentUrl = ""
-    private var attachmentName = ""
 
-    init {
-        determineAttachmentUrl()
-    }
-
-    private fun determineAttachmentUrl() {
-        if (attachmentUrl.isBlank() && type.payload.has("url")) {
-            attachmentUrl = type.payload.optString("url", "")
+    val attachmentUrl by lazy {
+        var url = ""
+        if (type.payload.has("url")) {
+            url = type.payload.optString("url")
         }
-
-        if (attachmentUrl.isBlank() && message.startsWith("[file]") && message.endsWith("[/file]")) {
-            attachmentUrl = message.replace("[file]", "")
+        if (url.isBlank() && message.startsWith("[file]") && message.endsWith("[/file]")) {
+            url = message.replace("[file]", "")
                     .replace("[/file]", "")
                     .trim()
         }
+        url
     }
 
-    fun getAttachmentUrl(): String {
-        if (attachmentUrl.isBlank()) {
-            determineAttachmentUrl()
+    val attachmentName by lazy {
+        var name = attachmentUrl.getAttachmentName()
+        if (name.isBlank() && file != null) {
+            name = file!!.name
         }
-        return attachmentUrl
-    }
-
-    fun getAttachmentName(): String {
-        if (attachmentName.isBlank()) {
-            attachmentName = getAttachmentUrl().getAttachmentName()
-        }
-
-        if (attachmentName.isBlank() && file != null) {
-            attachmentName = file!!.name
-        }
-
-        return attachmentName
+        name
     }
 
     override fun toString(): String {

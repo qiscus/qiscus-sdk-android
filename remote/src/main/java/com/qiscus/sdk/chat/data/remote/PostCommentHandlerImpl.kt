@@ -82,7 +82,7 @@ class PostCommentHandlerImpl(private val commentLocal: CommentLocal,
     }
 
     private fun resendFileComment(comment: FileAttachmentCommentEntity) {
-        if (!comment.getAttachmentUrl().isBlank()) {//We have upload it, just need to send comment
+        if (!comment.attachmentUrl.isBlank()) {//We have upload it, just need to send comment
             val disposable = commentRemote.postComment(comment)
                     .doOnSuccess { onSuccessSendingComment(it) }
                     .doOnError { onErrorSendingComment(comment, it) }
@@ -106,7 +106,7 @@ class PostCommentHandlerImpl(private val commentLocal: CommentLocal,
             progress.progress = it
             filePublisher.onFileProgressUpdated(progress)
         })
-                .doOnSuccess { comment.updateAttachmentUrl(it) }
+                .doOnSuccess { comment.attachmentUrl = it }
                 .doOnError { onErrorSendingComment(comment, it) }
                 .flatMap {
                     commentRemote.postComment(comment)

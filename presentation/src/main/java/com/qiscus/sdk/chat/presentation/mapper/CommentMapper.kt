@@ -128,7 +128,7 @@ private fun determineFileViewModel(comment: FileAttachmentComment, mentionAllCol
                                    mimeTypeGuesser: MimeTypeGuesser = Qiscus.instance.component.dataComponent.mimeTypeGuesser)
         : CommentFileViewModel {
 
-    val type = mimeTypeGuesser.getMimeTypeFromFileName(comment.getAttachmentName())
+    val type = mimeTypeGuesser.getMimeTypeFromFileName(comment.attachmentName)
     return when {
         type == null -> CommentFileViewModel(comment, mentionAllColor = mentionAllColor, mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor, mentionClickListener = mentionClickHandler, mimeType = "")

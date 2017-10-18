@@ -36,35 +36,35 @@ class FileAttachmentCommentEntity(
         state: CommentStateEntity,
         type: CommentTypeEntity
 ) : CommentEntity(commentId, defaultMessage, sender, nanoTimeStamp, room, state, type) {
-    private var attachmentUrl = ""
 
-    init {
-        determineAttachmentUrl()
-    }
-
-    private fun determineAttachmentUrl() {
-        if (attachmentUrl.isBlank() && type.payload.has("url")) {
-            attachmentUrl = type.payload.optString("url", "")
+    var attachmentUrl = ""
+        get() {
+            if (field.isBlank()) {
+                determineAttachmentUrl()
+            }
+            return field
+        }
+        set(value) {
+            if (value.isNotBlank()) {
+                field = value
+                val payload = JSONObject().put("url", value).put("caption", caption)
+                type.payload = payload
+            }
         }
 
-        if (attachmentUrl.isBlank() && message.startsWith("[file]") && message.endsWith("[/file]")) {
-            attachmentUrl = message.replace("[file]", "")
+    private fun determineAttachmentUrl() {
+        var url = ""
+        if (type.payload.has("url")) {
+            url = type.payload.optString("url", "")
+        }
+
+        if (url.isBlank() && message.startsWith("[file]") && message.endsWith("[/file]")) {
+            url = message.replace("[file]", "")
                     .replace("[/file]", "")
                     .trim()
         }
-    }
-
-    fun getAttachmentUrl(): String {
-        if (attachmentUrl.isBlank()) {
-            determineAttachmentUrl()
-        }
-        return attachmentUrl
-    }
-
-    fun updateAttachmentUrl(url: String) {
+        
         attachmentUrl = url
-        val payload = JSONObject().put("url", attachmentUrl).put("caption", caption)
-        type.payload = payload
     }
 
 

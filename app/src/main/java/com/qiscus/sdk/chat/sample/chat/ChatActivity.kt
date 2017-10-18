@@ -172,7 +172,7 @@ class ChatActivity : AppCompatActivity() {
         })
 
         listenCommentProgress.execute(null, Action {
-            val msg = "${it.state.name} ${it.fileAttachmentComment.getAttachmentName()} Progress ${it.progress}"
+            val msg = "${it.state.name} ${it.fileAttachmentComment.attachmentName} Progress ${it.progress}"
             Log.d("ZETRA", msg)
         })
     }
