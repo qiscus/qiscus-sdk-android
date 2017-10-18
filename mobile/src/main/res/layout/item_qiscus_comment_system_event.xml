@@ -58,6 +58,7 @@
             android:textColor="@color/qiscus_system_comment_text"
             android:textColorLink="@color/qiscus_system_comment_text"
             android:textSize="12sp"
+            android:gravity="center"
             app:emojiSize="18sp"/>
     </LinearLayout>
 
