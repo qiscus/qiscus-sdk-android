@@ -28,6 +28,7 @@
 
     <color name="qiscus_comment_date">#727272</color>
     <color name="qiscus_comment_sender_name">#727272</color>
+    <color name="qiscus_comment_download_upload_bg">#cdcdcd</color>
 
     <color name="qiscus_my_comment_text">#212121</color>
     <color name="qiscus_opponents_comment_text">#212121</color>
@@ -82,6 +83,16 @@
     <color name="qiscus_opponents_comment_contact_name">#212121</color>
     <color name="qiscus_my_comment_contact_id">#727272</color>
     <color name="qiscus_opponents_comment_contact_id">#727272</color>
+
+    <!-- file comment -->
+    <color name="qiscus_my_comment_file_bubble">#f6f6f6</color>
+    <color name="qiscus_opponents_comment_file_bubble">#f6f6f6</color>
+    <color name="qiscus_my_comment_file_icon_tint">#727272</color>
+    <color name="qiscus_opponents_comment_file_icon_tint">#727272</color>
+    <color name="qiscus_my_comment_file_name">#727272</color>
+    <color name="qiscus_opponents_comment_file_name">#727272</color>
+    <color name="qiscus_my_comment_file_type">#727272</color>
+    <color name="qiscus_opponents_comment_file_type">#727272</color>
 
     <!-- image comment -->
     <color name="qiscus_my_comment_image_icon_tint">#727272</color>
