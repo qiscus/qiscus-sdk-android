@@ -172,6 +172,7 @@ ext {
             appCompatV7        : "com.android.support:appcompat-v7:${supportLibraryVersion}",
             supportRecyclerView: "com.android.support:recyclerview-v7:${supportLibraryVersion}",
             supportDesign      : "com.android.support:design:${supportLibraryVersion}",
+            cardView           : "com.android.support:cardview-v7:${supportLibraryVersion}",
             manggil            : "com.qiscus.utils:manggil:${manggilVersion}"
     ]
 

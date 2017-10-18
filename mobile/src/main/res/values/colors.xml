@@ -56,4 +56,8 @@
     <color name="qiscus_audio_progress_filled">#212121</color>
     <color name="qiscus_audio_progress_thumb">#212121</color>
     <color name="qiscus_audio_duration">#212121</color>
+
+    <!-- card comment -->
+    <color name="qiscus_comment_card_title">#212121</color>
+    <color name="qiscus_comment_card_description">#212121</color>
 </resources>
