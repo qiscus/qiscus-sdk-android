@@ -107,4 +107,10 @@
     <color name="qiscus_opponents_comment_location_name">#212121</color>
     <color name="qiscus_my_comment_location_address">#727272</color>
     <color name="qiscus_opponents_comment_location_address">#727272</color>
+
+    <!-- account linking comment -->
+    <color name="qiscus_my_comment_account_linking_bg">#009688</color>
+    <color name="qiscus_opponents_comment_account_linking_bg">#D8D8D8</color>
+    <color name="qiscus_my_comment_account_linking_text">#FFFF</color>
+    <color name="qiscus_opponents_comment_account_linking_text">#009688</color>
 </resources>
