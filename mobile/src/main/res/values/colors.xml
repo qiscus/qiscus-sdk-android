@@ -72,4 +72,14 @@
     <color name="qiscus_opponents_comment_reply_text">#727272</color>
     <color name="qiscus_my_comment_reply_icon_tint">#727272</color>
     <color name="qiscus_opponents_comment_reply_icon_tint">#727272</color>
+
+    <!-- contact comment -->
+    <color name="qiscus_my_comment_contact_bubble">#f6f6f6</color>
+    <color name="qiscus_opponents_comment_contact_bubble">#f6f6f6</color>
+    <color name="qiscus_my_comment_contact_icon_tint">#727272</color>
+    <color name="qiscus_opponents_comment_contact_icon_tint">#727272</color>
+    <color name="qiscus_my_comment_contact_name">#212121</color>
+    <color name="qiscus_opponents_comment_contact_name">#212121</color>
+    <color name="qiscus_my_comment_contact_id">#727272</color>
+    <color name="qiscus_opponents_comment_contact_id">#727272</color>
 </resources>
