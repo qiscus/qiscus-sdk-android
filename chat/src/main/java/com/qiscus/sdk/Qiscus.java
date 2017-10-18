@@ -71,6 +71,7 @@ public class Qiscus {
     private static QiscusChatConfig chatConfig;
 
     private static String appServer;
+    private static String mqttBrokerUrl;
     private static long heartBeat;
     private static String authorities;
 
@@ -96,7 +97,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, "https://" + qiscusAppId + ".qiscus.com");
+        initWithCustomServer(application, "https://" + qiscusAppId + ".qiscus.com", "ssl://mqtt.qiscus.com:1885");
     }
 
     /**
@@ -117,9 +118,10 @@ public class Qiscus {
      * @param application   Application instance
      * @param serverBaseUrl Your qiscus chat engine base url
      */
-    public static void initWithCustomServer(Application application, String serverBaseUrl) {
+    public static void initWithCustomServer(Application application, String serverBaseUrl, String mqttBrokerUrl) {
         appInstance = application;
         appServer = serverBaseUrl;
+        Qiscus.mqttBrokerUrl = mqttBrokerUrl;
         appHandler = new Handler(appInstance.getApplicationContext().getMainLooper());
         taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
@@ -260,13 +262,23 @@ public class Qiscus {
     }
 
     /**
-     * Accessor to get current qiscus app id
+     * Accessor to get current qiscus app server
      *
-     * @return Current qiscus app id
+     * @return Current qiscus app server
      */
     public static String getAppServer() {
         checkAppIdSetup();
         return appServer;
+    }
+
+    /**
+     * Accessor to get current mqtt broker url
+     *
+     * @return Current mqtt broker url
+     */
+    public static String getMqttBrokerUrl() {
+        checkAppIdSetup();
+        return mqttBrokerUrl;
     }
 
     /**

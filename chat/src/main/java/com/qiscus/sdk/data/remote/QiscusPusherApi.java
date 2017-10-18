@@ -103,7 +103,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
         clientId = Qiscus.getApps().getPackageName() + "-";
         clientId += Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
-        serverUri = "ssl://mqtt.qiscus.com:1885";
+        serverUri = Qiscus.getMqttBrokerUrl();
 
         buildClient();
 
