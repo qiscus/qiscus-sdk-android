@@ -31,7 +31,7 @@ import java.util.concurrent.ScheduledFuture
  * GitHub     : https://github.com/zetbaitsu
  */
 class AppWatcher : ApplicationWatcher, Application.ActivityLifecycleCallbacks {
-    private val MAX_ACTIVITY_TRANSITION_TIME: Long = 2000
+    private val maxActivityTransitionTime: Long = 2000
 
     private var activityTransition: ScheduledFuture<*>? = null
     private var foreground: Boolean = false
@@ -59,7 +59,7 @@ class AppWatcher : ApplicationWatcher, Application.ActivityLifecycleCallbacks {
     override fun onActivityDestroyed(activity: Activity) {}
 
     private fun startActivityTransitionTimer() {
-        activityTransition = runOnBackgroundThread(Runnable { foreground = false }, MAX_ACTIVITY_TRANSITION_TIME)
+        activityTransition = runOnBackgroundThread(Runnable { foreground = false }, maxActivityTransitionTime)
     }
 
     private fun stopActivityTransitionTimer() {
