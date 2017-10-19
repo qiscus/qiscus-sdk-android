@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- primary color -->
     <color name="qiscus_primary">#009688</color>
     <color name="qiscus_primary_dark">#00796B</color>
     <color name="qiscus_primary_light">#B2DFDB</color>
@@ -113,4 +114,10 @@
     <color name="qiscus_opponents_comment_account_linking_bg">#D8D8D8</color>
     <color name="qiscus_my_comment_account_linking_text">#FFFF</color>
     <color name="qiscus_opponents_comment_account_linking_text">#009688</color>
+
+    <!-- link comment -->
+    <color name="qiscus_my_comment_web_preview_title">#212121</color>
+    <color name="qiscus_opponents_comment_web_preview_title">#212121</color>
+    <color name="qiscus_my_comment_web_preview_description">#727272</color>
+    <color name="qiscus_opponents_comment_web_preview_description">#727272</color>
 </resources>

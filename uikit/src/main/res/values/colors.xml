@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="qiscus_primary">#009688</color>
+    <color name="qiscus_primary_dark">#00796B</color>
+    <color name="qiscus_primary_light">#B2DFDB</color>
+    <color name="qiscus_accent">#FF5722</color>
+    <color name="qiscus_accent_light">#FFCCBC</color>
+
+    <color name="qiscus_web_preview_bg">#51B6B6B6</color>
+</resources>

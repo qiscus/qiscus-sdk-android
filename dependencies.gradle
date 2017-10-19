@@ -43,6 +43,7 @@ ext {
 
     okHttpVersion = '3.8.1'
     retrofitVersion = '2.3.0'
+    rxunfurlVersion = '0.3.0'
 
     mqttVersion = '1.1.1'
     mqttAndroidVersion = '1.1.1-q'
@@ -94,7 +95,8 @@ ext {
             okHttpLogger     : "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
             retrofit         : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
             retrofitConverter: "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
-            retrofitAdapter  : "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
+            retrofitAdapter  : "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}",
+            rxunfurl         : "com.schinizer:rxunfurl:${rxunfurlVersion}"
     ]
 
     remoteTestDependencies = [
@@ -173,6 +175,7 @@ ext {
             supportRecyclerView: "com.android.support:recyclerview-v7:${supportLibraryVersion}",
             supportDesign      : "com.android.support:design:${supportLibraryVersion}",
             cardView           : "com.android.support:cardview-v7:${supportLibraryVersion}",
+            customTabs         : "com.android.support:customtabs:${supportLibraryVersion}",
             manggil            : "com.qiscus.utils:manggil:${manggilVersion}"
     ]
 

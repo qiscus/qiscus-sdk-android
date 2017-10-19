@@ -47,6 +47,7 @@ dependencies {
     compile remoteDependencies.retrofit
     compile remoteDependencies.retrofitConverter
     compile remoteDependencies.retrofitAdapter
+    compile remoteDependencies.rxunfurl
 
     testImplementation remoteTestDependencies.junit
     testImplementation remoteTestDependencies.mockito

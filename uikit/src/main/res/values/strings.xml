@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="qiscus_web_preview_default_title">Untitled</string>
+    <string name="qiscus_web_preview_default_description">No description!</string>
+</resources>

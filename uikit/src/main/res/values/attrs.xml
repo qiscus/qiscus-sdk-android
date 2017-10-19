@@ -49,4 +49,9 @@
         <attr name="civ_border_overlay" format="boolean"/>
         <attr name="civ_fill_color" format="color"/>
     </declare-styleable>
+
+    <declare-styleable name="WebPreviewView">
+        <attr name="titleColor" format="color|reference"/>
+        <attr name="descColor" format="color|reference"/>
+    </declare-styleable>
 </resources>

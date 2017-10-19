@@ -61,14 +61,14 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <com.qiscus.sdk.ui.view.QiscusLinkPreviewView
+        <com.qiscus.sdk.chat.presentation.uikit.view.WebPreviewView
             android:id="@+id/preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:visibility="gone"
-            app:qpreview_descColor="@color/qiscus_secondary_text"
-            app:qpreview_titleColor="@color/qiscus_primary_text"/>
+            app:descColor="@color/qiscus_my_comment_web_preview_description"
+            app:titleColor="@color/qiscus_my_comment_web_preview_title"/>
 
         <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/contents"

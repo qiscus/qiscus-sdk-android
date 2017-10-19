@@ -48,6 +48,8 @@ import com.qiscus.sdk.chat.domain.repository.AccountRepository
 import com.qiscus.sdk.chat.domain.repository.CommentRepository
 import com.qiscus.sdk.chat.domain.repository.RoomRepository
 import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.schinizer.rxunfurl.RxUnfurl
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import okhttp3.OkHttpClient
 
@@ -123,4 +125,11 @@ data class DataComponent(
         var roomObserver: RoomObserver = RoomDataObserver(roomSubscriber),
         var commentObserver: CommentObserver = CommentDataObserver(pubSubClient, commentSubscriber),
         var userObserver: UserObserver = UserDataObserver(pubSubClient, userSubscriber)
-)
+) {
+    val webScrapper: WebScrapper by lazy {
+        val rxUnfurl = RxUnfurl.Builder()
+                .scheduler(Schedulers.io())
+                .build()
+        WebScrapperImpl(rxUnfurl)
+    }
+}

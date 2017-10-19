@@ -66,6 +66,7 @@ dependencies {
     compile uikitDependencies.supportRecyclerView
     compile uikitDependencies.supportDesign
     compile uikitDependencies.cardView
+    compile uikitDependencies.customTabs
     compile uikitDependencies.rxAndroid
     compile uikitDependencies.glide
     compile uikitDependencies.manggil
