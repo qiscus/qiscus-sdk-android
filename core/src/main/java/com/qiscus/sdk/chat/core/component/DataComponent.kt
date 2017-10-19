@@ -59,73 +59,175 @@ import okhttp3.OkHttpClient
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class DataComponent(
-        private val context: Context,
-        private val applicationWatcher: ApplicationWatcher,
-        private val restApiServerBaseUrl: String,
-        private val publishSubject: PublishSubject<Any> = PublishSubject.create(),
-        private val okHttpClient: OkHttpClient = HttpClientFactory.makeOkHttpClient(false),
+class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, restApiServerBaseUrl: String, mqttBrokerUrl: String) {
 
-        var dbOpenHelper: DbOpenHelper = DbOpenHelper(context),
-        var qiscusRestApi: QiscusRestApi = QiscusRestApiFactory.makeQiscusRestApi(restApiServerBaseUrl, okHttpClient),
+    private val publishSubject: PublishSubject<Any> by lazy {
+        PublishSubject.create<Any>()
+    }
 
-        var accountLocal: AccountLocal = AccountLocalImpl(context),
-        var accountRemote: AccountRemote = AccountRemoteImpl(accountLocal, qiscusRestApi),
-        var accountRepository: AccountRepository = AccountDataRepository(accountLocal, accountRemote),
+    private val okHttpClient: OkHttpClient by lazy {
+        HttpClientFactory.makeOkHttpClient(false)
+    }
 
-        var userLocal: UserLocal = UserLocalImpl(dbOpenHelper),
-        var userRepository: UserRepository = UserDataRepository(userLocal),
+    val dbOpenHelper: DbOpenHelper by lazy {
+        DbOpenHelper(context)
+    }
 
-        val mimeTypeGuesser: MimeTypeGuesser = MimeTypeGuesserImpl(),
-        private val fileUtil: FileUtil = FileUtil(context, mimeTypeGuesser),
-        private val filePathGenerator: FilePathGenerator = fileUtil,
-        private val fileManager: FileManager = fileUtil,
-        var fileLocal: FileLocal = FileLocalImpl(dbOpenHelper),
-        var fileRemote: FileRemote = FileRemoteImpl(accountLocal, restApiServerBaseUrl, okHttpClient,
-                filePathGenerator),
+    val qiscusRestApi: QiscusRestApi by lazy {
+        QiscusRestApiFactory.makeQiscusRestApi(restApiServerBaseUrl, okHttpClient)
+    }
 
-        private val fileDataPusher: FileDataPusher = FileDataPusher(publishSubject),
-        var filePublisher: FilePublisher = fileDataPusher,
-        var fileSubscriber: FileSubscriber = fileDataPusher,
-        var fileObserver: FileObserver = FileDataObserver(fileSubscriber),
+    val accountLocal: AccountLocal by lazy {
+        AccountLocalImpl(context)
+    }
 
-        private val roomDataPusher: RoomDataPusher = RoomDataPusher(publishSubject),
-        var roomPublisher: RoomPublisher = roomDataPusher,
-        var roomSubscriber: RoomSubscriber = roomDataPusher,
+    val accountRemote: AccountRemote by lazy {
+        AccountRemoteImpl(accountLocal, qiscusRestApi)
+    }
 
-        var roomLocal: RoomLocal = RoomLocalImpl(dbOpenHelper, accountLocal, userLocal, roomPublisher),
+    val accountRepository: AccountRepository by lazy {
+        AccountDataRepository(accountLocal, accountRemote)
+    }
 
-        private val commentDataPusher: CommentDataPusher = CommentDataPusher(publishSubject),
-        var commentPublisher: CommentPublisher = commentDataPusher,
-        var commentSubscriber: CommentSubscriber = commentDataPusher,
+    val userLocal: UserLocal by lazy {
+        UserLocalImpl(dbOpenHelper)
+    }
 
-        var commentLocal: CommentLocal = CommentLocalImpl(dbOpenHelper, accountLocal, roomLocal,
-                userLocal, fileLocal, commentPublisher),
+    val userRepository: UserRepository by lazy {
+        UserDataRepository(userLocal)
+    }
 
-        var roomRemote: RoomRemote = RoomRemoteImpl(accountLocal, qiscusRestApi, roomLocal, commentLocal),
-        var roomRepository: RoomRepository = RoomDataRepository(roomLocal, roomRemote),
+    val mimeTypeGuesser: MimeTypeGuesser by lazy {
+        MimeTypeGuesserImpl()
+    }
 
-        private val userDataPusher: UserDataPusher = UserDataPusher(publishSubject, userLocal),
-        var userPublisher: UserPublisher = userDataPusher,
-        var userSubscriber: UserSubscriber = userDataPusher,
+    private val fileUtil: FileUtil by lazy {
+        FileUtil(context, mimeTypeGuesser)
+    }
 
-        var commentRemote: CommentRemote = CommentRemoteImpl(accountLocal, qiscusRestApi),
-        var postCommentHandler: PostCommentHandler = PostCommentHandlerImpl(commentLocal, commentRemote, fileRemote, filePublisher),
-        var commentRepository: CommentRepository = CommentDataRepository(commentLocal, commentRemote,
-                fileLocal, fileRemote, fileManager, filePublisher, postCommentHandler),
+    private val filePathGenerator: FilePathGenerator by lazy {
+        fileUtil
+    }
 
-        var syncHandler: SyncHandler = SyncHandlerImpl(commentLocal, commentRemote, commentSubscriber),
+    private val fileManager: FileManager by lazy {
+        fileUtil
+    }
 
-        internal val commentPayloadMapper: CommentPayloadMapper = CommentPayloadMapper(),
-        var pubSubClient: QiscusPubSubClient = QiscusMqttClient(context, applicationWatcher = applicationWatcher,
+    val fileLocal: FileLocal by lazy {
+        FileLocalImpl(dbOpenHelper)
+    }
+
+    val fileRemote: FileRemote by lazy {
+        FileRemoteImpl(accountLocal, restApiServerBaseUrl, okHttpClient, filePathGenerator)
+    }
+
+    private val fileDataPusher: FileDataPusher by lazy {
+        FileDataPusher(publishSubject)
+    }
+
+    val filePublisher: FilePublisher by lazy {
+        fileDataPusher
+    }
+
+    val fileSubscriber: FileSubscriber by lazy {
+        fileDataPusher
+    }
+
+    val fileObserver: FileObserver by lazy {
+        FileDataObserver(fileSubscriber)
+    }
+
+    private val roomDataPusher: RoomDataPusher by lazy {
+        RoomDataPusher(publishSubject)
+    }
+
+    val roomPublisher: RoomPublisher by lazy {
+        roomDataPusher
+    }
+
+    val roomSubscriber: RoomSubscriber by lazy {
+        roomDataPusher
+    }
+
+    val roomLocal: RoomLocal by lazy {
+        RoomLocalImpl(dbOpenHelper, accountLocal, userLocal, roomPublisher)
+    }
+
+    private val commentDataPusher: CommentDataPusher by lazy {
+        CommentDataPusher(publishSubject)
+    }
+
+    val commentPublisher: CommentPublisher by lazy {
+        commentDataPusher
+    }
+
+    val commentSubscriber: CommentSubscriber by lazy {
+        commentDataPusher
+    }
+
+    val commentLocal: CommentLocal by lazy {
+        CommentLocalImpl(dbOpenHelper, accountLocal, roomLocal, userLocal, fileLocal, commentPublisher)
+    }
+
+    val roomRemote: RoomRemote by lazy {
+        RoomRemoteImpl(accountLocal, qiscusRestApi, roomLocal, commentLocal)
+    }
+
+    val roomRepository: RoomRepository by lazy {
+        RoomDataRepository(roomLocal, roomRemote)
+    }
+
+    private val userDataPusher: UserDataPusher by lazy {
+        UserDataPusher(publishSubject, userLocal)
+    }
+
+    val userPublisher: UserPublisher by lazy {
+        userDataPusher
+    }
+
+    val userSubscriber: UserSubscriber by lazy {
+        userDataPusher
+    }
+
+    val commentRemote: CommentRemote by lazy {
+        CommentRemoteImpl(accountLocal, qiscusRestApi)
+    }
+
+    val postCommentHandler: PostCommentHandler by lazy {
+        PostCommentHandlerImpl(commentLocal, commentRemote, fileRemote, filePublisher)
+    }
+
+    val commentRepository: CommentRepository by lazy {
+        CommentDataRepository(commentLocal, commentRemote, fileLocal, fileRemote, fileManager, filePublisher, postCommentHandler)
+    }
+
+    val syncHandler: SyncHandler by lazy {
+        SyncHandlerImpl(commentLocal, commentRemote, commentSubscriber)
+    }
+
+    internal val commentPayloadMapper: CommentPayloadMapper by lazy {
+        CommentPayloadMapper()
+    }
+
+    val pubSubClient: QiscusPubSubClient by lazy {
+        QiscusMqttClient(context, serverUri = mqttBrokerUrl, applicationWatcher = applicationWatcher,
                 accountLocal = accountLocal, commentLocal = commentLocal, commentPayloadMapper = commentPayloadMapper,
                 postCommentHandler = postCommentHandler, commentRemote = commentRemote, userPublisher = userPublisher,
-                syncHandler = syncHandler),
+                syncHandler = syncHandler)
+    }
 
-        var roomObserver: RoomObserver = RoomDataObserver(roomSubscriber),
-        var commentObserver: CommentObserver = CommentDataObserver(pubSubClient, commentSubscriber),
-        var userObserver: UserObserver = UserDataObserver(pubSubClient, userSubscriber)
-) {
+    val roomObserver: RoomObserver by lazy {
+        RoomDataObserver(roomSubscriber)
+    }
+
+    val commentObserver: CommentObserver by lazy {
+        CommentDataObserver(pubSubClient, commentSubscriber)
+    }
+
+    val userObserver: UserObserver by lazy {
+        UserDataObserver(pubSubClient, userSubscriber)
+    }
+
     val webScrapper: WebScrapper by lazy {
         val rxUnfurl = RxUnfurl.Builder()
                 .scheduler(Schedulers.io())

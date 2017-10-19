@@ -30,7 +30,8 @@ class QiscusComponent
 @JvmOverloads constructor(
         val application: Application,
         private val serverBaseUrl: String,
+        private val mqttBrokerUrl: String,
         val appWatcher: ApplicationWatcher = AppWatcher(),
         val executorComponent: ExecutorComponent = ExecutorComponent(),
-        val dataComponent: DataComponent = DataComponent(application, appWatcher, serverBaseUrl)
+        val dataComponent: DataComponent = DataComponent(application, appWatcher, serverBaseUrl, mqttBrokerUrl)
 )

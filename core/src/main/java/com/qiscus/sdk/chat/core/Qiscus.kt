@@ -33,8 +33,14 @@ import io.reactivex.schedulers.Schedulers
  * GitHub     : https://github.com/zetbaitsu
  */
 class Qiscus private constructor(val component: QiscusComponent) {
-    val useCaseFactory: QiscusUseCaseFactory = QiscusQiscusUseCaseFactoryImpl(component)
-    val commentFactory: CommentFactory = QiscusCommentFactory(component.dataComponent.accountRepository)
+
+    val useCaseFactory: QiscusUseCaseFactory by lazy {
+        QiscusQiscusUseCaseFactoryImpl(component)
+    }
+
+    val commentFactory: CommentFactory by lazy {
+        QiscusCommentFactory(component.dataComponent.accountRepository)
+    }
 
     val fcmHandler: FcmHandler by lazy {
         FcmHandlerImpl(
@@ -53,8 +59,9 @@ class Qiscus private constructor(val component: QiscusComponent) {
             initWithCustomServer(application, "https://$appId.qiscus.com")
         }
 
-        fun initWithCustomServer(application: Application, serverBaseUrl: String) {
-            INSTANCE = Qiscus(QiscusComponent(application, serverBaseUrl = serverBaseUrl))
+        @JvmOverloads
+        fun initWithCustomServer(application: Application, serverBaseUrl: String, mqttBrokerUrl: String = "ssl://mqtt.qiscus.com:1885") {
+            INSTANCE = Qiscus(QiscusComponent(application, serverBaseUrl, mqttBrokerUrl))
         }
 
         val instance: Qiscus
@@ -81,7 +88,7 @@ class Qiscus private constructor(val component: QiscusComponent) {
     }
 
     private fun startPubSubClient() {
-        if (component.dataComponent.accountLocal.isAuthenticate()) {
+        if (component.dataComponent.accountLocal.isAuthenticated()) {
             component.dataComponent.pubSubClient.restartConnection()
         }
     }
@@ -93,5 +100,9 @@ class Qiscus private constructor(val component: QiscusComponent) {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ onComplete?.call(null) }, { onError?.call(it) })
+    }
+
+    fun isAuthenticated(): Boolean {
+        return component.dataComponent.accountLocal.isAuthenticated()
     }
 }

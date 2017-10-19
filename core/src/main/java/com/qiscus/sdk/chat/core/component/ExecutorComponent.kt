@@ -27,7 +27,7 @@ import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class ExecutorComponent
+class ExecutorComponent
 @JvmOverloads constructor(
         var threadExecutor: ThreadExecutor = JobExecutor(),
         var postExecutionThread: PostExecutionThread = UiThread()
