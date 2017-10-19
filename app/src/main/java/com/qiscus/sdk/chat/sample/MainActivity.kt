@@ -40,12 +40,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val accountRepository = Qiscus.instance.component.dataComponent.accountRepository
-
-        loginButton.text = if (accountRepository.isAuthenticated().blockingGet()) "Logout" else "Login"
+        loginButton.text = if (Qiscus.instance.isAuthenticated()) "Logout" else "Login"
 
         loginButton.setOnClickListener {
-            if (accountRepository.isAuthenticated().blockingGet()) {
+            if (Qiscus.instance.isAuthenticated()) {
                 logout()
             } else {
                 authenticate()
