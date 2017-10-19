@@ -30,7 +30,7 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
-    <com.qiscus.sdk.chat.presentation.uikit.view.CircularImageView
+    <com.qiscus.sdk.chat.presentation.uikit.widget.CircularImageView
         android:id="@+id/avatar"
         android:layout_width="38dp"
         android:layout_height="38dp"
@@ -102,7 +102,7 @@
                 android:tint="@color/qiscus_audio_player_icon_tint"
                 android:visibility="visible" />
 
-            <com.qiscus.sdk.chat.presentation.uikit.view.CircleProgress
+            <com.qiscus.sdk.chat.presentation.uikit.widget.CircleProgress
                 android:id="@+id/progress"
                 android:layout_width="48dp"
                 android:layout_height="48dp"

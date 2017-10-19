@@ -30,7 +30,7 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
-    <com.qiscus.sdk.chat.presentation.uikit.view.CircularImageView
+    <com.qiscus.sdk.chat.presentation.uikit.widget.CircularImageView
         android:id="@+id/avatar"
         android:layout_width="38dp"
         android:layout_height="38dp"
@@ -69,7 +69,7 @@
         android:src="@drawable/ic_qiscus_opponent_first_bubble"
         android:tint="@color/qiscus_opponents_comment_bubble" />
 
-    <com.qiscus.sdk.chat.presentation.uikit.view.FlowLayout
+    <com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
             android:textColor="@color/qiscus_opponents_comment_time"
             android:textSize="12sp" />
 
-    </com.qiscus.sdk.chat.presentation.uikit.view.FlowLayout>
+    </com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout>
 
     <!-- Add this view because Xiaomi need it -->
     <View

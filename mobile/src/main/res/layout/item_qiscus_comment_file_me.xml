@@ -107,7 +107,7 @@
                 android:tint="@color/qiscus_my_comment_file_icon_tint"
                 android:visibility="visible" />
 
-            <com.qiscus.sdk.chat.presentation.uikit.view.CircleProgress
+            <com.qiscus.sdk.chat.presentation.uikit.widget.CircleProgress
                 android:id="@+id/progress"
                 android:layout_width="36dp"
                 android:layout_height="36dp"

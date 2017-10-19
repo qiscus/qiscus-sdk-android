@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.uikit.view
+package com.qiscus.sdk.chat.presentation.uikit.widget
 
 import android.content.Context
 import android.util.AttributeSet

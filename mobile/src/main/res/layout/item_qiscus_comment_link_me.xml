@@ -61,7 +61,7 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <com.qiscus.sdk.chat.presentation.uikit.view.WebPreviewView
+        <com.qiscus.sdk.chat.presentation.uikit.widget.WebPreviewView
             android:id="@+id/preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

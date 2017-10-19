@@ -6,7 +6,7 @@
     android:background="@color/qiscus_conversation_background"
     android:orientation="horizontal">
 
-    <com.qiscus.sdk.chat.presentation.uikit.view.CircularImageView
+    <com.qiscus.sdk.chat.presentation.uikit.widget.CircularImageView
         android:id="@+id/roomAvatar"
         android:layout_width="48dp"
         android:layout_height="48dp"

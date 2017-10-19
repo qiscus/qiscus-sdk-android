@@ -29,7 +29,7 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
-    <com.qiscus.sdk.chat.presentation.uikit.view.CircularImageView
+    <com.qiscus.sdk.chat.presentation.uikit.widget.CircularImageView
         android:id="@+id/avatar"
         android:layout_width="38dp"
         android:layout_height="38dp"

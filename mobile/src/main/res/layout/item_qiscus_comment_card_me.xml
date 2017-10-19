@@ -45,7 +45,7 @@
         android:src="@drawable/ic_qiscus_my_first_bubble"
         android:tint="@color/qiscus_my_comment_bubble"/>
 
-    <com.qiscus.sdk.chat.presentation.uikit.view.FlowLayout
+    <com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                 android:layout_marginStart="4dp"/>
 
         </LinearLayout>
-    </com.qiscus.sdk.chat.presentation.uikit.view.FlowLayout>
+    </com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout>
 
     <include
         android:id="@+id/card_view"
