@@ -50,7 +50,7 @@ class AccountDataRepository(private val accountLocal: AccountLocal,
     }
 
     override fun isAuthenticated(): Single<Boolean> {
-        return Single.defer { Single.just(accountLocal.isAuthenticate()) }
+        return Single.defer { Single.just(accountLocal.isAuthenticated()) }
     }
 
     override fun getAccount(): Single<Account> {

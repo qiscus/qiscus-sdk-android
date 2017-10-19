@@ -45,7 +45,7 @@ class AccountLocalImpl(context: Context) : AccountLocal {
         return gson.fromJson(sharedPreferences.getString("account", ""), AccountEntity::class.java)
     }
 
-    override fun isAuthenticate(): Boolean {
+    override fun isAuthenticated(): Boolean {
         return sharedPreferences.contains("account")
     }
 

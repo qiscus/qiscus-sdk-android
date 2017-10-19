@@ -23,7 +23,7 @@ class FcmHandlerImpl(private val accountLocal: AccountLocal,
 
     override fun handle(data: Map<String, String>): Boolean {
         if (data.containsKey("qiscus_sdk")) {
-            if (accountLocal.isAuthenticate()) {
+            if (accountLocal.isAuthenticated()) {
                 if (!qiscusPubSubClient.isConnected()) {
                     qiscusPubSubClient.restartConnection()
                 }

@@ -29,7 +29,7 @@ interface AccountLocal {
 
     fun getAccount(): AccountEntity
 
-    fun isAuthenticate(): Boolean
+    fun isAuthenticated(): Boolean
 
     fun clearData()
 }

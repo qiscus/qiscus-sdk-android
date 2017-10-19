@@ -95,7 +95,7 @@ class QiscusMqttClient @JvmOverloads constructor(
     }
 
     override fun connect() {
-        if (accountLocal.isAuthenticate() && !connecting) {
+        if (accountLocal.isAuthenticated() && !connecting) {
             connecting = true
             account = accountLocal.getAccount()
             val mqttConnectOptions = MqttConnectOptions()
@@ -261,7 +261,7 @@ class QiscusMqttClient @JvmOverloads constructor(
 
     private fun scheduleUserStatus() {
         scheduledUserStatus = scheduleOnBackgroundThread(Runnable {
-            if (accountLocal.isAuthenticate()) {
+            if (accountLocal.isAuthenticated()) {
                 if (applicationWatcher.isOnForeground()) {
                     postCommentHandler.tryResendPendingComment()
                 }
