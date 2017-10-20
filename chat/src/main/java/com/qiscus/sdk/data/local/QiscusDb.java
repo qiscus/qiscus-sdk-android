@@ -19,6 +19,8 @@ package com.qiscus.sdk.data.local;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
@@ -27,7 +29,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 7;
+    static final int DATABASE_VERSION = 8;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -158,6 +160,7 @@ final class QiscusDb {
         static final String COLUMN_STATE = "state";
         static final String COLUMN_TYPE = "type";
         static final String COLUMN_PAYLOAD = "payload";
+        static final String COLUMN_EXTRAS = "extras";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
@@ -173,7 +176,8 @@ final class QiscusDb {
                         COLUMN_TIME + " LONG NOT NULL," +
                         COLUMN_STATE + " INTEGER NOT NULL," +
                         COLUMN_TYPE + " TEXT," +
-                        COLUMN_PAYLOAD + " TEXT" +
+                        COLUMN_PAYLOAD + " TEXT, " +
+                        COLUMN_EXTRAS + " TEXT " +
                         " ); ";
 
         static ContentValues toContentValues(QiscusComment qiscusComment) {
@@ -191,6 +195,8 @@ final class QiscusDb {
             values.put(COLUMN_STATE, qiscusComment.getState());
             values.put(COLUMN_TYPE, qiscusComment.getRawType());
             values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
+            values.put(COLUMN_EXTRAS, qiscusComment.getExtras() != null ?
+                    qiscusComment.getExtras().toString() : null);
             return values;
         }
 
@@ -209,6 +215,7 @@ final class QiscusDb {
             qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
+            qiscusComment.setExtras(new Gson().fromJson(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS)), JsonObject.class));
             return qiscusComment;
         }
     }

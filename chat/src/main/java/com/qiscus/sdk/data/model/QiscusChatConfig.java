@@ -150,6 +150,7 @@ public class QiscusChatConfig {
 
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
     private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
+    private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
 
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
@@ -668,6 +669,12 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setCommentSendingInterceptor(QiscusCommentSendingInterceptor
+                                                                 qiscusCommentSendingInterceptor) {
+        this.qiscusCommentSendingInterceptor = qiscusCommentSendingInterceptor;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1098,5 +1105,9 @@ public class QiscusChatConfig {
 
     public QiscusRoomSenderNameInterceptor getRoomSenderNameInterceptor() {
         return qiscusRoomSenderNameInterceptor;
+    }
+
+    public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
+        return qiscusCommentSendingInterceptor;
     }
 }
