@@ -46,6 +46,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -485,6 +486,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     }
                 }
             }
+
+            if (jsonObject.has("extras") && !jsonObject.get("extras").isJsonNull()) {
+                qiscusComment.setExtras(new JSONObject(jsonObject.get("extras").getAsJsonObject().toString()));
+            }
+
             return qiscusComment;
         } catch (Exception e) {
             e.printStackTrace();

@@ -88,6 +88,7 @@ public class QiscusComment implements Parcelable {
 
     private String rawType;
     private String extraPayload;
+    private JSONObject extras;
 
     protected ProgressListener progressListener;
     protected DownloadingListener downloadingListener;
@@ -238,6 +239,11 @@ public class QiscusComment implements Parcelable {
         rawType = in.readString();
         extraPayload = in.readString();
         replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
+        try {
+            extras = new JSONObject(in.readString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
@@ -394,6 +400,14 @@ public class QiscusComment implements Parcelable {
 
     public void setExtraPayload(String extraPayload) {
         this.extraPayload = extraPayload;
+    }
+
+    public JSONObject getExtras() {
+        return extras;
+    }
+
+    public void setExtras(JSONObject extras) {
+        this.extras = extras;
     }
 
     public boolean isMyComment() {
@@ -834,6 +848,9 @@ public class QiscusComment implements Parcelable {
         dest.writeString(rawType);
         dest.writeString(extraPayload);
         dest.writeParcelable(replyTo, flags);
+        if (extras != null) {
+            dest.writeString(extras.toString());
+        }
     }
 
     public enum Type {

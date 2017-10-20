@@ -164,9 +164,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public QiscusChatRoom getChatRoomWithUniqueId(String uniqueId) {
-        String query = "SELECT * FROM "
-                + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
-                + QiscusDb.RoomTable.COLUMN_DISTINCT_ID + " = " + uniqueId;
+        String query = String.format(
+                "SELECT * FROM %s WHERE %s = \"%s\"",
+                QiscusDb.RoomTable.TABLE_NAME,
+                QiscusDb.RoomTable.COLUMN_DISTINCT_ID,
+                uniqueId
+        );
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 

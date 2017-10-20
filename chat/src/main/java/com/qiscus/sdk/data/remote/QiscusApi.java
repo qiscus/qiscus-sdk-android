@@ -169,9 +169,11 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
+        Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
         return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
                 qiscusComment.getTopicId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
-                qiscusComment.getExtraPayload())
+                qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :
+                        qiscusComment.getExtras().toString())
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject()
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
@@ -383,7 +385,8 @@ public enum QiscusApi {
                                             @Field("topic_id") int topicId,
                                             @Field("unique_temp_id") String uniqueId,
                                             @Field("type") String type,
-                                            @Field("payload") String payload);
+                                            @Field("payload") String payload,
+                                            @Field("extras") String extras);
 
         @GET("/api/v2/mobile/sync")
         Observable<JsonElement> sync(@Query("token") String token,
