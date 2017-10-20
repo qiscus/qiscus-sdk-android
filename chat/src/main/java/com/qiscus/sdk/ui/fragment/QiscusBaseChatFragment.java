@@ -149,57 +149,95 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 4;
     protected static final int SHOW_MEDIA_DETAIL = 5;
 
-    @NonNull protected ViewGroup rootView;
-    @Nullable protected ViewGroup emptyChatHolder;
-    @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
-    @NonNull protected QiscusRecyclerView messageRecyclerView;
+    @NonNull
+    protected ViewGroup rootView;
+    @Nullable
+    protected ViewGroup emptyChatHolder;
+    @NonNull
+    protected SwipeRefreshLayout swipeRefreshLayout;
+    @NonNull
+    protected QiscusRecyclerView messageRecyclerView;
 
-    @Nullable protected ViewGroup messageInputPanel;
-    @Nullable protected ViewGroup messageEditTextContainer;
-    @NonNull protected EditText messageEditText;
-    @NonNull protected ImageView sendButton;
-    @Nullable protected QiscusMentionSuggestionView mentionSuggestionView;
+    @Nullable
+    protected ViewGroup messageInputPanel;
+    @Nullable
+    protected ViewGroup messageEditTextContainer;
+    @NonNull
+    protected EditText messageEditText;
+    @NonNull
+    protected ImageView sendButton;
+    @Nullable
+    protected QiscusMentionSuggestionView mentionSuggestionView;
 
-    @Nullable protected View newMessageButton;
-    @NonNull protected View loadMoreProgressBar;
+    @Nullable
+    protected View newMessageButton;
+    @NonNull
+    protected View loadMoreProgressBar;
 
-    @Nullable protected ImageView emptyChatImageView;
-    @Nullable protected TextView emptyChatTitleView;
-    @Nullable protected TextView emptyChatDescView;
+    @Nullable
+    protected ImageView emptyChatImageView;
+    @Nullable
+    protected TextView emptyChatTitleView;
+    @Nullable
+    protected TextView emptyChatDescView;
 
-    @Nullable protected ViewGroup attachmentPanel;
+    @Nullable
+    protected ViewGroup attachmentPanel;
 
-    @Nullable protected View addImageLayout;
-    @Nullable protected ImageView addImageButton;
-    @Nullable protected TextView addImageTextView;
+    @Nullable
+    protected View addImageLayout;
+    @Nullable
+    protected ImageView addImageButton;
+    @Nullable
+    protected TextView addImageTextView;
 
-    @Nullable protected View takeImageLayout;
-    @Nullable protected ImageView takeImageButton;
-    @Nullable protected TextView takeImageTextView;
+    @Nullable
+    protected View takeImageLayout;
+    @Nullable
+    protected ImageView takeImageButton;
+    @Nullable
+    protected TextView takeImageTextView;
 
-    @Nullable protected View addFileLayout;
-    @Nullable protected ImageView addFileButton;
-    @Nullable protected TextView addFileTextView;
+    @Nullable
+    protected View addFileLayout;
+    @Nullable
+    protected ImageView addFileButton;
+    @Nullable
+    protected TextView addFileTextView;
 
-    @Nullable protected View recordAudioLayout;
-    @Nullable protected ImageView recordAudioButton;
-    @Nullable protected TextView recordAudioTextView;
+    @Nullable
+    protected View recordAudioLayout;
+    @Nullable
+    protected ImageView recordAudioButton;
+    @Nullable
+    protected TextView recordAudioTextView;
 
-    @Nullable protected View addContactLayout;
-    @Nullable protected ImageView addContactButton;
-    @Nullable protected TextView addContactTextView;
+    @Nullable
+    protected View addContactLayout;
+    @Nullable
+    protected ImageView addContactButton;
+    @Nullable
+    protected TextView addContactTextView;
 
-    @Nullable protected View addLocationLayout;
-    @Nullable protected ImageView addLocationButton;
-    @Nullable protected TextView addLocationTextView;
+    @Nullable
+    protected View addLocationLayout;
+    @Nullable
+    protected ImageView addLocationButton;
+    @Nullable
+    protected TextView addLocationTextView;
 
-    @Nullable protected ImageView hideAttachmentButton;
-    @Nullable protected ImageView toggleEmojiButton;
+    @Nullable
+    protected ImageView hideAttachmentButton;
+    @Nullable
+    protected ImageView toggleEmojiButton;
 
-    @Nullable protected QiscusAudioRecorderView recordAudioPanel;
-    @Nullable protected QiscusReplyPreviewView replyPreviewView;
+    @Nullable
+    protected QiscusAudioRecorderView recordAudioPanel;
+    @Nullable
+    protected QiscusReplyPreviewView replyPreviewView;
 
-    @Nullable protected View goToBottomButton;
+    @Nullable
+    protected View goToBottomButton;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -1674,11 +1712,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void requestPermissions() {
-        if (Qiscus.getChatConfig().isEnablePermission()) {
-            if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
-                QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
-                        RC_PERMISSIONS, PERMISSIONS);
-            }
+        if (!Qiscus.getChatConfig().isEnablePermission()) {
+            return;
+        }
+
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_PERMISSIONS, PERMISSIONS);
         }
     }
 
