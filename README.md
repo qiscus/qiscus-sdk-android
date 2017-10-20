@@ -35,7 +35,7 @@ Then add to your app module build.gradle
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.13.5'
+    compile 'com.qiscus.sdk:chat:2.13.6'
 }
 ```
 
