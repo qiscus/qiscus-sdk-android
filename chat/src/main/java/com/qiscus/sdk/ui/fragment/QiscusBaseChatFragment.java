@@ -1674,6 +1674,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void requestPermissions() {
+        if (!Qiscus.getChatConfig().isEnableRequestPermission()) {
+            return;
+        }
+
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
                     RC_PERMISSIONS, PERMISSIONS);
