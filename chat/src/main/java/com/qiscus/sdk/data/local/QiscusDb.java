@@ -19,11 +19,12 @@ package com.qiscus.sdk.data.local;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 
@@ -195,8 +196,8 @@ final class QiscusDb {
             values.put(COLUMN_STATE, qiscusComment.getState());
             values.put(COLUMN_TYPE, qiscusComment.getRawType());
             values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
-            values.put(COLUMN_EXTRAS, qiscusComment.getExtras() != null ?
-                    qiscusComment.getExtras().toString() : null);
+            values.put(COLUMN_EXTRAS, qiscusComment.getExtras() == null ? null :
+                    qiscusComment.getExtras().toString());
             return values;
         }
 
@@ -215,7 +216,12 @@ final class QiscusDb {
             qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
-            qiscusComment.setExtras(new Gson().fromJson(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS)), JsonObject.class));
+            try {
+                String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
+                qiscusComment.setExtras(extras == null ? null : new JSONObject(extras));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return qiscusComment;
         }
     }

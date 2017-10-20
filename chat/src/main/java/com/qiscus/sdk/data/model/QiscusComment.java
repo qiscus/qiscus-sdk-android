@@ -24,7 +24,6 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
@@ -89,7 +88,7 @@ public class QiscusComment implements Parcelable {
 
     private String rawType;
     private String extraPayload;
-    private JsonObject extras;
+    private JSONObject extras;
 
     protected ProgressListener progressListener;
     protected DownloadingListener downloadingListener;
@@ -398,11 +397,11 @@ public class QiscusComment implements Parcelable {
         this.extraPayload = extraPayload;
     }
 
-    public JsonObject getExtras() {
+    public JSONObject getExtras() {
         return extras;
     }
 
-    public void setExtras(JsonObject extras) {
+    public void setExtras(JSONObject extras) {
         this.extras = extras;
     }
 
