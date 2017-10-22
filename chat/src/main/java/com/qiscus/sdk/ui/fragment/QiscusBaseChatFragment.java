@@ -1182,7 +1182,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     .pickPhoto(this);
             hideAttachmentPanel();
         } else {
-            requestPermissions();
+            requestAddFilePermission();
         }
     }
 
@@ -1210,7 +1210,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 hideAttachmentPanel();
             }
         } else {
-            requestPermissions();
+            requestImagePermission();
+            requestAddFilePermission();
         }
     }
 
@@ -1223,7 +1224,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     .pickDoc(this);
             hideAttachmentPanel();
         } else {
-            requestPermissions();
+            requestAddFilePermission();
         }
     }
 
@@ -1246,7 +1247,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 }
             }
         } else {
-            requestPermissions();
+            requestRecordAudioPermission();
         }
     }
 
@@ -1266,7 +1267,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
             hideAttachmentPanel();
         } else {
-            requestPermissions();
+            requestAddLocationPermission();
         }
     }
 
@@ -1681,6 +1682,34 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
                     RC_PERMISSIONS, PERMISSIONS);
+        }
+    }
+
+    protected void requestImagePermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_PERMISSIONS, CAMERA_PERMISSION);
+        }
+    }
+
+    protected void requestAddFilePermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_PERMISSIONS, FILE_PERMISSION);
+        }
+    }
+
+    protected void requestRecordAudioPermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), AUDIO_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_PERMISSIONS, AUDIO_PERMISSION);
+        }
+    }
+
+    protected void requestAddLocationPermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), LOCATION_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_PERMISSIONS, LOCATION_PERMISSION);
         }
     }
 
