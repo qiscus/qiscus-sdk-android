@@ -49,7 +49,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
         super(view);
     }
 
-    public void loadQiscusPhotos(int topicId) {
+    public void loadQiscusPhotos(String topicId) {
         view.showLoading();
         Qiscus.getDataStore()
                 .getObservableComments(topicId)

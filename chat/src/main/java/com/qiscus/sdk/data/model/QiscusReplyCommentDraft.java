@@ -59,7 +59,7 @@ public class QiscusReplyCommentDraft extends QiscusCommentDraft {
         try {
             JSONObject payload = new JSONObject(repliedPayload);
             replyTo = new QiscusComment();
-            replyTo.setId(payload.getInt("replied_comment_id"));
+            replyTo.setId(payload.getString("replied_comment_id"));
             replyTo.setUniqueId(replyTo.getId() + "");
             replyTo.setMessage(payload.getString("replied_comment_message"));
             replyTo.setSender(payload.getString("replied_comment_sender_username"));

@@ -212,7 +212,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         Log.i(TAG, "Listening room...");
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
         try {
-            int roomId = qiscusChatRoom.getId();
+            String roomId = qiscusChatRoom.getId();
             mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
             mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
             mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
@@ -227,7 +227,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void unListenRoom(QiscusChatRoom qiscusChatRoom) {
         try {
-            int roomId = qiscusChatRoom.getId();
+            String roomId = qiscusChatRoom.getId();
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/t");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/d");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/r");
@@ -279,7 +279,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    public void setUserTyping(int roomId, int topicId, boolean typing) {
+    public void setUserTyping(String roomId, String topicId, boolean typing) {
         checkAndConnect();
         try {
             MqttMessage message = new MqttMessage();
@@ -291,16 +291,16 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    public void setUserRead(int roomId, int topicId, int commentId, String commentUniqueId) {
-        QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0)
+    public void setUserRead(String roomId, String topicId, String commentId, String commentUniqueId) {
+        QiscusApi.getInstance().updateCommentStatus(roomId, commentId, "0")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
                 }, QiscusErrorLogger::print);
     }
 
-    public void setUserDelivery(int roomId, int topicId, int commentId, String commentUniqueId) {
-        QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId)
+    public void setUserDelivery(String roomId, String topicId, String commentId, String commentUniqueId) {
+        QiscusApi.getInstance().updateCommentStatus(roomId, "0", commentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
@@ -346,8 +346,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             String[] data = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
-                        .setRoomId(Integer.parseInt(data[1]))
-                        .setTopicId(Integer.parseInt(data[2]))
+                        .setRoomId(data[1])
+                        .setTopicId(data[2])
                         .setUser(data[3])
                         .setEvent(QiscusChatRoomEvent.Event.TYPING)
                         .setTyping("1".equals(new String(message.getPayload())));
@@ -358,11 +358,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             if (!data[3].equals(qiscusAccount.getEmail())) {
                 String[] payload = new String(message.getPayload()).split(":");
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
-                        .setRoomId(Integer.parseInt(data[1]))
-                        .setTopicId(Integer.parseInt(data[2]))
+                        .setRoomId(data[1])
+                        .setTopicId(data[2])
                         .setUser(data[3])
                         .setEvent(QiscusChatRoomEvent.Event.DELIVERED)
-                        .setCommentId(Integer.parseInt(payload[0]))
+                        .setCommentId(payload[0])
                         .setCommentUniqueId(payload[1]);
                 EventBus.getDefault().post(event);
             }
@@ -371,11 +371,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             if (!data[3].equals(qiscusAccount.getEmail())) {
                 String[] payload = new String(message.getPayload()).split(":");
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
-                        .setRoomId(Integer.parseInt(data[1]))
-                        .setTopicId(Integer.parseInt(data[2]))
+                        .setRoomId(data[1])
+                        .setTopicId(data[2])
                         .setUser(data[3])
                         .setEvent(QiscusChatRoomEvent.Event.READ)
-                        .setCommentId(Integer.parseInt(payload[0]))
+                        .setCommentId(payload[0])
                         .setCommentUniqueId(payload[1]);
                 EventBus.getDefault().post(event);
             }
@@ -450,11 +450,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public static QiscusComment jsonToComment(JsonObject jsonObject) {
         try {
             QiscusComment qiscusComment = new QiscusComment();
-            qiscusComment.setId(jsonObject.get("id").getAsInt());
-            qiscusComment.setTopicId(jsonObject.get("topic_id").getAsInt());
-            qiscusComment.setRoomId(jsonObject.get("room_id").getAsInt());
+            qiscusComment.setId(jsonObject.get("id").getAsString());
+            qiscusComment.setTopicId(jsonObject.get("topic_id").getAsString());
+            qiscusComment.setRoomId(jsonObject.get("room_id").getAsString());
             qiscusComment.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
-            qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsInt());
+            qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsString());
             qiscusComment.setMessage(jsonObject.get("message").getAsString());
             qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
             qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());

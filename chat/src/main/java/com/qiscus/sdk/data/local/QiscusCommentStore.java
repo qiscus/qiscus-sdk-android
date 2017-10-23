@@ -39,31 +39,31 @@ public interface QiscusCommentStore {
 
     void delete(QiscusComment qiscusComment);
 
-    QiscusComment getComment(int id, String uniqueId);
+    QiscusComment getComment(String id, String uniqueId);
 
-    List<QiscusComment> getComments(int topicId);
+    List<QiscusComment> getComments(String topicId);
 
-    List<QiscusComment> getComments(int topicId, int count);
+    List<QiscusComment> getComments(String topicId, int count);
 
-    Observable<List<QiscusComment>> getObservableComments(int topicId);
+    Observable<List<QiscusComment>> getObservableComments(String topicId);
 
-    Observable<List<QiscusComment>> getObservableComments(int topicId, int count);
+    Observable<List<QiscusComment>> getObservableComments(String topicId, int count);
 
-    List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count);
+    List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, String topicId, int count);
 
-    Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count);
+    Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, String topicId, int count);
 
-    List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, int topicId);
+    List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, String topicId);
 
-    Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, int topicId);
+    Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, String topicId);
 
     QiscusComment getLatestComment();
 
-    QiscusComment getLatestComment(int roomId);
+    QiscusComment getLatestComment(String roomId);
 
-    QiscusComment getLatestDeliveredComment(int topicId);
+    QiscusComment getLatestDeliveredComment(String topicId);
 
-    QiscusComment getLatestReadComment(int topicId);
+    QiscusComment getLatestReadComment(String topicId);
 
     List<QiscusComment> getPendingComments();
 

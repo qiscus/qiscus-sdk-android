@@ -104,7 +104,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusChatRoom getChatRoom(int id) {
+    public QiscusChatRoom getChatRoomByRoomId(String id) {
         String query = "SELECT * FROM "
                 + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
                 + QiscusDb.RoomTable.COLUMN_ID + " = " + id;
@@ -271,7 +271,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void addRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
+    public void addRoomMember(String roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
         distinctId = distinctId == null ? "default" : distinctId;
         if (!isContainsRoomMember(roomId, qiscusRoomMember.getEmail())) {
             sqLiteDatabase.beginTransaction();
@@ -289,7 +289,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public boolean isContainsRoomMember(int roomId, String email) {
+    public boolean isContainsRoomMember(String roomId, String email) {
         String query = "SELECT * FROM "
                 + QiscusDb.RoomMemberTable.TABLE_NAME + " WHERE "
                 + QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId + " "
@@ -302,7 +302,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusRoomMember> getRoomMembers(int roomId) {
+    public List<QiscusRoomMember> getRoomMembers(String roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.RoomMemberTable.TABLE_NAME + " "
                 + "WHERE " + QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId;
@@ -332,7 +332,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void deleteRoomMembers(int roomId) {
+    public void deleteRoomMembers(String roomId) {
         String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId;
 
         sqLiteDatabase.beginTransaction();
@@ -429,7 +429,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void saveLocalPath(int topicId, int commentId, String localPath) {
+    public void saveLocalPath(String topicId, String commentId, String localPath) {
         if (!isContainsFileOfComment(commentId)) {
             sqLiteDatabase.beginTransaction();
             try {
@@ -447,7 +447,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public boolean isContains(QiscusComment qiscusComment) {
         String query;
-        if (qiscusComment.getId() == -1) {
+        if (qiscusComment.getId() == "-1") {
             query = "SELECT * FROM "
                     + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                     + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
@@ -464,7 +464,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public boolean isContainsFileOfComment(int commentId) {
+    public boolean isContainsFileOfComment(String commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
                 + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
@@ -477,7 +477,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public void update(QiscusComment qiscusComment) {
         String where;
-        if (qiscusComment.getId() == -1) {
+        if (qiscusComment.getId().equals("-1")) {
             where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
             where = QiscusDb.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
@@ -496,7 +496,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void updateLocalPath(int topicId, int commentId, String localPath) {
+    public void updateLocalPath(String topicId, String commentId, String localPath) {
         String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
         sqLiteDatabase.beginTransaction();
         try {
@@ -520,7 +520,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void addOrUpdateLocalPath(int topicId, int commentId, String localPath) {
+    public void addOrUpdateLocalPath(String topicId, String commentId, String localPath) {
         if (!isContainsFileOfComment(commentId)) {
             saveLocalPath(topicId, commentId, localPath);
         } else {
@@ -531,7 +531,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public void delete(QiscusComment qiscusComment) {
         String where;
-        if (qiscusComment.getId() == -1) {
+        if (qiscusComment.getId().equals("-1")) {
             where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
         } else {
             where = QiscusDb.CommentTable.COLUMN_ID + " = " + qiscusComment.getId() + " OR "
@@ -550,7 +550,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public File getLocalPath(int commentId) {
+    public File getLocalPath(String commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
                 + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
@@ -570,9 +570,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getComment(int id, String uniqueId) {
+    public QiscusComment getComment(String id, String uniqueId) {
         String query;
-        if (id == -1) {
+        if (id.equals("-1")) {
             query = "SELECT * FROM "
                     + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                     + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + id + "'";
@@ -600,7 +600,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getComments(int topicId) {
+    public List<QiscusComment> getComments(String topicId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
@@ -621,7 +621,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getComments(int topicId, int count) {
+    public List<QiscusComment> getComments(String topicId, int count) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " "
@@ -643,7 +643,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableComments(final int topicId) {
+    public Observable<List<QiscusComment>> getObservableComments(final String topicId) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(topicId));
             subscriber.onCompleted();
@@ -651,7 +651,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableComments(final int topicId, final int count) {
+    public Observable<List<QiscusComment>> getObservableComments(final String topicId, final int count) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(topicId, count));
             subscriber.onCompleted();
@@ -659,7 +659,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
+    public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, String topicId, int count) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND "
@@ -682,7 +682,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count) {
+    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, String topicId, int count) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, topicId, count));
             subscriber.onCompleted();
@@ -690,7 +690,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, int topicId) {
+    public List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, String topicId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_TOPIC_ID + " = " + topicId + " AND ("
@@ -713,7 +713,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, int topicId) {
+    public Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, String topicId) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getCommentsAfter(qiscusComment, topicId));
             subscriber.onCompleted();
@@ -742,7 +742,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getLatestComment(int roomId) {
+    public QiscusComment getLatestComment(String roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME
                 + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " "
@@ -763,7 +763,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getLatestDeliveredComment(int topicId) {
+    public QiscusComment getLatestDeliveredComment(String topicId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
@@ -786,7 +786,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getLatestReadComment(int topicId) {
+    public QiscusComment getLatestReadComment(String topicId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "

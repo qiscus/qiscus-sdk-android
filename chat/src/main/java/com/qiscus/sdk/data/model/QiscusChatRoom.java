@@ -28,11 +28,11 @@ import java.util.List;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusChatRoom implements Parcelable {
-    protected int id;
+    protected String id;
     protected String distinctId;
     protected String name;
     @Deprecated protected String subtitle = "";
-    protected int lastTopicId;
+    protected String lastTopicId;
     protected String options;
     protected boolean group;
     protected String avatarUrl;
@@ -47,11 +47,11 @@ public class QiscusChatRoom implements Parcelable {
 
 
     protected QiscusChatRoom(Parcel in) {
-        id = in.readInt();
+        id = in.readString();
         distinctId = in.readString();
         name = in.readString();
         subtitle = in.readString();
-        lastTopicId = in.readInt();
+        lastTopicId = in.readString();
         options = in.readString();
         group = in.readByte() != 0;
         avatarUrl = in.readString();
@@ -72,11 +72,11 @@ public class QiscusChatRoom implements Parcelable {
         }
     };
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -106,11 +106,11 @@ public class QiscusChatRoom implements Parcelable {
         this.subtitle = subtitle;
     }
 
-    public int getLastTopicId() {
+    public String getLastTopicId() {
         return lastTopicId;
     }
 
-    public void setLastTopicId(int lastTopicId) {
+    public void setLastTopicId(String lastTopicId) {
         this.lastTopicId = lastTopicId;
     }
 
@@ -163,13 +163,18 @@ public class QiscusChatRoom implements Parcelable {
     }
 
     @Override
-    public int hashCode() {
-        return id;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        QiscusChatRoom that = (QiscusChatRoom) o;
+
+        return id != null ? id.equals(that.id) : that.id == null;
     }
 
     @Override
-    public boolean equals(Object o) {
-        return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
@@ -179,11 +184,11 @@ public class QiscusChatRoom implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeString(id);
         dest.writeString(distinctId);
         dest.writeString(name);
         dest.writeString(subtitle);
-        dest.writeInt(lastTopicId);
+        dest.writeString(lastTopicId);
         dest.writeString(options);
         dest.writeByte((byte) (group ? 1 : 0));
         dest.writeString(avatarUrl);

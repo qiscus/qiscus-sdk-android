@@ -166,13 +166,13 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected int compare(E lhs, E rhs) {
         if (rhs.equals(lhs)) { //Same comments
             return 0;
-        } else if (rhs.getId() == -1 && lhs.getId() == -1) { //Not completed comments
+        } else if (rhs.getId().equals("-1") && lhs.getId().equals("-1")) { //Not completed comments
             return rhs.getTime().compareTo(lhs.getTime());
-        } else if (rhs.getId() != -1 && lhs.getId() != -1) { //Completed comments
-            return QiscusAndroidUtil.compare(rhs.getId(), lhs.getId());
-        } else if (rhs.getId() == -1) {
+        } else if (!rhs.getId().equals("-1") && !lhs.getId().equals("-1")) { //Completed comments
+            return QiscusAndroidUtil.compare(Integer.parseInt(rhs.getId()), Integer.parseInt(lhs.getId()));
+        } else if (rhs.getId().equals("-1")) {
             return 1;
-        } else if (lhs.getId() == -1) {
+        } else if (lhs.getId().equals("-1")) {
             return -1;
         }
         return rhs.getTime().compareTo(lhs.getTime());
@@ -324,7 +324,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         List<E> keep = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             //Keep not complete comment but in still range of remote comment
-            if (data.get(i).getId() == -1 && data.get(i).getTime().compareTo(minDate) >= 0) {
+            if (data.get(i).getId().equals("-1") && data.get(i).getTime().compareTo(minDate) >= 0) {
                 keep.add(data.get(i));
             }
 
@@ -401,12 +401,12 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         int size = data.size();
         for (int i = 0; i < size; i++) {
             if (data.get(i).getState() > QiscusComment.STATE_SENDING) {
-                if (data.get(i).getId() <= lastReadCommentId) {
+                if (Integer.parseInt(data.get(i).getId()) <= lastReadCommentId) {
                     if (data.get(i).getState() == QiscusComment.STATE_READ) {
                         break;
                     }
                     data.get(i).setState(QiscusComment.STATE_READ);
-                } else if (data.get(i).getId() <= lastDeliveredCommentId) {
+                } else if (Integer.parseInt(data.get(i).getId()) <= lastDeliveredCommentId) {
                     if (data.get(i).getState() == QiscusComment.STATE_DELIVERED) {
                         break;
                     }
