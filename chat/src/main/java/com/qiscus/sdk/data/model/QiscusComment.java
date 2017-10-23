@@ -240,7 +240,9 @@ public class QiscusComment implements Parcelable {
         extraPayload = in.readString();
         replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
         try {
-            extras = new JSONObject(in.readString());
+            if (in.readString() != null) {
+                extras = new JSONObject(in.readString());
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
