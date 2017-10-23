@@ -792,7 +792,7 @@ public class QiscusComment implements Parcelable {
     public boolean equals(Object o) {
         if (o instanceof QiscusComment) {
             QiscusComment qiscusComment = (QiscusComment) o;
-            if (id == "-1") {
+            if (id.equals("-1")) {
                 return qiscusComment.uniqueId.equals(uniqueId);
             } else {
                 return qiscusComment.id == id || qiscusComment.uniqueId.equals(uniqueId);

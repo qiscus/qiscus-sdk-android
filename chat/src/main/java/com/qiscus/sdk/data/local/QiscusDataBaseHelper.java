@@ -447,7 +447,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public boolean isContains(QiscusComment qiscusComment) {
         String query;
-        if (qiscusComment.getId() == "-1") {
+        if (qiscusComment.getId().equals("-1")) {
             query = "SELECT * FROM "
                     + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                     + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + qiscusComment.getUniqueId() + "'";
