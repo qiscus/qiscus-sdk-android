@@ -101,7 +101,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private boolean updateLastDeliveredCommentId(String id) {
-        if (Integer.parseInt(id)> lastDeliveredCommentId.get()) {
+        if (Integer.parseInt(id) > lastDeliveredCommentId.get()) {
             lastDeliveredCommentId.set(Integer.parseInt(id));
             return true;
         }
@@ -470,7 +470,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 && qiscusComment.getState() != QiscusComment.STATE_PENDING
                 && qiscusComment.getState() != QiscusComment.STATE_SENDING
                 && qiscusComment.getState() != QiscusComment.STATE_READ) {
-            if (Integer.parseInt(qiscusComment.getId())> lastDeliveredCommentId.get()) {
+            if (Integer.parseInt(qiscusComment.getId()) > lastDeliveredCommentId.get()) {
                 qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
             } else if (Integer.parseInt(qiscusComment.getId()) > lastReadCommentId.get()) {
                 qiscusComment.setState(QiscusComment.STATE_DELIVERED);
@@ -551,7 +551,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         view.showLoadMoreLoading();
         Qiscus.getDataStore().getObservableOlderCommentsThan(qiscusComment, currentTopicId, 40)
                 .flatMap(Observable::from)
-                .filter(qiscusComment1 -> qiscusComment.getId().equals("-1") || Integer.parseInt(qiscusComment1.getId()) < Integer.parseInt(qiscusComment.getId()))
+                .filter(qiscusComment1 -> qiscusComment.getId().equals("-1") ||
+                        Integer.parseInt(qiscusComment1.getId()) < Integer.parseInt(qiscusComment.getId()))
                 .toSortedList(commentComparator)
                 .map(comments -> {
                     if (comments.size() >= 20) {
