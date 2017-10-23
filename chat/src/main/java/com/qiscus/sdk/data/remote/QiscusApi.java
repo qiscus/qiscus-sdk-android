@@ -103,7 +103,7 @@ public enum QiscusApi {
         Request req = chain.request().newBuilder()
                 .addHeader("QISCUS_SDK_APP_ID", Qiscus.getAppId())
                 .addHeader("QISCUS_SDK_TOKEN", Qiscus.hasSetupUser() ? Qiscus.getToken() : "")
-                .addHeader("QISCUS_SDK_USER_ID", Qiscus.hasSetupUser() ? String.valueOf(Qiscus.getQiscusAccount().getId()) : "")
+                .addHeader("QISCUS_SDK_USER_EMAIL", Qiscus.hasSetupUser() ? Qiscus.getQiscusAccount().getEmail() : "")
                 .build();
         return chain.proceed(req);
     }
