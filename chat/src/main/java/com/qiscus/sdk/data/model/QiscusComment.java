@@ -240,10 +240,8 @@ public class QiscusComment implements Parcelable {
         extraPayload = in.readString();
         replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
         try {
-            if (in.readString() != null) {
-                extras = new JSONObject(in.readString());
-            }
-        } catch (JSONException e) {
+            extras = new JSONObject(in.readString());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -850,9 +848,14 @@ public class QiscusComment implements Parcelable {
         dest.writeString(rawType);
         dest.writeString(extraPayload);
         dest.writeParcelable(replyTo, flags);
-        if (extras != null) {
-            dest.writeString(extras.toString());
+        if (extras == null) {
+            try {
+                extras = new JSONObject("{}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+        dest.writeString(extras.toString());
     }
 
     public enum Type {
