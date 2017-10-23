@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -86,6 +87,7 @@ public enum QiscusApi {
         httpClient = new OkHttpClient.Builder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(this::headersInterceptor)
                 .build();
 
         api = new Retrofit.Builder()
@@ -95,6 +97,15 @@ public enum QiscusApi {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
                 .create(Api.class);
+    }
+
+    private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
+        Request req = chain.request().newBuilder()
+                .addHeader("QISCUS_SDK_APP_ID", Qiscus.getAppId())
+                .addHeader("QISCUS_SDK_TOKEN", Qiscus.hasSetupUser() ? Qiscus.getToken() : "")
+                .addHeader("QISCUS_SDK_USER_EMAIL", Qiscus.hasSetupUser() ? Qiscus.getQiscusAccount().getEmail() : "")
+                .build();
+        return chain.proceed(req);
     }
 
     public static QiscusApi getInstance() {

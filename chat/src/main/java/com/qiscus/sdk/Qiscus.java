@@ -71,6 +71,7 @@ public class Qiscus {
     private static QiscusChatConfig chatConfig;
 
     private static String appServer;
+    private static String appId;
     private static String mqttBrokerUrl;
     private static long heartBeat;
     private static String authorities;
@@ -97,7 +98,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, "https://" + qiscusAppId + ".qiscus.com", "ssl://mqtt.qiscus.com:1885");
+        initWithCustomServer(application, qiscusAppId, "https://" + qiscusAppId + ".qiscus.com", "ssl://mqtt.qiscus.com:1885");
     }
 
     /**
@@ -109,17 +110,20 @@ public class Qiscus {
      * public class SampleApps extends Application {
      *  public void onCreate() {
      *      super.onCreate();
-     *      Qiscus.initWithCustomServer(this, "http://myserver.com");
+     *      Qiscus.initWithCustomServer(this, my-app-id, "http://myserver.com", "ssl://mqtt.myserver.com:1885");
      *  }
      * }
      * }
      * </pre>
      *
      * @param application   Application instance
+     * @param qiscusAppId   Your Qiscus App Id
      * @param serverBaseUrl Your qiscus chat engine base url
+     * @param mqttBrokerUrl Your Mqtt Broker url
      */
-    public static void initWithCustomServer(Application application, String serverBaseUrl, String mqttBrokerUrl) {
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
         appInstance = application;
+        appId = qiscusAppId;
         appServer = serverBaseUrl;
         Qiscus.mqttBrokerUrl = mqttBrokerUrl;
         appHandler = new Handler(appInstance.getApplicationContext().getMainLooper());
@@ -259,6 +263,16 @@ public class Qiscus {
     public static ScheduledThreadPoolExecutor getTaskExecutor() {
         checkAppIdSetup();
         return taskExecutor;
+    }
+
+    /**
+     * Accessor to get current qiscus app id
+     *
+     * @return Current app id
+     */
+    public static String getAppId() {
+        checkAppIdSetup();
+        return appId;
     }
 
     /**
