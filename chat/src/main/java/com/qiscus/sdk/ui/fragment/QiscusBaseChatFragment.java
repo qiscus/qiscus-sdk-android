@@ -1210,7 +1210,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 hideAttachmentPanel();
             }
         } else {
-            requestImagePermission();
+            requestCameraPermission();
             requestAddFilePermission();
         }
     }
@@ -1685,7 +1685,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
-    protected void requestImagePermission() {
+    protected void requestCameraPermission() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
                     RC_PERMISSIONS, CAMERA_PERMISSION);
