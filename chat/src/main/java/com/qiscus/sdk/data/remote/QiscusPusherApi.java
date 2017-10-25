@@ -384,7 +384,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             if (!data[1].equals(qiscusAccount.getEmail())) {
                 String[] status = new String(message.getPayload()).split(":");
                 Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                calendar.setTimeInMillis(Long.parseLong(status[1]));
+                calendar.setTimeInMillis(Long.parseLong(status[1].substring(0, 13)));
                 QiscusUserStatusEvent event = new QiscusUserStatusEvent(data[1], "1".equals(status[0]),
                         calendar.getTime());
                 EventBus.getDefault().post(event);
