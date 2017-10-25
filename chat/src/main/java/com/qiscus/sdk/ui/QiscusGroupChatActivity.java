@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
-import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -93,15 +92,6 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
         }
         subtitle += String.format(" %s", getString(R.string.qiscus_group_member_closing));
         if (count == 0) subtitle = getString(R.string.qiscus_group_member_only_you);
-    }
-
-    @Override
-    protected void showRoomImage() {
-        Nirmana.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
-                .error(R.drawable.ic_qiscus_avatar)
-                .placeholder(R.drawable.ic_qiscus_avatar)
-                .dontAnimate()
-                .into(ivAvatar);
     }
 
     @Override

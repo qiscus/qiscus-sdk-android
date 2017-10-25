@@ -30,7 +30,6 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
@@ -105,16 +104,11 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     }
 
     protected void showRoomImage() {
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
-                Nirmana.getInstance().get().load(member.getAvatar())
-                        .error(R.drawable.ic_qiscus_avatar)
-                        .placeholder(R.drawable.ic_qiscus_avatar)
-                        .dontAnimate()
-                        .into(ivAvatar);
-                break;
-            }
-        }
+        Nirmana.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
+                .error(R.drawable.ic_qiscus_avatar)
+                .placeholder(R.drawable.ic_qiscus_avatar)
+                .dontAnimate()
+                .into(ivAvatar);
     }
 
     @Override
