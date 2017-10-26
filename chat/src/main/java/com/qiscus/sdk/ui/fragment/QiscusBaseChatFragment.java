@@ -114,6 +114,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener, CommentChainingListener {
 
     protected static final int RC_PERMISSIONS = 127;
+    protected static final int RC_CAMERA_PERMISSION = 128;
+    protected static final int RC_AUDIO_PERMISSION = 129;
+    protected static final int RC_FILE_PERMISSION = 130;
+    protected static final int RC_LOCATION_PERMISSION = 131;
 
     private static final String[] PERMISSIONS = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
@@ -1688,28 +1692,28 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void requestCameraPermission() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
-                    RC_PERMISSIONS, CAMERA_PERMISSION);
+                    RC_CAMERA_PERMISSION, CAMERA_PERMISSION);
         }
     }
 
     protected void requestAddFilePermission() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
-                    RC_PERMISSIONS, FILE_PERMISSION);
+                    RC_FILE_PERMISSION, FILE_PERMISSION);
         }
     }
 
     protected void requestRecordAudioPermission() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), AUDIO_PERMISSION)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
-                    RC_PERMISSIONS, AUDIO_PERMISSION);
+                    RC_AUDIO_PERMISSION, AUDIO_PERMISSION);
         }
     }
 
     protected void requestAddLocationPermission() {
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), LOCATION_PERMISSION)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
-                    RC_PERMISSIONS, LOCATION_PERMISSION);
+                    RC_LOCATION_PERMISSION, LOCATION_PERMISSION);
         }
     }
 
@@ -1721,7 +1725,20 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-
+        switch (requestCode) {
+            case RC_CAMERA_PERMISSION :
+                takeImage();
+                break;
+            case RC_AUDIO_PERMISSION :
+                recordAudio();
+                break;
+            case RC_FILE_PERMISSION :
+                addImage();
+                break;
+            case RC_LOCATION_PERMISSION :
+                addLocation();
+                break;
+        }
     }
 
     @Override
