@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.uikit
+package com.qiscus.sdk.chat.presentation.uikit.adapter
 
 import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView

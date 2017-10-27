@@ -1,8 +1,8 @@
-package com.qiscus.sdk.chat.presentation.uikit.comment
+package com.qiscus.sdk.chat.presentation.uikit.adapter.comment
 
 import android.view.ViewGroup
 import com.qiscus.sdk.chat.presentation.model.CommentViewModel
-import com.qiscus.sdk.chat.presentation.uikit.SortedAdapter
+import com.qiscus.sdk.chat.presentation.uikit.adapter.SortedAdapter
 import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
 
 /**

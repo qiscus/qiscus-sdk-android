@@ -25,9 +25,12 @@ import android.util.Log
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.presentation.listcomment.ListCommentContract
 import com.qiscus.sdk.chat.presentation.mobile.R
+import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.DefaultViewHolderFactory
+import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.ImageViewHolderFactory
+import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.TextViewHolderFactory
 import com.qiscus.sdk.chat.presentation.model.CommentViewModel
 import com.qiscus.sdk.chat.presentation.sendcomment.SendCommentContract
-import com.qiscus.sdk.chat.presentation.uikit.comment.CommentAdapter
+import com.qiscus.sdk.chat.presentation.uikit.adapter.comment.CommentAdapter
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
 /**

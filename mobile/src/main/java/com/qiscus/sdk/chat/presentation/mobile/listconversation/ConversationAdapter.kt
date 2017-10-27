@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
 import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
-import com.qiscus.sdk.chat.presentation.uikit.SortedAdapter
+import com.qiscus.sdk.chat.presentation.uikit.adapter.SortedAdapter
 import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
 import java.text.SimpleDateFormat
 

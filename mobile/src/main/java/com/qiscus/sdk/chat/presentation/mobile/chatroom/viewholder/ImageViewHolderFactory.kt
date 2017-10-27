@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.chatroom
+package com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -11,8 +11,8 @@ import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.CommentImageViewModel
 import com.qiscus.sdk.chat.presentation.model.CommentViewModel
-import com.qiscus.sdk.chat.presentation.uikit.comment.CommentViewHolder
-import com.qiscus.sdk.chat.presentation.uikit.comment.CommentViewHolderFactory
+import com.qiscus.sdk.chat.presentation.uikit.adapter.comment.CommentViewHolder
+import com.qiscus.sdk.chat.presentation.uikit.adapter.comment.CommentViewHolderFactory
 
 /**
  * Created on : October 17, 2017
