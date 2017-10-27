@@ -332,8 +332,16 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
+        try {
+            handleMessage(topic, new String(message.getPayload()));
+        } catch (Exception ignored) {
+            //Do nothing
+        }
+    }
+
+    private void handleMessage(String topic, String message) {
         if (topic.contains(qiscusAccount.getToken())) {
-            QiscusComment qiscusComment = jsonToComment(new String(message.getPayload()));
+            QiscusComment qiscusComment = jsonToComment(message);
             if (qiscusComment == null) {
                 return;
             }
@@ -350,13 +358,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                         .setTopicId(Integer.parseInt(data[2]))
                         .setUser(data[3])
                         .setEvent(QiscusChatRoomEvent.Event.TYPING)
-                        .setTyping("1".equals(new String(message.getPayload())));
+                        .setTyping("1".equals(message));
                 EventBus.getDefault().post(event);
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/d")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
-                String[] payload = new String(message.getPayload()).split(":");
+                String[] payload = message.split(":");
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
                         .setRoomId(Integer.parseInt(data[1]))
                         .setTopicId(Integer.parseInt(data[2]))
@@ -369,7 +377,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } else if (topic.startsWith("r/") && topic.endsWith("/r")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
-                String[] payload = new String(message.getPayload()).split(":");
+                String[] payload = message.split(":");
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
                         .setRoomId(Integer.parseInt(data[1]))
                         .setTopicId(Integer.parseInt(data[2]))
@@ -382,7 +390,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } else if (topic.startsWith("u/") && topic.endsWith("/s")) {
             String[] data = topic.split("/");
             if (!data[1].equals(qiscusAccount.getEmail())) {
-                String[] status = new String(message.getPayload()).split(":");
+                String[] status = message.split(":");
                 Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
                 calendar.setTimeInMillis(Long.parseLong(status[1].substring(0, 13)));
                 QiscusUserStatusEvent event = new QiscusUserStatusEvent(data[1], "1".equals(status[0]),
