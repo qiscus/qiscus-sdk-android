@@ -156,7 +156,7 @@ public final class QiscusImageUtil {
         return scaledBitmap;
     }
 
-    public static File compressImage(Uri imageUri, int topicId) {
+    public static File compressImage(Uri imageUri, String topicId) {
 
         FileOutputStream out = null;
         String filename = generateFilePath(imageUri, topicId);
@@ -189,7 +189,7 @@ public final class QiscusImageUtil {
         return imageFile;
     }
 
-    private static String generateFilePath(Uri uri, int topicId) {
+    private static String generateFilePath(Uri uri, String topicId) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
                 QiscusImageUtil.isImage(uri.getPath()) ? IMAGE_PATH : QiscusFileUtil.FILES_PATH);
 

@@ -38,7 +38,7 @@ public interface QiscusChatRoomStore {
 
     void addOrUpdate(QiscusChatRoom qiscusChatRoom);
 
-    QiscusChatRoom getChatRoom(int id);
+    QiscusChatRoom getChatRoomByRoomId(String id);
 
     QiscusChatRoom getChatRoom(String email);
 
@@ -54,13 +54,13 @@ public interface QiscusChatRoomStore {
 
     void deleteChatRoom(int roomId);
 
-    void addRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void addRoomMember(String roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
 
-    boolean isContainsRoomMember(int roomId, String email);
+    boolean isContainsRoomMember(String roomId, String email);
 
-    List<QiscusRoomMember> getRoomMembers(int roomId);
+    List<QiscusRoomMember> getRoomMembers(String roomId);
 
     void deleteRoomMember(int roomId, String email);
 
-    void deleteRoomMembers(int roomId);
+    void deleteRoomMembers(String roomId);
 }

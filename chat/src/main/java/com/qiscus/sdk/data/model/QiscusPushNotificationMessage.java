@@ -20,10 +20,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class QiscusPushNotificationMessage implements Parcelable {
-    private int commentId;
+    private String commentId;
     private String message;
 
-    public QiscusPushNotificationMessage(int commentId, String message) {
+    public QiscusPushNotificationMessage(String commentId, String message) {
         this.commentId = commentId;
         this.message = message;
     }
@@ -34,7 +34,7 @@ public class QiscusPushNotificationMessage implements Parcelable {
     }
 
     protected QiscusPushNotificationMessage(Parcel in) {
-        commentId = in.readInt();
+        commentId = in.readString();
         message = in.readString();
     }
 
@@ -50,11 +50,11 @@ public class QiscusPushNotificationMessage implements Parcelable {
         }
     };
 
-    public void setCommentId(int commentId) {
+    public void setCommentId(String commentId) {
         this.commentId = commentId;
     }
 
-    public int getCommentId() {
+    public String getCommentId() {
         return commentId;
     }
 
@@ -67,15 +67,19 @@ public class QiscusPushNotificationMessage implements Parcelable {
     }
 
     @Override
-    public int hashCode() {
-        int result = commentId;
-        result = 31 * result + (message != null ? message.hashCode() : 0);
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        QiscusPushNotificationMessage that = (QiscusPushNotificationMessage) o;
+
+        return commentId.equals(that.commentId);
+
     }
 
     @Override
-    public boolean equals(Object o) {
-        return o instanceof QiscusPushNotificationMessage && commentId == ((QiscusPushNotificationMessage) o).commentId;
+    public int hashCode() {
+        return commentId.hashCode();
     }
 
     @Override
@@ -93,7 +97,7 @@ public class QiscusPushNotificationMessage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(commentId);
+        dest.writeString(commentId);
         dest.writeString(message);
     }
 }

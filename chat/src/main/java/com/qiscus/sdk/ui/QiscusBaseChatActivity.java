@@ -208,7 +208,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     @Override
     protected void onStop() {
         super.onStop();
-        QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
+        QiscusCacheManager.getInstance().setLastChatActivity(false, "0");
     }
 
     @Override

@@ -26,8 +26,8 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
     private String email;
     private String username;
     private String avatar;
-    private int lastDeliveredCommentId;
-    private int lastReadCommentId;
+    private String lastDeliveredCommentId;
+    private String lastReadCommentId;
 
     public QiscusRoomMember() {
 
@@ -37,8 +37,8 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
         email = in.readString();
         username = in.readString();
         avatar = in.readString();
-        lastDeliveredCommentId = in.readInt();
-        lastReadCommentId = in.readInt();
+        lastDeliveredCommentId = in.readString();
+        lastReadCommentId = in.readString();
     }
 
     public static final Creator<QiscusRoomMember> CREATOR = new Creator<QiscusRoomMember>() {
@@ -77,19 +77,19 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
         this.avatar = avatar;
     }
 
-    public int getLastDeliveredCommentId() {
+    public String getLastDeliveredCommentId() {
         return lastDeliveredCommentId;
     }
 
-    public void setLastDeliveredCommentId(int lastDeliveredCommentId) {
+    public void setLastDeliveredCommentId(String lastDeliveredCommentId) {
         this.lastDeliveredCommentId = lastDeliveredCommentId;
     }
 
-    public int getLastReadCommentId() {
+    public String getLastReadCommentId() {
         return lastReadCommentId;
     }
 
-    public void setLastReadCommentId(int lastReadCommentId) {
+    public void setLastReadCommentId(String lastReadCommentId) {
         this.lastReadCommentId = lastReadCommentId;
     }
 
@@ -124,8 +124,8 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
         dest.writeString(email);
         dest.writeString(username);
         dest.writeString(avatar);
-        dest.writeInt(lastDeliveredCommentId);
-        dest.writeInt(lastReadCommentId);
+        dest.writeString(lastDeliveredCommentId);
+        dest.writeString(lastReadCommentId);
     }
 
     @NonNull

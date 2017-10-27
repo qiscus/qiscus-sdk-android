@@ -138,7 +138,7 @@ public class Qiscus {
         Jupuk.init(application);
 
         startPusherService();
-        QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
+        QiscusCacheManager.getInstance().setLastChatActivity(false, "0");
 
         configureFcmToken();
 

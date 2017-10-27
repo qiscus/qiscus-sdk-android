@@ -66,7 +66,7 @@ public final class QiscusPushNotificationUtil {
                 && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
             if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
                 Pair<Boolean, Integer> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
-                if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
+                if (!lastChatActivity.first || !lastChatActivity.second.equals(qiscusComment.getRoomId()) ) {
                     showPushNotification(context, qiscusComment);
                 }
             } else {
@@ -117,7 +117,8 @@ public final class QiscusPushNotificationUtil {
         }
 
         if (!QiscusCacheManager.getInstance()
-                .addMessageNotifItem(new QiscusPushNotificationMessage(comment.getId(), messageText), comment.getRoomId())) {
+                .addMessageNotifItem(new QiscusPushNotificationMessage(comment.getId(), messageText),
+                        comment.getRoomId())) {
             return;
         }
 
@@ -126,7 +127,8 @@ public final class QiscusPushNotificationUtil {
             QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, comment, finalMessageText));
         } else {
             pushNotification(context, comment, finalMessageText,
-                    BitmapFactory.decodeResource(context.getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
+                    BitmapFactory.decodeResource(context.getResources(), Qiscus.getChatConfig()
+                            .getNotificationBigIcon()));
         }
     }
 
@@ -139,7 +141,8 @@ public final class QiscusPushNotificationUtil {
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         QiscusAndroidUtil.runOnBackgroundThread(() -> {
                             try {
-                                pushNotification(context, comment, finalMessageText, QiscusImageUtil.getCircularBitmap(resource));
+                                pushNotification(context, comment, finalMessageText,
+                                        QiscusImageUtil.getCircularBitmap(resource));
                             } catch (Exception e) {
                                 pushNotification(context, comment, finalMessageText,
                                         BitmapFactory.decodeResource(context.getResources(),
@@ -162,7 +165,8 @@ public final class QiscusPushNotificationUtil {
         PendingIntent pendingIntent;
         Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
         openIntent.putExtra("data", comment);
-        pendingIntent = PendingIntent.getBroadcast(context, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        pendingIntent = PendingIntent.getBroadcast(context, Integer.parseInt(comment.getRoomId()),
+                openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
@@ -225,6 +229,6 @@ public final class QiscusPushNotificationUtil {
         }
 
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
-                .notify(comment.getRoomId(), notificationBuilder.build()));
+                .notify(Integer.parseInt(comment.getRoomId()), notificationBuilder.build()));
     }
 }

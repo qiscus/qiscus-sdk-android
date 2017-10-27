@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 8;
+    static final int DATABASE_VERSION = 9;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -70,8 +70,8 @@ final class QiscusDb {
 
         static QiscusChatRoom parseCursor(Cursor cursor) {
             QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
-            qiscusChatRoom.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-            qiscusChatRoom.setLastTopicId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
+            qiscusChatRoom.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qiscusChatRoom.setLastTopicId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
             qiscusChatRoom.setDistinctId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DISTINCT_ID)));
             qiscusChatRoom.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
             qiscusChatRoom.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBTITLE)));
@@ -125,11 +125,11 @@ final class QiscusDb {
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'" +
                         " ); ";
 
-        static ContentValues toContentValues(int roomId, String userEmail) {
+        static ContentValues toContentValues(String roomId, String userEmail) {
             return toContentValues(roomId, userEmail, "default");
         }
 
-        static ContentValues toContentValues(int roomId, String userEmail, String distinctId) {
+        static ContentValues toContentValues(String roomId, String userEmail, String distinctId) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_ROOM_ID, roomId);
             values.put(COLUMN_USER_EMAIL, userEmail);
@@ -137,8 +137,8 @@ final class QiscusDb {
             return values;
         }
 
-        static int getRoomId(Cursor cursor) {
-            return cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID));
+        static String getRoomId(Cursor cursor) {
+            return cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID));
         }
 
         static String getMember(Cursor cursor) {
@@ -203,11 +203,11 @@ final class QiscusDb {
 
         static QiscusComment parseCursor(Cursor cursor) {
             QiscusComment qiscusComment = new QiscusComment();
-            qiscusComment.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-            qiscusComment.setRoomId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
-            qiscusComment.setTopicId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
+            qiscusComment.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qiscusComment.setRoomId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
+            qiscusComment.setTopicId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
             qiscusComment.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
-            qiscusComment.setCommentBeforeId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
+            qiscusComment.setCommentBeforeId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
             qiscusComment.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
             qiscusComment.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
             qiscusComment.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
@@ -239,7 +239,7 @@ final class QiscusDb {
                         COLUMN_LOCAL_PATH + " TEXT NOT NULL" +
                         " ); ";
 
-        static ContentValues toContentValues(int topicId, int commentId, String localPath) {
+        static ContentValues toContentValues(String topicId, String commentId, String localPath) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_TOPIC_ID, topicId);
             values.put(COLUMN_COMMENT_ID, commentId);

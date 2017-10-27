@@ -879,7 +879,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onClearNotification() {
-        NotificationManagerCompat.from(getActivity()).cancel(qiscusChatRoom.getId());
+        NotificationManagerCompat.from(getActivity()).cancel(Integer.parseInt(qiscusChatRoom.getId()));
         QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
     }
 
@@ -1412,7 +1412,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     private void loadMoreComments() {
         if (loadMoreProgressBar.getVisibility() == View.GONE && chatAdapter.getItemCount() > 0) {
             QiscusComment qiscusComment = (QiscusComment) chatAdapter.getData().get(chatAdapter.getItemCount() - 1);
-            if (qiscusComment.getId() == -1 || qiscusComment.getCommentBeforeId() > 0) {
+            if (qiscusComment.getId().equals("-1") || Integer.parseInt(qiscusComment.getCommentBeforeId()) > 0) {
                 qiscusChatPresenter.loadOlderCommentThan(qiscusComment);
             }
         }
