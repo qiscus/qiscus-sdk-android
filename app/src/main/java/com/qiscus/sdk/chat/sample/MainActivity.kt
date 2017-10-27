@@ -20,6 +20,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.widget.Toast
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.account.AuthenticateWithKey
@@ -51,7 +52,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         startChatButton.setOnClickListener {
-            startActivity(Intent(this, ListConversationActivity::class.java))
+            if (Qiscus.instance.isAuthenticated()) {
+                startActivity(Intent(this, ListConversationActivity::class.java))
+            } else {
+                Toast.makeText(this, "You must login first", Toast.LENGTH_SHORT).show()
+            }
         }
 
         startChatButton.setOnLongClickListener {
