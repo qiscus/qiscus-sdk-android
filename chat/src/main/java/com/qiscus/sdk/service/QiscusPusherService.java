@@ -28,6 +28,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusSyncEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -80,6 +81,7 @@ public class QiscusPusherService extends Service {
     }
 
     private void scheduleSync(long period) {
+        EventBus.getDefault().post((QiscusSyncEvent.STARTED));
         qiscusAccount = Qiscus.getQiscusAccount();
         stopSync();
 
@@ -106,7 +108,10 @@ public class QiscusPusherService extends Service {
                                     QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
                                     EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
 
-                                }, QiscusErrorLogger::print);
+                                }, throwable -> {
+                                    QiscusErrorLogger.print(throwable);
+                                    EventBus.getDefault().post(QiscusSyncEvent.FAILED);
+                                });
                     }
                 }, 0, period, TimeUnit.MILLISECONDS);
     }
@@ -114,6 +119,7 @@ public class QiscusPusherService extends Service {
     private void stopSync() {
         if (scheduledSync != null) {
             scheduledSync.cancel(true);
+            EventBus.getDefault().post((QiscusSyncEvent.ENDED));
         }
     }
 
