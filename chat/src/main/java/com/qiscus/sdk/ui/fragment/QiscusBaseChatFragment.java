@@ -89,6 +89,7 @@ import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.util.QiscusTextUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
@@ -895,7 +896,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void showCommentDraft() {
-        if (startingMessage != null && !startingMessage.trim().isEmpty() && !autoSendExtra) {
+        if (QiscusTextUtil.isNotBlank(startingMessage) && !autoSendExtra) {
             return;
         }
         QiscusCommentDraft draftComment = QiscusCacheManager.getInstance().getDraftComment(qiscusChatRoom.getId());
@@ -935,7 +936,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (messageEditText instanceof MentionsEditText) {
             message = ((MentionsEditText) messageEditText).getMentionsTextEncoded().toString();
         }
-        if (!message.trim().isEmpty()) {
+        if (QiscusTextUtil.isNotBlank(message)) {
             if (replyPreviewView != null) {
                 QiscusComment repliedComment = replyPreviewView.getOriginComment();
                 if (repliedComment != null) {
@@ -1120,7 +1121,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onMessageEditTextChanged(CharSequence message) {
-        if (message == null || message.toString().trim().isEmpty()) {
+        if (QiscusTextUtil.isNotBlank(message.toString())) {
             if (!fieldMessageEmpty) {
                 fieldMessageEmpty = true;
                 sendButton.startAnimation(animation);

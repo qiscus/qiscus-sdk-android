@@ -35,6 +35,7 @@ import com.qiscus.sdk.event.QiscusUserStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -488,7 +489,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     JsonObject payload = jsonObject.get("payload").getAsJsonObject();
                     if (payload.has("text")) {
                         String text = payload.get("text").getAsString();
-                        if (text != null && !text.trim().isEmpty()) {
+                        if (QiscusTextUtil.isNotBlank(text)) {
                             qiscusComment.setMessage(text.trim());
                         }
                     }

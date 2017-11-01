@@ -27,6 +27,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -238,7 +239,7 @@ final class QiscusApiParser {
                 JsonObject payload = jsonComment.get("payload").getAsJsonObject();
                 if (payload.has("text")) {
                     String text = payload.get("text").getAsString();
-                    if (text != null && !text.trim().isEmpty()) {
+                    if (QiscusTextUtil.isNotBlank(text)) {
                         qiscusComment.setMessage(text.trim());
                     }
                 }
