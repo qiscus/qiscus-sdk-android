@@ -39,6 +39,8 @@ public interface QiscusCommentStore {
 
     void delete(QiscusComment qiscusComment);
 
+    void deleteCommentsByRoomId(int roomId);
+
     QiscusComment getComment(int id, String uniqueId);
 
     List<QiscusComment> getComments(int topicId);
