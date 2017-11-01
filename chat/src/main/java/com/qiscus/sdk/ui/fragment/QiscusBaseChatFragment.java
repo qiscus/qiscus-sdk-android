@@ -134,7 +134,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE"
     };
-    private static final String CAMERA_PERMISSION = "android.permission.CAMERA";
+
+    private static final String[] CAMERA_PERMISSION = {
+            "android.permission.CAMERA",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE",
+    };
+
     private static final String[] LOCATION_PERMISSION = {
             "android.permission.ACCESS_COARSE_LOCATION",
             "android.permission.ACCESS_FINE_LOCATION"
@@ -1192,8 +1198,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void takeImage() {
-        if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)
-                && QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
+        if (QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                 File photoFile = null;
@@ -1216,7 +1221,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
         } else {
             requestCameraPermission();
-            requestAddFilePermission();
         }
     }
 

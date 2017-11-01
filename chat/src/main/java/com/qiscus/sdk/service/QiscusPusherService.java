@@ -28,6 +28,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusSyncEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -100,13 +101,21 @@ public class QiscusPusherService extends Service {
                                     }
                                     Qiscus.getDataStore().addOrUpdate(qiscusComment);
                                 })
+                                .doOnSubscribe(() -> {
+                                    EventBus.getDefault().post((QiscusSyncEvent.STARTED));
+                                })
+                                .doOnCompleted(() -> {
+                                    EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
+                                })
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(qiscusComment -> {
                                     QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
                                     EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-
-                                }, QiscusErrorLogger::print);
+                                }, throwable -> {
+                                    QiscusErrorLogger.print(throwable);
+                                    EventBus.getDefault().post(QiscusSyncEvent.FAILED);
+                                });
                     }
                 }, 0, period, TimeUnit.MILLISECONDS);
     }

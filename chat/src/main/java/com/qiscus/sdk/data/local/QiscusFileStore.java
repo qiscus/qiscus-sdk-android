@@ -34,4 +34,6 @@ public interface QiscusFileStore {
     void addOrUpdateLocalPath(int topicId, int commentId, String localPath);
 
     File getLocalPath(int commentId);
+
+    void deleteLocalPath(int commentId);
 }

@@ -550,6 +550,24 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public void deleteCommentsByRoomId(int roomId) {
+        sqLiteDatabase.beginTransaction();
+        List<QiscusComment> comments = getComments(roomId);
+        String where = QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId;
+        try {
+            for (QiscusComment comment : comments) {
+                deleteLocalPath(comment.getId());
+            }
+            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+    }
+
+    @Override
     public File getLocalPath(int commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
@@ -566,6 +584,24 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } else {
             cursor.close();
             return null;
+        }
+    }
+
+    @Override
+    public void deleteLocalPath(int commentId) {
+        File file = getLocalPath(commentId);
+        if (file != null) {
+            file.delete();
+        }
+        sqLiteDatabase.beginTransaction();
+        try {
+            String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId;
+            sqLiteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 
