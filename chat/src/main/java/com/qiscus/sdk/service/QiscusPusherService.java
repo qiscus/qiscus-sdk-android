@@ -81,7 +81,6 @@ public class QiscusPusherService extends Service {
     }
 
     private void scheduleSync(long period) {
-        EventBus.getDefault().post((QiscusSyncEvent.STARTED));
         qiscusAccount = Qiscus.getQiscusAccount();
         stopSync();
 
@@ -102,12 +101,17 @@ public class QiscusPusherService extends Service {
                                     }
                                     Qiscus.getDataStore().addOrUpdate(qiscusComment);
                                 })
+                                .doOnSubscribe(() -> {
+                                    EventBus.getDefault().post((QiscusSyncEvent.STARTED));
+                                })
+                                .doOnCompleted(() -> {
+                                    EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
+                                })
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(qiscusComment -> {
                                     QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
                                     EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-
                                 }, throwable -> {
                                     QiscusErrorLogger.print(throwable);
                                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
@@ -119,7 +123,6 @@ public class QiscusPusherService extends Service {
     private void stopSync() {
         if (scheduledSync != null) {
             scheduledSync.cancel(true);
-            EventBus.getDefault().post((QiscusSyncEvent.ENDED));
         }
     }
 

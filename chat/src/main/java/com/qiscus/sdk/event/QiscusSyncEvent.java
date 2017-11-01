@@ -5,5 +5,5 @@ package com.qiscus.sdk.event;
  */
 
 public enum QiscusSyncEvent {
-    STARTED, ENDED, FAILED
+    STARTED, FAILED, COMPLETED
 }
