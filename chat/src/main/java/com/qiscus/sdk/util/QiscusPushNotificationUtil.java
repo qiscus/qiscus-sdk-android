@@ -62,7 +62,7 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void handlePN(Context context, QiscusComment qiscusComment) {
-        if (Qiscus.getDataStore().isContains(qiscusComment)){
+        if (Qiscus.getDataStore().isContains(qiscusComment)) {
             return;
         }
 
