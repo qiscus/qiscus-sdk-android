@@ -1675,7 +1675,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
         }
         QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
-        QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
         chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();
