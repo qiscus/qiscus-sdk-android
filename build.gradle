@@ -20,10 +20,7 @@ apply from: 'gradle/jacoco.gradle'
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        maven { url 'https://maven.google.com/' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.0'
@@ -37,7 +34,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url  "https://dl.bintray.com/qiscustech/maven" }
-        google()
+        maven { url 'https://maven.google.com/' }
     }
 }
 
