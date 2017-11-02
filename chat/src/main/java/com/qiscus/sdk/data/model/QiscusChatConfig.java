@@ -200,7 +200,6 @@ public class QiscusChatConfig {
 
     private ForwardCommentHandler forwardCommentHandler;
     private boolean enableForwardComment = false;
-    private boolean enableShowingImageFolderInGallery = true;
 
     private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
 
@@ -682,11 +681,6 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusChatConfig setEnableShowingImageFolderInGallery(boolean enableShowingImageFolderInGallery) {
-        this.enableShowingImageFolderInGallery = enableShowingImageFolderInGallery;
-        return this;
-    }
-
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1125,9 +1119,5 @@ public class QiscusChatConfig {
 
     public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
         return qiscusCommentSendingInterceptor;
-    }
-
-    public boolean isEnableShowingImageFolderInGallery() {
-        return enableShowingImageFolderInGallery;
     }
 }
