@@ -1127,7 +1127,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onMessageEditTextChanged(CharSequence message) {
-        if (QiscusTextUtil.isNotBlank(message.toString())) {
+        if (QiscusTextUtil.isBlank(message.toString())) {
             if (!fieldMessageEmpty) {
                 fieldMessageEmpty = true;
                 sendButton.startAnimation(animation);
