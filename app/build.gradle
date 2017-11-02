@@ -15,11 +15,12 @@
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 apply from: rootProject.file('gradle/quality.gradle')
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "com.qiscus.dragonfly"
@@ -43,6 +44,17 @@ android {
     lintOptions {
         abortOnError false
         textReport true
+    }
+
+    useLibrary 'org.apache.http.legacy'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.6.0'
     }
 }
 
