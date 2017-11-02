@@ -603,7 +603,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         handleExtra();
         handleForward();
-        handleImageFolderAppInGalleryConfig();
     }
 
     private void handleForward() {
@@ -1778,13 +1777,5 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     public interface RoomChangedListener {
         void onRoomUpdated(QiscusChatRoom qiscusChatRoom);
-    }
-
-    public void handleImageFolderAppInGalleryConfig() {
-        if (Qiscus.getChatConfig().isEnableShowingImageFolderInGallery()) {
-            QiscusImageUtil.showImageFolderAppInGallery();
-        } else {
-            QiscusImageUtil.hideImageFolderAppInGallery();
-        }
     }
 }

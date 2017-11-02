@@ -245,20 +245,13 @@ public final class QiscusImageUtil {
     }
 
     public static void showImageFolderAppInGallery() {
-        File folderImage = new File(Environment.getExternalStorageDirectory().getPath(), IMAGE_PATH);
-        if (folderImage.exists()) {
-            File[] files = folderImage.listFiles();
-            for (File file : files) {
-                String fileSplitted[] = file.toString().split("/");
-                String nomedia = fileSplitted[fileSplitted.length - 1];
-                if (nomedia.equals(Qiscus.getApps().getString(R.string.qiscus_nomedia))) {
-                    file.delete();
-
-                    //rescan media gallery for updating deleted .nomedia file
-                    addImageToGallery(file);
-                    break;
-                }
-            }
+        File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
+                QiscusImageUtil.IMAGE_PATH + File.separator +
+                        Qiscus.getApps().getString(R.string.qiscus_nomedia));
+        if (nomedia.exists()) {
+            nomedia.delete();
+            //rescan media gallery for updating deleted .nomedia file
+            addImageToGallery(nomedia);
         }
     }
 
