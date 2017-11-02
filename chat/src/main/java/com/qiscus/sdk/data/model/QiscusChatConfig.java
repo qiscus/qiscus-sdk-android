@@ -200,7 +200,7 @@ public class QiscusChatConfig {
 
     private ForwardCommentHandler forwardCommentHandler;
     private boolean enableForwardComment = false;
-    private boolean enableShowingFolderImageInGallery = true;
+    private boolean enableShowingImageFolderInGallery = true;
 
     private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
 
@@ -682,8 +682,8 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusChatConfig setEnableShowingFolderImageInGallery(boolean enableShowingFolderImageInGallery) {
-        this.enableShowingFolderImageInGallery = enableShowingFolderImageInGallery;
+    public QiscusChatConfig setEnableShowingImageFolderInGallery(boolean enableShowingImageFolderInGallery) {
+        this.enableShowingImageFolderInGallery = enableShowingImageFolderInGallery;
         return this;
     }
 
@@ -1127,7 +1127,7 @@ public class QiscusChatConfig {
         return qiscusCommentSendingInterceptor;
     }
 
-    public boolean isEnableShowingFolderImageInGallery() {
-        return enableShowingFolderImageInGallery;
+    public boolean isEnableShowingImageFolderInGallery() {
+        return enableShowingImageFolderInGallery;
     }
 }
