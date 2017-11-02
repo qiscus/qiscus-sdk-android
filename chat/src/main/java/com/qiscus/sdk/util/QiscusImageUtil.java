@@ -259,6 +259,11 @@ public final class QiscusImageUtil {
         File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
                 QiscusImageUtil.IMAGE_PATH + File.separator +
                         Qiscus.getApps().getString(R.string.qiscus_nomedia));
+
+        if (!nomedia.getParentFile().exists()) {
+            nomedia.getParentFile().mkdirs();
+        }
+
         if (!nomedia.exists()) {
             try {
                 if (nomedia.createNewFile()) {
