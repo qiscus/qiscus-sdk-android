@@ -18,10 +18,9 @@ public class QiscusLogger {
         }
     }
 
-    public static void print(String tag,String message) {
+    public static void print(String tag, String message) {
         if (Qiscus.isEnableLog()) {
             Log.i(tag, message);
         }
     }
-
 }
