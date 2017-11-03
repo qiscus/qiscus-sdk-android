@@ -43,6 +43,7 @@ import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -657,7 +658,7 @@ public class Qiscus {
     public static class ChatBuilder {
         private String email;
         private String distinctId;
-        private String options;
+        private JSONObject options;
 
         private ChatBuilder(String email) {
             this.email = email;
@@ -704,7 +705,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public ChatBuilder withOptions(String options) {
+        public ChatBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -751,7 +752,7 @@ public class Qiscus {
     public static class ChatActivityBuilder {
         private String email;
         private String distinctId;
-        private String options;
+        private JSONObject options;
         private String message;
         private File shareFile;
         private boolean autoSendExtra;
@@ -804,7 +805,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public ChatActivityBuilder withOptions(String options) {
+        public ChatActivityBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -912,7 +913,7 @@ public class Qiscus {
     public static class ChatFragmentBuilder {
         private String email;
         private String distinctId;
-        private String options;
+        private JSONObject options;
         private String message;
         private File shareFile;
         private boolean autoSendExtra;
@@ -965,7 +966,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public ChatFragmentBuilder withOptions(String options) {
+        public ChatFragmentBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -1071,7 +1072,7 @@ public class Qiscus {
     public static class GroupChatBuilder {
         private Set<String> emails;
         private String name;
-        private String options;
+        private JSONObject options;
         private String avatarUrl;
 
         private GroupChatBuilder(String name, String email) {
@@ -1113,7 +1114,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public GroupChatBuilder withOptions(String options) {
+        public GroupChatBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -1144,7 +1145,7 @@ public class Qiscus {
     public static class DefinedIdGroupChatBuilder {
         private String uniqueId;
         private String name;
-        private String options;
+        private JSONObject options;
         private String avatarUrl;
 
         private DefinedIdGroupChatBuilder(String uniqueId) {
@@ -1180,7 +1181,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public DefinedIdGroupChatBuilder withOptions(String options) {
+        public DefinedIdGroupChatBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }

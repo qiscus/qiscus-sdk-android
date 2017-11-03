@@ -88,7 +88,12 @@ final class QiscusApiParser {
             }
 
             qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-            qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null : jsonChatRoom.get("options").getAsString());
+            try {
+                qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :
+                        new JSONObject(jsonChatRoom.get("options").getAsString()));
+            } catch (JSONException ignored) {
+                //Do nothing
+            }
             qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
 
             JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
@@ -142,7 +147,12 @@ final class QiscusApiParser {
                 }
 
                 qiscusChatRoom.setLastTopicId(jsonChatRoom.get("id").getAsInt());
-                qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null : jsonChatRoom.get("options").getAsString());
+                try {
+                    qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :
+                            new JSONObject(jsonChatRoom.get("options").getAsString()));
+                } catch (JSONException ignored) {
+                    //Do nothing
+                }
                 qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
                 qiscusChatRoom.setUnreadCount(jsonChatRoom.get("unread_count").getAsInt());
 

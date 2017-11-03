@@ -19,6 +19,8 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
 /**
@@ -33,7 +35,7 @@ public class QiscusChatRoom implements Parcelable {
     protected String name;
     @Deprecated protected String subtitle = "";
     protected int lastTopicId;
-    protected String options;
+    protected JSONObject options;
     protected boolean group;
     protected String avatarUrl;
     protected List<QiscusRoomMember> member;
@@ -52,7 +54,11 @@ public class QiscusChatRoom implements Parcelable {
         name = in.readString();
         subtitle = in.readString();
         lastTopicId = in.readInt();
-        options = in.readString();
+        try {
+            options = new JSONObject(in.readString());
+        } catch (Exception ignored) {
+            //Do nothing
+        }
         group = in.readByte() != 0;
         avatarUrl = in.readString();
         member = in.createTypedArrayList(QiscusRoomMember.CREATOR);
@@ -114,11 +120,11 @@ public class QiscusChatRoom implements Parcelable {
         this.lastTopicId = lastTopicId;
     }
 
-    public String getOptions() {
+    public JSONObject getOptions() {
         return options;
     }
 
-    public void setOptions(String options) {
+    public void setOptions(JSONObject options) {
         this.options = options;
     }
 
@@ -184,7 +190,9 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(name);
         dest.writeString(subtitle);
         dest.writeInt(lastTopicId);
-        dest.writeString(options);
+        if (options != null) {
+            dest.writeString(options.toString());
+        }
         dest.writeByte((byte) (group ? 1 : 0));
         dest.writeString(avatarUrl);
         dest.writeTypedList(member);

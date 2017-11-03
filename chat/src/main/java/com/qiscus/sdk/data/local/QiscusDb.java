@@ -63,7 +63,7 @@ final class QiscusDb {
             values.put(COLUMN_NAME, qiscusChatRoom.getName());
             values.put(COLUMN_SUBTITLE, qiscusChatRoom.getSubtitle());
             values.put(COLUMN_IS_GROUP, qiscusChatRoom.isGroup() ? 1 : 0);
-            values.put(COLUMN_OPTIONS, qiscusChatRoom.getOptions());
+            values.put(COLUMN_OPTIONS, qiscusChatRoom.getOptions() == null ? null : qiscusChatRoom.getOptions().toString());
             values.put(COLUMN_AVATAR_URL, qiscusChatRoom.getAvatarUrl());
             return values;
         }
@@ -76,7 +76,12 @@ final class QiscusDb {
             qiscusChatRoom.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
             qiscusChatRoom.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBTITLE)));
             qiscusChatRoom.setGroup(cursor.getShort(cursor.getColumnIndexOrThrow(COLUMN_IS_GROUP)) == 1);
-            qiscusChatRoom.setOptions(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OPTIONS)));
+            try {
+                String options = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OPTIONS));
+                qiscusChatRoom.setOptions(options == null ? null : new JSONObject(options));
+            } catch (JSONException ignored) {
+                //Do nothing
+            }
             qiscusChatRoom.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AVATAR_URL)));
             return qiscusChatRoom;
         }

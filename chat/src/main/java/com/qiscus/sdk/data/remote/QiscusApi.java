@@ -130,18 +130,19 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, String options) {
-        return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId, options)
+    public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, JSONObject options) {
+        return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId,
+                options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, String options) {
-        return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options)
+    public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
+        return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, String options) {
-        return api.createOrGetGroupChatRoom(Qiscus.getToken(), uniqueId, name, avatarUrl, options)
+    public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {
+        return api.createOrGetGroupChatRoom(Qiscus.getToken(), uniqueId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
@@ -302,8 +303,8 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, String options) {
-        return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options)
+    public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, JSONObject options) {
+        return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
