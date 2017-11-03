@@ -66,6 +66,7 @@ public final class QiscusPushNotificationUtil {
             return;
         }
 
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
         if (Qiscus.getChatConfig().isEnablePushNotification()
                 && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
             if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {

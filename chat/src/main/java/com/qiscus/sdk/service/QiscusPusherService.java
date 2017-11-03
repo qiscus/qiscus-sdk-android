@@ -99,7 +99,6 @@ public class QiscusPusherService extends Service {
                                     if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
                                         qiscusComment.setState(savedQiscusComment.getState());
                                     }
-                                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
                                 })
                                 .doOnSubscribe(() -> {
                                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
