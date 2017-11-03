@@ -18,6 +18,8 @@ package com.qiscus.sdk.util;
 
 import android.util.Log;
 
+import com.qiscus.sdk.Qiscus;
+
 import java.io.IOException;
 
 import okhttp3.ResponseBody;
@@ -31,12 +33,24 @@ import retrofit2.HttpException;
  */
 public final class QiscusErrorLogger {
 
+    private static final String TAG = Qiscus.class.getSimpleName();
+
     public static void print(Throwable throwable) {
-        Log.e("QiscusErrorLogger", getMessage(throwable));
+        if (Qiscus.isEnableLog()) {
+            Log.e(TAG, getMessage(throwable));
+        }
     }
 
     public static void print(String tag, Throwable throwable) {
-        Log.e(tag, getMessage(throwable));
+        if (Qiscus.isEnableLog()) {
+            Log.e(tag, getMessage(throwable));
+        }
+    }
+
+    public static void print(String tag, String errorMessage) {
+        if (Qiscus.isEnableLog()) {
+            Log.e(tag, errorMessage);
+        }
     }
 
     public static String getMessage(Throwable throwable) {

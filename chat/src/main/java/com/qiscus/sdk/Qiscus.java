@@ -39,6 +39,7 @@ import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
@@ -76,6 +77,7 @@ public class Qiscus {
     private static String mqttBrokerUrl;
     private static long heartBeat;
     private static String authorities;
+    private static boolean enableLog;
 
     private Qiscus() {
     }
@@ -144,6 +146,7 @@ public class Qiscus {
         configureFcmToken();
 
         EmojiManager.install(new EmojiOneProvider());
+        QiscusLogger.print("init Qiscus with app Id " + appId);
     }
 
     public static void startPusherService() {
@@ -1208,4 +1211,24 @@ public class Qiscus {
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
+
+    /**
+     * Set the log of qiscus data. Default value is false
+     *
+     * @param enableLog boolean
+     */
+
+    public static void setEnableLog(boolean enableLog) {
+        Qiscus.enableLog = enableLog;
+    }
+
+    /**
+     * Get the log qiscus
+     *
+     * @return enableLog status in boolean
+     */
+    public static boolean isEnableLog() {
+        return Qiscus.enableLog;
+    }
+
 }
