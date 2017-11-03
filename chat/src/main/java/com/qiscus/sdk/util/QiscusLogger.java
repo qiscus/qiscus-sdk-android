@@ -13,13 +13,13 @@ public class QiscusLogger {
     private static final String TAG = Qiscus.class.getSimpleName();
 
     public static void print(String message) {
-        if (Qiscus.getChatConfig().isEnableDebugLog()) {
+        if (Qiscus.isEnableLog()) {
             Log.d(TAG, message);
         }
     }
 
     public static void print(String tag,String message) {
-        if (Qiscus.getChatConfig().isEnableDebugLog()) {
+        if (Qiscus.isEnableLog()) {
             Log.i(tag, message);
         }
     }

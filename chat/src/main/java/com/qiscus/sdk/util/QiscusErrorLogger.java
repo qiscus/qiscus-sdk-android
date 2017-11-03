@@ -36,19 +36,19 @@ public final class QiscusErrorLogger {
     private static final String TAG = Qiscus.class.getSimpleName();
 
     public static void print(Throwable throwable) {
-        if (Qiscus.getChatConfig().isEnableDebugLog()) {
+        if (Qiscus.isEnableLog()) {
             Log.e(TAG, getMessage(throwable));
         }
     }
 
     public static void print(String tag, Throwable throwable) {
-        if (Qiscus.getChatConfig().isEnableDebugLog()) {
+        if (Qiscus.isEnableLog()) {
             Log.e(tag, getMessage(throwable));
         }
     }
 
     public static void print(String tag, String errorMessage) {
-        if (Qiscus.getChatConfig().isEnableDebugLog()) {
+        if (Qiscus.isEnableLog()) {
             Log.e(tag, errorMessage);
         }
     }

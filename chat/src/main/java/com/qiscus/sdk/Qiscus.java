@@ -77,6 +77,7 @@ public class Qiscus {
     private static String mqttBrokerUrl;
     private static long heartBeat;
     private static String authorities;
+    private static boolean enableLog;
 
     private Qiscus() {
     }
@@ -1210,4 +1211,24 @@ public class Qiscus {
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
+
+    /**
+     * Set the log of qiscus data. Default value is false
+     *
+     * @param enableLog boolean
+     */
+
+    public static void setEnableLog(boolean enableLog) {
+        Qiscus.enableLog = enableLog;
+    }
+
+    /**
+     * Get the log qiscus
+     *
+     * @return enableLog status in boolean
+     */
+    public static boolean isEnableLog() {
+        return Qiscus.enableLog;
+    }
+
 }

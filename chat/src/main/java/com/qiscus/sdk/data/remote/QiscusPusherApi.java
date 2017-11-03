@@ -184,7 +184,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void disconnect() {
-        Log.i(TAG, "Disconnecting...");
+        QiscusLogger.print(TAG, "Disconnecting...");
         setUserStatus(false);
         try {
             connecting = false;
