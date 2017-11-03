@@ -39,6 +39,7 @@ import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
@@ -144,6 +145,7 @@ public class Qiscus {
         configureFcmToken();
 
         EmojiManager.install(new EmojiOneProvider());
+        QiscusLogger.print("init Qiscus with app Id " + appId);
     }
 
     public static void startPusherService() {

@@ -195,6 +195,7 @@ public class QiscusChatConfig {
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
     private boolean enableFcmPushNotification = false;
     private boolean enableRequestPermission = true;
+    private boolean enableDebugLog = false;
 
     private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
 
@@ -681,6 +682,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setEnableDebugLog(boolean enableDebugLog) {
+        this.enableDebugLog = enableDebugLog;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1119,5 +1125,9 @@ public class QiscusChatConfig {
 
     public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
         return qiscusCommentSendingInterceptor;
+    }
+
+    public boolean isEnableDebugLog() {
+        return enableDebugLog;
     }
 }
