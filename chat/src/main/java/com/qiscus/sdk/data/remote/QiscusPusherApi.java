@@ -34,6 +34,7 @@ import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
@@ -98,7 +99,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private int setOfflineCounter;
 
     QiscusPusherApi() {
-        Log.i("QiscusPusherApi", "Creating...");
+        QiscusLogger.print("QiscusPusherApi", "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
@@ -149,7 +150,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void restartConnection() {
-        Log.i(TAG, "Restart connection...");
+        QiscusLogger.print("QiscusPusherApi", "Restart connection...");
         try {
             connecting = false;
             mqttAndroidClient.disconnect();
@@ -183,7 +184,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void disconnect() {
-        Log.i(TAG, "Disconnecting...");
+        QiscusLogger.print(TAG, "Disconnecting...");
         setUserStatus(false);
         try {
             connecting = false;
@@ -197,7 +198,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     private void listenComment() {
-        Log.i(TAG, "Listening comment...");
+        QiscusLogger.print(TAG, "Listening comment...");
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
         } catch (MqttException e) {
@@ -210,7 +211,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void listenRoom(QiscusChatRoom qiscusChatRoom) {
-        Log.i(TAG, "Listening room...");
+        QiscusLogger.print(TAG, "Listening room...");
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
         try {
             int roomId = qiscusChatRoom.getId();
@@ -326,7 +327,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         }
         reconnectCounter++;
-        Log.e(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * reconnectCounter + " ms");
+        QiscusErrorLogger.print(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * reconnectCounter + " ms");
         connecting = false;
         scheduledConnect = QiscusAndroidUtil.runOnBackgroundThread(fallbackConnect, RETRY_PERIOD * reconnectCounter);
     }
@@ -408,7 +409,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void connectComplete(boolean reconnect, String serverUri) {
-        Log.i(TAG, "Connected...");
+        QiscusLogger.print(TAG, "Connected...");
         EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
         try {
             connecting = false;
@@ -441,7 +442,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         }
         reconnectCounter++;
-        Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms");
+        QiscusErrorLogger.print(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms");
         connecting = false;
         scheduledConnect = QiscusAndroidUtil.runOnBackgroundThread(fallbackConnect, RETRY_PERIOD * reconnectCounter);
     }

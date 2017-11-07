@@ -30,6 +30,7 @@ import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.json.JSONException;
@@ -191,6 +192,7 @@ public enum QiscusApi {
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
                     qiscusComment.setId(jsonComment.get("id").getAsInt());
                     qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    QiscusLogger.print("Sent Comment...");
                     return qiscusComment;
                 });
     }
