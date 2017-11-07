@@ -190,9 +190,10 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(name);
         dest.writeString(subtitle);
         dest.writeInt(lastTopicId);
-        if (options != null) {
-            dest.writeString(options.toString());
+        if (options == null) {
+            options = new JSONObject();
         }
+        dest.writeString(options.toString());
         dest.writeByte((byte) (group ? 1 : 0));
         dest.writeString(avatarUrl);
         dest.writeTypedList(member);
