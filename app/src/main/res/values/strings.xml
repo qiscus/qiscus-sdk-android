@@ -15,5 +15,5 @@
   -->
 
 <resources>
-    <string name="app_name">DragonFly</string>
+    <string name="app_name" translatable="false">DragonFly</string>
 </resources>
