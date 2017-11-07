@@ -45,6 +45,13 @@ android {
         abortOnError false
         textReport true
     }
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
 
     useLibrary 'org.apache.http.legacy'
 }
