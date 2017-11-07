@@ -212,9 +212,9 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         sendButton.setImageResource(chatConfig.getSendButtonIcon());
         sendButton.setOnClickListener(v -> confirm());
 
-        findViewById(R.id.field_message_container).setVisibility(chatConfig.isEnableCaption() ? View.VISIBLE: View.GONE);
-        findViewById(R.id.button_container).setVisibility(chatConfig.isEnableCaption() ? View.GONE: View.VISIBLE);
-        findViewById(R.id.button_container_divider).setVisibility(chatConfig.isEnableCaption() ? View.GONE: View.VISIBLE);
+        findViewById(R.id.field_message_container).setVisibility(chatConfig.isEnableCaption() ? View.VISIBLE : View.GONE);
+        findViewById(R.id.button_container).setVisibility(chatConfig.isEnableCaption() ? View.GONE : View.VISIBLE);
+        findViewById(R.id.button_container_divider).setVisibility(chatConfig.isEnableCaption() ? View.GONE : View.VISIBLE);
         recyclerView.setBackgroundColor(chatConfig.isEnableCaption() ? Color.WHITE : Color.BLACK);
 
         findViewById(R.id.submit).setOnClickListener(v -> confirm());
