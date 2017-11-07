@@ -19,6 +19,7 @@ package com.qiscus.sdk.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -184,7 +185,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         });
 
         mentionSuggestionView = (QiscusMentionSuggestionView) findViewById(R.id.mention_suggestion);
-        if (qiscusChatRoom.isGroup() && Qiscus.getChatConfig().getMentionConfig().isEnableMention()) {
+        if (qiscusChatRoom.isGroup() && chatConfig.getMentionConfig().isEnableMention()) {
             mentionSuggestionView.bind(messageEditText);
             mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
         }
@@ -210,6 +211,14 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         ImageView sendButton = (ImageView) findViewById(R.id.button_send);
         sendButton.setImageResource(chatConfig.getSendButtonIcon());
         sendButton.setOnClickListener(v -> confirm());
+
+        findViewById(R.id.field_message_container).setVisibility(chatConfig.isEnableCaption() ? View.VISIBLE: View.GONE);
+        findViewById(R.id.button_container).setVisibility(chatConfig.isEnableCaption() ? View.GONE: View.VISIBLE);
+        findViewById(R.id.button_container_divider).setVisibility(chatConfig.isEnableCaption() ? View.GONE: View.VISIBLE);
+        recyclerView.setBackgroundColor(chatConfig.isEnableCaption() ? Color.WHITE : Color.BLACK);
+
+        findViewById(R.id.submit).setOnClickListener(v -> confirm());
+        findViewById(R.id.cancel).setOnClickListener(v -> onBackPressed());
     }
 
     protected void onSetStatusBarColor() {
