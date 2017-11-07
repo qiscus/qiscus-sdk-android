@@ -567,6 +567,17 @@ compile 'com.android.support:customtabs:yourVersion'
 compile 'com.android.support:support-v13:yourVersion'
 ```
 
+If you have problem can not download android support libraries, please add Google's Maven repository to your project build.gradle
+
+```groovy
+allprojects {
+    repositories {
+        .....
+        maven { url  "https://maven.google.com" }
+    }
+}
+```
+
 ### RxJava support
 
 ```java
