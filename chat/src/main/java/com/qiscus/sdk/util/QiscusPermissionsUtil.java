@@ -18,6 +18,7 @@ package com.qiscus.sdk.util;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -29,6 +30,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+
+import com.qiscus.sdk.Qiscus;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -106,6 +109,14 @@ public final class QiscusPermissionsUtil {
                         callbacks.onPermissionsDenied(requestCode, Arrays.asList(perms));
                     }).create();
             dialog.show();
+
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor
+                    (ContextCompat.getColor(Qiscus.getApps(),
+                            Qiscus.getChatConfig().getDialogPermissionPositiveButtonTextColor()));
+            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor
+                    (ContextCompat.getColor(Qiscus.getApps(),
+                            Qiscus.getChatConfig().getDialogPermissionNegativeButtonTextColor()));
+
         } else {
             executePermissionsRequest(object, perms, requestCode);
         }
@@ -169,7 +180,15 @@ public final class QiscusPermissionsUtil {
                         })
                         .setNegativeButton(negativeButton, null)
                         .create();
+
                 dialog.show();
+
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor
+                        (ContextCompat.getColor(Qiscus.getApps(),
+                        Qiscus.getChatConfig().getDialogPermissionPositiveButtonTextColor()));
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor
+                        (ContextCompat.getColor(Qiscus.getApps(),
+                        Qiscus.getChatConfig().getDialogPermissionNegativeButtonTextColor()));
 
                 return true;
             }
