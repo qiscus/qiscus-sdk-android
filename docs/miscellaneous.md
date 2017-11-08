@@ -5,7 +5,7 @@ Qiscus SDK is using appcompat libraries to support some features. If your apps u
 
 ```groovy
 //Qiscus sdk without android support libraries
-compile('com.qiscus.sdk:chat:2.13.3') {
+compile('com.qiscus.sdk:chat:2.14.0') {
     transitive = true
     exclude group: 'com.android.support'
 }
@@ -19,6 +19,17 @@ compile 'com.android.support:cardview-v7:yourVersion'
 compile 'com.android.support:design:yourVersion'
 compile 'com.android.support:customtabs:yourVersion'
 compile 'com.android.support:support-v13:yourVersion'
+```
+
+If you have problem can not download android support libraries, please add Google's Maven repository to your project build.gradle
+
+```groovy
+allprojects {
+    repositories {
+        .....
+        maven { url  "https://maven.google.com" }
+    }
+}
 ```
 
 ### RxJava support
