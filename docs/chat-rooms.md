@@ -1,6 +1,6 @@
 # Chat Rooms
 
-### Creating 1-to-1 chat
+## Creating 1-to-1 chat
 
 Start chat with target is very easy, all you need is just call
 
@@ -33,7 +33,7 @@ Qiscus.buildChatWith("jhon.doe@gmail.com")
 ```
 
 
-### Creating a Group Room
+## Creating a Group Room
 
 Qiscus also support group chat. To create new group chat, all you need is just call
 
@@ -70,7 +70,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
 for accessing room that created by this call, you need to call it with its roomId. This methode is always creating new chat room.
 
 
-### Get a room by room id
+## Get a room by room id
 
 
 When you already know your chat room id, you can easily go to that room. Just call
@@ -105,7 +105,7 @@ QiscusApi.getInstance()
         });
 ```
 
-### Create or join room by defined id
+## Create or join room by defined id
 
 You probably want to set defined id for the room you are creating so that the id can be reference for users to get into.
 
@@ -146,15 +146,15 @@ Qiscus.buildGroupChatRoomWith("UniqueId")
         });
 ```
 
-### Inviting users to an existing Room
+## Inviting users to an existing Room
 
 Currently we recommend to invite user into existing room through our [**REST API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason
 
-### Leaving a Group Room
+## Leaving a Group Room
 
 Currently we recommend to kick user out of specific room through our [**REST API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason
 
-### Get room list
+## Get room list
 To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
 ```java
 QiscusApi.getInstance().getChatRooms(1, 20, true)

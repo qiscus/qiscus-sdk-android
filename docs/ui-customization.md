@@ -1,6 +1,6 @@
 # UI Customization
 
-### Theme Customization
+## Theme Customization
 
 Boring with default template? You can customized it, try it!, we have more items than those below code, its just example.
 
@@ -18,6 +18,6 @@ Qiscus.getChatConfig()
 
 
 
-### UI Source code
+## UI Source code
 
 If you want full customisations, you can modify everything on the view by forking our repository or just right away modifying our **[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java) **based on your needs.

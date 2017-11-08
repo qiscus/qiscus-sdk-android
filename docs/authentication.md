@@ -1,6 +1,6 @@
 # Authentication
 
-### Init with APP ID
+## Init with APP ID
 
 Init Qiscus at your application class with your application ID
 
@@ -14,7 +14,7 @@ public class SampleApps extends Application {
 }
 ```
 
-### Setup user using userId and userKey
+## Setup user using userId and userKey
 Before user can start chatting each other, they must login to qiscus engine.
 
 ```java
@@ -47,7 +47,7 @@ Qiscus.setUser("user@email.com", "userKey")
       });
 ```
 
-### Setup user using JWT Token
+## Setup user using JWT Token
 Another alternative is using jwt token. Using this authorization schema, you can only save your user unique identity such as email in your back-end server. You will no need to save two password, one for Qiscus SDK and one for your authorization logic. All you need is generating identity token using JWT in order to login or register an user.
 
 First, you need to get nonce using **QiscusApi.requestNonce()** method. You do not need to send any parameter. Nonce will be expired 10 minutes after request. Afterwards, in your application back-end server you must generate the JWT token using this:
@@ -102,7 +102,7 @@ QiscusApi.getInstance().requestNonce() //Request nonce from qiscus api
         });
 ```
 
-### Updating a User Profile and Avatar
+## Updating a User Profile and Avatar
 
 Updating user profile calls Qiscus.updateUser(name, avatar, listener) :
 
@@ -134,7 +134,7 @@ Qiscus.updateUser("Tony Stark", "http://avatar.url.com/handsome.jpg", new Qiscus
         });
 ```
 
-### Disconnect or Logout
+## Disconnect or Logout
 
 Whenever you no longer want the user to receive update
 

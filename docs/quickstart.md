@@ -2,7 +2,7 @@
 
 <p align="center"><br/><img src="https://raw.githubusercontent.com/qiscus/qiscus-sdk-android/master/screenshot/device-2017-06-02-093226.png" width="37%" /><br/></p>
 
-### Create a new app
+## Create a new app
 
 Register on [https://www.qiscus.com/dashboard](https://www.qiscus.com/dashboard) using your email and password and then create new application
 
@@ -14,7 +14,7 @@ Done! Now you can use the APP_ID into your apps and get chat functionality by im
 
 
 
-### integrating SDK with an existing app
+## integrating SDK with an existing app
 
 Add to your project build.gradle
 
