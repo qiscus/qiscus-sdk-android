@@ -133,6 +133,9 @@ public class QiscusChatConfig {
     private int cardButtonTextColor = R.color.qiscus_primary;
     private int cardButtonBackground = R.color.qiscus_white;
 
+    private int dialogPermissionPositiveButtonTextColor = R.color.qiscus_primary;
+    private int dialogPermissionNegativeButtonTextColor = R.color.qiscus_secondary_text;
+
     private int playAudioIcon = R.drawable.ic_qiscus_play_audio;
     private int pauseAudioIcon = R.drawable.ic_qiscus_pause_audio;
     private int showEmojiIcon = R.drawable.ic_qiscus_emot;
@@ -687,6 +690,18 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setDialogPermissionPositiveButtonTextColor
+            (@ColorRes int dialogPermissionPositiveButtonTextColor) {
+        this.dialogPermissionPositiveButtonTextColor = dialogPermissionPositiveButtonTextColor;
+        return this;
+    }
+
+    public QiscusChatConfig setDialogPermissionNegativeButtonTextColor
+            (@ColorRes int dialogPermissionNegativeButtonTextColor) {
+        this.dialogPermissionNegativeButtonTextColor = dialogPermissionNegativeButtonTextColor;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1129,5 +1144,15 @@ public class QiscusChatConfig {
 
     public boolean isEnableCaption() {
         return enableCaption;
+    }
+
+    @ColorRes
+    public int getDialogPermissionPositiveButtonTextColor() {
+        return dialogPermissionPositiveButtonTextColor;
+    }
+
+    @ColorRes
+    public int getDialogPermissionNegativeButtonTextColor() {
+        return dialogPermissionNegativeButtonTextColor;
     }
 }
