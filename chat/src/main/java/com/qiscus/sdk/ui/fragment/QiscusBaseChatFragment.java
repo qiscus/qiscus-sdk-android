@@ -89,6 +89,7 @@ import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.util.QiscusTextUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
@@ -114,6 +115,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener, CommentChainingListener {
 
     protected static final int RC_PERMISSIONS = 127;
+    protected static final int RC_CAMERA_PERMISSION = 128;
+    protected static final int RC_AUDIO_PERMISSION = 129;
+    protected static final int RC_FILE_PERMISSION = 130;
+    protected static final int RC_LOCATION_PERMISSION = 131;
 
     private static final String[] PERMISSIONS = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
@@ -129,7 +134,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE"
     };
-    private static final String CAMERA_PERMISSION = "android.permission.CAMERA";
+
+    private static final String[] CAMERA_PERMISSION = {
+            "android.permission.CAMERA",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE",
+    };
+
     private static final String[] LOCATION_PERMISSION = {
             "android.permission.ACCESS_COARSE_LOCATION",
             "android.permission.ACCESS_FINE_LOCATION"
@@ -891,7 +902,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void showCommentDraft() {
-        if (startingMessage != null && !startingMessage.trim().isEmpty() && !autoSendExtra) {
+        if (QiscusTextUtil.isNotBlank(startingMessage) && !autoSendExtra) {
             return;
         }
         QiscusCommentDraft draftComment = QiscusCacheManager.getInstance().getDraftComment(qiscusChatRoom.getId());
@@ -931,7 +942,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (messageEditText instanceof MentionsEditText) {
             message = ((MentionsEditText) messageEditText).getMentionsTextEncoded().toString();
         }
-        if (!message.trim().isEmpty()) {
+        if (QiscusTextUtil.isNotBlank(message)) {
             if (replyPreviewView != null) {
                 QiscusComment repliedComment = replyPreviewView.getOriginComment();
                 if (repliedComment != null) {
@@ -1116,7 +1127,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onMessageEditTextChanged(CharSequence message) {
-        if (message == null || message.toString().trim().isEmpty()) {
+        if (QiscusTextUtil.isBlank(message.toString())) {
             if (!fieldMessageEmpty) {
                 fieldMessageEmpty = true;
                 sendButton.startAnimation(animation);
@@ -1182,13 +1193,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     .pickPhoto(this);
             hideAttachmentPanel();
         } else {
-            requestPermissions();
+            requestAddFilePermission();
         }
     }
 
     protected void takeImage() {
-        if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)
-                && QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
+        if (QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                 File photoFile = null;
@@ -1210,7 +1220,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 hideAttachmentPanel();
             }
         } else {
-            requestPermissions();
+            requestCameraPermission();
         }
     }
 
@@ -1223,7 +1233,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     .pickDoc(this);
             hideAttachmentPanel();
         } else {
-            requestPermissions();
+            requestAddFilePermission();
         }
     }
 
@@ -1246,7 +1256,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 }
             }
         } else {
-            requestPermissions();
+            requestRecordAudioPermission();
         }
     }
 
@@ -1266,7 +1276,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
             hideAttachmentPanel();
         } else {
-            requestPermissions();
+            requestAddLocationPermission();
         }
     }
 
@@ -1665,7 +1675,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
         }
         QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
-        QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
         chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();
@@ -1674,9 +1683,41 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void requestPermissions() {
+        if (!Qiscus.getChatConfig().isEnableRequestPermission()) {
+            return;
+        }
+
         if (!QiscusPermissionsUtil.hasPermissions(getActivity(), PERMISSIONS)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
                     RC_PERMISSIONS, PERMISSIONS);
+        }
+    }
+
+    protected void requestCameraPermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), CAMERA_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_CAMERA_PERMISSION, CAMERA_PERMISSION);
+        }
+    }
+
+    protected void requestAddFilePermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_FILE_PERMISSION, FILE_PERMISSION);
+        }
+    }
+
+    protected void requestRecordAudioPermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), AUDIO_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_AUDIO_PERMISSION, AUDIO_PERMISSION);
+        }
+    }
+
+    protected void requestAddLocationPermission() {
+        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), LOCATION_PERMISSION)) {
+            QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
+                    RC_LOCATION_PERMISSION, LOCATION_PERMISSION);
         }
     }
 
@@ -1688,7 +1729,20 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-
+        switch (requestCode) {
+            case RC_CAMERA_PERMISSION :
+                takeImage();
+                break;
+            case RC_AUDIO_PERMISSION :
+                recordAudio();
+                break;
+            case RC_FILE_PERMISSION :
+                addImage();
+                break;
+            case RC_LOCATION_PERMISSION :
+                addLocation();
+                break;
+        }
     }
 
     @Override

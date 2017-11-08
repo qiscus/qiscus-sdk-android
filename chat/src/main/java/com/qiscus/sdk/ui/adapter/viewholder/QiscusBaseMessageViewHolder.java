@@ -191,7 +191,10 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         if (senderNameView != null && !messageFromMe && groupChat) {
             if (needToShowFirstMessageBubbleIndicator) {
                 senderNameView.setVisibility(View.VISIBLE);
-                senderNameView.setText(String.format("~ %s", qiscusComment.getSender()));
+                senderNameView.setText(String.format("~ %s", Qiscus
+                        .getChatConfig()
+                        .getRoomSenderNameInterceptor()
+                        .getSenderName(qiscusComment)));
             } else {
                 senderNameView.setVisibility(View.GONE);
             }

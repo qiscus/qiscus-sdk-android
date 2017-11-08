@@ -44,8 +44,10 @@ public class QiscusUserStatusPresenter extends QiscusPresenter<QiscusUserStatusP
     }
 
     public void listenUser(String user) {
-        users.add(user);
-        QiscusPusherApi.getInstance().listenUserStatus(user);
+        if (!users.contains(user)) {
+            users.add(user);
+            QiscusPusherApi.getInstance().listenUserStatus(user);
+        }
     }
 
     @Subscribe

@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
         //Start a sample activity with qiscus chat fragment, so you can customize the toolbar.
         showLoading();
         Qiscus.buildChatRoomWith("rya.meyvriska24@gmail.com")
-                .withTitle("Rya Meyvriska")
                 .build()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -34,7 +34,9 @@ import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -46,6 +48,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -96,14 +99,14 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private int setOfflineCounter;
 
     QiscusPusherApi() {
-        Log.i("QiscusPusherApi", "Creating...");
+        QiscusLogger.print("QiscusPusherApi", "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
 
         clientId = Qiscus.getApps().getPackageName() + "-";
         clientId += Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
-        serverUri = "ssl://mqtt.qiscus.com:1885";
+        serverUri = Qiscus.getMqttBrokerUrl();
 
         buildClient();
 
@@ -147,7 +150,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void restartConnection() {
-        Log.i(TAG, "Restart connection...");
+        QiscusLogger.print("QiscusPusherApi", "Restart connection...");
         try {
             connecting = false;
             mqttAndroidClient.disconnect();
@@ -181,7 +184,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void disconnect() {
-        Log.i(TAG, "Disconnecting...");
+        QiscusLogger.print(TAG, "Disconnecting...");
         setUserStatus(false);
         try {
             connecting = false;
@@ -195,7 +198,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     private void listenComment() {
-        Log.i(TAG, "Listening comment...");
+        QiscusLogger.print(TAG, "Listening comment...");
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
         } catch (MqttException e) {
@@ -208,7 +211,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void listenRoom(QiscusChatRoom qiscusChatRoom) {
-        Log.i(TAG, "Listening room...");
+        QiscusLogger.print(TAG, "Listening room...");
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
         try {
             int roomId = qiscusChatRoom.getId();
@@ -324,15 +327,23 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         }
         reconnectCounter++;
-        Log.e(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * reconnectCounter + " ms");
+        QiscusErrorLogger.print(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * reconnectCounter + " ms");
         connecting = false;
         scheduledConnect = QiscusAndroidUtil.runOnBackgroundThread(fallbackConnect, RETRY_PERIOD * reconnectCounter);
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
+        try {
+            handleMessage(topic, new String(message.getPayload()));
+        } catch (Exception ignored) {
+            //Do nothing
+        }
+    }
+
+    private void handleMessage(String topic, String message) {
         if (topic.contains(qiscusAccount.getToken())) {
-            QiscusComment qiscusComment = jsonToComment(new String(message.getPayload()));
+            QiscusComment qiscusComment = jsonToComment(message);
             if (qiscusComment == null) {
                 return;
             }
@@ -349,13 +360,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                         .setTopicId(Integer.parseInt(data[2]))
                         .setUser(data[3])
                         .setEvent(QiscusChatRoomEvent.Event.TYPING)
-                        .setTyping("1".equals(new String(message.getPayload())));
+                        .setTyping("1".equals(message));
                 EventBus.getDefault().post(event);
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/d")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
-                String[] payload = new String(message.getPayload()).split(":");
+                String[] payload = message.split(":");
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
                         .setRoomId(Integer.parseInt(data[1]))
                         .setTopicId(Integer.parseInt(data[2]))
@@ -368,7 +379,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } else if (topic.startsWith("r/") && topic.endsWith("/r")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
-                String[] payload = new String(message.getPayload()).split(":");
+                String[] payload = message.split(":");
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
                         .setRoomId(Integer.parseInt(data[1]))
                         .setTopicId(Integer.parseInt(data[2]))
@@ -381,9 +392,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } else if (topic.startsWith("u/") && topic.endsWith("/s")) {
             String[] data = topic.split("/");
             if (!data[1].equals(qiscusAccount.getEmail())) {
-                String[] status = new String(message.getPayload()).split(":");
+                String[] status = message.split(":");
                 Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                calendar.setTimeInMillis(Long.parseLong(status[1]));
+                calendar.setTimeInMillis(Long.parseLong(status[1].substring(0, 13)));
                 QiscusUserStatusEvent event = new QiscusUserStatusEvent(data[1], "1".equals(status[0]),
                         calendar.getTime());
                 EventBus.getDefault().post(event);
@@ -398,7 +409,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void connectComplete(boolean reconnect, String serverUri) {
-        Log.i(TAG, "Connected...");
+        QiscusLogger.print(TAG, "Connected...");
         EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
         try {
             connecting = false;
@@ -431,7 +442,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         }
         reconnectCounter++;
-        Log.e(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms");
+        QiscusErrorLogger.print(TAG, "Failure to connect, try again in " + RETRY_PERIOD * reconnectCounter + " ms");
         connecting = false;
         scheduledConnect = QiscusAndroidUtil.runOnBackgroundThread(fallbackConnect, RETRY_PERIOD * reconnectCounter);
     }
@@ -479,12 +490,17 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     JsonObject payload = jsonObject.get("payload").getAsJsonObject();
                     if (payload.has("text")) {
                         String text = payload.get("text").getAsString();
-                        if (text != null && !text.trim().isEmpty()) {
+                        if (QiscusTextUtil.isNotBlank(text)) {
                             qiscusComment.setMessage(text.trim());
                         }
                     }
                 }
             }
+
+            if (jsonObject.has("extras") && !jsonObject.get("extras").isJsonNull()) {
+                qiscusComment.setExtras(new JSONObject(jsonObject.get("extras").getAsJsonObject().toString()));
+            }
+
             return qiscusComment;
         } catch (Exception e) {
             e.printStackTrace();

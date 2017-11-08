@@ -30,7 +30,6 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
@@ -101,24 +100,15 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     protected void binRoomData() {
         super.binRoomData();
         tvTitle.setText(qiscusChatRoom.getName());
-        if (!qiscusChatRoom.getSubtitle().isEmpty()) {
-            tvSubtitle.setText(qiscusChatRoom.getSubtitle());
-            tvSubtitle.setVisibility(qiscusChatRoom.getSubtitle().isEmpty() ? View.GONE : View.VISIBLE);
-        }
         showRoomImage();
     }
 
     protected void showRoomImage() {
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
-                Nirmana.getInstance().get().load(member.getAvatar())
-                        .error(R.drawable.ic_qiscus_avatar)
-                        .placeholder(R.drawable.ic_qiscus_avatar)
-                        .dontAnimate()
-                        .into(ivAvatar);
-                break;
-            }
-        }
+        Nirmana.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
+                .error(R.drawable.ic_qiscus_avatar)
+                .placeholder(R.drawable.ic_qiscus_avatar)
+                .dontAnimate()
+                .into(ivAvatar);
     }
 
     @Override
@@ -129,18 +119,14 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     public void onUserTyping(String user, boolean typing) {
-        if (qiscusChatRoom.getSubtitle().isEmpty()) {
-            tvSubtitle.setText(typing ? getString(R.string.qiscus_typing) : getString(R.string.qiscus_online));
-            tvSubtitle.setVisibility(View.VISIBLE);
-        }
+        tvSubtitle.setText(typing ? getString(R.string.qiscus_typing) : getString(R.string.qiscus_online));
+        tvSubtitle.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onUserStatusChanged(String user, boolean online, Date lastActive) {
-        if (qiscusChatRoom.getSubtitle().isEmpty()) {
-            String last = QiscusDateUtil.getRelativeTimeDiff(lastActive);
-            tvSubtitle.setText(online ? getString(R.string.qiscus_online) : getString(R.string.qiscus_last_seen, last));
-            tvSubtitle.setVisibility(View.VISIBLE);
-        }
+        String last = QiscusDateUtil.getRelativeTimeDiff(lastActive);
+        tvSubtitle.setText(online ? getString(R.string.qiscus_online) : getString(R.string.qiscus_last_seen, last));
+        tvSubtitle.setVisibility(View.VISIBLE);
     }
 }

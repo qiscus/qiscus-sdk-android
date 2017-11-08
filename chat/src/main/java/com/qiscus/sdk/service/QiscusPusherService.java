@@ -20,7 +20,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -28,9 +27,11 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusSyncEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -57,7 +58,7 @@ public class QiscusPusherService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "Creating...");
+        QiscusLogger.print(TAG, "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
@@ -98,15 +99,25 @@ public class QiscusPusherService extends Service {
                                     if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
                                         qiscusComment.setState(savedQiscusComment.getState());
                                     }
-                                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                                })
+                                .doOnSubscribe(() -> {
+                                    EventBus.getDefault().post((QiscusSyncEvent.STARTED));
+                                    QiscusLogger.print("Sync started...");
+                                })
+                                .doOnCompleted(() -> {
+                                    EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
+                                    QiscusLogger.print("Sync completed...");
                                 })
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(qiscusComment -> {
                                     QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
                                     EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-
-                                }, QiscusErrorLogger::print);
+                                }, throwable -> {
+                                    QiscusErrorLogger.print(throwable);
+                                    EventBus.getDefault().post(QiscusSyncEvent.FAILED);
+                                    QiscusLogger.print("Sync failed...");
+                                });
                     }
                 }, 0, period, TimeUnit.MILLISECONDS);
     }
@@ -132,7 +143,7 @@ public class QiscusPusherService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "Destroying...");
+        QiscusLogger.print(TAG, "Destroying...");
         EventBus.getDefault().unregister(this);
         sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
         stopSync();

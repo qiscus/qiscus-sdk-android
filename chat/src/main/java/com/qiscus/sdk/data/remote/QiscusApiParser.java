@@ -27,6 +27,10 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.util.QiscusTextUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -84,7 +88,12 @@ final class QiscusApiParser {
             }
 
             qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
-            qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null : jsonChatRoom.get("options").getAsString());
+            try {
+                qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :
+                        new JSONObject(jsonChatRoom.get("options").getAsString()));
+            } catch (JSONException ignored) {
+                //Do nothing
+            }
             qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
 
             JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
@@ -138,7 +147,12 @@ final class QiscusApiParser {
                 }
 
                 qiscusChatRoom.setLastTopicId(jsonChatRoom.get("id").getAsInt());
-                qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null : jsonChatRoom.get("options").getAsString());
+                try {
+                    qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :
+                            new JSONObject(jsonChatRoom.get("options").getAsString()));
+                } catch (JSONException ignored) {
+                    //Do nothing
+                }
                 qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
                 qiscusChatRoom.setUnreadCount(jsonChatRoom.get("unread_count").getAsInt());
 
@@ -235,10 +249,18 @@ final class QiscusApiParser {
                 JsonObject payload = jsonComment.get("payload").getAsJsonObject();
                 if (payload.has("text")) {
                     String text = payload.get("text").getAsString();
-                    if (text != null && !text.trim().isEmpty()) {
+                    if (QiscusTextUtil.isNotBlank(text)) {
                         qiscusComment.setMessage(text.trim());
                     }
                 }
+            }
+        }
+
+        if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
+            try {
+                qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
 

@@ -30,6 +30,7 @@ import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.json.JSONException;
@@ -43,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -86,6 +88,7 @@ public enum QiscusApi {
         httpClient = new OkHttpClient.Builder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(this::headersInterceptor)
                 .build();
 
         api = new Retrofit.Builder()
@@ -95,6 +98,15 @@ public enum QiscusApi {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
                 .create(Api.class);
+    }
+
+    private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
+        Request req = chain.request().newBuilder()
+                .addHeader("QISCUS_SDK_APP_ID", Qiscus.getAppId())
+                .addHeader("QISCUS_SDK_TOKEN", Qiscus.hasSetupUser() ? Qiscus.getToken() : "")
+                .addHeader("QISCUS_SDK_USER_EMAIL", Qiscus.hasSetupUser() ? Qiscus.getQiscusAccount().getEmail() : "")
+                .build();
+        return chain.proceed(req);
     }
 
     public static QiscusApi getInstance() {
@@ -119,18 +131,19 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, String options) {
-        return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId, options)
+    public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, JSONObject options) {
+        return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId,
+                options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, String options) {
-        return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options)
+    public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
+        return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, String options) {
-        return api.createOrGetGroupChatRoom(Qiscus.getToken(), uniqueId, name, avatarUrl, options)
+    public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {
+        return api.createOrGetGroupChatRoom(Qiscus.getToken(), uniqueId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
@@ -169,14 +182,17 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
+        Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
         return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
                 qiscusComment.getTopicId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
-                qiscusComment.getExtraPayload())
+                qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :
+                        qiscusComment.getExtras().toString())
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject()
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
                     qiscusComment.setId(jsonComment.get("id").getAsInt());
                     qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    QiscusLogger.print("Sent Comment...");
                     return qiscusComment;
                 });
     }
@@ -289,8 +305,8 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, String options) {
-        return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options)
+    public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, JSONObject options) {
+        return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
@@ -383,7 +399,8 @@ public enum QiscusApi {
                                             @Field("topic_id") int topicId,
                                             @Field("unique_temp_id") String uniqueId,
                                             @Field("type") String type,
-                                            @Field("payload") String payload);
+                                            @Field("payload") String payload,
+                                            @Field("extras") String extras);
 
         @GET("/api/v2/mobile/sync")
         Observable<JsonElement> sync(@Query("token") String token,

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
@@ -49,14 +47,14 @@
                     android:id="@+id/back"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_qiscus_back"/>
+                    android:src="@drawable/ic_qiscus_back" />
 
                 <com.qiscus.sdk.ui.view.QiscusCircularImageView
                     android:id="@+id/profile_picture"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center_vertical"
-                    android:padding="6dp"/>
+                    android:padding="6dp" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -73,7 +71,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                        android:textColor="@color/qiscus_white"/>
+                        android:textColor="@color/qiscus_white" />
 
                 </LinearLayout>
 
@@ -88,12 +86,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#000"/>
+        android:background="#000" />
 
     <com.qiscus.sdk.ui.view.QiscusMentionSuggestionView
         android:id="@+id/mention_suggestion"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/field_message_container"
@@ -110,7 +108,7 @@
             android:layout_gravity="bottom"
             android:background="@drawable/bt_qiscus_selector_grey"
             android:padding="8dp"
-            android:src="@drawable/ic_qiscus_emot"/>
+            android:src="@drawable/ic_qiscus_emot" />
 
         <com.qiscus.manggil.ui.MentionsEditText
             android:id="@+id/field_message"
@@ -127,7 +125,7 @@
             android:padding="8dp"
             android:textColor="@color/qiscus_primary_text"
             android:textSize="16sp"
-            app:emojiSize="22sp"/>
+            app:emojiSize="22sp" />
 
         <ImageView
             android:id="@+id/button_send"
@@ -135,20 +133,70 @@
             android:layout_height="46dp"
             android:layout_gravity="bottom"
             android:padding="8dp"
-            android:src="@drawable/ic_qiscus_send"/>
+            android:src="@drawable/ic_qiscus_send" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="@color/qiscus_light_grey"/>
+        android:background="@color/qiscus_light_grey" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/qiscus_white"
-        android:visibility="gone"/>
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/button_container_divider"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/qiscus_light_grey"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_qiscus_selector_grey"
+            android:gravity="center"
+            android:text="@string/qiscus_cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/qiscus_white"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="1.2dp"
+            android:layout_height="match_parent"
+            android:background="@color/qiscus_white" />
+
+        <TextView
+            android:id="@+id/submit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_qiscus_selector_grey"
+            android:gravity="center"
+            android:text="@string/qiscus_send"
+            android:textAllCaps="true"
+            android:textColor="@color/qiscus_white"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 
 </LinearLayout>

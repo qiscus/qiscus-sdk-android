@@ -34,6 +34,7 @@ import android.os.Environment;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 
 import java.io.File;
@@ -241,6 +242,37 @@ public final class QiscusImageUtil {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         mediaScanIntent.setData(Uri.fromFile(picture));
         Qiscus.getApps().sendBroadcast(mediaScanIntent);
+    }
+
+    public static void showImageFolderAppInGallery() {
+        File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
+                QiscusImageUtil.IMAGE_PATH + File.separator +
+                        Qiscus.getApps().getString(R.string.qiscus_nomedia));
+        if (nomedia.exists()) {
+            nomedia.delete();
+            //rescan media gallery for updating deleted .nomedia file
+            addImageToGallery(nomedia);
+        }
+    }
+
+    public static void hideImageFolderAppInGallery() {
+        File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
+                QiscusImageUtil.IMAGE_PATH + File.separator +
+                        Qiscus.getApps().getString(R.string.qiscus_nomedia));
+
+        if (!nomedia.getParentFile().exists()) {
+            nomedia.getParentFile().mkdirs();
+        }
+
+        if (!nomedia.exists()) {
+            try {
+                if (nomedia.createNewFile()) {
+                    QiscusImageUtil.addImageToGallery(nomedia);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static File createImageFile() throws IOException {

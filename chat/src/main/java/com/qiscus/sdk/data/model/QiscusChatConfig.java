@@ -149,6 +149,8 @@ public class QiscusChatConfig {
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
 
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
+    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
+    private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
 
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
@@ -192,6 +194,8 @@ public class QiscusChatConfig {
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
     private boolean enableFcmPushNotification = false;
+    private boolean enableRequestPermission = true;
+    private boolean enableCaption = true;
 
     private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
 
@@ -661,6 +665,28 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setRoomSenderNameInterceptor(QiscusRoomSenderNameInterceptor
+                                                                 qiscusRoomSenderNameInterceptor) {
+        this.qiscusRoomSenderNameInterceptor = qiscusRoomSenderNameInterceptor;
+        return this;
+    }
+
+    public QiscusChatConfig setCommentSendingInterceptor(QiscusCommentSendingInterceptor
+                                                                 qiscusCommentSendingInterceptor) {
+        this.qiscusCommentSendingInterceptor = qiscusCommentSendingInterceptor;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableRequestPermission(boolean enableRequestPermission) {
+        this.enableRequestPermission = enableRequestPermission;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableCaption(boolean enableCaption) {
+        this.enableCaption = enableCaption;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1042,6 +1068,10 @@ public class QiscusChatConfig {
         return qiscusImageCompressionConfig;
     }
 
+    public boolean isEnableRequestPermission() {
+        return enableRequestPermission;
+    }
+
     @ColorRes
     public int getReplyBarColor() {
         return replyBarColor;
@@ -1087,5 +1117,17 @@ public class QiscusChatConfig {
 
     public QiscusMentionConfig getMentionConfig() {
         return mentionConfig;
+    }
+
+    public QiscusRoomSenderNameInterceptor getRoomSenderNameInterceptor() {
+        return qiscusRoomSenderNameInterceptor;
+    }
+
+    public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
+        return qiscusCommentSendingInterceptor;
+    }
+
+    public boolean isEnableCaption() {
+        return enableCaption;
     }
 }

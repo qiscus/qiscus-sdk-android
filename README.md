@@ -35,7 +35,7 @@ Then add to your app module build.gradle
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.13.3'
+    compile 'com.qiscus.sdk:chat:2.14.0'
 }
 ```
 
@@ -65,7 +65,6 @@ Qiscus.setUser("user@email.com", "userKey")
       .save(new Qiscus.SetUserListener() {
           @Override
           public void onSuccess(QiscusAccount qiscusAccount) {
-              DataManager.saveQiscusAccount(qiscusAccount);
               startActivity(new Intent(this, ConsultationListActivity.class));
           }
           @Override
@@ -123,7 +122,6 @@ QiscusApi.getInstance().requestNonce() //Request nonce from qiscus api
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(qiscusAccount -> {
-              DataManager.saveQiscusAccount(qiscusAccount);
               startActivity(new Intent(this, ConsultationListActivity.class));
         }, throwable -> {
               if (throwable instanceof HttpException) { //Error response from server
@@ -151,7 +149,6 @@ Updating user profile calls Qiscus.updateUser(name, avatar, listener) :
 Qiscus.updateUser("Tony Stark", "http://avatar.url.com/handsome.jpg", new Qiscus.SetUserListener() {
             @Override
             public void onSuccess(QiscusAccount qiscusAccount) {
-                DataManager.saveQiscusAccount(qiscusAccount);
                 startActivity(new Intent(this, ConsultationListActivity.class));
             }
 
@@ -193,7 +190,6 @@ Start chat with target is very easy, all you need is just call
 
 ```java
 Qiscus.buildChatWith("jhon.doe@gmail.com")
-      .withTitle("Jhon Doe")
       .build(this, new Qiscus.ChatActivityBuilderListener() {
           @Override
           public void onSuccess(Intent intent) {
@@ -254,7 +250,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
        });
 ```
 
-for accesing room that created by this call, you need to call it with its roomId. This methode is always creating new chat room.
+for accessing room that created by this call, you need to call it with its roomId. This methode is always creating new chat room.
 
 
 ### Get a room by room id
@@ -516,28 +512,112 @@ If you want full customisations, you can modify everything on the view by forkin
 
 # Push Notifications 
 
-Currently we recommend to use our Webhook-API to push notification from your own server to client app for simplicity and flexibility handling
+First install FCM to your apps, you can follow [this steps.](https://firebase.google.com/docs/cloud-messaging/android/client) You can skip this step, if your apps already use FCM. Then put your api key to qiscus dashboard.
+
+Now lets integrate with Qiscus client sdk, first enable FCM at Qiscus chat config.
+
+```java
+Qiscus.getChatConfig().setEnableFcmPushNotification(true);
+```
+
+After that, lets change your firebase service to extend Qiscus firebase service instead of firebase service class.
+```java
+public class MyFirebaseIdService extends QiscusFirebaseIdService {
+    @Override
+    public void onTokenRefresh() {
+        super.onTokenRefresh(); // Must call super
+
+        //Below is your own apps specific code
+        // e.g register the token to your backend
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        sendTokenToMyBackend(refreshedToken);
+    }
+}
+```
+
+```java
+public class MyFirebaseMessagingService extends QiscusFirebaseService {
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        if (handleMessageReceived(remoteMessage)) { // For qiscus
+            return;
+        }
+
+        //Your FCM PN here
+    }
+}
+```
+
+If extension is not possible or desirable, use the following code the ensure Qiscus handle the FCM.
+
+```java
+public class MyFirebaseIdService extends FirebaseInstanceIdService {
+    @Override
+    public void onTokenRefresh() {
+        super.onTokenRefresh();
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+
+        //Register token to qiscus
+        Qiscus.setFcmToken(refreshedToken);
+
+        //Below is your own apps specific code
+        // e.g register the token to your backend
+        sendTokenToMyBackend(refreshedToken);
+    }
+}
+```
+
+```java
+public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        if (QiscusFirebaseService.handleMessageReceived(remoteMessage)) { // For qiscus
+            return;
+        }
+
+        //Your FCM PN here
+    }
+}
+```
 
 # Offline Messages
 
 ## Post Messages
 
-During post message, if you dont have any internet connection, message will be store locally and will be automatically being send once your internet connection is back. 
+During post message, if you don't have any internet connection, message will be store locally and will be automatically being send once your internet connection is back. For you want to enqueue a message manually you can call this api:
+```java
+QiscusApi.getInstance().postComment(qiscusComment)
+        .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+        .doOnError(throwable -> {
+            qiscusComment.setState(QiscusComment.STATE_PENDING);
+            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        })
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(commentSend -> {
+            //Success
+        }, throwable -> {
+            //we will automatically retry again later
+        });
+```
 
 ## Get Messages
 
-Messages are stored locally so you can still access the messages when you dont have internet conenction. However any new messages will not being received after you have your internet connection back.
+Messages are stored locally so you can still access the messages when you don't have internet connection. However any new messages will not being received after you have your internet connection back. To access data locally, you can use QiscusDataStore, here sample code to get local room and message
 
-
+```java
+QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(roomId);
+List<QiscusComment> comments = Qiscus.getDataStore().getComments(room.getLastTopicId(), count);
+```
 
 # Miscellaneous
 
 ### Android Support Libraries
-Qiscus SDK is using appcompat libraries to support some features. If your apps using appcompat too, we highly recommended to using the latest stable appcompat version, or using the same version with Qiscus SDK. You can check the appcompat version of Qiscus SDK [here](https://github.com/qiscus/qiscus-sdk-android/blob/master/chat/build.gradle#L102). You can also force Qiscus SDK to use your apps appcompat verion. Use "exclude group" at your build.gradle, for example:
+Qiscus SDK is using appcompat libraries to support some features. If your apps using appcompat too, we highly recommended to using the latest stable appcompat version, or using the same version with Qiscus SDK. You can check the appcompat version of Qiscus SDK [here](https://github.com/qiscus/qiscus-sdk-android/blob/master/chat/build.gradle#L102). You can also force Qiscus SDK to use your apps appcompat version. Use "exclude group" at your build.gradle, for example:
 
 ```groovy
 //Qiscus sdk without android support libraries
-compile('com.qiscus.sdk:chat:2.13.3') {
+compile('com.qiscus.sdk:chat:2.14.0') {
     transitive = true
     exclude group: 'com.android.support'
 }
@@ -553,6 +633,17 @@ compile 'com.android.support:customtabs:yourVersion'
 compile 'com.android.support:support-v13:yourVersion'
 ```
 
+If you have problem can not download android support libraries, please add Google's Maven repository to your project build.gradle
+
+```groovy
+allprojects {
+    repositories {
+        .....
+        maven { url  "https://maven.google.com" }
+    }
+}
+```
+
 ### RxJava support
 
 ```java
@@ -564,7 +655,6 @@ Qiscus.setUser("user@email.com", "password")
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe(qiscusAccount -> {
-          DataManager.saveQiscusAccount(qiscusAccount);
           startActivity(new Intent(this, ConsultationListActivity.class));
       }, throwable -> {
               if (throwable instanceof HttpException) { //Error response from server
@@ -585,7 +675,6 @@ Qiscus.setUser("user@email.com", "password")
       
 // Start a chat activity with rxjava example      
 Qiscus.buildChatWith("jhon.doe@gmail.com")
-      .withTitle("Jhon Doe")
       .build(this)
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
@@ -634,6 +723,3 @@ If you are using Proguard in your application, make sure you add Proguard rules 
 # Sample Application
 
 You can get the sample apps [here](https://github.com/qiscus/qiscus-sdk-android-sample)
-
-
-

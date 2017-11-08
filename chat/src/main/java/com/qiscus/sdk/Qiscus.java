@@ -39,10 +39,12 @@ import com.qiscus.sdk.service.QiscusPusherService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusLogger;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,8 +73,11 @@ public class Qiscus {
     private static QiscusChatConfig chatConfig;
 
     private static String appServer;
+    private static String appId;
+    private static String mqttBrokerUrl;
     private static long heartBeat;
     private static String authorities;
+    private static boolean enableLog;
 
     private Qiscus() {
     }
@@ -96,7 +101,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, "https://" + qiscusAppId + ".qiscus.com");
+        initWithCustomServer(application, qiscusAppId, "https://" + qiscusAppId + ".qiscus.com", "ssl://mqtt.qiscus.com:1885");
     }
 
     /**
@@ -108,18 +113,22 @@ public class Qiscus {
      * public class SampleApps extends Application {
      *  public void onCreate() {
      *      super.onCreate();
-     *      Qiscus.initWithCustomServer(this, "http://myserver.com");
+     *      Qiscus.initWithCustomServer(this, my-app-id, "http://myserver.com", "ssl://mqtt.myserver.com:1885");
      *  }
      * }
      * }
      * </pre>
      *
      * @param application   Application instance
+     * @param qiscusAppId   Your Qiscus App Id
      * @param serverBaseUrl Your qiscus chat engine base url
+     * @param mqttBrokerUrl Your Mqtt Broker url
      */
-    public static void initWithCustomServer(Application application, String serverBaseUrl) {
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
         appInstance = application;
+        appId = qiscusAppId;
         appServer = serverBaseUrl;
+        Qiscus.mqttBrokerUrl = mqttBrokerUrl;
         appHandler = new Handler(appInstance.getApplicationContext().getMainLooper());
         taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
@@ -137,6 +146,7 @@ public class Qiscus {
         configureFcmToken();
 
         EmojiManager.install(new EmojiOneProvider());
+        QiscusLogger.print("init Qiscus with app Id " + appId);
     }
 
     public static void startPusherService() {
@@ -262,11 +272,31 @@ public class Qiscus {
     /**
      * Accessor to get current qiscus app id
      *
-     * @return Current qiscus app id
+     * @return Current app id
+     */
+    public static String getAppId() {
+        checkAppIdSetup();
+        return appId;
+    }
+
+    /**
+     * Accessor to get current qiscus app server
+     *
+     * @return Current qiscus app server
      */
     public static String getAppServer() {
         checkAppIdSetup();
         return appServer;
+    }
+
+    /**
+     * Accessor to get current mqtt broker url
+     *
+     * @return Current mqtt broker url
+     */
+    public static String getMqttBrokerUrl() {
+        checkAppIdSetup();
+        return mqttBrokerUrl;
     }
 
     /**
@@ -630,14 +660,10 @@ public class Qiscus {
 
     public static class ChatBuilder {
         private String email;
-        private String title;
-        private String subtitle;
         private String distinctId;
-        private String options;
+        private JSONObject options;
 
         private ChatBuilder(String email) {
-            title = "Chat";
-            subtitle = "";
             this.email = email;
         }
 
@@ -646,9 +672,10 @@ public class Qiscus {
          *
          * @param title The title of chat room
          * @return builder
+         * @deprecated 1-1 chat title will always the opponent user name
          */
+        @Deprecated
         public ChatBuilder withTitle(String title) {
-            this.title = title;
             return this;
         }
 
@@ -657,9 +684,10 @@ public class Qiscus {
          *
          * @param subtitle The subtitle of chat
          * @return builder
+         * @deprecated to create sub title, please create your won toolbar
          */
+        @Deprecated
         public ChatBuilder withSubtitle(String subtitle) {
-            this.subtitle = subtitle;
             return this;
         }
 
@@ -680,7 +708,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public ChatBuilder withOptions(String options) {
+        public ChatBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -704,10 +732,6 @@ public class Qiscus {
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
-                    .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setName(title);
-                        qiscusChatRoom.setSubtitle(subtitle);
-                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -730,10 +754,8 @@ public class Qiscus {
 
     public static class ChatActivityBuilder {
         private String email;
-        private String title;
-        private String subtitle;
         private String distinctId;
-        private String options;
+        private JSONObject options;
         private String message;
         private File shareFile;
         private boolean autoSendExtra;
@@ -741,8 +763,6 @@ public class Qiscus {
         private QiscusComment scrollToComment;
 
         private ChatActivityBuilder(String email) {
-            title = "Chat";
-            subtitle = "";
             this.email = email;
             autoSendExtra = true;
         }
@@ -752,9 +772,10 @@ public class Qiscus {
          *
          * @param title The title of chat room
          * @return builder
+         * @deprecated 1-1 chat title will always the opponent user name
          */
+        @Deprecated
         public ChatActivityBuilder withTitle(String title) {
-            this.title = title;
             return this;
         }
 
@@ -763,9 +784,10 @@ public class Qiscus {
          *
          * @param subtitle The subtitle of chat
          * @return builder
+         * @deprecated to create sub title, please create your won toolbar
          */
+        @Deprecated
         public ChatActivityBuilder withSubtitle(String subtitle) {
-            this.subtitle = subtitle;
             return this;
         }
 
@@ -786,7 +808,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public ChatActivityBuilder withOptions(String options) {
+        public ChatActivityBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -868,10 +890,6 @@ public class Qiscus {
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
-                    .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setName(title);
-                        qiscusChatRoom.setSubtitle(subtitle);
-                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
@@ -897,10 +915,8 @@ public class Qiscus {
 
     public static class ChatFragmentBuilder {
         private String email;
-        private String title;
-        private String subtitle;
         private String distinctId;
-        private String options;
+        private JSONObject options;
         private String message;
         private File shareFile;
         private boolean autoSendExtra;
@@ -908,8 +924,6 @@ public class Qiscus {
         private QiscusComment scrollToComment;
 
         private ChatFragmentBuilder(String email) {
-            title = "Chat";
-            subtitle = "";
             this.email = email;
             autoSendExtra = true;
         }
@@ -919,9 +933,10 @@ public class Qiscus {
          *
          * @param title The title of chat room
          * @return builder
+         * @deprecated 1-1 chat title will always the opponent user name
          */
+        @Deprecated
         public ChatFragmentBuilder withTitle(String title) {
-            this.title = title;
             return this;
         }
 
@@ -930,9 +945,10 @@ public class Qiscus {
          *
          * @param subtitle The subtitle of chat
          * @return builder
+         * @deprecated to create sub title, please create your won toolbar
          */
+        @Deprecated
         public ChatFragmentBuilder withSubtitle(String subtitle) {
-            this.subtitle = subtitle;
             return this;
         }
 
@@ -953,7 +969,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public ChatFragmentBuilder withOptions(String options) {
+        public ChatFragmentBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -1033,10 +1049,6 @@ public class Qiscus {
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
                     .getChatRoom(email, distinctId, options)
-                    .doOnNext(qiscusChatRoom -> {
-                        qiscusChatRoom.setName(title);
-                        qiscusChatRoom.setSubtitle(subtitle);
-                    })
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile,
@@ -1063,7 +1075,7 @@ public class Qiscus {
     public static class GroupChatBuilder {
         private Set<String> emails;
         private String name;
-        private String options;
+        private JSONObject options;
         private String avatarUrl;
 
         private GroupChatBuilder(String name, String email) {
@@ -1105,7 +1117,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public GroupChatBuilder withOptions(String options) {
+        public GroupChatBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -1136,7 +1148,7 @@ public class Qiscus {
     public static class DefinedIdGroupChatBuilder {
         private String uniqueId;
         private String name;
-        private String options;
+        private JSONObject options;
         private String avatarUrl;
 
         private DefinedIdGroupChatBuilder(String uniqueId) {
@@ -1172,7 +1184,7 @@ public class Qiscus {
          * @param options The data need to save
          * @return builder
          */
-        public DefinedIdGroupChatBuilder withOptions(String options) {
+        public DefinedIdGroupChatBuilder withOptions(JSONObject options) {
             this.options = options;
             return this;
         }
@@ -1199,4 +1211,24 @@ public class Qiscus {
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
+
+    /**
+     * Set the log of qiscus data. Default value is false
+     *
+     * @param enableLog boolean
+     */
+
+    public static void setEnableLog(boolean enableLog) {
+        Qiscus.enableLog = enableLog;
+    }
+
+    /**
+     * Get the log qiscus
+     *
+     * @return enableLog status in boolean
+     */
+    public static boolean isEnableLog() {
+        return Qiscus.enableLog;
+    }
+
 }
