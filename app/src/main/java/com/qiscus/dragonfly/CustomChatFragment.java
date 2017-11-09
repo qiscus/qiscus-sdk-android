@@ -64,14 +64,25 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     protected void onLoadView(View view) {
         super.onLoadView(view);
         swipeRefreshLayout.setProgressViewOffset(false, 0, 128);
+
+        View clickConsumer = view.findViewById(R.id.click_consumer);
         mAttachButton = (ImageView) view.findViewById(R.id.button_attach);
         mAddPanel = (LinearLayout) view.findViewById(R.id.add_panel);
         mAttachButton.setOnClickListener(v -> {
             if (mAddPanel.getVisibility() == View.GONE) {
                 mAddPanel.startAnimation(animation);
                 mAddPanel.setVisibility(View.VISIBLE);
+                clickConsumer.setVisibility(View.VISIBLE);
             } else {
                 mAddPanel.setVisibility(View.GONE);
+                clickConsumer.setVisibility(View.GONE);
+            }
+        });
+
+        clickConsumer.setOnClickListener(v -> {
+            if (mAddPanel.getVisibility() == View.VISIBLE) {
+                mAddPanel.setVisibility(View.GONE);
+                clickConsumer.setVisibility(View.GONE);
             }
         });
     }
