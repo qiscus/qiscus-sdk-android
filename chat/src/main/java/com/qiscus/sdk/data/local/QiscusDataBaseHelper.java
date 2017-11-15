@@ -234,26 +234,26 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             return qiscusChatRooms;
         }
 
-        String query = "SELECT * FROM " + QiscusDb.RoomTable.TABLE_NAME + " WHERE ";
+        StringBuilder query = new StringBuilder("SELECT * FROM " + QiscusDb.RoomTable.TABLE_NAME + " WHERE ");
         for (int i = 0; i < roomIds.size(); i++) {
-            query += QiscusDb.RoomTable.COLUMN_ID + " = " + roomIds.get(i);
+            query.append(QiscusDb.RoomTable.COLUMN_ID + " = ").append(roomIds.get(i));
             if (i < roomIds.size() - 1) {
-                query += " OR ";
+                query.append(" OR ");
             }
         }
 
         if (!roomIds.isEmpty() && !uniqueIds.isEmpty()) {
-            query += " OR ";
+            query.append(" OR ");
         }
 
         for (int i = 0; i < uniqueIds.size(); i++) {
-            query += QiscusDb.RoomTable.COLUMN_DISTINCT_ID + " = " + DatabaseUtils.sqlEscapeString(uniqueIds.get(i));
+            query.append(QiscusDb.RoomTable.COLUMN_DISTINCT_ID + " = ").append(DatabaseUtils.sqlEscapeString(uniqueIds.get(i)));
             if (i < uniqueIds.size() - 1) {
-                query += " OR ";
+                query.append(" OR ");
             }
         }
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteDatabase.rawQuery(query.toString(), null);
         while (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qiscusChatRoom.setMember(getRoomMembers(qiscusChatRoom.getId()));
