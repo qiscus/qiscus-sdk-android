@@ -33,7 +33,7 @@ public class SampleApps extends Application {
     public void onCreate() {
         super.onCreate();
         Qiscus.init(this, "dragongo");
-        Qiscus.setEnableLog(true);
+        Qiscus.setEnableLog(BuildConfig.DEBUG);
         Stetho.initializeWithDefaults(this);
     }
 }
