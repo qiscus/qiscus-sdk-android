@@ -59,6 +59,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                     addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
                 }
             }
+            QiscusComment comment = qiscusChatRoom.getLastComment();
+            if (comment != null && comment.getId() > 0) {
+                addOrUpdate(comment);
+            }
         }
     }
 
@@ -91,6 +95,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
                 addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
             }
+        }
+
+        QiscusComment comment = qiscusChatRoom.getLastComment();
+        if (comment != null && comment.getId() > 0) {
+            addOrUpdate(comment);
         }
     }
 
