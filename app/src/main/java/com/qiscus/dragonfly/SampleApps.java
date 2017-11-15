@@ -18,6 +18,7 @@ package com.qiscus.dragonfly;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
 
 /**
@@ -32,5 +33,7 @@ public class SampleApps extends Application {
     public void onCreate() {
         super.onCreate();
         Qiscus.init(this, "dragongo");
+        Qiscus.setEnableLog(true);
+        Stetho.initializeWithDefaults(this);
     }
 }
