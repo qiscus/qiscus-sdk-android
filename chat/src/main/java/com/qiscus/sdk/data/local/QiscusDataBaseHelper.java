@@ -28,6 +28,7 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rx.Emitter;
@@ -214,6 +215,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusChatRooms.add(qiscusChatRoom);
         }
         cursor.close();
+        sortRooms(qiscusChatRooms);
         return qiscusChatRooms;
     }
 
@@ -262,6 +264,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusChatRooms.add(qiscusChatRoom);
         }
         cursor.close();
+        sortRooms(qiscusChatRooms);
         return qiscusChatRooms;
     }
 
@@ -897,5 +900,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } finally {
             sqLiteDatabase.endTransaction();
         }
+    }
+
+    private void sortRooms(List<QiscusChatRoom> qiscusChatRooms) {
+        Collections.sort(qiscusChatRooms, (room1, room2) -> {
+            if (room1.getLastComment() != null && room2.getLastComment() != null) {
+                return room2.getLastComment().getTime().compareTo(room1.getLastComment().getTime());
+            } else if (room1.getLastComment() == null && room2.getLastComment() != null) {
+                return 1;
+            } else if (room1.getLastComment() != null && room2.getLastComment() == null) {
+                return -1;
+            }
+            return 0;
+        });
     }
 }
