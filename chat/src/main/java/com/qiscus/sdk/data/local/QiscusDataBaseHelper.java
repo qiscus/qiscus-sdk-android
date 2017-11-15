@@ -234,9 +234,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             return qiscusChatRooms;
         }
 
-        StringBuilder query = new StringBuilder("SELECT * FROM " + QiscusDb.RoomTable.TABLE_NAME + " WHERE ");
+        StringBuilder query = new StringBuilder("SELECT * FROM ").append(QiscusDb.RoomTable.TABLE_NAME).append(" WHERE ");
         for (int i = 0; i < roomIds.size(); i++) {
-            query.append(QiscusDb.RoomTable.COLUMN_ID + " = ").append(roomIds.get(i));
+            query.append(QiscusDb.RoomTable.COLUMN_ID).append(" = ").append(roomIds.get(i));
             if (i < roomIds.size() - 1) {
                 query.append(" OR ");
             }
@@ -247,7 +247,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         }
 
         for (int i = 0; i < uniqueIds.size(); i++) {
-            query.append(QiscusDb.RoomTable.COLUMN_DISTINCT_ID + " = ").append(DatabaseUtils.sqlEscapeString(uniqueIds.get(i)));
+            query.append(QiscusDb.RoomTable.COLUMN_DISTINCT_ID).append(" = ").append(DatabaseUtils.sqlEscapeString(uniqueIds.get(i)));
             if (i < uniqueIds.size() - 1) {
                 query.append(" OR ");
             }
