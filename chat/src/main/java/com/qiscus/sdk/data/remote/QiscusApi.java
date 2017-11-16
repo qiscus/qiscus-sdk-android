@@ -27,7 +27,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusCommentSentEvent;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -197,7 +197,7 @@ public enum QiscusApi {
                     QiscusLogger.print("Sent Comment...");
                     return qiscusComment;
                 })
-                .doOnNext(comment -> EventBus.getDefault().post(new QiscusCommentReceivedEvent(comment)));
+                .doOnNext(comment -> EventBus.getDefault().post(new QiscusCommentSentEvent(comment)));
     }
 
     public Observable<QiscusComment> sync(int lastCommentId) {
