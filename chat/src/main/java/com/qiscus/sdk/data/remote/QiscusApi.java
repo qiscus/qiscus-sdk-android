@@ -27,12 +27,14 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
+import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -194,7 +196,8 @@ public enum QiscusApi {
                     qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
                     QiscusLogger.print("Sent Comment...");
                     return qiscusComment;
-                });
+                })
+                .doOnNext(comment -> EventBus.getDefault().post(new QiscusCommentReceivedEvent(comment)));
     }
 
     public Observable<QiscusComment> sync(int lastCommentId) {
