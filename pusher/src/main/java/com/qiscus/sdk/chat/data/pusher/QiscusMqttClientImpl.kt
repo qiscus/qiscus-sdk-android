@@ -397,9 +397,9 @@ class QiscusMqttClient @JvmOverloads constructor(
         }
     }
 
-    override fun messageArrived(topic: String?, message: MqttMessage?) {
+    override fun messageArrived(topic: String?, mqttMessage: MqttMessage?) {
         if (topic!!.contains(account.token)) {
-            val message = messagePayloadMapper.mapFromPusher(String(message!!.payload))
+            val message = messagePayloadMapper.mapFromPusher(String(mqttMessage!!.payload))
             messageLocal.saveAndNotify(message)
             if (message.sender.id != account.user.id) {
                 notifyDelivered(message)
@@ -407,24 +407,24 @@ class QiscusMqttClient @JvmOverloads constructor(
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {//typing
             val data = topic.split("/")
             if (data[3] != account.user.id) {
-                userPublisher.onUserTyping(data[1], data[3], "1" == String(message!!.payload))
+                userPublisher.onUserTyping(data[1], data[3], "1" == String(mqttMessage!!.payload))
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/d")) {//delivered
             val data = topic.split("/")
             if (data[3] != account.user.id) {
-                val payload = String(message!!.payload).split(":")
+                val payload = String(mqttMessage!!.payload).split(":")
                 messageLocal.updateLastDeliveredMessage(data[1], data[3], MessageIdEntity(payload[0], uniqueId = payload[1]))
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/r")) {//read
             val data = topic.split("/")
             if (data[3] != account.user.id) {
-                val payload = String(message!!.payload).split(":")
+                val payload = String(mqttMessage!!.payload).split(":")
                 messageLocal.updateLastReadMessage(data[1], data[3], MessageIdEntity(payload[0], uniqueId = payload[1]))
             }
         } else if (topic.startsWith("u/") && topic.endsWith("/s")) {//online status
             val data = topic.split("/")
             if (data[1] != account.user.id) {
-                val payload = String(message!!.payload).split(":")
+                val payload = String(mqttMessage!!.payload).split(":")
                 userPublisher.onUserStatusChanged(data[1], "1" == payload[0], Date(payload[1].substring(0, 13).toLong()))
             }
         }
