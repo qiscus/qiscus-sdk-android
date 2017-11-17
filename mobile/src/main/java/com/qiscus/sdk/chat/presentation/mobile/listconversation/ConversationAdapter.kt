@@ -47,14 +47,14 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
     }
 
     override fun compare(lhs: ConversationViewModel, rhs: ConversationViewModel): Int {
-        return if (lhs.lastComment == null) {
+        return if (lhs.lastMessage == null) {
             1
-        } else if (rhs.lastComment == null) {
+        } else if (rhs.lastMessage == null) {
             -1
-        } else if (lhs.lastComment == null && rhs.lastComment == null) {
+        } else if (lhs.lastMessage == null && rhs.lastMessage == null) {
             0
         } else {
-            rhs.lastComment!!.comment.date.compareTo(lhs.lastComment!!.comment.date)
+            rhs.lastMessage!!.message.date.compareTo(lhs.lastMessage!!.message.date)
         }
     }
 
@@ -93,8 +93,8 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
         fun bind(conversationViewModel: ConversationViewModel) {
             Glide.with(roomAvatarView).load(conversationViewModel.room.avatar).into(roomAvatarView)
             roomNameView.text = conversationViewModel.room.name
-            lastMessageView.text = conversationViewModel.lastComment?.spannableMessage
-            lastMessageDateView.text = dateFormat.format(conversationViewModel.lastComment?.comment?.date)
+            lastMessageView.text = conversationViewModel.lastMessage?.spannableMessage
+            lastMessageDateView.text = dateFormat.format(conversationViewModel.lastMessage?.message?.date)
             unreadCountView.text = "${conversationViewModel.room.unreadCount}"
 
             if (conversationViewModel.room.unreadCount > 0) {

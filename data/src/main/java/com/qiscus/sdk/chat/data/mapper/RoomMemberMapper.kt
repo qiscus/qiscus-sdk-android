@@ -30,13 +30,13 @@ import com.qiscus.sdk.chat.domain.model.RoomMember
 fun RoomMemberEntity.toDomainModel(): RoomMember {
     return RoomMember(
             userEntity.toDomainModel(),
-            MemberState(memberStateEntity.lastDeliveredCommentId, memberStateEntity.lastReadCommentId)
+            MemberState(memberStateEntity.lastDeliveredMessageId, memberStateEntity.lastReadMessageId)
     )
 }
 
 fun RoomMember.toEntity(): RoomMemberEntity {
     return RoomMemberEntity(
             user.toEntity(),
-            MemberStateEntity(memberState.lastDeliveredCommentId, memberState.lastReadCommentId)
+            MemberStateEntity(memberState.lastDeliveredMessageId, memberState.lastReadMessageId)
     )
 }

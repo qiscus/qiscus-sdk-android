@@ -23,14 +23,14 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import com.qiscus.sdk.chat.domain.model.Room
-import com.qiscus.sdk.chat.presentation.listcomment.ListCommentContract
+import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.DefaultViewHolderFactory
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.ImageViewHolderFactory
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.TextViewHolderFactory
-import com.qiscus.sdk.chat.presentation.model.CommentViewModel
-import com.qiscus.sdk.chat.presentation.sendcomment.SendCommentContract
-import com.qiscus.sdk.chat.presentation.uikit.adapter.comment.CommentAdapter
+import com.qiscus.sdk.chat.presentation.model.MessageViewModel
+import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
+import com.qiscus.sdk.chat.presentation.uikit.adapter.message.MessageAdapter
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
 /**
@@ -53,12 +53,12 @@ fun Context.chatRoomIntent(roomId: String): Intent {
 
 private const val INTENT_ROOM_ID = "room_id"
 
-class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendCommentContract.View {
+class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMessageContract.View {
 
-    private lateinit var listCommentPresenter: ListCommentContract.Presenter
-    private lateinit var sendCommentPresenter: SendCommentContract.Presenter
+    private lateinit var listMessagePresenter: ListMessageContract.Presenter
+    private lateinit var sendMessagePresenter: SendMessageContract.Presenter
 
-    private val adapter = CommentAdapter()
+    private val adapter = MessageAdapter()
 
     private var roomId: String? = null
 
@@ -76,20 +76,20 @@ class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendComm
         adapter.registerViewHolderFactory(ImageViewHolderFactory(this))
         adapter.registerViewHolderFactory(DefaultViewHolderFactory(this))
 
-        commentRecyclerView.adapter = adapter
-        commentRecyclerView.layoutManager = LinearLayoutManager(this)
-        commentRecyclerView.setHasFixedSize(true)
+        messageRecyclerView.adapter = adapter
+        messageRecyclerView.layoutManager = LinearLayoutManager(this)
+        messageRecyclerView.setHasFixedSize(true)
 
         init()
     }
 
     private fun init() {
         val chatRoomActivityComponent = ChatRoomActivityComponent(this)
-        listCommentPresenter = chatRoomActivityComponent.listCommentPresenter
-        sendCommentPresenter = chatRoomActivityComponent.sendCommentPresenter
+        listMessagePresenter = chatRoomActivityComponent.listMessagePresenter
+        sendMessagePresenter = chatRoomActivityComponent.sendMessagePresenter
 
-        listCommentPresenter.setRoomId(roomId!!)
-        listCommentPresenter.start()
+        listMessagePresenter.setRoomId(roomId!!)
+        listMessagePresenter.start()
     }
 
     override fun onStart() {
@@ -97,17 +97,17 @@ class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendComm
         init()
     }
 
-    override fun addComment(commentViewModel: CommentViewModel) {
-        adapter.addOrUpdate(commentViewModel)
-        commentRecyclerView.smoothScrollToPosition(adapter.itemCount)
+    override fun addMessage(messageViewModel: MessageViewModel) {
+        adapter.addOrUpdate(messageViewModel)
+        messageRecyclerView.smoothScrollToPosition(adapter.itemCount)
     }
 
-    override fun updateComment(commentViewModel: CommentViewModel) {
-        adapter.addOrUpdate(commentViewModel)
+    override fun updateMessage(messageViewModel: MessageViewModel) {
+        adapter.addOrUpdate(messageViewModel)
     }
 
-    override fun removeComment(commentViewModel: CommentViewModel) {
-        adapter.removeComment(commentViewModel)
+    override fun removeMessage(messageViewModel: MessageViewModel) {
+        adapter.removeMessage(messageViewModel)
     }
 
     override fun clearTextField() {
@@ -116,7 +116,7 @@ class ChatRoomActivity : AppCompatActivity(), ListCommentContract.View, SendComm
 
     override fun onStop() {
         super.onStop()
-        listCommentPresenter.stop()
-        sendCommentPresenter.stop()
+        listMessagePresenter.stop()
+        sendMessagePresenter.stop()
     }
 }

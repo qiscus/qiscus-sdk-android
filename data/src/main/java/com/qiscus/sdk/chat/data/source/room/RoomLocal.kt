@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.data.source.room
 
-import com.qiscus.sdk.chat.data.model.CommentIdEntity
+import com.qiscus.sdk.chat.data.model.MessageIdEntity
 import com.qiscus.sdk.chat.data.model.RoomEntity
 import com.qiscus.sdk.chat.data.model.RoomMemberEntity
 
@@ -47,9 +47,9 @@ interface RoomLocal {
 
     fun addRoomMember(roomId: String, roomMemberEntity: RoomMemberEntity)
 
-    fun updateRoomMemberDeliveredState(roomId: String, userId: String, commentIdEntity: CommentIdEntity)
+    fun updateRoomMemberDeliveredState(roomId: String, userId: String, messageIdEntity: MessageIdEntity)
 
-    fun updateRoomMemberReadState(roomId: String, userId: String, commentIdEntity: CommentIdEntity)
+    fun updateRoomMemberReadState(roomId: String, userId: String, messageIdEntity: MessageIdEntity)
 
     fun updateRoomMembers(roomId: String, roomMemberEntities: List<RoomMemberEntity>)
 

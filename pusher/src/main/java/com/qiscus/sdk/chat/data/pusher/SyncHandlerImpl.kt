@@ -1,10 +1,10 @@
 package com.qiscus.sdk.chat.data.pusher
 
-import com.qiscus.sdk.chat.data.model.CommentIdEntity
-import com.qiscus.sdk.chat.data.model.CommentStateEntity
-import com.qiscus.sdk.chat.data.pubsub.comment.CommentSubscriber
-import com.qiscus.sdk.chat.data.source.comment.CommentLocal
-import com.qiscus.sdk.chat.data.source.comment.CommentRemote
+import com.qiscus.sdk.chat.data.model.MessageIdEntity
+import com.qiscus.sdk.chat.data.model.MessageStateEntity
+import com.qiscus.sdk.chat.data.pubsub.message.MessageSubscriber
+import com.qiscus.sdk.chat.data.source.message.MessageLocal
+import com.qiscus.sdk.chat.data.source.message.MessageRemote
 import com.qiscus.sdk.chat.data.util.SyncHandler
 import io.reactivex.schedulers.Schedulers
 
@@ -14,18 +14,18 @@ import io.reactivex.schedulers.Schedulers
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class SyncHandlerImpl(private val commentLocal: CommentLocal,
-                      private val commentRemote: CommentRemote,
-                      commentSubscriber: CommentSubscriber) : SyncHandler {
+class SyncHandlerImpl(private val messageLocal: MessageLocal,
+                      private val messageRemote: MessageRemote,
+                      messageSubscriber: MessageSubscriber) : SyncHandler {
 
     init {
-        commentSubscriber.listenCommentAdded()
-                .filter { it.state.intValue >= CommentStateEntity.ON_SERVER.intValue }
+        messageSubscriber.listenMessageAdded()
+                .filter { it.state.intValue >= MessageStateEntity.ON_SERVER.intValue }
                 .doOnNext {
-                    val comments = commentLocal.getOnServerComments(it.room.id, it.commentId, 10)
-                    for (i in 0 until comments.size - 1) {
-                        if (comments[i].commentId.commentBeforeId != comments[i + 1].commentId.id) {
-                            sync(it.room.id, comments[i + 1].commentId)
+                    val messages = messageLocal.getOnServerMessages(it.room.id, it.messageId, 10)
+                    for (i in 0 until messages.size - 1) {
+                        if (messages[i].messageId.beforeId != messages[i + 1].messageId.id) {
+                            sync(it.room.id, messages[i + 1].messageId)
                             break
                         }
                     }
@@ -35,32 +35,32 @@ class SyncHandlerImpl(private val commentLocal: CommentLocal,
     }
 
     override fun sync() {
-        val lastId = commentLocal.getLastOnServerCommentId()
+        val lastId = messageLocal.getLastOnServerMessageId()
         if (lastId != null) {
             sync(lastId)
         }
     }
 
-    override fun sync(lastCommentId: CommentIdEntity) {
-        commentRemote.sync(lastCommentId)
+    override fun sync(lastMessageId: MessageIdEntity) {
+        messageRemote.sync(lastMessageId)
                 .doOnSuccess {
                     if (it.size > 20) {
-                        it.forEach { commentLocal.addOrUpdateComment(it) }
+                        it.forEach { messageLocal.addOrUpdateMessage(it) }
                     } else {
-                        it.forEach { commentLocal.saveAndNotify(it) }
+                        it.forEach { messageLocal.saveAndNotify(it) }
                     }
                 }
                 .subscribeOn(Schedulers.io())
                 .subscribe({}, {})
     }
 
-    override fun sync(roomId: String, lastCommentId: CommentIdEntity) {
-        commentRemote.sync(roomId, lastCommentId)
+    override fun sync(roomId: String, lastMessageId: MessageIdEntity) {
+        messageRemote.sync(roomId, lastMessageId)
                 .doOnSuccess {
                     if (it.size > 20) {
-                        it.forEach { commentLocal.addOrUpdateComment(it) }
+                        it.forEach { messageLocal.addOrUpdateMessage(it) }
                     } else {
-                        it.forEach { commentLocal.saveAndNotify(it) }
+                        it.forEach { messageLocal.saveAndNotify(it) }
                     }
                 }
                 .subscribeOn(Schedulers.io())

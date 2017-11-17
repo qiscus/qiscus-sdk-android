@@ -66,8 +66,8 @@ object Db {
         const val TABLE_NAME = "room_members"
         const val COLUMN_ROOM_ID = "room_id"
         const val COLUMN_USER_ID = "user_id"
-        const val COLUMN_LAST_DELIVERED = "last_delivered_comment"
-        const val COLUMN_LAST_READ = "last_read_comment"
+        const val COLUMN_LAST_DELIVERED = "last_delivered_message"
+        const val COLUMN_LAST_READ = "last_read_message"
 
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_ROOM_ID + " TEXT," +
@@ -77,13 +77,13 @@ object Db {
                 " ); "
     }
 
-    object CommentTable {
-        const val TABLE_NAME = "comments"
+    object MessageTable {
+        const val TABLE_NAME = "messages"
         const val COLUMN_ID = "id"
         const val COLUMN_ROOM_ID = "room_id"
         const val COLUMN_UNIQUE_ID = "unique_id"
-        const val COLUMN_COMMENT_BEFORE_ID = "comment_before_id"
-        const val COLUMN_MESSAGE = "message"
+        const val COLUMN_BEFORE_ID = "before_id"
+        const val COLUMN_MESSAGE = "text"
         const val COLUMN_SENDER_ID = "sender_id"
         const val COLUMN_SENDER_NAME = "sender_name"
         const val COLUMN_SENDER_AVATAR = "sender_avatar"
@@ -96,7 +96,7 @@ object Db {
                 COLUMN_ID + " TEXT," +
                 COLUMN_ROOM_ID + " TEXT," +
                 COLUMN_UNIQUE_ID + " TEXT unique," +
-                COLUMN_COMMENT_BEFORE_ID + " TEXT," +
+                COLUMN_BEFORE_ID + " TEXT," +
                 COLUMN_MESSAGE + " TEXT," +
                 COLUMN_SENDER_ID + " TEXT NOT NULL," +
                 COLUMN_SENDER_NAME + " TEXT," +
@@ -110,11 +110,11 @@ object Db {
 
     object FileTable {
         const val TABLE_NAME = "files"
-        const val COLUMN_COMMENT_UNIQUE_ID = "unique_id"
+        const val COLUMN_MESSAGE_UNIQUE_ID = "unique_id"
         const val COLUMN_LOCAL_PATH = "local_path"
 
         const val CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_COMMENT_UNIQUE_ID + " TEXT PRIMARY KEY," +
+                COLUMN_MESSAGE_UNIQUE_ID + " TEXT PRIMARY KEY," +
                 COLUMN_LOCAL_PATH + " TEXT NOT NULL" +
                 " ); "
     }

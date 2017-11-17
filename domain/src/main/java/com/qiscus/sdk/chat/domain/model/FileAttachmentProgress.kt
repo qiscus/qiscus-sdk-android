@@ -22,7 +22,7 @@ package com.qiscus.sdk.chat.domain.model
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class FileAttachmentProgress(val fileAttachmentComment: FileAttachmentComment, val state: State, var progress: Int) {
+data class FileAttachmentProgress(val fileAttachmentMessage: FileAttachmentMessage, val state: State, var progress: Int) {
 
     enum class State {
         UPLOADING,

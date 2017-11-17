@@ -18,7 +18,7 @@ package com.qiscus.sdk.chat.core
 
 import com.qiscus.sdk.chat.core.component.QiscusComponent
 import com.qiscus.sdk.chat.domain.interactor.account.*
-import com.qiscus.sdk.chat.domain.interactor.comment.*
+import com.qiscus.sdk.chat.domain.interactor.message.*
 import com.qiscus.sdk.chat.domain.interactor.file.ListenFileAttachmentProgress
 import com.qiscus.sdk.chat.domain.interactor.room.*
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
@@ -72,7 +72,7 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
                 component.dataComponent.accountRepository,
                 component.dataComponent.userRepository,
                 component.dataComponent.roomRepository,
-                component.dataComponent.commentRepository,
+                component.dataComponent.messageRepository,
                 component.dataComponent.pubSubClient,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
@@ -159,9 +159,9 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
         )
     }
 
-    override fun listenNewComment(): ListenNewComment {
-        return ListenNewComment(
-                component.dataComponent.commentObserver,
+    override fun listenNewMessage(): ListenNewMessage {
+        return ListenNewMessage(
+                component.dataComponent.messageObserver,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )
@@ -175,57 +175,57 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
         )
     }
 
-    override fun listenCommentState(): ListenCommentState {
-        return ListenCommentState(
-                component.dataComponent.commentObserver,
+    override fun listenMessageState(): ListenMessageState {
+        return ListenMessageState(
+                component.dataComponent.messageObserver,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )
     }
 
-    override fun listenCommentDeleted(): ListenCommentDeleted {
-        return ListenCommentDeleted(
-                component.dataComponent.commentObserver,
+    override fun listenMessageDeleted(): ListenMessageDeleted {
+        return ListenMessageDeleted(
+                component.dataComponent.messageObserver,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )
     }
 
-    override fun postComment(): PostComment {
-        return PostComment(
-                component.dataComponent.commentRepository,
+    override fun postMessage(): PostMessage {
+        return PostMessage(
+                component.dataComponent.messageRepository,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )
     }
 
-    override fun updateCommentState(): UpdateCommentState {
-        return UpdateCommentState(
-                component.dataComponent.commentRepository,
+    override fun updateMessageState(): UpdateMessageState {
+        return UpdateMessageState(
+                component.dataComponent.messageRepository,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )
     }
 
-    override fun downloadAttachmentComment(): DownloadAttachmentComment {
-        return DownloadAttachmentComment(
-                component.dataComponent.commentRepository,
+    override fun downloadAttachmentMessage(): DownloadAttachmentMessage {
+        return DownloadAttachmentMessage(
+                component.dataComponent.messageRepository,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )
     }
 
-    override fun deleteComment(): DeleteComment {
-        return DeleteComment(
-                component.dataComponent.commentRepository,
+    override fun deleteMessage(): DeleteMessage {
+        return DeleteMessage(
+                component.dataComponent.messageRepository,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )
     }
 
-    override fun getComments(): GetComments {
-        return GetComments(
-                component.dataComponent.commentRepository,
+    override fun getMessages(): GetMessages {
+        return GetMessages(
+                component.dataComponent.messageRepository,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread
         )

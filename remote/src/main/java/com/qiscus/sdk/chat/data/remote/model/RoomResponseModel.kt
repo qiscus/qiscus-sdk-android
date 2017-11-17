@@ -17,7 +17,7 @@
 package com.qiscus.sdk.chat.data.remote.model
 
 import com.google.gson.JsonElement
-import com.qiscus.sdk.chat.data.mapper.transformToTypedCommentEntity
+import com.qiscus.sdk.chat.data.mapper.transformToTypedMessageEntity
 import com.qiscus.sdk.chat.data.model.*
 import org.json.JSONObject
 
@@ -59,18 +59,18 @@ data class RoomResponseModel(var results: Results, var status: Int) {
         private var lastDelivered = 0L
         private var lastRead = 0L
 
-        fun toEntity(account: AccountEntity, participants: List<Participant>): CommentEntity {
+        fun toEntity(account: AccountEntity, participants: List<Participant>): MessageEntity {
             if (this.account == null) {
                 this.account = account
                 this.participants = participants
                 findRoomMemberState()
             }
-            return CommentEntity(
-                    CommentIdEntity(idStr, commentBeforeIdStr, uniqueTempId),
+            return MessageEntity(
+                    MessageIdEntity(idStr, commentBeforeIdStr, uniqueTempId),
                     message, UserEntity(email, username, userAvatarUrl),
                     unixNanoTimestamp, RoomEntity(roomIdStr, name = roomName),
-                    determineState(id), CommentTypeEntity(type, if (!payload.isJsonNull) JSONObject(payload.toString()) else JSONObject())
-            ).transformToTypedCommentEntity()
+                    determineState(id), MessageTypeEntity(type, if (!payload.isJsonNull) JSONObject(payload.toString()) else JSONObject())
+            ).transformToTypedMessageEntity()
         }
 
         private fun findRoomMemberState() {
@@ -86,11 +86,11 @@ data class RoomResponseModel(var results: Results, var status: Int) {
             }
         }
 
-        private fun determineState(commentId: Long): CommentStateEntity {
+        private fun determineState(commentId: Long): MessageStateEntity {
             return when {
-                commentId <= lastRead -> CommentStateEntity.READ
-                commentId <= lastDelivered -> CommentStateEntity.DELIVERED
-                else -> CommentStateEntity.ON_SERVER
+                commentId <= lastRead -> MessageStateEntity.READ
+                commentId <= lastDelivered -> MessageStateEntity.DELIVERED
+                else -> MessageStateEntity.ON_SERVER
             }
         }
     }

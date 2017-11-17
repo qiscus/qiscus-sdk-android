@@ -35,8 +35,8 @@ fun RoomMemberEntity.toContentValues(roomId: String): ContentValues {
     return ContentValues().apply {
         put(Db.RoomMemberTable.COLUMN_ROOM_ID, roomId)
         put(Db.RoomMemberTable.COLUMN_USER_ID, userEntity.id)
-        put(Db.RoomMemberTable.COLUMN_LAST_DELIVERED, memberStateEntity.lastDeliveredCommentId)
-        put(Db.RoomMemberTable.COLUMN_LAST_READ, memberStateEntity.lastReadCommentId)
+        put(Db.RoomMemberTable.COLUMN_LAST_DELIVERED, memberStateEntity.lastDeliveredMessageId)
+        put(Db.RoomMemberTable.COLUMN_LAST_READ, memberStateEntity.lastReadMessageId)
     }
 }
 

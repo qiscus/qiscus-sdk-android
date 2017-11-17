@@ -16,6 +16,6 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/qiscus_my_comment_reply_bubble"/>
+    <solid android:color="@color/qiscus_my_message_reply_bubble"/>
     <corners android:radius="16dp" />
 </shape>

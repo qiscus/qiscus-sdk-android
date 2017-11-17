@@ -30,7 +30,7 @@
             android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textColor="@color/qiscus_comment_card_title"
+            android:textColor="@color/qiscus_message_card_title"
             android:textSize="16sp"/>
 
         <TextView
@@ -43,14 +43,14 @@
             android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="4"
-            android:textColor="@color/qiscus_comment_card_description"
+            android:textColor="@color/qiscus_message_card_description"
             android:textSize="12sp"/>
 
         <LinearLayout
             android:id="@+id/buttons_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/qiscus_opponents_comment_bubble"
+            android:background="@color/qiscus_opponents_message_bubble"
             android:gravity="center"
             android:orientation="vertical"
             android:paddingTop="1dp"

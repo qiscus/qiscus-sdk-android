@@ -23,7 +23,7 @@ import com.qiscus.sdk.chat.data.local.database.transaction
 import com.qiscus.sdk.chat.data.local.mapper.toContentValues
 import com.qiscus.sdk.chat.data.local.mapper.toRoomEntity
 import com.qiscus.sdk.chat.data.local.mapper.toRoomMemberEntity
-import com.qiscus.sdk.chat.data.model.CommentIdEntity
+import com.qiscus.sdk.chat.data.model.MessageIdEntity
 import com.qiscus.sdk.chat.data.model.RoomEntity
 import com.qiscus.sdk.chat.data.model.RoomMemberEntity
 import com.qiscus.sdk.chat.data.pubsub.room.RoomPublisher
@@ -156,20 +156,20 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
         userLocal.addOrUpdateUser(roomMemberEntity.userEntity)
     }
 
-    override fun updateRoomMemberDeliveredState(roomId: String, userId: String, commentIdEntity: CommentIdEntity) {
+    override fun updateRoomMemberDeliveredState(roomId: String, userId: String, messageIdEntity: MessageIdEntity) {
         database.transaction {
             val sql = "UPDATE " + Db.RoomMemberTable.TABLE_NAME + " SET " + Db.RoomMemberTable.COLUMN_LAST_DELIVERED +
-                    " = " + DatabaseUtils.sqlEscapeString(commentIdEntity.id) + " WHERE " +
+                    " = " + DatabaseUtils.sqlEscapeString(messageIdEntity.id) + " WHERE " +
                     Db.RoomMemberTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) +
                     " AND " + Db.RoomMemberTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
             database.execSQL(sql)
         }
     }
 
-    override fun updateRoomMemberReadState(roomId: String, userId: String, commentIdEntity: CommentIdEntity) {
+    override fun updateRoomMemberReadState(roomId: String, userId: String, messageIdEntity: MessageIdEntity) {
         database.transaction {
             val sql = "UPDATE " + Db.RoomMemberTable.TABLE_NAME + " SET " + Db.RoomMemberTable.COLUMN_LAST_READ +
-                    " = " + DatabaseUtils.sqlEscapeString(commentIdEntity.id) + " WHERE " +
+                    " = " + DatabaseUtils.sqlEscapeString(messageIdEntity.id) + " WHERE " +
                     Db.RoomMemberTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) +
                     " AND " + Db.RoomMemberTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
             database.execSQL(sql)
@@ -217,7 +217,7 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
 
     override fun getRooms(page: Int, limit: Int): List<RoomEntity> {
         val roomsTable = Db.RoomTable.TABLE_NAME
-        val commentsTable = Db.CommentTable.TABLE_NAME
+        val messagesTable = Db.MessageTable.TABLE_NAME
         val query = "SELECT DISTINCT ${Db.RoomTable.COLUMN_ID}, ${Db.RoomTable.COLUMN_UNIQUE_ID}, " +
                 "${Db.RoomTable.COLUMN_NAME}, ${Db.RoomTable.COLUMN_IS_GROUP}, ${Db.RoomTable.COLUMN_OPTIONS}, " +
                 "${Db.RoomTable.COLUMN_AVATAR_URL}, ${Db.RoomTable.COLUMN_UNREAD_COUNT}" +
@@ -225,10 +225,10 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
                 "$roomsTable.${Db.RoomTable.COLUMN_UNIQUE_ID}, $roomsTable.${Db.RoomTable.COLUMN_NAME}, " +
                 "$roomsTable.${Db.RoomTable.COLUMN_IS_GROUP}, $roomsTable.${Db.RoomTable.COLUMN_OPTIONS}, " +
                 "$roomsTable.${Db.RoomTable.COLUMN_AVATAR_URL}, $roomsTable.${Db.RoomTable.COLUMN_UNREAD_COUNT}," +
-                "$commentsTable.${Db.CommentTable.COLUMN_TIME} FROM $roomsTable, $commentsTable WHERE " +
-                "$roomsTable.${Db.RoomTable.COLUMN_ID} = $commentsTable.${Db.CommentTable.COLUMN_ROOM_ID} " +
-                "ORDER BY $commentsTable.${Db.CommentTable.COLUMN_TIME} DESC) " +
-                "ORDER BY ${Db.CommentTable.COLUMN_TIME} DESC LIMIT ${(page - 1) * limit},$limit"
+                "$messagesTable.${Db.MessageTable.COLUMN_TIME} FROM $roomsTable, $messagesTable WHERE " +
+                "$roomsTable.${Db.RoomTable.COLUMN_ID} = $messagesTable.${Db.MessageTable.COLUMN_ROOM_ID} " +
+                "ORDER BY $messagesTable.${Db.MessageTable.COLUMN_TIME} DESC) " +
+                "ORDER BY ${Db.MessageTable.COLUMN_TIME} DESC LIMIT ${(page - 1) * limit},$limit"
 
         val cursor = database.rawQuery(query, null)
         val rooms = ArrayList<RoomEntity>()

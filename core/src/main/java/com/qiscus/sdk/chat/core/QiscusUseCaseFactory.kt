@@ -17,7 +17,7 @@
 package com.qiscus.sdk.chat.core
 
 import com.qiscus.sdk.chat.domain.interactor.account.*
-import com.qiscus.sdk.chat.domain.interactor.comment.*
+import com.qiscus.sdk.chat.domain.interactor.message.*
 import com.qiscus.sdk.chat.domain.interactor.file.ListenFileAttachmentProgress
 import com.qiscus.sdk.chat.domain.interactor.room.*
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
@@ -63,23 +63,23 @@ interface QiscusUseCaseFactory {
     fun listenRoomDeleted(): ListenRoomDeleted
 
 
-    fun listenNewComment(): ListenNewComment
+    fun listenNewMessage(): ListenNewMessage
 
-    fun listenCommentState(): ListenCommentState
+    fun listenMessageState(): ListenMessageState
 
     fun listenFileAttachmentProgress(): ListenFileAttachmentProgress
 
-    fun listenCommentDeleted(): ListenCommentDeleted
+    fun listenMessageDeleted(): ListenMessageDeleted
 
-    fun postComment(): PostComment
+    fun postMessage(): PostMessage
 
-    fun updateCommentState(): UpdateCommentState
+    fun updateMessageState(): UpdateMessageState
 
-    fun downloadAttachmentComment(): DownloadAttachmentComment
+    fun downloadAttachmentMessage(): DownloadAttachmentMessage
 
-    fun deleteComment(): DeleteComment
+    fun deleteMessage(): DeleteMessage
 
-    fun getComments(): GetComments
+    fun getMessages(): GetMessages
 
 
     fun listenUserStatus(): ListenUserStatus

@@ -31,11 +31,11 @@ interface QiscusPubSubClient {
 
     fun disconnect()
 
-    fun listenNewComment()
+    fun listenNewMessage()
 
-    fun listenCommentState(roomId: String)
+    fun listenMessageState(roomId: String)
 
-    fun unlistenCommentState(roomId: String)
+    fun unlistenMessageState(roomId: String)
 
     fun listenUserStatus(userId: String)
 

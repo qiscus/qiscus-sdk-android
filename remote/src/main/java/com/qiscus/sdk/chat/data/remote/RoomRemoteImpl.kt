@@ -19,7 +19,7 @@ package com.qiscus.sdk.chat.data.remote
 import com.qiscus.sdk.chat.data.model.RoomEntity
 import com.qiscus.sdk.chat.data.model.RoomMemberEntity
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
-import com.qiscus.sdk.chat.data.source.comment.CommentLocal
+import com.qiscus.sdk.chat.data.source.message.MessageLocal
 import com.qiscus.sdk.chat.data.source.room.RoomLocal
 import com.qiscus.sdk.chat.data.source.room.RoomRemote
 import io.reactivex.Single
@@ -33,7 +33,7 @@ import io.reactivex.Single
 class RoomRemoteImpl(private val accountLocal: AccountLocal,
                      private val qiscusRestApi: QiscusRestApi,
                      private val roomLocal: RoomLocal,
-                     private val commentLocal: CommentLocal) : RoomRemote {
+                     private val messageLocal: MessageLocal) : RoomRemote {
 
     override fun getRoom(roomId: String): Single<RoomEntity> {
         return qiscusRestApi.getChatRoom(accountLocal.getAccount().token, roomId)
@@ -42,7 +42,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                     roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
-                            .forEach { commentLocal.addOrUpdateComment(it) }
+                            .forEach { messageLocal.addOrUpdateMessage(it) }
                 }
                 .map { it.results.room.toEntity() }
     }
@@ -54,7 +54,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                     roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
-                            .forEach { commentLocal.addOrUpdateComment(it) }
+                            .forEach { messageLocal.addOrUpdateMessage(it) }
                 }
                 .map { it.results.room.toEntity() }
     }
@@ -66,7 +66,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                     roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
-                            .forEach { commentLocal.addOrUpdateComment(it) }
+                            .forEach { messageLocal.addOrUpdateMessage(it) }
                 }
                 .map { it.results.room.toEntity() }
     }
@@ -78,7 +78,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                     roomLocal.updateRoomMembers(it.results.room.idStr, participants.map { it.toEntity() })
 
                     it.results.comments.map { it.toEntity(accountLocal.getAccount(), participants) }
-                            .forEach { commentLocal.addOrUpdateComment(it) }
+                            .forEach { messageLocal.addOrUpdateMessage(it) }
                 }
                 .map { it.results.room.toEntity() }
     }
@@ -95,9 +95,9 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                         val participants = it.participants
                         roomLocal.updateRoomMembers(it.idStr, participants.map { it.toEntity() })
 
-                        val lastComment = it.lastComment.toEntity(accountLocal.getAccount(), participants)
-                        if (lastComment.commentId.id != "0" && lastComment.commentId.commentBeforeId != "0") {
-                            commentLocal.addOrUpdateComment(lastComment)
+                        val lastMessage = it.lastComment.toEntity(accountLocal.getAccount(), participants)
+                        if (lastMessage.messageId.id != "0" && lastMessage.messageId.beforeId != "0") {
+                            messageLocal.addOrUpdateMessage(lastMessage)
                         }
                     }
                 }
@@ -111,9 +111,9 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
                         val participants = it.participants
                         roomLocal.updateRoomMembers(it.idStr, participants.map { it.toEntity() })
 
-                        val lastComment = it.lastComment.toEntity(accountLocal.getAccount(), participants)
-                        if (lastComment.commentId.id != "0" && lastComment.commentId.commentBeforeId != "0") {
-                            commentLocal.addOrUpdateComment(lastComment)
+                        val lastMessage = it.lastComment.toEntity(accountLocal.getAccount(), participants)
+                        if (lastMessage.messageId.id != "0" && lastMessage.messageId.beforeId != "0") {
+                            messageLocal.addOrUpdateMessage(lastMessage)
                         }
                     }
                 }

@@ -91,29 +91,28 @@ interface QiscusRestApi {
                     @Query("id") roomId: String): Single<RoomResponseModel>
 
     @GET("/api/v2/mobile/load_comments")
-    fun getComments(@Query("token") token: String,
-                    @Query("topic_id") roomId: String,
-                    @Query("after") afterCommentId: Boolean): Single<ListCommentResponseModel>
+    fun getMessages(@Query("token") token: String,
+                    @Query("topic_id") roomId: String): Single<ListMessageResponseModel>
 
     @GET("/api/v2/mobile/load_comments")
-    fun getComments(@Query("token") token: String,
+    fun getMessages(@Query("token") token: String,
                     @Query("topic_id") roomId: String,
-                    @Query("last_comment_id") lastCommentId: String,
+                    @Query("last_comment_id") lastMessageId: String,
                     @Query("limit") limit: Int,
-                    @Query("after") afterCommentId: Boolean): Single<ListCommentResponseModel>
+                    @Query("after") afterMessageId: Boolean): Single<ListMessageResponseModel>
 
     @FormUrlEncoded
     @POST("/api/v2/mobile/post_comment")
-    fun postComment(@Field("token") token: String,
+    fun postMessage(@Field("token") token: String,
                     @Field("topic_id") roomId: String,
-                    @Field("comment") message: String,
+                    @Field("text") text: String,
                     @Field("unique_temp_id") uniqueId: String,
                     @Field("type") type: String,
-                    @Field("payload") payload: String): Single<CommentResponseModel>
+                    @Field("payload") payload: String): Single<MessageResponseModel>
 
     @GET("/api/v2/mobile/sync")
     fun sync(@Query("token") token: String,
-             @Query("last_received_comment_id") lastCommentId: String): Single<SyncCommentResponseModel>
+             @Query("last_received_comment_id") lastMessageId: String): Single<SyncMessageResponseModel>
 
     @FormUrlEncoded
     @POST("/api/v2/mobile/update_room")
@@ -125,7 +124,7 @@ interface QiscusRestApi {
 
     @FormUrlEncoded
     @POST("/api/v2/mobile/update_comment_status")
-    fun updateCommentStatus(@Field("token") token: String,
+    fun updateMessageStatus(@Field("token") token: String,
                             @Field("room_id") roomId: String,
                             @Field("last_comment_received_id") lastReceivedId: String,
                             @Field("last_comment_read_id") lastReadId: String): Completable
@@ -137,10 +136,10 @@ interface QiscusRestApi {
                          @Field("device_token") fcmToken: String): Completable
 
     @POST("/api/v2/mobile/search_messages")
-    fun searchComments(@Query("token") token: String,
+    fun searchMessages(@Query("token") token: String,
                        @Query("room_id") roomId: String,
                        @Query("query") query: String,
-                       @Query("last_comment_id") lastCommentId: String): Single<SearchCommentResponseModel>
+                       @Query("last_comment_id") lastMessageId: String): Single<SearchMessageResponseModel>
 
     @GET("/api/v2/mobile/user_rooms")
     fun getChatRooms(@Query("token") token: String,

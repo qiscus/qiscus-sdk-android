@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
+import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.model.CommentImageViewModel
-import com.qiscus.sdk.chat.presentation.model.CommentViewModel
-import com.qiscus.sdk.chat.presentation.uikit.adapter.comment.CommentViewHolder
-import com.qiscus.sdk.chat.presentation.uikit.adapter.comment.CommentViewHolderFactory
+import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
+import com.qiscus.sdk.chat.presentation.model.MessageViewModel
+import com.qiscus.sdk.chat.presentation.uikit.adapter.message.MessageViewHolder
+import com.qiscus.sdk.chat.presentation.uikit.adapter.message.MessageViewHolderFactory
 
 /**
  * Created on : October 17, 2017
@@ -20,27 +20,27 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.comment.CommentViewHolderF
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class ImageViewHolderFactory(private val context: Context) : CommentViewHolderFactory {
-    override fun isUsingThisFactory(commentViewModel: CommentViewModel): Boolean {
-        return commentViewModel is CommentImageViewModel
+class ImageViewHolderFactory(private val context: Context) : MessageViewHolderFactory {
+    override fun isUsingThisFactory(messageViewModel: MessageViewModel): Boolean {
+        return messageViewModel is MessageImageViewModel
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?): CommentViewHolder {
-        return ImageViewHolder(LayoutInflater.from(context).inflate(R.layout.item_comment_image, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup?): MessageViewHolder {
+        return ImageViewHolder(LayoutInflater.from(context).inflate(R.layout.item_message_image, parent, false))
     }
 }
 
-class ImageViewHolder(view: View) : CommentViewHolder(view) {
+class ImageViewHolder(view: View) : MessageViewHolder(view) {
     private val senderAvatarView: ImageView = itemView.findViewById(R.id.senderAvatar) as ImageView
     private val senderNameView: TextView = itemView.findViewById(R.id.senderName) as TextView
     private val captionView: TextView = itemView.findViewById(R.id.caption) as TextView
     private val imageView: ImageView = itemView.findViewById(R.id.image) as ImageView
 
-    override fun bind(commentViewModel: CommentViewModel) {
-        senderNameView.text = commentViewModel.comment.sender.name
-        captionView.text = (commentViewModel as CommentImageViewModel).spannableCaption
+    override fun bind(messageViewModel: MessageViewModel) {
+        senderNameView.text = messageViewModel.message.sender.name
+        captionView.text = (messageViewModel as MessageImageViewModel).spannableCaption
         Glide.with(imageView)
-                .load((commentViewModel.comment as FileAttachmentComment).attachmentUrl)
+                .load((messageViewModel.message as FileAttachmentMessage).attachmentUrl)
                 .into(imageView)
     }
 }

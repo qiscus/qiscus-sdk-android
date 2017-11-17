@@ -4,5 +4,5 @@
     android:shape="oval">
 
     <solid
-        android:color="@color/qiscus_comment_download_upload_bg"/>
+        android:color="@color/qiscus_message_download_upload_bg"/>
 </shape>

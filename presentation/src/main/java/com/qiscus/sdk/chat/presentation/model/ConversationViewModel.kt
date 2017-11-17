@@ -8,4 +8,4 @@ import com.qiscus.sdk.chat.domain.model.Room
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class ConversationViewModel(var room: Room, var lastComment: CommentViewModel? = null)
+data class ConversationViewModel(var room: Room, var lastMessage: MessageViewModel? = null)

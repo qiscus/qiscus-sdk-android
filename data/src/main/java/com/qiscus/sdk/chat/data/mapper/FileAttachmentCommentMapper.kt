@@ -16,12 +16,12 @@
 
 package com.qiscus.sdk.chat.data.mapper
 
-import com.qiscus.sdk.chat.data.model.CommentStateEntity
-import com.qiscus.sdk.chat.data.model.CommentTypeEntity
-import com.qiscus.sdk.chat.data.model.FileAttachmentCommentEntity
-import com.qiscus.sdk.chat.domain.model.CommentState
-import com.qiscus.sdk.chat.domain.model.CommentType
-import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
+import com.qiscus.sdk.chat.data.model.MessageStateEntity
+import com.qiscus.sdk.chat.data.model.MessageTypeEntity
+import com.qiscus.sdk.chat.data.model.FileAttachmentMessageEntity
+import com.qiscus.sdk.chat.domain.model.MessageState
+import com.qiscus.sdk.chat.domain.model.MessageType
+import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import java.util.*
 
 /**
@@ -30,30 +30,30 @@ import java.util.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-fun FileAttachmentCommentEntity.toDomainModel(): FileAttachmentComment {
-    return FileAttachmentComment(
-            commentId.toDomainModel(),
+fun FileAttachmentMessageEntity.toDomainModel(): FileAttachmentMessage {
+    return FileAttachmentMessage(
+            messageId.toDomainModel(),
             file,
             caption,
-            message,
+            text,
             sender.toDomainModel(),
             Date(nanoTimeStamp / 1000000),
             room.toDomainModel(),
-            CommentState.valueOf(state.intValue),
-            CommentType(type.rawType, type.payload)
+            MessageState.valueOf(state.intValue),
+            MessageType(type.rawType, type.payload)
     )
 }
 
-fun FileAttachmentComment.toEntity(): FileAttachmentCommentEntity {
-    return FileAttachmentCommentEntity(
-            commentId.toEntity(),
+fun FileAttachmentMessage.toEntity(): FileAttachmentMessageEntity {
+    return FileAttachmentMessageEntity(
+            messageId.toEntity(),
             file,
             caption,
-            message,
+            text,
             sender.toEntity(),
             date.time * 1000000,
             room.toEntity(),
-            CommentStateEntity.valueOf(state.intValue),
-            CommentTypeEntity(type.rawType, type.payload)
+            MessageStateEntity.valueOf(state.intValue),
+            MessageTypeEntity(type.rawType, type.payload)
     )
 }

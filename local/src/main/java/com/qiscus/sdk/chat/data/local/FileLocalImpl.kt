@@ -22,7 +22,7 @@ import com.qiscus.sdk.chat.data.local.database.DbOpenHelper
 import com.qiscus.sdk.chat.data.local.database.transaction
 import com.qiscus.sdk.chat.data.local.mapper.getLocalPath
 import com.qiscus.sdk.chat.data.local.mapper.toContentValues
-import com.qiscus.sdk.chat.data.model.CommentIdEntity
+import com.qiscus.sdk.chat.data.model.MessageIdEntity
 import com.qiscus.sdk.chat.data.source.file.FileLocal
 import java.io.File
 
@@ -36,25 +36,25 @@ class FileLocalImpl(dbOpenHelper: DbOpenHelper) : FileLocal {
 
     private val database = dbOpenHelper.readableDatabase
 
-    override fun saveLocalPath(commentIdEntity: CommentIdEntity, file: File) {
-        val oldLocalPath = getLocalPath(commentIdEntity)
+    override fun saveLocalPath(messageIdEntity: MessageIdEntity, file: File) {
+        val oldLocalPath = getLocalPath(messageIdEntity)
         if (oldLocalPath != null && oldLocalPath != file) {
-            val where = Db.FileTable.COLUMN_COMMENT_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(commentIdEntity.uniqueId)
+            val where = Db.FileTable.COLUMN_MESSAGE_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(messageIdEntity.uniqueId)
             database.transaction {
                 database.update(Db.FileTable.TABLE_NAME,
-                        toContentValues(commentIdEntity.uniqueId, file.absolutePath), where, null)
+                        toContentValues(messageIdEntity.uniqueId, file.absolutePath), where, null)
             }
         } else if (oldLocalPath == null) {
             database.transaction {
                 database.insert(Db.FileTable.TABLE_NAME, null,
-                        toContentValues(commentIdEntity.uniqueId, file.absolutePath))
+                        toContentValues(messageIdEntity.uniqueId, file.absolutePath))
             }
         }
     }
 
-    override fun getLocalPath(commentIdEntity: CommentIdEntity): File? {
-        val query = "SELECT * FROM ${Db.FileTable.TABLE_NAME} WHERE ${Db.FileTable.COLUMN_COMMENT_UNIQUE_ID} " +
-                "= ${DatabaseUtils.sqlEscapeString(commentIdEntity.uniqueId)}"
+    override fun getLocalPath(messageIdEntity: MessageIdEntity): File? {
+        val query = "SELECT * FROM ${Db.FileTable.TABLE_NAME} WHERE ${Db.FileTable.COLUMN_MESSAGE_UNIQUE_ID} " +
+                "= ${DatabaseUtils.sqlEscapeString(messageIdEntity.uniqueId)}"
         val cursor = database.rawQuery(query, null)
 
         if (cursor.moveToNext()) {

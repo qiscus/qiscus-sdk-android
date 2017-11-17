@@ -20,15 +20,15 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.provider.Settings
 import com.qiscus.sdk.chat.data.model.AccountEntity
-import com.qiscus.sdk.chat.data.model.CommentEntity
-import com.qiscus.sdk.chat.data.model.CommentIdEntity
+import com.qiscus.sdk.chat.data.model.MessageEntity
+import com.qiscus.sdk.chat.data.model.MessageIdEntity
 import com.qiscus.sdk.chat.data.pubsub.user.UserPublisher
-import com.qiscus.sdk.chat.data.pusher.mapper.CommentPayloadMapper
+import com.qiscus.sdk.chat.data.pusher.mapper.MessagePayloadMapper
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
-import com.qiscus.sdk.chat.data.source.comment.CommentLocal
-import com.qiscus.sdk.chat.data.source.comment.CommentRemote
+import com.qiscus.sdk.chat.data.source.message.MessageLocal
+import com.qiscus.sdk.chat.data.source.message.MessageRemote
 import com.qiscus.sdk.chat.data.util.ApplicationWatcher
-import com.qiscus.sdk.chat.data.util.PostCommentHandler
+import com.qiscus.sdk.chat.data.util.PostMessageHandler
 import com.qiscus.sdk.chat.data.util.SyncHandler
 import com.qiscus.sdk.chat.domain.common.runOnBackgroundThread
 import com.qiscus.sdk.chat.domain.common.scheduleOnBackgroundThread
@@ -52,12 +52,12 @@ class QiscusMqttClient @JvmOverloads constructor(
         private val clientId: String = "${context.packageName}-" +
                 Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID),
         private val applicationWatcher: ApplicationWatcher,
-        private val postCommentHandler: PostCommentHandler,
+        private val postMessageHandler: PostMessageHandler,
         private val syncHandler: SyncHandler,
         private val accountLocal: AccountLocal,
-        private val commentLocal: CommentLocal,
-        private val commentRemote: CommentRemote,
-        private val commentPayloadMapper: CommentPayloadMapper,
+        private val messageLocal: MessageLocal,
+        private val messageRemote: MessageRemote,
+        private val messagePayloadMapper: MessagePayloadMapper,
         private val userPublisher: UserPublisher)
     : QiscusPubSubClient, MqttCallbackExtended, IMqttActionListener {
 
@@ -67,14 +67,14 @@ class QiscusMqttClient @JvmOverloads constructor(
     private lateinit var account: AccountEntity
 
     private val fallbackConnect = Runnable { this.connect() }
-    private val fallBackListenComment = Runnable { this.listenNewComment() }
-    private var fallBackListenCommentState: Runnable? = null
+    private val fallBackListenMessage = Runnable { this.listenNewMessage() }
+    private var fallBackListenMessageState: Runnable? = null
     private var fallBackListenUserStatus: Runnable? = null
     private var fallBackListenUserTyping: Runnable? = null
 
     private var scheduledConnect: ScheduledFuture<*>? = null
-    private var scheduledListenComment: ScheduledFuture<*>? = null
-    private var scheduledListenCommentState: ScheduledFuture<*>? = null
+    private var scheduledListenMessage: ScheduledFuture<*>? = null
+    private var scheduledListenMessageState: ScheduledFuture<*>? = null
     private var scheduledListenUserStatus: ScheduledFuture<*>? = null
     private var scheduledListenUserTyping: ScheduledFuture<*>? = null
 
@@ -174,13 +174,13 @@ class QiscusMqttClient @JvmOverloads constructor(
             scheduledConnect!!.cancel(true)
             scheduledConnect = null
         }
-        if (scheduledListenComment != null) {
-            scheduledListenComment!!.cancel(true)
-            scheduledListenComment = null
+        if (scheduledListenMessage != null) {
+            scheduledListenMessage!!.cancel(true)
+            scheduledListenMessage = null
         }
-        if (scheduledListenCommentState != null) {
-            scheduledListenCommentState!!.cancel(true)
-            scheduledListenCommentState = null
+        if (scheduledListenMessageState != null) {
+            scheduledListenMessageState!!.cancel(true)
+            scheduledListenMessageState = null
         }
         if (scheduledListenUserStatus != null) {
             scheduledListenUserStatus!!.cancel(true)
@@ -192,22 +192,22 @@ class QiscusMqttClient @JvmOverloads constructor(
         }
     }
 
-    override fun listenNewComment() {
+    override fun listenNewMessage() {
         try {
             mqttAndroidClient.subscribe("${account.token}/c", 2)
         } catch (e: MqttException) {
             //Do nothing
         } catch (e: NullPointerException) {
             connect()
-            scheduledListenComment = runOnBackgroundThread(fallBackListenComment, retryPeriod)
+            scheduledListenMessage = runOnBackgroundThread(fallBackListenMessage, retryPeriod)
         } catch (e: IllegalArgumentException) {
             connect()
-            scheduledListenComment = runOnBackgroundThread(fallBackListenComment, retryPeriod)
+            scheduledListenMessage = runOnBackgroundThread(fallBackListenMessage, retryPeriod)
         }
     }
 
-    override fun listenCommentState(roomId: String) {
-        fallBackListenCommentState = Runnable { listenCommentState(roomId) }
+    override fun listenMessageState(roomId: String) {
+        fallBackListenMessageState = Runnable { listenMessageState(roomId) }
         try {
             mqttAndroidClient.subscribe("r/$roomId/+/+/d", 2)
             mqttAndroidClient.subscribe("r/$roomId/+/+/r", 2)
@@ -215,14 +215,14 @@ class QiscusMqttClient @JvmOverloads constructor(
             //Do nothing
         } catch (e: NullPointerException) {
             connect()
-            scheduledListenCommentState = runOnBackgroundThread(fallBackListenCommentState!!, retryPeriod)
+            scheduledListenMessageState = runOnBackgroundThread(fallBackListenMessageState!!, retryPeriod)
         } catch (e: IllegalArgumentException) {
             connect()
-            scheduledListenCommentState = runOnBackgroundThread(fallBackListenCommentState!!, retryPeriod)
+            scheduledListenMessageState = runOnBackgroundThread(fallBackListenMessageState!!, retryPeriod)
         }
     }
 
-    override fun unlistenCommentState(roomId: String) {
+    override fun unlistenMessageState(roomId: String) {
         try {
             mqttAndroidClient.unsubscribe("r/$roomId/+/+/d")
             mqttAndroidClient.unsubscribe("r/$roomId/+/+/r")
@@ -234,12 +234,12 @@ class QiscusMqttClient @JvmOverloads constructor(
             //Do nothing
         }
 
-        if (scheduledListenCommentState != null) {
-            scheduledListenCommentState!!.cancel(true)
-            scheduledListenCommentState = null
+        if (scheduledListenMessageState != null) {
+            scheduledListenMessageState!!.cancel(true)
+            scheduledListenMessageState = null
         }
 
-        fallBackListenCommentState = null
+        fallBackListenMessageState = null
     }
 
     private fun setUserStatus(online: Boolean) {
@@ -263,7 +263,7 @@ class QiscusMqttClient @JvmOverloads constructor(
         scheduledUserStatus = scheduleOnBackgroundThread(Runnable {
             if (accountLocal.isAuthenticated()) {
                 if (applicationWatcher.isOnForeground()) {
-                    postCommentHandler.tryResendPendingComment()
+                    postMessageHandler.tryResendPendingMessage()
                 }
                 if (isConnected()) {
                     if (applicationWatcher.isOnForeground()) {
@@ -375,9 +375,9 @@ class QiscusMqttClient @JvmOverloads constructor(
         try {
             connecting = false
             reconnectCounter = 0
-            listenNewComment()
-            if (fallBackListenCommentState != null) {
-                scheduledListenCommentState = runOnBackgroundThread(fallBackListenCommentState!!)
+            listenNewMessage()
+            if (fallBackListenMessageState != null) {
+                scheduledListenMessageState = runOnBackgroundThread(fallBackListenMessageState!!)
             }
             if (fallBackListenUserStatus != null) {
                 scheduledListenUserStatus = runOnBackgroundThread(fallBackListenUserStatus!!)
@@ -399,10 +399,10 @@ class QiscusMqttClient @JvmOverloads constructor(
 
     override fun messageArrived(topic: String?, message: MqttMessage?) {
         if (topic!!.contains(account.token)) {
-            val comment = commentPayloadMapper.mapFromPusher(String(message!!.payload))
-            commentLocal.saveAndNotify(comment)
-            if (comment.sender.id != account.user.id) {
-                notifyDelivered(comment)
+            val message = messagePayloadMapper.mapFromPusher(String(message!!.payload))
+            messageLocal.saveAndNotify(message)
+            if (message.sender.id != account.user.id) {
+                notifyDelivered(message)
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {//typing
             val data = topic.split("/")
@@ -413,13 +413,13 @@ class QiscusMqttClient @JvmOverloads constructor(
             val data = topic.split("/")
             if (data[3] != account.user.id) {
                 val payload = String(message!!.payload).split(":")
-                commentLocal.updateLastDeliveredComment(data[1], data[3], CommentIdEntity(payload[0], uniqueId = payload[1]))
+                messageLocal.updateLastDeliveredMessage(data[1], data[3], MessageIdEntity(payload[0], uniqueId = payload[1]))
             }
         } else if (topic.startsWith("r/") && topic.endsWith("/r")) {//read
             val data = topic.split("/")
             if (data[3] != account.user.id) {
                 val payload = String(message!!.payload).split(":")
-                commentLocal.updateLastReadComment(data[1], data[3], CommentIdEntity(payload[0], uniqueId = payload[1]))
+                messageLocal.updateLastReadMessage(data[1], data[3], MessageIdEntity(payload[0], uniqueId = payload[1]))
             }
         } else if (topic.startsWith("u/") && topic.endsWith("/s")) {//online status
             val data = topic.split("/")
@@ -430,8 +430,8 @@ class QiscusMqttClient @JvmOverloads constructor(
         }
     }
 
-    private fun notifyDelivered(comment: CommentEntity) {
-        commentRemote.updateLastDeliveredComment(comment.room.id, comment.commentId)
+    private fun notifyDelivered(message: MessageEntity) {
+        messageRemote.updateLastDeliveredMessage(message.room.id, message.messageId)
                 .subscribeOn(Schedulers.io())
                 .subscribe({}, {})
     }

@@ -1,11 +1,11 @@
 package com.qiscus.sdk.chat.data.pusher
 
-import com.qiscus.sdk.chat.data.model.CommentEntity
+import com.qiscus.sdk.chat.data.model.MessageEntity
 import com.qiscus.sdk.chat.data.pubsub.FcmHandler
-import com.qiscus.sdk.chat.data.pusher.mapper.CommentPayloadMapper
+import com.qiscus.sdk.chat.data.pusher.mapper.MessagePayloadMapper
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
-import com.qiscus.sdk.chat.data.source.comment.CommentLocal
-import com.qiscus.sdk.chat.data.source.comment.CommentRemote
+import com.qiscus.sdk.chat.data.source.message.MessageLocal
+import com.qiscus.sdk.chat.data.source.message.MessageRemote
 import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
 import io.reactivex.schedulers.Schedulers
 
@@ -16,10 +16,10 @@ import io.reactivex.schedulers.Schedulers
  * GitHub     : https://github.com/zetbaitsu
  */
 class FcmHandlerImpl(private val accountLocal: AccountLocal,
-                     private val commentLocal: CommentLocal,
-                     private val commentRemote: CommentRemote,
+                     private val messageLocal: MessageLocal,
+                     private val messageRemote: MessageRemote,
                      private val qiscusPubSubClient: QiscusPubSubClient,
-                     private val commentPayloadMapper: CommentPayloadMapper) : FcmHandler {
+                     private val messagePayloadMapper: MessagePayloadMapper) : FcmHandler {
 
     override fun handle(data: Map<String, String>): Boolean {
         if (data.containsKey("qiscus_sdk")) {
@@ -29,10 +29,10 @@ class FcmHandlerImpl(private val accountLocal: AccountLocal,
                 }
 
                 if (data.containsKey("payload")) {
-                    val comment = commentPayloadMapper.mapFromPusher(data["payload"]!!)
-                    commentLocal.saveAndNotify(comment)
-                    if (comment.sender.id != accountLocal.getAccount().user.id) {
-                        notifyDelivered(comment)
+                    val message = messagePayloadMapper.mapFromPusher(data["payload"]!!)
+                    messageLocal.saveAndNotify(message)
+                    if (message.sender.id != accountLocal.getAccount().user.id) {
+                        notifyDelivered(message)
                     }
                 }
             }
@@ -42,8 +42,8 @@ class FcmHandlerImpl(private val accountLocal: AccountLocal,
         return false
     }
 
-    private fun notifyDelivered(comment: CommentEntity) {
-        commentRemote.updateLastDeliveredComment(comment.room.id, comment.commentId)
+    private fun notifyDelivered(message: MessageEntity) {
+        messageRemote.updateLastDeliveredMessage(message.room.id, message.messageId)
                 .subscribeOn(Schedulers.io())
                 .subscribe({}, {})
     }

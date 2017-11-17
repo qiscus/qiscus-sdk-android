@@ -26,57 +26,57 @@ import java.util.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-fun CommentIdEntity.toDomainModel(): CommentId {
-    return CommentId(id, commentBeforeId, uniqueId)
+fun MessageIdEntity.toDomainModel(): MessageId {
+    return MessageId(id, beforeId, uniqueId)
 }
 
-fun CommentId.toEntity(): CommentIdEntity {
-    return CommentIdEntity(id, commentBeforeId, uniqueId)
+fun MessageId.toEntity(): MessageIdEntity {
+    return MessageIdEntity(id, beforeId, uniqueId)
 }
 
-fun CommentEntity.toDomainModel(): Comment {
-    if (this is FileAttachmentCommentEntity) {
+fun MessageEntity.toDomainModel(): Message {
+    if (this is FileAttachmentMessageEntity) {
         return toDomainModel()
     }
-    return Comment(
-            commentId.toDomainModel(),
-            message,
+    return Message(
+            messageId.toDomainModel(),
+            text,
             sender.toDomainModel(),
             Date(nanoTimeStamp/1000000),
             room.toDomainModel(),
-            CommentState.valueOf(state.intValue),
-            CommentType(type.rawType, type.payload)
+            MessageState.valueOf(state.intValue),
+            MessageType(type.rawType, type.payload)
     )
 }
 
-fun Comment.toEntity(): CommentEntity {
-    if (this is FileAttachmentComment) {
+fun Message.toEntity(): MessageEntity {
+    if (this is FileAttachmentMessage) {
         return toEntity()
     }
 
-    return CommentEntity(
-            commentId.toEntity(),
-            message,
+    return MessageEntity(
+            messageId.toEntity(),
+            text,
             sender.toEntity(),
             date.time * 1000000,
             room.toEntity(),
-            CommentStateEntity.valueOf(state.intValue),
-            CommentTypeEntity(type.rawType, type.payload)
+            MessageStateEntity.valueOf(state.intValue),
+            MessageTypeEntity(type.rawType, type.payload)
     )
 }
 
-fun CommentEntity.transformToTypedCommentEntity(): CommentEntity {
-    if (type.rawType == "file_attachment" || (message.startsWith("[file]") && message.endsWith("[/file]"))) {
-        return FileAttachmentCommentEntity(
-                commentId,
+fun MessageEntity.transformToTypedMessageEntity(): MessageEntity {
+    if (type.rawType == "file_attachment" || (text.startsWith("[file]") && text.endsWith("[/file]"))) {
+        return FileAttachmentMessageEntity(
+                messageId,
                 null,
                 type.payload.optString("caption", ""),
-                message,
+                text,
                 sender,
                 nanoTimeStamp,
                 room,
-                CommentStateEntity.valueOf(state.intValue),
-                CommentTypeEntity(type.rawType, type.payload)
+                MessageStateEntity.valueOf(state.intValue),
+                MessageTypeEntity(type.rawType, type.payload)
         )
     }
     return this

@@ -22,6 +22,6 @@ package com.qiscus.sdk.chat.data.model
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class MemberStateEntity(var lastDeliveredCommentId: String = "", var lastReadCommentId: String = "")
+data class MemberStateEntity(var lastDeliveredMessageId: String = "", var lastReadMessageId: String = "")
 
 data class RoomMemberEntity(val userEntity: UserEntity, val memberStateEntity: MemberStateEntity)

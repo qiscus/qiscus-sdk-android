@@ -25,7 +25,7 @@
     <string name="qiscus_record">Rekaman</string>
     <string name="qiscus_account_linking_text">LOGIN</string>
     <string name="qiscus_corrupted_file">Tidak bisa membaca berkas, mohon pastikan berkas tersebut tidak korup!</string>
-    <string name="qiscus_failed_load_comments">Gagal memuat pesan!</string>
+    <string name="qiscus_failed_load_messages">Gagal memuat pesan!</string>
     <string name="qiscus_failed_download_file">Gagal mengunduh berkas!</string>
     <string name="qiscus_general_error">Terjadi suatu kesalahan!</string>
     <string name="qiscus_notif_count">%d pesan baru</string>
@@ -42,9 +42,9 @@
     <string name="qiscus_link_preview_default_title">Tidak ada judul</string>
     <string name="qiscus_link_preview_default_description">Tidak ada deskripsi</string>
     <string name="qiscus_success_linking_account">Berhasil menghubungkan akun</string>
-    <string name="qiscus_selected_comment">%d dipilih</string>
+    <string name="qiscus_selected_message">%d dipilih</string>
     <string name="qiscus_copied_message">%d pesan disalin</string>
-    <string name="qiscus_share_comments_title">Bagikan</string>
+    <string name="qiscus_share_messages_title">Bagikan</string>
     <string name="qiscus_typing">Mengetik…</string>
     <string name="qiscus_online">Online</string>
     <string name="qiscus_last_seen">Terakhir aktif %s</string>

@@ -25,7 +25,7 @@
     <string name="qiscus_record">Record</string>
     <string name="qiscus_account_linking_text">LOGIN</string>
     <string name="qiscus_corrupted_file">Can not read file, please make sure that is not corrupted file!</string>
-    <string name="qiscus_failed_load_comments">Failed to load comments!</string>
+    <string name="qiscus_failed_load_messages">Failed to load messages!</string>
     <string name="qiscus_failed_download_file">Failed to download file!</string>
     <string name="qiscus_general_error">Something went wrong!</string>
     <string name="qiscus_notif_count">%d new message</string>
@@ -42,9 +42,9 @@
     <string name="qiscus_link_preview_default_title">Untitled</string>
     <string name="qiscus_link_preview_default_description">No description!</string>
     <string name="qiscus_success_linking_account">Account linking successfully.</string>
-    <string name="qiscus_selected_comment">%d selected</string>
+    <string name="qiscus_selected_message">%d selected</string>
     <string name="qiscus_copied_message">%d messages copied!</string>
-    <string name="qiscus_share_comments_title">Share</string>
+    <string name="qiscus_share_messages_title">Share</string>
     <string name="qiscus_typing">Typing…</string>
     <string name="qiscus_online">Online</string>
     <string name="qiscus_last_seen">Last seen %s</string>

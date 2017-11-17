@@ -22,8 +22,8 @@ import com.qiscus.sdk.chat.data.local.*
 import com.qiscus.sdk.chat.data.local.database.DbOpenHelper
 import com.qiscus.sdk.chat.data.local.util.FileUtil
 import com.qiscus.sdk.chat.data.local.util.MimeTypeGuesserImpl
-import com.qiscus.sdk.chat.data.pubsub.comment.CommentPublisher
-import com.qiscus.sdk.chat.data.pubsub.comment.CommentSubscriber
+import com.qiscus.sdk.chat.data.pubsub.message.MessagePublisher
+import com.qiscus.sdk.chat.data.pubsub.message.MessageSubscriber
 import com.qiscus.sdk.chat.data.pubsub.file.FilePublisher
 import com.qiscus.sdk.chat.data.pubsub.file.FileSubscriber
 import com.qiscus.sdk.chat.data.pubsub.room.RoomPublisher
@@ -31,12 +31,12 @@ import com.qiscus.sdk.chat.data.pubsub.room.RoomSubscriber
 import com.qiscus.sdk.chat.data.pubsub.user.UserPublisher
 import com.qiscus.sdk.chat.data.pubsub.user.UserSubscriber
 import com.qiscus.sdk.chat.data.pusher.*
-import com.qiscus.sdk.chat.data.pusher.mapper.CommentPayloadMapper
+import com.qiscus.sdk.chat.data.pusher.mapper.MessagePayloadMapper
 import com.qiscus.sdk.chat.data.remote.*
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
 import com.qiscus.sdk.chat.data.source.account.AccountRemote
-import com.qiscus.sdk.chat.data.source.comment.CommentLocal
-import com.qiscus.sdk.chat.data.source.comment.CommentRemote
+import com.qiscus.sdk.chat.data.source.message.MessageLocal
+import com.qiscus.sdk.chat.data.source.message.MessageRemote
 import com.qiscus.sdk.chat.data.source.file.FileLocal
 import com.qiscus.sdk.chat.data.source.file.FileRemote
 import com.qiscus.sdk.chat.data.source.room.RoomLocal
@@ -45,7 +45,7 @@ import com.qiscus.sdk.chat.data.source.user.UserLocal
 import com.qiscus.sdk.chat.data.util.*
 import com.qiscus.sdk.chat.domain.pubsub.*
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
-import com.qiscus.sdk.chat.domain.repository.CommentRepository
+import com.qiscus.sdk.chat.domain.repository.MessageRepository
 import com.qiscus.sdk.chat.domain.repository.RoomRepository
 import com.qiscus.sdk.chat.domain.repository.UserRepository
 import com.schinizer.rxunfurl.RxUnfurl
@@ -153,24 +153,24 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
         RoomLocalImpl(dbOpenHelper, accountLocal, userLocal, roomPublisher)
     }
 
-    private val commentDataPusher: CommentDataPusher by lazy {
-        CommentDataPusher(publishSubject)
+    private val messageDataPusher: MessageDataPusher by lazy {
+        MessageDataPusher(publishSubject)
     }
 
-    val commentPublisher: CommentPublisher by lazy {
-        commentDataPusher
+    val messagePublisher: MessagePublisher by lazy {
+        messageDataPusher
     }
 
-    val commentSubscriber: CommentSubscriber by lazy {
-        commentDataPusher
+    val messageSubscriber: MessageSubscriber by lazy {
+        messageDataPusher
     }
 
-    val commentLocal: CommentLocal by lazy {
-        CommentLocalImpl(dbOpenHelper, accountLocal, roomLocal, userLocal, fileLocal, commentPublisher)
+    val messageLocal: MessageLocal by lazy {
+        MessageLocalImpl(dbOpenHelper, accountLocal, roomLocal, userLocal, fileLocal, messagePublisher)
     }
 
     val roomRemote: RoomRemote by lazy {
-        RoomRemoteImpl(accountLocal, qiscusRestApi, roomLocal, commentLocal)
+        RoomRemoteImpl(accountLocal, qiscusRestApi, roomLocal, messageLocal)
     }
 
     val roomRepository: RoomRepository by lazy {
@@ -189,30 +189,30 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
         userDataPusher
     }
 
-    val commentRemote: CommentRemote by lazy {
-        CommentRemoteImpl(accountLocal, qiscusRestApi)
+    val messageRemote: MessageRemote by lazy {
+        MessageRemoteImpl(accountLocal, qiscusRestApi)
     }
 
-    val postCommentHandler: PostCommentHandler by lazy {
-        PostCommentHandlerImpl(commentLocal, commentRemote, fileRemote, filePublisher)
+    val postMessageHandler: PostMessageHandler by lazy {
+        PostMessageHandlerImpl(messageLocal, messageRemote, fileRemote, filePublisher)
     }
 
-    val commentRepository: CommentRepository by lazy {
-        CommentDataRepository(commentLocal, commentRemote, fileLocal, fileRemote, fileManager, filePublisher, postCommentHandler)
+    val messageRepository: MessageRepository by lazy {
+        MessageDataRepository(messageLocal, messageRemote, fileLocal, fileRemote, fileManager, filePublisher, postMessageHandler)
     }
 
     val syncHandler: SyncHandler by lazy {
-        SyncHandlerImpl(commentLocal, commentRemote, commentSubscriber)
+        SyncHandlerImpl(messageLocal, messageRemote, messageSubscriber)
     }
 
-    internal val commentPayloadMapper: CommentPayloadMapper by lazy {
-        CommentPayloadMapper()
+    internal val messagePayloadMapper: MessagePayloadMapper by lazy {
+        MessagePayloadMapper()
     }
 
     val pubSubClient: QiscusPubSubClient by lazy {
         QiscusMqttClient(context, serverUri = mqttBrokerUrl, applicationWatcher = applicationWatcher,
-                accountLocal = accountLocal, commentLocal = commentLocal, commentPayloadMapper = commentPayloadMapper,
-                postCommentHandler = postCommentHandler, commentRemote = commentRemote, userPublisher = userPublisher,
+                accountLocal = accountLocal, messageLocal = messageLocal, messagePayloadMapper = messagePayloadMapper,
+                postMessageHandler = postMessageHandler, messageRemote = messageRemote, userPublisher = userPublisher,
                 syncHandler = syncHandler)
     }
 
@@ -220,8 +220,8 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
         RoomDataObserver(roomSubscriber)
     }
 
-    val commentObserver: CommentObserver by lazy {
-        CommentDataObserver(pubSubClient, commentSubscriber)
+    val messageObserver: MessageObserver by lazy {
+        MessageDataObserver(pubSubClient, messageSubscriber)
     }
 
     val userObserver: UserObserver by lazy {

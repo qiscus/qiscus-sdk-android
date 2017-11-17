@@ -27,9 +27,9 @@ import com.qiscus.sdk.chat.data.local.database.stringValue
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-internal fun toContentValues(commentUniqueId: String, localPath: String): ContentValues {
+internal fun toContentValues(messageUniqueId: String, localPath: String): ContentValues {
     return ContentValues().apply {
-        put(Db.FileTable.COLUMN_COMMENT_UNIQUE_ID, commentUniqueId)
+        put(Db.FileTable.COLUMN_MESSAGE_UNIQUE_ID, messageUniqueId)
         put(Db.FileTable.COLUMN_LOCAL_PATH, localPath)
     }
 }

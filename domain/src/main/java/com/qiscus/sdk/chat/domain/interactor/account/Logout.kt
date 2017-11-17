@@ -21,7 +21,7 @@ import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.interactor.CompletableUseCase
 import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
-import com.qiscus.sdk.chat.domain.repository.CommentRepository
+import com.qiscus.sdk.chat.domain.repository.MessageRepository
 import com.qiscus.sdk.chat.domain.repository.RoomRepository
 import com.qiscus.sdk.chat.domain.repository.UserRepository
 import io.reactivex.Completable
@@ -36,13 +36,13 @@ class Logout(
         private val accountRepository: AccountRepository,
         private val userRepository: UserRepository,
         private val roomRepository: RoomRepository,
-        private val commentRepository: CommentRepository,
+        private val messageRepository: MessageRepository,
         private val pubSubClient: QiscusPubSubClient,
         threadExecutor: ThreadExecutor,
         postExecutionThread: PostExecutionThread) : CompletableUseCase<Void?>(threadExecutor, postExecutionThread) {
 
     override fun buildUseCaseObservable(params: Void?): Completable {
-        return commentRepository.clearData()
+        return messageRepository.clearData()
                 .andThen(roomRepository.clearData())
                 .andThen(userRepository.clearData())
                 .andThen(accountRepository.clearData())

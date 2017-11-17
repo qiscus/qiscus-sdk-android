@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.data.source.file
 
-import com.qiscus.sdk.chat.data.model.CommentIdEntity
+import com.qiscus.sdk.chat.data.model.MessageIdEntity
 import java.io.File
 
 /**
@@ -26,9 +26,9 @@ import java.io.File
  * GitHub     : https://github.com/zetbaitsu
  */
 interface FileLocal {
-    fun saveLocalPath(commentIdEntity: CommentIdEntity, file: File)
+    fun saveLocalPath(messageIdEntity: MessageIdEntity, file: File)
 
-    fun getLocalPath(commentIdEntity: CommentIdEntity): File?
+    fun getLocalPath(messageIdEntity: MessageIdEntity): File?
 
     fun clearData()
 }

@@ -20,27 +20,27 @@ import android.support.annotation.ColorInt
 import android.support.v4.content.ContextCompat
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.core.QiscusUseCaseFactory
-import com.qiscus.sdk.chat.presentation.listcomment.ListCommentContract
-import com.qiscus.sdk.chat.presentation.listcomment.ListCommentPresenter
+import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
+import com.qiscus.sdk.chat.presentation.listmessage.ListMessagePresenter
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.sendcomment.SendCommentContract
-import com.qiscus.sdk.chat.presentation.sendcomment.SendCommentPresenter
+import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
+import com.qiscus.sdk.chat.presentation.sendmessage.SendMessagePresenter
 
 data class ChatRoomActivityComponent
 (
         private val activity: ChatRoomActivity,
-        private val sendCommentView: SendCommentContract.View = activity,
-        private val listCommentView: ListCommentContract.View = activity,
+        private val sendMessageView: SendMessageContract.View = activity,
+        private val listMessageView: ListMessageContract.View = activity,
         private val useCaseFactory: QiscusUseCaseFactory = Qiscus.instance.useCaseFactory,
         private @ColorInt val mentionAllColor: Int = ContextCompat.getColor(activity, R.color.qiscus_mention_all),
         private @ColorInt val mentionOtherColor: Int = ContextCompat.getColor(activity, R.color.qiscus_mention_other),
         private @ColorInt val mentionMeColor: Int = ContextCompat.getColor(activity, R.color.qiscus_mention_me),
 
-        val sendCommentPresenter: SendCommentContract.Presenter =
-        SendCommentPresenter(sendCommentView, useCaseFactory.postComment(), Qiscus.instance.commentFactory),
+        val sendMessagePresenter: SendMessageContract.Presenter =
+        SendMessagePresenter(sendMessageView, useCaseFactory.postMessage(), Qiscus.instance.messageFactory),
 
-        val listCommentPresenter: ListCommentPresenter =
-        ListCommentPresenter(listCommentView, useCaseFactory.getComments(), useCaseFactory.listenNewComment(),
-                useCaseFactory.listenCommentState(), useCaseFactory.listenCommentDeleted(), useCaseFactory.updateCommentState(),
+        val listMessagePresenter: ListMessagePresenter =
+        ListMessagePresenter(listMessageView, useCaseFactory.getMessages(), useCaseFactory.listenNewMessage(),
+                useCaseFactory.listenMessageState(), useCaseFactory.listenMessageDeleted(), useCaseFactory.updateMessageState(),
                 mentionAllColor, mentionOtherColor, mentionMeColor)
 )

@@ -30,13 +30,13 @@ import com.qiscus.jupuk.JupukBuilder
 import com.qiscus.jupuk.JupukConst
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.interactor.Action
-import com.qiscus.sdk.chat.domain.interactor.comment.*
+import com.qiscus.sdk.chat.domain.interactor.message.*
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserStatus
 import com.qiscus.sdk.chat.domain.interactor.user.ListenUserTyping
 import com.qiscus.sdk.chat.domain.interactor.user.PublishTyping
-import com.qiscus.sdk.chat.domain.model.CommentId
-import com.qiscus.sdk.chat.domain.model.CommentState
-import com.qiscus.sdk.chat.domain.model.FileAttachmentComment
+import com.qiscus.sdk.chat.domain.model.MessageId
+import com.qiscus.sdk.chat.domain.model.MessageState
+import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.sample.R
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -60,23 +60,23 @@ private const val INTENT_ROOM_ID = "room_id"
 class ChatActivity : AppCompatActivity() {
     private val useCaseFactory = Qiscus.instance.useCaseFactory
 
-    private val postComment = useCaseFactory.postComment()
-    private val downloadAttachmentComment = useCaseFactory.downloadAttachmentComment()
+    private val postMessage = useCaseFactory.postMessage()
+    private val downloadAttachmentMessage = useCaseFactory.downloadAttachmentMessage()
 
-    private val getComments = useCaseFactory.getComments()
+    private val getMessages = useCaseFactory.getMessages()
 
-    private val listenNewComment = useCaseFactory.listenNewComment()
+    private val listenNewMessage = useCaseFactory.listenNewMessage()
 
-    private val updateCommentState = useCaseFactory.updateCommentState()
-    private val listenCommentState = useCaseFactory.listenCommentState()
-    private val listenCommentProgress = useCaseFactory.listenFileAttachmentProgress()
+    private val updateMessageState = useCaseFactory.updateMessageState()
+    private val listenMessageState = useCaseFactory.listenMessageState()
+    private val listenMessageProgress = useCaseFactory.listenFileAttachmentProgress()
 
     private val publishTyping = useCaseFactory.publishTyping()
     private val listenUserTyping = useCaseFactory.listenUserTyping()
 
     private val listenUserStatus = useCaseFactory.listenUserStatus()
 
-    private val commentFactory = Qiscus.instance.commentFactory
+    private val messageFactory = Qiscus.instance.messageFactory
 
     private val adapter = ChatAdapter(this)
 
@@ -125,8 +125,8 @@ class ChatActivity : AppCompatActivity() {
             }
         })
 
-        loadComments()
-        listenComment()
+        loadMessages()
+        listenMessage()
         listenTyping()
         listenOnlinePresence()
     }
@@ -138,8 +138,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun tryDownloadAnAttachment() {
-        val comment = adapter.data.first { it is FileAttachmentComment } as FileAttachmentComment
-        downloadAttachmentComment.execute(DownloadAttachmentComment.Params(comment), Action {
+        val message = adapter.data.first { it is FileAttachmentMessage } as FileAttachmentMessage
+        downloadAttachmentMessage.execute(DownloadAttachmentMessage.Params(message), Action {
             Log.d("ZETRA", "Download: $it")
         }, Action {
             it.printStackTrace()
@@ -158,52 +158,52 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    private fun listenComment() {
-        listenNewComment.execute(null, Action {
+    private fun listenMessage() {
+        listenNewMessage.execute(null, Action {
             adapter.addOrUpdate(it)
             if (it.sender.id != account.user.id) {
-                updateCommentState.execute(UpdateCommentState.Params(roomId!!, it.commentId, CommentState.READ))
+                updateMessageState.execute(UpdateMessageState.Params(roomId!!, it.messageId, MessageState.READ))
             }
             recyclerView.smoothScrollToPosition(adapter.itemCount)
         })
 
-        listenCommentState.execute(ListenCommentState.Params(roomId!!), Action {
+        listenMessageState.execute(ListenMessageState.Params(roomId!!), Action {
             adapter.addOrUpdate(it)
         })
 
-        listenCommentProgress.execute(null, Action {
-            val msg = "${it.state.name} ${it.fileAttachmentComment.attachmentName} Progress ${it.progress}"
+        listenMessageProgress.execute(null, Action {
+            val msg = "${it.state.name} ${it.fileAttachmentMessage.attachmentName} Progress ${it.progress}"
             Log.d("ZETRA", msg)
         })
     }
 
-    private fun loadComments() {
-        getComments.execute(GetComments.Params(roomId!!), Action {
-            Log.d("ZETRA", "loadComments: ${it.comments.size}")
+    private fun loadMessages() {
+        getMessages.execute(GetMessages.Params(roomId!!), Action {
+            Log.d("ZETRA", "loadMessages: ${it.messages.size}")
             Log.d("ZETRA", "Has more: ${it.hasMoreMessages()}")
-            it.comments.reversed().forEach { adapter.addOrUpdate(it) }
+            it.messages.reversed().forEach { adapter.addOrUpdate(it) }
             recyclerView.smoothScrollToPosition(adapter.itemCount)
             if (it.hasMoreMessages()) {
-                loadMoreComments(it.comments.last().commentId)
+                loadMoreMessages(it.messages.last().messageId)
             }
         })
     }
 
-    private fun loadMoreComments(lastCommentId: CommentId) {
-        getComments.execute(GetComments.Params(roomId!!, lastCommentId), Action {
-            Log.d("ZETRA", "loadMoreComments: ${it.comments.size}")
-            Log.d("ZETRA", "Has more comments: ${it.hasMoreMessages()}")
-            it.comments.reversed().forEach { adapter.addOrUpdate(it) }
+    private fun loadMoreMessages(lastMessageId: MessageId) {
+        getMessages.execute(GetMessages.Params(roomId!!, lastMessageId), Action {
+            Log.d("ZETRA", "loadMoreMessages: ${it.messages.size}")
+            Log.d("ZETRA", "Has more messages: ${it.hasMoreMessages()}")
+            it.messages.reversed().forEach { adapter.addOrUpdate(it) }
             recyclerView.smoothScrollToPosition(adapter.itemCount)
             if (it.hasMoreMessages()) {
-                loadMoreComments(it.comments.last().commentId)
+                loadMoreMessages(it.messages.last().messageId)
             }
         })
     }
 
-    private fun sendMessage(message: String) {
-        val comment = commentFactory.createTextComment(roomId!!, message)
-        postComment.execute(PostComment.Params(comment))
+    private fun sendMessage(text: String) {
+        val message = messageFactory.createTextMessage(roomId!!, text)
+        postMessage.execute(PostMessage.Params(message))
         editText.setText("")
     }
 
@@ -217,17 +217,17 @@ class ChatActivity : AppCompatActivity() {
             val paths = data.getStringArrayListExtra(JupukConst.KEY_SELECTED_MEDIA)
             if (paths.size > 0) {
                 val file = File(paths[0])
-                val comment = commentFactory.createFileAttachmentComment(roomId!!, file, "caption")
-                postComment.execute(PostComment.Params(comment))
+                val message = messageFactory.createFileAttachmentMessage(roomId!!, file, "caption")
+                postMessage.execute(PostMessage.Params(message))
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        listenNewComment.dispose()
-        listenCommentState.dispose()
-        listenCommentProgress.dispose()
+        listenNewMessage.dispose()
+        listenMessageState.dispose()
+        listenMessageProgress.dispose()
         listenUserTyping.dispose()
         listenUserStatus.dispose()
     }

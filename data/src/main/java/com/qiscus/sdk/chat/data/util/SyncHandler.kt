@@ -1,6 +1,6 @@
 package com.qiscus.sdk.chat.data.util
 
-import com.qiscus.sdk.chat.data.model.CommentIdEntity
+import com.qiscus.sdk.chat.data.model.MessageIdEntity
 
 /**
  * Created on : September 29, 2017
@@ -11,7 +11,7 @@ import com.qiscus.sdk.chat.data.model.CommentIdEntity
 interface SyncHandler {
     fun sync()
 
-    fun sync(lastCommentId: CommentIdEntity)
+    fun sync(lastMessageId: MessageIdEntity)
 
-    fun sync(roomId: String, lastCommentId: CommentIdEntity)
+    fun sync(roomId: String, lastMessageId: MessageIdEntity)
 }
