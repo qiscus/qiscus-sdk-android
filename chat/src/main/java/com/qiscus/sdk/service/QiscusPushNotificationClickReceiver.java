@@ -33,7 +33,7 @@ import com.qiscus.sdk.util.QiscusPushNotificationUtil;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusPusherReceiver extends BroadcastReceiver {
+public class QiscusPushNotificationClickReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

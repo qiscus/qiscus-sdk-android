@@ -49,8 +49,8 @@ import rx.schedulers.Schedulers;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusPusherService extends Service {
-    private static final String TAG = QiscusPusherService.class.getSimpleName();
+public class QiscusSyncService extends Service {
+    private static final String TAG = QiscusSyncService.class.getSimpleName();
 
     private QiscusAccount qiscusAccount;
     private ScheduledFuture<?> scheduledSync;

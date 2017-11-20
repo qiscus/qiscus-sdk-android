@@ -23,7 +23,7 @@ import android.content.Intent;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 
-public class QiscusStartReceiver extends BroadcastReceiver {
+public class QiscusStartServiceReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Qiscus.hasSetupUser()) {

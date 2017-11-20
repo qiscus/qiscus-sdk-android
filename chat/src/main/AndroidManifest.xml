@@ -49,11 +49,11 @@
             android:theme="@style/QiscusTheme"
             android:windowSoftInputMode="adjustResize"/>
 
-        <service android:name=".service.QiscusPusherService"/>
+        <service android:name=".service.QiscusSyncService"/>
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
 
         <receiver
-            android:name=".service.QiscusStartReceiver"
+            android:name=".service.QiscusStartServiceReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -62,7 +62,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".service.QiscusPusherReceiver"
+            android:name=".service.QiscusPushNotificationClickReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.qiscus.OPEN_COMMENT_PN"/>

@@ -35,7 +35,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
-import com.qiscus.sdk.service.QiscusPusherService;
+import com.qiscus.sdk.service.QiscusSyncService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -152,7 +152,7 @@ public class Qiscus {
     public static void startPusherService() {
         checkAppIdSetup();
         appInstance.getApplicationContext()
-                .startService(new Intent(appInstance.getApplicationContext(), QiscusPusherService.class));
+                .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
     }
 
     /**
