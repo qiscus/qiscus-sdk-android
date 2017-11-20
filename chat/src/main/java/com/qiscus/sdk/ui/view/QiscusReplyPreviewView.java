@@ -107,7 +107,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
             content.setText(null);
             setVisibility(GONE);
         } else {
-            sender.setText(originComment.getSender());
+            sender.setText(Qiscus.getChatConfig().getRoomSenderNameInterceptor().getSenderName(originComment));
             switch (originComment.getType()) {
                 case IMAGE:
                 case VIDEO:
