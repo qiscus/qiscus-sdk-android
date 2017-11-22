@@ -498,7 +498,7 @@ If you are using Proguard in your application, make sure you add Proguard rules 
 
 ## RXJava Support
 
-For you who prefer to code with RXJava, Qiscus Chat SDK does support RXJava. So, you can do anything as you do with Native Java. For example, to set a user, as has been explained in [Basic Authentication](https://basicauth/) section, you can do the same with RXJava. Here an example of how you can set user with it:  
+For you who prefer to code with RXJava, Qiscus Chat SDK does support RXJava. So, you can do anything as you do with Native Java. For example, to set a user, as has been explained in [Basic Authentication](#basic-authentication) section, you can do the same with RXJava. Here an example of how you can set user with it:  
 
 ```java
 // Setup qiscus account with rxjava example
