@@ -4,12 +4,12 @@ With Qiscus chat SDK (Software Development Kit), You can embed chat feature insi
 
 ## A Brief About Chat
 
-Talking about chat app, you may figure out such messager app like Whatsapp. You might have familiar with the flow, how to start conversation, and do things, like sharing image, inside chat room.  If you want to create chat app, for customer service, for instance, Qiscus Chat SDK enable you to establish chat UI and  functionalities easily. But before dive into it, there are essential basic knowledges you need to know about chat app.
+Talking about chat app, you may figure out such messenger app like Whatsapp. You might have familiar with the flow, how to start conversation, and do things, like sharing image, inside chat room.  If you want to create chat app, for customer service, for instance, Qiscus Chat SDK enable you to establish chat UI and functionalities easily. But before dive into it, there are essential basic knowledges you need to know about chat app.
 
 ### Basic Flow of Chat App
 
 In a chat app, to start a conversation, we usually choose person we want to chat with, from a contact list. Then, we start conversation inside a chat room. In a chat room, we can do things such as sharing images, sending emoji, sharing contact, location, and many more. We can even know when a person is typing or when our message has been read. If chatting is done, we can go back to the conversation list which display our conversations in the app.
-To make a chat app with the described flow, we noticed that the most complex part is creating chat room, which posses many features inside it. Hence, Qiscus Chat SDK provide an easy way to create chat app without dealing with  complexity of real-time comunication infrastucture that resides inside a chat room.
+To make a chat app with the described flow, we noticed that the most complex part is creating chat room, which posses many features inside it. Hence, Qiscus Chat SDK provide an easy way to create chat app without dealing with complexity of real-time comunication infrastucture that resides inside a chat room.
 
 ### Qiscus Chat SDK and UI Components
 
@@ -17,25 +17,24 @@ To make a chat app with the described flow, we noticed that the most complex par
 
 In spite of real-time chat, Qiscus Chat SDK provides UI that can be customized according to your needs. But please keep in mind that, by default, Qiscus provides UI for chat room only. If you need to create contact list and conversation list UI, for example, you need to create it your own. However, we provide essential data that you can get and utilize for your app.
 
-
 ### Qiscus Chat SDK Features
 
 When you try our chat SDK, you will find the default built-in features such as:
 
 * Private & group chat
 * Typing indicator
-* Delivery indicator
+* Delivery indicator 
 * Image and file attachment
-* Online presence
-* Read receipt
-* Reply message
-* Pending Messages
+* Online presence 
+* Read receipt 
+* Reply message 
+* Pending messages
 * Emoji support
 
 You also can access more advance and customizable features such as :
 
 * Server side integration with Server API and Webhook
-* Customize your user interface
+* Customize your user interface 
 * Embed bot engine in your app
 * Enable Push notification
 * Export and import messages from you app
@@ -55,7 +54,6 @@ If you have your own chat app, you may think how to handle your user. In this ca
 
 > Note: We assume that you already downloaded the sample app. The sample app will be needed to work together with the sample dashboard.
 
-
 To start with sample dashboard, you should do the following steps:
 clone sample dashboard [here](https://github.com/qiscus/dashboard-sample), or just copy the following code.
 
@@ -64,7 +62,7 @@ git clone https://github.com/qiscus/dashboard-sample.git
 cd dashboard-sample
 ```
 
-Before running the sample app on your local, first, you need to install composer.
+Before running the sample app on your local, first, you need to install composer. 
 
 ```
 composer install
