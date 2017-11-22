@@ -154,7 +154,7 @@ public class Qiscus {
         checkAppIdSetup();
         if (BuildVersionUtil.isOreoLower()) {
             appInstance.getApplicationContext()
-                    .startService(new Intent(appInstance.getApplicationContext(), QiscusPusherService.class));
+                    .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
         }
     }
 
