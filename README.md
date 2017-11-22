@@ -4,19 +4,18 @@ With Qiscus chat SDK (Software Development Kit), You can embed chat feature insi
 
 ## A Brief About Chat
 
-Talking about chat app, you may figure out such messager app like Whatsapp. You might have familiar with the flow, how to start conversation, and do things, like sharing image, inside chat room.  If you want to create chat app, for customer service, for instance, Qiscus Chat SDK enable you to establish chat UI and  functionalities easily. But before dive into it, there are essential basic knowledges you need to know about chat app.
+Talking about chat app, you may figure out such messenger app like Whatsapp. You might have familiar with the flow, how to start conversation, and do things, like sharing image, inside chat room.  If you want to create chat app, for customer service, for instance, Qiscus Chat SDK enable you to establish chat UI and functionalities easily. But before dive into it, there are essential basic knowledges you need to know about chat app.
 
 ### Basic Flow of Chat App
 
 In a chat app, to start a conversation, we usually choose person we want to chat with, from a contact list. Then, we start conversation inside a chat room. In a chat room, we can do things such as sharing images, sending emoji, sharing contact, location, and many more. We can even know when a person is typing or when our message has been read. If chatting is done, we can go back to the conversation list which display our conversations in the app.
-To make a chat app with the described flow, we noticed that the most complex part is creating chat room, which posses many features inside it. Hence, Qiscus Chat SDK provide an easy way to create chat app without dealing with  complexity of real-time comunication infrastucture that resides inside a chat room.
+To make a chat app with the described flow, we noticed that the most complex part is creating chat room, which posses many features inside it. Hence, Qiscus Chat SDK provide an easy way to create chat app without dealing with complexity of real-time comunication infrastucture that resides inside a chat room.
 
 ### Qiscus Chat SDK and UI Components
 
 <p align="center"><br/><img src="https://raw.githubusercontent.com/qiscus/qiscus-sdk-android/develop/screenshot/sample.png" width="37%" /><br/></p>
 
 In spite of real-time chat, Qiscus Chat SDK provides UI that can be customized according to your needs. But please keep in mind that, by default, Qiscus provides UI for chat room only. If you need to create contact list and conversation list UI, for example, you need to create it your own. However, we provide essential data that you can get and utilize for your app.
-
 
 ### Qiscus Chat SDK Features
 
@@ -29,7 +28,7 @@ When you try our chat SDK, you will find the default built-in features such as:
 * Online presence 
 * Read receipt 
 * Reply message 
-* Pending Messages
+* Pending messages
 * Emoji support
 
 You also can access more advance and customizable features such as :
@@ -54,7 +53,6 @@ If you have your own chat app, you may think how to handle your user. In this ca
 
 
 > Note: We assume that you already downloaded the sample app. The sample app will be needed to work together with the sample dashboard.
-
 
 To start with sample dashboard, you should do the following steps:
 clone sample dashboard [here](https://github.com/qiscus/dashboard-sample), or just copy the following code.
@@ -131,7 +129,7 @@ public class SampleApps extends Application {
 ## Authentication
 
 To authenticate to SDK server, app needs to have user credential locally stored for further requests. The credential consists of a token that will identify a user in SDK server.
-When you want to disconnect from SDK server,  terminating authentication will be done by clearing the stored credential.
+When you want to disconnect from SDK server, terminating authentication will be done by clearing the stored credential.
 Qiscus SDK authentication can be done separately with your main app authentication, especially if your main app has functionality before the messaging features. 
 There are 2 type of authentication that you can opt to use: Basic Authentication and Authentication using JWT.
 Here somet comparison to help you decide between the two options:
@@ -157,7 +155,6 @@ Qiscus.setUser(userId , userKey)
               //do anything if error occurs
       });
 ```
-
 
 Here are the explanation for the parameters on user setup:
 
@@ -190,13 +187,13 @@ You need to request Nonce from Qiscus Chat SDK Server. Nonce (Number Used Once) 
 ```java
 QiscusRxExecutor.execute(QiscusApi.getInstance().requestNonce(), new QiscusRxExecutor.Listener<QiscusNonce>() {
         @Override
-        public void onSuccess(QiscusNonce result) {
+        public void onSuccess(QiscusNonce qiscusNonce) {
             //do request jwt from your backend using returned Nonce
         }
 
         @Override
         public void onError(Throwable throwable) {
-            // do anything if error occurred 
+            //do anything if error occurred 
         }
     });
 ```
@@ -206,17 +203,16 @@ When you got the JWT Token, you can pass that JWTto` Qiscus.setUser()` method to
 
 ```java
 Qiscus.setUser('your jwt token', new Qiscus.SetUserListener() {
+        @Override
+        public void onSuccess(QiscusAccount qiscusAccount) {
+            //do anything if success
+        }
 
-            @Override
-            public void onSuccess(QiscusAccount qiscusAccount) {
-                // Do anything if success
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                // Do anything if error
-            }
-        });
+        @Override
+        public void onError(Throwable throwable) {
+            //do anything if error occurs
+        }
+    });
 ```
 
 ### Setting jose header and jwt claim set in your backend
@@ -248,32 +244,28 @@ When your backend returns a JWT after receiving Nonce from your client app, the 
 }
 ```
 
-
-
 ### Updating User Profile
-
 
 After your user account is created, sometimes you may need to update a user information, such as changing user avatar. You can use method `Qiscus.updateUser()` to make changes to your account.
 
 
 ```java
 Qiscus.updateUser(userName, avatarUrl, new Qiscus.SetUserListener() {
-            @Override
-            public void onSuccess(QiscusAccount qiscusAccount) {
-               //do anything after it successfully updated
-            }
+        @Override
+        public void onSuccess(QiscusAccount qiscusAccount) {
+           //do anything after it successfully updated
+        }
 
-            @Override
-            public void onError(Throwable throwable) {   
-               //do anything if error occurs                 
-            }
-        });
+        @Override
+        public void onError(Throwable throwable) {   
+           //do anything if error occurs                 
+        }
+    });
 ```
 
 ### Clear User Data and disconnect
 
-
-As mentioned in previous section, when you did setUser(), user's data will be stored locally. When user need to disconnect from Qiscus Chat SDK service, you need to clear the user data that is related to Qiscus Chat SDK, such as token, profile, messages,rooms, etc, from local device. You can do this by calling clearUser() method :
+As mentioned in previous section, when you did setUser(), user's data will be stored locally. When user need to disconnect from Qiscus Chat SDK service, you need to clear the user data that is related to Qiscus Chat SDK, such as token, profile, messages, rooms, etc, from local device. You can do this by calling clearUser() method :
 
 ```java
 Qiscus.clearUser();
@@ -281,13 +273,12 @@ Qiscus.clearUser();
 
 ## Create Chat Room
 
-**Chat Room** is a place where 2 or more users can chat each other**.** There are 2 type of Chat Room that can be created using Qiscus Chat SDK: 1-on-1 Chat Room and Group Chat Room. For some cases, a room can be identified by room unique id or room name. 
+**Chat Room** is a place where 2 or more users can chat each other. There are 2 type of Chat Room that can be created using Qiscus Chat SDK: 1-on-1 Chat Room and Group Chat Room. For some cases, a room can be identified by room unique id or room name. 
 
 ### 1-on-1 Chat Room
 
-We assume that you already know a targeted user you want to chat with. Make sure that your targeted user has been registered in Qiscus Chat SDK through setUser() method, as explained in the previous section. To start a conversation with your targeted user, it can be done with  `buildChatWith("targeted_userID")` method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is succesfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener. To use the created room, you can call `startActivity() `inside the `onSuccess()` listener.   
+We assume that you already know a targeted user you want to chat with. Make sure that your targeted user has been registered in Qiscus Chat SDK through setUser() method, as explained in the previous section. To start a conversation with your targeted user, it can be done with `buildChatWith("targeted_userID")` method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is succesfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener. To use the created room, you can call `startActivity()` inside the `onSuccess()` listener.   
 Here is the example to start a conversation:
-
 
 ```java
 Qiscus.buildChatWith("jhon.doe@gmail.com") //here we use email as userID. But you can make it whatever you want.
@@ -318,25 +309,24 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
 
           @Override
           public void onError(Throwable throwable) {
-          // error message when failed building group chat
-             throwable.printStackTrace();
+              //do anything if error occurs
           }
        });
 ```
 
 ### Room Participant Management
 
-In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API here. 
+In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi). 
 
 ### Get List of Rooms
 
 To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
 
 ```java
-QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom('room id'), new QiscusRxExecutor.Listener<QiscusChatRoom>() {
+QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms('room id', limit, showMembers), new QiscusRxExecutor.Listener<List<QiscusChatRoom>>() {
         @Override
-        public void onSuccess(QiscusChatRoom result) {
-            //Success getting the room
+        public void onSuccess(List<QiscusChatRoom> qiscusChatRooms) {
+            //Success getting the rooms
         }
 
         @Override
@@ -359,7 +349,8 @@ After that, you need to change your firebase service to extend 'Qiscus firebase 
 
 ```java
 public class MyFirebaseIdService extends QiscusFirebaseIdService {
-    @Overridepublic void onTokenRefresh() {
+    @Override
+    public void onTokenRefresh() {
         super.onTokenRefresh(); // Must call super
         
         // Below is your own apps specific code
@@ -370,7 +361,8 @@ public class MyFirebaseIdService extends QiscusFirebaseIdService {
 }
 
 public class MyFirebaseMessagingService extends QiscusFirebaseService {
-    @Overridepublic void onMessageReceived(RemoteMessage remoteMessage) {
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
         if (handleMessageReceived(remoteMessage)) { // For qiscus
             return;
         }
@@ -434,12 +426,12 @@ Qiscus.getChatConfig()
 
 ### Advance Customization
 
-For advance customization, you can modify everything on the chat interface by forking our repository or just right away modifying our **[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)** ****based on your needs.
+For advance customization, you can modify everything on the chat interface by forking our repository or just right away modifying our **[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)** based on your needs.
 
 ## Event Handler
 
 An Event Handler is a callback routine that operates asynchronously and handles inputs received into a program. Event Handlers are important in Qiscus because it allows a client to react to any events happening in Qiscus Chat SDK. For example, if a client wants to know any important events from server, such as success login event, client's app can be notified by calling a specific Event Handler. Client, then, can do things with data returned by the event.
-To enable client app to publish or subscribe something to Qiscus Chat SDK,**  **we use **EventBus** library , so you can listen event from anywhere, It does not matter whether it's an activity or not**. **You can learn more about Eventbus [here](http://greenrobot.org/eventbus/). 
+To enable client app to publish or subscribe something to Qiscus Chat SDK, we use **EventBus** library , so you can listen event from anywhere. **You can learn more about Eventbus [here](http://greenrobot.org/eventbus/)**. 
 
 Here is an example to use Eventbus on your application class :
 
