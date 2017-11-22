@@ -323,7 +323,7 @@ In some cases, you may need to add additional participants into your room chat o
 To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
 
 ```java
-QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms('room id', limit, showMembers), new QiscusRxExecutor.Listener<List<QiscusChatRoom>>() {
+QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms(1, 20, true), new QiscusRxExecutor.Listener<List<QiscusChatRoom>>() {
         @Override
         public void onSuccess(List<QiscusChatRoom> qiscusChatRooms) {
             //Success getting the rooms
