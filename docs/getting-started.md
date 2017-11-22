@@ -61,7 +61,7 @@ Here somet comparison to help you decide between the two options:
 * Basic Authentication can be done simply by providing userID and userKey through your client app. On the other hand, JWT authentication, the credential information is provided by your Server App. In this case, you need o prepare your own Backend.
 * The Basic Authentication is easier to implement but JWT Authentication is more secure.
 
-### **Basic Authentication**
+### Basic Authentication
 
 This authentication is done by calling `Qiscus.setUser()` function. This function will retrieve or create user credential based on the unique UserId. Here is example:
 
@@ -92,7 +92,7 @@ You can learn from the figure below to understand what really happened when call
 
 <p align="center"><br/><img src="https://raw.githubusercontent.com/qiscus/qiscus-sdk-android/develop/screenshot/set_user.png" width="80%" /><br/></p>
 
-### **JWT Authentication**
+### JWT Authentication
 
 Another option is to authenticate using Json Web Token (JWT) (read [here ](https://jwt.io/)for more detail about JWT). Json web token contains your app account details which typically consists of a single string which contains information of two parts, Jose header and JWT claims set.
 
@@ -172,7 +172,7 @@ When your backend returns a JWT after receiving Nonce from your client app, the 
 
 
 
-### **Updating User Profile**
+### Updating User Profile
 
 
 After your user account is created, sometimes you may need to update a user information, such as changing user avatar. You can use method `Qiscus.updateUser()` to make changes to your account.
@@ -192,7 +192,7 @@ Qiscus.updateUser(userName, avatarUrl, new Qiscus.SetUserListener() {
         });
 ```
 
-### **Clear User Data and disconnect**
+### Clear User Data and disconnect
 
 
 As mentioned in previous section, when you did setUser(), user's data will be stored locally. When user need to disconnect from Qiscus Chat SDK service, you need to clear the user data that is related to Qiscus Chat SDK, such as token, profile, messages,rooms, etc, from local device. You can do this by calling clearUser() method :
@@ -246,7 +246,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
        });
 ```
 
-### **Room Participant Management**
+### Room Participant Management
 
 In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API here.
 
