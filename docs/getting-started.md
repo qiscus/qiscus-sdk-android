@@ -22,7 +22,7 @@ allprojects {
 }
 ```
 
-Secondly, you need to add SDK dependencies inside your app .gradle. Then, you need to synchronize to compile the Qiscus Chat SDK for your app.
+Secondly, you need to add SDK dependencies inside your app .gradle. Then, you need to synchronize to compile the Qiscus Chat SDK for your app. 
 
 ```groovy
 dependencies {
@@ -53,12 +53,12 @@ public class SampleApps extends Application {
 ## Authentication
 
 To authenticate to SDK server, app needs to have user credential locally stored for further requests. The credential consists of a token that will identify a user in SDK server.
-When you want to disconnect from SDK server,  terminating authentication will be done by clearing the stored credential.
-Qiscus SDK authentication can be done separately with your main app authentication, especially if your main app has functionality before the messaging features.
+When you want to disconnect from SDK server, terminating authentication will be done by clearing the stored credential.
+Qiscus SDK authentication can be done separately with your main app authentication, especially if your main app has functionality before the messaging features. 
 There are 2 type of authentication that you can opt to use: Basic Authentication and Authentication using JWT.
 Here somet comparison to help you decide between the two options:
 
-* Basic Authentication can be done simply by providing userID and userKey through your client app. On the other hand, JWT authentication, the credential information is provided by your Server App. In this case, you need o prepare your own Backend.
+* Basic Authentication can be done simply by providing userID and userKey through your client app. On the other hand, JWT authentication, the credential information is provided by your Server App. In this case, you need o prepare your own Backend. 
 * The Basic Authentication is easier to implement but JWT Authentication is more secure.
 
 ### Basic Authentication
@@ -80,7 +80,6 @@ Qiscus.setUser(userId , userKey)
       });
 ```
 
-
 Here are the explanation for the parameters on user setup:
 
 * ***userId*** (string, unique): A User identifier that will be used to identify a user and used whenever another user need to chat with this user. It can be anything, wheter is is user's email, your user database index, etc. As long as it is unique and a string.
@@ -94,7 +93,7 @@ You can learn from the figure below to understand what really happened when call
 
 ### JWT Authentication
 
-Another option is to authenticate using Json Web Token (JWT) (read [here ](https://jwt.io/)for more detail about JWT). Json web token contains your app account details which typically consists of a single string which contains information of two parts, Jose header and JWT claims set.
+Another option is to authenticate using Json Web Token (JWT) (read [here ](https://jwt.io/)for more detail about JWT). Json web token contains your app account details which typically consists of a single string which contains information of two parts, Jose header and JWT claims set. 
 
 The steps to authenticate with JWT goes like this:
 
@@ -112,33 +111,32 @@ You need to request Nonce from Qiscus Chat SDK Server. Nonce (Number Used Once) 
 ```java
 QiscusRxExecutor.execute(QiscusApi.getInstance().requestNonce(), new QiscusRxExecutor.Listener<QiscusNonce>() {
         @Override
-        public void onSuccess(QiscusNonce result) {
+        public void onSuccess(QiscusNonce qiscusNonce) {
             //do request jwt from your backend using returned Nonce
         }
 
         @Override
         public void onError(Throwable throwable) {
-            // do anything if error occurred
+            //do anything if error occurred 
         }
     });
 ```
 
-The code above is a sample of method you can implement in your app. By calling `QiscusRxExecutor.execute(QiscusApi.getInstance().requestNonce()` , you will request Nonce from Qiscus SDK server and a Nonce will be returned. If it is success, you can request JWT from your backend by sending Nonce you got from Qiscus SDK Server.
+The code above is a sample of method you can implement in your app. By calling `QiscusRxExecutor.execute(QiscusApi.getInstance().requestNonce()` , you will request Nonce from Qiscus SDK server and a Nonce will be returned. If it is success, you can request JWT from your backend by sending Nonce you got from Qiscus SDK Server. 
 When you got the JWT Token, you can pass that JWTto` Qiscus.setUser()` method to allow Qiscus to authenticate your user and return user account, as shown in the code below :
 
 ```java
 Qiscus.setUser('your jwt token', new Qiscus.SetUserListener() {
+        @Override
+        public void onSuccess(QiscusAccount qiscusAccount) {
+            //do anything if success
+        }
 
-            @Override
-            public void onSuccess(QiscusAccount qiscusAccount) {
-                // Do anything if success
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                // Do anything if error
-            }
-        });
+        @Override
+        public void onError(Throwable throwable) {
+            //do anything if error occurs
+        }
+    });
 ```
 
 ### Setting jose header and jwt claim set in your backend
@@ -170,32 +168,28 @@ When your backend returns a JWT after receiving Nonce from your client app, the 
 }
 ```
 
-
-
 ### Updating User Profile
-
 
 After your user account is created, sometimes you may need to update a user information, such as changing user avatar. You can use method `Qiscus.updateUser()` to make changes to your account.
 
 
 ```java
 Qiscus.updateUser(userName, avatarUrl, new Qiscus.SetUserListener() {
-            @Override
-            public void onSuccess(QiscusAccount qiscusAccount) {
-               //do anything after it successfully updated
-            }
+        @Override
+        public void onSuccess(QiscusAccount qiscusAccount) {
+           //do anything after it successfully updated
+        }
 
-            @Override
-            public void onError(Throwable throwable) {
-               //do anything if error occurs
-            }
-        });
+        @Override
+        public void onError(Throwable throwable) {   
+           //do anything if error occurs                 
+        }
+    });
 ```
 
 ### Clear User Data and disconnect
 
-
-As mentioned in previous section, when you did setUser(), user's data will be stored locally. When user need to disconnect from Qiscus Chat SDK service, you need to clear the user data that is related to Qiscus Chat SDK, such as token, profile, messages,rooms, etc, from local device. You can do this by calling clearUser() method :
+As mentioned in previous section, when you did setUser(), user's data will be stored locally. When user need to disconnect from Qiscus Chat SDK service, you need to clear the user data that is related to Qiscus Chat SDK, such as token, profile, messages, rooms, etc, from local device. You can do this by calling clearUser() method :
 
 ```java
 Qiscus.clearUser();
@@ -203,13 +197,12 @@ Qiscus.clearUser();
 
 ## Create Chat Room
 
-**Chat Room** is a place where 2 or more users can chat each other**.** There are 2 type of Chat Room that can be created using Qiscus Chat SDK: 1-on-1 Chat Room and Group Chat Room. For some cases, a room can be identified by room unique id or room name.
+**Chat Room** is a place where 2 or more users can chat each other. There are 2 type of Chat Room that can be created using Qiscus Chat SDK: 1-on-1 Chat Room and Group Chat Room. For some cases, a room can be identified by room unique id or room name. 
 
 ### 1-on-1 Chat Room
 
-We assume that you already know a targeted user you want to chat with. Make sure that your targeted user has been registered in Qiscus Chat SDK through setUser() method, as explained in the previous section. To start a conversation with your targeted user, it can be done with  `buildChatWith("targeted_userID")` method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is succesfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener. To use the created room, you can call `startActivity() `inside the `onSuccess()` listener.
+We assume that you already know a targeted user you want to chat with. Make sure that your targeted user has been registered in Qiscus Chat SDK through setUser() method, as explained in the previous section. To start a conversation with your targeted user, it can be done with `buildChatWith("targeted_userID")` method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is succesfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener. To use the created room, you can call `startActivity()` inside the `onSuccess()` listener.   
 Here is the example to start a conversation:
-
 
 ```java
 Qiscus.buildChatWith("jhon.doe@gmail.com") //here we use email as userID. But you can make it whatever you want.
@@ -220,7 +213,7 @@ Qiscus.buildChatWith("jhon.doe@gmail.com") //here we use email as userID. But yo
           }
           @Override
           public void onError(Throwable throwable) {
-             //do anything if error occurs
+             //do anything if error occurs 
           }
       });
 ```
@@ -240,25 +233,24 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
 
           @Override
           public void onError(Throwable throwable) {
-          // error message when failed building group chat
-             throwable.printStackTrace();
+              //do anything if error occurs
           }
        });
 ```
 
 ### Room Participant Management
 
-In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API here.
+In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi). 
 
 ### Get List of Rooms
 
 To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
 
 ```java
-QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom('room id'), new QiscusRxExecutor.Listener<QiscusChatRoom>() {
+QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms(1, 20, true), new QiscusRxExecutor.Listener<List<QiscusChatRoom>>() {
         @Override
-        public void onSuccess(QiscusChatRoom result) {
-            //Success getting the room
+        public void onSuccess(List<QiscusChatRoom> qiscusChatRooms) {
+            //Success getting the rooms
         }
 
         @Override
@@ -281,9 +273,10 @@ After that, you need to change your firebase service to extend 'Qiscus firebase 
 
 ```java
 public class MyFirebaseIdService extends QiscusFirebaseIdService {
-    @Overridepublic void onTokenRefresh() {
+    @Override
+    public void onTokenRefresh() {
         super.onTokenRefresh(); // Must call super
-
+        
         // Below is your own apps specific code
         // e.g register the token to your backend
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
@@ -292,7 +285,8 @@ public class MyFirebaseIdService extends QiscusFirebaseIdService {
 }
 
 public class MyFirebaseMessagingService extends QiscusFirebaseService {
-    @Overridepublic void onMessageReceived(RemoteMessage remoteMessage) {
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
         if (handleMessageReceived(remoteMessage)) { // For qiscus
             return;
         }
