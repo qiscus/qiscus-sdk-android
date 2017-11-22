@@ -24,7 +24,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
-import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
@@ -47,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.qiscus.sdk.util.BuildVersionUtil.isNougatOrHigher;
 
 /**
  * Created on : June 15, 2017
@@ -182,7 +183,7 @@ public final class QiscusPushNotificationUtil {
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
-        if (Qiscus.getChatConfig().isEnableReplyNotification() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Qiscus.getChatConfig().isEnableReplyNotification() && isNougatOrHigher()) {
             String getRepliedTo = comment.getRoomName();
             RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
                     .setLabel(QiscusTextUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))

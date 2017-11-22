@@ -40,6 +40,7 @@ import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusLogger;
+import com.qiscus.sdk.util.BuildVersionUtil;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
@@ -151,8 +152,10 @@ public class Qiscus {
 
     public static void startPusherService() {
         checkAppIdSetup();
-        appInstance.getApplicationContext()
-                .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
+        if (BuildVersionUtil.isOreoLower()) {
+            appInstance.getApplicationContext()
+                    .startService(new Intent(appInstance.getApplicationContext(), QiscusPusherService.class));
+        }
     }
 
     /**
