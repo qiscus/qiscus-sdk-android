@@ -1,4 +1,4 @@
-# 3. Advanced Section
+# Advanced Section
 
 ## UI Costomization
 
