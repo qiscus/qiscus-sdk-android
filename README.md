@@ -1,4 +1,4 @@
-# 1. Introduction
+# Introduction
 
 With Qiscus chat SDK (Software Development Kit), You can embed chat feature inside your application quickly and easily without dealing with complexity of real-time comunication infrastucture. We provide Chat UI that has been designed and optimized for easy customization. So, you can modify the UI to show off your branding identity, favorite color, or customize event.
 
@@ -74,7 +74,7 @@ Now you have successfully run the sample dashboard. But please be noted that the
 If you are wondering how our sample app with dashboard worked, here some ilustration :
 <p align="center"><br/><img src="https://raw.githubusercontent.com/qiscus/qiscus-sdk-android/develop/screenshot/how_sample_work.png" width="80%" /><br/></p>
 
-# 2. Getting Started
+# Getting Started
 
 ## Embed Chat to Your App
 
@@ -402,7 +402,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 }
 ```
 
-# 3. Advanced Section
+# Advanced Section
 
 ## UI Costomization
 
