@@ -282,6 +282,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     public void addOrUpdate(E e) {
         int i = findPosition(e);
         if (i >= 0) {
+            e.setSelected(data.get(i).isSelected());
             data.updateItemAt(i, e);
             notifyItemChanged(i);
         } else {
@@ -293,6 +294,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         for (E e : es) {
             int i = findPosition(e);
             if (i >= 0) {
+                e.setSelected(data.get(i).isSelected());
                 data.updateItemAt(i, e);
             } else {
                 data.add(e);
