@@ -14,58 +14,62 @@
   ~ limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.qiscus.sdk">
+    package="com.qiscus.sdk">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- Need to request runtime permission -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application android:largeHeap="true">
         <activity
             android:name=".ui.QiscusChatActivity"
-            android:theme="@style/QiscusTheme"/>
+            android:theme="@style/QiscusTheme" />
         <activity
             android:name=".ui.QiscusGroupChatActivity"
-            android:theme="@style/QiscusTheme"/>
+            android:theme="@style/QiscusTheme" />
         <activity
             android:name=".ui.QiscusAccountLinkingActivity"
-            android:theme="@style/QiscusTheme"/>
+            android:theme="@style/QiscusTheme" />
         <activity
             android:name=".ui.QiscusPhotoViewerActivity"
-            android:theme="@style/QiscusTheme"/>
+            android:theme="@style/QiscusTheme" />
         <activity
             android:name=".ui.QiscusSendPhotoConfirmationActivity"
             android:theme="@style/QiscusTheme"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
 
-        <service android:name=".service.QiscusSyncService"/>
-        <service android:name="org.eclipse.paho.android.service.MqttService"/>
+        <service android:name=".service.QiscusSyncService" />
+        <service android:name="org.eclipse.paho.android.service.MqttService" />
+
+        <service
+            android:name=".service.QiscusSyncJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <receiver
             android:name=".service.QiscusStartServiceReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="com.qiscus.START_SERVICE"/>
-                <action android:name="android.intent.action.USER_PRESENT"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.qiscus.START_SERVICE" />
+                <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".service.QiscusPushNotificationClickReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.qiscus.OPEN_COMMENT_PN"/>
+                <action android:name="com.qiscus.OPEN_COMMENT_PN" />
             </intent-filter>
         </receiver>
 
@@ -76,7 +80,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/qiscus_provider_paths"/>
+                android:resource="@xml/qiscus_provider_paths" />
         </provider>
 
     </application>

@@ -35,6 +35,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
+import com.qiscus.sdk.service.QiscusSyncJobService;
 import com.qiscus.sdk.service.QiscusSyncService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
@@ -155,6 +156,9 @@ public class Qiscus {
         if (BuildVersionUtil.isOreoLower()) {
             appInstance.getApplicationContext()
                     .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
+        } else {
+            appInstance.getApplicationContext()
+                    .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
         }
     }
 
