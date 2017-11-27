@@ -25,10 +25,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 
-import java.io.IOException;
-
-import retrofit2.HttpException;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -60,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
                         mLoginButton.setText("Logout");
                         dismissLoading();
                     }, throwable -> {
-                        throwable.printStackTrace();
-                        showError(throwable.getMessage());
+                        QiscusErrorLogger.print(throwable);
+                        showError(QiscusErrorLogger.getMessage(throwable));
                         dismissLoading();
                     });
         }
@@ -78,21 +76,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
-                    if (throwable instanceof HttpException) { //Error response from server
-                        HttpException e = (HttpException) throwable;
-                        try {
-                            String errorMessage = e.response().errorBody().string();
-                            Log.e("openChat", errorMessage);
-                            showError(errorMessage);
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-                    } else if (throwable instanceof IOException) { //Error from network
-                        showError("Can not connect to qiscus server!");
-                    } else { //Unknown error
-                        showError("Unexpected error!");
-                    }
-                    throwable.printStackTrace();
+                    QiscusErrorLogger.print(throwable);
+                    showError(QiscusErrorLogger.getMessage(throwable));
                     dismissLoading();
                 });
     }
@@ -110,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
-                    throwable.printStackTrace();
-                    showError(throwable.getMessage());
+                    QiscusErrorLogger.print(throwable);
+                    showError(QiscusErrorLogger.getMessage(throwable));
                     dismissLoading();
                 });
     }
@@ -128,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
-                    throwable.printStackTrace();
-                    showError(throwable.getMessage());
+                    QiscusErrorLogger.print(throwable);
+                    showError(QiscusErrorLogger.getMessage(throwable));
                     dismissLoading();
                 });
     }
@@ -146,8 +131,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
-                    throwable.printStackTrace();
-                    showError(throwable.getMessage());
+                    QiscusErrorLogger.print(throwable);
+                    showError(QiscusErrorLogger.getMessage(throwable));
                     dismissLoading();
                 });
     }
@@ -162,8 +147,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(MainActivity.class.getSimpleName(),
                             "Last message: " + qiscusChatRoom.getLastComment().getMessage());
                 }, throwable -> {
-                    throwable.printStackTrace();
-                    showError(throwable.getMessage());
+                    QiscusErrorLogger.print(throwable);
+                    showError(QiscusErrorLogger.getMessage(throwable));
+                    dismissLoading();
                 });
     }
 
