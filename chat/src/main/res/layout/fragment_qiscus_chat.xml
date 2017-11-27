@@ -162,6 +162,7 @@
                     android:maxLines="4"
                     android:nextFocusRight="@+id/button_send"
                     android:padding="8dp"
+                    android:textColorHint="@color/qiscus_secondary_text"
                     android:textColor="@color/qiscus_primary_text"
                     android:textSize="16sp"
                     app:emojiSize="22sp"/>

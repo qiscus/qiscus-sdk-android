@@ -764,16 +764,25 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         rootView.setBackground(chatConfig.getChatRoomBackground());
         swipeRefreshLayout.setColorSchemeResources(chatConfig.getSwipeRefreshColorScheme());
         sendButton.setImageResource(chatConfig.getShowAttachmentPanelIcon());
+
         messageEditText.setHint(chatConfig.getMessageFieldHint());
+        messageEditText.setHintTextColor(ContextCompat.getColor(Qiscus.getApps(),
+                chatConfig.getMessageFieldHintColor()));
+        messageEditText.setTextColor(ContextCompat.getColor(Qiscus.getApps(),
+                chatConfig.getMessageFieldTextColor()));
 
         if (emptyChatImageView != null) {
             emptyChatImageView.setImageResource(chatConfig.getEmptyRoomImageResource());
         }
         if (emptyChatTitleView != null) {
             emptyChatTitleView.setText(chatConfig.getEmptyRoomTitle());
+            emptyChatTitleView.setTextColor(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getEmptyRoomTitleColor()));
         }
         if (emptyChatDescView != null) {
             emptyChatDescView.setText(chatConfig.getEmptyRoomSubtitle());
+            emptyChatDescView.setTextColor(ContextCompat.getColor(Qiscus.getApps(),
+                    chatConfig.getEmptyRoomSubtitleColor()));
         }
         if (newMessageButton != null) {
             int accentColor = ContextCompat.getColor(Qiscus.getApps(), chatConfig.getAccentColor());

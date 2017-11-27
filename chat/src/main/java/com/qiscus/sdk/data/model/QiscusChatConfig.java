@@ -82,9 +82,16 @@ public class QiscusChatConfig {
     private DateFormatter timeFormat = QiscusDateUtil::toHour;
 
     private String emptyRoomTitle = QiscusTextUtil.getString(R.string.qiscus_welcome);
+    private int emptyRoomTitleColor = R.color.qiscus_divider;
+
     private String emptyRoomSubtitle = QiscusTextUtil.getString(R.string.qiscus_desc_empty_chat);
+    private int emptyRoomSubtitleColor = R.color.qiscus_divider;
+
     private int emptyRoomImageResource = R.drawable.ic_qiscus_chat_empty;
+
     private String messageFieldHint = QiscusTextUtil.getString(R.string.qiscus_hint_message);
+    private int messageFieldHintColor = R.color.qiscus_secondary_text;
+    private int messageFieldTextColor = R.color.qiscus_primary_text;
 
     private int addPictureIcon = R.drawable.ic_qiscus_add_image;
     private int addPictureBackgroundColor = R.color.qiscus_gallery_background;
@@ -362,8 +369,18 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setEmptyRoomTitleColor(@ColorRes int emptyRoomTitleColor) {
+        this.emptyRoomTitleColor = emptyRoomTitleColor;
+        return this;
+    }
+
     public QiscusChatConfig setEmptyRoomSubtitle(String emptyRoomSubtitle) {
         this.emptyRoomSubtitle = emptyRoomSubtitle;
+        return this;
+    }
+
+    public QiscusChatConfig setEmptyRoomSubtitleColor(@ColorRes int emptyRoomSubtitleColor) {
+        this.emptyRoomSubtitleColor = emptyRoomSubtitleColor;
         return this;
     }
 
@@ -374,6 +391,16 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setMessageFieldHint(String messageFieldHint) {
         this.messageFieldHint = messageFieldHint;
+        return this;
+    }
+
+    public QiscusChatConfig setMessageFieldHintColor(@ColorRes int messageFieldHintColor) {
+        this.messageFieldHintColor = messageFieldHintColor;
+        return this;
+    }
+
+    public QiscusChatConfig setMessageFieldTextColor(@ColorRes int messageFieldTextColor) {
+        this.messageFieldTextColor = messageFieldTextColor;
         return this;
     }
 
@@ -853,8 +880,18 @@ public class QiscusChatConfig {
         return emptyRoomTitle;
     }
 
+    @ColorRes
+    public int getEmptyRoomTitleColor() {
+        return emptyRoomTitleColor;
+    }
+
     public String getEmptyRoomSubtitle() {
         return emptyRoomSubtitle;
+    }
+
+    @ColorRes
+    public int getEmptyRoomSubtitleColor() {
+        return emptyRoomSubtitleColor;
     }
 
     @DrawableRes
@@ -864,6 +901,16 @@ public class QiscusChatConfig {
 
     public String getMessageFieldHint() {
         return messageFieldHint;
+    }
+
+    @ColorRes
+    public int getMessageFieldHintColor() {
+        return messageFieldHintColor;
+    }
+
+    @ColorRes
+    public int getMessageFieldTextColor() {
+        return messageFieldTextColor;
     }
 
     @DrawableRes
