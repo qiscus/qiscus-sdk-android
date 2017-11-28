@@ -161,7 +161,9 @@ public class QiscusSyncJobService extends JobService {
                 .build();
 
         JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        jobScheduler.schedule(jobInfo);
+        if (jobScheduler != null) {
+            jobScheduler.schedule(jobInfo);
+        }
 
     }
 
