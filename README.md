@@ -102,7 +102,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.14.3'
+    compile 'com.qiscus.sdk:chat:2.15.0'
 }
 ```
 
