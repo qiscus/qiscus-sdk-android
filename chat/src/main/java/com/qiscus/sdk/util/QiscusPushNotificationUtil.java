@@ -68,10 +68,15 @@ public final class QiscusPushNotificationUtil {
         }
 
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
+
+        Pair<Boolean, Integer> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
+        if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
+            updateUnreadCount(qiscusComment);
+        }
+
         if (Qiscus.getChatConfig().isEnablePushNotification()
                 && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
             if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
-                Pair<Boolean, Integer> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
                 if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
                     showPushNotification(context, qiscusComment);
                 }
@@ -79,6 +84,16 @@ public final class QiscusPushNotificationUtil {
                 showPushNotification(context, qiscusComment);
             }
         }
+    }
+
+    private static void updateUnreadCount(QiscusComment qiscusComment) {
+        QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+        if (qiscusComment.isMyComment()) {
+            room.setUnreadCount(0);
+        } else {
+            room.setUnreadCount(room.getUnreadCount() + 1);
+        }
+        Qiscus.getDataStore().addOrUpdate(room);
     }
 
     private static void showPushNotification(Context context, QiscusComment comment) {

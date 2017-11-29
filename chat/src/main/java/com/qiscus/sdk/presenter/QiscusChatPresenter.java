@@ -876,11 +876,17 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
     }
 
+    private void clearUnreadCount() {
+        room.setUnreadCount(0);
+        Qiscus.getDataStore().addOrUpdate(room);
+    }
+
     @Override
     public void detachView() {
         super.detachView();
         QiscusAndroidUtil.cancelRunOnUIThread(listenRoomTask);
         QiscusPusherApi.getInstance().unListenRoom(room);
+        clearUnreadCount();
         room = null;
         EventBus.getDefault().unregister(this);
     }
