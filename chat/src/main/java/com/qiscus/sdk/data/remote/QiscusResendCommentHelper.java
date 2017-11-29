@@ -26,7 +26,9 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import retrofit2.HttpException;
 import rx.Observable;
@@ -43,13 +45,24 @@ import rx.schedulers.Schedulers;
 public final class QiscusResendCommentHelper {
 
     private static Map<QiscusComment, Subscription> pendingTask = new HashMap<>();
+    private static Set<String> processingComment = new HashSet<>();
 
     public static void tryResendPendingComment() {
         Qiscus.getDataStore()
                 .getObservablePendingComments()
                 .flatMap(Observable::from)
-                .filter(qiscusComment -> !pendingTask.containsKey(qiscusComment))
-                .doOnNext(QiscusResendCommentHelper::resendComment)
+                .doOnNext(qiscusComment -> {
+                    if (qiscusComment.isAttachment() && !pendingTask.containsKey(qiscusComment)) {
+                        resendFile(qiscusComment);
+                    }
+                })
+                .filter(qiscusComment -> !qiscusComment.isAttachment())
+                .take(1)
+                .doOnNext(qiscusComment -> {
+                    if (!pendingTask.containsKey(qiscusComment)) {
+                        resendComment(qiscusComment);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
@@ -63,17 +76,23 @@ public final class QiscusResendCommentHelper {
                 subscription.unsubscribe();
             }
             pendingTask.remove(qiscusComment);
+            processingComment.remove(qiscusComment.getUniqueId());
         }
     }
 
     private static void resendComment(QiscusComment qiscusComment) {
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
-        Qiscus.getDataStore().addOrUpdate(qiscusComment);
-
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
             return;
         }
+
+        //Wait until this success
+        if (!processingComment.isEmpty() && !processingComment.contains(qiscusComment.getUniqueId())) {
+            return;
+        }
+
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
 
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
@@ -82,14 +101,19 @@ public final class QiscusResendCommentHelper {
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(commentSend ->
-                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
-                        QiscusErrorLogger::print);
+                .subscribe(commentSend -> {
+                    tryResendPendingComment(); //Process next pending comments
+                    EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend));
+                }, QiscusErrorLogger::print);
 
         pendingTask.put(qiscusComment, subscription);
+        processingComment.add(qiscusComment.getUniqueId());
     }
 
     private static void resendFile(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
+
         if (qiscusComment.getAttachmentUri().toString().startsWith("http")) { //We forward file message
             forwardFile(qiscusComment);
             return;
@@ -152,6 +176,7 @@ public final class QiscusResendCommentHelper {
 
     private static void commentSuccess(QiscusComment qiscusComment) {
         pendingTask.remove(qiscusComment);
+        processingComment.remove(qiscusComment.getUniqueId());
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
         if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
@@ -172,6 +197,7 @@ public final class QiscusResendCommentHelper {
             if (httpException.code() >= 400) {
                 qiscusComment.setDownloading(false);
                 state = QiscusComment.STATE_FAILED;
+                processingComment.remove(qiscusComment.getUniqueId());
             }
         }
 
