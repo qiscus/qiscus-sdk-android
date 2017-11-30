@@ -289,7 +289,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.beginTransaction();
             try {
                 sqLiteDatabase.insert(QiscusDb.RoomMemberTable.TABLE_NAME, null,
-                        QiscusDb.RoomMemberTable.toContentValues(roomId, qiscusRoomMember.getEmail(), distinctId));
+                        QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember));
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -321,7 +321,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusRoomMember> members = new ArrayList<>();
         while (cursor.moveToNext()) {
-            members.add(getMember(QiscusDb.RoomMemberTable.getMember(cursor)));
+            QiscusRoomMember member = getMember(QiscusDb.RoomMemberTable.getUserEmail(cursor));
+            member.setLastDeliveredCommentId(QiscusDb.RoomMemberTable.getLastDeliveredCommentId(cursor));
+            member.setLastReadCommentId(QiscusDb.RoomMemberTable.getLastReadCommentId(cursor));
+            members.add(member);
         }
         cursor.close();
         return members;

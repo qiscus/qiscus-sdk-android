@@ -126,23 +126,29 @@ final class QiscusDb {
         static final String COLUMN_ROOM_ID = "room_id";
         static final String COLUMN_USER_EMAIL = "user_email";
         static final String COLUMN_DISTINCT_ID = "distinct_id";
+        static final String COLUMN_LAST_DELIVERED = "last_delivered";
+        static final String COLUMN_LAST_READ = "last_read";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         COLUMN_ROOM_ID + " INTEGER," +
                         COLUMN_USER_EMAIL + " TEXT," +
-                        COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'" +
+                        COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
+                        COLUMN_LAST_DELIVERED + " INTEGER DEFAULT 0," +
+                        COLUMN_LAST_READ + " INTEGER DEFAULT 0" +
                         " ); ";
 
-        static ContentValues toContentValues(int roomId, String userEmail) {
-            return toContentValues(roomId, userEmail, "default");
+        static ContentValues toContentValues(int roomId, QiscusRoomMember roomMember) {
+            return toContentValues(roomId, "default", roomMember);
         }
 
-        static ContentValues toContentValues(int roomId, String userEmail, String distinctId) {
+        static ContentValues toContentValues(int roomId, String distinctId, QiscusRoomMember roomMember) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_ROOM_ID, roomId);
-            values.put(COLUMN_USER_EMAIL, userEmail);
             values.put(COLUMN_DISTINCT_ID, distinctId);
+            values.put(COLUMN_USER_EMAIL, roomMember.getEmail());
+            values.put(COLUMN_LAST_DELIVERED, roomMember.getLastDeliveredCommentId());
+            values.put(COLUMN_LAST_READ, roomMember.getLastReadCommentId());
             return values;
         }
 
@@ -150,8 +156,16 @@ final class QiscusDb {
             return cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID));
         }
 
-        static String getMember(Cursor cursor) {
+        static String getUserEmail(Cursor cursor) {
             return cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL));
+        }
+
+        static Integer getLastDeliveredCommentId(Cursor cursor) {
+            return cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LAST_DELIVERED));
+        }
+
+        static Integer getLastReadCommentId(Cursor cursor) {
+            return cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LAST_READ));
         }
     }
 
