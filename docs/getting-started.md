@@ -232,11 +232,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
               //do anything if error occurs
           }
        });
-```
-
-## Room Participant Management
-
-In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi). 
+``` 
 
 ## More About Rooms
 
@@ -302,13 +298,14 @@ After successfully getting your room list, you may want to enter an existing roo
 
 ### Participant Management
 
-In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API here. 
+In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi).
 
 
 ## Enable Push Notification
 
-First install FCM to your apps, you can follow [this steps.](https://firebase.google.com/docs/cloud-messaging/android/client) You can skip this step, if your apps already use FCM. Then put your api key to qiscus dashboard.
-Now lets integrate with Qiscus client sdk, first enable FCM at Qiscus chat config.
+To enable Push Norification in your app, you need to first install FCM to your apps, you can follow Firebase steps (https://firebase.google.com/docs/cloud-messaging/android/client) if you have not set it up. Otherwise, you can skip this step if your apps already use FCM. After the FCM is ready, you need to put your api key to qiscus dashboard.
+
+Now let's integrate with Qiscus client sdk, first enable FCM at Qiscus chat config.
 
 ```java
 Qiscus.getChatConfig().setEnableFcmPushNotification(true);
