@@ -10,9 +10,10 @@ allprojects {
         maven { url  "https://dl.bintray.com/qiscustech/maven" }
     }
 }
-
+```
 Secondly, you need to add SDK dependencies inside your app .gradle. Then, you need to synchronize to compile the Qiscus Chat SDK for your app. 
 
+```java
 dependencies {
     compile 'com.qiscus.sdk:chat:2.15.1'
 }
