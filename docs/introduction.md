@@ -11,13 +11,13 @@ Talking about chat app, you may figure out such messenger app like Whatsapp. You
 In a chat app, to start a conversation, we usually choose person we want to chat with, from a contact list. Then, we start conversation inside a chat room. In a chat room, we can do things such as sharing images, sending emoji, sharing contact, location, and many more. We can even know when a person is typing or when our message has been read. If chatting is done, we can go back to the conversation list which display our conversations in the app.
 To make a chat app with the described flow, we noticed that the most complex part is creating chat room, which posses many features inside it. Hence, Qiscus Chat SDK provide an easy way to create chat app without dealing with complexity of real-time comunication infrastucture that resides inside a chat room.
 
-### Qiscus Chat SDK and UI Components
+## Qiscus Chat SDK and UI Components
 
 <p align="center"><br/><img src="https://raw.githubusercontent.com/qiscus/qiscus-sdk-android/develop/screenshot/sample.png" width="37%" /><br/></p>
 
 In spite of real-time chat, Qiscus Chat SDK provides UI that can be customized according to your needs. But please keep in mind that, by default, Qiscus provides UI for chat room only. If you need to create contact list and conversation list UI, for example, you need to create it your own. However, we provide essential data that you can get and utilize for your app.
 
-### Qiscus Chat SDK Features
+## Qiscus Chat SDK Features
 
 When you try our chat SDK, you will find the default built-in features such as:
 
