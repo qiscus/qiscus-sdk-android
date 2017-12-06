@@ -303,7 +303,7 @@ In some cases, you may need to add additional participants into your room chat o
 
 ## Enable Push Notification
 
-To enable Push Norification in your app, you need to first install FCM to your apps, you can follow Firebase steps (https://firebase.google.com/docs/cloud-messaging/android/client) if you have not set it up. Otherwise, you can skip this step if your apps already use FCM. After the FCM is ready, you need to put your api key to qiscus dashboard.
+To enable Push Norification in your app, you need to first install FCM to your apps, you can follow [Firebase steps](https://firebase.google.com/docs/cloud-messaging/android/client) if you have not set it up. Otherwise, you can skip this step if your apps already use FCM. After the FCM is ready, you need to put your api key to qiscus dashboard.
 
 Now let's integrate with Qiscus client sdk, first enable FCM at Qiscus chat config.
 
