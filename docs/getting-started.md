@@ -3,7 +3,7 @@
 ## Requirement
 To integrate your app with Qiscus Chat SDK, it can be done in 2 steps. Firstly, you need to add URL reference in your .gradle project. This reference is a guide for .gradle to get Qiscus Chat SDK from the right repository. Here is how to do that :
 
-```java
+```groovy
 allprojects {
     repositories {
         .....
@@ -13,7 +13,7 @@ allprojects {
 ```
 Secondly, you need to add SDK dependencies inside your app .gradle. Then, you need to synchronize to compile the Qiscus Chat SDK for your app. 
 
-```java
+```groovy
 dependencies {
     compile 'com.qiscus.sdk:chat:2.15.1'
 }
