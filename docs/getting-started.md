@@ -1,54 +1,29 @@
 # Getting Started
 
-## Embed Chat to Your App
-
-### Get your app id
-
-To start building app using Qiscus  Chat SDK you need a key called APP ID. This APP ID acts as identifier of your Application so that Qiscus can connect user to other users on the sample APP ID. You can get your APP ID [here](https://www.qiscus.com/dashboard/register).
-You can find your APP ID on your Qiscus app dashboard. Here you can see the picture as a reference.
-
-> *All users within the same APP ID are able to communicate with each other, across all platforms. This means users using iOS, Android, Web clients, etc. can all chat with one another. However, users in different Qiscus applications cannot talk to each other.*
-
-### Configuration
-
+## Requirement
 To integrate your app with Qiscus Chat SDK, it can be done in 2 steps. Firstly, you need to add URL reference in your .gradle project. This reference is a guide for .gradle to get Qiscus Chat SDK from the right repository. Here is how to do that :
 
-```groovy
+```java
 allprojects {
     repositories {
         .....
         maven { url  "https://dl.bintray.com/qiscustech/maven" }
     }
 }
-```
 
 Secondly, you need to add SDK dependencies inside your app .gradle. Then, you need to synchronize to compile the Qiscus Chat SDK for your app. 
 
-```groovy
 dependencies {
     compile 'com.qiscus.sdk:chat:2.15.1'
 }
 ```
 
-### Initiate Your APP ID
+## Get your app id
 
-After successfully installing Qiscus SDK, you need to initiate your app id for your chat app. This initialization only need to be done once in the app lifecycle.
+To start building app using Qiscus  Chat SDK you need a key called APP ID. This APP ID acts as identifier of your Application so that Qiscus can connect user to other users on the sample APP ID. You can get your APP ID [here](https://www.qiscus.com/dashboard/register).
+You can find your APP ID on your Qiscus app dashboard. Here you can see the picture as a reference.
 
-```java
-Qiscus.init(context, APP_ID);
-```
-
-Initialization can be implemented in the initial startup. Here is how you can do that:
-
-```java
-public class SampleApps extends Application {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Qiscus.init(this, "APP_ID");
-    }
-}
-```
+> *All users within the same APP ID are able to communicate with each other, across all platforms. This means users using iOS, Android, Web clients, etc. can all chat with one another. However, users in different Qiscus applications cannot talk to each other.*
 
 ## Authentication
 
@@ -60,6 +35,24 @@ Here somet comparison to help you decide between the two options:
 
 * Basic Authentication can be done simply by providing userID and userKey through your client app. On the other hand, JWT authentication, the credential information is provided by your Server App. In this case, you need o prepare your own Backend. 
 * The Basic Authentication is easier to implement but JWT Authentication is more secure.
+
+### Configuration
+
+After successfully installing Qiscus SDK, you need to first initiate your app id for your chat app before accry out to User Authentication. This initialization only need to be done once in the app lifecycle.
+
+Qiscus.init(context, APP_ID);
+
+Initialization can be implemented in the initial startup. Here is how you can do that:
+
+```java
+public class SampleApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Qiscus.init(this, "APP_ID");
+    }
+}
+```
 
 ### Basic Authentication
 
@@ -199,7 +192,7 @@ Qiscus.clearUser();
 
 **Chat Room** is a place where 2 or more users can chat each other. There are 2 type of Chat Room that can be created using Qiscus Chat SDK: 1-on-1 Chat Room and Group Chat Room. For some cases, a room can be identified by room unique id or room name. 
 
-### 1-on-1 Chat Room
+## 1-on-1 Chat Room
 
 We assume that you already know a targeted user you want to chat with. Make sure that your targeted user has been registered in Qiscus Chat SDK through setUser() method, as explained in the previous section. To start a conversation with your targeted user, it can be done with `buildChatWith("targeted_userID")` method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is succesfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener. To use the created room, you can call `startActivity()` inside the `onSuccess()` listener.   
 Here is the example to start a conversation:
@@ -218,7 +211,7 @@ Qiscus.buildChatWith("jhon.doe@gmail.com") //here we use email as userID. But yo
       });
 ```
 
-### Group Chat Room
+## Group Chat Room
 
 When you want your many users to chat together in a single room, you need to create Group Room. Basically Group Room has the same concept as 1-on-1 Chat Room, but the different is that Group Room will target array of userID in a single method. Here how you can create Group Room:
 
@@ -238,7 +231,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
        });
 ```
 
-### Room Participant Management
+## Room Participant Management
 
 In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi). 
 
@@ -259,6 +252,72 @@ QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms(1, 20, true), new 
         }
     });
 ```
+## More About Rooms
+
+After successfully creating your room, you may need to do advanced development for your chat app. This may include inviting more participant to your room, entering a specific room without invitation, and so on. Hence, in this section you will learn about the following things :
+
+1. **Get Room List**, to get data of your user list so that you can use that data to load a specific room or many more.
+2. **Enter to Existing Room**, to enable you to open a room that you have already created by passing a room ID that is obtained by Get Room List.
+3. **Participant Management**, to educate you on adding more participants to your room or managing users in your room.
+
+### Get room list
+
+To get all room list you can call ```QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers)```, page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
+
+```java
+QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms(1, 10, true), 
+ new QiscusRxExecutor.Listener<List<QiscusChatRoom>>() {
+ @Override
+ public void onSuccess(List<QiscusChatRoom> chatRoomList) {
+    //success get chat room list   
+ }
+
+ @Override
+ public void onError(Throwable throwable) {
+    //error get chat room list
+ }
+ });
+```
+
+After executing the code above, here is what you will get in return :
+```java
+protected int id;
+ protected String distinctId;
+ protected String name;
+ protected String subtitle = "";
+ protected int lastTopicId;
+ protected JSONObject options;
+ protected boolean group;
+ protected String avatarUrl;
+ protected List<QiscusRoomMember> member;
+ protected int unreadCount;
+ protected QiscusComment lastComment;
+```
+### Enter to Existing Room
+
+After successfully getting your room list, you may want to enter an existing room. Remember that there are 2 type of rooms, 1-on-1 Chat Room and Group Room. Qiscus Android Chat SDK uses API to allow you get existing room. Here is how to do that:
+
+```java
+    QiscusRxExecutor.execute(QiscusApi
+                    .getInstance().getChatRoom(roomID),
+                    new QiscusRxExecutor.Listener<QiscusChatRoom>() {
+                        @Override
+                        public void onSuccess(QiscusChatRoom qiscusChatRoom) {
+                            context.startActivity(QiscusGroupChatActivity.
+                                    generateIntent(context, qiscusChatRoom));
+                        }
+                        @Override
+                        public void onError(Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    });
+        }
+```
+
+### Participant Management
+
+In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API here. 
+
 
 ## Enable Push Notification
 
