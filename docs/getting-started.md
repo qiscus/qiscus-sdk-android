@@ -226,7 +226,7 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
           public void onSuccess(QiscusChatRoom qiscusChatRoom) {
               startActivity(QiscusGroupChatActivity.generateIntent(MainActivity.this, qiscusChatRoom));
           }
-
+          
           @Override
           public void onError(Throwable throwable) {
               //do anything if error occurs
@@ -247,23 +247,23 @@ After successfully creating your room, you may need to do advanced development f
 To get all room list you can call ```QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers)```, page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
 
 ```java
-QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms(1, 10, true), 
- new QiscusRxExecutor.Listener<List<QiscusChatRoom>>() {
- @Override
- public void onSuccess(List<QiscusChatRoom> chatRoomList) {
-    //success get chat room list   
- }
+QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms(1, 10, true), newQiscusRxExecutor
+      .Listener<List<QiscusChatRoom>>() {
+          @Override
+          public void onSuccess(List<QiscusChatRoom> chatRoomList) {
+          //success get chat room list   
+          }
 
- @Override
- public void onError(Throwable throwable) {
-    //error get chat room list
- }
+          @Override
+          public void onError(Throwable throwable) {
+          //error get chat room list
+          }
  });
 ```
 
 After executing the code above, here is what you will get in return :
 ```java
-protected int id;
+ protected int id;
  protected String distinctId;
  protected String name;
  protected String subtitle = "";
@@ -280,8 +280,7 @@ protected int id;
 After successfully getting your room list, you may want to enter an existing room. Remember that there are 2 type of rooms, 1-on-1 Chat Room and Group Room. Qiscus Android Chat SDK uses API to allow you get existing room. Here is how to do that:
 
 ```java
-    QiscusRxExecutor.execute(QiscusApi
-                    .getInstance().getChatRoom(roomID),
+QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom(roomID),
                     new QiscusRxExecutor.Listener<QiscusChatRoom>() {
                         @Override
                         public void onSuccess(QiscusChatRoom qiscusChatRoom) {
