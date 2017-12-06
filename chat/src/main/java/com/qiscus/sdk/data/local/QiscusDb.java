@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 9;
+    static final int DATABASE_VERSION = 10;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
