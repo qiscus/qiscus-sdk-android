@@ -235,23 +235,6 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
 
 In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi). 
 
-### Get List of Rooms
-
-To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
-
-```java
-QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRooms(1, 20, true), new QiscusRxExecutor.Listener<List<QiscusChatRoom>>() {
-        @Override
-        public void onSuccess(List<QiscusChatRoom> qiscusChatRooms) {
-            //Success getting the rooms
-        }
-
-        @Override
-        public void onError(Throwable throwable) {
-            //Something went wrong
-        }
-    });
-```
 ## More About Rooms
 
 After successfully creating your room, you may need to do advanced development for your chat app. This may include inviting more participant to your room, entering a specific room without invitation, and so on. Hence, in this section you will learn about the following things :
