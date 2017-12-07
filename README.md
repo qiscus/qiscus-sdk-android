@@ -102,7 +102,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.15.0'
+    compile 'com.qiscus.sdk:chat:2.15.1'
 }
 ```
 
@@ -404,7 +404,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 # Advanced Section
 
-## UI Costomization
+## UI Customization
 
 Qiscus Chat SDK enable you to customize Chat UI as you like. You can modify colors, change bubble chat design, modify Chat Header, and many more. There are 2 level of UI customization, Basic and Advance Customization. For Basic Customization, you can simply look at the autocomplete suggestion in your IDE to see lots of method to modify your Chat Interface. For Advance Customization, you need to download the UI source code and modify anything as you need.  
 
