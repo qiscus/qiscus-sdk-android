@@ -16,7 +16,6 @@
 
 package com.qiscus.sdk.presenter;
 
-import android.util.Log;
 import android.util.Pair;
 
 import com.qiscus.sdk.Qiscus;
