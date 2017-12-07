@@ -583,6 +583,46 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public void updateLastDeliveredComment(int roomId, int commentId) {
+        String sql = "UPDATE " + QiscusDb.CommentTable.TABLE_NAME
+                + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_DELIVERED
+                + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
+                + " AND " + QiscusDb.CommentTable.COLUMN_ID + " <= " + commentId
+                + " AND " + QiscusDb.CommentTable.COLUMN_ID + " != -1"
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QiscusComment.STATE_DELIVERED;
+
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.execSQL(sql);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+    }
+
+    @Override
+    public void updateLastReadComment(int roomId, int commentId) {
+        String sql = "UPDATE " + QiscusDb.CommentTable.TABLE_NAME
+                + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_READ
+                + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
+                + " AND " + QiscusDb.CommentTable.COLUMN_ID + " <= " + commentId
+                + " AND " + QiscusDb.CommentTable.COLUMN_ID + " != -1"
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QiscusComment.STATE_READ;
+
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.execSQL(sql);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+    }
+
+    @Override
     public File getLocalPath(int commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
