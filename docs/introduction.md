@@ -43,7 +43,7 @@ You also can access more advance and customizable features such as :
 
 To meet your expectations, we suggest you try out our sample app. The sample app is built with full functionalities so that you can figure out the flow and main activities of common chat apps.  We provide you with two options to start with the sample app: 
 1) Try Sample App only or
-2) Try Sample App with Sample Backend
+2) Try Sample App with Sample Dashboard
 
 ### Try Sample App Only
 
@@ -61,7 +61,7 @@ public class SampleApp extends Application {
 }
 ```
 
-### Try Sample App With sample dashboard
+### Try Sample App With Sample Dashboard
 
 If you have your own chat app, you may be wondering how you can manage your users. In this case, we provide a sample dashboard for user management. This sample dashboard can help you to figure out how to work with Qiscus Server Api for more advanced functionalities. You can go to https://www.qiscus.com/documentation/rest/list-api to know more about Server API.
 
