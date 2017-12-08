@@ -150,12 +150,10 @@ class QiscusRoomEventHandler {
      */
     private boolean updateLastDelivered(String email, int commentId) {
         QiscusRoomMember member = memberState.get(email);
-        if (member != null) {
-            if (member.getLastDeliveredCommentId() < commentId) {
-                member.setLastDeliveredCommentId(commentId);
-                QiscusAndroidUtil.runOnBackgroundThread(() -> updateLocalMemberState(member));
-                return true;
-            }
+        if (member != null && member.getLastDeliveredCommentId() < commentId) {
+            member.setLastDeliveredCommentId(commentId);
+            QiscusAndroidUtil.runOnBackgroundThread(() -> updateLocalMemberState(member));
+            return true;
         }
         return false;
     }
@@ -169,13 +167,11 @@ class QiscusRoomEventHandler {
      */
     private boolean updateLastRead(String email, int commentId) {
         QiscusRoomMember member = memberState.get(email);
-        if (member != null) {
-            if (member.getLastReadCommentId() < commentId) {
-                member.setLastDeliveredCommentId(commentId);
-                member.setLastReadCommentId(commentId);
-                QiscusAndroidUtil.runOnBackgroundThread(() -> updateLocalMemberState(member));
-                return true;
-            }
+        if (member != null && member.getLastReadCommentId() < commentId) {
+            member.setLastDeliveredCommentId(commentId);
+            member.setLastReadCommentId(commentId);
+            QiscusAndroidUtil.runOnBackgroundThread(() -> updateLocalMemberState(member));
+            return true;
         }
         return false;
     }
