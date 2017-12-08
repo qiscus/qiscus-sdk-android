@@ -58,6 +58,10 @@ public interface QiscusChatRoomStore {
 
     boolean isContainsRoomMember(int roomId, String email);
 
+    void updateRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+
+    void addOrUpdateRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+
     List<QiscusRoomMember> getRoomMembers(int roomId);
 
     void deleteRoomMember(int roomId, String email);

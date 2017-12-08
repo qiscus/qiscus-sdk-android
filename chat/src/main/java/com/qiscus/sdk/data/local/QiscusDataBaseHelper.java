@@ -314,6 +314,34 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public void updateRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
+        distinctId = distinctId == null ? "default" : distinctId;
+        String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(qiscusRoomMember.getEmail());
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.update(QiscusDb.RoomMemberTable.TABLE_NAME,
+                    QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember), where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+
+        addOrUpdate(qiscusRoomMember);
+    }
+
+    @Override
+    public void addOrUpdateRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
+        if (!isContainsRoomMember(roomId, qiscusRoomMember.getEmail())) {
+            addRoomMember(roomId, qiscusRoomMember, distinctId);
+        } else {
+            updateRoomMember(roomId, qiscusRoomMember, distinctId);
+        }
+    }
+
+    @Override
     public List<QiscusRoomMember> getRoomMembers(int roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.RoomMemberTable.TABLE_NAME + " "
