@@ -24,6 +24,7 @@
         <item name="colorControlActivated">@color/qiscus_accent</item>
         <item name="colorControlHighlight">@color/qiscus_accent</item>
         <item name="actionModeBackground">@color/qiscus_primary</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
 </resources>
