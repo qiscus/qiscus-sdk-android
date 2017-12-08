@@ -18,7 +18,6 @@ package com.qiscus.sdk.presenter;
 
 import android.net.Uri;
 import android.support.v4.util.Pair;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
@@ -724,10 +723,44 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Override
+    public void onRoomNameChanged(String roomName) {
+        room.setName(roomName);
+        QiscusAndroidUtil.runOnUIThread(() -> {
+            if (view != null) {
+                view.onRoomChanged(room);
+            }
+        });
+    }
+
+    @Override
+    public void onRoomMemberAdded(QiscusRoomMember roomMember) {
+        if (!room.getMember().contains(roomMember)) {
+            room.getMember().add(roomMember);
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.onRoomChanged(room);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onRoomMemberRemoved(QiscusRoomMember roomMember) {
+        int x = room.getMember().indexOf(roomMember);
+        if (x >= 0) {
+            room.getMember().remove(x);
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.onRoomChanged(room);
+                }
+            });
+        }
+    }
+
+    @Override
     public void onChangeLastDelivered(int lastDeliveredCommentId) {
         QiscusAndroidUtil.runOnUIThread(() -> {
             if (view != null) {
-                Log.d("ZETRA", "onChangeLastDelivered");
                 view.updateLastDeliveredComment(lastDeliveredCommentId);
             }
         });
@@ -737,7 +770,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void onChangeLastRead(int lastReadCommentId) {
         QiscusAndroidUtil.runOnUIThread(() -> {
             if (view != null) {
-                Log.d("ZETRA", "onChangeLastRead");
                 view.updateLastReadComment(lastReadCommentId);
             }
         });
@@ -757,6 +789,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void showLoadMoreLoading();
 
         void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments);
+
+        void onRoomChanged(QiscusChatRoom qiscusChatRoom);
 
         void showComments(List<QiscusComment> qiscusComments);
 

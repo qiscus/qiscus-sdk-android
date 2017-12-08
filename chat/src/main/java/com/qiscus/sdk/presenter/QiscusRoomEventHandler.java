@@ -16,8 +16,6 @@
 
 package com.qiscus.sdk.presenter;
 
-import android.util.Pair;
-
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -26,9 +24,12 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ class QiscusRoomEventHandler {
     private AtomicInteger lastReadCommentId;
 
     //status terakhir masing-masing anggota room
-    Map<String, Pair<Integer, Integer>> memberState;
+    Map<String, QiscusRoomMember> memberState;
 
     //task untuk listen mqtt room
     private Runnable listenRoomTask;
@@ -106,8 +107,7 @@ class QiscusRoomEventHandler {
                     }
                 }
 
-                memberState.put(member.getEmail(),
-                        Pair.create(member.getLastDeliveredCommentId(), member.getLastReadCommentId()));
+                memberState.put(member.getEmail(), member);
             }
         }
     }
@@ -149,15 +149,13 @@ class QiscusRoomEventHandler {
      * @return true jika commentId nya lebih besar dari yg sudah disimpan
      */
     private boolean updateLastDelivered(String email, int commentId) {
-        Pair<Integer, Integer> state = memberState.get(email);
-        if (state != null) {
-            if (state.first < commentId) {
-                memberState.put(email, Pair.create(commentId, state.second));
+        QiscusRoomMember member = memberState.get(email);
+        if (member != null) {
+            if (member.getLastDeliveredCommentId() < commentId) {
+                member.setLastDeliveredCommentId(commentId);
+                QiscusAndroidUtil.runOnBackgroundThread(() -> updateLocalMemberState(member));
                 return true;
             }
-        } else {
-            memberState.put(email, Pair.create(commentId, commentId));
-            return true;
         }
         return false;
     }
@@ -170,15 +168,14 @@ class QiscusRoomEventHandler {
      * @return true jika commentId nya lebih besar dari yg sudah disimpan
      */
     private boolean updateLastRead(String email, int commentId) {
-        Pair<Integer, Integer> state = memberState.get(email);
-        if (state != null) {
-            if (state.second < commentId) {
-                memberState.put(email, Pair.create(commentId, commentId));
+        QiscusRoomMember member = memberState.get(email);
+        if (member != null) {
+            if (member.getLastReadCommentId() < commentId) {
+                member.setLastDeliveredCommentId(commentId);
+                member.setLastReadCommentId(commentId);
+                QiscusAndroidUtil.runOnBackgroundThread(() -> updateLocalMemberState(member));
                 return true;
             }
-        } else {
-            memberState.put(email, Pair.create(commentId, commentId));
-            return true;
         }
         return false;
     }
@@ -190,13 +187,13 @@ class QiscusRoomEventHandler {
     private void tryUpdateLastState() {
         int minDelivered = Integer.MAX_VALUE;
         int minRead = Integer.MAX_VALUE;
-        for (Map.Entry<String, Pair<Integer, Integer>> state : memberState.entrySet()) {
-            if (state.getValue().first < minDelivered) {
-                minDelivered = state.getValue().first;
+        for (Map.Entry<String, QiscusRoomMember> member : memberState.entrySet()) {
+            if (member.getValue().getLastDeliveredCommentId() < minDelivered) {
+                minDelivered = member.getValue().getLastDeliveredCommentId();
             }
 
-            if (state.getValue().second < minRead) {
-                minRead = state.getValue().second;
+            if (member.getValue().getLastReadCommentId() < minRead) {
+                minRead = member.getValue().getLastReadCommentId();
             }
         }
 
@@ -234,15 +231,8 @@ class QiscusRoomEventHandler {
     /**
      * update local DB
      */
-    private void updateLocalMemberState() {
-        for (QiscusRoomMember member : room.getMember()) {
-            Pair<Integer, Integer> state = memberState.get(member.getEmail());
-            if (state != null) {
-                member.setLastDeliveredCommentId(state.first);
-                member.setLastReadCommentId(state.second);
-                Qiscus.getDataStore().addRoomMember(room.getId(), member, room.getDistinctId());
-            }
-        }
+    private void updateLocalMemberState(QiscusRoomMember roomMember) {
+        Qiscus.getDataStore().addOrUpdateRoomMember(room.getId(), roomMember, room.getDistinctId());
     }
 
     void transformCommentState(List<QiscusComment> comments, boolean fromLocal) {
@@ -259,27 +249,89 @@ class QiscusRoomEventHandler {
                 && qiscusComment.getState() != QiscusComment.STATE_PENDING
                 && qiscusComment.getState() != QiscusComment.STATE_SENDING
                 && qiscusComment.getState() != QiscusComment.STATE_READ) {
-            if (qiscusComment.getId() > lastDeliveredCommentId.get()) {
-                qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-            } else if (qiscusComment.getId() > lastReadCommentId.get()) {
+
+            if (qiscusComment.getId() <= lastReadCommentId.get()) {
+                qiscusComment.setState(QiscusComment.STATE_READ);
+            } else if (qiscusComment.getId() <= lastDeliveredCommentId.get()) {
                 qiscusComment.setState(QiscusComment.STATE_DELIVERED);
             } else {
-                qiscusComment.setState(QiscusComment.STATE_READ);
+                qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
             }
+
             Qiscus.getDataStore().addOrUpdate(qiscusComment);
         }
     }
 
     void onGotComment(QiscusComment qiscusComment) {
         if (!qiscusComment.getSender().equals(account.getEmail())) {
+            //Handle room event such as invite user, kick user
+            if (qiscusComment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
+                handleRoomChanged(qiscusComment);
+            }
+
             if (updateLastRead(qiscusComment.getSenderEmail(), qiscusComment.getId())) {
                 tryUpdateLastState();
             }
         }
     }
 
+    private void handleRoomChanged(QiscusComment qiscusComment) {
+        try {
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            QiscusRoomMember member = new QiscusRoomMember();
+            switch (payload.optString("type")) {
+                case "add_member":
+                    member.setEmail(payload.optString("object_email"));
+                    member.setUsername(payload.optString("object_username"));
+                    handleMemberAdded(member);
+                    break;
+                case "join_room":
+                    member.setEmail(payload.optString("subject_email"));
+                    member.setUsername(payload.optString("subject_username"));
+                    handleMemberAdded(member);
+                    break;
+                case "remove_member":
+                    member.setEmail(payload.optString("object_email"));
+                    member.setUsername(payload.optString("object_username"));
+                    handleMemberRemoved(member);
+                    break;
+                case "left_room":
+                    member.setEmail(payload.optString("subject_email"));
+                    member.setUsername(payload.optString("subject_username"));
+                    handleMemberRemoved(member);
+                    break;
+                case "change_room_name":
+                    listener.onRoomNameChanged(payload.optString("room_name"));
+                    break;
+            }
+        } catch (JSONException e) {
+            //Do nothing
+        }
+    }
+
+    private void handleMemberAdded(QiscusRoomMember member) {
+        if (!memberState.containsKey(member.getEmail())) {
+            member.setLastDeliveredCommentId(lastDeliveredCommentId.get());
+            member.setLastReadCommentId(lastReadCommentId.get());
+            memberState.put(member.getEmail(), member);
+
+            listener.onRoomMemberAdded(member);
+            QiscusAndroidUtil.runOnBackgroundThread(() ->
+                    Qiscus.getDataStore().addOrUpdateRoomMember(room.getId(), member, room.getDistinctId()));
+        }
+    }
+
+    private void handleMemberRemoved(QiscusRoomMember member) {
+        if (memberState.remove(member.getEmail()) != null) {
+            tryUpdateLastState();
+
+            listener.onRoomMemberRemoved(member);
+            QiscusAndroidUtil.runOnBackgroundThread(() ->
+                    Qiscus.getDataStore().deleteRoomMember(room.getId(), member.getEmail()));
+        }
+    }
+
     void detach() {
-        QiscusAndroidUtil.runOnBackgroundThread(this::updateLocalMemberState);
         QiscusAndroidUtil.cancelRunOnUIThread(listenRoomTask);
         QiscusPusherApi.getInstance().unListenRoom(room);
         listener = null;
@@ -287,6 +339,12 @@ class QiscusRoomEventHandler {
     }
 
     interface StateListener {
+        void onRoomNameChanged(String roomName);
+
+        void onRoomMemberAdded(QiscusRoomMember roomMember);
+
+        void onRoomMemberRemoved(QiscusRoomMember roomMember);
+
         void onChangeLastDelivered(int lastDeliveredCommentId);
 
         void onChangeLastRead(int lastReadCommentId);
