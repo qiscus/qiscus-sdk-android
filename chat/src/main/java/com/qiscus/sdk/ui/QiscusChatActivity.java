@@ -114,7 +114,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
         return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFile,
-                autoSendExtra, forwardComments, scrollToComment);
+                autoSendExtra, forwardCommentsData, scrollToComment);
     }
 
     @Override

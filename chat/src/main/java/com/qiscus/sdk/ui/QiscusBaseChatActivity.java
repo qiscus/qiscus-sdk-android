@@ -73,7 +73,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected String startingMessage;
     protected File shareFile;
     protected boolean autoSendExtra;
-    protected List<QiscusComment> forwardComments;
+    protected List<QiscusComment> forwardCommentsData;
     protected QiscusComment scrollToComment;
 
     private Map<String, QiscusRoomMember> roomMembers;
@@ -165,7 +165,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     protected void resolveForwardComments() {
         if (getIntent().hasExtra(EXTRA_FORWARD_COMMENTS)) {
-            forwardComments = getIntent().getParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS);
+            forwardCommentsData = getIntent().getParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS);
             getIntent().removeExtra(EXTRA_FORWARD_COMMENTS);
         }
     }
@@ -299,10 +299,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             }
         } else if (i == R.id.action_forward) {
             forwardComments(selectedComments);
-        } else if (i == R.id.action_info) {
-            if (selectedComments.size() > 0) {
-                showCommentInfo(selectedComments.get(0));
-            }
+        } else if (i == R.id.action_info && selectedComments.size() > 0) {
+            showCommentInfo(selectedComments.get(0));
         }
         mode.finish();
     }
@@ -326,7 +324,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                 text.append(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
                         new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
                                 .build().toString());
-                text.append("\n");
+                text.append('\n');
             }
         }
 
