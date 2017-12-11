@@ -288,72 +288,95 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected void onSelectedCommentsAction(ActionMode mode, MenuItem item, List<QiscusComment> selectedComments) {
         int i = item.getItemId();
         if (i == R.id.action_copy) {
-            if (roomMembers == null) {
-                roomMembers = new HashMap<>();
-                for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-                    roomMembers.put(member.getEmail(), member);
-                }
-            }
-            String text = "";
-            if (selectedComments.size() == 1) {
-                QiscusComment qiscusComment = selectedComments.get(0);
-                text = qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
-                        new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
-                                .build().toString();
-            } else {
-                for (QiscusComment qiscusComment : selectedComments) {
-                    text += qiscusComment.getSender() + ": ";
-                    text += qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
-                            new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
-                                    .build().toString();
-                    text += "\n";
-                }
-            }
-
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(getString(R.string.qiscus_chat_activity_label_clipboard), text);
-            clipboard.setPrimaryClip(clip);
-            Toast.makeText(this, getString(R.string.qiscus_copied_message, selectedComments.size()), Toast.LENGTH_SHORT).show();
+            copyComments(selectedComments);
         } else if (i == R.id.action_share) {
             if (selectedComments.size() > 0) {
-                QiscusComment qiscusComment = selectedComments.get(0);
-                String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension());
-                File file = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType(mime);
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-                } else {
-                    intent.putExtra(Intent.EXTRA_STREAM,
-                            FileProvider.getUriForFile(this, Qiscus.getProviderAuthorities(), file));
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_image_title)));
+                shareComment(selectedComments.get(0));
             }
         } else if (i == R.id.action_reply) {
-            QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
-                    .findFragmentByTag(QiscusBaseChatFragment.class.getName());
-            if (fragment != null && selectedComments.size() > 0) {
-                fragment.replyComment(selectedComments.get(0));
+            if (selectedComments.size() > 0) {
+                replyComment(selectedComments.get(0));
             }
         } else if (i == R.id.action_forward) {
-            ForwardCommentHandler forwardCommentHandler = Qiscus.getChatConfig().getForwardCommentHandler();
-            if (forwardCommentHandler == null) {
-                throw new NullPointerException("Please set forward handler before.\n" +
-                        "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
-            }
-            forwardCommentHandler.forward(selectedComments);
+            forwardComments(selectedComments);
         } else if (i == R.id.action_info) {
-            CommentInfoHandler commentInfoHandler = Qiscus.getChatConfig().getCommentInfoHandler();
-            if (commentInfoHandler == null) {
-                throw new NullPointerException("Please set comment info handler before.\n" +
-                        "Set it using this method Qiscus.getChatConfig().setCommentInfoHandler()");
-            }
             if (selectedComments.size() > 0) {
-                commentInfoHandler.showInfo(selectedComments.get(0));
+                showCommentInfo(selectedComments.get(0));
             }
         }
         mode.finish();
+    }
+
+    protected void copyComments(List<QiscusComment> selectedComments) {
+        if (roomMembers == null) {
+            roomMembers = new HashMap<>();
+            for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+                roomMembers.put(member.getEmail(), member);
+            }
+        }
+        StringBuilder text = new StringBuilder();
+        if (selectedComments.size() == 1) {
+            QiscusComment qiscusComment = selectedComments.get(0);
+            text = new StringBuilder(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
+                    new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
+                            .build().toString());
+        } else {
+            for (QiscusComment qiscusComment : selectedComments) {
+                text.append(qiscusComment.getSender()).append(": ");
+                text.append(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
+                        new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
+                                .build().toString());
+                text.append("\n");
+            }
+        }
+
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(getString(R.string.qiscus_chat_activity_label_clipboard), text.toString());
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+        }
+        Toast.makeText(this, getString(R.string.qiscus_copied_message, selectedComments.size()), Toast.LENGTH_SHORT).show();
+    }
+
+    protected void shareComment(QiscusComment qiscusComment) {
+        String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension());
+        File file = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType(mime);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        } else {
+            intent.putExtra(Intent.EXTRA_STREAM,
+                    FileProvider.getUriForFile(this, Qiscus.getProviderAuthorities(), file));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_image_title)));
+    }
+
+    protected void replyComment(QiscusComment qiscusComment) {
+        QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+        if (fragment != null) {
+            fragment.replyComment(qiscusComment);
+        }
+    }
+
+    protected void forwardComments(List<QiscusComment> selectedComments) {
+        ForwardCommentHandler forwardCommentHandler = Qiscus.getChatConfig().getForwardCommentHandler();
+        if (forwardCommentHandler == null) {
+            throw new NullPointerException("Please set forward handler before.\n" +
+                    "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
+        }
+        forwardCommentHandler.forward(selectedComments);
+    }
+
+    protected void showCommentInfo(QiscusComment qiscusComment) {
+        CommentInfoHandler commentInfoHandler = Qiscus.getChatConfig().getCommentInfoHandler();
+        if (commentInfoHandler == null) {
+            throw new NullPointerException("Please set comment info handler before.\n" +
+                    "Set it using this method Qiscus.getChatConfig().setCommentInfoHandler()");
+        }
+        commentInfoHandler.showInfo(qiscusComment);
     }
 
     @Override
