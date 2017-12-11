@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.model.CommentInfoHandler;
 import com.qiscus.sdk.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -212,8 +213,17 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             actionMode.getMenu().findItem(R.id.action_forward)
                     .setVisible(Qiscus.getChatConfig().isEnableForwardComment());
             if (selectedComments.size() == 1 && selectedComments.get(0).getState() >= QiscusComment.STATE_ON_QISCUS) {
-                actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
                 QiscusComment qiscusComment = selectedComments.get(0);
+
+                actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
+
+                if (qiscusChatRoom.isGroup() && qiscusComment.isMyComment()) {
+                    actionMode.getMenu().findItem(R.id.action_info)
+                            .setVisible(Qiscus.getChatConfig().isEnableCommentInfo());
+                } else {
+                    actionMode.getMenu().findItem(R.id.action_info).setVisible(false);
+                }
+
                 File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
                 if (localPath != null) {
                     actionMode.getMenu().findItem(R.id.action_share).setVisible(true);
@@ -223,6 +233,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             } else {
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(false);
                 actionMode.getMenu().findItem(R.id.action_share).setVisible(false);
+                actionMode.getMenu().findItem(R.id.action_info).setVisible(false);
             }
 
             if (onlyTextOrLinkType(selectedComments)) {
@@ -332,6 +343,15 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                         "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
             }
             forwardCommentHandler.forward(selectedComments);
+        } else if (i == R.id.action_info) {
+            CommentInfoHandler commentInfoHandler = Qiscus.getChatConfig().getCommentInfoHandler();
+            if (commentInfoHandler == null) {
+                throw new NullPointerException("Please set comment info handler before.\n" +
+                        "Set it using this method Qiscus.getChatConfig().setCommentInfoHandler()");
+            }
+            if (selectedComments.size() > 0) {
+                commentInfoHandler.showInfo(selectedComments.get(0));
+            }
         }
         mode.finish();
     }

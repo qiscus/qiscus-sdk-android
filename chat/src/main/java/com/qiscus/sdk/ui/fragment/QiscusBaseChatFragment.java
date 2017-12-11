@@ -1326,6 +1326,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Override
+    public void onRoomChanged(QiscusChatRoom qiscusChatRoom) {
+        this.qiscusChatRoom = qiscusChatRoom;
+        if (roomChangedListener != null) {
+            roomChangedListener.onRoomUpdated(qiscusChatRoom);
+        }
+    }
+
+    @Override
     public void showComments(List<QiscusComment> qiscusComments) {
         if (!qiscusComments.isEmpty()) {
             chatAdapter.mergeLocalAndRemoteData(qiscusComments);

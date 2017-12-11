@@ -268,18 +268,20 @@ final class QiscusApiParser {
     }
 
     private static Pair<Integer, Integer> getPairedLastState(List<QiscusRoomMember> members) {
-        int lastDelivered = 0;
-        int lastRead = 0;
+        int lastDelivered = Integer.MAX_VALUE;
+        int lastRead = Integer.MAX_VALUE;
         QiscusAccount account = Qiscus.getQiscusAccount();
         for (QiscusRoomMember member : members) {
             if (!member.getEmail().equals(account.getEmail())) {
-                if (member.getLastDeliveredCommentId() > lastDelivered) {
+                if (member.getLastDeliveredCommentId() < lastDelivered) {
                     lastDelivered = member.getLastDeliveredCommentId();
                 }
 
-                if (member.getLastReadCommentId() > lastRead) {
+                if (member.getLastReadCommentId() < lastRead) {
                     lastRead = member.getLastReadCommentId();
-                    lastDelivered = lastRead;
+                    if (lastRead > lastDelivered) {
+                        lastDelivered = lastRead;
+                    }
                 }
             }
         }

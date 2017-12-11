@@ -41,6 +41,10 @@ public interface QiscusCommentStore {
 
     void deleteCommentsByRoomId(int roomId);
 
+    void updateLastDeliveredComment(int roomId, int commentId);
+
+    void updateLastReadComment(int roomId, int commentId);
+
     QiscusComment getComment(int id, String uniqueId);
 
     List<QiscusComment> getComments(int topicId);

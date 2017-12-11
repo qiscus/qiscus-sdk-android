@@ -91,6 +91,7 @@
     <string name="qiscus_redownload_canceled">Unduh ulang dibatalkan</string>
     <string name="qiscus_downloading">Sedang Mengunduh</string>
     <string name="qiscus_forward">Teruskan</string>
+    <string name="qiscus_info">Info</string>
     <string name="qiscus_subtext_summary">Kamu memiliki %1$s chat</string>
     <string name="qiscus_send_attachment">Mengirimkan sebuah lampiran.</string>
     <string name="qiscus_send_a_photo">Mengirimkan sebuah foto.</string>

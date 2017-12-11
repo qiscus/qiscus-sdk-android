@@ -91,6 +91,7 @@
     <string name="qiscus_redownload_canceled">Redownload canceled</string>
     <string name="qiscus_downloading">Downloading</string>
     <string name="qiscus_forward">Forward</string>
+    <string name="qiscus_info">Info</string>
     <string name="qiscus_subtext_summary">You have %1$s chat</string>
     <string name="qiscus_send_attachment">Send a file attachment.</string>
     <string name="qiscus_send_a_photo">Send a photo.</string>
