@@ -62,8 +62,8 @@ class QiscusRoomEventHandler {
         this.listener = listener;
 
         //Tidak diset 0 karena kita akan mencari nilai terkecil dari semua anggota room
-        lastDeliveredCommentId = new AtomicInteger(Integer.MAX_VALUE);
-        lastReadCommentId = new AtomicInteger(Integer.MAX_VALUE);
+        lastDeliveredCommentId = new AtomicInteger(0);
+        lastReadCommentId = new AtomicInteger(0);
 
         account = Qiscus.getQiscusAccount();
         setRoom(qiscusChatRoom);
@@ -94,21 +94,36 @@ class QiscusRoomEventHandler {
             memberState.clear();
         }
 
+        int minDelivered = Integer.MAX_VALUE;
+        int minRead = Integer.MAX_VALUE;
         for (QiscusRoomMember member : room.getMember()) {
             if (!member.getEmail().equals(account.getEmail())) {
-                if (member.getLastDeliveredCommentId() < lastDeliveredCommentId.get()) {
-                    lastDeliveredCommentId.set(member.getLastDeliveredCommentId());
+                if (member.getLastDeliveredCommentId() < minDelivered) {
+                    minDelivered = member.getLastDeliveredCommentId();
                 }
 
-                if (member.getLastReadCommentId() < lastReadCommentId.get()) {
-                    lastReadCommentId.set(member.getLastReadCommentId());
-                    if (lastReadCommentId.get() > lastDeliveredCommentId.get()) {
-                        lastDeliveredCommentId.set(lastReadCommentId.get());
-                    }
+                if (member.getLastReadCommentId() < minRead) {
+                    minRead = member.getLastReadCommentId();
                 }
 
                 memberState.put(member.getEmail(), member);
             }
+        }
+
+        if (minRead > minDelivered) {
+            minDelivered = minRead;
+        }
+
+        if (minDelivered > lastDeliveredCommentId.get()) {
+            lastDeliveredCommentId.set(minDelivered);
+            QiscusAndroidUtil.runOnBackgroundThread(this::updateLocalLastDelivered);
+            listener.onChangeLastDelivered(lastDeliveredCommentId.get());
+        }
+
+        if (minRead > lastReadCommentId.get()) {
+            lastReadCommentId.set(minRead);
+            QiscusAndroidUtil.runOnBackgroundThread(this::updateLocalLastRead);
+            listener.onChangeLastRead(lastReadCommentId.get());
         }
     }
 
