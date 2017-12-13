@@ -17,6 +17,8 @@
 package com.qiscus.sdk.util;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +44,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.service.QiscusPushNotificationClickReceiver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -200,12 +203,23 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void pushNotification(Context context, QiscusComment comment, String messageText, Bitmap largeIcon) {
+
+        String notificationChannelId = Qiscus.getApps().getPackageName() + ".qiscus.sdk.notification.channel";
+        if (BuildVersionUtil.isOreoOrHigher()) {
+            NotificationChannel notificationChannel =
+                    new NotificationChannel(notificationChannelId, "Chat", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+
         PendingIntent pendingIntent;
-        Intent openIntent = new Intent("com.qiscus.OPEN_COMMENT_PN");
+        Intent openIntent = new Intent(context, QiscusPushNotificationClickReceiver.class);
         openIntent.putExtra("data", comment);
         pendingIntent = PendingIntent.getBroadcast(context, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelId);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
                 .setContentIntent(pendingIntent)
                 .setContentText(messageText)

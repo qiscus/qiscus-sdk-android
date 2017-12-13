@@ -12,7 +12,7 @@ public class BuildVersionUtil {
         return Build.VERSION.SDK_INT < 26;
     }
 
-    public static boolean isOreo() {
+    public static boolean isOreoOrHigher() {
         return Build.VERSION.SDK_INT == 26;
     }
 
