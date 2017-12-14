@@ -58,7 +58,7 @@ class ChatAdapter(private val context: Context) : RecyclerView.Adapter<ChatAdapt
     }
 
     class VH(view: View) : RecyclerView.ViewHolder(view) {
-        private val messageTextView: TextView = view.findViewById(R.id.message) as TextView
+        private val messageTextView: TextView = view.findViewById(R.id.message)
 
         fun bind(message: Message) {
             if (message is FileAttachmentMessage) {

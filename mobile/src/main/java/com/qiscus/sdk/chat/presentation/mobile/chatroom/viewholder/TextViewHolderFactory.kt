@@ -29,9 +29,9 @@ class TextViewHolderFactory(private val context: Context) : MessageViewHolderFac
 }
 
 class TextViewHolder(view: View) : MessageViewHolder(view) {
-    private val senderAvatarView: ImageView = itemView.findViewById(R.id.senderAvatar) as ImageView
-    private val senderNameView: TextView = itemView.findViewById(R.id.senderName) as TextView
-    private val messageView: TextView = itemView.findViewById(R.id.message) as TextView
+    private val senderAvatarView: ImageView = itemView.findViewById(R.id.senderAvatar)
+    private val senderNameView: TextView = itemView.findViewById(R.id.senderName)
+    private val messageView: TextView = itemView.findViewById(R.id.message)
 
     override fun bind(messageViewModel: MessageViewModel) {
         senderNameView.text = messageViewModel.message.sender.name

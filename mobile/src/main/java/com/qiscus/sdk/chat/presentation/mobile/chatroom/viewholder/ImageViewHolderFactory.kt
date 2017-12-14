@@ -31,10 +31,10 @@ class ImageViewHolderFactory(private val context: Context) : MessageViewHolderFa
 }
 
 class ImageViewHolder(view: View) : MessageViewHolder(view) {
-    private val senderAvatarView: ImageView = itemView.findViewById(R.id.senderAvatar) as ImageView
-    private val senderNameView: TextView = itemView.findViewById(R.id.senderName) as TextView
-    private val captionView: TextView = itemView.findViewById(R.id.caption) as TextView
-    private val imageView: ImageView = itemView.findViewById(R.id.image) as ImageView
+    private val senderAvatarView: ImageView = itemView.findViewById(R.id.senderAvatar)
+    private val senderNameView: TextView = itemView.findViewById(R.id.senderName)
+    private val captionView: TextView = itemView.findViewById(R.id.caption)
+    private val imageView: ImageView = itemView.findViewById(R.id.image)
 
     override fun bind(messageViewModel: MessageViewModel) {
         senderNameView.text = messageViewModel.message.sender.name

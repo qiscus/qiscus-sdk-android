@@ -79,11 +79,11 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
     }
 
     class VH(view: View) : RecyclerView.ViewHolder(view) {
-        private val roomAvatarView: ImageView = view.findViewById(R.id.roomAvatar) as ImageView
-        private val roomNameView: TextView = view.findViewById(R.id.roomName) as TextView
-        private val lastMessageView: TextView = view.findViewById(R.id.lastMessage) as TextView
-        private val lastMessageDateView: TextView = view.findViewById(R.id.lastMessageDate) as TextView
-        private val unreadCountView: TextView = view.findViewById(R.id.unreadCount) as TextView
+        private val roomAvatarView: ImageView = view.findViewById(R.id.roomAvatar)
+        private val roomNameView: TextView = view.findViewById(R.id.roomName)
+        private val lastMessageView: TextView = view.findViewById(R.id.lastMessage)
+        private val lastMessageDateView: TextView = view.findViewById(R.id.lastMessageDate)
+        private val unreadCountView: TextView = view.findViewById(R.id.unreadCount)
 
         private val dateFormat = SimpleDateFormat.getDateInstance()
 
