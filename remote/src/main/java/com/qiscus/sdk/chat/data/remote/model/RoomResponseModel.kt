@@ -127,9 +127,9 @@ data class RoomResponseModel(var results: Results, var status: Int) {
             var lastCommentReceivedIdStr: String,
             var username: String
     ) {
-        fun toEntity(): RoomMemberEntity {
-            return RoomMemberEntity(UserEntity(email, username, avatarUrl),
-                    MemberStateEntity(lastCommentReceivedIdStr, lastCommentReadIdStr))
+        fun toEntity(): ParticipantEntity {
+            return ParticipantEntity(UserEntity(email, username, avatarUrl),
+                    ParticipantStateEntity(lastCommentReceivedIdStr, lastCommentReadIdStr))
         }
     }
 }

@@ -19,7 +19,7 @@ package com.qiscus.sdk.chat.domain.interactor.room
 import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.interactor.SingleUseCase
-import com.qiscus.sdk.chat.domain.model.RoomMember
+import com.qiscus.sdk.chat.domain.model.Participant
 import com.qiscus.sdk.chat.domain.repository.RoomRepository
 import io.reactivex.Single
 
@@ -29,12 +29,12 @@ import io.reactivex.Single
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class GetRoomMembers(private val roomRepository: RoomRepository,
-                     threadExecutor: ThreadExecutor, postExecutionThread: PostExecutionThread)
-    : SingleUseCase<List<RoomMember>, GetRoomMembers.Params>(threadExecutor, postExecutionThread) {
+class GetRoomParticipants(private val roomRepository: RoomRepository,
+                          threadExecutor: ThreadExecutor, postExecutionThread: PostExecutionThread)
+    : SingleUseCase<List<Participant>, GetRoomParticipants.Params>(threadExecutor, postExecutionThread) {
 
-    public override fun buildUseCaseObservable(params: Params?): Single<List<RoomMember>> {
-        return roomRepository.getRoomMembers(params!!.roomId)
+    public override fun buildUseCaseObservable(params: Params?): Single<List<Participant>> {
+        return roomRepository.getRoomParticipants(params!!.roomId)
     }
 
     data class Params(val roomId: String)

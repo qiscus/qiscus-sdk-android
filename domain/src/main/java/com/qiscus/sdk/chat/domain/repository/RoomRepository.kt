@@ -17,7 +17,7 @@
 package com.qiscus.sdk.chat.domain.repository
 
 import com.qiscus.sdk.chat.domain.model.Room
-import com.qiscus.sdk.chat.domain.model.RoomMember
+import com.qiscus.sdk.chat.domain.model.Participant
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -36,7 +36,7 @@ interface RoomRepository {
 
     fun getRoomWithChannelId(channelId: String, roomAvatarUrl: String): Single<Room>
 
-    fun getRoomMembers(roomId: String): Single<List<RoomMember>>
+    fun getRoomParticipants(roomId: String): Single<List<Participant>>
 
     fun getRooms(page: Int, limit: Int): Single<List<Room>>
 

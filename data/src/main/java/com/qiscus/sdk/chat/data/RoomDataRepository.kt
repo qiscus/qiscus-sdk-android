@@ -17,11 +17,11 @@
 package com.qiscus.sdk.chat.data
 
 import com.qiscus.sdk.chat.data.mapper.toDomainModel
-import com.qiscus.sdk.chat.data.model.RoomMemberEntity
+import com.qiscus.sdk.chat.data.model.ParticipantEntity
 import com.qiscus.sdk.chat.data.source.room.RoomLocal
 import com.qiscus.sdk.chat.data.source.room.RoomRemote
 import com.qiscus.sdk.chat.domain.model.Room
-import com.qiscus.sdk.chat.domain.model.RoomMember
+import com.qiscus.sdk.chat.domain.model.Participant
 import com.qiscus.sdk.chat.domain.repository.RoomRepository
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -91,17 +91,17 @@ class RoomDataRepository(private val roomLocal: RoomLocal,
                 .map { it.toDomainModel() }
     }
 
-    override fun getRoomMembers(roomId: String): Single<List<RoomMember>> {
-        roomRemote.getRoomMembers(roomId)
-                .doOnSuccess { updateLocalRoomMembers(roomId, it) }
+    override fun getRoomParticipants(roomId: String): Single<List<Participant>> {
+        roomRemote.getParticipants(roomId)
+                .doOnSuccess { updateLocalParticipants(roomId, it) }
                 .subscribeOn(Schedulers.io())
                 .subscribe({}, {})
 
-        return Single.defer { Single.fromCallable { roomLocal.getRoomMembers(roomId) } }
+        return Single.defer { Single.fromCallable { roomLocal.getParticipants(roomId) } }
                 .flatMap {
                     if (it.isEmpty()) {
-                        return@flatMap roomRemote.getRoomMembers(roomId)
-                                .doOnSuccess { updateLocalRoomMembers(roomId, it) }
+                        return@flatMap roomRemote.getParticipants(roomId)
+                                .doOnSuccess { updateLocalParticipants(roomId, it) }
                     }
                     return@flatMap Single.just(it)
                 }.map { it.map { it.toDomainModel() } }
@@ -139,15 +139,15 @@ class RoomDataRepository(private val roomLocal: RoomLocal,
                 }.map { it.map { it.toDomainModel() } }
     }
 
-    private fun updateLocalRoomMembers(roomId: String, members: List<RoomMemberEntity>) {
+    private fun updateLocalParticipants(roomId: String, participants: List<ParticipantEntity>) {
         val savedRoom = roomLocal.getRoom(roomId)
         if (savedRoom != null) {
-            roomLocal.updateRoomMembers(savedRoom.id, members)
+            roomLocal.updateParticipants(savedRoom.id, participants)
         } else {
             roomRemote.getRoom(roomId)
                     .doOnSuccess { room ->
                         roomLocal.addOrUpdateRoom(room)
-                        roomLocal.updateRoomMembers(room.id, members)
+                        roomLocal.updateParticipants(room.id, participants)
                     }
                     .subscribeOn(Schedulers.io())
                     .subscribe({}, {})

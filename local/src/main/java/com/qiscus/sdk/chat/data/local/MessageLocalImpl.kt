@@ -288,7 +288,7 @@ class MessageLocalImpl(dbOpenHelper: DbOpenHelper,
             }
         }
 
-        roomLocal.updateRoomMemberDeliveredState(roomId, userId, messageId)
+        roomLocal.updateParticipantDeliveredState(roomId, userId, messageId)
     }
 
     override fun updateLastReadMessage(roomId: String, userId: String, messageId: MessageIdEntity) {
@@ -301,7 +301,7 @@ class MessageLocalImpl(dbOpenHelper: DbOpenHelper,
             }
         }
 
-        roomLocal.updateRoomMemberReadState(roomId, userId, messageId)
+        roomLocal.updateParticipantReadState(roomId, userId, messageId)
     }
 
     private fun getMessagesNeedUpdateDeliverState(roomId: String, messageId: MessageIdEntity): List<MessageEntity> {

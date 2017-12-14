@@ -50,7 +50,7 @@ interface QiscusUseCaseFactory {
 
     fun getRoomWithChannelId(): GetRoomWithChannelId
 
-    fun getRoomMembers(): GetRoomMembers
+    fun getRoomParticipants(): GetRoomParticipants
 
     fun getRooms(): GetRooms
 

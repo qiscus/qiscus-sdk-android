@@ -18,7 +18,7 @@ package com.qiscus.sdk.chat.data.source.room
 
 import com.qiscus.sdk.chat.data.model.MessageIdEntity
 import com.qiscus.sdk.chat.data.model.RoomEntity
-import com.qiscus.sdk.chat.data.model.RoomMemberEntity
+import com.qiscus.sdk.chat.data.model.ParticipantEntity
 
 /**
  * Created on : September 01, 2017
@@ -45,19 +45,19 @@ interface RoomLocal {
 
     fun getRoomWithChannelId(channelId: String): RoomEntity?
 
-    fun addRoomMember(roomId: String, roomMemberEntity: RoomMemberEntity)
+    fun addParticipant(roomId: String, participantEntity: ParticipantEntity)
 
-    fun updateRoomMemberDeliveredState(roomId: String, userId: String, messageIdEntity: MessageIdEntity)
+    fun updateParticipantDeliveredState(roomId: String, userId: String, messageIdEntity: MessageIdEntity)
 
-    fun updateRoomMemberReadState(roomId: String, userId: String, messageIdEntity: MessageIdEntity)
+    fun updateParticipantReadState(roomId: String, userId: String, messageIdEntity: MessageIdEntity)
 
-    fun updateRoomMembers(roomId: String, roomMemberEntities: List<RoomMemberEntity>)
+    fun updateParticipants(roomId: String, participantEntities: List<ParticipantEntity>)
 
-    fun deleteRoomMember(roomId: String, userId: String)
+    fun deleteParticipant(roomId: String, userId: String)
 
-    fun deleteRoomMembers(roomId: String)
+    fun deleteParticipants(roomId: String)
 
-    fun getRoomMembers(roomId: String): List<RoomMemberEntity>
+    fun getParticipants(roomId: String): List<ParticipantEntity>
 
     fun getRooms(page: Int, limit: Int): List<RoomEntity>
 

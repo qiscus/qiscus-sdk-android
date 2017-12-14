@@ -62,8 +62,8 @@ object Db {
                 " ); "
     }
 
-    object RoomMemberTable {
-        const val TABLE_NAME = "room_members"
+    object ParticipantTable {
+        const val TABLE_NAME = "participants"
         const val COLUMN_ROOM_ID = "room_id"
         const val COLUMN_USER_ID = "user_id"
         const val COLUMN_LAST_DELIVERED = "last_delivered_message"

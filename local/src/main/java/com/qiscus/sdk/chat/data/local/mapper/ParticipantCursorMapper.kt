@@ -21,8 +21,8 @@ import android.database.Cursor
 import com.qiscus.sdk.chat.data.local.database.Db
 import com.qiscus.sdk.chat.data.local.database.longValue
 import com.qiscus.sdk.chat.data.local.database.stringValue
-import com.qiscus.sdk.chat.data.model.MemberStateEntity
-import com.qiscus.sdk.chat.data.model.RoomMemberEntity
+import com.qiscus.sdk.chat.data.model.ParticipantStateEntity
+import com.qiscus.sdk.chat.data.model.ParticipantEntity
 import com.qiscus.sdk.chat.data.model.UserEntity
 
 /**
@@ -31,27 +31,27 @@ import com.qiscus.sdk.chat.data.model.UserEntity
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-fun RoomMemberEntity.toContentValues(roomId: String): ContentValues {
+fun ParticipantEntity.toContentValues(roomId: String): ContentValues {
     return ContentValues().apply {
-        put(Db.RoomMemberTable.COLUMN_ROOM_ID, roomId)
-        put(Db.RoomMemberTable.COLUMN_USER_ID, userEntity.id)
-        put(Db.RoomMemberTable.COLUMN_LAST_DELIVERED, memberStateEntity.lastDeliveredMessageId)
-        put(Db.RoomMemberTable.COLUMN_LAST_READ, memberStateEntity.lastReadMessageId)
+        put(Db.ParticipantTable.COLUMN_ROOM_ID, roomId)
+        put(Db.ParticipantTable.COLUMN_USER_ID, userEntity.id)
+        put(Db.ParticipantTable.COLUMN_LAST_DELIVERED, stateEntity.lastDeliveredMessageId)
+        put(Db.ParticipantTable.COLUMN_LAST_READ, stateEntity.lastReadMessageId)
     }
 }
 
-fun Cursor.toRoomMemberEntity(): RoomMemberEntity {
-    return RoomMemberEntity(
-            UserEntity(stringValue(Db.RoomMemberTable.COLUMN_USER_ID)),
-            MemberStateEntity(stringValue(Db.RoomMemberTable.COLUMN_LAST_DELIVERED),
-                    stringValue(Db.RoomMemberTable.COLUMN_LAST_READ))
+fun Cursor.toParticipantEntity(): ParticipantEntity {
+    return ParticipantEntity(
+            UserEntity(stringValue(Db.ParticipantTable.COLUMN_USER_ID)),
+            ParticipantStateEntity(stringValue(Db.ParticipantTable.COLUMN_LAST_DELIVERED),
+                    stringValue(Db.ParticipantTable.COLUMN_LAST_READ))
     )
 }
 
 internal fun Cursor.getRoomId(): Long {
-    return longValue(Db.RoomMemberTable.COLUMN_ROOM_ID)
+    return longValue(Db.ParticipantTable.COLUMN_ROOM_ID)
 }
 
 internal fun Cursor.getUserId(): String {
-    return stringValue(Db.RoomMemberTable.COLUMN_USER_ID)
+    return stringValue(Db.ParticipantTable.COLUMN_USER_ID)
 }

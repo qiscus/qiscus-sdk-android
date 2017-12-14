@@ -22,10 +22,10 @@ import com.qiscus.sdk.chat.data.local.database.DbOpenHelper
 import com.qiscus.sdk.chat.data.local.database.transaction
 import com.qiscus.sdk.chat.data.local.mapper.toContentValues
 import com.qiscus.sdk.chat.data.local.mapper.toRoomEntity
-import com.qiscus.sdk.chat.data.local.mapper.toRoomMemberEntity
+import com.qiscus.sdk.chat.data.local.mapper.toParticipantEntity
 import com.qiscus.sdk.chat.data.model.MessageIdEntity
 import com.qiscus.sdk.chat.data.model.RoomEntity
-import com.qiscus.sdk.chat.data.model.RoomMemberEntity
+import com.qiscus.sdk.chat.data.model.ParticipantEntity
 import com.qiscus.sdk.chat.data.pubsub.room.RoomPublisher
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
 import com.qiscus.sdk.chat.data.source.room.RoomLocal
@@ -86,7 +86,7 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
 
     override fun deleteRoom(roomEntity: RoomEntity) {
         if (isExistRoom(roomEntity.id)) {
-            val where = Db.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomEntity.id
+            val where = Db.ParticipantTable.COLUMN_ROOM_ID + " = " + roomEntity.id
             database.transaction {
                 database.delete(Db.RoomTable.TABLE_NAME, where, null)
                 roomPublisher.onRoomDeleted(roomEntity)
@@ -146,73 +146,73 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
         return getRoomByUniqueId(channelId)
     }
 
-    override fun addRoomMember(roomId: String, roomMemberEntity: RoomMemberEntity) {
-        if (!isExistRoomMember(roomId, roomMemberEntity.userEntity.id)) {
+    override fun addParticipant(roomId: String, participantEntity: ParticipantEntity) {
+        if (!isExistParticipant(roomId, participantEntity.userEntity.id)) {
             database.transaction {
-                database.insert(Db.RoomMemberTable.TABLE_NAME, null,
-                        roomMemberEntity.toContentValues(roomId))
+                database.insert(Db.ParticipantTable.TABLE_NAME, null,
+                        participantEntity.toContentValues(roomId))
             }
         }
-        userLocal.addOrUpdateUser(roomMemberEntity.userEntity)
+        userLocal.addOrUpdateUser(participantEntity.userEntity)
     }
 
-    override fun updateRoomMemberDeliveredState(roomId: String, userId: String, messageIdEntity: MessageIdEntity) {
+    override fun updateParticipantDeliveredState(roomId: String, userId: String, messageIdEntity: MessageIdEntity) {
         database.transaction {
-            val sql = "UPDATE " + Db.RoomMemberTable.TABLE_NAME + " SET " + Db.RoomMemberTable.COLUMN_LAST_DELIVERED +
+            val sql = "UPDATE " + Db.ParticipantTable.TABLE_NAME + " SET " + Db.ParticipantTable.COLUMN_LAST_DELIVERED +
                     " = " + DatabaseUtils.sqlEscapeString(messageIdEntity.id) + " WHERE " +
-                    Db.RoomMemberTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) +
-                    " AND " + Db.RoomMemberTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
+                    Db.ParticipantTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) +
+                    " AND " + Db.ParticipantTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
             database.execSQL(sql)
         }
     }
 
-    override fun updateRoomMemberReadState(roomId: String, userId: String, messageIdEntity: MessageIdEntity) {
+    override fun updateParticipantReadState(roomId: String, userId: String, messageIdEntity: MessageIdEntity) {
         database.transaction {
-            val sql = "UPDATE " + Db.RoomMemberTable.TABLE_NAME + " SET " + Db.RoomMemberTable.COLUMN_LAST_READ +
+            val sql = "UPDATE " + Db.ParticipantTable.TABLE_NAME + " SET " + Db.ParticipantTable.COLUMN_LAST_READ +
                     " = " + DatabaseUtils.sqlEscapeString(messageIdEntity.id) + " WHERE " +
-                    Db.RoomMemberTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) +
-                    " AND " + Db.RoomMemberTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
+                    Db.ParticipantTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) +
+                    " AND " + Db.ParticipantTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
             database.execSQL(sql)
         }
     }
 
-    override fun updateRoomMembers(roomId: String, roomMemberEntities: List<RoomMemberEntity>) {
-        deleteRoomMembers(roomId)
-        for (member in roomMemberEntities) {
-            addRoomMember(roomId, member)
+    override fun updateParticipants(roomId: String, participantEntities: List<ParticipantEntity>) {
+        deleteParticipants(roomId)
+        for (participant in participantEntities) {
+            addParticipant(roomId, participant)
         }
     }
 
-    override fun deleteRoomMember(roomId: String, userId: String) {
-        val where = Db.RoomMemberTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
-                Db.RoomMemberTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
+    override fun deleteParticipant(roomId: String, userId: String) {
+        val where = Db.ParticipantTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
+                Db.ParticipantTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
         database.transaction {
-            database.delete(Db.RoomMemberTable.TABLE_NAME, where, null)
+            database.delete(Db.ParticipantTable.TABLE_NAME, where, null)
         }
     }
 
-    override fun deleteRoomMembers(roomId: String) {
-        val where = Db.RoomMemberTable.COLUMN_ROOM_ID + " = ${DatabaseUtils.sqlEscapeString(roomId)}"
+    override fun deleteParticipants(roomId: String) {
+        val where = Db.ParticipantTable.COLUMN_ROOM_ID + " = ${DatabaseUtils.sqlEscapeString(roomId)}"
         database.transaction {
-            database.delete(Db.RoomMemberTable.TABLE_NAME, where, null)
+            database.delete(Db.ParticipantTable.TABLE_NAME, where, null)
         }
     }
 
-    override fun getRoomMembers(roomId: String): List<RoomMemberEntity> {
-        val query = "SELECT * FROM " + Db.RoomMemberTable.TABLE_NAME + " WHERE " +
-                Db.RoomMemberTable.COLUMN_ROOM_ID + " = ${DatabaseUtils.sqlEscapeString(roomId)}"
+    override fun getParticipants(roomId: String): List<ParticipantEntity> {
+        val query = "SELECT * FROM " + Db.ParticipantTable.TABLE_NAME + " WHERE " +
+                Db.ParticipantTable.COLUMN_ROOM_ID + " = ${DatabaseUtils.sqlEscapeString(roomId)}"
         val cursor = database.rawQuery(query, null)
-        val members = ArrayList<RoomMemberEntity>()
+        val participants = ArrayList<ParticipantEntity>()
         while (cursor.moveToNext()) {
-            var roomMemberEntity = cursor.toRoomMemberEntity()
-            roomMemberEntity = RoomMemberEntity(
-                    userLocal.getUser(roomMemberEntity.userEntity.id)!!,
-                    roomMemberEntity.memberStateEntity
+            var roomparticipantEntity = cursor.toParticipantEntity()
+            roomparticipantEntity = ParticipantEntity(
+                    userLocal.getUser(roomparticipantEntity.userEntity.id)!!,
+                    roomparticipantEntity.stateEntity
             )
-            members.add(roomMemberEntity)
+            participants.add(roomparticipantEntity)
         }
         cursor.close()
-        return members
+        return participants
     }
 
     override fun getRooms(page: Int, limit: Int): List<RoomEntity> {
@@ -275,7 +275,7 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
     override fun clearData() {
         database.transaction {
             database.delete(Db.RoomTable.TABLE_NAME, null, null)
-            database.delete(Db.RoomMemberTable.TABLE_NAME, null, null)
+            database.delete(Db.ParticipantTable.TABLE_NAME, null, null)
         }
     }
 
@@ -288,10 +288,10 @@ class RoomLocalImpl(dbOpenHelper: DbOpenHelper,
         return contains
     }
 
-    private fun isExistRoomMember(roomId: String, userId: String): Boolean {
-        val query = "SELECT * FROM " + Db.RoomMemberTable.TABLE_NAME + " WHERE " +
-                Db.RoomMemberTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
-                Db.RoomMemberTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
+    private fun isExistParticipant(roomId: String, userId: String): Boolean {
+        val query = "SELECT * FROM " + Db.ParticipantTable.TABLE_NAME + " WHERE " +
+                Db.ParticipantTable.COLUMN_ROOM_ID + " = " + DatabaseUtils.sqlEscapeString(roomId) + " AND " +
+                Db.ParticipantTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId)
         val cursor = database.rawQuery(query, null)
         val contains = cursor.count > 0
         cursor.close()

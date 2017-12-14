@@ -17,7 +17,7 @@
 package com.qiscus.sdk.chat.data.source.room
 
 import com.qiscus.sdk.chat.data.model.RoomEntity
-import com.qiscus.sdk.chat.data.model.RoomMemberEntity
+import com.qiscus.sdk.chat.data.model.ParticipantEntity
 import io.reactivex.Single
 
 /**
@@ -35,7 +35,7 @@ interface RoomRemote {
 
     fun getRoomWithChannelId(channelId: String, roomAvatarUrl: String): Single<RoomEntity>
 
-    fun getRoomMembers(roomId: String): Single<List<RoomMemberEntity>>
+    fun getParticipants(roomId: String): Single<List<ParticipantEntity>>
 
     fun getRooms(page: Int, limit: Int): Single<List<RoomEntity>>
 

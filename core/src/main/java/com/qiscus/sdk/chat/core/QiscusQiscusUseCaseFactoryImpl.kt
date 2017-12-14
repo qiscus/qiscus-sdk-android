@@ -111,8 +111,8 @@ class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : Q
         )
     }
 
-    override fun getRoomMembers(): GetRoomMembers {
-        return GetRoomMembers(
+    override fun getRoomParticipants(): GetRoomParticipants {
+        return GetRoomParticipants(
                 component.dataComponent.roomRepository,
                 component.executorComponent.threadExecutor,
                 component.executorComponent.postExecutionThread

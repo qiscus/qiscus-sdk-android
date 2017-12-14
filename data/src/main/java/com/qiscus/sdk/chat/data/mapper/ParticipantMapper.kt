@@ -16,10 +16,10 @@
 
 package com.qiscus.sdk.chat.data.mapper
 
-import com.qiscus.sdk.chat.data.model.MemberStateEntity
-import com.qiscus.sdk.chat.data.model.RoomMemberEntity
-import com.qiscus.sdk.chat.domain.model.MemberState
-import com.qiscus.sdk.chat.domain.model.RoomMember
+import com.qiscus.sdk.chat.data.model.ParticipantStateEntity
+import com.qiscus.sdk.chat.data.model.ParticipantEntity
+import com.qiscus.sdk.chat.domain.model.ParticipantState
+import com.qiscus.sdk.chat.domain.model.Participant
 
 /**
  * Created on : September 21, 2017
@@ -27,16 +27,16 @@ import com.qiscus.sdk.chat.domain.model.RoomMember
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-fun RoomMemberEntity.toDomainModel(): RoomMember {
-    return RoomMember(
+fun ParticipantEntity.toDomainModel(): Participant {
+    return Participant(
             userEntity.toDomainModel(),
-            MemberState(memberStateEntity.lastDeliveredMessageId, memberStateEntity.lastReadMessageId)
+            ParticipantState(stateEntity.lastDeliveredMessageId, stateEntity.lastReadMessageId)
     )
 }
 
-fun RoomMember.toEntity(): RoomMemberEntity {
-    return RoomMemberEntity(
+fun Participant.toEntity(): ParticipantEntity {
+    return ParticipantEntity(
             user.toEntity(),
-            MemberStateEntity(memberState.lastDeliveredMessageId, memberState.lastReadMessageId)
+            ParticipantStateEntity(state.lastDeliveredMessageId, state.lastReadMessageId)
     )
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.data.model
+package com.qiscus.sdk.chat.domain.model
 
 /**
  * Created on : August 17, 2017
@@ -22,6 +22,6 @@ package com.qiscus.sdk.chat.data.model
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class MemberStateEntity(var lastDeliveredMessageId: String = "", var lastReadMessageId: String = "")
+data class ParticipantState(var lastDeliveredMessageId: String = "", var lastReadMessageId: String = "")
 
-data class RoomMemberEntity(val userEntity: UserEntity, val memberStateEntity: MemberStateEntity)
+data class Participant(val user: User, val state: ParticipantState)

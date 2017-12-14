@@ -32,7 +32,7 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, Db.DATABASE_NAM
         db.transaction {
             db.execSQL(Db.RoomTable.CREATE)
             db.execSQL(Db.UserTable.CREATE)
-            db.execSQL(Db.RoomMemberTable.CREATE)
+            db.execSQL(Db.ParticipantTable.CREATE)
             db.execSQL(Db.MessageTable.CREATE)
             db.execSQL(Db.FileTable.CREATE)
         }
@@ -47,7 +47,7 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, Db.DATABASE_NAM
         db.transaction {
             db.execSQL("DROP TABLE IF EXISTS " + Db.RoomTable.TABLE_NAME)
             db.execSQL("DROP TABLE IF EXISTS " + Db.UserTable.TABLE_NAME)
-            db.execSQL("DROP TABLE IF EXISTS " + Db.RoomMemberTable.TABLE_NAME)
+            db.execSQL("DROP TABLE IF EXISTS " + Db.ParticipantTable.TABLE_NAME)
             db.execSQL("DROP TABLE IF EXISTS " + Db.MessageTable.TABLE_NAME)
             db.execSQL("DROP TABLE IF EXISTS " + Db.FileTable.TABLE_NAME)
         }
