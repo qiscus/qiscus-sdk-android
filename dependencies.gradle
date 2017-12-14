@@ -30,7 +30,7 @@ ext {
     androidCompileSdkVersion = 25
 
     //Libraries
-    kotlinVersion = '1.1.51'
+    kotlinVersion = '1.1.61'
 
     supportLibraryVersion = '25.4.0'
     androidAnnotationsVersion = '24.2.0'
