@@ -157,8 +157,12 @@ public class Qiscus {
             appInstance.getApplicationContext()
                     .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
         } else {
-            appInstance.getApplicationContext()
-                    .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
+            try {
+                appInstance.getApplicationContext()
+                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
+            } catch (IllegalStateException e) {
+                //Prevent crash because trying to start service while application on background
+            }
         }
     }
 
