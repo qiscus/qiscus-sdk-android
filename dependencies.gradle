@@ -16,8 +16,8 @@
 
 allprojects {
     repositories {
-        maven { url "https://maven.google.com" }
         jcenter()
+        google()
         maven { url "https://dl.bintray.com/qiscustech/maven" }
     }
 }
@@ -26,14 +26,14 @@ ext {
     //Android
     androidBuildToolsVersion = "26.0.2"
     androidMinSdkVersion = 16
-    androidTargetSdkVersion = 25
-    androidCompileSdkVersion = 25
+    androidTargetSdkVersion = 26
+    androidCompileSdkVersion = 26
 
     //Libraries
     kotlinVersion = '1.1.61'
 
-    supportLibraryVersion = '25.4.0'
-    androidAnnotationsVersion = '24.2.0'
+    supportLibraryVersion = '26.1.0'
+    androidAnnotationsVersion = '26.1.0'
 
     rxKotlinVersion = '2.1.0'
     rxAndroidVersion = '2.0.1'
