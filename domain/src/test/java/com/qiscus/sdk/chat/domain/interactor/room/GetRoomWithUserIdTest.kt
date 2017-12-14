@@ -52,11 +52,11 @@ class GetRoomWithUserIdTest {
         val userId = "1234"
         stubRoomRepositoryGetRoom(userId)
         val testObserver = getRoom.buildUseCaseObservable(GetRoomWithUserId.Params(userId)).test()
-        testObserver.assertValue(Room(1, name = "Room"))
+        testObserver.assertValue(Room("1", name = "Room"))
     }
 
     private fun stubRoomRepositoryGetRoom(userId: String) {
         whenever(mockRoomRepository.getRoomWithUserId(userId))
-                .thenReturn(Single.just(Room(1, name = "Room")))
+                .thenReturn(Single.just(Room("1", name = "Room")))
     }
 }

@@ -7,6 +7,7 @@ import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.User
+import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
 import io.reactivex.Single
 import org.junit.Before
@@ -22,22 +23,26 @@ class AuthenticateTest {
     private lateinit var authenticate: Authenticate
 
     private lateinit var mockAccountRepository: AccountRepository
+    private lateinit var mockPubSubClient: QiscusPubSubClient
     private lateinit var mockThreadExecutor: ThreadExecutor
     private lateinit var mockPostExecutionThread: PostExecutionThread
 
     @Before
     fun setUp() {
         mockAccountRepository = mock()
+        mockPubSubClient = mock()
         mockThreadExecutor = mock()
         mockPostExecutionThread = mock()
-        authenticate = Authenticate(mockAccountRepository, mockThreadExecutor, mockPostExecutionThread)
+        authenticate = Authenticate(mockAccountRepository, mockPubSubClient, mockThreadExecutor, mockPostExecutionThread)
     }
 
     @Test
     fun buildUseCaseObservableCallsRepository() {
         val token = "asagfgafsg"
-        authenticate.buildUseCaseObservable(Authenticate.Params(token))
+        stubAccountRepositoryLogin(token)
+        authenticate.buildUseCaseObservable(Authenticate.Params(token)).test()
         verify(mockAccountRepository).authenticate(token)
+        verify(mockPubSubClient).restartConnection()
     }
 
     @Test

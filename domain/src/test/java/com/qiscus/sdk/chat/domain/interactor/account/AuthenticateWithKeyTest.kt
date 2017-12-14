@@ -7,6 +7,7 @@ import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.User
+import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
 import io.reactivex.Single
 import org.junit.Before
@@ -22,15 +23,17 @@ class AuthenticateWithKeyTest {
     private lateinit var authenticate: AuthenticateWithKey
 
     private lateinit var mockAccountRepository: AccountRepository
+    private lateinit var mockPubSubClient: QiscusPubSubClient
     private lateinit var mockThreadExecutor: ThreadExecutor
     private lateinit var mockPostExecutionThread: PostExecutionThread
 
     @Before
     fun setUp() {
         mockAccountRepository = mock()
+        mockPubSubClient = mock()
         mockThreadExecutor = mock()
         mockPostExecutionThread = mock()
-        authenticate = AuthenticateWithKey(mockAccountRepository, mockThreadExecutor, mockPostExecutionThread)
+        authenticate = AuthenticateWithKey(mockAccountRepository, mockPubSubClient, mockThreadExecutor, mockPostExecutionThread)
     }
 
     @Test
