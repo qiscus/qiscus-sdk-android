@@ -141,7 +141,7 @@ dependencies {
     //Custom EditText
     compile 'com.qiscus.utils:manggil:1.0.1'
 
-    compile 'com.google.android:flexbox:0.3.0'
+    compile 'com.google.android:flexbox:0.3.1'
 
     //File picker
     compile 'com.qiscus.utils:jupuk:1.0.1'
