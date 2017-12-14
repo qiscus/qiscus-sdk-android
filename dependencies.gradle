@@ -41,7 +41,7 @@ ext {
     jsonVersion = '20170516'
     gsonVersion = '2.8.1'
 
-    okHttpVersion = '3.8.1'
+    okHttpVersion = '3.9.1'
     retrofitVersion = '2.3.0'
     rxunfurlVersion = '0.3.0'
 
