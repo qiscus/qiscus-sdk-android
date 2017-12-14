@@ -55,12 +55,9 @@ class Qiscus private constructor(val component: QiscusComponent) {
     companion object {
         @Volatile private var INSTANCE: Qiscus? = null
 
-        fun init(application: Application, appId: String) {
-            initWithCustomServer(application, "https://$appId.qiscus.com")
-        }
-
         @JvmOverloads
-        fun initWithCustomServer(application: Application, serverBaseUrl: String, mqttBrokerUrl: String = "ssl://mqtt.qiscus.com:1885") {
+        fun init(application: Application, appId: String, serverBaseUrl: String = "https://$appId.qiscus.com",
+                 mqttBrokerUrl: String = "ssl://mqtt.qiscus.com:1885") {
             INSTANCE = Qiscus(QiscusComponent(application, serverBaseUrl, mqttBrokerUrl))
         }
 
