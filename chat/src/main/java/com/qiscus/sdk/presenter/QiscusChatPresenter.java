@@ -342,18 +342,12 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
         return QiscusApi.getInstance().getChatRoomComments(room.getId())
-                .doOnSubscribe(() -> QiscusAndroidUtil.runOnUIThread(() -> {
-                    if (view != null) {
-                        view.showLoadMoreLoading();
-                    }
-                }))
                 .doOnError(throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     QiscusAndroidUtil.runOnUIThread(() -> {
                         if (view != null) {
-                            view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_load_comments));
-                            view.dismissLoading();
+                            view.onLoadCommentsError(throwable);
                         }
                     });
                 })
@@ -366,11 +360,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
                 })
-                .doOnNext(roomData -> QiscusAndroidUtil.runOnUIThread(() -> {
-                    if (view != null) {
-                        view.dismissLoading();
-                    }
-                }))
                 .subscribeOn(Schedulers.io())
                 .onErrorReturn(throwable -> null);
     }
@@ -414,8 +403,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_load_comments));
-                        view.dismissLoading();
+                        view.onLoadCommentsError(throwable);
                     }
                 });
     }
@@ -503,7 +491,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
-                        view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_load_comments));
+                        view.onLoadCommentsError(throwable);
                         view.dismissLoading();
                     }
                 });
@@ -821,5 +809,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void showCommentsAndScrollToTop(List<QiscusComment> qiscusComments);
 
         void onRealtimeStatusChanged(boolean connected);
+
+        void onLoadCommentsError(Throwable throwable);
     }
 }

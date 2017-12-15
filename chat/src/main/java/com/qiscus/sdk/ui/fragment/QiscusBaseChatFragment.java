@@ -1788,6 +1788,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
+    /**
+     * Callback when an error happening while load comments
+     * @param throwable the error
+     */
+    @Override
+    public void onLoadCommentsError(Throwable throwable) {
+
+    }
+
     public interface CommentSelectedListener {
         void onCommentSelected(List<QiscusComment> selectedComments);
     }
