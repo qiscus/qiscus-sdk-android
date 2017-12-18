@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:background="@color/qiscus_conversation_background"
+    android:background="@color/qiscus_list_room_background"
     android:orientation="horizontal">
 
     <com.qiscus.sdk.chat.presentation.uikit.widget.CircularImageView
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/qiscus_conversation_room_name"
+                android:textColor="@color/qiscus_list_room_name"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:textColor="@color/qiscus_conversation_last_message_date" />
+                android:textColor="@color/qiscus_list_room_last_message_date" />
 
         </LinearLayout>
 
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/qiscus_conversation_last_message"
+                android:textColor="@color/qiscus_list_room_last_message"
                 android:textSize="14sp" />
 
             <TextView
@@ -70,7 +70,7 @@
                 android:textSize="12sp"
                 android:padding="4dp"
                 android:background="@drawable/qiscus_unread_count_bg"
-                android:textColor="@color/qiscus_conversation_unread_count"/>
+                android:textColor="@color/qiscus_list_room_unread_count"/>
 
         </LinearLayout>
 
@@ -78,7 +78,7 @@
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/qiscus_conversation_divider"/>
+            android:background="@color/qiscus_list_room_divider"/>
 
     </LinearLayout>
 

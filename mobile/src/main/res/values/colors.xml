@@ -7,15 +7,15 @@
     <color name="qiscus_accent">#FF5722</color>
     <color name="qiscus_accent_light">#FFCCBC</color>
 
-    <!-- conversations color -->
-    <color name="qiscus_conversation_room_name">#212121</color>
-    <color name="qiscus_conversation_last_message">#727272</color>
-    <color name="qiscus_conversation_last_message_date">#727272</color>
-    <color name="qiscus_conversation_last_message_date_active">#009688</color>
-    <color name="qiscus_conversation_unread_count">#FFFFFF</color>
-    <color name="qiscus_conversation_unread_count_background">#009688</color>
-    <color name="qiscus_conversation_background">#FFFFFF</color>
-    <color name="qiscus_conversation_divider">#B6B6B6</color>
+    <!-- list room color -->
+    <color name="qiscus_list_room_name">#212121</color>
+    <color name="qiscus_list_room_last_message">#727272</color>
+    <color name="qiscus_list_room_last_message_date">#727272</color>
+    <color name="qiscus_list_room_last_message_date_active">#009688</color>
+    <color name="qiscus_list_room_unread_count">#FFFFFF</color>
+    <color name="qiscus_list_room_unread_count_background">#009688</color>
+    <color name="qiscus_list_room_background">#FFFFFF</color>
+    <color name="qiscus_list_room_divider">#B6B6B6</color>
 
     <!-- mention color -->
     <color name="qiscus_mention_all">#1a237e</color>

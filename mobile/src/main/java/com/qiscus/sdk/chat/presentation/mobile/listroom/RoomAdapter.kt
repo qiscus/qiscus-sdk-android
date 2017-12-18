@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.listconversation
+package com.qiscus.sdk.chat.presentation.mobile.listroom
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
@@ -11,7 +11,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
-import com.qiscus.sdk.chat.presentation.model.ConversationViewModel
+import com.qiscus.sdk.chat.presentation.model.RoomViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.SortedAdapter
 import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
 import java.text.SimpleDateFormat
@@ -22,31 +22,31 @@ import java.text.SimpleDateFormat
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class ConversationAdapter(private val context: Context) : SortedAdapter<ConversationViewModel, ConversationAdapter.VH>() {
+class RoomAdapter(private val context: Context) : SortedAdapter<RoomViewModel, RoomAdapter.VH>() {
 
-    fun addOrUpdate(conversationViewModel: ConversationViewModel) {
-        val pos = data.indexOfFirst { it.room.id == conversationViewModel.room.id }
+    fun addOrUpdate(roomViewModel: RoomViewModel) {
+        val pos = data.indexOfFirst { it.room.id == roomViewModel.room.id }
         if (pos >= 0) {
-            data.updateItemAt(pos, conversationViewModel)
+            data.updateItemAt(pos, roomViewModel)
         } else {
-            data.add(conversationViewModel)
+            data.add(roomViewModel)
         }
         notifyDataSetChanged()
     }
 
-    fun removeConversation(conversationViewModel: ConversationViewModel) {
-        val pos = data.indexOfFirst { it.room.id == conversationViewModel.room.id }
+    fun removeRoom(roomViewModel: RoomViewModel) {
+        val pos = data.indexOfFirst { it.room.id == roomViewModel.room.id }
         if (pos >= 0) {
             data.removeItemAt(pos)
         }
         notifyDataSetChanged()
     }
 
-    override fun getItemClass(): Class<ConversationViewModel> {
-        return ConversationViewModel::class.java
+    override fun getItemClass(): Class<RoomViewModel> {
+        return RoomViewModel::class.java
     }
 
-    override fun compare(lhs: ConversationViewModel, rhs: ConversationViewModel): Int {
+    override fun compare(lhs: RoomViewModel, rhs: RoomViewModel): Int {
         return if (lhs.lastMessage == null) {
             1
         } else if (rhs.lastMessage == null) {
@@ -58,11 +58,11 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
         }
     }
 
-    override fun areContentsTheSame(oldE: ConversationViewModel, newE: ConversationViewModel): Boolean {
+    override fun areContentsTheSame(oldE: RoomViewModel, newE: RoomViewModel): Boolean {
         return oldE.room == newE.room
     }
 
-    override fun areItemsTheSame(oldE: ConversationViewModel, newE: ConversationViewModel): Boolean {
+    override fun areItemsTheSame(oldE: RoomViewModel, newE: RoomViewModel): Boolean {
         return oldE.room == newE.room
     }
 
@@ -71,7 +71,7 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): VH {
-        return VH(LayoutInflater.from(context).inflate(R.layout.item_conversation, parent, false))
+        return VH(LayoutInflater.from(context).inflate(R.layout.item_qiscus_room, parent, false))
     }
 
     override fun onBindViewHolder(holder: VH?, position: Int) {
@@ -87,17 +87,17 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
 
         private val dateFormat = SimpleDateFormat.getDateInstance()
 
-        private val normalColor = ContextCompat.getColor(view.context, R.color.qiscus_conversation_last_message_date)
-        private val unreadColor = ContextCompat.getColor(view.context, R.color.qiscus_conversation_last_message_date_active)
+        private val normalColor = ContextCompat.getColor(view.context, R.color.qiscus_list_room_last_message_date)
+        private val unreadColor = ContextCompat.getColor(view.context, R.color.qiscus_list_room_last_message_date_active)
 
-        fun bind(conversationViewModel: ConversationViewModel) {
-            Glide.with(roomAvatarView).load(conversationViewModel.room.avatar).into(roomAvatarView)
-            roomNameView.text = conversationViewModel.room.name
-            lastMessageView.text = conversationViewModel.lastMessage?.spannableMessage
-            lastMessageDateView.text = dateFormat.format(conversationViewModel.lastMessage?.message?.date)
-            unreadCountView.text = "${conversationViewModel.room.unreadCount}"
+        fun bind(roomViewModel: RoomViewModel) {
+            Glide.with(roomAvatarView).load(roomViewModel.room.avatar).into(roomAvatarView)
+            roomNameView.text = roomViewModel.room.name
+            lastMessageView.text = roomViewModel.lastMessage?.spannableMessage
+            lastMessageDateView.text = dateFormat.format(roomViewModel.lastMessage?.message?.date)
+            unreadCountView.text = "${roomViewModel.room.unreadCount}"
 
-            if (conversationViewModel.room.unreadCount > 0) {
+            if (roomViewModel.room.unreadCount > 0) {
                 unreadCountView.visibility = View.VISIBLE
                 lastMessageDateView.setTextColor(unreadColor)
             } else {
@@ -106,7 +106,7 @@ class ConversationAdapter(private val context: Context) : SortedAdapter<Conversa
             }
 
             roomAvatarView.setOnClickListener {
-                it.context.startActivity(it.context.chatRoomIntent(conversationViewModel.room))
+                it.context.startActivity(it.context.chatRoomIntent(roomViewModel.room))
             }
         }
     }

@@ -4,5 +4,5 @@
     android:shape="oval">
 
     <solid
-        android:color="@color/qiscus_conversation_unread_count_background"/>
+        android:color="@color/qiscus_list_room_unread_count_background"/>
 </shape>

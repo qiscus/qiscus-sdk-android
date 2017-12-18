@@ -26,7 +26,7 @@ import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.account.AuthenticateWithKey
 import com.qiscus.sdk.chat.domain.interactor.room.GetRoomWithUserId
 import com.qiscus.sdk.chat.domain.interactor.room.GetRooms
-import com.qiscus.sdk.chat.presentation.mobile.listconversation.ListConversationActivity
+import com.qiscus.sdk.chat.presentation.mobile.listroom.ListRoomActivity
 import com.qiscus.sdk.chat.sample.chat.chatIntent
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         startChatButton.setOnClickListener {
             if (Qiscus.instance.isAuthenticated()) {
-                startActivity(Intent(this, ListConversationActivity::class.java))
+                startActivity(Intent(this, ListRoomActivity::class.java))
             } else {
                 Toast.makeText(this, "You must login first", Toast.LENGTH_SHORT).show()
             }
