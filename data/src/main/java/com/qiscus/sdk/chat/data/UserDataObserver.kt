@@ -19,7 +19,7 @@ package com.qiscus.sdk.chat.data
 import com.qiscus.sdk.chat.data.pubsub.user.UserSubscriber
 import com.qiscus.sdk.chat.domain.model.UserStatus
 import com.qiscus.sdk.chat.domain.model.UserTyping
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
+import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import com.qiscus.sdk.chat.domain.pubsub.UserObserver
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -30,7 +30,7 @@ import io.reactivex.Observable
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class UserDataObserver(private val pubSubClient: QiscusPubSubClient,
+class UserDataObserver(private val pubSubClient: PubSubClient,
                        private val userSubscriber: UserSubscriber) : UserObserver {
 
     override fun listenUserStatus(userId: String): Observable<UserStatus> {

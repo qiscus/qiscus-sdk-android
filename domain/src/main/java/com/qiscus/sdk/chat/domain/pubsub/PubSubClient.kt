@@ -22,7 +22,7 @@ package com.qiscus.sdk.chat.domain.pubsub
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-interface QiscusPubSubClient {
+interface PubSubClient {
     fun connect()
 
     fun isConnected(): Boolean

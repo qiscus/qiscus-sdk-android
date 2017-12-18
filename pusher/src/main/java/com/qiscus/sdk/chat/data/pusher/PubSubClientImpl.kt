@@ -32,7 +32,7 @@ import com.qiscus.sdk.chat.data.util.PostMessageHandler
 import com.qiscus.sdk.chat.data.util.SyncHandler
 import com.qiscus.sdk.chat.domain.common.runOnBackgroundThread
 import com.qiscus.sdk.chat.domain.common.scheduleOnBackgroundThread
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
+import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import io.reactivex.schedulers.Schedulers
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
@@ -46,7 +46,7 @@ import java.util.concurrent.ScheduledFuture
  * GitHub     : https://github.com/zetbaitsu
  */
 @SuppressLint("HardwareIds")
-class QiscusMqttClient @JvmOverloads constructor(
+class PubSubClientImpl @JvmOverloads constructor(
         private val context: Context,
         private val serverUri: String = "ssl://mqtt.qiscus.com:1885",
         private val clientId: String = "${context.packageName}-" +
@@ -59,7 +59,7 @@ class QiscusMqttClient @JvmOverloads constructor(
         private val messageRemote: MessageRemote,
         private val messagePayloadMapper: MessagePayloadMapper,
         private val userPublisher: UserPublisher)
-    : QiscusPubSubClient, MqttCallbackExtended, IMqttActionListener {
+    : PubSubClient, MqttCallbackExtended, IMqttActionListener {
 
     private val retryPeriod = 2000L
 

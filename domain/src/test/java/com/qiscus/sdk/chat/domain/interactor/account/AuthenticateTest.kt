@@ -7,7 +7,7 @@ import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.User
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
+import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
 import io.reactivex.Single
 import org.junit.Before
@@ -23,7 +23,7 @@ class AuthenticateTest {
     private lateinit var authenticate: Authenticate
 
     private lateinit var mockAccountRepository: AccountRepository
-    private lateinit var mockPubSubClient: QiscusPubSubClient
+    private lateinit var mockPubSubClient: PubSubClient
     private lateinit var mockThreadExecutor: ThreadExecutor
     private lateinit var mockPostExecutionThread: PostExecutionThread
 

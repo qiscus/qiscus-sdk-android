@@ -20,7 +20,7 @@ import com.qiscus.sdk.chat.data.mapper.toDomainModel
 import com.qiscus.sdk.chat.data.pubsub.message.MessageSubscriber
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.pubsub.MessageObserver
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
+import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import io.reactivex.Observable
 
 /**
@@ -29,7 +29,7 @@ import io.reactivex.Observable
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class MessageDataObserver(private val pubSubClient: QiscusPubSubClient,
+class MessageDataObserver(private val pubSubClient: PubSubClient,
                           private val messageSubscriber: MessageSubscriber) : MessageObserver {
 
     override fun listenNewMessage(): Observable<Message> {

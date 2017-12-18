@@ -27,24 +27,24 @@ import io.reactivex.Single
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class AccountRemoteImpl(private val accountLocal: AccountLocal, private val qiscusRestApi: QiscusRestApi) : AccountRemote {
+class AccountRemoteImpl(private val accountLocal: AccountLocal, private val restApi: RestApi) : AccountRemote {
 
     override fun requestNonce(): Single<String> {
-        return qiscusRestApi.requestNonce().map { it.results.nonce }
+        return restApi.requestNonce().map { it.results.nonce }
     }
 
     override fun authenticateWithKey(userId: String, userKey: String, name: String, avatarUrl: String): Single<AccountEntity> {
-        return qiscusRestApi.authenticateWithKey(userId, userKey, name, avatarUrl)
+        return restApi.authenticateWithKey(userId, userKey, name, avatarUrl)
                 .map { it.results.user.toEntity() }
     }
 
     override fun authenticate(token: String): Single<AccountEntity> {
-        return qiscusRestApi.authenticate(token)
+        return restApi.authenticate(token)
                 .map { it.results.user.toEntity() }
     }
 
     override fun updateAccount(name: String, avatarUrl: String): Single<AccountEntity> {
-        return qiscusRestApi.updateProfile(accountLocal.getAccount().token, name, avatarUrl)
+        return restApi.updateProfile(accountLocal.getAccount().token, name, avatarUrl)
                 .map { it.results.user.toEntity() }
     }
 }

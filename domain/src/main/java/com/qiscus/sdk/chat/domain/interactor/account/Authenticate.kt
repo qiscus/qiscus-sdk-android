@@ -20,7 +20,7 @@ import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.interactor.SingleUseCase
 import com.qiscus.sdk.chat.domain.model.Account
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
+import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
 import io.reactivex.Single
 
@@ -31,7 +31,7 @@ import io.reactivex.Single
  * GitHub     : https://github.com/zetbaitsu
  */
 
-class Authenticate(private val accountRepository: AccountRepository, private val pubSubClient: QiscusPubSubClient,
+class Authenticate(private val accountRepository: AccountRepository, private val pubSubClient: PubSubClient,
                    threadExecutor: ThreadExecutor, postExecutionThread: PostExecutionThread) :
         SingleUseCase<Account, Authenticate.Params>(threadExecutor, postExecutionThread) {
 

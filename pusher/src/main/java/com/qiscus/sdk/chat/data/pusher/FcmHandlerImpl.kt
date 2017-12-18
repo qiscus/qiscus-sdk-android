@@ -6,7 +6,7 @@ import com.qiscus.sdk.chat.data.pusher.mapper.MessagePayloadMapper
 import com.qiscus.sdk.chat.data.source.account.AccountLocal
 import com.qiscus.sdk.chat.data.source.message.MessageLocal
 import com.qiscus.sdk.chat.data.source.message.MessageRemote
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
+import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import io.reactivex.schedulers.Schedulers
 
 /**
@@ -18,14 +18,14 @@ import io.reactivex.schedulers.Schedulers
 class FcmHandlerImpl(private val accountLocal: AccountLocal,
                      private val messageLocal: MessageLocal,
                      private val messageRemote: MessageRemote,
-                     private val qiscusPubSubClient: QiscusPubSubClient,
+                     private val pubSubClient: PubSubClient,
                      private val messagePayloadMapper: MessagePayloadMapper) : FcmHandler {
 
     override fun handle(data: Map<String, String>): Boolean {
         if (data.containsKey("qiscus_sdk")) {
             if (accountLocal.isAuthenticated()) {
-                if (!qiscusPubSubClient.isConnected()) {
-                    qiscusPubSubClient.restartConnection()
+                if (!pubSubClient.isConnected()) {
+                    pubSubClient.restartConnection()
                 }
 
                 if (data.containsKey("payload")) {

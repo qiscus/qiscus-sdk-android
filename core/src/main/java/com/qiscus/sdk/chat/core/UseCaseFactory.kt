@@ -30,7 +30,7 @@ import com.qiscus.sdk.chat.domain.interactor.user.PublishTyping
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-interface QiscusUseCaseFactory {
+interface UseCaseFactory {
     fun requestNonce(): RequestNonce
 
     fun authenticate(): Authenticate

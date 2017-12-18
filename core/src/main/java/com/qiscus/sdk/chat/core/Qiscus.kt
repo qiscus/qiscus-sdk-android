@@ -21,7 +21,7 @@ import com.qiscus.sdk.chat.core.component.QiscusComponent
 import com.qiscus.sdk.chat.data.pubsub.FcmHandler
 import com.qiscus.sdk.chat.data.pusher.FcmHandlerImpl
 import com.qiscus.sdk.chat.domain.common.MessageFactory
-import com.qiscus.sdk.chat.domain.common.QiscusMessageFactory
+import com.qiscus.sdk.chat.domain.common.MessageFactoryImpl
 import com.qiscus.sdk.chat.domain.interactor.Action
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -34,12 +34,12 @@ import io.reactivex.schedulers.Schedulers
  */
 class Qiscus private constructor(val component: QiscusComponent) {
 
-    val useCaseFactory: QiscusUseCaseFactory by lazy {
-        QiscusQiscusUseCaseFactoryImpl(component)
+    val useCaseFactory: UseCaseFactory by lazy {
+        UseCaseFactoryImpl(component)
     }
 
     val messageFactory: MessageFactory by lazy {
-        QiscusMessageFactory(component.dataComponent.accountRepository)
+        MessageFactoryImpl(component.dataComponent.accountRepository)
     }
 
     val fcmHandler: FcmHandler by lazy {
@@ -92,7 +92,7 @@ class Qiscus private constructor(val component: QiscusComponent) {
 
     @JvmOverloads
     fun registerFcmToken(fcmToken: String, onComplete: Action<Void?>? = null, onError: Action<Throwable>? = null) {
-        component.dataComponent.qiscusRestApi
+        component.dataComponent.restApi
                 .registerFcmToken(component.dataComponent.accountLocal.getAccount().token, "android", fcmToken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -28,7 +28,7 @@ import java.util.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class QiscusMessageFactory(private val accountRepository: AccountRepository) : MessageFactory {
+class MessageFactoryImpl(private val accountRepository: AccountRepository) : MessageFactory {
 
     override fun createTextMessage(roomId: String, message: String): Message {
         return Message(MessageId(), message, accountRepository.getAccount().blockingGet().user,

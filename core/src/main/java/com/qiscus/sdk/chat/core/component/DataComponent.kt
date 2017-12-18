@@ -73,8 +73,8 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
         DbOpenHelper(context)
     }
 
-    val qiscusRestApi: QiscusRestApi by lazy {
-        QiscusRestApiFactory.makeQiscusRestApi(restApiServerBaseUrl, okHttpClient)
+    val restApi: RestApi by lazy {
+        RestApiFactory.makeQiscusRestApi(restApiServerBaseUrl, okHttpClient)
     }
 
     val accountLocal: AccountLocal by lazy {
@@ -82,7 +82,7 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
     }
 
     val accountRemote: AccountRemote by lazy {
-        AccountRemoteImpl(accountLocal, qiscusRestApi)
+        AccountRemoteImpl(accountLocal, restApi)
     }
 
     val accountRepository: AccountRepository by lazy {
@@ -170,7 +170,7 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
     }
 
     val roomRemote: RoomRemote by lazy {
-        RoomRemoteImpl(accountLocal, qiscusRestApi, roomLocal, messageLocal)
+        RoomRemoteImpl(accountLocal, restApi, roomLocal, messageLocal)
     }
 
     val roomRepository: RoomRepository by lazy {
@@ -190,7 +190,7 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
     }
 
     val messageRemote: MessageRemote by lazy {
-        MessageRemoteImpl(accountLocal, qiscusRestApi)
+        MessageRemoteImpl(accountLocal, restApi)
     }
 
     val postMessageHandler: PostMessageHandler by lazy {
@@ -209,8 +209,8 @@ class DataComponent(context: Context, applicationWatcher: ApplicationWatcher, re
         MessagePayloadMapper()
     }
 
-    val pubSubClient: QiscusPubSubClient by lazy {
-        QiscusMqttClient(context, serverUri = mqttBrokerUrl, applicationWatcher = applicationWatcher,
+    val pubSubClient: PubSubClient by lazy {
+        PubSubClientImpl(context, serverUri = mqttBrokerUrl, applicationWatcher = applicationWatcher,
                 accountLocal = accountLocal, messageLocal = messageLocal, messagePayloadMapper = messagePayloadMapper,
                 postMessageHandler = postMessageHandler, messageRemote = messageRemote, userPublisher = userPublisher,
                 syncHandler = syncHandler)

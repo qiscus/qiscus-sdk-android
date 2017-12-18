@@ -19,7 +19,7 @@ package com.qiscus.sdk.chat.domain.interactor.account
 import com.qiscus.sdk.chat.domain.executor.PostExecutionThread
 import com.qiscus.sdk.chat.domain.executor.ThreadExecutor
 import com.qiscus.sdk.chat.domain.interactor.CompletableUseCase
-import com.qiscus.sdk.chat.domain.pubsub.QiscusPubSubClient
+import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import com.qiscus.sdk.chat.domain.repository.AccountRepository
 import com.qiscus.sdk.chat.domain.repository.MessageRepository
 import com.qiscus.sdk.chat.domain.repository.RoomRepository
@@ -37,7 +37,7 @@ class Logout(
         private val userRepository: UserRepository,
         private val roomRepository: RoomRepository,
         private val messageRepository: MessageRepository,
-        private val pubSubClient: QiscusPubSubClient,
+        private val pubSubClient: PubSubClient,
         threadExecutor: ThreadExecutor,
         postExecutionThread: PostExecutionThread) : CompletableUseCase<Void?>(threadExecutor, postExecutionThread) {
 

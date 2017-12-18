@@ -31,7 +31,7 @@ import com.qiscus.sdk.chat.domain.interactor.user.PublishTyping
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class QiscusQiscusUseCaseFactoryImpl(private val component: QiscusComponent) : QiscusUseCaseFactory {
+class UseCaseFactoryImpl(private val component: QiscusComponent) : UseCaseFactory {
 
     override fun requestNonce(): RequestNonce {
         return RequestNonce(

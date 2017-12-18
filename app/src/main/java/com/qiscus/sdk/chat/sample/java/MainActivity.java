@@ -23,7 +23,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.qiscus.sdk.chat.core.Qiscus;
-import com.qiscus.sdk.chat.core.QiscusUseCaseFactory;
+import com.qiscus.sdk.chat.core.UseCaseFactory;
 import com.qiscus.sdk.chat.domain.interactor.Action;
 import com.qiscus.sdk.chat.domain.interactor.account.AuthenticateWithKey;
 import com.qiscus.sdk.chat.domain.interactor.room.GetRoomWithUserId;
@@ -32,7 +32,7 @@ import com.qiscus.sdk.chat.domain.model.Room;
 import com.qiscus.sdk.chat.sample.R;
 
 public class MainActivity extends AppCompatActivity {
-    private QiscusUseCaseFactory useCaseFactory = Qiscus.Companion.getInstance().getUseCaseFactory();
+    private UseCaseFactory useCaseFactory = Qiscus.Companion.getInstance().getUseCaseFactory();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

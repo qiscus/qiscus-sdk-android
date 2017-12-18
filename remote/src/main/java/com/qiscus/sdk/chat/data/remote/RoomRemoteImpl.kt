@@ -31,12 +31,12 @@ import io.reactivex.Single
  * GitHub     : https://github.com/zetbaitsu
  */
 class RoomRemoteImpl(private val accountLocal: AccountLocal,
-                     private val qiscusRestApi: QiscusRestApi,
+                     private val restApi: RestApi,
                      private val roomLocal: RoomLocal,
                      private val messageLocal: MessageLocal) : RoomRemote {
 
     override fun getRoom(roomId: String): Single<RoomEntity> {
-        return qiscusRestApi.getChatRoom(accountLocal.getAccount().token, roomId)
+        return restApi.getChatRoom(accountLocal.getAccount().token, roomId)
                 .doOnSuccess {
                     val participants = it.results.room.participants
                     roomLocal.updateParticipants(it.results.room.idStr, participants.map { it.toEntity() })
@@ -48,7 +48,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
     }
 
     override fun getRoomWithUserId(userId: String): Single<RoomEntity> {
-        return qiscusRestApi.createOrGetChatRoom(accountLocal.getAccount().token, userId)
+        return restApi.createOrGetChatRoom(accountLocal.getAccount().token, userId)
                 .doOnSuccess {
                     val participants = it.results.room.participants
                     roomLocal.updateParticipants(it.results.room.idStr, participants.map { it.toEntity() })
@@ -60,7 +60,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
     }
 
     override fun createGroupRoom(userIds: List<String>, roomName: String, roomAvatarUrl: String): Single<RoomEntity> {
-        return qiscusRestApi.createGroupChatRoom(accountLocal.getAccount().token, roomName, userIds, roomAvatarUrl, "")
+        return restApi.createGroupChatRoom(accountLocal.getAccount().token, roomName, userIds, roomAvatarUrl, "")
                 .doOnSuccess {
                     val participants = it.results.room.participants
                     roomLocal.updateParticipants(it.results.room.idStr, participants.map { it.toEntity() })
@@ -72,7 +72,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
     }
 
     override fun getRoomWithChannelId(channelId: String, roomAvatarUrl: String): Single<RoomEntity> {
-        return qiscusRestApi.createOrGetGroupChatRoom(accountLocal.getAccount().token, channelId, "", roomAvatarUrl, "")
+        return restApi.createOrGetGroupChatRoom(accountLocal.getAccount().token, channelId, "", roomAvatarUrl, "")
                 .doOnSuccess {
                     val participants = it.results.room.participants
                     roomLocal.updateParticipants(it.results.room.idStr, participants.map { it.toEntity() })
@@ -84,12 +84,12 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
     }
 
     override fun getParticipants(roomId: String): Single<List<ParticipantEntity>> {
-        return qiscusRestApi.getChatRoom(accountLocal.getAccount().token, roomId)
+        return restApi.getChatRoom(accountLocal.getAccount().token, roomId)
                 .map { it.results.room.participants.map { it.toEntity() } }
     }
 
     override fun getRooms(page: Int, limit: Int): Single<List<RoomEntity>> {
-        return qiscusRestApi.getChatRooms(accountLocal.getAccount().token, page, limit, true)
+        return restApi.getChatRooms(accountLocal.getAccount().token, page, limit, true)
                 .doOnSuccess {
                     it.results.roomsInfo.forEach {
                         val participants = it.participants
@@ -105,7 +105,7 @@ class RoomRemoteImpl(private val accountLocal: AccountLocal,
     }
 
     override fun getRoomsWithSpecificIds(roomIds: List<String>, channelIds: List<String>): Single<List<RoomEntity>> {
-        return qiscusRestApi.getChatRooms(accountLocal.getAccount().token, roomIds, channelIds, true)
+        return restApi.getChatRooms(accountLocal.getAccount().token, roomIds, channelIds, true)
                 .doOnSuccess {
                     it.results.roomsInfo.forEach {
                         val participants = it.participants

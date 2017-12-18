@@ -25,7 +25,7 @@ import retrofit2.http.*
 /**
  * Interface yang digunakan untuk berinteraksi dengan Rest API server
  */
-interface QiscusRestApi {
+interface RestApi {
 
     /**
      * Endpoint yang bisa digunakan untuk meminta nonce yang nantinya bisa digunakan untuk

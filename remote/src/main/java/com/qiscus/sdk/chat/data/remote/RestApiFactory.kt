@@ -30,20 +30,20 @@ import retrofit2.converter.gson.GsonConverterFactory
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-object QiscusRestApiFactory {
+object RestApiFactory {
 
-    fun makeQiscusRestApi(baseUrl: String, okHttpClient: OkHttpClient): QiscusRestApi {
+    fun makeQiscusRestApi(baseUrl: String, okHttpClient: OkHttpClient): RestApi {
         return makeService(baseUrl, okHttpClient, makeGson())
     }
 
-    private fun makeService(baseUrl: String, okHttpClient: OkHttpClient, gson: Gson): QiscusRestApi {
+    private fun makeService(baseUrl: String, okHttpClient: OkHttpClient, gson: Gson): RestApi {
         val retrofit = Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
-        return retrofit.create(QiscusRestApi::class.java)
+        return retrofit.create(RestApi::class.java)
     }
 
     private fun makeGson(): Gson {
