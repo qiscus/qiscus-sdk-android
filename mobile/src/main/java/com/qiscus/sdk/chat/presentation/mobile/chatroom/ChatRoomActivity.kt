@@ -95,8 +95,8 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         adapter.delegatesManager
                 .addDelegate(DefaultMultiLineAdapterDelegate(this, this, this))
                 .addDelegate(DefaultAdapterDelegate(this, this, this))
-                .addDelegate(DefaultOpponentMultiLineAdapterDelegate(this, this, this))
-                .addDelegate(DefaultOpponentAdapterDelegate(this, this, this))
+                .addDelegate(OpponentDefaultMultiLineAdapterDelegate(this, this, this))
+                .addDelegate(OpponentDefaultAdapterDelegate(this, this, this))
 
         messageRecyclerView.adapter = adapter
         messageRecyclerView.setHasFixedSize(true)

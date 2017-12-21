@@ -16,7 +16,7 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class DefaultOpponentAdapterDelegate @JvmOverloads constructor(private val context: Context,
+class OpponentDefaultAdapterDelegate @JvmOverloads constructor(private val context: Context,
                                                                private val itemClickListener: ItemClickListener? = null,
                                                                private val itemLongClickListener: ItemLongClickListener? = null)
     : MessageAdapterDelegate() {
@@ -31,7 +31,7 @@ class DefaultOpponentAdapterDelegate @JvmOverloads constructor(private val conte
     }
 }
 
-class DefaultOpponentMultiLineAdapterDelegate @JvmOverloads constructor(private val context: Context,
+class OpponentDefaultMultiLineAdapterDelegate @JvmOverloads constructor(private val context: Context,
                                                                         private val itemClickListener: ItemClickListener? = null,
                                                                         private val itemLongClickListener: ItemLongClickListener? = null)
     : MessageAdapterDelegate() {
