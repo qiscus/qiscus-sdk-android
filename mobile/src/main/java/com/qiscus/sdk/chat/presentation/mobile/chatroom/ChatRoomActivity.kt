@@ -74,18 +74,22 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
             throw RuntimeException("Please provide room id!")
         }
 
-        adapter.delegatesManager.addDelegate(LinkAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(OpponentLinkAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(MultiLineTextAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(OpponentMultiLineTextAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(TextAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(OpponentTextAdapterDelegate(this, this, this))
+        adapter.delegatesManager
+                .addDelegate(LinkAdapterDelegate(this, this, this))
+                .addDelegate(OpponentLinkAdapterDelegate(this, this, this))
+                .addDelegate(MultiLineTextAdapterDelegate(this, this, this))
+                .addDelegate(OpponentMultiLineTextAdapterDelegate(this, this, this))
+                .addDelegate(TextAdapterDelegate(this, this, this))
+                .addDelegate(OpponentTextAdapterDelegate(this, this, this))
+                .addDelegate(ContactAdapterDelegate(this, this, this))
+                .addDelegate(OpponentContactAdapterDelegate(this, this, this))
 
         //Fallback adapter delegate
-        adapter.delegatesManager.addDelegate(DefaultMultiLineAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(DefaultAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(DefaultOpponentMultiLineAdapterDelegate(this, this, this))
-        adapter.delegatesManager.addDelegate(DefaultOpponentAdapterDelegate(this, this, this))
+        adapter.delegatesManager
+                .addDelegate(DefaultMultiLineAdapterDelegate(this, this, this))
+                .addDelegate(DefaultAdapterDelegate(this, this, this))
+                .addDelegate(DefaultOpponentMultiLineAdapterDelegate(this, this, this))
+                .addDelegate(DefaultOpponentAdapterDelegate(this, this, this))
 
         messageRecyclerView.adapter = adapter
         messageRecyclerView.setHasFixedSize(true)
