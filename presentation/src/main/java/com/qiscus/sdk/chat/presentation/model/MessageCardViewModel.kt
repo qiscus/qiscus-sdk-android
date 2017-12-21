@@ -33,7 +33,7 @@ open class MessageCardViewModel
     }
 
     val cardDescription by lazy {
-        message.type.payload.optDouble("description")
+        message.type.payload.optString("description")
     }
 
     val cardUrl by lazy {
