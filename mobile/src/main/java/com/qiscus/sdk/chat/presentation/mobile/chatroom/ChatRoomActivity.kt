@@ -83,6 +83,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
                 .addDelegate(OpponentTextAdapterDelegate(this, this, this))
                 .addDelegate(ContactAdapterDelegate(this, this, this))
                 .addDelegate(OpponentContactAdapterDelegate(this, this, this))
+                .addDelegate(SystemEventAdapterDelegate(this))
 
         //Fallback adapter delegate
         adapter.delegatesManager
