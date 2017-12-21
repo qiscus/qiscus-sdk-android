@@ -2,4 +2,10 @@
 <resources>
     <string name="qiscus_web_preview_default_title">Untitled</string>
     <string name="qiscus_web_preview_default_description">No description!</string>
+
+    <string name="qiscus_date_format">MMMM dd, yyyy</string>
+    <string name="qiscus_hour_format">hh:mm a</string>
+    <string name="qiscus_today">Today</string>
+    <string name="qiscus_few_seconds_ago">in few seconds ago</string>
+    <string name="qiscus_date_and_time">%1$s at %2$s</string>
 </resources>

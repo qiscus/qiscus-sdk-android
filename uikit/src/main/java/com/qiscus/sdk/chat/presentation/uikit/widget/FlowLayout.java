@@ -572,8 +572,8 @@ public class FlowLayout extends ViewGroup {
 
 
         void setPosition(int x, int y) {
-            x = x;
-            y = y;
+            this.x = x;
+            this.y = y;
         }
 
         int getInlineStartLength() {
@@ -581,7 +581,7 @@ public class FlowLayout extends ViewGroup {
         }
 
         void setInlineStartLength(int inlineStartLength) {
-            inlineStartLength = inlineStartLength;
+            this.inlineStartLength = inlineStartLength;
         }
 
         int getLength() {
@@ -589,7 +589,7 @@ public class FlowLayout extends ViewGroup {
         }
 
         void setLength(int length) {
-            length = length;
+            this.length = length;
         }
 
         int getThickness() {
@@ -597,7 +597,7 @@ public class FlowLayout extends ViewGroup {
         }
 
         void setThickness(int thickness) {
-            thickness = thickness;
+            this.thickness = thickness;
         }
 
         int getInlineStartThickness() {
@@ -605,7 +605,7 @@ public class FlowLayout extends ViewGroup {
         }
 
         void setInlineStartThickness(int inlineStartThickness) {
-            inlineStartThickness = inlineStartThickness;
+            this.inlineStartThickness = inlineStartThickness;
         }
 
         int getSpacingLength() {
@@ -637,7 +637,7 @@ public class FlowLayout extends ViewGroup {
         }
 
         public void setGravity(int gravity) {
-            gravity = gravity;
+            this.gravity = gravity;
         }
 
         public float getWeight() {
@@ -645,7 +645,7 @@ public class FlowLayout extends ViewGroup {
         }
 
         public void setWeight(float weight) {
-            weight = weight;
+            this.weight = weight;
         }
 
         public boolean isNewLine() {
@@ -653,7 +653,7 @@ public class FlowLayout extends ViewGroup {
         }
 
         public void setNewLine(boolean newLine) {
-            newLine = newLine;
+            this.newLine = newLine;
         }
     }
 }

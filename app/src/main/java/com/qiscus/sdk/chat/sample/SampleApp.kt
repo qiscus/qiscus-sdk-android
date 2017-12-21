@@ -20,6 +20,8 @@ import android.app.Application
 import com.facebook.stetho.Stetho
 import com.qiscus.jupuk.Jupuk
 import com.qiscus.sdk.chat.core.Qiscus
+import com.vanniktech.emoji.EmojiManager
+import com.vanniktech.emoji.one.EmojiOneProvider
 
 /**
  * Created on : August 19, 2017
@@ -33,5 +35,6 @@ class SampleApp : Application() {
         Qiscus.init(this, "dragongo")
         Stetho.initializeWithDefaults(this)
         Jupuk.init(this)
+        EmojiManager.install(EmojiOneProvider())
     }
 }

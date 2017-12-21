@@ -67,6 +67,7 @@ dependencies {
     compile mobileDependencies.supportDesign
     compile mobileDependencies.rxAndroid
     compile mobileDependencies.glide
+    compile mobileDependencies.emoji
 
     testImplementation mobileTestDependencies.kotlinJUnit
 

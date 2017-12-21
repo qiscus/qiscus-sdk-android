@@ -22,15 +22,17 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.DefaultViewHolderFactory
-import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.ImageViewHolderFactory
-import com.qiscus.sdk.chat.presentation.mobile.chatroom.viewholder.TextViewHolderFactory
+import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.*
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
-import com.qiscus.sdk.chat.presentation.uikit.adapter.message.MessageAdapter
+import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
+import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.adapter.MessageAdapter
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
 /**
@@ -53,7 +55,8 @@ fun Context.chatRoomIntent(roomId: String): Intent {
 
 private const val INTENT_ROOM_ID = "room_id"
 
-class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMessageContract.View {
+class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMessageContract.View,
+        ItemClickListener, ItemLongClickListener {
 
     private lateinit var listMessagePresenter: ListMessageContract.Presenter
     private lateinit var sendMessagePresenter: SendMessageContract.Presenter
@@ -71,15 +74,24 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
             throw RuntimeException("Please provide room id!")
         }
 
+        adapter.delegatesManager.addDelegate(TextAdapterDelegate(this, this, this))
+        adapter.delegatesManager.addDelegate(OpponentTextAdapterDelegate(this, this, this))
 
-        adapter.registerViewHolderFactory(TextViewHolderFactory(this))
-        adapter.registerViewHolderFactory(ImageViewHolderFactory(this))
-        adapter.registerViewHolderFactory(DefaultViewHolderFactory(this))
+        //Fallback adapter delegate
+        adapter.delegatesManager.addDelegate(DefaultMultiLineAdapterDelegate(this, this, this))
+        adapter.delegatesManager.addDelegate(DefaultAdapterDelegate(this, this, this))
+        adapter.delegatesManager.addDelegate(DefaultOpponentMultiLineAdapterDelegate(this, this, this))
+        adapter.delegatesManager.addDelegate(DefaultOpponentAdapterDelegate(this, this, this))
 
         messageRecyclerView.adapter = adapter
-        messageRecyclerView.layoutManager = LinearLayoutManager(this)
         messageRecyclerView.setHasFixedSize(true)
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.reverseLayout = true
+        messageRecyclerView.layoutManager = layoutManager
+    }
 
+    override fun onStart() {
+        super.onStart()
         init()
     }
 
@@ -92,14 +104,9 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         listMessagePresenter.start()
     }
 
-    override fun onStart() {
-        super.onStart()
-        init()
-    }
-
     override fun addMessage(messageViewModel: MessageViewModel) {
         adapter.addOrUpdate(messageViewModel)
-        messageRecyclerView.smoothScrollToPosition(adapter.itemCount)
+        messageRecyclerView.smoothScrollToPosition(0)
     }
 
     override fun updateMessage(messageViewModel: MessageViewModel) {
@@ -108,6 +115,14 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
 
     override fun removeMessage(messageViewModel: MessageViewModel) {
         adapter.removeMessage(messageViewModel)
+    }
+
+    override fun onItemClick(view: View, position: Int) {
+        Toast.makeText(this, "click: ${adapter.data[position].spannableMessage}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onItemLongClick(view: View, position: Int) {
+        Toast.makeText(this, "long click: ${adapter.data[position].spannableMessage}", Toast.LENGTH_SHORT).show()
     }
 
     override fun clearTextField() {
