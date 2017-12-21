@@ -53,7 +53,7 @@ class OpponentMultiLineTextAdapterDelegate @JvmOverloads constructor(private val
     }
 }
 
-class OpponentTextViewHolder @JvmOverloads constructor(view: View,
+open class OpponentTextViewHolder @JvmOverloads constructor(view: View,
                                                        itemClickListener: ItemClickListener? = null,
                                                        itemLongClickListener: ItemLongClickListener? = null)
     : OpponentMessageViewHolder(view, itemClickListener, itemLongClickListener) {

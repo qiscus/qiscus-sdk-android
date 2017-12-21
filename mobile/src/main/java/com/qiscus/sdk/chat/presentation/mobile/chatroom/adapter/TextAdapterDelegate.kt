@@ -53,7 +53,7 @@ class MultiLineTextAdapterDelegate @JvmOverloads constructor(private val context
     }
 }
 
-class TextViewHolder @JvmOverloads constructor(view: View,
+open class TextViewHolder @JvmOverloads constructor(view: View,
                                                itemClickListener: ItemClickListener? = null,
                                                itemLongClickListener: ItemLongClickListener? = null)
     : MessageViewHolder(view, itemClickListener, itemLongClickListener) {

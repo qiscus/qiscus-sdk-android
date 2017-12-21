@@ -74,6 +74,8 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
             throw RuntimeException("Please provide room id!")
         }
 
+        adapter.delegatesManager.addDelegate(LinkAdapterDelegate(this, this, this))
+        adapter.delegatesManager.addDelegate(OpponentLinkAdapterDelegate(this, this, this))
         adapter.delegatesManager.addDelegate(MultiLineTextAdapterDelegate(this, this, this))
         adapter.delegatesManager.addDelegate(OpponentMultiLineTextAdapterDelegate(this, this, this))
         adapter.delegatesManager.addDelegate(TextAdapterDelegate(this, this, this))
