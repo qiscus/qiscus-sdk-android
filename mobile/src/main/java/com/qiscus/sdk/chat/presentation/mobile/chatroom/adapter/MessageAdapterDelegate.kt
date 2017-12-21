@@ -53,8 +53,8 @@ abstract class MessageAdapterDelegate : AdapterDelegate<SortedList<MessageViewMo
 }
 
 abstract class BaseMessageViewHolder @JvmOverloads constructor(view: View,
-                                                               private var itemClickListener: ItemClickListener? = null,
-                                                               private var itemLongClickListener: ItemLongClickListener? = null)
+                                                               protected var itemClickListener: ItemClickListener? = null,
+                                                               protected var itemLongClickListener: ItemLongClickListener? = null)
     : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnLongClickListener {
 
     var needToShowDate: Boolean = false
