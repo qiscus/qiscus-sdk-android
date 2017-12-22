@@ -81,6 +81,8 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
                 .addDelegate(OpponentMultiLineTextAdapterDelegate(this, this, this))
                 .addDelegate(TextAdapterDelegate(this, this, this))
                 .addDelegate(OpponentTextAdapterDelegate(this, this, this))
+                .addDelegate(VideoAdapterDelegate(this, this, this))
+                .addDelegate(OpponentVideoAdapterDelegate(this, this, this))
                 .addDelegate(ImageAdapterDelegate(this, this, this))
                 .addDelegate(OpponentImageAdapterDelegate(this, this, this))
                 .addDelegate(ContactAdapterDelegate(this, this, this))
