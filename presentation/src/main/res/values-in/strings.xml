@@ -13,4 +13,7 @@
     <string name="qiscus_left_room">meninggalkan room</string>
     <string name="qiscus_changed_room_name">mengubah nama room menjadi</string>
     <string name="qiscus_changed_room_avatar">mengubah gambar room</string>
+
+    <string name="qiscus_unknown_file_type">Tipe tidak diketahui</string>
+    <string name="qiscus_file_type">Berkas %s</string>
 </resources>

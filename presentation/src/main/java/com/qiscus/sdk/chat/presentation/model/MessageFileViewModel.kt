@@ -3,6 +3,7 @@ package com.qiscus.sdk.chat.presentation.model
 import android.support.annotation.ColorInt
 import android.text.Spannable
 import com.qiscus.sdk.chat.core.Qiscus
+import com.qiscus.sdk.chat.domain.common.getExtension
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.repository.UserRepository
@@ -48,5 +49,14 @@ open class MessageFileViewModel
 
     override fun determineSpannableMessage(): Spannable {
         return readableMessage.toSpannable(account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
+    }
+
+    val fileType by lazy {
+        val extension = message.attachmentName.getExtension()
+        if (extension.isBlank()) {
+            return@lazy getString(resId = R.string.qiscus_unknown_file_type)
+        }
+
+        return@lazy getString(resId = R.string.qiscus_file_type, formatArgs = *arrayOf(extension))
     }
 }

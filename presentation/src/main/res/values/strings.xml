@@ -12,4 +12,7 @@
     <string name="qiscus_left_room">left room</string>
     <string name="qiscus_changed_room_name">changed room name to</string>
     <string name="qiscus_changed_room_avatar">changed room avatar</string>
+
+    <string name="qiscus_unknown_file_type">Unknown Type</string>
+    <string name="qiscus_file_type">%s File</string>
 </resources>
