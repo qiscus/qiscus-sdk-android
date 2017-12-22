@@ -25,7 +25,7 @@ open class MessageVideoViewModel
                           @ColorInt mentionMeColor: Int,
                           mentionClickListener: MentionClickHandler? = null)
 
-    : MessageFileViewModel(message, mimeType, account, userRepository, mentionAllColor, mentionOtherColor,
+    : MessageImageViewModel(message, mimeType, account, userRepository, mentionAllColor, mentionOtherColor,
         mentionMeColor, mentionClickListener) {
 
     override fun determineReadableMessage(): String {

@@ -8,6 +8,7 @@ import com.qiscus.sdk.chat.domain.repository.UserRepository
 import com.qiscus.sdk.chat.presentation.MentionClickHandler
 import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.util.getString
+import com.qiscus.sdk.chat.presentation.util.toReadableText
 
 /**
  * Created on : October 05, 2017
@@ -34,5 +35,21 @@ open class MessageImageViewModel
         } else {
             "\uD83D\uDCF7 " + message.caption
         }
+    }
+
+    val blurryThumbnail by lazy {
+        var i = message.attachmentUrl.indexOf("upload/")
+        if (i > 0) {
+            i += 7
+            var blurryImageUrl = message.attachmentUrl.substring(0, i)
+            blurryImageUrl += "w_320,h_320,c_limit,e_blur:300/"
+            var file = message.attachmentUrl.substring(i)
+            i = file.lastIndexOf('.')
+            if (i > 0) {
+                file = file.substring(0, i)
+            }
+            return@lazy blurryImageUrl + file + ".jpg"
+        }
+        return@lazy message.attachmentUrl
     }
 }
