@@ -17,13 +17,13 @@ abstract class AdapterDelegate<in T> {
 
     abstract fun onBindViewHolder(data: T, position: Int, holder: RecyclerView.ViewHolder)
 
-    fun onViewRecycled(viewHolder: RecyclerView.ViewHolder) {}
+    open fun onViewRecycled(viewHolder: RecyclerView.ViewHolder) {}
 
-    fun onFailedToRecycleView(holder: RecyclerView.ViewHolder): Boolean {
+    open fun onFailedToRecycleView(holder: RecyclerView.ViewHolder): Boolean {
         return false
     }
 
-    fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {}
+    open fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {}
 
-    fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {}
+    open fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {}
 }
