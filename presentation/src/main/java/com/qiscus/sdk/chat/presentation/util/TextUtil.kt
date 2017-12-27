@@ -9,7 +9,7 @@ import android.view.View
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.model.MentionClickListener
 
 /**
  * Created on : October 05, 2017
@@ -75,7 +75,7 @@ fun String.toReadableText(userRepository: UserRepository): String {
 fun String.toSpannable(account: Account,
                        userRepository: UserRepository,
                        @ColorInt mentionColor: Int,
-                       mentionClickListener: MentionClickHandler? = null): Spannable {
+                       mentionClickListener: MentionClickListener? = null): Spannable {
 
     return toSpannable(account, userRepository, mentionColor, mentionColor, mentionColor, mentionClickListener)
 }
@@ -86,7 +86,7 @@ fun String.toSpannable(account: Account,
                        @ColorInt mentionAllColor: Int,
                        @ColorInt mentionOtherColor: Int,
                        @ColorInt mentionMeColor: Int,
-                       mentionClickListener: MentionClickHandler? = null): Spannable {
+                       mentionClickListener: MentionClickListener? = null): Spannable {
     if (isBlank()) {
         return SpannableString("")
     }

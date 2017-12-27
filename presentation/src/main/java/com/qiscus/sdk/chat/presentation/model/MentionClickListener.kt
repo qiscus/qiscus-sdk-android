@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation
+package com.qiscus.sdk.chat.presentation.model
 
 import com.qiscus.sdk.chat.domain.model.User
 
@@ -8,6 +8,6 @@ import com.qiscus.sdk.chat.domain.model.User
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-interface MentionClickHandler {
+interface MentionClickListener {
     fun onMentionClick(user: User)
 }

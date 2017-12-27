@@ -6,7 +6,7 @@ import com.qiscus.sdk.chat.domain.interactor.message.*
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.model.MessageId
 import com.qiscus.sdk.chat.domain.model.MessageState
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.model.MentionClickListener
 import com.qiscus.sdk.chat.presentation.mapper.toViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 
@@ -25,7 +25,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
                            private @ColorInt val mentionAllColor: Int,
                            private @ColorInt val mentionOtherColor: Int,
                            private @ColorInt val mentionMeColor: Int,
-                           private val mentionClickHandler: MentionClickHandler? = null) : ListMessageContract.Presenter {
+                           private val mentionClickListener: MentionClickListener? = null) : ListMessageContract.Presenter {
 
     private lateinit var roomId: String
 
@@ -81,6 +81,6 @@ class ListMessagePresenter(val view: ListMessageContract.View,
 
 
     private fun toViewModel(message: Message): MessageViewModel {
-        return message.toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)
+        return message.toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
     }
 }

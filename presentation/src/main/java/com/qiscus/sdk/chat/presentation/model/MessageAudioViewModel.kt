@@ -5,7 +5,6 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
 import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.util.getString
 
@@ -23,7 +22,7 @@ open class MessageAudioViewModel
                           @ColorInt mentionAllColor: Int,
                           @ColorInt mentionOtherColor: Int,
                           @ColorInt mentionMeColor: Int,
-                          mentionClickListener: MentionClickHandler? = null)
+                          mentionClickListener: MentionClickListener? = null)
     : MessageFileViewModel(message, mimeType, account, userRepository, mentionAllColor, mentionOtherColor,
         mentionMeColor, mentionClickListener) {
 

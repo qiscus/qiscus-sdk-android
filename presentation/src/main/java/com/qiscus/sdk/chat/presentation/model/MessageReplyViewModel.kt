@@ -4,7 +4,6 @@ import android.text.Spannable
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.*
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
 import com.qiscus.sdk.chat.presentation.util.toReadableText
 import com.qiscus.sdk.chat.presentation.util.toSpannable
 import java.util.*
@@ -22,7 +21,7 @@ open class MessageReplyViewModel
                           mentionAllColor: Int,
                           mentionOtherColor: Int,
                           mentionMeColor: Int,
-                          mentionClickListener: MentionClickHandler? = null)
+                          mentionClickListener: MentionClickListener? = null)
     : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
 
     val repliedMessage by lazy {

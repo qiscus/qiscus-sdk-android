@@ -4,7 +4,6 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
 
 /**
  * Created on : October 05, 2017
@@ -19,5 +18,5 @@ open class MessageTextViewModel
                           mentionAllColor: Int,
                           mentionOtherColor: Int,
                           mentionMeColor: Int,
-                          mentionClickListener: MentionClickHandler? = null)
+                          mentionClickListener: MentionClickListener? = null)
     : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)

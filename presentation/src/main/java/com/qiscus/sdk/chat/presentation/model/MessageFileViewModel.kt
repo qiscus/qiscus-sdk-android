@@ -7,7 +7,6 @@ import com.qiscus.sdk.chat.domain.common.getExtension
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
 import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.util.getString
 import com.qiscus.sdk.chat.presentation.util.toReadableText
@@ -27,7 +26,7 @@ open class MessageFileViewModel
                           @ColorInt mentionAllColor: Int,
                           @ColorInt mentionOtherColor: Int,
                           @ColorInt mentionMeColor: Int,
-                          mentionClickListener: MentionClickHandler? = null)
+                          mentionClickListener: MentionClickListener? = null)
 
     : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
 

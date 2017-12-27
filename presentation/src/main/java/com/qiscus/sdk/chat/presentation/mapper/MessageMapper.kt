@@ -21,7 +21,7 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.data.util.MimeTypeGuesser
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.model.MentionClickListener
 import com.qiscus.sdk.chat.presentation.model.*
 
 /**
@@ -31,8 +31,8 @@ import com.qiscus.sdk.chat.presentation.model.*
  * GitHub     : https://github.com/zetbaitsu
  */
 @JvmOverloads
-fun Message.toViewModel(@ColorInt mentionColor: Int, mentionClickHandler: MentionClickHandler? = null): MessageViewModel {
-    return toViewModel(mentionColor, mentionColor, mentionColor, mentionClickHandler)
+fun Message.toViewModel(@ColorInt mentionColor: Int, mentionClickListener: MentionClickListener? = null): MessageViewModel {
+    return toViewModel(mentionColor, mentionColor, mentionColor, mentionClickListener)
 }
 
 @JvmOverloads
@@ -40,11 +40,11 @@ fun Message.toViewModel(
         @ColorInt mentionAllColor: Int,
         @ColorInt mentionOtherColor: Int,
         @ColorInt mentionMeColor: Int,
-        mentionClickHandler: MentionClickHandler? = null
+        mentionClickListener: MentionClickListener? = null
 ): MessageViewModel {
 
     if (this is FileAttachmentMessage) {
-        return determineFileViewModel(this, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)
+        return determineFileViewModel(this, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
     }
 
     when (type.rawType) {
@@ -53,7 +53,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         "account_linking" -> return MessageAccountLinkingViewModel(
@@ -61,7 +61,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         "buttons" -> return MessageButtonsViewModel(
@@ -69,7 +69,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         "card" -> return MessageCardViewModel(
@@ -77,7 +77,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         "contact_person" -> return MessageContactViewModel(
@@ -85,7 +85,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         "location" -> return MessageLocationViewModel(
@@ -93,7 +93,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         "system_event" -> return MessageSystemEventViewModel(
@@ -101,7 +101,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         "reply" -> return MessageReplyViewModel(
@@ -109,7 +109,7 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
         else -> return MessageViewModel(
@@ -117,28 +117,28 @@ fun Message.toViewModel(
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
-                mentionClickListener = mentionClickHandler
+                mentionClickListener = mentionClickListener
 
         )
     }
 }
 
 private fun determineFileViewModel(message: FileAttachmentMessage, mentionAllColor: Int, mentionOtherColor: Int,
-                                   mentionMeColor: Int, mentionClickHandler: MentionClickHandler?,
+                                   mentionMeColor: Int, mentionClickListener: MentionClickListener?,
                                    mimeTypeGuesser: MimeTypeGuesser = Qiscus.instance.component.dataComponent.mimeTypeGuesser)
         : MessageFileViewModel {
 
     val type = mimeTypeGuesser.getMimeTypeFromFileName(message.attachmentName)
     return when {
         type == null -> MessageFileViewModel(message, mentionAllColor = mentionAllColor, mentionOtherColor = mentionOtherColor,
-                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickHandler, mimeType = "")
+                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickListener, mimeType = "")
         type.contains("image") -> MessageImageViewModel(message, mentionAllColor = mentionAllColor, mentionOtherColor = mentionOtherColor,
-                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickHandler, mimeType = type)
+                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickListener, mimeType = type)
         type.contains("video") -> MessageVideoViewModel(message, mentionAllColor = mentionAllColor, mentionOtherColor = mentionOtherColor,
-                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickHandler, mimeType = type)
+                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickListener, mimeType = type)
         type.contains("audio") -> MessageAudioViewModel(message, mentionAllColor = mentionAllColor, mentionOtherColor = mentionOtherColor,
-                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickHandler, mimeType = type)
+                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickListener, mimeType = type)
         else -> MessageFileViewModel(message, mentionAllColor = mentionAllColor, mentionOtherColor = mentionOtherColor,
-                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickHandler, mimeType = type)
+                mentionMeColor = mentionMeColor, mentionClickListener = mentionClickListener, mimeType = type)
     }
 }

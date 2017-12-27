@@ -6,7 +6,6 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.repository.UserRepository
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
 import com.qiscus.sdk.chat.presentation.util.toReadableText
 import com.qiscus.sdk.chat.presentation.util.toSpannable
 
@@ -23,7 +22,7 @@ open class MessageViewModel
                           @ColorInt protected val mentionAllColor: Int,
                           @ColorInt protected val mentionOtherColor: Int,
                           @ColorInt protected val mentionMeColor: Int,
-                          protected val mentionClickListener: MentionClickHandler? = null) {
+                          protected val mentionClickListener: MentionClickListener? = null) {
 
     val readableMessage by lazy {
         determineReadableMessage()

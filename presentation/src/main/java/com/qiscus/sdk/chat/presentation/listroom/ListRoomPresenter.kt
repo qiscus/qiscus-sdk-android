@@ -5,7 +5,7 @@ import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.message.GetMessages
 import com.qiscus.sdk.chat.domain.interactor.message.ListenNewMessage
 import com.qiscus.sdk.chat.domain.interactor.room.*
-import com.qiscus.sdk.chat.presentation.MentionClickHandler
+import com.qiscus.sdk.chat.presentation.model.MentionClickListener
 import com.qiscus.sdk.chat.presentation.mapper.toViewModel
 import com.qiscus.sdk.chat.presentation.model.RoomViewModel
 
@@ -26,7 +26,7 @@ class ListRoomPresenter(val view: ListRoomContract.View,
                         private @ColorInt val mentionAllColor: Int,
                         private @ColorInt val mentionOtherColor: Int,
                         private @ColorInt val mentionMeColor: Int,
-                        private val mentionClickHandler: MentionClickHandler? = null) : ListRoomContract.Presenter {
+                        private val mentionClickListener: MentionClickListener? = null) : ListRoomContract.Presenter {
 
     override fun start() {
         listenNewMessage()
@@ -40,7 +40,7 @@ class ListRoomPresenter(val view: ListRoomContract.View,
         getMessages.execute(GetMessages.Params(roomViewModel.room.id, limit = 1), Action {
             if (it.messages.isNotEmpty()) {
                 roomViewModel.lastMessage = it.messages.first()
-                        .toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)
+                        .toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
             }
             onSuccess.call(roomViewModel)
         })
@@ -49,7 +49,7 @@ class ListRoomPresenter(val view: ListRoomContract.View,
     private fun listenNewMessage() {
         listenNewMessage.execute(null, Action {
             view.addOrUpdateRoom(RoomViewModel(it.room,
-                    it.toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickHandler)))
+                    it.toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)))
         })
     }
 
