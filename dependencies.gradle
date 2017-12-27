@@ -24,16 +24,15 @@ allprojects {
 
 ext {
     //Android
-    androidBuildToolsVersion = "26.0.2"
     androidMinSdkVersion = 16
-    androidTargetSdkVersion = 26
-    androidCompileSdkVersion = 26
+    androidTargetSdkVersion = 27
+    androidCompileSdkVersion = 27
 
     //Libraries
     kotlinVersion = '1.2.10'
 
-    supportLibraryVersion = '26.1.0'
-    androidAnnotationsVersion = '26.1.0'
+    supportLibraryVersion = '27.0.2'
+    androidAnnotationsVersion = '27.0.2'
 
     rxKotlinVersion = '2.1.0'
     rxAndroidVersion = '2.0.1'
