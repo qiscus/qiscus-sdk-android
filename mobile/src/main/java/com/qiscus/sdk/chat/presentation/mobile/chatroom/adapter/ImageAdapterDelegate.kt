@@ -73,10 +73,25 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
     }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
-        renderCaption(messageViewModel as MessageImageViewModel)
+        renderImage(messageViewModel as MessageImageViewModel)
+        renderCaption(messageViewModel)
         renderDownloadIcon(messageViewModel)
-        renderProgress(messageViewModel)
-        renderImage(messageViewModel)
+    }
+
+    open protected fun renderImage(messageViewModel: MessageImageViewModel) {
+        if ((messageViewModel.message as FileAttachmentMessage).file != null) {
+            Glide.with(thumbnailView)
+                    .load((messageViewModel.message as FileAttachmentMessage).file)
+                    .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
+                            .error(R.drawable.qiscus_image_place_holder)
+                    ).into(thumbnailView)
+        } else {
+            Glide.with(thumbnailView)
+                    .load(messageViewModel.blurryThumbnail)
+                    .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
+                            .error(R.drawable.qiscus_image_place_holder)
+                    ).into(thumbnailView)
+        }
     }
 
     open protected fun renderCaption(messageViewModel: MessageImageViewModel) {
@@ -95,42 +110,21 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
             MessageState.SENDING -> R.drawable.ic_qiscus_upload
             else -> R.drawable.ic_qiscus_download
         })
-    }
 
-    open protected fun renderProgress(messageViewModel: MessageImageViewModel) {
-        val attachmentProgress: FileAttachmentProgress? = messageViewModel.progress
-        if (attachmentProgress != null) {
-            progressView.progress = attachmentProgress.progress
-            if (attachmentProgress.progress in 1..99) {
+        if ((messageViewModel.message as FileAttachmentMessage).file != null
+                && messageViewModel.message.state.intValue >= MessageState.ON_SERVER.intValue) {
+            downloadIconView.visibility = View.GONE
+            progressView.visibility = View.GONE
+        } else {
+            val attachmentProgress: FileAttachmentProgress? = messageViewModel.progress
+            if (attachmentProgress != null && attachmentProgress.progress in 0..99) {
+                progressView.progress = attachmentProgress.progress
                 progressView.visibility = View.VISIBLE
                 downloadIconView.visibility = View.GONE
             } else {
                 progressView.visibility = View.GONE
                 downloadIconView.visibility = View.VISIBLE
             }
-        } else {
-            progressView.visibility = View.GONE
-            downloadIconView.visibility = View.VISIBLE
-        }
-    }
-
-    open protected fun renderImage(messageViewModel: MessageImageViewModel) {
-        if ((messageViewModel.message as FileAttachmentMessage).file != null) {
-            Glide.with(thumbnailView)
-                    .load((messageViewModel.message as FileAttachmentMessage).file)
-                    .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
-                            .error(R.drawable.qiscus_image_place_holder)
-                    ).into(thumbnailView)
-            downloadIconView.visibility = View.GONE
-            progressView.visibility = View.GONE
-        } else {
-            Glide.with(thumbnailView)
-                    .load(messageViewModel.blurryThumbnail)
-                    .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
-                            .error(R.drawable.qiscus_image_place_holder)
-                    ).into(thumbnailView)
-            downloadIconView.visibility = View.VISIBLE
-            progressView.visibility = View.GONE
         }
     }
 }

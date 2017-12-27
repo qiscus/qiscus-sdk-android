@@ -112,7 +112,7 @@ open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
             progressView.visibility = View.GONE
         } else {
             val attachmentProgress: FileAttachmentProgress? = messageViewModel.progress
-            if (attachmentProgress != null && attachmentProgress.progress in 1..99) {
+            if (attachmentProgress != null && attachmentProgress.progress in 0..99) {
                 progressView.progress = attachmentProgress.progress
                 progressView.visibility = View.VISIBLE
                 downloadIconView.visibility = View.GONE
