@@ -23,11 +23,11 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.*
+import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
@@ -142,12 +142,16 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         adapter.removeMessage(messageViewModel)
     }
 
+    override fun openImageViewer(messageImageViewModel: MessageImageViewModel) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onItemClick(view: View, position: Int) {
-        Toast.makeText(this, "click: ${adapter.data[position].spannableMessage}", Toast.LENGTH_SHORT).show()
+        listMessagePresenter.onMessageClick(adapter.data[position])
     }
 
     override fun onItemLongClick(view: View, position: Int) {
-        Toast.makeText(this, "long click: ${adapter.data[position].spannableMessage}", Toast.LENGTH_SHORT).show()
+        listMessagePresenter.onMessageLongClick(adapter.data[position])
     }
 
     override fun clearTextField() {

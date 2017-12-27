@@ -6,6 +6,7 @@ import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.common.getExtension
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
+import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
 import com.qiscus.sdk.chat.domain.repository.UserRepository
 import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.util.getString
@@ -29,6 +30,8 @@ open class MessageFileViewModel
                           mentionClickListener: MentionClickListener? = null)
 
     : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
+
+    var progress: FileAttachmentProgress? = null
 
     val readableCaption by lazy {
         message.caption.toReadableText(userRepository)

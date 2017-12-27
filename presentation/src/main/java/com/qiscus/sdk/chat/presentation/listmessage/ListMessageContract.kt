@@ -4,6 +4,7 @@ import com.qiscus.sdk.chat.domain.model.MessageId
 import com.qiscus.sdk.chat.domain.model.MessageState
 import com.qiscus.sdk.chat.presentation.BasePresenter
 import com.qiscus.sdk.chat.presentation.BaseView
+import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 
 /**
@@ -20,6 +21,8 @@ interface ListMessageContract {
         fun updateMessage(messageViewModel: MessageViewModel)
 
         fun removeMessage(messageViewModel: MessageViewModel)
+
+        fun openImageViewer(messageImageViewModel: MessageImageViewModel)
     }
 
     interface Presenter : BasePresenter {
@@ -33,6 +36,12 @@ interface ListMessageContract {
 
         fun listenMessageDeleted(roomId: String)
 
+        fun listenMessageProgress(roomId: String)
+
         fun updateMessageState(roomId: String, lastMessageId: MessageId, messageState: MessageState)
+
+        fun onMessageClick(messageViewModel: MessageViewModel)
+
+        fun onMessageLongClick(messageViewModel: MessageViewModel)
     }
 }

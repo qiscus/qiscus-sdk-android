@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
+import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
@@ -78,7 +79,6 @@ open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
         renderImage(messageViewModel as MessageImageViewModel)
         renderCaption(messageViewModel)
         renderDownloadIcon(messageViewModel)
-        renderProgress(messageViewModel)
     }
 
     open protected fun renderImage(messageViewModel: MessageImageViewModel) {
@@ -88,16 +88,12 @@ open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
                     .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
                             .error(R.drawable.qiscus_image_place_holder)
                     ).into(thumbnailView)
-            downloadIconView.visibility = View.GONE
-            progressView.visibility = View.GONE
         } else {
             Glide.with(thumbnailView)
                     .load(messageViewModel.blurryThumbnail)
                     .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
                             .error(R.drawable.qiscus_image_place_holder)
                     ).into(thumbnailView)
-            downloadIconView.visibility = View.VISIBLE
-            progressView.visibility = View.GONE
         }
     }
 
@@ -111,10 +107,19 @@ open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
     }
 
     open protected fun renderDownloadIcon(messageViewModel: MessageImageViewModel) {
-
-    }
-
-    open protected fun renderProgress(messageViewModel: MessageImageViewModel) {
-
+        if ((messageViewModel.message as FileAttachmentMessage).file != null) {
+            downloadIconView.visibility = View.GONE
+            progressView.visibility = View.GONE
+        } else {
+            val attachmentProgress: FileAttachmentProgress? = messageViewModel.progress
+            if (attachmentProgress != null && attachmentProgress.progress in 1..99) {
+                progressView.progress = attachmentProgress.progress
+                progressView.visibility = View.VISIBLE
+                downloadIconView.visibility = View.GONE
+            } else {
+                progressView.visibility = View.GONE
+                downloadIconView.visibility = View.VISIBLE
+            }
+        }
     }
 }

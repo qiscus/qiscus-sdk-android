@@ -1,14 +1,13 @@
 package com.qiscus.sdk.chat.presentation.listmessage
 
 import android.support.annotation.ColorInt
+import android.util.Log
 import com.qiscus.sdk.chat.domain.interactor.Action
+import com.qiscus.sdk.chat.domain.interactor.file.ListenFileAttachmentProgress
 import com.qiscus.sdk.chat.domain.interactor.message.*
-import com.qiscus.sdk.chat.domain.model.Message
-import com.qiscus.sdk.chat.domain.model.MessageId
-import com.qiscus.sdk.chat.domain.model.MessageState
-import com.qiscus.sdk.chat.presentation.model.MentionClickListener
+import com.qiscus.sdk.chat.domain.model.*
 import com.qiscus.sdk.chat.presentation.mapper.toViewModel
-import com.qiscus.sdk.chat.presentation.model.MessageViewModel
+import com.qiscus.sdk.chat.presentation.model.*
 
 /**
  * Created on : October 10, 2017
@@ -21,7 +20,9 @@ class ListMessagePresenter(val view: ListMessageContract.View,
                            private val listenNewMessage: ListenNewMessage,
                            private val listenMessageState: ListenMessageState,
                            private val listenMessageDeleted: ListenMessageDeleted,
+                           private val listenFileAttachmentProgress: ListenFileAttachmentProgress,
                            private val updateMessageState: UpdateMessageState,
+                           private val downloadAttachmentMessage: DownloadAttachmentMessage,
                            private @ColorInt val mentionAllColor: Int,
                            private @ColorInt val mentionOtherColor: Int,
                            private @ColorInt val mentionMeColor: Int,
@@ -33,6 +34,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         listenMessageAdded(roomId)
         listenMessageUpdated(roomId)
         listenMessageDeleted(roomId)
+        listenMessageProgress(roomId)
         loadMessages(roomId, limit = 20)
     }
 
@@ -67,8 +69,39 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         })
     }
 
+    override fun listenMessageProgress(roomId: String) {
+        listenFileAttachmentProgress.execute(null, Action {
+            if (it.fileAttachmentMessage.room.id == roomId) {
+                val messageViewModel: MessageFileViewModel = toViewModel(it.fileAttachmentMessage) as MessageFileViewModel
+                messageViewModel.progress = it
+                view.updateMessage(messageViewModel)
+            }
+        })
+    }
+
     override fun updateMessageState(roomId: String, lastMessageId: MessageId, messageState: MessageState) {
         updateMessageState.execute(UpdateMessageState.Params(roomId, lastMessageId, messageState))
+    }
+
+    override fun onMessageClick(messageViewModel: MessageViewModel) {
+        when (messageViewModel) {
+            is MessageFileViewModel -> downloadFileAttachment(messageViewModel)
+            is MessageTextViewModel -> TODO()
+            else -> TODO()
+        }
+    }
+
+    override fun onMessageLongClick(messageViewModel: MessageViewModel) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun downloadFileAttachment(messageFileViewModel: MessageFileViewModel) {
+        Log.d("ZETRA", "downloadFileAttachment")
+        downloadAttachmentMessage.execute(DownloadAttachmentMessage.Params(messageFileViewModel.message as FileAttachmentMessage), Action {
+            view.updateMessage(toViewModel(it))
+        }, Action {
+            it.printStackTrace()
+        })
     }
 
     override fun stop() {
@@ -77,6 +110,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         listenMessageState.dispose()
         listenMessageDeleted.dispose()
         updateMessageState.dispose()
+        downloadAttachmentMessage.dispose()
     }
 
 
