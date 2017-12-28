@@ -32,7 +32,6 @@ import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
-import com.qiscus.sdk.chat.presentation.uikit.adapter.MessageAdapter
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
 /**
@@ -61,7 +60,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
     private lateinit var listMessagePresenter: ListMessageContract.Presenter
     private lateinit var sendMessagePresenter: SendMessageContract.Presenter
 
-    private val adapter = MessageAdapter()
+    private val adapter = DefaultMessageAdapter()
 
     private var roomId: String? = null
 
@@ -162,5 +161,10 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         super.onStop()
         listMessagePresenter.stop()
         sendMessagePresenter.stop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.onDestroy()
     }
 }
