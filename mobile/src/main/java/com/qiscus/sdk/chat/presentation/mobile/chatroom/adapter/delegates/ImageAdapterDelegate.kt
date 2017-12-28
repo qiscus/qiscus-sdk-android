@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter
+package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 
 import android.content.Context
 import android.support.v7.util.SortedList
@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
+import com.qiscus.sdk.chat.domain.model.MessageState
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
@@ -27,34 +28,34 @@ import com.qiscus.sdk.chat.presentation.uikit.widget.CircleProgress
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class OpponentImageAdapterDelegate @JvmOverloads constructor(private val context: Context,
-                                                             private val itemClickListener: ItemClickListener? = null,
-                                                             private val itemLongClickListener: ItemLongClickListener? = null)
+class ImageAdapterDelegate @JvmOverloads constructor(private val context: Context,
+                                                     private val itemClickListener: ItemClickListener? = null,
+                                                     private val itemLongClickListener: ItemLongClickListener? = null)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
         val messageViewModel = data[position]
-        return messageViewModel is MessageImageViewModel && messageViewModel.message.sender != account.user
+        return messageViewModel is MessageImageViewModel && messageViewModel.message.sender == account.user
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_img, parent, false)
-        return OpponentImageViewHolder(view, itemClickListener, itemLongClickListener)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_img_me, parent, false)
+        return ImageViewHolder(view, itemClickListener, itemLongClickListener)
     }
 
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
-        (holder as OpponentImageViewHolder).attach()
+        (holder as ImageViewHolder).attach()
     }
 
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-        (holder as OpponentImageViewHolder).detach()
+        (holder as ImageViewHolder).detach()
     }
 }
 
-open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
-                                                             itemClickListener: ItemClickListener? = null,
-                                                             itemLongClickListener: ItemLongClickListener? = null)
-    : OpponentMessageViewHolder(view, itemClickListener, itemLongClickListener), ProgressListener, TransferListener {
+open class ImageViewHolder @JvmOverloads constructor(view: View,
+                                                     itemClickListener: ItemClickListener? = null,
+                                                     itemLongClickListener: ItemLongClickListener? = null)
+    : MessageViewHolder(view, itemClickListener, itemLongClickListener), ProgressListener, TransferListener {
 
     private val thumbnailView: ImageView = itemView.findViewById(R.id.thumbnail)
     private val captionView: TextView = itemView.findViewById(R.id.caption)
@@ -79,12 +80,8 @@ open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
         return itemView.findViewById(R.id.time)
     }
 
-    override fun determineSenderNameView(): TextView {
-        return itemView.findViewById(R.id.name)
-    }
-
-    override fun determineSenderAvatarView(): ImageView {
-        return itemView.findViewById(R.id.avatar)
+    override fun determineMessageStateView(): ImageView {
+        return itemView.findViewById(R.id.icon_read)
     }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
@@ -102,14 +99,12 @@ open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
                     .load((messageViewModel.message as FileAttachmentMessage).file)
                     .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
                             .error(R.drawable.qiscus_image_place_holder)
-                            .dontAnimate()
                     ).into(thumbnailView)
         } else {
             Glide.with(thumbnailView)
                     .load(messageViewModel.blurryThumbnail)
                     .apply(RequestOptions().placeholder(R.drawable.qiscus_image_place_holder)
                             .error(R.drawable.qiscus_image_place_holder)
-                            .dontAnimate()
                     ).into(thumbnailView)
         }
     }
@@ -124,7 +119,15 @@ open class OpponentImageViewHolder @JvmOverloads constructor(view: View,
     }
 
     open protected fun renderDownloadIcon(messageViewModel: MessageImageViewModel) {
-        if ((messageViewModel.message as FileAttachmentMessage).file != null) {
+        downloadIconView.setImageResource(when (messageViewModel.message.state) {
+            MessageState.FAILED -> R.drawable.ic_qiscus_upload
+            MessageState.PENDING -> R.drawable.ic_qiscus_upload
+            MessageState.SENDING -> R.drawable.ic_qiscus_upload
+            else -> R.drawable.ic_qiscus_download
+        })
+
+        if ((messageViewModel.message as FileAttachmentMessage).file != null
+                && messageViewModel.message.state.intValue >= MessageState.ON_SERVER.intValue) {
             downloadIconView.visibility = View.GONE
             progressView.visibility = View.GONE
         } else {

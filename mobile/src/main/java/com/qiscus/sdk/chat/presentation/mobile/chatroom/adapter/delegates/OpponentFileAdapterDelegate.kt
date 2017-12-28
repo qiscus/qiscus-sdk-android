@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter
+package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 
 import android.content.Context
 import android.support.v7.util.SortedList
@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
-import com.qiscus.sdk.chat.domain.model.MessageState
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageFileViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
@@ -23,26 +22,26 @@ import com.qiscus.sdk.chat.presentation.uikit.widget.CircleProgress
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class FileAdapterDelegate @JvmOverloads constructor(private val context: Context,
-                                                    private val itemClickListener: ItemClickListener? = null,
-                                                    private val itemLongClickListener: ItemLongClickListener? = null)
+class OpponentFileAdapterDelegate @JvmOverloads constructor(private val context: Context,
+                                                            private val itemClickListener: ItemClickListener? = null,
+                                                            private val itemLongClickListener: ItemLongClickListener? = null)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
         val messageViewModel = data[position]
-        return messageViewModel is MessageFileViewModel && messageViewModel.message.sender == account.user
+        return messageViewModel is MessageFileViewModel && messageViewModel.message.sender != account.user
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_file_me, parent, false)
-        return FileViewHolder(view, itemClickListener, itemLongClickListener)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_file, parent, false)
+        return OpponentFileViewHolder(view, itemClickListener, itemLongClickListener)
     }
 }
 
-open class FileViewHolder @JvmOverloads constructor(view: View,
-                                                    itemClickListener: ItemClickListener? = null,
-                                                    itemLongClickListener: ItemLongClickListener? = null)
-    : MessageViewHolder(view, itemClickListener, itemLongClickListener) {
+open class OpponentFileViewHolder @JvmOverloads constructor(view: View,
+                                                            itemClickListener: ItemClickListener? = null,
+                                                            itemLongClickListener: ItemLongClickListener? = null)
+    : OpponentMessageViewHolder(view, itemClickListener, itemLongClickListener) {
 
     private val fileNameView: TextView = itemView.findViewById(R.id.file_name)
     private val fileTypeView: TextView = itemView.findViewById(R.id.file_type)
@@ -65,8 +64,12 @@ open class FileViewHolder @JvmOverloads constructor(view: View,
         return itemView.findViewById(R.id.time)
     }
 
-    override fun determineMessageStateView(): ImageView {
-        return itemView.findViewById(R.id.icon_read)
+    override fun determineSenderNameView(): TextView {
+        return itemView.findViewById(R.id.name)
+    }
+
+    override fun determineSenderAvatarView(): ImageView {
+        return itemView.findViewById(R.id.avatar)
     }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
@@ -92,12 +95,7 @@ open class FileViewHolder @JvmOverloads constructor(view: View,
     }
 
     open protected fun renderDownloadIcon(messageViewModel: MessageFileViewModel) {
-        downloadIconView.setImageResource(when (messageViewModel.message.state) {
-            MessageState.FAILED -> R.drawable.ic_qiscus_upload
-            MessageState.PENDING -> R.drawable.ic_qiscus_upload
-            MessageState.SENDING -> R.drawable.ic_qiscus_upload
-            else -> R.drawable.ic_qiscus_download
-        })
+        TODO()
     }
 
     open protected fun renderProgress(messageViewModel: MessageFileViewModel) {

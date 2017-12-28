@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter
+package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 
 import android.content.Context
 import android.support.v7.util.SortedList
@@ -8,10 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.model.MessageLocationViewModel
+import com.qiscus.sdk.chat.presentation.model.MessageContactViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
@@ -22,30 +20,29 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class OpponentLocationAdapterDelegate @JvmOverloads constructor(private val context: Context,
+class OpponentContactAdapterDelegate @JvmOverloads constructor(private val context: Context,
                                                                 private val itemClickListener: ItemClickListener? = null,
                                                                 private val itemLongClickListener: ItemLongClickListener? = null)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
         val messageViewModel = data[position]
-        return messageViewModel is MessageLocationViewModel && messageViewModel.message.sender != account.user
+        return messageViewModel is MessageContactViewModel && messageViewModel.message.sender != account.user
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_location, parent, false)
-        return OpponentLocationViewHolder(view, itemClickListener, itemLongClickListener)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_contact, parent, false)
+        return OpponentContactViewHolder(view, itemClickListener, itemLongClickListener)
     }
 }
 
-open class OpponentLocationViewHolder @JvmOverloads constructor(view: View,
-                                                                itemClickListener: ItemClickListener? = null,
-                                                                itemLongClickListener: ItemLongClickListener? = null)
+open class OpponentContactViewHolder @JvmOverloads constructor(view: View,
+                                                               itemClickListener: ItemClickListener? = null,
+                                                               itemLongClickListener: ItemLongClickListener? = null)
     : OpponentMessageViewHolder(view, itemClickListener, itemLongClickListener) {
 
-    private val mapImageView: ImageView = itemView.findViewById(R.id.thumbnail)
-    private val locationNameView: TextView = itemView.findViewById(R.id.location_name)
-    private val locationAddressView: TextView = itemView.findViewById(R.id.location_address)
+    private val contactNameView: TextView = itemView.findViewById(R.id.contact_name)
+    private val contactValueView: TextView = itemView.findViewById(R.id.contact_id)
 
     override fun determineDateView(): TextView {
         return itemView.findViewById(R.id.date)
@@ -72,13 +69,7 @@ open class OpponentLocationViewHolder @JvmOverloads constructor(view: View,
     }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
-        locationNameView.text = (messageViewModel as MessageLocationViewModel).locationName
-        locationAddressView.text = messageViewModel.locationAddress
-        Glide.with(mapImageView)
-                .load(messageViewModel.thumbnailUrl)
-                .apply(RequestOptions()
-                        .placeholder(R.drawable.ic_qiscus_place_holder_map)
-                        .error(R.drawable.ic_qiscus_place_holder_map)
-                ).into(mapImageView)
+        contactNameView.text = (messageViewModel as MessageContactViewModel).contactName
+        contactValueView.text = messageViewModel.contactValue
     }
 }

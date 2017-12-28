@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter
+package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 
 import android.content.Context
 import android.support.v7.util.SortedList
@@ -23,34 +23,34 @@ import com.qiscus.sdk.chat.presentation.uikit.widget.CircleProgress
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class AudioAdapterDelegate @JvmOverloads constructor(private val context: Context,
-                                                     private val itemClickListener: ItemClickListener? = null,
-                                                     private val itemLongClickListener: ItemLongClickListener? = null)
+class OpponentAudioAdapterDelegate @JvmOverloads constructor(private val context: Context,
+                                                             private val itemClickListener: ItemClickListener? = null,
+                                                             private val itemLongClickListener: ItemLongClickListener? = null)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
         val messageViewModel = data[position]
-        return messageViewModel is MessageAudioViewModel && messageViewModel.message.sender == account.user
+        return messageViewModel is MessageAudioViewModel && messageViewModel.message.sender != account.user
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_audio_me, parent, false)
-        return AudioViewHolder(view, itemClickListener, itemLongClickListener)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_audio, parent, false)
+        return OpponentAudioViewHolder(view, itemClickListener, itemLongClickListener)
     }
 
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
-        (holder as AudioViewHolder).attach()
+        (holder as OpponentAudioViewHolder).attach()
     }
 
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-        (holder as AudioViewHolder).detach()
+        (holder as OpponentAudioViewHolder).detach()
     }
 }
 
-open class AudioViewHolder @JvmOverloads constructor(view: View,
-                                                     itemClickListener: ItemClickListener? = null,
-                                                     itemLongClickListener: ItemLongClickListener? = null)
-    : MessageViewHolder(view, itemClickListener, itemLongClickListener), TransferListener, ProgressListener, PlayingAudioListener {
+open class OpponentAudioViewHolder @JvmOverloads constructor(view: View,
+                                                             itemClickListener: ItemClickListener? = null,
+                                                             itemLongClickListener: ItemLongClickListener? = null)
+    : OpponentMessageViewHolder(view, itemClickListener, itemLongClickListener), TransferListener, ProgressListener, PlayingAudioListener {
 
     private val playButton: ImageView = itemView.findViewById(R.id.iv_play)
     private val seekBar: AppCompatSeekBar = itemView.findViewById(R.id.seekbar)
@@ -79,8 +79,12 @@ open class AudioViewHolder @JvmOverloads constructor(view: View,
         return itemView.findViewById(R.id.time)
     }
 
-    override fun determineMessageStateView(): ImageView {
-        return itemView.findViewById(R.id.icon_read)
+    override fun determineSenderNameView(): TextView {
+        return itemView.findViewById(R.id.name)
+    }
+
+    override fun determineSenderAvatarView(): ImageView {
+        return itemView.findViewById(R.id.avatar)
     }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {

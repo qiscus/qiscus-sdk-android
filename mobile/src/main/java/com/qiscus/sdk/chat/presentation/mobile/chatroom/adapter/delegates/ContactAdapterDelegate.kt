@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter
+package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 
 import android.content.Context
 import android.support.v7.util.SortedList

@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter
+package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 
 import android.content.Context
 import android.support.v7.util.SortedList
@@ -22,26 +22,26 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class LocationAdapterDelegate @JvmOverloads constructor(private val context: Context,
-                                                        private val itemClickListener: ItemClickListener? = null,
-                                                        private val itemLongClickListener: ItemLongClickListener? = null)
+class OpponentLocationAdapterDelegate @JvmOverloads constructor(private val context: Context,
+                                                                private val itemClickListener: ItemClickListener? = null,
+                                                                private val itemLongClickListener: ItemLongClickListener? = null)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
         val messageViewModel = data[position]
-        return messageViewModel is MessageLocationViewModel && messageViewModel.message.sender == account.user
+        return messageViewModel is MessageLocationViewModel && messageViewModel.message.sender != account.user
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_location_me, parent, false)
-        return LocationViewHolder(view, itemClickListener, itemLongClickListener)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_location, parent, false)
+        return OpponentLocationViewHolder(view, itemClickListener, itemLongClickListener)
     }
 }
 
-open class LocationViewHolder @JvmOverloads constructor(view: View,
-                                                        itemClickListener: ItemClickListener? = null,
-                                                        itemLongClickListener: ItemLongClickListener? = null)
-    : MessageViewHolder(view, itemClickListener, itemLongClickListener) {
+open class OpponentLocationViewHolder @JvmOverloads constructor(view: View,
+                                                                itemClickListener: ItemClickListener? = null,
+                                                                itemLongClickListener: ItemLongClickListener? = null)
+    : OpponentMessageViewHolder(view, itemClickListener, itemLongClickListener) {
 
     private val mapImageView: ImageView = itemView.findViewById(R.id.thumbnail)
     private val locationNameView: TextView = itemView.findViewById(R.id.location_name)
@@ -63,8 +63,12 @@ open class LocationViewHolder @JvmOverloads constructor(view: View,
         return itemView.findViewById(R.id.time)
     }
 
-    override fun determineMessageStateView(): ImageView {
-        return itemView.findViewById(R.id.icon_read)
+    override fun determineSenderNameView(): TextView {
+        return itemView.findViewById(R.id.name)
+    }
+
+    override fun determineSenderAvatarView(): ImageView {
+        return itemView.findViewById(R.id.avatar)
     }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
