@@ -25,7 +25,7 @@ fun getString(context: Context = Qiscus.instance.component.application, @StringR
 
 @JvmOverloads
 fun getString(context: Context = Qiscus.instance.component.application, @StringRes resId: Int, vararg formatArgs: Any): String {
-    return context.getString(resId, formatArgs)
+    return context.getString(resId, *formatArgs)
 }
 
 fun String.toReadableText(userRepository: UserRepository): String {

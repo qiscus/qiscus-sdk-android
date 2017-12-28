@@ -2,6 +2,7 @@ package com.qiscus.sdk.chat.presentation.model
 
 import android.support.annotation.ColorInt
 import android.text.Spannable
+import android.util.Log
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.common.getExtension
 import com.qiscus.sdk.chat.domain.interactor.Action
@@ -73,7 +74,7 @@ open class MessageFileViewModel
             return@lazy getString(resId = R.string.qiscus_unknown_file_type)
         }
 
-        return@lazy getString(resId = R.string.qiscus_file_type, formatArgs = *arrayOf(extension))
+        return@lazy getString(resId = R.string.qiscus_file_type, formatArgs = *arrayOf(extension.toUpperCase()))
     }
 
     fun listenAttachmentProgress() {
