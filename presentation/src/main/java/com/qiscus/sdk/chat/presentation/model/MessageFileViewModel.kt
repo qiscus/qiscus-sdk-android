@@ -4,6 +4,7 @@ import android.support.annotation.ColorInt
 import android.text.Spannable
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.common.getExtension
+import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
@@ -31,7 +32,20 @@ open class MessageFileViewModel
 
     : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
 
+    var transferListener: TransferListener? = null
+    var transfer: Boolean = false
+        set(value) {
+            field = value
+            if (transferListener != null) {
+                transferListener!!.onTransfer(value)
+            }
+        }
+
+    var progressListener: ProgressListener? = null
     var progress: FileAttachmentProgress? = null
+        private set
+
+    private var attachmentProgress = Qiscus.instance.useCaseFactory.listenFileAttachmentProgress()
 
     val readableCaption by lazy {
         message.caption.toReadableText(userRepository)
@@ -60,5 +74,24 @@ open class MessageFileViewModel
         }
 
         return@lazy getString(resId = R.string.qiscus_file_type, formatArgs = *arrayOf(extension))
+    }
+
+    fun listenAttachmentProgress() {
+        if (attachmentProgress.isDisposed()) {
+            attachmentProgress = Qiscus.instance.useCaseFactory.listenFileAttachmentProgress()
+        }
+
+        attachmentProgress.execute(null, Action {
+            if (it.fileAttachmentMessage.messageId == message.messageId) {
+                progress = it
+                if (progressListener != null) {
+                    progressListener!!.onProgress(it)
+                }
+            }
+        })
+    }
+
+    fun stopListenAttachmentProgress() {
+        attachmentProgress.dispose()
     }
 }

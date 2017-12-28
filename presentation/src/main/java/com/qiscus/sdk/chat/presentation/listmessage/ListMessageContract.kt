@@ -36,8 +36,6 @@ interface ListMessageContract {
 
         fun listenMessageDeleted(roomId: String)
 
-        fun listenMessageProgress(roomId: String)
-
         fun updateMessageState(roomId: String, lastMessageId: MessageId, messageState: MessageState)
 
         fun onMessageClick(messageViewModel: MessageViewModel)

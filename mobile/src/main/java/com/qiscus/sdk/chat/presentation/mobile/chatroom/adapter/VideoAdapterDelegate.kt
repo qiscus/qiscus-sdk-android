@@ -32,10 +32,17 @@ class VideoAdapterDelegate @JvmOverloads constructor(private val context: Contex
         val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_video_me, parent, false)
         return VideoViewHolder(view, itemClickListener, itemLongClickListener)
     }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        (holder as VideoViewHolder).attach()
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        (holder as VideoViewHolder).detach()
+    }
 }
 
 open class VideoViewHolder @JvmOverloads constructor(view: View,
                                                      itemClickListener: ItemClickListener? = null,
                                                      itemLongClickListener: ItemLongClickListener? = null)
-    : ImageViewHolder(view, itemClickListener, itemLongClickListener) {
-}
+    : ImageViewHolder(view, itemClickListener, itemLongClickListener)

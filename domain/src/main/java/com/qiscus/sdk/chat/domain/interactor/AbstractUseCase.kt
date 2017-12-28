@@ -45,4 +45,8 @@ abstract class AbstractUseCase protected constructor(
     protected fun addDisposable(disposable: Disposable) {
         disposables.add(disposable)
     }
+
+    fun isDisposed(): Boolean {
+        return disposables.isDisposed
+    }
 }

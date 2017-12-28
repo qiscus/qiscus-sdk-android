@@ -41,7 +41,6 @@ data class ChatRoomActivityComponent
 
         val listMessagePresenter: ListMessagePresenter =
         ListMessagePresenter(listMessageView, useCaseFactory.getMessages(), useCaseFactory.listenNewMessage(),
-                useCaseFactory.listenMessageState(), useCaseFactory.listenMessageDeleted(),
-                useCaseFactory.listenFileAttachmentProgress(), useCaseFactory.updateMessageState(),
+                useCaseFactory.listenMessageState(), useCaseFactory.listenMessageDeleted(), useCaseFactory.updateMessageState(),
                 useCaseFactory.downloadAttachmentMessage(), mentionAllColor, mentionOtherColor, mentionMeColor)
 )

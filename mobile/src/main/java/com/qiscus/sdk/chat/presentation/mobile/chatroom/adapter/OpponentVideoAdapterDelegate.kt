@@ -32,6 +32,14 @@ class OpponentVideoAdapterDelegate @JvmOverloads constructor(private val context
         val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_video, parent, false)
         return OpponentVideoViewHolder(view, itemClickListener, itemLongClickListener)
     }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        (holder as OpponentVideoViewHolder).attach()
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        (holder as OpponentVideoViewHolder).detach()
+    }
 }
 
 open class OpponentVideoViewHolder @JvmOverloads constructor(view: View,
