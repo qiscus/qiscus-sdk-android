@@ -108,9 +108,9 @@
                 android:layout_height="48dp"
                 android:layout_centerVertical="true"
                 android:visibility="gone"
-                app:circle_finished_color="@color/qiscus_opponents_message_finished_progress"
+                app:circle_finished_color="@color/qiscus_opponents_message_bubble"
                 app:circle_text_size="14sp"
-                app:circle_unfinished_color="@color/qiscus_opponents_message_unfinished_progress" />
+                app:circle_unfinished_color="@color/qiscus_opponents_message_bubble" />
 
             <LinearLayout
                 android:layout_width="match_parent"

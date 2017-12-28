@@ -4,14 +4,15 @@ import android.content.Context
 import android.support.v7.util.SortedList
 import android.support.v7.widget.AppCompatSeekBar
 import android.support.v7.widget.RecyclerView
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.model.MessageAudioViewModel
-import com.qiscus.sdk.chat.presentation.model.MessageViewModel
+import com.qiscus.sdk.chat.presentation.model.*
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
 import com.qiscus.sdk.chat.presentation.uikit.widget.CircleProgress
@@ -36,17 +37,27 @@ class AudioAdapterDelegate @JvmOverloads constructor(private val context: Contex
         val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_audio_me, parent, false)
         return AudioViewHolder(view, itemClickListener, itemLongClickListener)
     }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        (holder as AudioViewHolder).attach()
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        (holder as AudioViewHolder).detach()
+    }
 }
 
 open class AudioViewHolder @JvmOverloads constructor(view: View,
                                                      itemClickListener: ItemClickListener? = null,
                                                      itemLongClickListener: ItemLongClickListener? = null)
-    : MessageViewHolder(view, itemClickListener, itemLongClickListener) {
+    : MessageViewHolder(view, itemClickListener, itemLongClickListener), TransferListener, ProgressListener, PlayingAudioListener {
 
     private val playButton: ImageView = itemView.findViewById(R.id.iv_play)
     private val seekBar: AppCompatSeekBar = itemView.findViewById(R.id.seekbar)
     private val durationView: TextView = itemView.findViewById(R.id.duration)
     private val progressView: CircleProgress = itemView.findViewById(R.id.progress)
+
+    protected lateinit var messageViewModel: MessageAudioViewModel
 
     init {
         seekBar.setOnTouchListener { _, _ -> true }
@@ -73,10 +84,81 @@ open class AudioViewHolder @JvmOverloads constructor(view: View,
     }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
-        TODO()
+        this.messageViewModel = messageViewModel as MessageAudioViewModel
+        messageViewModel.transferListener = this
+        messageViewModel.progressListener = this
+        messageViewModel.playingAudioListener = this
+
+        playButton.setOnClickListener { _ -> playAudio(messageViewModel) }
+        seekBar.max = messageViewModel.getAudioDuration()
+        seekBar.progress = if (messageViewModel.isPlayingAudio()) messageViewModel.getCurrentAudioPosition() else 0
+
+        setTimeRemaining(if (messageViewModel.isPlayingAudio())
+            messageViewModel.getAudioDuration() - messageViewModel.getCurrentAudioPosition()
+        else
+            messageViewModel.getAudioDuration())
+
+        onTransfer(messageViewModel.transfer)
+        renderProgress(messageViewModel.progress)
     }
 
-    open protected fun renderProgress(messageViewModel: MessageAudioViewModel) {
-        TODO()
+    open protected fun renderProgress(attachmentProgress: FileAttachmentProgress?) {
+        if (attachmentProgress != null) {
+            progressView.progress = attachmentProgress.progress
+        }
+    }
+
+    override fun onTransfer(transfer: Boolean) = if (transfer) {
+        progressView.visibility = View.VISIBLE
+    } else {
+        progressView.visibility = View.GONE
+    }
+
+    override fun onProgress(fileAttachmentProgress: FileAttachmentProgress) {
+        if (fileAttachmentProgress.fileAttachmentMessage.messageId == messageViewModel.message.messageId) {
+            renderProgress(fileAttachmentProgress)
+        }
+    }
+
+    open protected fun playAudio(messageAudioViewModel: MessageAudioViewModel) {
+        if (messageAudioViewModel.getAudioDuration() > 0) {
+            messageAudioViewModel.playAudio()
+        } else {
+            onClick(bubbleView)
+        }
+    }
+
+    override fun onPlayingAudio(messageAudioViewModel: MessageAudioViewModel, currentPosition: Int) {
+        if (messageAudioViewModel == messageViewModel) {
+            playButton.setImageResource(R.drawable.ic_qiscus_pause_audio)
+            seekBar.progress = currentPosition
+            setTimeRemaining(messageAudioViewModel.getAudioDuration() - currentPosition)
+        }
+    }
+
+    override fun onPauseAudio(messageAudioViewModel: MessageAudioViewModel) {
+        if (messageAudioViewModel == messageViewModel) {
+            playButton.setImageResource(R.drawable.ic_qiscus_play_audio)
+        }
+    }
+
+    override fun onStopAudio(messageAudioViewModel: MessageAudioViewModel) {
+        if (messageAudioViewModel == messageViewModel) {
+            playButton.setImageResource(R.drawable.ic_qiscus_play_audio)
+            seekBar.progress = 0
+            setTimeRemaining(messageAudioViewModel.getAudioDuration())
+        }
+    }
+
+    private fun setTimeRemaining(duration: Int) {
+        durationView.text = DateUtils.formatElapsedTime(duration / 1000L)
+    }
+
+    open fun attach() {
+        messageViewModel.listenAttachmentProgress()
+    }
+
+    open fun detach() {
+        messageViewModel.stopListenAttachmentProgress()
     }
 }

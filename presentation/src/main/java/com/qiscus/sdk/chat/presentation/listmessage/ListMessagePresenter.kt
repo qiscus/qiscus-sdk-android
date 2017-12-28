@@ -77,7 +77,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
 
     override fun onMessageClick(messageViewModel: MessageViewModel) {
         when (messageViewModel) {
-            is MessageFileViewModel -> downloadFileAttachment(messageViewModel)
+            is MessageFileViewModel -> handleClickFileMessage(messageViewModel)
             is MessageTextViewModel -> TODO()
             else -> TODO()
         }
@@ -87,11 +87,19 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    private fun handleClickFileMessage(messageViewModel: MessageFileViewModel) {
+        if ((messageViewModel.message as FileAttachmentMessage).file == null) {
+            downloadFileAttachment(messageViewModel)
+        } else {
+
+        }
+    }
+
     private fun downloadFileAttachment(messageFileViewModel: MessageFileViewModel) {
         if (messageFileViewModel.transfer) {
             return
         }
-        
+
         messageFileViewModel.transfer = true
         downloadAttachmentMessage.execute(DownloadAttachmentMessage.Params(messageFileViewModel.message as FileAttachmentMessage), Action {
             val viewModel = toViewModel(it)
