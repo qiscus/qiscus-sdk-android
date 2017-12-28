@@ -4,6 +4,7 @@ import com.qiscus.sdk.chat.domain.model.MessageId
 import com.qiscus.sdk.chat.domain.model.MessageState
 import com.qiscus.sdk.chat.presentation.BasePresenter
 import com.qiscus.sdk.chat.presentation.BaseView
+import com.qiscus.sdk.chat.presentation.model.MessageFileViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 
@@ -22,7 +23,11 @@ interface ListMessageContract {
 
         fun removeMessage(messageViewModel: MessageViewModel)
 
-        fun openImageViewer(messageImageViewModel: MessageImageViewModel)
+        fun openImageViewer(messageViewModel: MessageImageViewModel)
+
+        fun openFileHandler(messageViewModel: MessageFileViewModel)
+
+        fun showError(errorMessage: String)
     }
 
     interface Presenter : BasePresenter {

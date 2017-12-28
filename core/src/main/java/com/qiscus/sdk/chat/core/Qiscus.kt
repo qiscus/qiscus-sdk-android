@@ -102,4 +102,6 @@ class Qiscus private constructor(val component: QiscusComponent) {
     fun isAuthenticated(): Boolean {
         return component.dataComponent.accountLocal.isAuthenticated()
     }
+
+    var providerAuthorities = "${component.application.packageName}.qiscus.sdk.provider"
 }

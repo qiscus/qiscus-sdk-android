@@ -16,18 +16,26 @@
 
 package com.qiscus.sdk.chat.presentation.mobile.chatroom
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
+import android.widget.Toast
+import com.qiscus.sdk.chat.core.Qiscus
+import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.*
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates.*
+import com.qiscus.sdk.chat.presentation.model.MessageFileViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
@@ -142,8 +150,28 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         adapter.removeMessage(messageViewModel)
     }
 
-    override fun openImageViewer(messageImageViewModel: MessageImageViewModel) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun openImageViewer(messageViewModel: MessageImageViewModel) {
+        Toast.makeText(this, "open image", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun openFileHandler(messageViewModel: MessageFileViewModel) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        val file = (messageViewModel.message as FileAttachmentMessage).file
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            intent.setDataAndType(Uri.fromFile(file), messageViewModel.mimeType)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        } else {
+            intent.setDataAndType(FileProvider.getUriForFile(this,
+                    Qiscus.instance.providerAuthorities, file!!), messageViewModel.mimeType)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showError(getString(R.string.qiscus_chat_error_no_handler))
+        }
+
     }
 
     override fun onItemClick(view: View, position: Int) {
@@ -156,6 +184,10 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
 
     override fun clearTextField() {
         Log.d("ZETRA", "clearTextField")
+    }
+
+    override fun showError(errorMessage: String) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     override fun onStop() {

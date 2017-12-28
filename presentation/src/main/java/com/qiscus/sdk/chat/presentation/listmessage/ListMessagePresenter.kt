@@ -8,10 +8,7 @@ import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.model.MessageId
 import com.qiscus.sdk.chat.domain.model.MessageState
 import com.qiscus.sdk.chat.presentation.mapper.toViewModel
-import com.qiscus.sdk.chat.presentation.model.MentionClickListener
-import com.qiscus.sdk.chat.presentation.model.MessageFileViewModel
-import com.qiscus.sdk.chat.presentation.model.MessageTextViewModel
-import com.qiscus.sdk.chat.presentation.model.MessageViewModel
+import com.qiscus.sdk.chat.presentation.model.*
 
 /**
  * Created on : October 10, 2017
@@ -91,7 +88,12 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         if ((messageViewModel.message as FileAttachmentMessage).file == null) {
             downloadFileAttachment(messageViewModel)
         } else {
-
+            when (messageViewModel) {
+                is MessageVideoViewModel -> view.openFileHandler(messageViewModel)
+                is MessageImageViewModel -> view.openImageViewer(messageViewModel)
+                is MessageAudioViewModel -> messageViewModel.playAudio()
+                else -> view.openFileHandler(messageViewModel)
+            }
         }
     }
 

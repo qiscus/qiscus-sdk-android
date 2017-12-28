@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2016 Qiscus.
   ~
@@ -14,18 +15,6 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.qiscus.sdk.chat.core">
-
-    <application android:largeHeap="true">
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.qiscus.sdk.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/qiscus_provider_paths" />
-        </provider>
-    </application>
-</manifest>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path name="external_files" path="."/>
+</paths>

@@ -67,6 +67,7 @@ dependencies {
     compile project(':local')
     compile project(':remote')
     compile project(':pusher')
+    compile coreDependencies.androidSupportV4
     compile coreDependencies.kotlin
     compile coreDependencies.rxKotlin
     compile coreDependencies.rxAndroid
