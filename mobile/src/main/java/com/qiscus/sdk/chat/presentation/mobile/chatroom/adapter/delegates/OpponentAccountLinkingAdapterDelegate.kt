@@ -11,7 +11,6 @@ import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageAccountLinkingViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
-import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
 
 /**
  * Created on : December 21, 2017
@@ -20,8 +19,7 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
  * GitHub     : https://github.com/zetbaitsu
  */
 class OpponentAccountLinkingAdapterDelegate @JvmOverloads constructor(private val context: Context,
-                                                                      private val itemClickListener: ItemClickListener? = null,
-                                                                      private val itemLongClickListener: ItemLongClickListener? = null)
+                                                                      private val itemClickListener: ItemClickListener? = null)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
@@ -31,14 +29,13 @@ class OpponentAccountLinkingAdapterDelegate @JvmOverloads constructor(private va
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_linking, parent, false)
-        return OpponentAccountLinkingViewHolder(view, itemClickListener, itemLongClickListener)
+        return OpponentAccountLinkingViewHolder(view, itemClickListener)
     }
 }
 
 open class OpponentAccountLinkingViewHolder @JvmOverloads constructor(view: View,
-                                                                      itemClickListener: ItemClickListener? = null,
-                                                                      itemLongClickListener: ItemLongClickListener? = null)
-    : OpponentTextViewHolder(view, itemClickListener, itemLongClickListener) {
+                                                                      itemClickListener: ItemClickListener? = null)
+    : OpponentTextViewHolder(view, itemClickListener) {
 
     private val buttonLabelView: TextView = itemView.findViewById(R.id.account_linking)
 
@@ -48,7 +45,7 @@ open class OpponentAccountLinkingViewHolder @JvmOverloads constructor(view: View
     }
 
     open protected fun renderButton(messageViewModel: MessageViewModel) {
-        buttonLabelView.text = (messageViewModel as MessageAccountLinkingViewModel).button.title
+        buttonLabelView.text = (messageViewModel as MessageAccountLinkingViewModel).button.label
     }
 
     override fun onClick(v: View?) {
