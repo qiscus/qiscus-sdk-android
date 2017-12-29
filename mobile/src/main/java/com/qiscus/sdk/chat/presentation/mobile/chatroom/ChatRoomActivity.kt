@@ -33,14 +33,16 @@ import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.*
+import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.DefaultMessageAdapter
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates.*
+import com.qiscus.sdk.chat.presentation.model.ButtonViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageFileViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
 /**
@@ -64,7 +66,7 @@ fun Context.chatRoomIntent(roomId: String): Intent {
 private const val INTENT_ROOM_ID = "room_id"
 
 class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMessageContract.View,
-        ItemClickListener, ItemLongClickListener {
+        ItemClickListener, ItemLongClickListener, ChatButtonView.ChatButtonClickListener {
 
     private lateinit var listMessagePresenter: ListMessageContract.Presenter
     private lateinit var sendMessagePresenter: SendMessageContract.Presenter
@@ -105,8 +107,8 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
                 .addDelegate(OpponentCardAdapterDelegate(this, this, this))
                 .addDelegate(AccountLinkingAdapterDelegate(this, this, this))
                 .addDelegate(OpponentAccountLinkingAdapterDelegate(this, this, this))
-                .addDelegate(ButtonsAdapterDelegate(this, this, this))
-                .addDelegate(OpponentButtonsAdapterDelegate(this, this, this))
+                .addDelegate(ButtonsAdapterDelegate(this, this))
+                .addDelegate(OpponentButtonsAdapterDelegate(this, this))
                 .addDelegate(SystemEventAdapterDelegate(this))
 
         //Fallback adapter delegate
@@ -180,6 +182,10 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
 
     override fun onItemLongClick(view: View, position: Int) {
         listMessagePresenter.onMessageLongClick(adapter.data[position])
+    }
+
+    override fun onChatButtonClick(buttonViewModel: ButtonViewModel) {
+        listMessagePresenter.onChatButtonClick(buttonViewModel)
     }
 
     override fun clearTextField() {

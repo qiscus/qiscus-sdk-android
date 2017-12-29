@@ -84,6 +84,10 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun onChatButtonClick(buttonViewModel: ButtonViewModel) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private fun handleClickFileMessage(messageViewModel: MessageFileViewModel) {
         if ((messageViewModel.message as FileAttachmentMessage).file == null) {
             downloadFileAttachment(messageViewModel)

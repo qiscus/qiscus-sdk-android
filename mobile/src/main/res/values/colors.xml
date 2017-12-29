@@ -115,6 +115,12 @@
     <color name="qiscus_my_message_account_linking_text">#FFFF</color>
     <color name="qiscus_opponents_message_account_linking_text">#009688</color>
 
+    <!-- buttons message -->
+    <color name="qiscus_my_message_buttons_bg">#009688</color>
+    <color name="qiscus_opponents_message_buttons_bg">#D8D8D8</color>
+    <color name="qiscus_my_message_buttons_text">#FFFF</color>
+    <color name="qiscus_opponents_message_buttons_text">#009688</color>
+
     <!-- link message -->
     <color name="qiscus_my_message_web_preview_title">#212121</color>
     <color name="qiscus_opponents_message_web_preview_title">#212121</color>

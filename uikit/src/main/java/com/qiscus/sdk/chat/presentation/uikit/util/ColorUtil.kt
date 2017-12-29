@@ -2,7 +2,9 @@ package com.qiscus.sdk.chat.presentation.uikit.util
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.common.randomInt
@@ -21,4 +23,9 @@ fun randomColor(alpha: Int = 100): Int {
 @JvmOverloads
 fun getColor(context: Context = Qiscus.instance.component.application, @ColorRes resId: Int): Int {
     return ContextCompat.getColor(context, resId)
+}
+
+@JvmOverloads
+fun getDrawable(context: Context = Qiscus.instance.component.application, @DrawableRes resId: Int): Drawable? {
+    return ContextCompat.getDrawable(context, resId)
 }

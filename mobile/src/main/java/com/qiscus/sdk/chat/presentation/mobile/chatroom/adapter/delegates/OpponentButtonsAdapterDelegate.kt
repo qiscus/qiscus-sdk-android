@@ -9,8 +9,9 @@ import android.view.ViewGroup
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageButtonsViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
-import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
-import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.util.getColor
+import com.qiscus.sdk.chat.presentation.uikit.util.getDrawable
+import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 
 /**
  * Created on : December 21, 2017
@@ -18,9 +19,8 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class OpponentButtonsAdapterDelegate @JvmOverloads constructor(private val context: Context,
-                                                               private val itemClickListener: ItemClickListener? = null,
-                                                               private val itemLongClickListener: ItemLongClickListener? = null)
+class OpponentButtonsAdapterDelegate(private val context: Context,
+                                     private val chatButtonClickListener: ChatButtonView.ChatButtonClickListener)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
@@ -30,16 +30,19 @@ class OpponentButtonsAdapterDelegate @JvmOverloads constructor(private val conte
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_button, parent, false)
-        return OpponentButtonsViewHolder(view, itemClickListener, itemLongClickListener)
+        return OpponentButtonsViewHolder(view, chatButtonClickListener)
     }
 }
 
-open class OpponentButtonsViewHolder @JvmOverloads constructor(view: View,
-                                                               itemClickListener: ItemClickListener? = null,
-                                                               itemLongClickListener: ItemLongClickListener? = null)
-    : OpponentTextViewHolder(view, itemClickListener, itemLongClickListener) {
+open class OpponentButtonsViewHolder(view: View,
+                                     private val chatButtonClickListener: ChatButtonView.ChatButtonClickListener)
+    : OpponentTextViewHolder(view) {
 
     private val buttonsContainer: ViewGroup = itemView.findViewById(R.id.buttons_container)
+
+    private val buttonTextColor = getColor(resId = R.color.qiscus_opponents_message_buttons_text)
+    private val buttonBackgroundColor = getColor(resId = R.color.qiscus_opponents_message_buttons_bg)
+    private val buttonBackgroundDrawable = getDrawable(resId = R.drawable.qiscus_opponents_buttons_bg)
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
         super.renderMessageContents(messageViewModel)
@@ -47,7 +50,24 @@ open class OpponentButtonsViewHolder @JvmOverloads constructor(view: View,
     }
 
     open protected fun renderButtons(messageViewModel: MessageButtonsViewModel) {
+        if (messageViewModel.buttons.isEmpty()) {
+            buttonsContainer.visibility = View.GONE
+            return
+        }
+
         buttonsContainer.removeAllViews()
-        TODO()
+        messageViewModel.buttons.forEachIndexed { index, buttonViewModel ->
+            val buttonView = ChatButtonView(buttonsContainer.context, buttonViewModel)
+            buttonView.setChatButtonClickListener(chatButtonClickListener)
+            buttonView.setTextColor(buttonTextColor)
+            if (index == messageViewModel.buttons.size - 1) {
+                buttonView.background = buttonBackgroundDrawable
+            } else {
+                buttonView.setBackgroundColor(buttonBackgroundColor)
+            }
+            buttonsContainer.addView(buttonView)
+        }
+
+        buttonsContainer.visibility = View.VISIBLE
     }
 }

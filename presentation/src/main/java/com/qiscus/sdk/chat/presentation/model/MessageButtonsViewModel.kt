@@ -1,9 +1,11 @@
 package com.qiscus.sdk.chat.presentation.model
 
+import android.text.Spannable
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.presentation.util.toSpannable
 import org.json.JSONObject
 
 /**
@@ -66,5 +68,15 @@ open class MessageButtonsViewModel
                     }
                 }
         return@lazy buttons
+    }
+
+    override fun determineReadableMessage(): String {
+        return message.type.payload.optString("text", message.text)
+    }
+
+    override fun determineSpannableMessage(): Spannable {
+        return message.type.payload.optString("text", message.text)
+                .toSpannable(account, userRepository, mentionAllColor, mentionOtherColor,
+                        mentionMeColor, mentionClickListener)
     }
 }
