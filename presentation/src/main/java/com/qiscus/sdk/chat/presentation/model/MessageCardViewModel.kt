@@ -1,11 +1,11 @@
 package com.qiscus.sdk.chat.presentation.model
 
 import android.text.Spannable
-import android.text.SpannableString
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.presentation.util.toSpannable
 
 /**
  * Created on : October 05, 2017
@@ -57,11 +57,13 @@ open class MessageCardViewModel
         return@lazy buttons
     }
 
-    override fun determineSpannableMessage(): Spannable {
-        return SpannableString(readableMessage)
+    override fun determineReadableMessage(): String {
+        return message.type.payload.optString("text", message.text)
     }
 
-    override fun determineReadableMessage(): String {
-        return "$cardTitle\n$cardDescription"
+    override fun determineSpannableMessage(): Spannable {
+        return message.type.payload.optString("text", message.text)
+                .toSpannable(account, userRepository, mentionAllColor, mentionOtherColor,
+                        mentionMeColor, mentionClickListener)
     }
 }

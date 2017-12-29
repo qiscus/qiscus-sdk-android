@@ -60,8 +60,12 @@
     <color name="qiscus_audio_duration">#212121</color>
 
     <!-- card message -->
+    <color name="qiscus_message_card_bg">#FFFFFF</color>
     <color name="qiscus_message_card_title">#212121</color>
     <color name="qiscus_message_card_description">#212121</color>
+    <color name="qiscus_message_card_buttons_container_bg">#D0D0D0</color>
+    <color name="qiscus_message_card_buttons_bg">#FFFFFF</color>
+    <color name="qiscus_message_card_buttons_text">#009688</color>
 
     <!-- reply message -->
     <color name="qiscus_my_message_reply_bubble">#51B6B6B6</color>

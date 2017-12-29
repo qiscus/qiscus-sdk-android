@@ -13,8 +13,8 @@ import com.bumptech.glide.request.RequestOptions
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageCardViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
-import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
-import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.util.getColor
+import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 
 /**
  * Created on : December 21, 2017
@@ -22,9 +22,8 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-class CardAdapterDelegate @JvmOverloads constructor(private val context: Context,
-                                                    private val itemClickListener: ItemClickListener? = null,
-                                                    private val itemLongClickListener: ItemLongClickListener? = null)
+class CardAdapterDelegate(private val context: Context,
+                          private val chatButtonClickListener: ChatButtonView.ChatButtonClickListener)
     : MessageAdapterDelegate() {
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
@@ -34,20 +33,22 @@ class CardAdapterDelegate @JvmOverloads constructor(private val context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_card_me, parent, false)
-        return CardViewHolder(view, itemClickListener, itemLongClickListener)
+        return CardViewHolder(view, chatButtonClickListener)
     }
 }
 
-open class CardViewHolder @JvmOverloads constructor(view: View,
-                                                    itemClickListener: ItemClickListener? = null,
-                                                    itemLongClickListener: ItemLongClickListener? = null)
-    : TextViewHolder(view, itemClickListener, itemLongClickListener) {
+open class CardViewHolder(view: View,
+                          private val chatButtonClickListener: ChatButtonView.ChatButtonClickListener)
+    : TextViewHolder(view) {
 
     private val messageBubbleView: View = itemView.findViewById(R.id.message)
     private val imageView: ImageView = itemView.findViewById(R.id.thumbnail)
     private val titleView: TextView = itemView.findViewById(R.id.title)
     private val descriptionView: TextView = itemView.findViewById(R.id.description)
     private val buttonsContainer: ViewGroup = itemView.findViewById(R.id.buttons_container)
+
+    private val buttonTextColor = getColor(resId = R.color.qiscus_message_card_buttons_text)
+    private val buttonBackgroundColor = getColor(resId = R.color.qiscus_message_card_buttons_bg)
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
         super.renderMessageContents(messageViewModel)
@@ -60,7 +61,7 @@ open class CardViewHolder @JvmOverloads constructor(view: View,
             messageBubbleView.visibility = View.GONE
             firstMessageBubbleIndicatorView.visibility = View.GONE
         } else {
-            messageBubbleView.visibility = View.GONE
+            messageBubbleView.visibility = View.VISIBLE
         }
     }
 
@@ -76,7 +77,20 @@ open class CardViewHolder @JvmOverloads constructor(view: View,
     }
 
     private fun renderButtons(messageViewModel: MessageCardViewModel) {
+        if (messageViewModel.buttons.isEmpty()) {
+            buttonsContainer.visibility = View.GONE
+            return
+        }
+
         buttonsContainer.removeAllViews()
-        TODO("not implemented")
+        messageViewModel.buttons.forEachIndexed { _, buttonViewModel ->
+            val buttonView = ChatButtonView(buttonsContainer.context, buttonViewModel)
+            buttonView.setChatButtonClickListener(chatButtonClickListener)
+            buttonView.setTextColor(buttonTextColor)
+            buttonView.setBackgroundColor(buttonBackgroundColor)
+            buttonsContainer.addView(buttonView)
+        }
+
+        buttonsContainer.visibility = View.VISIBLE
     }
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/qiscus_message_card_bg"
     app:cardCornerRadius="8dp"
     app:cardElevation="8dp"
     app:cardPreventCornerOverlap="false"
@@ -19,7 +19,7 @@
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="120dp"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/title"
@@ -31,7 +31,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:textColor="@color/qiscus_message_card_title"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/description"
@@ -44,17 +44,17 @@
             android:ellipsize="end"
             android:maxLines="4"
             android:textColor="@color/qiscus_message_card_description"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <LinearLayout
             android:id="@+id/buttons_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/qiscus_opponents_message_bubble"
+            android:background="@color/qiscus_message_card_buttons_container_bg"
             android:gravity="center"
             android:orientation="vertical"
             android:paddingTop="1dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </LinearLayout>
 
