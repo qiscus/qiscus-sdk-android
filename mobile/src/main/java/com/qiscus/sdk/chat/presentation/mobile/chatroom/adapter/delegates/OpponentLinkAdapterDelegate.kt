@@ -6,12 +6,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.qiscus.sdk.chat.domain.common.containsUrl
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.model.MessageTextViewModel
+import com.qiscus.sdk.chat.presentation.model.LinkPreviewListener
+import com.qiscus.sdk.chat.presentation.model.MessageLinkViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.widget.WebPreviewView
 
 /**
  * Created on : December 21, 2017
@@ -26,8 +27,7 @@ class OpponentLinkAdapterDelegate @JvmOverloads constructor(private val context:
 
     override fun isForViewType(data: SortedList<MessageViewModel>, position: Int): Boolean {
         val messageViewModel = data[position]
-        return messageViewModel is MessageTextViewModel && messageViewModel.message.sender != account.user
-                && messageViewModel.readableMessage.containsUrl()
+        return messageViewModel is MessageLinkViewModel && messageViewModel.message.sender != account.user
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
@@ -39,14 +39,21 @@ class OpponentLinkAdapterDelegate @JvmOverloads constructor(private val context:
 open class OpponentLinkViewHolder @JvmOverloads constructor(view: View,
                                                             itemClickListener: ItemClickListener? = null,
                                                             itemLongClickListener: ItemLongClickListener? = null)
-    : OpponentTextViewHolder(view, itemClickListener, itemLongClickListener) {
+    : OpponentTextViewHolder(view, itemClickListener, itemLongClickListener), LinkPreviewListener {
+
+    private val webPreview: WebPreviewView = itemView.findViewById(R.id.preview)
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
         super.renderMessageContents(messageViewModel)
-        renderLinks(messageViewModel)
+        renderLinks(messageViewModel as MessageLinkViewModel)
     }
 
-    open protected fun renderLinks(messageViewModel: MessageViewModel) {
-        TODO()
+    open protected fun renderLinks(messageViewModel: MessageLinkViewModel) {
+        messageViewModel.linkPreviewListener = this
+        messageViewModel.loadLinkPreview()
+    }
+
+    override fun onLinkPreviewReady(messageViewModel: MessageLinkViewModel) {
+        webPreview.bind(messageViewModel.previewData)
     }
 }

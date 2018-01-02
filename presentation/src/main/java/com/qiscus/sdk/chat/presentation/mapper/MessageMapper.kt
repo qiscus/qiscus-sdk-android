@@ -19,6 +19,7 @@ package com.qiscus.sdk.chat.presentation.mapper
 import android.support.annotation.ColorInt
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.data.util.MimeTypeGuesser
+import com.qiscus.sdk.chat.domain.common.containsUrl
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.presentation.model.MentionClickListener
@@ -48,13 +49,18 @@ fun Message.toViewModel(
     }
 
     when (type.rawType) {
-        "text" -> return MessageTextViewModel(
+        "text" -> return if (text.containsUrl()) MessageLinkViewModel(
                 this,
                 mentionAllColor = mentionAllColor,
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
+        ) else MessageTextViewModel(
+                this,
+                mentionAllColor = mentionAllColor,
+                mentionOtherColor = mentionOtherColor,
+                mentionMeColor = mentionMeColor,
+                mentionClickListener = mentionClickListener
         )
         "account_linking" -> return MessageAccountLinkingViewModel(
                 this,
@@ -62,7 +68,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
         "buttons" -> return MessageButtonsViewModel(
                 this,
@@ -70,7 +75,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
         "card" -> return MessageCardViewModel(
                 this,
@@ -78,7 +82,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
         "contact_person" -> return MessageContactViewModel(
                 this,
@@ -86,7 +89,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
         "location" -> return MessageLocationViewModel(
                 this,
@@ -94,7 +96,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
         "system_event" -> return MessageSystemEventViewModel(
                 this,
@@ -102,7 +103,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
         "reply" -> return MessageReplyViewModel(
                 this,
@@ -110,7 +110,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
         else -> return MessageViewModel(
                 this,
@@ -118,7 +117,6 @@ fun Message.toViewModel(
                 mentionOtherColor = mentionOtherColor,
                 mentionMeColor = mentionMeColor,
                 mentionClickListener = mentionClickListener
-
         )
     }
 }
