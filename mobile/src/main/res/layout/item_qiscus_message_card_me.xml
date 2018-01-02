@@ -45,7 +45,7 @@
         android:src="@drawable/ic_qiscus_my_first_bubble"
         android:tint="@color/qiscus_my_message_bubble"/>
 
-    <com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout
+    <LinearLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,8 +57,7 @@
         android:layout_marginRight="19dp"
         android:layout_marginStart="64dp"
         android:background="@drawable/qiscus_my_message_bubble"
-        android:gravity="end"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="8dp">
 
         <com.vanniktech.emoji.EmojiTextView
@@ -66,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:autoLink="email"
+            android:autoLink="all"
             android:linksClickable="true"
             android:textColor="@color/qiscus_my_message_text"
             android:textColorLink="@color/qiscus_my_message_link"
@@ -76,7 +75,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|end"
             android:gravity="bottom"
             android:orientation="horizontal">
 
@@ -97,7 +96,7 @@
                 android:layout_marginStart="4dp"/>
 
         </LinearLayout>
-    </com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout>
+    </LinearLayout>
 
     <include
         android:id="@+id/card_view"

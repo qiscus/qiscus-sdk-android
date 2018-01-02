@@ -71,7 +71,7 @@
         android:src="@drawable/ic_qiscus_opponent_first_bubble"
         android:tint="@color/qiscus_opponents_message_bubble"/>
 
-    <com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout
+    <LinearLayout
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -81,8 +81,7 @@
         android:layout_marginRight="32dp"
         android:layout_marginStart="54dp"
         android:background="@drawable/qiscus_opponents_message_bubble"
-        android:gravity="end"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="8dp">
 
         <com.vanniktech.emoji.EmojiTextView
@@ -101,13 +100,13 @@
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|end"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:textColor="@color/qiscus_opponents_message_time"
             android:textSize="12sp"/>
 
-    </com.qiscus.sdk.chat.presentation.uikit.widget.FlowLayout>
+    </LinearLayout>
 
     <include
         android:id="@+id/card_view"
