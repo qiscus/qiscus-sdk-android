@@ -202,7 +202,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     }
 
     protected void determineIsNeedToShowFirstMessageIndicator(H holder, int position) {
-        if (holder.isNeedToShowDate() || data.get(position + 1).getType() == QiscusComment.Type.CARD) {
+        if (holder.isNeedToShowDate() || data.get(position + 1).getType() == QiscusComment.Type.CARD
+                || data.get(position + 1).getType() == QiscusComment.Type.CAROUSEL) {
             holder.setNeedToShowFirstMessageBubbleIndicator(true);
         } else if (data.get(position).getSenderEmail().equals(data.get(position + 1).getSenderEmail())) {
             holder.setNeedToShowFirstMessageBubbleIndicator(false);
