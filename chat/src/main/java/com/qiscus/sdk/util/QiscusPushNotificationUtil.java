@@ -46,6 +46,10 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.service.QiscusPushNotificationClickReceiver;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -152,6 +156,20 @@ public final class QiscusPushNotificationUtil {
                 break;
             case LOCATION:
                 messageText += "\uD83D\uDCCD " + comment.getMessage();
+                break;
+            case CAROUSEL:
+                try {
+                    JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                    JSONArray cards = payload.optJSONArray("cards");
+                    if (cards.length() > 0) {
+                        messageText += "\uD83D\uDCDA " + cards.optJSONObject(0).optString("title");
+                    } else {
+                        messageText += "\uD83D\uDCDA " + QiscusTextUtil.getString(R.string.qiscus_send_a_carousel);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    messageText += "\uD83D\uDCDA " + QiscusTextUtil.getString(R.string.qiscus_send_a_carousel);
+                }
                 break;
             default:
                 messageText += comment.isAttachment() ? "\uD83D\uDCC4 " +

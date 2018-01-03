@@ -97,6 +97,7 @@
     <string name="qiscus_send_a_photo">Mengirimkan sebuah foto.</string>
     <string name="qiscus_send_a_video">Mengirimkan sebuah video.</string>
     <string name="qiscus_send_a_audio">Mengirimkan sebuah audio.</string>
+    <string name="qiscus_send_a_carousel">Mengirimkan sebuah rich message.</string>
     <string name="qiscus_add_a_caption">Tambah keterangan…</string>
     <string name="qiscus_add_images">Tambah Gambar Lain</string>
     <string name="qiscus_error_gif">Terjadi kesalahan dalam mengirim gambar GIF!</string>
