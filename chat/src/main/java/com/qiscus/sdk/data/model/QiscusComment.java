@@ -626,6 +626,8 @@ public class QiscusComment implements Parcelable {
             return Type.CONTACT;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("location")) {
             return Type.LOCATION;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("carousel")) {
+            return Type.CAROUSEL;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("custom")) {
             return Type.CUSTOM;
         } else if (!isAttachment()) {
@@ -860,7 +862,7 @@ public class QiscusComment implements Parcelable {
 
     public enum Type {
         TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
-        CONTACT, LOCATION, CUSTOM
+        CONTACT, LOCATION, CAROUSEL, CUSTOM
     }
 
     public interface ProgressListener {

@@ -51,7 +51,7 @@ public class QiscusChatButtonView extends FrameLayout implements View.OnClickLis
 
     private void injectViews() {
         inflate(getContext(), R.layout.view_qiscus_chat_button, this);
-        button = (TextView) findViewById(R.id.button);
+        button = findViewById(R.id.button);
     }
 
     private void initLayout() {
