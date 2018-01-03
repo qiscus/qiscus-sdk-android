@@ -113,7 +113,8 @@ import java.util.Map;
 public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> extends RxFragment
         implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
         QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener,
-        QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener, CommentChainingListener, QiscusCarouselItemView.CarouselItemClickListener {
+        QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener,
+        CommentChainingListener, QiscusCarouselItemView.CarouselItemClickListener {
 
     protected static final int RC_PERMISSIONS = 127;
     protected static final int RC_CAMERA_PERMISSION = 128;
