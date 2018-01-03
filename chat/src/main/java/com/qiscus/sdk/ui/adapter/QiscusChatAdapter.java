@@ -26,6 +26,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusAudioViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusButtonMessageViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusCardMessageViewHolder;
+import com.qiscus.sdk.ui.adapter.viewholder.QiscusCarouselViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusContactViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusFileViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusImageViewHolder;
@@ -68,6 +69,7 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     private static final int TYPE_CONTACT_OTHER = 23;
     private static final int TYPE_LOCATION_ME = 24;
     private static final int TYPE_LOCATION_OTHER = 25;
+    private static final int TYPE_CAROUSEL = 26;
 
     public QiscusChatAdapter(Context context, boolean groupChat) {
         super(context, groupChat);
@@ -118,6 +120,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_CONTACT_ME;
             case LOCATION:
                 return TYPE_LOCATION_ME;
+            case CAROUSEL:
+                return TYPE_CAROUSEL;
             default:
                 return TYPE_MESSAGE_ME;
         }
@@ -153,6 +157,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return TYPE_CONTACT_OTHER;
             case LOCATION:
                 return TYPE_LOCATION_OTHER;
+            case CAROUSEL:
+                return TYPE_CAROUSEL;
             default:
                 return TYPE_MESSAGE_OTHER;
         }
@@ -211,6 +217,8 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return R.layout.item_qiscus_chat_location_me;
             case TYPE_LOCATION_OTHER:
                 return R.layout.item_qiscus_chat_location;
+            case TYPE_CAROUSEL:
+                return R.layout.item_qiscus_chat_carousel;
             default:
                 return R.layout.item_qiscus_chat_text;
         }
@@ -260,6 +268,9 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
             case TYPE_LOCATION_ME:
             case TYPE_LOCATION_OTHER:
                 return new QiscusLocationMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+            case TYPE_CAROUSEL:
+                return new QiscusCarouselViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener,
+                        carouselItemClickListener, chatButtonClickListener);
             default:
                 return new QiscusTextViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
         }

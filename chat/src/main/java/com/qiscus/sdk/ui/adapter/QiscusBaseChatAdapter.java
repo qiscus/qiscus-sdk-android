@@ -29,6 +29,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
+import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
@@ -52,6 +53,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected OnItemClickListener itemClickListener;
     protected OnLongItemClickListener longItemClickListener;
     protected QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener;
+    protected QiscusCarouselItemView.CarouselItemClickListener carouselItemClickListener;
     protected ReplyItemClickListener replyItemClickListener;
     protected CommentChainingListener commentChainingListener;
 
@@ -200,7 +202,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     }
 
     protected void determineIsNeedToShowFirstMessageIndicator(H holder, int position) {
-        if (holder.isNeedToShowDate() || data.get(position + 1).getType() == QiscusComment.Type.CARD) {
+        if (holder.isNeedToShowDate() || data.get(position + 1).getType() == QiscusComment.Type.CARD
+                || data.get(position + 1).getType() == QiscusComment.Type.CAROUSEL) {
             holder.setNeedToShowFirstMessageBubbleIndicator(true);
         } else if (data.get(position).getSenderEmail().equals(data.get(position + 1).getSenderEmail())) {
             holder.setNeedToShowFirstMessageBubbleIndicator(false);
@@ -250,6 +253,10 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     public void setChatButtonClickListener(QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener) {
         this.chatButtonClickListener = chatButtonClickListener;
+    }
+
+    public void setCarouselItemClickListener(QiscusCarouselItemView.CarouselItemClickListener carouselItemClickListener) {
+        this.carouselItemClickListener = carouselItemClickListener;
     }
 
     public void setReplyItemClickListener(ReplyItemClickListener replyItemClickListener) {
