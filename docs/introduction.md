@@ -52,13 +52,13 @@ If you simply want to try the android sample app, you can direct to our [github 
 If you want your sample app running with your own APP ID, you can change it inside Configuration.java.
 Please be noted that when you connect your app with your APP ID, you may not see your contact list in your app *before* changing Sample Dashboard URL to your own URL.
 
-`java
+```java
 
 public class Configuration {
     public static String BASE_URL="http://dashboard-sample.herokuapp.com";
     public static String QISCUS_APP_ID="sampleapp-65ghcsaysse";
 }
-`
+```
 ### Try Sample App With Sample Dashboard
 
 If you have your own chat app, you may be wondering how you can manage your users. In this case, we provide a sample dashboard for user management. This sample dashboard can help you to figure out how to work with Qiscus Server Api for more advanced functionalities. You can go to https://www.qiscus.com/documentation/rest/list-api to know more about Server API.
