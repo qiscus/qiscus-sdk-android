@@ -643,7 +643,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     public void clickChatButton(JSONObject jsonButton) {
         if ("postback".equals(jsonButton.opt("type"))) {
-            sendCommentPostBack(jsonButton.optString("label", "Button"), jsonButton.optJSONObject("payload").toString());
+            String message = jsonButton.optString("postback_text", "");
+            if (message.isEmpty()) {
+                message = jsonButton.optString("label", "Button");
+            }
+            sendCommentPostBack(message, jsonButton.optJSONObject("payload").toString());
         }
     }
 
