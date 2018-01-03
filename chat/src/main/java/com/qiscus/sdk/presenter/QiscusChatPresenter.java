@@ -647,6 +647,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
     }
 
+    public void clickCarouselItem(JSONObject payload) {
+        if ("postback".equals(payload.optString("type"))) {
+            sendCommentPostBack(payload.optString("postback_text", "postback"),
+                    payload.optJSONObject("payload").toString());
+        }
+    }
+
     public void loadUntilComment(QiscusComment qiscusComment) {
         Qiscus.getDataStore().getObservableCommentsAfter(qiscusComment, currentTopicId)
                 .map(comments -> comments.contains(qiscusComment) ? comments : new ArrayList<QiscusComment>())

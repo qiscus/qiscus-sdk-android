@@ -17,7 +17,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
-    android:layout_width="match_parent"
+    android:layout_width="160dp"
     android:layout_height="wrap_content"
     app:cardCornerRadius="4dp"
     app:cardElevation="4dp"
@@ -33,8 +33,7 @@
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="96dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_qiscus_avatar" />
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/title"
@@ -45,7 +44,6 @@
             android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="Halo"
             android:textColor="@color/qiscus_primary_text"
             android:textSize="14sp" />
 
@@ -58,7 +56,6 @@
             android:layout_marginRight="8dp"
             android:ellipsize="end"
             android:maxLines="4"
-            android:text="Yeay"
             android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp" />
 

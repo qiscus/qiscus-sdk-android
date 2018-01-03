@@ -78,6 +78,7 @@ import com.qiscus.sdk.ui.QiscusSendPhotoConfirmationActivity;
 import com.qiscus.sdk.ui.adapter.CommentChainingListener;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
+import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
 import com.qiscus.sdk.ui.view.QiscusChatScrollListener;
 import com.qiscus.sdk.ui.view.QiscusEditText;
@@ -112,7 +113,7 @@ import java.util.Map;
 public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> extends RxFragment
         implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
         QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener,
-        QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener, CommentChainingListener {
+        QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener, CommentChainingListener, QiscusCarouselItemView.CarouselItemClickListener {
 
     protected static final int RC_PERMISSIONS = 127;
     protected static final int RC_CAMERA_PERMISSION = 128;
@@ -568,6 +569,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 onItemCommentLongClick((QiscusComment) chatAdapter.getData().get(position)));
         chatAdapter.setReplyItemClickListener(comment -> scrollToComment(comment.getReplyTo()));
         chatAdapter.setChatButtonClickListener(this);
+        chatAdapter.setCarouselItemClickListener(this);
         chatAdapter.setCommentChainingListener(this);
         messageRecyclerView.setUpAsBottomList();
         chatLayoutManager = (LinearLayoutManager) messageRecyclerView.getLayoutManager();
@@ -1771,6 +1773,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onChatButtonClick(JSONObject jsonButton) {
         qiscusChatPresenter.clickChatButton(jsonButton);
+    }
+
+    @Override
+    public void onCarouselItemClick(JSONObject payload) {
+        qiscusChatPresenter.clickCarouselItem(payload);
     }
 
     @Override
