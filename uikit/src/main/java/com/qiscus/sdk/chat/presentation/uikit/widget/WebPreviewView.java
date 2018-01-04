@@ -47,9 +47,9 @@ public class WebPreviewView extends LinearLayout {
 
     private void injectViews() {
         inflate(getContext(), R.layout.view_web_preview, this);
-        image = (ImageView) findViewById(R.id.image);
-        title = (TextView) findViewById(R.id.title);
-        description = (TextView) findViewById(R.id.description);
+        image = findViewById(R.id.image);
+        title = findViewById(R.id.title);
+        description = findViewById(R.id.description);
     }
 
     private void applyAttrs(Context context, AttributeSet attrs) {
