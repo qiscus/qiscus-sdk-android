@@ -42,6 +42,7 @@ import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.util.RecyclerViewScrollListener
 import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
@@ -66,7 +67,7 @@ fun Context.chatRoomIntent(roomId: String): Intent {
 private const val INTENT_ROOM_ID = "room_id"
 
 class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMessageContract.View,
-        ItemClickListener, ItemLongClickListener, ChatButtonView.ChatButtonClickListener {
+        ItemClickListener, ItemLongClickListener, ChatButtonView.ChatButtonClickListener, RecyclerViewScrollListener.Listener {
 
     private lateinit var listMessagePresenter: ListMessageContract.Presenter
     private lateinit var sendMessagePresenter: SendMessageContract.Presenter
@@ -123,6 +124,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         val layoutManager = LinearLayoutManager(this)
         layoutManager.reverseLayout = true
         messageRecyclerView.layoutManager = layoutManager
+        messageRecyclerView.addOnScrollListener(RecyclerViewScrollListener(layoutManager, this))
     }
 
     override fun onStart() {
@@ -141,7 +143,6 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
 
     override fun addMessage(messageViewModel: MessageViewModel) {
         adapter.addOrUpdate(messageViewModel)
-        messageRecyclerView.smoothScrollToPosition(0)
     }
 
     override fun updateMessage(messageViewModel: MessageViewModel) {
@@ -186,6 +187,18 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
 
     override fun onChatButtonClick(buttonViewModel: ButtonViewModel) {
         listMessagePresenter.onChatButtonClick(buttonViewModel)
+    }
+
+    override fun onTopOffList() {
+        listMessagePresenter.loadMessages(roomId!!, adapter.data[adapter.itemCount - 1].message.messageId)
+    }
+
+    override fun onMiddleOffList() {
+
+    }
+
+    override fun onBottomOffList() {
+
     }
 
     override fun clearTextField() {
