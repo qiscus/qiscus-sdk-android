@@ -3,7 +3,10 @@ package com.qiscus.sdk.data.model;
 import android.content.Context;
 
 /**
- * Created by rajapulau on 5/25/17.
+ * Created on : May 25, 2017
+ * Author     : rajapulau
+ * Name       : Ganjar Widiatmansyah
+ * GitHub     : https://github.com/rajapulau
  */
 
 public interface ReplyNotificationHandler {

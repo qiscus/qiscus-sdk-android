@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.remote;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
 import com.google.gson.JsonElement;
@@ -471,7 +472,7 @@ public enum QiscusApi {
         }
 
         @Override
-        public void writeTo(BufferedSink sink) throws IOException {
+        public void writeTo(@NonNull BufferedSink sink) throws IOException {
             Source source = null;
             try {
                 source = Okio.source(file);

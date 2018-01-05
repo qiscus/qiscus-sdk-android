@@ -68,7 +68,6 @@ final class QiscusApiParser {
         qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
         qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
         qiscusAccount.setToken(jsonAccount.get("token").getAsString());
-        qiscusAccount.setRtKey(jsonAccount.get("rtKey").getAsString());
         qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
         return qiscusAccount;
     }

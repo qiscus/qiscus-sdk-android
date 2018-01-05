@@ -71,10 +71,10 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private void injectViews() {
         inflate(getContext(), R.layout.view_qiscus_reply_preview, this);
         bar = findViewById(R.id.bar);
-        sender = (TextView) findViewById(R.id.origin_sender);
-        content = (TextView) findViewById(R.id.origin_content);
-        image = (ImageView) findViewById(R.id.origin_image);
-        icon = (ImageView) findViewById(R.id.icon);
+        sender = findViewById(R.id.origin_sender);
+        content = findViewById(R.id.origin_content);
+        image = findViewById(R.id.origin_image);
+        icon = findViewById(R.id.icon);
         closeView = findViewById(R.id.cancel_reply);
     }
 

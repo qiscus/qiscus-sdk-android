@@ -31,7 +31,6 @@ public class QiscusAccount implements Parcelable {
     protected String avatar;
     protected String token;
     protected String username;
-    protected String rtKey;
 
     public QiscusAccount() {
 
@@ -43,7 +42,6 @@ public class QiscusAccount implements Parcelable {
         avatar = in.readString();
         token = in.readString();
         username = in.readString();
-        rtKey = in.readString();
     }
 
     public static final Creator<QiscusAccount> CREATOR = new Creator<QiscusAccount>() {
@@ -98,14 +96,6 @@ public class QiscusAccount implements Parcelable {
         this.username = username;
     }
 
-    public String getRtKey() {
-        return rtKey;
-    }
-
-    public void setRtKey(String rtKey) {
-        this.rtKey = rtKey;
-    }
-
     @Override
     public int describeContents() {
         return hashCode();
@@ -118,7 +108,6 @@ public class QiscusAccount implements Parcelable {
         dest.writeString(avatar);
         dest.writeString(token);
         dest.writeString(username);
-        dest.writeString(rtKey);
     }
 
     @Override
@@ -128,7 +117,6 @@ public class QiscusAccount implements Parcelable {
         result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
         result = 31 * result + (token != null ? token.hashCode() : 0);
         result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (rtKey != null ? rtKey.hashCode() : 0);
         return result;
     }
 
@@ -145,7 +133,6 @@ public class QiscusAccount implements Parcelable {
                 ", avatar='" + avatar + '\'' +
                 ", token='" + token + '\'' +
                 ", username='" + username + '\'' +
-                ", rtKey='" + rtKey + '\'' +
                 '}';
     }
 }

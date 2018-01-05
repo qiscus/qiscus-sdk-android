@@ -108,9 +108,9 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         onSetStatusBarColor();
         setContentView(R.layout.activity_qiscus_send_photo_confirmation);
 
-        rootView = (ViewGroup) findViewById(R.id.root_view);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        TextView tvTitle = (TextView) findViewById(R.id.tv_title);
+        rootView = findViewById(R.id.root_view);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView tvTitle = findViewById(R.id.tv_title);
         ImageView ivAvatar = (QiscusCircularImageView) findViewById(R.id.profile_picture);
         findViewById(R.id.back).setOnClickListener(v -> onBackPressed());
 
@@ -130,10 +130,10 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
                 .dontAnimate()
                 .into(ivAvatar);
 
-        viewPager = (ViewPager) findViewById(R.id.view_pager);
-        messageEditText = (MentionsEditText) findViewById(R.id.field_message);
+        viewPager = findViewById(R.id.view_pager);
+        messageEditText = findViewById(R.id.field_message);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
@@ -172,7 +172,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
             }
         });
 
-        toggleEmojiButton = (ImageView) findViewById(R.id.button_add_emoticon);
+        toggleEmojiButton = findViewById(R.id.button_add_emoticon);
         toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon());
         toggleEmojiButton.setOnClickListener(v -> toggleEmoji());
 
@@ -184,7 +184,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
             }
         });
 
-        mentionSuggestionView = (QiscusMentionSuggestionView) findViewById(R.id.mention_suggestion);
+        mentionSuggestionView = findViewById(R.id.mention_suggestion);
         if (qiscusChatRoom.isGroup() && chatConfig.getMentionConfig().isEnableMention()) {
             mentionSuggestionView.bind(messageEditText);
             mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
@@ -208,7 +208,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
             return;
         }
 
-        ImageView sendButton = (ImageView) findViewById(R.id.button_send);
+        ImageView sendButton = findViewById(R.id.button_send);
         sendButton.setImageResource(chatConfig.getSendButtonIcon());
         sendButton.setOnClickListener(v -> confirm());
 

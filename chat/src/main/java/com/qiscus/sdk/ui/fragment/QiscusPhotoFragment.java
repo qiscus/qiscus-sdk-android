@@ -58,7 +58,7 @@ public class QiscusPhotoFragment extends RxFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_qiscus_photo, container, false);
-        imageView = (QiscusTouchImageView) view.findViewById(R.id.image_view);
+        imageView = view.findViewById(R.id.image_view);
         imageView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onPhotoClick();

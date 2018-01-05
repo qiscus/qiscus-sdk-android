@@ -29,7 +29,10 @@ import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import java.util.Date;
 
 /**
- * Created by zetra. on 9/19/16.
+ * Created on : September 09, 2016
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
  */
 public class SimpleCustomChatActivity extends QiscusBaseChatActivity {
     private TextView mTitle;
@@ -52,9 +55,9 @@ public class SimpleCustomChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected void onLoadView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mTitle = (TextView) findViewById(R.id.tv_title);
+        mTitle = findViewById(R.id.tv_title);
     }
 
     @Override

@@ -62,9 +62,9 @@ public class QiscusAudioRecorderView extends LinearLayout {
 
     private void injectViews() {
         inflate(getContext(), R.layout.view_qiscus_audio_recorder, this);
-        buttonStopRecord = (ImageView) findViewById(R.id.button_stop_record);
-        buttonCancelRecord = (ImageView) findViewById(R.id.button_cancel_record);
-        textViewDuration = (TextView) findViewById(R.id.record_duration);
+        buttonStopRecord = findViewById(R.id.button_stop_record);
+        buttonCancelRecord = findViewById(R.id.button_cancel_record);
+        textViewDuration = findViewById(R.id.record_duration);
     }
 
     private void applyAttrs(Context context, AttributeSet attrs) {

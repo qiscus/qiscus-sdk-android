@@ -37,7 +37,6 @@ import android.support.annotation.DrawableRes;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
-import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
 
 public class QiscusCircularImageView extends AppCompatImageView {
@@ -77,8 +76,6 @@ public class QiscusCircularImageView extends AppCompatImageView {
     private boolean setupPending;
     private boolean borderOverlay;
     private boolean disableCircularTransformation;
-
-    private String imageUrl;
 
     public QiscusCircularImageView(Context context) {
         super(context);
@@ -433,35 +430,5 @@ public class QiscusCircularImageView extends AppCompatImageView {
         shaderMatrix.postTranslate((int) (dx + 0.5f) + drawableRect.left, (int) (dy + 0.5f) + drawableRect.top);
 
         bitmapShader.setLocalMatrix(shaderMatrix);
-    }
-
-    public void setImageUrl(String url) {
-        imageUrl = url;
-        Nirmana.getInstance().get()
-                .load(url)
-                .into(this);
-    }
-
-    public void setImageUrl(String url, @DrawableRes int placeHolderResourceId) {
-        imageUrl = url;
-        Nirmana.getInstance().get()
-                .load(url)
-                .dontAnimate()
-                .placeholder(placeHolderResourceId)
-                .error(placeHolderResourceId)
-                .into(this);
-    }
-
-    public void setImageUrl(String url, @DrawableRes int placeHolderResourceId, @DrawableRes int errorResourceId) {
-        imageUrl = url;
-        Nirmana.getInstance().get()
-                .load(url)
-                .placeholder(placeHolderResourceId)
-                .error(errorResourceId)
-                .into(this);
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
     }
 }

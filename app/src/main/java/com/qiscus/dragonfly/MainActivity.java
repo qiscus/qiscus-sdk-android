@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mLoginButton = (Button) findViewById(R.id.bt_login);
+        mLoginButton = findViewById(R.id.bt_login);
         mLoginButton.setText(Qiscus.hasSetupUser() ? "Logout" : "Login");
     }
 

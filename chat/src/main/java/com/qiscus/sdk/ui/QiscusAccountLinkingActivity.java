@@ -70,9 +70,9 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         super.onCreate(savedInstanceState);
         onSetStatusBarColor();
         setContentView(R.layout.activity_qiscus_account_linking);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
-        TextView titleView = (TextView) findViewById(R.id.title);
+        TextView titleView = findViewById(R.id.title);
         String title = getIntent().getStringExtra(EXTRA_TITLE);
         title = (title == null || title.isEmpty()) ? getString(R.string.qiscus_account_linking) : title;
         titleView.setText(title);
@@ -81,8 +81,8 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         successMessage = (successMessage == null || successMessage.isEmpty()) ?
                 getString(R.string.qiscus_success_linking_account) : successMessage;
 
-        webView = (WebView) findViewById(R.id.web_view);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        webView = findViewById(R.id.web_view);
+        progressBar = findViewById(R.id.progressBar);
 
         setupWebView();
 

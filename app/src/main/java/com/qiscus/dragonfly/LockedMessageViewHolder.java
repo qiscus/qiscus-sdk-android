@@ -40,7 +40,7 @@ public class LockedMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusC
 
     public LockedMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
-        textView = (TextView) itemView.findViewById(R.id.contents);
+        textView = itemView.findViewById(R.id.contents);
     }
 
     @Nullable

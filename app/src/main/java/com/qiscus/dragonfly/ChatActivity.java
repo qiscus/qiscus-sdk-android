@@ -38,7 +38,10 @@ import com.qiscus.sdk.util.QiscusDateUtil;
 import java.util.Date;
 
 /**
- * Created by zetra. on 9/19/16.
+ * Created on : September 09, 2016
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
  */
 public class ChatActivity extends QiscusBaseChatActivity {
     private Toolbar toolbar;
@@ -61,10 +64,10 @@ public class ChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected void onLoadView() {
-        toolbar = (Toolbar) findViewById(com.qiscus.sdk.R.id.toolbar);
-        tvTitle = (TextView) findViewById(com.qiscus.sdk.R.id.tv_title);
-        tvSubtitle = (TextView) findViewById(com.qiscus.sdk.R.id.tv_subtitle);
-        ivAvatar = (QiscusCircularImageView) findViewById(com.qiscus.sdk.R.id.profile_picture);
+        toolbar = findViewById(com.qiscus.sdk.R.id.toolbar);
+        tvTitle = findViewById(com.qiscus.sdk.R.id.tv_title);
+        tvSubtitle = findViewById(com.qiscus.sdk.R.id.tv_subtitle);
+        ivAvatar = findViewById(com.qiscus.sdk.R.id.profile_picture);
         findViewById(com.qiscus.sdk.R.id.back).setOnClickListener(v -> onBackPressed());
         setSupportActionBar(toolbar);
     }

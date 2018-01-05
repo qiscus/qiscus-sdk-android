@@ -75,10 +75,10 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected void onLoadView() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        tvTitle = (TextView) findViewById(R.id.tv_title);
-        tvSubtitle = (TextView) findViewById(R.id.tv_subtitle);
-        ivAvatar = (QiscusCircularImageView) findViewById(R.id.profile_picture);
+        toolbar = findViewById(R.id.toolbar);
+        tvTitle = findViewById(R.id.tv_title);
+        tvSubtitle = findViewById(R.id.tv_subtitle);
+        ivAvatar = findViewById(R.id.profile_picture);
         findViewById(R.id.back).setOnClickListener(v -> onBackPressed());
         setSupportActionBar(toolbar);
     }

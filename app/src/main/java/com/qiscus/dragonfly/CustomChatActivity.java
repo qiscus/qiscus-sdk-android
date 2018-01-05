@@ -50,9 +50,9 @@ public class CustomChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected void onLoadView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mTitle = (TextView) findViewById(R.id.tv_title);
+        mTitle = findViewById(R.id.tv_title);
     }
 
     @Override

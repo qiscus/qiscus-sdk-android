@@ -33,9 +33,11 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by adicatur on 11/23/17.
+ * Created on : November 23, 2018
+ * Author     : adicatur
+ * Name       : Catur Adi Nugroho
+ * GitHub     : https://github.com/adicatur
  */
-
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class QiscusSyncJobService extends JobService {
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();

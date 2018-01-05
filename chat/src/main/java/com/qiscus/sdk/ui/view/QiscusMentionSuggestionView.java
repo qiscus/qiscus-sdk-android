@@ -73,7 +73,7 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
 
     private void injectViews() {
         inflate(getContext(), R.layout.view_qiscus_mention_suggestion, this);
-        listView = (ListView) findViewById(R.id.list_suggestion);
+        listView = findViewById(R.id.list_suggestion);
     }
 
     public void bind(MentionsEditText editText) {

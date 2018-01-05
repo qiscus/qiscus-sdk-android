@@ -103,13 +103,13 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
         presenter = new QiscusPhotoViewerPresenter(this);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        tvTitle = (TextView) findViewById(R.id.tv_title);
-        viewPager = (ViewPager) findViewById(R.id.view_pager);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        senderName = (TextView) findViewById(R.id.sender_name);
-        date = (TextView) findViewById(R.id.date);
-        ImageButton shareButton = (ImageButton) findViewById(R.id.action_share);
+        toolbar = findViewById(R.id.toolbar);
+        tvTitle = findViewById(R.id.tv_title);
+        viewPager = findViewById(R.id.view_pager);
+        progressBar = findViewById(R.id.progress_bar);
+        senderName = findViewById(R.id.sender_name);
+        date = findViewById(R.id.date);
+        ImageButton shareButton = findViewById(R.id.action_share);
         infoPanel = findViewById(R.id.info_panel);
         fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
         fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);

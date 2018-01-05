@@ -57,7 +57,7 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     protected void onLoadView(View view) {
         super.onLoadView(view);
         mInputPanel = view.findViewById(R.id.box);
-        mLockedView = (TextView) view.findViewById(R.id.lock);
+        mLockedView = view.findViewById(R.id.lock);
         mLockedView.setOnLongClickListener(v -> {
             openLockedChat();
             return true;

@@ -74,7 +74,7 @@ public final class QiscusAndroidUtil {
     public static boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager)
                 Qiscus.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        NetworkInfo activeNetwork = cm != null ? cm.getActiveNetworkInfo() : null;
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
@@ -98,13 +98,15 @@ public final class QiscusAndroidUtil {
 
     public static void showKeyboard(Context context, View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (view.requestFocus()) {
+        if (view.requestFocus() && inputMethodManager != null) {
             inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
         }
     }
 
     public static void hideKeyboard(Context context, View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

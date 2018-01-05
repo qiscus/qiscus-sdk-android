@@ -70,11 +70,11 @@ public class QiscusMentionSuggestionBuilder implements SuggestionsListBuilder {
             view = convertView;
         }
 
-        TextView textView = (TextView) view.findViewById(R.id.name);
+        TextView textView = view.findViewById(R.id.name);
         textView.setText(suggestion.getSuggestiblePrimaryText());
 
         if (suggestion instanceof QiscusRoomMember) {
-            ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
+            ImageView imageView = view.findViewById(R.id.avatar);
             QiscusRoomMember member = (QiscusRoomMember) suggestion;
             Nirmana.getInstance().get()
                     .load(member.getAvatar())

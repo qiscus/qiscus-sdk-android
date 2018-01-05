@@ -110,7 +110,7 @@ public class QiscusPhotoAdapter extends RecyclerView.Adapter<QiscusPhotoAdapter.
             super(itemView);
             itemView.setOnClickListener(this);
             this.itemClickListener = itemClickListener;
-            imageView = (ImageView) itemView.findViewById(R.id.image);
+            imageView = itemView.findViewById(R.id.image);
         }
 
         @Override

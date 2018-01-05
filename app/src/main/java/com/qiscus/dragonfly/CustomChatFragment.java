@@ -66,8 +66,8 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         swipeRefreshLayout.setProgressViewOffset(false, 0, 128);
 
         View clickConsumer = view.findViewById(R.id.click_consumer);
-        mAttachButton = (ImageView) view.findViewById(R.id.button_attach);
-        mAddPanel = (LinearLayout) view.findViewById(R.id.add_panel);
+        mAttachButton = view.findViewById(R.id.button_attach);
+        mAddPanel = view.findViewById(R.id.add_panel);
         mAttachButton.setOnClickListener(v -> {
             if (mAddPanel.getVisibility() == View.GONE) {
                 mAddPanel.startAnimation(animation);
