@@ -1,7 +1,6 @@
 package com.qiscus.sdk.chat.presentation.uikit.util
 
 import android.text.format.DateUtils
-import android.util.Log
 import com.qiscus.sdk.chat.presentation.uikit.R
 import com.qiscus.sdk.chat.presentation.util.getString
 import java.text.DateFormat
