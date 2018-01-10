@@ -137,6 +137,10 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                         .getChatConfig()
                         .getRoomSenderNameColorInterceptor()
                         .getColor(qiscusComment)));
+        if (barView != null) {
+            barView.setBackgroundColor(ContextCompat.getColor(Qiscus.getApps(),
+                    Qiscus.getChatConfig().getRoomReplybarColorInterceptor().getColor(qiscusComment)));
+        }
         switch (originComment.getType()) {
             case IMAGE:
             case VIDEO:
