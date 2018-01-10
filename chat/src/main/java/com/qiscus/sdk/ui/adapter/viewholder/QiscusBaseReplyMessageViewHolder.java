@@ -132,6 +132,11 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
         originSenderTextView.setText(originComment.getSenderEmail().equals(qiscusAccount.getEmail()) ?
                 QiscusTextUtil.getString(R.string.qiscus_you) : Qiscus.getChatConfig().getRoomSenderNameInterceptor()
                 .getSenderName(originComment));
+        originSenderTextView.setTextColor(ContextCompat
+                .getColor(Qiscus.getApps(), Qiscus
+                        .getChatConfig()
+                        .getRoomSenderNameColorInterceptor()
+                        .getColor(qiscusComment)));
         switch (originComment.getType()) {
             case IMAGE:
             case VIDEO:
