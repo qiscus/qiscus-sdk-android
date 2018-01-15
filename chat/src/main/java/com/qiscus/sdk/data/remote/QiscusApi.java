@@ -62,6 +62,7 @@ import okio.Source;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -341,6 +342,20 @@ public enum QiscusApi {
                 .toList();
     }
 
+    public Observable<Void> clearChatRoomMessages(List<String> roomChannelIds) {
+        return api.clearChatRoomMessages(Qiscus.getToken(), roomChannelIds)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
+                .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("unique_id").getAsString())
+                .map(s -> Qiscus.getDataStore().getChatRoomWithUniqueId(s))
+                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().deleteCommentsByRoomId(qiscusChatRoom.getId()))
+                .toList()
+                .map(qiscusChatRooms -> null);
+    }
+
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -449,6 +464,10 @@ public enum QiscusApi {
                                              @Field("room_id[]") List<Integer> roomIds,
                                              @Field("room_unique_id[]") List<String> roomUniqueIds,
                                              @Field("show_participants") boolean showParticipants);
+
+        @DELETE("/api/v2/sdk/clear_room_messages")
+        Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
+                                                      @Query("room_channel_ids[]") List<String> roomChannelIds);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
