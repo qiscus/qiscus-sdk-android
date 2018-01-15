@@ -24,6 +24,8 @@ interface ListMessageContract {
 
         fun removeMessage(messageViewModel: MessageViewModel)
 
+        fun getSelectedMessages(): List<MessageViewModel>
+
         fun openImageViewer(messageViewModel: MessageImageViewModel)
 
         fun openFileHandler(messageViewModel: MessageFileViewModel)
@@ -49,5 +51,7 @@ interface ListMessageContract {
         fun onMessageLongClick(messageViewModel: MessageViewModel)
 
         fun onChatButtonClick(buttonViewModel: ButtonViewModel)
+
+        fun setMessageSelectedListener(messageSelectedListener: MessageSelectedListener)
     }
 }

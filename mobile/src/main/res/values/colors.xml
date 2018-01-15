@@ -52,6 +52,8 @@
     <color name="qiscus_opponents_message_unfinished_progress">#009688</color>
     <color name="qiscus_opponents_message_finished_progress">#009688</color>
 
+    <color name="qiscus_message_selected">#009688</color>
+
     <!-- audio player -->
     <color name="qiscus_audio_player_icon_tint">#212121</color>
     <color name="qiscus_audio_progress_unfilled">#B6B6B6</color>

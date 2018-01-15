@@ -29,6 +29,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
                            private val mentionClickListener: MentionClickListener? = null) : ListMessageContract.Presenter {
 
     private lateinit var roomId: String
+    private var messageSelectedListener: MessageSelectedListener? = null
 
     override fun start() {
         listenMessageAdded(roomId)
@@ -39,6 +40,10 @@ class ListMessagePresenter(val view: ListMessageContract.View,
 
     override fun setRoomId(roomId: String) {
         this.roomId = roomId
+    }
+
+    override fun setMessageSelectedListener(messageSelectedListener: MessageSelectedListener) {
+        this.messageSelectedListener = messageSelectedListener
     }
 
     override fun loadMessages(roomId: String, lastMessageId: MessageId?, limit: Int) {
@@ -73,6 +78,16 @@ class ListMessagePresenter(val view: ListMessageContract.View,
     }
 
     override fun onMessageClick(messageViewModel: MessageViewModel) {
+        if (view.getSelectedMessages().isNotEmpty() &&
+                (messageViewModel is MessageTextViewModel
+                        || messageViewModel is MessageFileViewModel
+                        || messageViewModel is MessageContactViewModel
+                        || messageViewModel is MessageLocationViewModel
+                        || messageViewModel is MessageReplyViewModel)) {
+            toggleMessageSelection(messageViewModel)
+            return
+        }
+
         when (messageViewModel) {
             is MessageFileViewModel -> handleClickFileMessage(messageViewModel)
             is MessageTextViewModel -> TODO()
@@ -81,7 +96,22 @@ class ListMessagePresenter(val view: ListMessageContract.View,
     }
 
     override fun onMessageLongClick(messageViewModel: MessageViewModel) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (view.getSelectedMessages().isEmpty() &&
+                (messageViewModel is MessageTextViewModel
+                        || messageViewModel is MessageFileViewModel
+                        || messageViewModel is MessageContactViewModel
+                        || messageViewModel is MessageLocationViewModel
+                        || messageViewModel is MessageReplyViewModel)) {
+            toggleMessageSelection(messageViewModel)
+        }
+    }
+
+    private fun toggleMessageSelection(messageViewModel: MessageViewModel) {
+        messageViewModel.selected = !messageViewModel.selected
+        view.updateMessage(messageViewModel)
+        if (messageSelectedListener != null) {
+            messageSelectedListener!!.onMessageSelected(view.getSelectedMessages())
+        }
     }
 
     override fun onChatButtonClick(buttonViewModel: ButtonViewModel) {

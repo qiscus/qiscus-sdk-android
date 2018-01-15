@@ -40,4 +40,6 @@ open class MessageViewModel
         return message.text.toSpannable(account, userRepository, mentionAllColor, mentionOtherColor,
                 mentionMeColor, mentionClickListener)
     }
+
+    var selected = false
 }

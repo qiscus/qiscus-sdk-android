@@ -153,6 +153,10 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         adapter.removeMessage(messageViewModel)
     }
 
+    override fun getSelectedMessages(): List<MessageViewModel> {
+        return adapter.getSelectedMessages()
+    }
+
     override fun openImageViewer(messageViewModel: MessageImageViewModel) {
         Toast.makeText(this, "open image", Toast.LENGTH_SHORT).show()
     }

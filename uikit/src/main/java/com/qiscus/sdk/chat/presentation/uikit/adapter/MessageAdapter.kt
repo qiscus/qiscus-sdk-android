@@ -27,6 +27,7 @@ open class MessageAdapter : SortedAdapter<MessageViewModel, RecyclerView.ViewHol
     fun addOrUpdate(messageViewModel: MessageViewModel) {
         val pos = data.indexOfFirst { it.message.messageId == messageViewModel.message.messageId }
         if (pos >= 0) {
+            messageViewModel.selected = data[pos].selected
             data.updateItemAt(pos, messageViewModel)
         } else {
             data.add(messageViewModel)
@@ -72,5 +73,12 @@ open class MessageAdapter : SortedAdapter<MessageViewModel, RecyclerView.ViewHol
 
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder?) {
         delegatesManager.onViewDetachedFromWindow(holder!!)
+    }
+
+    fun getSelectedMessages(): List<MessageViewModel> {
+        val size = data.size()
+        return (size - 1 downTo 0)
+                .filter { data[it].selected }
+                .map { data[it] }
     }
 }

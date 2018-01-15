@@ -1,5 +1,7 @@
 package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -60,6 +62,7 @@ abstract class BaseMessageViewHolder @JvmOverloads constructor(view: View,
     var needToShowDate: Boolean = false
     var needToShowFirstMessageBubbleIndicator: Boolean = false
     var needToShowSenderName: Boolean = false
+    protected lateinit var selectionBackground: Drawable
 
     protected val dateView: TextView by lazy {
         determineDateView()
@@ -80,6 +83,8 @@ abstract class BaseMessageViewHolder @JvmOverloads constructor(view: View,
     init {
         bubbleView.setOnClickListener(this)
         bubbleView.setOnLongClickListener(this)
+        selectionBackground = ColorDrawable(getColor(resId = R.color.qiscus_message_selected))
+        selectionBackground.alpha = 51
     }
 
     abstract fun determineDateView(): TextView
@@ -95,6 +100,7 @@ abstract class BaseMessageViewHolder @JvmOverloads constructor(view: View,
         renderFirstMessageBubbleIndicator(messageViewModel)
         renderTime(messageViewModel)
         renderMessageContents(messageViewModel)
+        renderSelection(messageViewModel)
     }
 
     abstract fun renderMessageContents(messageViewModel: MessageViewModel)
@@ -118,6 +124,14 @@ abstract class BaseMessageViewHolder @JvmOverloads constructor(view: View,
 
     open protected fun renderTime(messageViewModel: MessageViewModel) {
         timeView.text = messageViewModel.message.date.toHour()
+    }
+
+    open protected fun renderSelection(messageViewModel: MessageViewModel) {
+        if (messageViewModel.selected) {
+            itemView.background = selectionBackground
+        } else {
+            itemView.background = null
+        }
     }
 
     override fun onClick(v: View?) {
