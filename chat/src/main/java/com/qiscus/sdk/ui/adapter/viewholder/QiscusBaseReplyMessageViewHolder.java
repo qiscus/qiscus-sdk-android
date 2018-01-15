@@ -127,11 +127,19 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                 replyItemClickListener.onReplyItemClick(qiscusComment);
             }
         });
-
         QiscusComment originComment = qiscusComment.getReplyTo();
         originSenderTextView.setText(originComment.getSenderEmail().equals(qiscusAccount.getEmail()) ?
                 QiscusTextUtil.getString(R.string.qiscus_you) : Qiscus.getChatConfig().getRoomSenderNameInterceptor()
                 .getSenderName(originComment));
+        originSenderTextView.setTextColor(ContextCompat
+                .getColor(Qiscus.getApps(), Qiscus
+                        .getChatConfig()
+                        .getRoomSenderNameColorInterceptor()
+                        .getColor(originComment)));
+        if (barView != null) {
+            barView.setBackgroundColor(ContextCompat.getColor(Qiscus.getApps(),
+                    Qiscus.getChatConfig().getRoomReplybarColorInterceptor().getColor(originComment)));
+        }
         switch (originComment.getType()) {
             case IMAGE:
             case VIDEO:

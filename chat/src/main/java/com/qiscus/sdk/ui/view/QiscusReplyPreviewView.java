@@ -19,6 +19,7 @@ package com.qiscus.sdk.ui.view;
 import android.content.Context;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -107,7 +108,12 @@ public class QiscusReplyPreviewView extends LinearLayout {
             content.setText(null);
             setVisibility(GONE);
         } else {
-            sender.setText(Qiscus.getChatConfig().getRoomSenderNameInterceptor().getSenderName(originComment));
+            sender.setText(Qiscus.getChatConfig().getRoomSenderNameInterceptor()
+                    .getSenderName(originComment));
+            sender.setTextColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig()
+                    .getRoomSenderNameColorInterceptor().getColor(originComment)));
+            setBarColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig()
+                    .getRoomReplybarColorInterceptor().getColor(originComment)));
             switch (originComment.getType()) {
                 case IMAGE:
                 case VIDEO:
