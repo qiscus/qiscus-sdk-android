@@ -14,7 +14,7 @@ import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
 import com.qiscus.sdk.chat.presentation.model.RoomViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.SortedAdapter
 import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
-import java.text.SimpleDateFormat
+import com.qiscus.sdk.chat.presentation.uikit.util.toTodayOrDate
 
 /**
  * Created on : October 04, 2017
@@ -85,8 +85,6 @@ class RoomAdapter(private val context: Context) : SortedAdapter<RoomViewModel, R
         private val lastMessageDateView: TextView = view.findViewById(R.id.lastMessageDate)
         private val unreadCountView: TextView = view.findViewById(R.id.unreadCount)
 
-        private val dateFormat = SimpleDateFormat.getDateInstance()
-
         private val normalColor = ContextCompat.getColor(view.context, R.color.qiscus_list_room_last_message_date)
         private val unreadColor = ContextCompat.getColor(view.context, R.color.qiscus_list_room_last_message_date_active)
 
@@ -94,7 +92,7 @@ class RoomAdapter(private val context: Context) : SortedAdapter<RoomViewModel, R
             Glide.with(roomAvatarView).load(roomViewModel.room.avatar).into(roomAvatarView)
             roomNameView.text = roomViewModel.room.name
             lastMessageView.text = roomViewModel.lastMessage?.spannableMessage
-            lastMessageDateView.text = dateFormat.format(roomViewModel.lastMessage?.message?.date)
+            lastMessageDateView.text = roomViewModel.lastMessage?.message?.date?.toTodayOrDate()
             unreadCountView.text = "${roomViewModel.room.unreadCount}"
 
             if (roomViewModel.room.unreadCount > 0) {
