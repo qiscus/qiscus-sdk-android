@@ -38,6 +38,8 @@ interface ListMessageContract {
         fun showAddContactDialog(messageViewModel: MessageContactViewModel)
 
         fun openMap(messageViewModel: MessageLocationViewModel)
+
+        fun openUrl(url: String)
     }
 
     interface Presenter : BasePresenter {

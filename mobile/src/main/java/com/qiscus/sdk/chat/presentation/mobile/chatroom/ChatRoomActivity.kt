@@ -106,8 +106,8 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
                 .addDelegate(OpponentContactAdapterDelegate(this, this, this))
                 .addDelegate(LocationAdapterDelegate(this, this, this))
                 .addDelegate(OpponentLocationAdapterDelegate(this, this, this))
-                .addDelegate(CardAdapterDelegate(this, this))
-                .addDelegate(OpponentCardAdapterDelegate(this, this))
+                .addDelegate(CardAdapterDelegate(this, this, this))
+                .addDelegate(OpponentCardAdapterDelegate(this, this, this))
                 .addDelegate(AccountLinkingAdapterDelegate(this, this))
                 .addDelegate(OpponentAccountLinkingAdapterDelegate(this, this))
                 .addDelegate(ButtonsAdapterDelegate(this, this))
@@ -283,7 +283,11 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
     }
 
     override fun openMap(messageViewModel: MessageLocationViewModel) {
-        startCustomTabActivity(messageViewModel.mapUrl)
+        openUrl(messageViewModel.mapUrl)
+    }
+
+    override fun openUrl(url: String) {
+        startCustomTabActivity(url)
     }
 
     override fun onStop() {

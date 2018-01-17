@@ -94,6 +94,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
                 is MessageAccountLinkingViewModel -> handleClickAccountLinking(messageViewModel)
                 is MessageContactViewModel -> handleClickContactMessage(messageViewModel)
                 is MessageLocationViewModel -> handleClickLocationMessage(messageViewModel)
+                is MessageCardViewModel -> handleClickCardMessage(messageViewModel)
             }
         } else if (messageViewModel.message.state == MessageState.FAILED) {
             view.showFailedMessageDialog(messageViewModel)
@@ -144,6 +145,10 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         view.openMap(messageViewModel)
     }
 
+    private fun handleClickCardMessage(messageViewModel: MessageCardViewModel) {
+        view.openUrl(messageViewModel.cardUrl)
+    }
+
     override fun onMessageLongClick(messageViewModel: MessageViewModel) {
         if (view.getSelectedMessages().isEmpty() &&
                 (messageViewModel is MessageTextViewModel
@@ -164,8 +169,9 @@ class ListMessagePresenter(val view: ListMessageContract.View,
     }
 
     override fun onChatButtonClick(buttonViewModel: ButtonViewModel) {
-        if ("postback" == buttonViewModel.type) {
-            TODO()
+        when (buttonViewModel) {
+            is ButtonPostBackViewModel -> TODO()
+            is ButtonLinkViewModel -> view.openUrl(buttonViewModel.url)
         }
     }
 

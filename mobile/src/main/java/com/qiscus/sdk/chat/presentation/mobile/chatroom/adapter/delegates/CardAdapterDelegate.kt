@@ -13,6 +13,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageCardViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
+import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.util.getColor
 import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 
@@ -23,6 +24,7 @@ import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
  * GitHub     : https://github.com/zetbaitsu
  */
 class CardAdapterDelegate(private val context: Context,
+                          private val itemClickListener: ItemClickListener? = null,
                           private val chatButtonClickListener: ChatButtonView.ChatButtonClickListener)
     : MessageAdapterDelegate() {
 
@@ -33,14 +35,16 @@ class CardAdapterDelegate(private val context: Context,
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.item_qiscus_message_card_me, parent, false)
-        return CardViewHolder(view, chatButtonClickListener)
+        return CardViewHolder(view, itemClickListener, chatButtonClickListener)
     }
 }
 
 open class CardViewHolder(view: View,
+                          itemClickListener: ItemClickListener? = null,
                           private val chatButtonClickListener: ChatButtonView.ChatButtonClickListener)
-    : TextViewHolder(view) {
+    : TextViewHolder(view, itemClickListener) {
 
+    private val cardView: View = itemView.findViewById(R.id.card_view)
     private val messageBubbleView: View = itemView.findViewById(R.id.message)
     private val imageView: ImageView = itemView.findViewById(R.id.thumbnail)
     private val titleView: TextView = itemView.findViewById(R.id.title)
@@ -49,6 +53,10 @@ open class CardViewHolder(view: View,
 
     private val buttonTextColor = getColor(resId = R.color.qiscus_message_card_buttons_text)
     private val buttonBackgroundColor = getColor(resId = R.color.qiscus_message_card_buttons_bg)
+
+    init {
+        cardView.setOnClickListener(this)
+    }
 
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
         super.renderMessageContents(messageViewModel)
@@ -92,5 +100,14 @@ open class CardViewHolder(view: View,
         }
 
         buttonsContainer.visibility = View.VISIBLE
+    }
+
+    override fun onClick(v: View?) {
+        if (v == cardView) {
+            val position = adapterPosition
+            if (position >= 0) {
+                itemClickListener?.onItemClick(v, position)
+            }
+        }
     }
 }
