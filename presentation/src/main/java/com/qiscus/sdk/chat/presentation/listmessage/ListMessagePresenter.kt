@@ -88,34 +88,19 @@ class ListMessagePresenter(val view: ListMessageContract.View,
             return
         }
 
-        when (messageViewModel) {
-            is MessageFileViewModel -> handleClickFileMessage(messageViewModel)
-            is MessageTextViewModel -> TODO()
-            else -> TODO()
+        if (messageViewModel.message.state.intValue > MessageState.SENDING.intValue) {
+            when (messageViewModel) {
+                is MessageFileViewModel -> handleClickFileMessage(messageViewModel)
+                is MessageAccountLinkingViewModel -> handleClickAccountLinking(messageViewModel)
+                is MessageContactViewModel -> handleClickContactMessage(messageViewModel)
+                is MessageLocationViewModel -> handleClickLocationMessage(messageViewModel)
+            }
+        } else if (messageViewModel.message.state == MessageState.FAILED) {
+            view.showFailedMessageDialog(messageViewModel)
+        } else if (messageViewModel.message.state == MessageState.PENDING
+                || messageViewModel.message.state == MessageState.SENDING) {
+            view.showPendingMessageDialog(messageViewModel)
         }
-    }
-
-    override fun onMessageLongClick(messageViewModel: MessageViewModel) {
-        if (view.getSelectedMessages().isEmpty() &&
-                (messageViewModel is MessageTextViewModel
-                        || messageViewModel is MessageFileViewModel
-                        || messageViewModel is MessageContactViewModel
-                        || messageViewModel is MessageLocationViewModel
-                        || messageViewModel is MessageReplyViewModel)) {
-            toggleMessageSelection(messageViewModel)
-        }
-    }
-
-    private fun toggleMessageSelection(messageViewModel: MessageViewModel) {
-        messageViewModel.selected = !messageViewModel.selected
-        view.updateMessage(messageViewModel)
-        if (messageSelectedListener != null) {
-            messageSelectedListener!!.onMessageSelected(view.getSelectedMessages())
-        }
-    }
-
-    override fun onChatButtonClick(buttonViewModel: ButtonViewModel) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun handleClickFileMessage(messageViewModel: MessageFileViewModel) {
@@ -145,6 +130,43 @@ class ListMessagePresenter(val view: ListMessageContract.View,
             it.printStackTrace()
             messageFileViewModel.transfer = false
         })
+    }
+
+    private fun handleClickAccountLinking(messageViewModel: MessageAccountLinkingViewModel) {
+        view.openAccountLinkingPage(messageViewModel)
+    }
+
+    private fun handleClickContactMessage(messageViewModel: MessageContactViewModel) {
+       view.showAddContactDialog(messageViewModel)
+    }
+
+    private fun handleClickLocationMessage(messageViewModel: MessageLocationViewModel) {
+        view.openMap(messageViewModel)
+    }
+
+    override fun onMessageLongClick(messageViewModel: MessageViewModel) {
+        if (view.getSelectedMessages().isEmpty() &&
+                (messageViewModel is MessageTextViewModel
+                        || messageViewModel is MessageFileViewModel
+                        || messageViewModel is MessageContactViewModel
+                        || messageViewModel is MessageLocationViewModel
+                        || messageViewModel is MessageReplyViewModel)) {
+            toggleMessageSelection(messageViewModel)
+        }
+    }
+
+    private fun toggleMessageSelection(messageViewModel: MessageViewModel) {
+        messageViewModel.selected = !messageViewModel.selected
+        view.updateMessage(messageViewModel)
+        if (messageSelectedListener != null) {
+            messageSelectedListener!!.onMessageSelected(view.getSelectedMessages())
+        }
+    }
+
+    override fun onChatButtonClick(buttonViewModel: ButtonViewModel) {
+        if ("postback" == buttonViewModel.type) {
+            TODO()
+        }
     }
 
     override fun stop() {

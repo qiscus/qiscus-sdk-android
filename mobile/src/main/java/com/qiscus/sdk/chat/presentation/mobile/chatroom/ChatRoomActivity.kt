@@ -22,7 +22,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
+import android.support.annotation.ColorInt
 import android.support.v4.content.FileProvider
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
@@ -35,14 +38,12 @@ import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.DefaultMessageAdapter
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates.*
-import com.qiscus.sdk.chat.presentation.model.ButtonViewModel
-import com.qiscus.sdk.chat.presentation.model.MessageFileViewModel
-import com.qiscus.sdk.chat.presentation.model.MessageImageViewModel
-import com.qiscus.sdk.chat.presentation.model.MessageViewModel
+import com.qiscus.sdk.chat.presentation.model.*
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
 import com.qiscus.sdk.chat.presentation.uikit.util.RecyclerViewScrollListener
+import com.qiscus.sdk.chat.presentation.uikit.util.startCustomTabActivity
 import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 import kotlinx.android.synthetic.main.activity_chat_room.*
 
@@ -211,6 +212,76 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
 
     override fun showError(errorMessage: String) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showFailedMessageDialog(messageViewModel: MessageViewModel) {
+        AlertDialog.Builder(this)
+                .setTitle(R.string.qiscus_failed_send_message_dialog_title)
+                .setItems(arrayOf<CharSequence>(getString(R.string.qiscus_resend), getString(R.string.qiscus_delete))) { _, which ->
+                    if (which == 0) {
+                        TODO() // Resend message
+                    } else {
+                        TODO() // Delete message
+                    }
+                }
+                .setCancelable(true)
+                .create()
+                .show()
+    }
+
+    override fun showPendingMessageDialog(messageViewModel: MessageViewModel) {
+        AlertDialog.Builder(this)
+                .setTitle(R.string.qiscus_sending_message_dialog_title)
+                .setItems(arrayOf<CharSequence>(getString(R.string.qiscus_delete))) { _, _ ->
+                    TODO() // Delete message
+                }
+                .setCancelable(true)
+                .create()
+                .show()
+    }
+
+    override fun openAccountLinkingPage(messageViewModel: MessageAccountLinkingViewModel) {
+        TODO() // Open account linking
+    }
+
+    override fun showAddContactDialog(messageViewModel: MessageContactViewModel) {
+        var type = ContactsContract.Intents.Insert.PHONE
+        if ("email" == messageViewModel.contactType) {
+            type = ContactsContract.Intents.Insert.EMAIL
+        }
+        val finalType = type
+        val alertDialog = AlertDialog.Builder(this)
+                .setMessage(R.string.qiscus_add_contact_confirmation)
+                .setPositiveButton(R.string.qiscus_new_contact) { dialog, _ ->
+                    val intent = Intent(Intent.ACTION_INSERT)
+                    intent.type = ContactsContract.Contacts.CONTENT_TYPE
+                    intent.putExtra(ContactsContract.Intents.Insert.NAME, messageViewModel.contactName)
+                    intent.putExtra(finalType, messageViewModel.contactValue)
+                    startActivity(intent)
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.qiscus_existing_contact) { dialog, _ ->
+                    val intent = Intent(Intent.ACTION_INSERT_OR_EDIT)
+                    intent.type = ContactsContract.Contacts.CONTENT_ITEM_TYPE
+                    intent.putExtra(ContactsContract.Intents.Insert.NAME, messageViewModel.contactName)
+                    intent.putExtra(finalType, messageViewModel.contactValue)
+                    startActivity(intent)
+                    dialog.dismiss()
+                }
+                .setCancelable(true)
+                .create()
+
+        alertDialog.setOnShowListener { _ ->
+            @ColorInt val accent = com.qiscus.sdk.chat.presentation.uikit.util.getColor(resId = R.color.qiscus_accent)
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(accent)
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(accent)
+        }
+
+        alertDialog.show()
+    }
+
+    override fun openMap(messageViewModel: MessageLocationViewModel) {
+       startCustomTabActivity(messageViewModel.mapUrl)
     }
 
     override fun onStop() {
