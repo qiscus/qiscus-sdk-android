@@ -3,16 +3,21 @@ package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 import android.content.Context
 import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import com.qiscus.sdk.chat.domain.common.Patterns
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.LinkPreviewListener
 import com.qiscus.sdk.chat.presentation.model.MessageLinkViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.util.ClickSpan
+import com.qiscus.sdk.chat.presentation.uikit.util.startCustomTabActivity
 import com.qiscus.sdk.chat.presentation.uikit.widget.WebPreviewView
 
 /**
@@ -52,6 +57,39 @@ open class LinkViewHolder @JvmOverloads constructor(view: View,
     open protected fun renderLinks(messageViewModel: MessageLinkViewModel) {
         messageViewModel.linkPreviewListener = this
         messageViewModel.loadLinkPreview()
+        val message = messageView.text.toString()
+        val matcher = Patterns.AUTOLINK_WEB_URL.matcher(message)
+        while (matcher.find()) {
+            val start = matcher.start()
+            if (start > 0 && message[start - 1] == '@') {
+                continue
+            }
+            val end = matcher.end()
+            clickify(start, end) {
+                var url = message.substring(start, end)
+                if (!url.startsWith("http")) {
+                    url = "http://" + url
+                }
+                messageView.context.startCustomTabActivity(url)
+            }
+        }
+    }
+
+    private fun clickify(start: Int, end: Int, onClick: () -> Unit) {
+        val text = messageView.text
+        val span = ClickSpan(onClick)
+
+        if (start == -1) {
+            return
+        }
+
+        if (text is Spannable) {
+            text.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else {
+            val s = SpannableString.valueOf(text)
+            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            messageView.text = s
+        }
     }
 
     override fun onLinkPreviewReady(messageViewModel: MessageLinkViewModel) {

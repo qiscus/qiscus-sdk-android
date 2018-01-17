@@ -3,6 +3,9 @@ package com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates
 import android.content.Context
 import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.qiscus.sdk.chat.domain.common.Patterns
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
 import com.qiscus.sdk.chat.domain.model.MessageState
@@ -20,6 +24,9 @@ import com.qiscus.sdk.chat.presentation.model.ProgressListener
 import com.qiscus.sdk.chat.presentation.model.TransferListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.util.ClickSpan
+import com.qiscus.sdk.chat.presentation.uikit.util.ClickableMovementMethod
+import com.qiscus.sdk.chat.presentation.uikit.util.startCustomTabActivity
 import com.qiscus.sdk.chat.presentation.uikit.widget.CircleProgress
 
 /**
@@ -63,6 +70,12 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
     private val progressView: CircleProgress = itemView.findViewById(R.id.progress)
 
     protected lateinit var messageViewModel: MessageImageViewModel
+
+    init {
+        captionView.movementMethod = ClickableMovementMethod.instance
+        captionView.isClickable = false
+        captionView.isLongClickable = false
+    }
 
     override fun determineDateView(): TextView {
         return itemView.findViewById(R.id.date)
@@ -115,6 +128,40 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
         } else {
             captionView.text = messageViewModel.spannableCaption
             captionView.visibility = View.VISIBLE
+
+            val caption = captionView.text.toString()
+            val matcher = Patterns.AUTOLINK_WEB_URL.matcher(caption)
+            while (matcher.find()) {
+                val start = matcher.start()
+                if (start > 0 && caption[start - 1] == '@') {
+                    continue
+                }
+                val end = matcher.end()
+                clickify(start, end) {
+                    var url = caption.substring(start, end)
+                    if (!url.startsWith("http")) {
+                        url = "http://" + url
+                    }
+                    captionView.context.startCustomTabActivity(url)
+                }
+            }
+        }
+    }
+
+    private fun clickify(start: Int, end: Int, onClick: () -> Unit) {
+        val text = captionView.text
+        val span = ClickSpan(onClick)
+
+        if (start == -1) {
+            return
+        }
+
+        if (text is Spannable) {
+            text.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else {
+            val s = SpannableString.valueOf(text)
+            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            captionView.text = s
         }
     }
 

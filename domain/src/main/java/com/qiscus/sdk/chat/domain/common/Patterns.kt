@@ -21,7 +21,7 @@ import java.util.regex.Pattern
 /**
  * Commonly used regular expression patterns.
  */
-internal object Patterns {
+object Patterns {
 
     /**
      * Regular expression to match all IANA top-level domains.

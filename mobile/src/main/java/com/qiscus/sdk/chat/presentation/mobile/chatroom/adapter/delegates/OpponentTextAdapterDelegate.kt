@@ -13,6 +13,7 @@ import com.qiscus.sdk.chat.presentation.model.MessageTextViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.util.ClickableMovementMethod
 
 /**
  * Created on : December 20, 2017
@@ -58,7 +59,13 @@ open class OpponentTextViewHolder @JvmOverloads constructor(view: View,
                                                        itemLongClickListener: ItemLongClickListener? = null)
     : OpponentMessageViewHolder(view, itemClickListener, itemLongClickListener) {
 
-    private val messageView: TextView = itemView.findViewById(R.id.contents)
+    protected val messageView: TextView = itemView.findViewById(R.id.contents)
+
+    init {
+        messageView.movementMethod = ClickableMovementMethod.instance
+        messageView.isClickable = false
+        messageView.isLongClickable = false
+    }
 
     override fun determineDateView(): TextView {
         return itemView.findViewById(R.id.date)
