@@ -18,8 +18,15 @@
     package="com.qiscus.sdk.chat.presentation.mobile">
 
     <application android:largeHeap="true">
-        <activity android:name=".chatroom.ChatRoomActivity" />
-        <activity android:name=".listroom.ListRoomActivity" />
+        <activity
+            android:name=".chatroom.ChatRoomActivity"
+            android:theme="@style/QiscusTheme" />
+        <activity
+            android:name=".listroom.ListRoomActivity"
+            android:theme="@style/QiscusTheme" />
+        <activity
+            android:name=".accountlinking.AccountLinkingActivity"
+            android:theme="@style/QiscusTheme" />
 
     </application>
 </manifest>

@@ -137,7 +137,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
     }
 
     private fun handleClickContactMessage(messageViewModel: MessageContactViewModel) {
-       view.showAddContactDialog(messageViewModel)
+        view.showAddContactDialog(messageViewModel)
     }
 
     private fun handleClickLocationMessage(messageViewModel: MessageLocationViewModel) {

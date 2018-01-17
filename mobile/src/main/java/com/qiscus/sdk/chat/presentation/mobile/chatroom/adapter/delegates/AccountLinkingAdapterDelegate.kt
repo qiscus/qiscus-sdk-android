@@ -39,6 +39,10 @@ open class AccountLinkingViewHolder @JvmOverloads constructor(view: View,
 
     private val buttonLabelView: TextView = itemView.findViewById(R.id.account_linking)
 
+    init {
+        buttonLabelView.setOnClickListener(this)
+    }
+
     override fun renderMessageContents(messageViewModel: MessageViewModel) {
         super.renderMessageContents(messageViewModel)
         renderButton(messageViewModel)

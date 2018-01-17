@@ -36,6 +36,7 @@ import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
+import com.qiscus.sdk.chat.presentation.mobile.accountlinking.accountLinkinIntent
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.DefaultMessageAdapter
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates.*
 import com.qiscus.sdk.chat.presentation.model.*
@@ -241,7 +242,8 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
     }
 
     override fun openAccountLinkingPage(messageViewModel: MessageAccountLinkingViewModel) {
-        TODO() // Open account linking
+        startActivity(accountLinkinIntent(messageViewModel.button.title, messageViewModel.button.url,
+                messageViewModel.button.finishUrl, messageViewModel.button.successMessage))
     }
 
     override fun showAddContactDialog(messageViewModel: MessageContactViewModel) {
@@ -281,7 +283,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
     }
 
     override fun openMap(messageViewModel: MessageLocationViewModel) {
-       startCustomTabActivity(messageViewModel.mapUrl)
+        startCustomTabActivity(messageViewModel.mapUrl)
     }
 
     override fun onStop() {

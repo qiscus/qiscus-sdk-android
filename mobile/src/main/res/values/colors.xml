@@ -6,6 +6,8 @@
     <color name="qiscus_primary_light">#B2DFDB</color>
     <color name="qiscus_accent">#FF5722</color>
     <color name="qiscus_accent_light">#FFCCBC</color>
+    <color name="qiscus_toolbar_text">#FFFFFF</color>
+    <color name="qiscus_divider">#B6B6B6</color>
 
     <!-- list room color -->
     <color name="qiscus_list_room_name">#212121</color>

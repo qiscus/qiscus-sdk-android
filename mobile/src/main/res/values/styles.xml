@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="QiscusTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/qiscus_primary</item>
+        <item name="colorPrimaryDark">@color/qiscus_primary_dark</item>
+        <item name="colorAccent">@color/qiscus_accent</item>
+        <item name="colorControlNormal">@color/qiscus_divider</item>
+        <item name="colorControlActivated">@color/qiscus_accent</item>
+        <item name="colorControlHighlight">@color/qiscus_accent</item>
+        <item name="actionModeBackground">@color/qiscus_primary</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+</resources>
