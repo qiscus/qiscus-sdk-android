@@ -48,7 +48,7 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <com.vanniktech.emoji.EmojiTextView
+        <TextView
             android:id="@+id/contents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,8 +57,7 @@
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="12sp"
-            app:emojiSize="18sp"/>
+            android:textSize="12sp"/>
     </LinearLayout>
 
     <!-- Add this view because Xiaomi need it -->

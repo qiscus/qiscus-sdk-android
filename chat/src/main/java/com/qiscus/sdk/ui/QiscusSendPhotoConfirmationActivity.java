@@ -33,7 +33,6 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -57,7 +56,6 @@ import com.qiscus.sdk.ui.fragment.QiscusPhotoFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
 import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-import com.vanniktech.emoji.EmojiPopup;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,7 +74,6 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     public static final String EXTRA_QISCUS_PHOTOS = "qiscus_photos";
     public static final String EXTRA_CAPTIONS = "captions";
 
-    private ViewGroup rootView;
     private MentionsEditText messageEditText;
 
     private ViewPager viewPager;
@@ -85,9 +82,6 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     private List<QiscusPhoto> qiscusPhotos;
     private Map<String, String> captions;
     private int position = -1;
-
-    private ImageView toggleEmojiButton;
-    private EmojiPopup emojiPopup;
 
     private RecyclerView recyclerView;
     private QiscusPhotoAdapter photoAdapter;
@@ -108,7 +102,6 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         onSetStatusBarColor();
         setContentView(R.layout.activity_qiscus_send_photo_confirmation);
 
-        rootView = findViewById(R.id.root_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView tvTitle = findViewById(R.id.tv_title);
         ImageView ivAvatar = (QiscusCircularImageView) findViewById(R.id.profile_picture);
@@ -172,18 +165,6 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
             }
         });
 
-        toggleEmojiButton = findViewById(R.id.button_add_emoticon);
-        toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon());
-        toggleEmojiButton.setOnClickListener(v -> toggleEmoji());
-
-        setupEmojiPopup();
-
-        messageEditText.setOnClickListener(v -> {
-            if (emojiPopup != null && emojiPopup.isShowing()) {
-                toggleEmoji();
-            }
-        });
-
         mentionSuggestionView = findViewById(R.id.mention_suggestion);
         if (qiscusChatRoom.isGroup() && chatConfig.getMentionConfig().isEnableMention()) {
             mentionSuggestionView.bind(messageEditText);
@@ -230,7 +211,6 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
     }
 
     private void confirm() {
-        dismissEmoji();
         Intent data = new Intent();
         data.putParcelableArrayListExtra(EXTRA_QISCUS_PHOTOS, (ArrayList<QiscusPhoto>) qiscusPhotos);
         data.putExtra(EXTRA_CAPTIONS, (HashMap<String, String>) captions);
@@ -311,30 +291,6 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
                 messageEditText.setMentionsTextEncoded(caption, qiscusChatRoom.getMember());
                 messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
             }
-        }
-    }
-
-    protected void setupEmojiPopup() {
-        if (messageEditText != null && toggleEmojiButton != null) {
-            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
-                    .setOnSoftKeyboardCloseListener(this::dismissEmoji)
-                    .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
-                    .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
-                    .build(messageEditText);
-        }
-    }
-
-    protected void toggleEmoji() {
-        boolean lastShowing = emojiPopup.isShowing();
-        emojiPopup.toggle();
-        if (!lastShowing && !emojiPopup.isShowing()) {
-            emojiPopup.toggle();
-        }
-    }
-
-    protected void dismissEmoji() {
-        if (emojiPopup != null && emojiPopup.isShowing()) {
-            emojiPopup.dismiss();
         }
     }
 

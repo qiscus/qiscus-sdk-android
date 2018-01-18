@@ -138,7 +138,7 @@
                         android:tint="@color/qiscus_secondary_text"
                         android:visibility="gone"/>
 
-                    <com.vanniktech.emoji.EmojiTextView
+                    <TextView
                         android:id="@+id/origin_content"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
 
         </LinearLayout>
 
-        <com.vanniktech.emoji.EmojiTextView
+        <TextView
             android:id="@+id/contents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -174,8 +174,7 @@
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="16sp"
-            app:emojiSize="22sp"/>
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/time"

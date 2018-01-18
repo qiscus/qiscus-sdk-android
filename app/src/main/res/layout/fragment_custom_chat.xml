@@ -202,7 +202,7 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_action_add"/>
 
-            <com.vanniktech.emoji.EmojiEditText
+            <EditText
                 android:id="@+id/field_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -215,19 +215,7 @@
                 android:maxLines="4"
                 android:padding="8dp"
                 android:textColor="@color/qiscus_primary_text"
-                android:textSize="16sp"
-                app:emojiSize="22sp"/>
-
-            <ImageView
-                android:id="@+id/button_emoji"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:background="@drawable/bt_qiscus_selector_grey"
-                android:padding="2dp"
-                android:src="@drawable/ic_qiscus_emot"/>
+                android:textSize="16sp"/>
 
             <ImageView
                 android:id="@+id/button_send"

@@ -80,7 +80,7 @@
                 android:tint="@color/qiscus_secondary_text"
                 android:visibility="gone"/>
 
-            <com.vanniktech.emoji.EmojiTextView
+            <TextView
                 android:id="@+id/origin_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

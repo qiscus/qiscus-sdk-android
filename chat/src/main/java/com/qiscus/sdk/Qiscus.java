@@ -42,8 +42,6 @@ import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.BuildVersionUtil;
-import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
@@ -147,7 +145,6 @@ public class Qiscus {
 
         configureFcmToken();
 
-        EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + appId);
     }
 

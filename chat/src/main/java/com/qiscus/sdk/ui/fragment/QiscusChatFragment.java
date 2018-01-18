@@ -297,12 +297,6 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Nullable
     @Override
-    protected ImageView getToggleEmojiButton(View view) {
-        return (ImageView) view.findViewById(R.id.button_add_emoticon);
-    }
-
-    @Nullable
-    @Override
     protected QiscusAudioRecorderView getRecordAudioPanel(View view) {
         return (QiscusAudioRecorderView) view.findViewById(R.id.record_panel);
     }

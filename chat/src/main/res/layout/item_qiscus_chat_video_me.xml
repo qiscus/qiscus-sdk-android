@@ -125,7 +125,7 @@
             android:padding="64dp"
             android:src="@drawable/ic_qiscus_play_icon"/>
 
-        <com.vanniktech.emoji.EmojiTextView
+        <TextView
             android:id="@+id/caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -140,8 +140,7 @@
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
             android:textSize="16sp"
-            android:visibility="visible"
-            app:emojiSize="22sp"/>
+            android:visibility="visible"/>
 
         <TextView
             android:id="@+id/time"

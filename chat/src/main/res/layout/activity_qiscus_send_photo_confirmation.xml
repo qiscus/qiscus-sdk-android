@@ -101,15 +101,6 @@
         android:orientation="horizontal"
         android:padding="4dp">
 
-        <ImageView
-            android:id="@+id/button_add_emoticon"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/bt_qiscus_selector_grey"
-            android:padding="8dp"
-            android:src="@drawable/ic_qiscus_emot" />
-
         <com.qiscus.manggil.ui.MentionsEditText
             android:id="@+id/field_message"
             android:layout_width="0dp"
@@ -124,8 +115,7 @@
             android:nextFocusRight="@+id/button_send"
             android:padding="8dp"
             android:textColor="@color/qiscus_primary_text"
-            android:textSize="16sp"
-            app:emojiSize="22sp" />
+            android:textSize="16sp" />
 
         <ImageView
             android:id="@+id/button_send"

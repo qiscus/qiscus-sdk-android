@@ -85,7 +85,7 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <com.vanniktech.emoji.EmojiTextView
+        <TextView
             android:id="@+id/contents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -94,8 +94,7 @@
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="16sp"
-            app:emojiSize="22sp"/>
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/time"

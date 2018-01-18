@@ -92,8 +92,6 @@ import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.util.QiscusTextUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
-import com.vanniktech.emoji.EmojiEditText;
-import com.vanniktech.emoji.EmojiPopup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -162,57 +160,93 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 4;
     protected static final int SHOW_MEDIA_DETAIL = 5;
 
-    @NonNull protected ViewGroup rootView;
-    @Nullable protected ViewGroup emptyChatHolder;
-    @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
-    @NonNull protected QiscusRecyclerView messageRecyclerView;
+    @NonNull
+    protected ViewGroup rootView;
+    @Nullable
+    protected ViewGroup emptyChatHolder;
+    @NonNull
+    protected SwipeRefreshLayout swipeRefreshLayout;
+    @NonNull
+    protected QiscusRecyclerView messageRecyclerView;
 
-    @Nullable protected ViewGroup messageInputPanel;
-    @Nullable protected ViewGroup messageEditTextContainer;
-    @NonNull protected EditText messageEditText;
-    @NonNull protected ImageView sendButton;
-    @Nullable protected QiscusMentionSuggestionView mentionSuggestionView;
+    @Nullable
+    protected ViewGroup messageInputPanel;
+    @Nullable
+    protected ViewGroup messageEditTextContainer;
+    @NonNull
+    protected EditText messageEditText;
+    @NonNull
+    protected ImageView sendButton;
+    @Nullable
+    protected QiscusMentionSuggestionView mentionSuggestionView;
 
-    @Nullable protected View newMessageButton;
-    @NonNull protected View loadMoreProgressBar;
+    @Nullable
+    protected View newMessageButton;
+    @NonNull
+    protected View loadMoreProgressBar;
 
-    @Nullable protected ImageView emptyChatImageView;
-    @Nullable protected TextView emptyChatTitleView;
-    @Nullable protected TextView emptyChatDescView;
+    @Nullable
+    protected ImageView emptyChatImageView;
+    @Nullable
+    protected TextView emptyChatTitleView;
+    @Nullable
+    protected TextView emptyChatDescView;
 
-    @Nullable protected ViewGroup attachmentPanel;
+    @Nullable
+    protected ViewGroup attachmentPanel;
 
-    @Nullable protected View addImageLayout;
-    @Nullable protected ImageView addImageButton;
-    @Nullable protected TextView addImageTextView;
+    @Nullable
+    protected View addImageLayout;
+    @Nullable
+    protected ImageView addImageButton;
+    @Nullable
+    protected TextView addImageTextView;
 
-    @Nullable protected View takeImageLayout;
-    @Nullable protected ImageView takeImageButton;
-    @Nullable protected TextView takeImageTextView;
+    @Nullable
+    protected View takeImageLayout;
+    @Nullable
+    protected ImageView takeImageButton;
+    @Nullable
+    protected TextView takeImageTextView;
 
-    @Nullable protected View addFileLayout;
-    @Nullable protected ImageView addFileButton;
-    @Nullable protected TextView addFileTextView;
+    @Nullable
+    protected View addFileLayout;
+    @Nullable
+    protected ImageView addFileButton;
+    @Nullable
+    protected TextView addFileTextView;
 
-    @Nullable protected View recordAudioLayout;
-    @Nullable protected ImageView recordAudioButton;
-    @Nullable protected TextView recordAudioTextView;
+    @Nullable
+    protected View recordAudioLayout;
+    @Nullable
+    protected ImageView recordAudioButton;
+    @Nullable
+    protected TextView recordAudioTextView;
 
-    @Nullable protected View addContactLayout;
-    @Nullable protected ImageView addContactButton;
-    @Nullable protected TextView addContactTextView;
+    @Nullable
+    protected View addContactLayout;
+    @Nullable
+    protected ImageView addContactButton;
+    @Nullable
+    protected TextView addContactTextView;
 
-    @Nullable protected View addLocationLayout;
-    @Nullable protected ImageView addLocationButton;
-    @Nullable protected TextView addLocationTextView;
+    @Nullable
+    protected View addLocationLayout;
+    @Nullable
+    protected ImageView addLocationButton;
+    @Nullable
+    protected TextView addLocationTextView;
 
-    @Nullable protected ImageView hideAttachmentButton;
-    @Nullable protected ImageView toggleEmojiButton;
+    @Nullable
+    protected ImageView hideAttachmentButton;
 
-    @Nullable protected QiscusAudioRecorderView recordAudioPanel;
-    @Nullable protected QiscusReplyPreviewView replyPreviewView;
+    @Nullable
+    protected QiscusAudioRecorderView recordAudioPanel;
+    @Nullable
+    protected QiscusReplyPreviewView replyPreviewView;
 
-    @Nullable protected View goToBottomButton;
+    @Nullable
+    protected View goToBottomButton;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -228,7 +262,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     private boolean fieldMessageEmpty = true;
     private CommentSelectedListener commentSelectedListener;
     private RoomChangedListener roomChangedListener;
-    private EmojiPopup emojiPopup;
 
     private Runnable commentHighlightTask;
 
@@ -292,14 +325,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         addLocationButton = getAddLocationButton(view);
         addLocationTextView = getAddLocationTextView(view);
 
-        toggleEmojiButton = getToggleEmojiButton(view);
         recordAudioPanel = getRecordAudioPanel(view);
         replyPreviewView = getReplyPreviewView(view);
         goToBottomButton = getGotoBottomButton(view);
-
-        if (toggleEmojiButton != null && !(messageEditText instanceof EmojiEditText)) {
-            throw new RuntimeException("Please use EmojiEditText as message text field if you want to using EmojiKeyboard.");
-        }
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -338,12 +366,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             return false;
         });
 
-        messageEditText.setOnClickListener(v -> {
-            if (emojiPopup != null && emojiPopup.isShowing()) {
-                toggleEmoji();
-            }
-        });
-
         sendButton.setOnClickListener(v -> {
             String message = messageEditText.getText().toString().trim();
             if (messageEditText instanceof MentionsEditText) {
@@ -376,9 +398,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
         if (addLocationButton != null) {
             addLocationButton.setOnClickListener(v -> addLocation());
-        }
-        if (toggleEmojiButton != null) {
-            toggleEmojiButton.setOnClickListener(v -> toggleEmoji());
         }
         if (hideAttachmentButton != null) {
             hideAttachmentButton.setOnClickListener(v -> hideAttachmentPanel());
@@ -513,9 +532,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public abstract ImageView getHideAttachmentButton(View view);
 
     @Nullable
-    protected abstract ImageView getToggleEmojiButton(View view);
-
-    @Nullable
     protected abstract QiscusAudioRecorderView getRecordAudioPanel(View view);
 
     @Nullable
@@ -578,7 +594,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageRecyclerView.addOnScrollListener(new QiscusChatScrollListener(chatLayoutManager, this));
 
         setupGifKeyboard();
-        setupEmojiPopup();
         setupMentionEditText();
 
         stopTypingNotifyTask = () -> {
@@ -665,16 +680,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     showError(getString(R.string.qiscus_error_gif));
                 }
             });
-        }
-    }
-
-    protected void setupEmojiPopup() {
-        if (messageEditText instanceof EmojiEditText && toggleEmojiButton != null) {
-            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
-                    .setOnSoftKeyboardCloseListener(this::dismissEmoji)
-                    .setOnEmojiPopupShownListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowKeyboardIcon()))
-                    .setOnEmojiPopupDismissListener(() -> toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon()))
-                    .build((EmojiEditText) messageEditText);
         }
     }
 
@@ -863,9 +868,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (recordAudioPanel != null) {
             recordAudioPanel.setButtonStopRecord(chatConfig.getStopRecordIcon());
             recordAudioPanel.setButtonCancelRecord(chatConfig.getCancelRecordIcon());
-        }
-        if (toggleEmojiButton != null) {
-            toggleEmojiButton.setImageResource(chatConfig.getShowEmojiIcon());
         }
 
         if (addImageLayout != null) {
@@ -1292,20 +1294,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
-    protected void toggleEmoji() {
-        boolean lastShowing = emojiPopup.isShowing();
-        emojiPopup.toggle();
-        if (!lastShowing && !emojiPopup.isShowing()) {
-            emojiPopup.toggle();
-        }
-    }
-
-    protected void dismissEmoji() {
-        if (emojiPopup != null && emojiPopup.isShowing()) {
-            emojiPopup.dismiss();
-        }
-    }
-
     protected void updateMentionSuggestionData() {
         if (mentionSuggestionView != null && qiscusChatRoom.isGroup()
                 && Qiscus.getChatConfig().getMentionConfig().isEnableMention()) {
@@ -1679,15 +1667,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Override
-    public void onStop() {
-        if (emojiPopup != null) {
-            emojiPopup.dismiss();
-        }
-
-        super.onStop();
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         notifyLatestRead();
@@ -1750,16 +1729,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         switch (requestCode) {
-            case RC_CAMERA_PERMISSION :
+            case RC_CAMERA_PERMISSION:
                 takeImage();
                 break;
-            case RC_AUDIO_PERMISSION :
+            case RC_AUDIO_PERMISSION:
                 recordAudio();
                 break;
-            case RC_FILE_PERMISSION :
+            case RC_FILE_PERMISSION:
                 addImage();
                 break;
-            case RC_LOCATION_PERMISSION :
+            case RC_LOCATION_PERMISSION:
                 addLocation();
                 break;
         }
@@ -1798,6 +1777,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     /**
      * Callback when an error happening while load comments
+     *
      * @param throwable the error
      */
     @Override
