@@ -145,7 +145,6 @@ public class QiscusChatConfig {
 
     private int playAudioIcon = R.drawable.ic_qiscus_play_audio;
     private int pauseAudioIcon = R.drawable.ic_qiscus_pause_audio;
-    private int showEmojiIcon = R.drawable.ic_qiscus_emot;
     private int showKeyboardIcon = R.drawable.ic_qiscus_keyboard;
 
     private int[] swipeRefreshColorScheme = new int[]{R.color.qiscus_primary, R.color.qiscus_accent};
@@ -572,11 +571,6 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setPauseAudioIcon(@DrawableRes int pauseAudioIcon) {
         this.pauseAudioIcon = pauseAudioIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setShowEmojiIcon(@DrawableRes int showEmojiIcon) {
-        this.showEmojiIcon = showEmojiIcon;
         return this;
     }
 
@@ -1086,11 +1080,6 @@ public class QiscusChatConfig {
     @DrawableRes
     public int getPauseAudioIcon() {
         return pauseAudioIcon;
-    }
-
-    @DrawableRes
-    public int getShowEmojiIcon() {
-        return showEmojiIcon;
     }
 
     @DrawableRes
