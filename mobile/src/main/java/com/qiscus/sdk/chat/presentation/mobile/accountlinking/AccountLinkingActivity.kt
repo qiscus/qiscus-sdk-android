@@ -14,7 +14,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.qiscus.sdk.chat.presentation.mobile.R
-import kotlinx.android.synthetic.main.activity_account_linking.*
+import kotlinx.android.synthetic.main.activity_qiscus_account_linking.*
 
 /**
  * Created on : January 17, 2018
@@ -43,7 +43,7 @@ class AccountLinkingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_account_linking)
+        setContentView(R.layout.activity_qiscus_account_linking)
         var title = intent.getStringExtra(EXTRA_TITLE)
         title = if (title == null || title.isEmpty()) getString(R.string.qiscus_account_linking) else title
         titleView.text = title

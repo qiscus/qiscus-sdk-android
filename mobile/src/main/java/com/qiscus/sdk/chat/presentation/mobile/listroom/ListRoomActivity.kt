@@ -6,7 +6,7 @@ import android.support.v7.widget.LinearLayoutManager
 import com.qiscus.sdk.chat.presentation.listroom.ListRoomContract
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.RoomViewModel
-import kotlinx.android.synthetic.main.activity_list_room.*
+import kotlinx.android.synthetic.main.activity_qiscus_list_room.*
 
 /**
  * Created on : October 04, 2017
@@ -21,7 +21,7 @@ class ListRoomActivity : AppCompatActivity(), ListRoomContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list_room)
+        setContentView(R.layout.activity_qiscus_list_room)
 
         roomRecyclerView.adapter = adapter
         roomRecyclerView.layoutManager = LinearLayoutManager(this)

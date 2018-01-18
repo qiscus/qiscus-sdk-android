@@ -46,7 +46,7 @@ import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
 import com.qiscus.sdk.chat.presentation.uikit.util.RecyclerViewScrollListener
 import com.qiscus.sdk.chat.presentation.uikit.util.startCustomTabActivity
 import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
-import kotlinx.android.synthetic.main.activity_chat_room.*
+import kotlinx.android.synthetic.main.activity_qiscus_chat_room.*
 
 /**
  * Created on : August 19, 2017
@@ -80,7 +80,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat_room)
+        setContentView(R.layout.activity_qiscus_chat_room)
 
         roomId = intent.getStringExtra(INTENT_ROOM_ID)
         if (roomId == null) {
