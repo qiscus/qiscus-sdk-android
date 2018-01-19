@@ -226,7 +226,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
                 File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
                 if (localPath != null) {
-                    actionMode.getMenu().findItem(R.id.action_share).setVisible(true);
+                    actionMode.getMenu().findItem(R.id.action_share)
+                            .setVisible(Qiscus.getChatConfig().isEnableShareMedia());
                 } else {
                     actionMode.getMenu().findItem(R.id.action_share).setVisible(false);
                 }
