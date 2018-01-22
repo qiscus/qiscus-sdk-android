@@ -1,11 +1,13 @@
 package com.qiscus.sdk.chat.presentation.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.Spannable
 import android.text.SpannableString
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
-import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.writeBoolean
 import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.util.getString
 
@@ -15,15 +17,13 @@ import com.qiscus.sdk.chat.presentation.util.getString
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-open class MessageSystemEventViewModel
-@JvmOverloads constructor(message: Message,
-                          account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
-                          userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
-                          mentionAllColor: Int,
-                          mentionOtherColor: Int,
-                          mentionMeColor: Int,
-                          mentionClickListener: MentionClickListener? = null)
-    : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
+open class MessageSystemEventViewModel(message: Message) : MessageViewModel(message) {
+
+    private val account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet()
+
+    private constructor(parcel: Parcel) : this(message = parcel.readParcelable(Message::class.java.classLoader)) {
+        selected = parcel.readBoolean()
+    }
 
     override fun determineReadableMessage(): String {
         val payload = message.type.payload
@@ -67,5 +67,24 @@ open class MessageSystemEventViewModel
 
     override fun determineSpannableMessage(): Spannable {
         return SpannableString(readableMessage)
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(message, flags)
+        parcel.writeBoolean(selected)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<MessageSystemEventViewModel> {
+        override fun createFromParcel(parcel: Parcel): MessageSystemEventViewModel {
+            return MessageSystemEventViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MessageSystemEventViewModel?> {
+            return arrayOfNulls(size)
+        }
     }
 }

@@ -1,14 +1,16 @@
 package com.qiscus.sdk.chat.presentation.model
 
-import android.support.annotation.ColorInt
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.Spannable
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.util.getExtension
 import com.qiscus.sdk.chat.domain.interactor.Action
-import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.FileAttachmentProgress
-import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.domain.model.Message
+import com.qiscus.sdk.chat.domain.util.getExtension
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.writeBoolean
 import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.util.getString
 import com.qiscus.sdk.chat.presentation.util.toReadableText
@@ -20,17 +22,12 @@ import com.qiscus.sdk.chat.presentation.util.toSpannable
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-open class MessageFileViewModel
-@JvmOverloads constructor(message: FileAttachmentMessage,
-                          val mimeType: String,
-                          account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
-                          userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
-                          @ColorInt mentionAllColor: Int,
-                          @ColorInt mentionOtherColor: Int,
-                          @ColorInt mentionMeColor: Int,
-                          mentionClickListener: MentionClickListener? = null)
+open class MessageFileViewModel(message: FileAttachmentMessage, val mimeType: String) : MessageViewModel(message) {
 
-    : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
+    protected constructor(parcel: Parcel) : this(parcel.readParcelable(Message::class.java.classLoader), parcel.readString()) {
+        selected = parcel.readBoolean()
+        transfer = parcel.readBoolean()
+    }
 
     var transferListener: TransferListener? = null
     var transfer: Boolean = false
@@ -48,11 +45,11 @@ open class MessageFileViewModel
     private var attachmentProgress = Qiscus.instance.useCaseFactory.listenFileAttachmentProgress()
 
     val readableCaption by lazy {
-        message.caption.toReadableText(userRepository)
+        message.caption.toReadableText()
     }
 
     val spannableCaption by lazy {
-        message.caption.toSpannable(account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
+        message.caption.toSpannable(mentionClickListener = mentionClickListener)
     }
 
     override fun determineReadableMessage(): String {
@@ -64,7 +61,7 @@ open class MessageFileViewModel
     }
 
     override fun determineSpannableMessage(): Spannable {
-        return readableMessage.toSpannable(account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
+        return readableMessage.toSpannable(mentionClickListener = mentionClickListener)
     }
 
     val fileType by lazy {
@@ -93,5 +90,26 @@ open class MessageFileViewModel
 
     fun stopListenAttachmentProgress() {
         attachmentProgress.dispose()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(message, flags)
+        parcel.writeString(mimeType)
+        parcel.writeBoolean(selected)
+        parcel.writeBoolean(transfer)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<MessageFileViewModel> {
+        override fun createFromParcel(parcel: Parcel): MessageFileViewModel {
+            return MessageFileViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MessageFileViewModel?> {
+            return arrayOfNulls(size)
+        }
     }
 }

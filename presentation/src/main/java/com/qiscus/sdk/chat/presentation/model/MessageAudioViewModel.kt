@@ -1,11 +1,12 @@
 package com.qiscus.sdk.chat.presentation.model
 
 import android.media.MediaPlayer
-import android.support.annotation.ColorInt
-import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.model.Account
+import android.os.Parcel
+import android.os.Parcelable
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
-import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.domain.model.Message
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.writeBoolean
 import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.util.getString
 import com.qiscus.sdk.chat.presentation.util.runOnUIThread
@@ -18,17 +19,12 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-open class MessageAudioViewModel
-@JvmOverloads constructor(message: FileAttachmentMessage,
-                          mimeType: String,
-                          account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
-                          userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
-                          @ColorInt mentionAllColor: Int,
-                          @ColorInt mentionOtherColor: Int,
-                          @ColorInt mentionMeColor: Int,
-                          mentionClickListener: MentionClickListener? = null)
-    : MessageFileViewModel(message, mimeType, account, userRepository, mentionAllColor, mentionOtherColor,
-        mentionMeColor, mentionClickListener) {
+open class MessageAudioViewModel(message: FileAttachmentMessage, mimeType: String) : MessageFileViewModel(message, mimeType) {
+
+    private constructor(parcel: Parcel) : this(parcel.readParcelable(Message::class.java.classLoader), parcel.readString()) {
+        selected = parcel.readBoolean()
+        transfer = parcel.readBoolean()
+    }
 
     var playingAudioListener: PlayingAudioListener? = null
 
@@ -155,6 +151,27 @@ open class MessageAudioViewModel
                 }
 
             }
+        }
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(message, flags)
+        parcel.writeString(mimeType)
+        parcel.writeBoolean(selected)
+        parcel.writeBoolean(transfer)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<MessageAudioViewModel> {
+        override fun createFromParcel(parcel: Parcel): MessageAudioViewModel {
+            return MessageAudioViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MessageAudioViewModel?> {
+            return arrayOfNulls(size)
         }
     }
 }

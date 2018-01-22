@@ -16,13 +16,10 @@
 
 package com.qiscus.sdk.chat.presentation.mobile.chatroom
 
-import android.support.annotation.ColorInt
-import android.support.v4.content.ContextCompat
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.core.UseCaseFactory
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessagePresenter
-import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessagePresenter
 
@@ -32,9 +29,6 @@ data class ChatRoomActivityComponent
         private val sendMessageView: SendMessageContract.View = activity,
         private val listMessageView: ListMessageContract.View = activity,
         private val useCaseFactory: UseCaseFactory = Qiscus.instance.useCaseFactory,
-        private @ColorInt val mentionAllColor: Int = ContextCompat.getColor(activity, R.color.qiscus_mention_all),
-        private @ColorInt val mentionOtherColor: Int = ContextCompat.getColor(activity, R.color.qiscus_mention_other),
-        private @ColorInt val mentionMeColor: Int = ContextCompat.getColor(activity, R.color.qiscus_mention_me),
 
         val sendMessagePresenter: SendMessageContract.Presenter =
         SendMessagePresenter(sendMessageView, useCaseFactory.postMessage(), Qiscus.instance.messageFactory),
@@ -42,5 +36,5 @@ data class ChatRoomActivityComponent
         val listMessagePresenter: ListMessagePresenter =
         ListMessagePresenter(listMessageView, useCaseFactory.getMessages(), useCaseFactory.listenNewMessage(),
                 useCaseFactory.listenMessageState(), useCaseFactory.listenMessageDeleted(), useCaseFactory.updateMessageState(),
-                useCaseFactory.downloadAttachmentMessage(), mentionAllColor, mentionOtherColor, mentionMeColor)
+                useCaseFactory.downloadAttachmentMessage())
 )

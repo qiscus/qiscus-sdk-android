@@ -1,9 +1,11 @@
 package com.qiscus.sdk.chat.presentation.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.Spannable
-import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.*
-import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.writeBoolean
 import com.qiscus.sdk.chat.presentation.util.toReadableText
 import com.qiscus.sdk.chat.presentation.util.toSpannable
 import java.util.*
@@ -14,15 +16,11 @@ import java.util.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-open class MessageReplyViewModel
-@JvmOverloads constructor(message: Message,
-                          account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
-                          userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
-                          mentionAllColor: Int,
-                          mentionOtherColor: Int,
-                          mentionMeColor: Int,
-                          mentionClickListener: MentionClickListener? = null)
-    : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
+open class MessageReplyViewModel(message: Message) : MessageViewModel(message) {
+
+    private constructor(parcel: Parcel) : this(message = parcel.readParcelable(Message::class.java.classLoader)) {
+        selected = parcel.readBoolean()
+    }
 
     val repliedMessage by lazy {
         val payload = message.type.payload
@@ -32,18 +30,35 @@ open class MessageReplyViewModel
                         User(payload.optString("replied_comment_sender_email"), payload.optString("replied_comment_sender_username")),
                         Date(), message.room, MessageState.ON_SERVER,
                         MessageType(payload.optString("replied_comment_type"),
-                                payload.optJSONObject("replied_comment_payload"))),
-                account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener
+                                payload.optJSONObject("replied_comment_payload")))
         )
     }
 
     override fun determineReadableMessage(): String {
-        return message.type.payload.optString("text", message.text).toReadableText(userRepository)
+        return message.type.payload.optString("text", message.text).toReadableText()
     }
 
     override fun determineSpannableMessage(): Spannable {
         return message.type.payload.optString("text", message.text)
-                .toSpannable(account, userRepository, mentionAllColor, mentionOtherColor,
-                        mentionMeColor, mentionClickListener)
+                .toSpannable(mentionClickListener = mentionClickListener)
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(message, flags)
+        parcel.writeBoolean(selected)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<MessageReplyViewModel> {
+        override fun createFromParcel(parcel: Parcel): MessageReplyViewModel {
+            return MessageReplyViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MessageReplyViewModel?> {
+            return arrayOfNulls(size)
+        }
     }
 }
