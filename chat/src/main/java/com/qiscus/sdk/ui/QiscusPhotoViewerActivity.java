@@ -137,11 +137,14 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
         presenter.loadQiscusPhotos(qiscusComment.getTopicId());
 
+        if (!Qiscus.getChatConfig().isEnableShareMedia()) {
+            shareButton.setVisibility(View.GONE);
+        }
+
         shareButton.setOnClickListener(v -> {
             Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
             shareImage(qiscusPhoto.second);
         });
-
     }
 
     private void resolveData(Bundle savedInstanceState) {

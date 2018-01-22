@@ -72,7 +72,11 @@ public class QiscusPhotoFragment extends RxFragment {
         super.onActivityCreated(savedInstanceState);
         resolveImageFile(savedInstanceState);
         if (QiscusImageUtil.isImage(imageFile)) {
-            Nirmana.getInstance().get().load(imageFile).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
+            Nirmana.getInstance().get()
+                    .load(imageFile)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(imageView);
         } else {
             Nirmana.getInstance().get().load(imageFile).into(imageView);
         }

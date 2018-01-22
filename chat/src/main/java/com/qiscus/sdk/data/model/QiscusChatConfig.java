@@ -216,6 +216,8 @@ public class QiscusChatConfig {
     private CommentInfoHandler commentInfoHandler;
     private boolean enableCommentInfo = false;
 
+    private boolean enableShareMedia = true;
+
     private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
 
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
@@ -696,6 +698,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setEnableCommentInfo(boolean enableCommentInfo) {
         this.enableCommentInfo = enableCommentInfo;
+        return this;
+    }
+
+    public QiscusChatConfig setEnableShareMedia(boolean enableShareMedia) {
+        this.enableShareMedia = enableShareMedia;
         return this;
     }
 
@@ -1199,6 +1206,10 @@ public class QiscusChatConfig {
 
     public boolean isEnableCommentInfo() {
         return enableCommentInfo;
+    }
+
+    public boolean isEnableShareMedia() {
+        return enableShareMedia;
     }
 
     public QiscusMentionConfig getMentionConfig() {
