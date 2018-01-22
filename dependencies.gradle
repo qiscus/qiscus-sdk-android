@@ -52,6 +52,8 @@ ext {
 
     emojiVersion = '0.5.0'
 
+    flexboxVersion = '0.3.0'
+
     //Testing
     robolectricVersion = '3.4.2'
     jUnitVersion = '4.12'
@@ -162,7 +164,8 @@ ext {
             supportDesign      : "com.android.support:design:${supportLibraryVersion}",
             cardView           : "com.android.support:cardview-v7:${supportLibraryVersion}",
             customTabs         : "com.android.support:customtabs:${supportLibraryVersion}",
-            manggil            : "com.qiscus.utils:manggil:${manggilVersion}"
+            manggil            : "com.qiscus.utils:manggil:${manggilVersion}",
+            flexbox            : "com.google.android:flexbox:${flexboxVersion}"
     ]
 
     presentationTestDependencies = [

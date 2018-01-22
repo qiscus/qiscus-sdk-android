@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/commentComposerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:contentPadding="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/commentComposerInsertEmoticon"
+                style="@style/CommentComposerIcon"
+                android:src="@drawable/ic_qiscus_emot" />
+
+            <com.qiscus.sdk.chat.presentation.uikit.widget.QiscusEditText
+                android:id="@+id/commentComposerTextField"
+                style="@style/QiscusEditText"
+                android:layout_weight="1"
+                android:hint="@string/qiscus_hint_message"
+                android:imeOptions="actionSend"
+                android:maxLines="4"
+                android:nextFocusRight="@+id/commentComposerButtonSend"
+                app:emojiSize="22sp" />
+
+            <ImageView
+                android:id="@+id/commentComposerButtonSend"
+                style="@style/CommentComposerIcon"
+                android:src="@drawable/ic_qiscus_attach" />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</merge>

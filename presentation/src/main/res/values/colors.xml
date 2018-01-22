@@ -7,4 +7,5 @@
     <color name="qiscus_accent_light">#FFCCBC</color>
 
     <color name="qiscus_web_preview_bg">#51B6B6B6</color>
+    <color name="qiscus_primary_text">#212121</color>
 </resources>

@@ -71,6 +71,7 @@ dependencies {
     compile presentationDependencies.rxAndroid
     compile presentationDependencies.glide
     compile presentationDependencies.manggil
+    compile presentationDependencies.flexbox
 
     testImplementation presentationTestDependencies.kotlinJUnit
 

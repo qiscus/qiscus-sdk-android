@@ -24,4 +24,7 @@
     <string name="qiscus_today">Today</string>
     <string name="qiscus_few_seconds_ago">in few seconds ago</string>
     <string name="qiscus_date_and_time">%1$s at %2$s</string>
+
+    <string name="qiscus_label">Label</string>
+    <string name="qiscus_hint_message">Type a message…</string>
 </resources>

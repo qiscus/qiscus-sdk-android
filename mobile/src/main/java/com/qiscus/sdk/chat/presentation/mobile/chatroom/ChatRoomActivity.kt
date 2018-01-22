@@ -28,6 +28,7 @@ import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -44,9 +45,10 @@ import com.qiscus.sdk.chat.presentation.model.*
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
+import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
+import com.qiscus.sdk.chat.presentation.uikit.widget.QiscusMessageComposer
 import com.qiscus.sdk.chat.presentation.util.RecyclerViewScrollListener
 import com.qiscus.sdk.chat.presentation.util.startCustomTabActivity
-import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 import kotlinx.android.synthetic.main.activity_qiscus_chat_room.*
 
 /**
@@ -70,7 +72,8 @@ fun Context.chatRoomIntent(roomId: String): Intent {
 private const val INTENT_ROOM_ID = "room_id"
 
 class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMessageContract.View,
-        ItemClickListener, ItemLongClickListener, ChatButtonView.ChatButtonClickListener, RecyclerViewScrollListener.Listener {
+        ItemClickListener, ItemLongClickListener, ChatButtonView.ChatButtonClickListener,
+        RecyclerViewScrollListener.Listener, QiscusMessageComposer.QiscusCommentComposerListener {
 
     private lateinit var listMessagePresenter: ListMessageContract.Presenter
     private lateinit var sendMessagePresenter: SendMessageContract.Presenter
@@ -128,6 +131,8 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
         layoutManager.reverseLayout = true
         messageRecyclerView.layoutManager = layoutManager
         messageRecyclerView.addOnScrollListener(RecyclerViewScrollListener(layoutManager, this))
+
+        messageComposer.setAction(this)
     }
 
     override fun onStart() {
@@ -300,5 +305,33 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
     override fun onDestroy() {
         super.onDestroy()
         adapter.onDestroy()
+    }
+
+    private fun sendMessage(msg: String) {
+        sendMessagePresenter.sendMessage(roomId!!, msg)
+    }
+
+    override fun onClickSend(v: View?, message: String) {
+        if (message.isNotEmpty()) {
+            sendMessage(message)
+        } else {
+            showAttachmentPanel(true)
+        }
+    }
+
+    private fun showAttachmentPanel(visible: Boolean) {
+        messageAttachmentPanel.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    override fun onClickInsertEmoticon(v: View?) {
+        Toast.makeText(this, "Emoticon", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onBeforeTextFieldChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        Log.d("YUANA", "onBeforeTextFieldChanged : " + s.toString())
+    }
+
+    override fun onAfterTextFieldChanged(s: Editable?) {
+        Log.d("YUANA", "onAfterTextFieldChanged : " + s.toString())
     }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout style="@style/QiscusAttachmentButton">
+
+        <ImageView
+            android:id="@+id/attachmentBtnIcon"
+            style="@style/QiscusAttachmentButtonIcon"
+            android:background="@drawable/qiscus_button_attachment_bg"
+            android:src="@android:drawable/ic_menu_camera" />
+
+        <TextView
+            android:id="@+id/attachmentBtnLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/qiscus_label" />
+
+    </LinearLayout>
+
+</merge>

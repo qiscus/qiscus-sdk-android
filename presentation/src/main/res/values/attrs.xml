@@ -54,4 +54,20 @@
         <attr name="titleColor" format="color|reference"/>
         <attr name="descColor" format="color|reference"/>
     </declare-styleable>
+
+    <declare-styleable name="QiscusMessageComposer">
+        <attr name="btnEmoticonIcon" format="integer" />
+        <attr name="btnSendIcon" format="integer" />
+        <attr name="btnAttachment" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="QiscusAttachmentButton">
+        <attr name="btnIcon" format="integer" />
+        <attr name="btnBackground" format="integer" />
+        <attr name="btnLabel" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="QiscusMessageAttachmentPanel">
+        <attr name="icHalo" format="integer" />
+    </declare-styleable>
 </resources>

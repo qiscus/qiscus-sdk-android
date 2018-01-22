@@ -16,4 +16,7 @@
 
     <string name="qiscus_unknown_file_type">Tipe tidak diketahui</string>
     <string name="qiscus_file_type">Berkas %s</string>
+
+    <string name="qiscus_label">Label</string>
+    <string name="qiscus_hint_message">Ketik pesan…</string>
 </resources>
