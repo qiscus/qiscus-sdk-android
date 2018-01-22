@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.activity_qiscus_account_linking.*
  * GitHub     : https://github.com/zetbaitsu
  */
 
-fun Context.accountLinkinIntent(title: String, url: String, finishUrl: String, successMessage: String): Intent {
+fun Context.accountLinkingIntent(title: String, url: String, finishUrl: String, successMessage: String): Intent {
     return Intent(this, AccountLinkingActivity::class.java).apply {
         putExtra(EXTRA_TITLE, title)
         putExtra(EXTRA_URL, url)

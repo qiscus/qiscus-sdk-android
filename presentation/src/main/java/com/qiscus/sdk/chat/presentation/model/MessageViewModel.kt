@@ -32,11 +32,11 @@ open class MessageViewModel
         determineSpannableMessage()
     }
 
-    open protected fun determineReadableMessage(): String {
+    protected open fun determineReadableMessage(): String {
         return message.text.toReadableText(userRepository)
     }
 
-    open protected fun determineSpannableMessage(): Spannable {
+    protected open fun determineSpannableMessage(): Spannable {
         return message.text.toSpannable(account, userRepository, mentionAllColor, mentionOtherColor,
                 mentionMeColor, mentionClickListener)
     }

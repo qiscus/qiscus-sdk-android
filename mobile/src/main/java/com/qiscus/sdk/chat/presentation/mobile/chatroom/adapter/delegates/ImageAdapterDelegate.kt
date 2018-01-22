@@ -106,7 +106,7 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
         renderDownloadIcon(messageViewModel)
     }
 
-    open protected fun renderImage(messageViewModel: MessageImageViewModel) {
+    protected open fun renderImage(messageViewModel: MessageImageViewModel) {
         if ((messageViewModel.message as FileAttachmentMessage).file != null) {
             Glide.with(thumbnailView)
                     .load((messageViewModel.message as FileAttachmentMessage).file)
@@ -122,7 +122,7 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
         }
     }
 
-    open protected fun renderCaption(messageViewModel: MessageImageViewModel) {
+    protected open fun renderCaption(messageViewModel: MessageImageViewModel) {
         if (messageViewModel.spannableCaption.isBlank()) {
             captionView.visibility = View.GONE
         } else {
@@ -165,7 +165,7 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
         }
     }
 
-    open protected fun renderDownloadIcon(messageViewModel: MessageImageViewModel) {
+    protected open fun renderDownloadIcon(messageViewModel: MessageImageViewModel) {
         downloadIconView.setImageResource(when (messageViewModel.message.state) {
             MessageState.FAILED -> R.drawable.ic_qiscus_upload
             MessageState.PENDING -> R.drawable.ic_qiscus_upload
@@ -183,7 +183,7 @@ open class ImageViewHolder @JvmOverloads constructor(view: View,
         }
     }
 
-    open protected fun renderProgress(attachmentProgress: FileAttachmentProgress?) {
+    protected open fun renderProgress(attachmentProgress: FileAttachmentProgress?) {
         if (attachmentProgress != null) {
             progressView.progress = attachmentProgress.progress
         }
