@@ -9,6 +9,7 @@ import android.view.View
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.presentation.R
 import com.qiscus.sdk.chat.presentation.model.MentionClickListener
 
 /**
@@ -28,7 +29,7 @@ fun getString(context: Context = Qiscus.instance.component.application, @StringR
     return context.getString(resId, *formatArgs)
 }
 
-fun String.toReadableText(userRepository: UserRepository): String {
+fun String.toReadableText(userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository): String {
 
     if (isBlank()) {
         return ""
@@ -72,20 +73,11 @@ fun String.toReadableText(userRepository: UserRepository): String {
 }
 
 @JvmOverloads
-fun String.toSpannable(account: Account,
-                       userRepository: UserRepository,
-                       @ColorInt mentionColor: Int,
-                       mentionClickListener: MentionClickListener? = null): Spannable {
-
-    return toSpannable(account, userRepository, mentionColor, mentionColor, mentionColor, mentionClickListener)
-}
-
-@JvmOverloads
-fun String.toSpannable(account: Account,
-                       userRepository: UserRepository,
-                       @ColorInt mentionAllColor: Int,
-                       @ColorInt mentionOtherColor: Int,
-                       @ColorInt mentionMeColor: Int,
+fun String.toSpannable(account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
+                       userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
+                       @ColorInt mentionAllColor: Int  = getColor(resId = R.color.qiscus_mention_all),
+                       @ColorInt mentionOtherColor: Int =  getColor(resId = R.color.qiscus_mention_other),
+                       @ColorInt mentionMeColor: Int =  getColor(resId = R.color.qiscus_mention_me),
                        mentionClickListener: MentionClickListener? = null): Spannable {
     if (isBlank()) {
         return SpannableString("")

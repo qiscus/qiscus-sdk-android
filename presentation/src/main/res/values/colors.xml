@@ -7,5 +7,16 @@
     <color name="qiscus_accent_light">#FFCCBC</color>
 
     <color name="qiscus_web_preview_bg">#51B6B6B6</color>
+<<<<<<< HEAD
     <color name="qiscus_primary_text">#212121</color>
 </resources>
+||||||| merged common ancestors
+</resources>
+=======
+
+    <!-- mention color -->
+    <color name="qiscus_mention_all">#1a237e</color>
+    <color name="qiscus_mention_other">#009688</color>
+    <color name="qiscus_mention_me">#af2412</color>
+</resources>
+>>>>>>> 927609dacf5bcb7f19e0738afdc1af314eebe14b

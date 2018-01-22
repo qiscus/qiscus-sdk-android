@@ -1,10 +1,12 @@
 package com.qiscus.sdk.chat.presentation.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.util.extractUrls
-import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
-import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.domain.util.extractUrls
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.writeBoolean
 import com.schinizer.rxunfurl.model.PreviewData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -15,15 +17,11 @@ import io.reactivex.schedulers.Schedulers
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-open class MessageLinkViewModel
-@JvmOverloads constructor(message: Message,
-                          account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
-                          userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
-                          mentionAllColor: Int,
-                          mentionOtherColor: Int,
-                          mentionMeColor: Int,
-                          mentionClickListener: MentionClickListener? = null)
-    : MessageTextViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
+open class MessageLinkViewModel(message: Message) : MessageTextViewModel(message) {
+
+    private constructor(parcel: Parcel) : this(message = parcel.readParcelable(Message::class.java.classLoader)) {
+        selected = parcel.readBoolean()
+    }
 
     var linkPreviewListener: LinkPreviewListener? = null
     private val webScrapper = Qiscus.instance.component.dataComponent.webScrapper
@@ -51,6 +49,25 @@ open class MessageLinkViewModel
                             linkPreviewListener!!.onLinkPreviewReady(this)
                         }
                     }, {})
+        }
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(message, flags)
+        parcel.writeBoolean(selected)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<MessageLinkViewModel> {
+        override fun createFromParcel(parcel: Parcel): MessageLinkViewModel {
+            return MessageLinkViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MessageLinkViewModel?> {
+            return arrayOfNulls(size)
         }
     }
 }

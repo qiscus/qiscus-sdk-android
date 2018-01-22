@@ -1,11 +1,12 @@
 package com.qiscus.sdk.chat.presentation.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.Spannable
 import android.text.SpannableString
-import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
-import com.qiscus.sdk.chat.domain.repository.UserRepository
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.writeBoolean
 
 /**
  * Created on : October 05, 2017
@@ -13,15 +14,11 @@ import com.qiscus.sdk.chat.domain.repository.UserRepository
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-open class MessageLocationViewModel
-@JvmOverloads constructor(message: Message,
-                          account: Account = Qiscus.instance.component.dataComponent.accountRepository.getAccount().blockingGet(),
-                          userRepository: UserRepository = Qiscus.instance.component.dataComponent.userRepository,
-                          mentionAllColor: Int,
-                          mentionOtherColor: Int,
-                          mentionMeColor: Int,
-                          mentionClickListener: MentionClickListener? = null)
-    : MessageViewModel(message, account, userRepository, mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener) {
+open class MessageLocationViewModel(message: Message) : MessageViewModel(message) {
+
+    private constructor(parcel: Parcel) : this(message = parcel.readParcelable(Message::class.java.classLoader)) {
+        selected = parcel.readBoolean()
+    }
 
     val locationName by lazy {
         message.type.payload.optString("name")
@@ -54,5 +51,24 @@ open class MessageLocationViewModel
 
     override fun determineSpannableMessage(): Spannable {
         return SpannableString(readableMessage)
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(message, flags)
+        parcel.writeBoolean(selected)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<MessageLocationViewModel> {
+        override fun createFromParcel(parcel: Parcel): MessageLocationViewModel {
+            return MessageLocationViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MessageLocationViewModel?> {
+            return arrayOfNulls(size)
+        }
     }
 }

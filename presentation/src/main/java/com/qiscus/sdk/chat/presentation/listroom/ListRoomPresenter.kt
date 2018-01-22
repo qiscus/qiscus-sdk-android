@@ -1,11 +1,9 @@
 package com.qiscus.sdk.chat.presentation.listroom
 
-import android.support.annotation.ColorInt
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.message.GetMessages
 import com.qiscus.sdk.chat.domain.interactor.message.ListenNewMessage
 import com.qiscus.sdk.chat.domain.interactor.room.*
-import com.qiscus.sdk.chat.presentation.model.MentionClickListener
 import com.qiscus.sdk.chat.presentation.mapper.toViewModel
 import com.qiscus.sdk.chat.presentation.model.RoomViewModel
 
@@ -22,11 +20,7 @@ class ListRoomPresenter(val view: ListRoomContract.View,
                         private val listenNewMessage: ListenNewMessage,
                         private val listenRoomAdded: ListenRoomAdded,
                         private val listenRoomUpdated: ListenRoomUpdated,
-                        private val listenRoomDeleted: ListenRoomDeleted,
-                        private @ColorInt val mentionAllColor: Int,
-                        private @ColorInt val mentionOtherColor: Int,
-                        private @ColorInt val mentionMeColor: Int,
-                        private val mentionClickListener: MentionClickListener? = null) : ListRoomContract.Presenter {
+                        private val listenRoomDeleted: ListenRoomDeleted) : ListRoomContract.Presenter {
 
     override fun start() {
         listenNewMessage()
@@ -39,8 +33,7 @@ class ListRoomPresenter(val view: ListRoomContract.View,
     private fun loadLastMessage(roomViewModel: RoomViewModel, onSuccess: Action<RoomViewModel>) {
         getMessages.execute(GetMessages.Params(roomViewModel.room.id, limit = 1), Action {
             if (it.messages.isNotEmpty()) {
-                roomViewModel.lastMessage = it.messages.first()
-                        .toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
+                roomViewModel.lastMessage = it.messages.first().toViewModel()
             }
             onSuccess.call(roomViewModel)
         })
@@ -48,8 +41,7 @@ class ListRoomPresenter(val view: ListRoomContract.View,
 
     private fun listenNewMessage() {
         listenNewMessage.execute(null, Action {
-            view.addOrUpdateRoom(RoomViewModel(it.room,
-                    it.toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)))
+            view.addOrUpdateRoom(RoomViewModel(it.room, it.toViewModel()))
         })
     }
 

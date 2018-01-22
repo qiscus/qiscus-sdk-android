@@ -1,10 +1,8 @@
 package com.qiscus.sdk.chat.presentation.listmessage
 
-import android.support.annotation.ColorInt
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.interactor.message.*
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
-import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.model.MessageId
 import com.qiscus.sdk.chat.domain.model.MessageState
 import com.qiscus.sdk.chat.presentation.mapper.toViewModel
@@ -22,11 +20,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
                            private val listenMessageState: ListenMessageState,
                            private val listenMessageDeleted: ListenMessageDeleted,
                            private val updateMessageState: UpdateMessageState,
-                           private val downloadAttachmentMessage: DownloadAttachmentMessage,
-                           private @ColorInt val mentionAllColor: Int,
-                           private @ColorInt val mentionOtherColor: Int,
-                           private @ColorInt val mentionMeColor: Int,
-                           private val mentionClickListener: MentionClickListener? = null) : ListMessageContract.Presenter {
+                           private val downloadAttachmentMessage: DownloadAttachmentMessage) : ListMessageContract.Presenter {
 
     private lateinit var roomId: String
     private var messageSelectedListener: MessageSelectedListener? = null
@@ -48,14 +42,14 @@ class ListMessagePresenter(val view: ListMessageContract.View,
 
     override fun loadMessages(roomId: String, lastMessageId: MessageId?, limit: Int) {
         getMessages.execute(GetMessages.Params(roomId, lastMessageId, limit), Action {
-            it.messages.forEach { view.addMessage(toViewModel(it)) }
+            it.messages.forEach { view.addMessage(it.toViewModel()) }
         })
     }
 
     override fun listenMessageAdded(roomId: String) {
         listenNewMessage.execute(null, Action {
             if (it.room.id == roomId) {
-                view.addMessage(toViewModel(it))
+                view.addMessage(it.toViewModel())
                 updateMessageState(roomId, it.messageId, MessageState.READ)
             }
         })
@@ -63,13 +57,13 @@ class ListMessagePresenter(val view: ListMessageContract.View,
 
     override fun listenMessageUpdated(roomId: String) {
         listenMessageState.execute(ListenMessageState.Params(roomId), Action {
-            view.updateMessage(toViewModel(it))
+            view.updateMessage(it.toViewModel())
         })
     }
 
     override fun listenMessageDeleted(roomId: String) {
         listenMessageDeleted.execute(ListenMessageDeleted.Params(roomId), Action {
-            view.removeMessage(toViewModel(it))
+            view.removeMessage(it.toViewModel())
         })
     }
 
@@ -124,7 +118,7 @@ class ListMessagePresenter(val view: ListMessageContract.View,
 
         messageFileViewModel.transfer = true
         downloadAttachmentMessage.execute(DownloadAttachmentMessage.Params(messageFileViewModel.message as FileAttachmentMessage), Action {
-            val viewModel = toViewModel(it)
+            val viewModel = it.toViewModel()
             (viewModel as MessageFileViewModel).transfer = false
             view.updateMessage(viewModel)
         }, Action {
@@ -182,10 +176,5 @@ class ListMessagePresenter(val view: ListMessageContract.View,
         listenMessageDeleted.dispose()
         updateMessageState.dispose()
         downloadAttachmentMessage.dispose()
-    }
-
-
-    private fun toViewModel(message: Message): MessageViewModel {
-        return message.toViewModel(mentionAllColor, mentionOtherColor, mentionMeColor, mentionClickListener)
     }
 }
