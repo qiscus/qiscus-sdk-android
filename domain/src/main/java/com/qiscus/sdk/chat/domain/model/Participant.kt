@@ -16,12 +16,36 @@
 
 package com.qiscus.sdk.chat.domain.model
 
+import android.os.Parcel
+import android.os.Parcelable
+
 /**
  * Created on : August 17, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class ParticipantState(var lastDeliveredMessageId: String = "", var lastReadMessageId: String = "")
+data class Participant(val user: User, val state: ParticipantState) : Parcelable {
 
-data class Participant(val user: User, val state: ParticipantState)
+    private constructor(parcel: Parcel) :
+            this(parcel.readParcelable(User::class.java.classLoader), parcel.readParcelable(ParticipantState::class.java.classLoader))
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(user, flags)
+        parcel.writeParcelable(state, flags)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<Participant> {
+        override fun createFromParcel(parcel: Parcel): Participant {
+            return Participant(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Participant?> {
+            return arrayOfNulls(size)
+        }
+    }
+}

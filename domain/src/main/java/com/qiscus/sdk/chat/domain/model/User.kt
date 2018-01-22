@@ -16,10 +16,38 @@
 
 package com.qiscus.sdk.chat.domain.model
 
+import android.os.Parcel
+import android.os.Parcelable
+
 /**
-* Created on : August 17, 2017
-* Author     : zetbaitsu
-* Name       : Zetra
-* GitHub     : https://github.com/zetbaitsu
-*/
-data class User @JvmOverloads constructor(val id: String, var name: String = id, var avatar: String = "")
+ * Created on : August 17, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
+ */
+data class User
+@JvmOverloads
+constructor(val id: String, var name: String = id, var avatar: String = "") : Parcelable {
+
+    private constructor(parcel: Parcel) : this(parcel.readString(), parcel.readString(), parcel.readString())
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(id)
+        parcel.writeString(name)
+        parcel.writeString(avatar)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<User> {
+        override fun createFromParcel(parcel: Parcel): User {
+            return User(parcel)
+        }
+
+        override fun newArray(size: Int): Array<User?> {
+            return arrayOfNulls(size)
+        }
+    }
+}

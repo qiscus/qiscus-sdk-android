@@ -16,6 +16,12 @@
 
 package com.qiscus.sdk.chat.domain.model
 
+import android.os.Parcel
+import android.os.Parcelable
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.readDate
+import com.qiscus.sdk.chat.domain.util.writeBoolean
+import com.qiscus.sdk.chat.domain.util.writeDate
 import java.util.*
 
 /**
@@ -24,4 +30,28 @@ import java.util.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class UserStatus(val user: User, val online: Boolean, val lastActive: Date)
+data class UserStatus(val user: User, val online: Boolean, val lastActive: Date) : Parcelable {
+
+    private constructor(parcel: Parcel) :
+            this(parcel.readParcelable(User::class.java.classLoader), parcel.readBoolean(), parcel.readDate()!!)
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(user, flags)
+        parcel.writeBoolean(online)
+        parcel.writeDate(lastActive)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<UserStatus> {
+        override fun createFromParcel(parcel: Parcel): UserStatus {
+            return UserStatus(parcel)
+        }
+
+        override fun newArray(size: Int): Array<UserStatus?> {
+            return arrayOfNulls(size)
+        }
+    }
+}

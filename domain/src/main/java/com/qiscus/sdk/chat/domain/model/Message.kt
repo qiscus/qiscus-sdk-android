@@ -16,8 +16,12 @@
 
 package com.qiscus.sdk.chat.domain.model
 
-import com.qiscus.sdk.chat.domain.util.generateUniqueId
-import org.json.JSONObject
+import android.os.Parcel
+import android.os.Parcelable
+import com.qiscus.sdk.chat.domain.util.readDate
+import com.qiscus.sdk.chat.domain.util.readEnum
+import com.qiscus.sdk.chat.domain.util.writeDate
+import com.qiscus.sdk.chat.domain.util.writeEnum
 import java.util.*
 
 /**
@@ -26,46 +30,6 @@ import java.util.*
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class MessageId
-@JvmOverloads constructor(val id: String = "", val beforeId: String = "", val uniqueId: String = generateUniqueId()) {
-    override fun equals(other: Any?): Boolean {
-        if (other !is MessageId) {
-            return false
-        }
-
-        return if (id.isBlank()) {
-            uniqueId == other.uniqueId
-        } else {
-            id == other.id || uniqueId == other.uniqueId
-        }
-    }
-
-    override fun hashCode(): Int {
-        return uniqueId.hashCode()
-    }
-}
-
-data class MessageType(val rawType: String, val payload: JSONObject) {
-    constructor(rawType: String) : this(rawType, JSONObject())
-}
-
-enum class MessageState(val intValue: Int) {
-    PENDING(0), SENDING(1), ON_SERVER(2), DELIVERED(3), READ(4), FAILED(-1);
-
-    companion object {
-        fun valueOf(intValue: Int): MessageState {
-            return when (intValue) {
-                0 -> PENDING
-                1 -> SENDING
-                2 -> ON_SERVER
-                3 -> DELIVERED
-                4 -> READ
-                else -> FAILED
-            }
-        }
-    }
-}
-
 open class Message(
         val messageId: MessageId,
         val text: String,
@@ -73,8 +37,16 @@ open class Message(
         val date: Date,
         val room: Room,
         var state: MessageState,
-        val type: MessageType
-) {
+        val type: MessageType) : Parcelable {
+
+    private constructor(parcel: Parcel) : this(
+            parcel.readParcelable(MessageId::class.java.classLoader),
+            parcel.readString(),
+            parcel.readParcelable(User::class.java.classLoader),
+            parcel.readDate()!!,
+            parcel.readParcelable(Room::class.java.classLoader),
+            parcel.readEnum<MessageState>()!!,
+            parcel.readParcelable(MessageType::class.java.classLoader))
 
     override fun toString(): String {
         return "Message(messageId=$messageId, text='$text', sender=$sender, date=$date, " +
@@ -93,5 +65,29 @@ open class Message(
 
     override fun hashCode(): Int {
         return messageId.hashCode()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(messageId, flags)
+        parcel.writeString(text)
+        parcel.writeParcelable(sender, flags)
+        parcel.writeDate(date)
+        parcel.writeParcelable(room, flags)
+        parcel.writeEnum(state)
+        parcel.writeParcelable(type, flags)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<Message> {
+        override fun createFromParcel(parcel: Parcel): Message {
+            return Message(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Message?> {
+            return arrayOfNulls(size)
+        }
     }
 }

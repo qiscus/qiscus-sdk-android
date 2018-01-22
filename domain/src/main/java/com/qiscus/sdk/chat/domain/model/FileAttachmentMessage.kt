@@ -16,7 +16,9 @@
 
 package com.qiscus.sdk.chat.domain.model
 
-import com.qiscus.sdk.chat.domain.util.getAttachmentName
+import android.os.Parcel
+import android.os.Parcelable
+import com.qiscus.sdk.chat.domain.util.*
 import java.io.File
 import java.util.*
 
@@ -35,8 +37,18 @@ class FileAttachmentMessage(
         date: Date,
         room: Room,
         state: MessageState,
-        type: MessageType
-) : Message(messageId, defaultMessage, sender, date, room, state, type) {
+        type: MessageType) : Message(messageId, defaultMessage, sender, date, room, state, type) {
+
+    private constructor(parcel: Parcel) : this(
+            parcel.readParcelable(MessageId::class.java.classLoader),
+            parcel.readFile(),
+            parcel.readString(),
+            parcel.readString(),
+            parcel.readParcelable(User::class.java.classLoader),
+            parcel.readDate()!!,
+            parcel.readParcelable(Room::class.java.classLoader),
+            parcel.readEnum<MessageState>()!!,
+            parcel.readParcelable(MessageType::class.java.classLoader))
 
     val attachmentUrl by lazy {
         var url = ""
@@ -48,7 +60,7 @@ class FileAttachmentMessage(
                     .replace("[/file]", "")
                     .trim()
         }
-        url
+        return@lazy url
     }
 
     val attachmentName by lazy {
@@ -56,7 +68,7 @@ class FileAttachmentMessage(
         if (name.isBlank() && file != null) {
             name = file!!.name
         }
-        name
+        return@lazy name
     }
 
     override fun toString(): String {
@@ -78,5 +90,27 @@ class FileAttachmentMessage(
 
     override fun hashCode(): Int {
         return messageId.hashCode()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(messageId, flags)
+        parcel.writeFile(file)
+        parcel.writeString(caption)
+        parcel.writeString(text)
+        parcel.writeParcelable(sender, flags)
+        parcel.writeDate(date)
+        parcel.writeParcelable(room, flags)
+        parcel.writeEnum(state)
+        parcel.writeParcelable(type, flags)
+    }
+
+    companion object CREATOR : Parcelable.Creator<FileAttachmentMessage> {
+        override fun createFromParcel(parcel: Parcel): FileAttachmentMessage {
+            return FileAttachmentMessage(parcel)
+        }
+
+        override fun newArray(size: Int): Array<FileAttachmentMessage?> {
+            return arrayOfNulls(size)
+        }
     }
 }

@@ -16,10 +16,39 @@
 
 package com.qiscus.sdk.chat.domain.model
 
+import android.os.Parcel
+import android.os.Parcelable
+import com.qiscus.sdk.chat.domain.util.readBoolean
+import com.qiscus.sdk.chat.domain.util.writeBoolean
+
 /**
  * Created on : September 22, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-data class UserTyping(val roomId: String, val user: User, val typing: Boolean)
+data class UserTyping(val roomId: String, val user: User, val typing: Boolean) : Parcelable {
+
+    private constructor(parcel: Parcel) :
+            this(parcel.readString(), parcel.readParcelable(User::class.java.classLoader), parcel.readBoolean())
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(roomId)
+        parcel.writeParcelable(user, flags)
+        parcel.writeBoolean(typing)
+    }
+
+    override fun describeContents(): Int {
+        return hashCode()
+    }
+
+    companion object CREATOR : Parcelable.Creator<UserTyping> {
+        override fun createFromParcel(parcel: Parcel): UserTyping {
+            return UserTyping(parcel)
+        }
+
+        override fun newArray(size: Int): Array<UserTyping?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
