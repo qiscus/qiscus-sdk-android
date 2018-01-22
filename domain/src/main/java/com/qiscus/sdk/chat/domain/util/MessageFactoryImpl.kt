@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.domain.common
+package com.qiscus.sdk.chat.domain.util
 
 import com.qiscus.sdk.chat.domain.model.*
 import com.qiscus.sdk.chat.domain.repository.AccountRepository

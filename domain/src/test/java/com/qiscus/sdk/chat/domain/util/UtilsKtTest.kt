@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.domain.common
+package com.qiscus.sdk.chat.domain.util
 
 import org.junit.Assert.assertNotNull
 import org.junit.Test

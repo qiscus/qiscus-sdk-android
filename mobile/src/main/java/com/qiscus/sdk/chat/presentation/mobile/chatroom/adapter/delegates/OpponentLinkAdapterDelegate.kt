@@ -9,7 +9,7 @@ import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.qiscus.sdk.chat.domain.common.Patterns
+import com.qiscus.sdk.chat.domain.util.Patterns
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.LinkPreviewListener
 import com.qiscus.sdk.chat.presentation.model.MessageLinkViewModel

@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.presentation.sendmessage
 
-import com.qiscus.sdk.chat.domain.common.MessageFactory
+import com.qiscus.sdk.chat.domain.util.MessageFactory
 import com.qiscus.sdk.chat.domain.interactor.message.PostMessage
 import java.io.File
 

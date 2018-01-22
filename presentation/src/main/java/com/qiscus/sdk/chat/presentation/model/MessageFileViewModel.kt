@@ -3,7 +3,7 @@ package com.qiscus.sdk.chat.presentation.model
 import android.support.annotation.ColorInt
 import android.text.Spannable
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.common.getExtension
+import com.qiscus.sdk.chat.domain.util.getExtension
 import com.qiscus.sdk.chat.domain.interactor.Action
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage

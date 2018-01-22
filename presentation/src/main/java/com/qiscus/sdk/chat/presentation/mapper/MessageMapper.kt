@@ -19,7 +19,7 @@ package com.qiscus.sdk.chat.presentation.mapper
 import android.support.annotation.ColorInt
 import com.qiscus.sdk.chat.core.Qiscus
 import com.qiscus.sdk.chat.data.util.MimeTypeGuesser
-import com.qiscus.sdk.chat.domain.common.containsUrl
+import com.qiscus.sdk.chat.domain.util.containsUrl
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.presentation.model.MentionClickListener

@@ -1,7 +1,7 @@
 package com.qiscus.sdk.chat.presentation.model
 
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.common.extractUrls
+import com.qiscus.sdk.chat.domain.util.extractUrls
 import com.qiscus.sdk.chat.domain.model.Account
 import com.qiscus.sdk.chat.domain.model.Message
 import com.qiscus.sdk.chat.domain.repository.UserRepository

@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.domain.model
 
-import com.qiscus.sdk.chat.domain.common.getAttachmentName
+import com.qiscus.sdk.chat.domain.util.getAttachmentName
 import java.io.File
 import java.util.*
 

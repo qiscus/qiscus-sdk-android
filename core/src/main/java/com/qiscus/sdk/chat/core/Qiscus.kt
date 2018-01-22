@@ -20,8 +20,8 @@ import android.app.Application
 import com.qiscus.sdk.chat.core.component.QiscusComponent
 import com.qiscus.sdk.chat.data.pubsub.FcmHandler
 import com.qiscus.sdk.chat.data.pusher.FcmHandlerImpl
-import com.qiscus.sdk.chat.domain.common.MessageFactory
-import com.qiscus.sdk.chat.domain.common.MessageFactoryImpl
+import com.qiscus.sdk.chat.domain.util.MessageFactory
+import com.qiscus.sdk.chat.domain.util.MessageFactoryImpl
 import com.qiscus.sdk.chat.domain.interactor.Action
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

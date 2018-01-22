@@ -30,8 +30,8 @@ import com.qiscus.sdk.chat.data.source.message.MessageRemote
 import com.qiscus.sdk.chat.data.util.ApplicationWatcher
 import com.qiscus.sdk.chat.data.util.PostMessageHandler
 import com.qiscus.sdk.chat.data.util.SyncHandler
-import com.qiscus.sdk.chat.domain.common.runOnBackgroundThread
-import com.qiscus.sdk.chat.domain.common.scheduleOnBackgroundThread
+import com.qiscus.sdk.chat.domain.util.runOnBackgroundThread
+import com.qiscus.sdk.chat.domain.util.scheduleOnBackgroundThread
 import com.qiscus.sdk.chat.domain.pubsub.PubSubClient
 import io.reactivex.schedulers.Schedulers
 import org.eclipse.paho.android.service.MqttAndroidClient

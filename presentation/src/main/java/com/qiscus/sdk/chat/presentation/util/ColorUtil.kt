@@ -7,7 +7,7 @@ import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.domain.common.randomInt
+import com.qiscus.sdk.chat.domain.util.randomInt
 
 /**
  * Created on : October 16, 2017

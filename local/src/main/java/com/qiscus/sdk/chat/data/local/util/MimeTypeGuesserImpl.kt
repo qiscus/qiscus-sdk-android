@@ -18,8 +18,8 @@ package com.qiscus.sdk.chat.data.local.util
 
 import android.webkit.MimeTypeMap
 import com.qiscus.sdk.chat.data.util.MimeTypeGuesser
-import com.qiscus.sdk.chat.domain.common.getAttachmentName
-import com.qiscus.sdk.chat.domain.common.getExtension
+import com.qiscus.sdk.chat.domain.util.getAttachmentName
+import com.qiscus.sdk.chat.domain.util.getExtension
 import java.io.File
 
 /**

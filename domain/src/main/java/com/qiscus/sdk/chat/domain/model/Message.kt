@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.domain.model
 
-import com.qiscus.sdk.chat.domain.common.generateUniqueId
+import com.qiscus.sdk.chat.domain.util.generateUniqueId
 import org.json.JSONObject
 import java.util.*
 

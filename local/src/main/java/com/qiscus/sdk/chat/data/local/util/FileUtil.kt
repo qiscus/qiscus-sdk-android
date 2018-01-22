@@ -23,7 +23,7 @@ import android.os.Environment
 import com.qiscus.sdk.chat.data.util.FileManager
 import com.qiscus.sdk.chat.data.util.FilePathGenerator
 import com.qiscus.sdk.chat.data.util.MimeTypeGuesser
-import com.qiscus.sdk.chat.domain.common.getAttachmentName
+import com.qiscus.sdk.chat.domain.util.getAttachmentName
 import java.io.*
 
 /**

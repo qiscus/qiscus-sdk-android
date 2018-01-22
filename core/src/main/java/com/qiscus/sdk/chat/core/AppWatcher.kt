@@ -20,7 +20,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.qiscus.sdk.chat.data.util.ApplicationWatcher
-import com.qiscus.sdk.chat.domain.common.runOnBackgroundThread
+import com.qiscus.sdk.chat.domain.util.runOnBackgroundThread
 import java.util.concurrent.ScheduledFuture
 
 
