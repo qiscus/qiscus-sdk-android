@@ -36,9 +36,10 @@ import com.qiscus.sdk.chat.domain.model.FileAttachmentMessage
 import com.qiscus.sdk.chat.domain.model.Room
 import com.qiscus.sdk.chat.presentation.listmessage.ListMessageContract
 import com.qiscus.sdk.chat.presentation.mobile.R
-import com.qiscus.sdk.chat.presentation.mobile.accountlinking.accountLinkinIntent
+import com.qiscus.sdk.chat.presentation.mobile.accountlinking.accountLinkingIntent
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.DefaultMessageAdapter
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.adapter.delegates.*
+import com.qiscus.sdk.chat.presentation.mobile.imageviewer.imageViewerIntent
 import com.qiscus.sdk.chat.presentation.model.*
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
@@ -160,7 +161,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
     }
 
     override fun openImageViewer(messageViewModel: MessageImageViewModel) {
-        Toast.makeText(this, "open image", Toast.LENGTH_SHORT).show()
+        startActivity(imageViewerIntent(messageViewModel))
     }
 
     override fun openFileHandler(messageViewModel: MessageFileViewModel) {
@@ -242,7 +243,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
     }
 
     override fun openAccountLinkingPage(messageViewModel: MessageAccountLinkingViewModel) {
-        startActivity(accountLinkinIntent(messageViewModel.button.title, messageViewModel.button.url,
+        startActivity(accountLinkingIntent(messageViewModel.button.title, messageViewModel.button.url,
                 messageViewModel.button.finishUrl, messageViewModel.button.successMessage))
     }
 

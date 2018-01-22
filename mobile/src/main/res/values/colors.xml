@@ -134,4 +134,11 @@
     <color name="qiscus_opponents_message_web_preview_title">#212121</color>
     <color name="qiscus_my_message_web_preview_description">#727272</color>
     <color name="qiscus_opponents_message_web_preview_description">#727272</color>
+
+    <!-- image viewer -->
+    <color name="qiscus_image_viewer_background">#000</color>
+    <color name="qiscus_image_viewer_sender_name">#FFF</color>
+    <color name="qiscus_image_viewer_date">#FFF</color>
+    <color name="qiscus_image_viewer_toolbar">#88000000</color>
+    <color name="qiscus_image_viewer_info_panel">#88000000</color>
 </resources>
