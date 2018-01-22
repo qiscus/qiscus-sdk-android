@@ -13,8 +13,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.qiscus.sdk.chat.core.Qiscus
-import com.qiscus.sdk.chat.presentation.uikit.R
-import com.qiscus.sdk.chat.presentation.uikit.util.randomColor
+import com.qiscus.sdk.chat.presentation.R
+import com.qiscus.sdk.chat.presentation.util.randomColor
 import com.schinizer.rxunfurl.model.PreviewData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

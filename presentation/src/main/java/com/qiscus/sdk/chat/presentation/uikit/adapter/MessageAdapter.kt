@@ -4,7 +4,7 @@ import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
-import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
+import com.qiscus.sdk.chat.presentation.util.indexOfFirst
 
 /**
  * Created on : October 17, 2017

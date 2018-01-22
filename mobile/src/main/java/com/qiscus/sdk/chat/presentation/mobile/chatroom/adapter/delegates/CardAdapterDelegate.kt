@@ -14,7 +14,7 @@ import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageCardViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
-import com.qiscus.sdk.chat.presentation.uikit.util.getColor
+import com.qiscus.sdk.chat.presentation.util.getColor
 import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 
 /**

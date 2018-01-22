@@ -44,8 +44,8 @@ import com.qiscus.sdk.chat.presentation.model.*
 import com.qiscus.sdk.chat.presentation.sendmessage.SendMessageContract
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
-import com.qiscus.sdk.chat.presentation.uikit.util.RecyclerViewScrollListener
-import com.qiscus.sdk.chat.presentation.uikit.util.startCustomTabActivity
+import com.qiscus.sdk.chat.presentation.util.RecyclerViewScrollListener
+import com.qiscus.sdk.chat.presentation.util.startCustomTabActivity
 import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 import kotlinx.android.synthetic.main.activity_qiscus_chat_room.*
 
@@ -275,7 +275,7 @@ class ChatRoomActivity : AppCompatActivity(), ListMessageContract.View, SendMess
                 .create()
 
         alertDialog.setOnShowListener { _ ->
-            @ColorInt val accent = com.qiscus.sdk.chat.presentation.uikit.util.getColor(resId = R.color.qiscus_accent)
+            @ColorInt val accent = com.qiscus.sdk.chat.presentation.util.getColor(resId = R.color.qiscus_accent)
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(accent)
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(accent)
         }

@@ -3,7 +3,7 @@ package com.qiscus.sdk.chat.presentation.uikit.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import com.qiscus.sdk.chat.presentation.uikit.R
+import com.qiscus.sdk.chat.presentation.R
 
 internal class LayoutConfiguration(context: Context, attributeSet: AttributeSet) {
 

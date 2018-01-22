@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.model.MessageButtonsViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
-import com.qiscus.sdk.chat.presentation.uikit.util.getColor
-import com.qiscus.sdk.chat.presentation.uikit.util.getDrawable
+import com.qiscus.sdk.chat.presentation.util.getColor
+import com.qiscus.sdk.chat.presentation.util.getDrawable
 import com.qiscus.sdk.chat.presentation.uikit.widget.ChatButtonView
 
 /**

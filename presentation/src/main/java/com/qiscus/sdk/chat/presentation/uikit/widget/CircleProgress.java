@@ -13,8 +13,8 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.qiscus.sdk.chat.presentation.uikit.R;
-import com.qiscus.sdk.chat.presentation.uikit.util.UiUtilKt;
+import com.qiscus.sdk.chat.presentation.R;
+import com.qiscus.sdk.chat.presentation.util.UiUtilKt;
 
 public class CircleProgress extends View {
     private Paint textPaint;

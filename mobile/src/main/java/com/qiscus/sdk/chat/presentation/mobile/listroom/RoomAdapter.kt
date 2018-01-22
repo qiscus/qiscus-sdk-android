@@ -13,8 +13,8 @@ import com.qiscus.sdk.chat.presentation.mobile.R
 import com.qiscus.sdk.chat.presentation.mobile.chatroom.chatRoomIntent
 import com.qiscus.sdk.chat.presentation.model.RoomViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.SortedAdapter
-import com.qiscus.sdk.chat.presentation.uikit.util.indexOfFirst
-import com.qiscus.sdk.chat.presentation.uikit.util.toTodayOrDate
+import com.qiscus.sdk.chat.presentation.util.indexOfFirst
+import com.qiscus.sdk.chat.presentation.util.toTodayOrDate
 
 /**
  * Created on : October 04, 2017

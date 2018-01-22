@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewDebug;
 import android.view.ViewGroup;
 
-import com.qiscus.sdk.chat.presentation.uikit.R;
+import com.qiscus.sdk.chat.presentation.R;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

@@ -13,7 +13,7 @@ import com.qiscus.sdk.chat.presentation.model.MessageTextViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
-import com.qiscus.sdk.chat.presentation.uikit.util.ClickableMovementMethod
+import com.qiscus.sdk.chat.presentation.util.ClickableMovementMethod
 
 /**
  * Created on : December 20, 2017

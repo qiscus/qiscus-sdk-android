@@ -16,8 +16,8 @@ import com.qiscus.sdk.chat.presentation.model.MessageLinkViewModel
 import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
-import com.qiscus.sdk.chat.presentation.uikit.util.ClickSpan
-import com.qiscus.sdk.chat.presentation.uikit.util.startCustomTabActivity
+import com.qiscus.sdk.chat.presentation.util.ClickSpan
+import com.qiscus.sdk.chat.presentation.util.startCustomTabActivity
 import com.qiscus.sdk.chat.presentation.uikit.widget.WebPreviewView
 
 /**

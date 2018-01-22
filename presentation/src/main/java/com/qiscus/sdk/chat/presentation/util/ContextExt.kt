@@ -1,9 +1,9 @@
-package com.qiscus.sdk.chat.presentation.uikit.util
+package com.qiscus.sdk.chat.presentation.util
 
 import android.content.Context
 import android.net.Uri
 import android.support.customtabs.CustomTabsIntent
-import com.qiscus.sdk.chat.presentation.uikit.R
+import com.qiscus.sdk.chat.presentation.R
 
 /**
  * Created on : January 17, 2018

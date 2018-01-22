@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.qiscus.sdk.chat.presentation.model.ButtonViewModel
-import com.qiscus.sdk.chat.presentation.uikit.R
+import com.qiscus.sdk.chat.presentation.R
 
 class ChatButtonView(context: Context, private val buttonViewModel: ButtonViewModel) : FrameLayout(context), View.OnClickListener {
     private lateinit var button: TextView

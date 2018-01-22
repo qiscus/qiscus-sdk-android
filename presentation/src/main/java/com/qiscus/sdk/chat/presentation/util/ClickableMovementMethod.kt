@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.uikit.util
+package com.qiscus.sdk.chat.presentation.util
 
 import android.text.Selection
 import android.text.Spannable

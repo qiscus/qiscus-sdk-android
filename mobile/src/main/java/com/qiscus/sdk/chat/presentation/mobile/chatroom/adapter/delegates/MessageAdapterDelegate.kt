@@ -17,10 +17,10 @@ import com.qiscus.sdk.chat.presentation.model.MessageViewModel
 import com.qiscus.sdk.chat.presentation.uikit.adapter.AdapterDelegate
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemClickListener
 import com.qiscus.sdk.chat.presentation.uikit.adapter.ItemLongClickListener
-import com.qiscus.sdk.chat.presentation.uikit.util.getColor
-import com.qiscus.sdk.chat.presentation.uikit.util.isEqualIgnoreTime
-import com.qiscus.sdk.chat.presentation.uikit.util.toHour
-import com.qiscus.sdk.chat.presentation.uikit.util.toTodayOrDate
+import com.qiscus.sdk.chat.presentation.util.getColor
+import com.qiscus.sdk.chat.presentation.util.isEqualIgnoreTime
+import com.qiscus.sdk.chat.presentation.util.toHour
+import com.qiscus.sdk.chat.presentation.util.toTodayOrDate
 
 /**
  * Created on : December 20, 2017

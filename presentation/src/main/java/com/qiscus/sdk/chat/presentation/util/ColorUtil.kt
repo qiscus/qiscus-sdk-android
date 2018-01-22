@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.uikit.util
+package com.qiscus.sdk.chat.presentation.util
 
 import android.content.Context
 import android.graphics.Color

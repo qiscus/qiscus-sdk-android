@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.presentation.uikit.util
+package com.qiscus.sdk.chat.presentation.util
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView

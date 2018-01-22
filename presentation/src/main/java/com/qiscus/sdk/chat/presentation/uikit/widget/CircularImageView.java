@@ -22,7 +22,7 @@ import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import com.qiscus.sdk.chat.presentation.uikit.R;
+import com.qiscus.sdk.chat.presentation.R;
 
 /**
  * Created on : October 16, 2017
