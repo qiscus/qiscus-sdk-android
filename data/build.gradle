@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-apply plugin: 'kotlin'
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply from: '../buildsystem/bintrayConfig.gradle'
 
 ext {
@@ -24,8 +25,31 @@ ext {
     libraryDescription = 'Data layer of qiscus chat sdk'
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+android {
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+
+    defaultConfig {
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+    }
+}
 
 configurations.all {
     resolutionStrategy {
@@ -57,5 +81,5 @@ buildscript {
     }
 }
 
-apply from: '../buildsystem/bintrayv2.gradle'
-apply from: '../buildsystem/installv2.gradle'
+apply from: '../buildsystem/bintrayv1.gradle'
+apply from: '../buildsystem/installv1.gradle'

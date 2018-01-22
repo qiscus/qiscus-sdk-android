@@ -37,7 +37,6 @@ ext {
     rxKotlinVersion = '2.1.0'
     rxAndroidVersion = '2.0.1'
 
-    jsonVersion = '20170516'
     gsonVersion = '2.8.1'
 
     okHttpVersion = '3.9.1'
@@ -67,8 +66,7 @@ ext {
 
     domainDependencies = [
             rxKotlin: "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
-            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
-            json    : "org.json:json:${jsonVersion}"
+            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}"
     ]
 
     domainTestDependencies = [
