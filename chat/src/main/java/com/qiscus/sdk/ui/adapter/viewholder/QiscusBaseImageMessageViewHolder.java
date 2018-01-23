@@ -65,6 +65,8 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected int rightProgressFinishedColor;
     protected int leftProgressFinishedColor;
 
+    protected QiscusComment qiscusComment;
+
     public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
@@ -105,14 +107,11 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     @Override
     public void bind(QiscusComment qiscusComment) {
         super.bind(qiscusComment);
+        this.qiscusComment = qiscusComment;
         qiscusComment.setProgressListener(this);
         qiscusComment.setDownloadingListener(this);
         setUpDownloadIcon(qiscusComment);
         showProgressOrNot(qiscusComment);
-        if (qiscusComment.getState() == QiscusComment.STATE_PENDING
-                || qiscusComment.getState() == QiscusComment.STATE_SENDING) {
-            qiscusComment.setDownloading(true);
-        }
         if (captionView != null) {
             setUpLinks();
         }
@@ -232,14 +231,14 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
 
     @Override
     public void onProgress(QiscusComment qiscusComment, int percentage) {
-        if (progressView != null) {
+        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
             progressView.setProgress(percentage);
         }
     }
 
     @Override
     public void onDownloading(QiscusComment qiscusComment, boolean downloading) {
-        if (progressView != null) {
+        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
             progressView.setVisibility(downloading ? View.VISIBLE : View.GONE);
         }
     }

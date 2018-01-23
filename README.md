@@ -102,7 +102,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.19.0'
+    compile 'com.qiscus.sdk:chat:2.19.1'
 }
 ```
 
@@ -403,6 +403,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 ```
 
 # Advanced Section
+
+## Without Emoji
+Add Qiscus SDK to your apps without emoji library, change gradle file to like this.
+
+```groovy
+dependencies {
+    compile 'com.qiscus.sdk:chat:2.19.1-without-emoji'
+}
+```
 
 ## UI Customization
 
