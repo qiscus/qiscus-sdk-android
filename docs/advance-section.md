@@ -1,5 +1,14 @@
 # Advanced Section
 
+## Without Emoji
+Add Qiscus SDK to your apps without emoji library, change gradle file to like this.
+
+```groovy
+dependencies {
+    compile 'com.qiscus.sdk:chat:2.19.1-without-emoji'
+}
+```
+
 ## Server Authentication
 
 Server Authentication is another option, which allow you to authenticate using Json Web Token [(JWT)](https://jwt.io/). Json web token contains your app account details which typically consists of a single string which contains information of two parts, Jose header and JWT claims set. 

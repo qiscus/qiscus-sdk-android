@@ -404,6 +404,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 # Advanced Section
 
+## Without Emoji
+Add Qiscus SDK to your apps without emoji library, change gradle file to like this.
+
+```groovy
+dependencies {
+    compile 'com.qiscus.sdk:chat:2.19.1-without-emoji'
+}
+```
+
 ## UI Customization
 
 Qiscus Chat SDK enable you to customize Chat UI as you like. You can modify colors, change bubble chat design, modify Chat Header, and many more. There are 2 level of UI customization, Basic and Advance Customization. For Basic Customization, you can simply look at the autocomplete suggestion in your IDE to see lots of method to modify your Chat Interface. For Advance Customization, you need to download the UI source code and modify anything as you need.  
