@@ -50,6 +50,8 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     protected int rightProgressFinishedColor;
     protected int leftProgressFinishedColor;
 
+    protected QiscusComment qiscusComment;
+
     public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
@@ -81,6 +83,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     @Override
     public void bind(QiscusComment qiscusComment) {
         super.bind(qiscusComment);
+        this.qiscusComment = qiscusComment;
         qiscusComment.setProgressListener(this);
         qiscusComment.setDownloadingListener(this);
         setUpDownloadIcon(qiscusComment);
@@ -141,14 +144,14 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
 
     @Override
     public void onProgress(QiscusComment qiscusComment, int percentage) {
-        if (progressView != null) {
+        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
             progressView.setProgress(percentage);
         }
     }
 
     @Override
     public void onDownloading(QiscusComment qiscusComment, boolean downloading) {
-        if (progressView != null) {
+        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
             progressView.setVisibility(downloading ? View.VISIBLE : View.GONE);
         }
     }
