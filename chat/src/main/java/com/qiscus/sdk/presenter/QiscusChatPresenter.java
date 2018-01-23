@@ -715,6 +715,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     @Override
     public void detachView() {
         super.detachView();
+        for (Map.Entry<QiscusComment, Subscription> entry : pendingTask.entrySet()) {
+            roomEventHandler.transformCommentState(entry.getKey(), true);
+        }
         roomEventHandler.detach();
         clearUnreadCount();
         room = null;
