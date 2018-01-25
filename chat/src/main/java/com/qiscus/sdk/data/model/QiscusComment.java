@@ -488,6 +488,8 @@ public class QiscusComment implements Parcelable {
 
         String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
         try {
+            fileName = fileName.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+            fileName = fileName.replaceAll("\\+", "%2B");
             return URLDecoder.decode(fileName, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
