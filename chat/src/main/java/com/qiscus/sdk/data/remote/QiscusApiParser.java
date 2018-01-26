@@ -86,6 +86,7 @@ final class QiscusApiParser {
                 qiscusChatRoom.setDistinctId(jsonChatRoom.get("raw_room_name").getAsString());
             }
 
+            qiscusChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
             qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
             try {
                 qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :
@@ -145,6 +146,7 @@ final class QiscusApiParser {
                     qiscusChatRoom.setDistinctId(jsonChatRoom.get("raw_room_name").getAsString());
                 }
 
+                qiscusChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
                 qiscusChatRoom.setLastTopicId(jsonChatRoom.get("id").getAsInt());
                 try {
                     qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :

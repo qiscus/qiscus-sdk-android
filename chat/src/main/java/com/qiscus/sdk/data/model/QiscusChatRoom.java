@@ -32,6 +32,7 @@ import java.util.List;
 public class QiscusChatRoom implements Parcelable {
     protected int id;
     protected String distinctId;
+    protected String uniqueId;
     protected String name;
     @Deprecated protected String subtitle = "";
     protected int lastTopicId;
@@ -51,6 +52,7 @@ public class QiscusChatRoom implements Parcelable {
     protected QiscusChatRoom(Parcel in) {
         id = in.readInt();
         distinctId = in.readString();
+        uniqueId = in.readString();
         name = in.readString();
         subtitle = in.readString();
         lastTopicId = in.readInt();
@@ -92,6 +94,14 @@ public class QiscusChatRoom implements Parcelable {
 
     public void setDistinctId(String distinctId) {
         this.distinctId = distinctId;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
     }
 
     public String getName() {
@@ -187,6 +197,7 @@ public class QiscusChatRoom implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(distinctId);
+        dest.writeString(uniqueId);
         dest.writeString(name);
         dest.writeString(subtitle);
         dest.writeInt(lastTopicId);
@@ -206,10 +217,11 @@ public class QiscusChatRoom implements Parcelable {
         return "QiscusChatRoom{" +
                 "id=" + id +
                 ", distinctId='" + distinctId + '\'' +
+                ", uniqueId='" + uniqueId + '\'' +
                 ", name='" + name + '\'' +
                 ", subtitle='" + subtitle + '\'' +
                 ", lastTopicId=" + lastTopicId +
-                ", options='" + options + '\'' +
+                ", options=" + options +
                 ", group=" + group +
                 ", avatarUrl='" + avatarUrl + '\'' +
                 ", member=" + member +
