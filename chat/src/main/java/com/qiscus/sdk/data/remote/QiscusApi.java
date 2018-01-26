@@ -29,7 +29,6 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -343,29 +342,27 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<Void> clearChatRoomMessages(List<QiscusChatRoom> chatRooms) {
-        List<String> roomChannelIds = Observable.from(chatRooms)
-                .map(qiscusChatRoom -> {
-                    if (!qiscusChatRoom.isGroup()) {
-                        return QiscusAndroidUtil.md5Hash(qiscusChatRoom.getDistinctId());
-                    }
-                    return qiscusChatRoom.getDistinctId();
-                })
+    public Observable<Void> clearChatRoomMessages(List<Integer> roomIds) {
+        return api.getChatRooms(Qiscus.getToken(), roomIds, null, false)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
+                .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("unique_id").getAsString())
                 .toList()
-                .toBlocking()
-                .single();
-        return api.clearChatRoomMessages(Qiscus.getToken(), roomChannelIds)
+                .flatMap(roomChannelIds ->
+                        api.clearChatRoomMessages(Qiscus.getToken(), roomChannelIds))
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("id").getAsString())
-                .map(roomId -> Qiscus.getDataStore().getChatRoom(roomId))
-                .map(QiscusChatRoom::getId)
+                .map(Integer::valueOf)
                 .doOnNext(roomId -> Qiscus.getDataStore().deleteCommentsByRoomId(roomId))
                 .toList()
-                .map(roomIds -> null);
+                .map(integers -> null);
     }
 
     private interface Api {
