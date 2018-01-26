@@ -360,11 +360,12 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonObject -> jsonObject.get("unique_id").getAsString())
-                .map(s -> Qiscus.getDataStore().getChatRoomWithUniqueId(s))
-                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().deleteCommentsByRoomId(qiscusChatRoom.getId()))
+                .map(jsonObject -> jsonObject.get("id").getAsString())
+                .map(roomId -> Qiscus.getDataStore().getChatRoom(roomId))
+                .map(QiscusChatRoom::getId)
+                .doOnNext(roomId -> Qiscus.getDataStore().deleteCommentsByRoomId(roomId))
                 .toList()
-                .map(qiscusChatRooms -> null);
+                .map(roomIds -> null);
     }
 
     private interface Api {
