@@ -26,6 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.qiscus.sdk.Qiscus;
 
+import java.security.MessageDigest;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 
@@ -107,6 +108,21 @@ public final class QiscusAndroidUtil {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public static String md5Hash(String plain) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(plain.getBytes());
+            byte byteData[] = md.digest();
+            StringBuffer sb = new StringBuffer();
+            for (byte aByteData : byteData) {
+                sb.append(Integer.toString((aByteData & 0xff) + 0x100, 16).substring(1));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return null;
         }
     }
 }

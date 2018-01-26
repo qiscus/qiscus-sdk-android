@@ -29,6 +29,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -342,7 +343,17 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<Void> clearChatRoomMessages(List<String> roomChannelIds) {
+    public Observable<Void> clearChatRoomMessages(List<QiscusChatRoom> chatRooms) {
+        List<String> roomChannelIds = Observable.from(chatRooms)
+                .map(qiscusChatRoom -> {
+                    if (!qiscusChatRoom.isGroup()) {
+                        return QiscusAndroidUtil.md5Hash(qiscusChatRoom.getDistinctId());
+                    }
+                    return qiscusChatRoom.getDistinctId();
+                })
+                .toList()
+                .toBlocking()
+                .single();
         return api.clearChatRoomMessages(Qiscus.getToken(), roomChannelIds)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
