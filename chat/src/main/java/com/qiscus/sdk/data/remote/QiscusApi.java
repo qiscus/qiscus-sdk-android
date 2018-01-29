@@ -342,16 +342,27 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<Void> clearChatRoomMessages(List<String> roomUniqueIds) {
-        return api.clearChatRoomMessages(Qiscus.getToken(), roomUniqueIds)
+    public Observable<Void> clearChatRoomMessages(List<Integer> roomIds) {
+        return api.getChatRooms(Qiscus.getToken(), roomIds, null, false)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
+                .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("unique_id").getAsString())
+                .toList()
+                .flatMap(roomChannelIds ->
+                        api.clearChatRoomMessages(Qiscus.getToken(), roomChannelIds))
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .doOnNext(json -> Qiscus.getDataStore().deleteCommentsByRoomId(json.get("id").getAsInt()))
+                .map(jsonObject -> jsonObject.get("id").getAsString())
+                .map(Integer::valueOf)
+                .doOnNext(roomId -> Qiscus.getDataStore().deleteCommentsByRoomId(roomId))
                 .toList()
-                .map(qiscusChatRooms -> null);
+                .map(integers -> null);
     }
 
     private interface Api {
