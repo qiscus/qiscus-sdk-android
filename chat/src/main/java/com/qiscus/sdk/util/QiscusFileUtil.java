@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.util;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -264,5 +265,11 @@ public final class QiscusFileUtil {
     public static String createTimestampFileName(String extension) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
         return timeStamp + "." + extension;
+    }
+
+    public static void notifySystem(File file) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        mediaScanIntent.setData(Uri.fromFile(file));
+        Qiscus.getApps().sendBroadcast(mediaScanIntent);
     }
 }

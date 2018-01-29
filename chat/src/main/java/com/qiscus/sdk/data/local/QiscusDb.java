@@ -30,13 +30,14 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 10;
+    static final int DATABASE_VERSION = 11;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
         static final String COLUMN_ID = "id";
         static final String COLUMN_TOPIC_ID = "last_topic";
         static final String COLUMN_DISTINCT_ID = "distinct_id";
+        static final String COLUMN_UNIQUE_ID = "unique_id";
         static final String COLUMN_NAME = "name";
         static final String COLUMN_SUBTITLE = "subtitle";
         static final String COLUMN_IS_GROUP = "is_group";
@@ -49,6 +50,7 @@ final class QiscusDb {
                         COLUMN_ID + " INTEGER," +
                         COLUMN_TOPIC_ID + " INTEGER," +
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
+                        COLUMN_UNIQUE_ID + " TEXT," +
                         COLUMN_NAME + " TEXT," +
                         COLUMN_SUBTITLE + " TEXT," +
                         COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
@@ -62,6 +64,7 @@ final class QiscusDb {
             values.put(COLUMN_ID, qiscusChatRoom.getId());
             values.put(COLUMN_TOPIC_ID, qiscusChatRoom.getLastTopicId());
             values.put(COLUMN_DISTINCT_ID, qiscusChatRoom.getDistinctId());
+            values.put(COLUMN_UNIQUE_ID, qiscusChatRoom.getUniqueId());
             values.put(COLUMN_NAME, qiscusChatRoom.getName());
             values.put(COLUMN_SUBTITLE, qiscusChatRoom.getSubtitle());
             values.put(COLUMN_IS_GROUP, qiscusChatRoom.isGroup() ? 1 : 0);
@@ -76,6 +79,7 @@ final class QiscusDb {
             qiscusChatRoom.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
             qiscusChatRoom.setLastTopicId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOPIC_ID)));
             qiscusChatRoom.setDistinctId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DISTINCT_ID)));
+            qiscusChatRoom.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
             qiscusChatRoom.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
             qiscusChatRoom.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBTITLE)));
             qiscusChatRoom.setGroup(cursor.getShort(cursor.getColumnIndexOrThrow(COLUMN_IS_GROUP)) == 1);

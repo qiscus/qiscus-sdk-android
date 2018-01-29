@@ -426,12 +426,12 @@ public class Qiscus {
     /**
      * Use this method to create or join specific room chat with defined unique id.
      *
-     * @param uniqueId the room unique id.
+     * @param channelName the room channel name (must be unique).
      * @return Defined Id Group Chat room builder
      */
-    public static DefinedIdGroupChatBuilder buildGroupChatRoomWith(String uniqueId) {
+    public static DefinedIdGroupChatBuilder buildGroupChatRoomWith(String channelName) {
         checkUserSetup();
-        return new DefinedIdGroupChatBuilder(uniqueId);
+        return new DefinedIdGroupChatBuilder(channelName);
     }
 
     /**

@@ -23,7 +23,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
@@ -95,9 +95,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .doOnNext(file1 -> {
-                    if (QiscusImageUtil.isImage(file1)) {
-                        QiscusImageUtil.addImageToGallery(file1);
-                    }
+                    QiscusFileUtil.notifySystem(file1);
                     qiscusComment.setDownloading(false);
                     Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
                             file1.getAbsolutePath());

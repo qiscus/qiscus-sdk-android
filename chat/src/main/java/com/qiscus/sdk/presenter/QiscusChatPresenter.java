@@ -609,9 +609,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .doOnNext(file1 -> {
-                        if (QiscusImageUtil.isImage(file1)) {
-                            QiscusImageUtil.addImageToGallery(file1);
-                        }
+                        QiscusFileUtil.notifySystem(file1);
                         qiscusComment.setDownloading(false);
                         Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
                                 file1.getAbsolutePath());

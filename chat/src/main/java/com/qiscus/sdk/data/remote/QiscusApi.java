@@ -476,7 +476,7 @@ public enum QiscusApi {
 
         @DELETE("/api/v2/sdk/clear_room_messages")
         Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
-                                                      @Query("room_channel_ids[]") List<String> roomChannelIds);
+                                                      @Query("room_channel_ids[]") List<String> roomUniqueIds);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
