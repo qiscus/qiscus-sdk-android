@@ -342,7 +342,19 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<Void> clearChatRoomMessages(List<String> roomUniqueIds) {
+    public Observable<Void> clearCommentsByRoomIds(List<Integer> roomIds) {
+        return api.getChatRooms(Qiscus.getToken(), roomIds, null, false)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
+                .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("unique_id").getAsString())
+                .toList()
+                .flatMap(this::clearCommentsByRoomUniqueIds);
+    }
+
+    public Observable<Void> clearCommentsByRoomUniqueIds(List<String> roomUniqueIds) {
         return api.clearChatRoomMessages(Qiscus.getToken(), roomUniqueIds)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
