@@ -16,7 +16,6 @@
 
 package com.qiscus.sdk.util;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -185,7 +184,7 @@ public final class QiscusImageUtil {
         }
 
         File imageFile = new File(filename);
-        QiscusImageUtil.addImageToGallery(imageFile);
+        QiscusFileUtil.notifySystem(imageFile);
 
         return imageFile;
     }
@@ -239,9 +238,7 @@ public final class QiscusImageUtil {
     }
 
     public static void addImageToGallery(File picture) {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        mediaScanIntent.setData(Uri.fromFile(picture));
-        Qiscus.getApps().sendBroadcast(mediaScanIntent);
+        QiscusFileUtil.notifySystem(picture);
     }
 
     public static void showImageFolderAppInGallery() {
@@ -251,7 +248,7 @@ public final class QiscusImageUtil {
         if (nomedia.exists()) {
             nomedia.delete();
             //rescan media gallery for updating deleted .nomedia file
-            addImageToGallery(nomedia);
+            QiscusFileUtil.notifySystem(nomedia);
         }
     }
 
@@ -267,7 +264,7 @@ public final class QiscusImageUtil {
         if (!nomedia.exists()) {
             try {
                 if (nomedia.createNewFile()) {
-                    QiscusImageUtil.addImageToGallery(nomedia);
+                    QiscusFileUtil.notifySystem(nomedia);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

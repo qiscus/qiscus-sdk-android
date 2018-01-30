@@ -177,7 +177,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = String.format(
                 "SELECT * FROM %s WHERE %s = \"%s\"",
                 QiscusDb.RoomTable.TABLE_NAME,
-                QiscusDb.RoomTable.COLUMN_DISTINCT_ID,
+                QiscusDb.RoomTable.COLUMN_UNIQUE_ID,
                 uniqueId
         );
 
@@ -247,7 +247,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         }
 
         for (int i = 0; i < uniqueIds.size(); i++) {
-            query.append(QiscusDb.RoomTable.COLUMN_DISTINCT_ID).append(" = ").append(DatabaseUtils.sqlEscapeString(uniqueIds.get(i)));
+            query.append(QiscusDb.RoomTable.COLUMN_UNIQUE_ID).append(" = ").append(DatabaseUtils.sqlEscapeString(uniqueIds.get(i)));
             if (i < uniqueIds.size() - 1) {
                 query.append(" OR ");
             }

@@ -342,16 +342,26 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<Void> clearChatRoomMessages(List<String> roomChannelIds) {
-        return api.clearChatRoomMessages(Qiscus.getToken(), roomChannelIds)
+    public Observable<Void> clearCommentsByRoomIds(List<Integer> roomIds) {
+        return api.getChatRooms(Qiscus.getToken(), roomIds, null, false)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
+                .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonObject -> jsonObject.get("unique_id").getAsString())
+                .toList()
+                .flatMap(this::clearCommentsByRoomUniqueIds);
+    }
+
+    public Observable<Void> clearCommentsByRoomUniqueIds(List<String> roomUniqueIds) {
+        return api.clearChatRoomMessages(Qiscus.getToken(), roomUniqueIds)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonObject -> jsonObject.get("unique_id").getAsString())
-                .map(s -> Qiscus.getDataStore().getChatRoomWithUniqueId(s))
-                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().deleteCommentsByRoomId(qiscusChatRoom.getId()))
+                .doOnNext(json -> Qiscus.getDataStore().deleteCommentsByRoomId(json.get("id").getAsInt()))
                 .toList()
                 .map(qiscusChatRooms -> null);
     }
@@ -467,7 +477,7 @@ public enum QiscusApi {
 
         @DELETE("/api/v2/sdk/clear_room_messages")
         Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
-                                                      @Query("room_channel_ids[]") List<String> roomChannelIds);
+                                                      @Query("room_channel_ids[]") List<String> roomUniqueIds);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
