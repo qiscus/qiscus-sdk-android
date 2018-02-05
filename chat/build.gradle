@@ -130,8 +130,8 @@ dependencies {
     compile 'com.qiscus.mqtt:android:1.1.1-q'
 
     //Push notification
-    compile 'com.google.firebase:firebase-core:11.6.2'
-    compile 'com.google.firebase:firebase-messaging:11.6.2'
+    compile 'com.google.firebase:firebase-core:11.8.0'
+    compile 'com.google.firebase:firebase-messaging:11.8.0'
 
     //Image loader
     compile 'com.qiscus.nirmana:nirmana:1.0.0'
@@ -147,5 +147,5 @@ dependencies {
     compile 'com.qiscus.utils:jupuk:1.0.1'
 
     //Place picker
-    compile 'com.google.android.gms:play-services-places:11.6.2'
+    compile 'com.google.android.gms:play-services-places:11.8.0'
 }
