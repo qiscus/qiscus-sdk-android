@@ -41,6 +41,12 @@ ext {
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
+
+    //library version
+    androidSupportLibVersion = "27.0.2"
+    playServicesLibVersion = "11.8.0"
+    okhttpLibVersion = '3.9.1'
+    retrofitLibVersion = '2.3.0'
 }
 
 android {
@@ -98,13 +104,6 @@ repositories {
 
 apply from: '../buildsystem/bintrayv1.gradle'
 apply from: '../buildsystem/installv1.gradle'
-
-ext {
-    androidSupportLibVersion = "27.0.2"
-    playServicesLibVersion = "11.8.0"
-    okhttpLibVersion = '3.9.1'
-    retrofitLibVersion = '2.3.0'
-}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
