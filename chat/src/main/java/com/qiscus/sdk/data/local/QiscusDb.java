@@ -129,11 +129,11 @@ final class QiscusDb {
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
-                        COLUMN_ROOM_ID + " INTEGER," +
+                        COLUMN_ROOM_ID + " LONG," +
                         COLUMN_USER_EMAIL + " TEXT," +
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
-                        COLUMN_LAST_DELIVERED + " INTEGER DEFAULT 0," +
-                        COLUMN_LAST_READ + " INTEGER DEFAULT 0" +
+                        COLUMN_LAST_DELIVERED + " LONG DEFAULT 0," +
+                        COLUMN_LAST_READ + " LONG DEFAULT 0" +
                         " ); ";
 
         static ContentValues toContentValues(long roomId, QiscusRoomMember roomMember) {
@@ -158,12 +158,12 @@ final class QiscusDb {
             return cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL));
         }
 
-        static Integer getLastDeliveredCommentId(Cursor cursor) {
-            return cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LAST_DELIVERED));
+        static long getLastDeliveredCommentId(Cursor cursor) {
+            return cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_LAST_DELIVERED));
         }
 
-        static Integer getLastReadCommentId(Cursor cursor) {
-            return cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LAST_READ));
+        static long getLastReadCommentId(Cursor cursor) {
+            return cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_LAST_READ));
         }
     }
 
@@ -185,10 +185,10 @@ final class QiscusDb {
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
-                        COLUMN_ID + " INTEGER," +
+                        COLUMN_ID + " LONG," +
                         COLUMN_ROOM_ID + " LONG," +
                         COLUMN_UNIQUE_ID + " TEXT," +
-                        COLUMN_COMMENT_BEFORE_ID + " INTEGER," +
+                        COLUMN_COMMENT_BEFORE_ID + " LONG," +
                         COLUMN_MESSAGE + " TEXT," +
                         COLUMN_SENDER + " TEXT," +
                         COLUMN_SENDER_EMAIL + " TEXT NOT NULL," +
@@ -221,10 +221,10 @@ final class QiscusDb {
 
         static QiscusComment parseCursor(Cursor cursor) {
             QiscusComment qiscusComment = new QiscusComment();
-            qiscusComment.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qiscusComment.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));
             qiscusComment.setRoomId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
             qiscusComment.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
-            qiscusComment.setCommentBeforeId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
+            qiscusComment.setCommentBeforeId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
             qiscusComment.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
             qiscusComment.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
             qiscusComment.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
@@ -251,12 +251,12 @@ final class QiscusDb {
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
-                        COLUMN_COMMENT_ID + " INTEGER PRIMARY KEY," +
-                        COLUMN_ROOM_ID + " INTEGER NOT NULL," +
+                        COLUMN_COMMENT_ID + " LONG PRIMARY KEY," +
+                        COLUMN_ROOM_ID + " LONG NOT NULL," +
                         COLUMN_LOCAL_PATH + " TEXT NOT NULL" +
                         " ); ";
 
-        static ContentValues toContentValues(long roomId, int commentId, String localPath) {
+        static ContentValues toContentValues(long roomId, long commentId, String localPath) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_ROOM_ID, roomId);
             values.put(COLUMN_COMMENT_ID, commentId);

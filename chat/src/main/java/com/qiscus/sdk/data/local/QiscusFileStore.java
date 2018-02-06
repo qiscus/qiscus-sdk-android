@@ -25,15 +25,15 @@ import java.io.File;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusFileStore {
-    void saveLocalPath(long roomId, int commentId, String localPath);
+    void saveLocalPath(long roomId, long commentId, String localPath);
 
-    boolean isContainsFileOfComment(int commentId);
+    boolean isContainsFileOfComment(long commentId);
 
-    void updateLocalPath(long roomId, int commentId, String localPath);
+    void updateLocalPath(long roomId, long commentId, String localPath);
 
-    void addOrUpdateLocalPath(long roomId, int commentId, String localPath);
+    void addOrUpdateLocalPath(long roomId, long commentId, String localPath);
 
-    File getLocalPath(int commentId);
+    File getLocalPath(long commentId);
 
-    void deleteLocalPath(int commentId);
+    void deleteLocalPath(long commentId);
 }

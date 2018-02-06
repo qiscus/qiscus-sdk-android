@@ -60,10 +60,10 @@ public class QiscusComment implements Parcelable {
     public static final int STATE_DELIVERED = 3;
     public static final int STATE_READ = 4;
 
-    protected int id;
+    protected long id;
     protected long roomId;
     protected String uniqueId;
-    protected int commentBeforeId;
+    protected long commentBeforeId;
     protected String message;
     protected String sender;
     protected String senderEmail;
@@ -221,10 +221,10 @@ public class QiscusComment implements Parcelable {
     }
 
     protected QiscusComment(Parcel in) {
-        id = in.readInt();
+        id = in.readLong();
         roomId = in.readLong();
         uniqueId = in.readString();
-        commentBeforeId = in.readInt();
+        commentBeforeId = in.readLong();
         message = in.readString();
         sender = in.readString();
         senderEmail = in.readString();
@@ -254,11 +254,11 @@ public class QiscusComment implements Parcelable {
         }
     };
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -278,11 +278,11 @@ public class QiscusComment implements Parcelable {
         this.uniqueId = uniqueId;
     }
 
-    public int getCommentBeforeId() {
+    public long getCommentBeforeId() {
         return commentBeforeId;
     }
 
-    public void setCommentBeforeId(int commentBeforeId) {
+    public void setCommentBeforeId(long commentBeforeId) {
         this.commentBeforeId = commentBeforeId;
     }
 
@@ -821,10 +821,10 @@ public class QiscusComment implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeLong(id);
         dest.writeLong(roomId);
         dest.writeString(uniqueId);
-        dest.writeInt(commentBeforeId);
+        dest.writeLong(commentBeforeId);
         dest.writeString(message);
         dest.writeString(sender);
         dest.writeString(senderEmail);

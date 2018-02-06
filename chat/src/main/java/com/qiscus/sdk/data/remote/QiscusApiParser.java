@@ -163,10 +163,10 @@ final class QiscusApiParser {
                         member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
                         member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
                         if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
-                            member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsInt());
+                            member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsLong());
                         }
                         if (jsonMember.getAsJsonObject().has("last_comment_read_id")) {
-                            member.setLastReadCommentId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsInt());
+                            member.setLastReadCommentId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsLong());
                         }
                         members.add(member);
                     }
@@ -206,8 +206,8 @@ final class QiscusApiParser {
         QiscusComment qiscusComment = new QiscusComment();
         JsonObject jsonComment = jsonElement.getAsJsonObject();
         qiscusComment.setRoomId(roomId);
-        qiscusComment.setId(jsonComment.get("id").getAsInt());
-        qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+        qiscusComment.setId(jsonComment.get("id").getAsLong());
+        qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsLong());
         qiscusComment.setMessage(jsonComment.get("message").getAsString());
         qiscusComment.setSender(jsonComment.get("username").getAsString());
         qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
@@ -263,9 +263,9 @@ final class QiscusApiParser {
         return qiscusComment;
     }
 
-    private static Pair<Integer, Integer> getPairedLastState(List<QiscusRoomMember> members) {
-        int lastDelivered = Integer.MAX_VALUE;
-        int lastRead = Integer.MAX_VALUE;
+    private static Pair<Long, Long> getPairedLastState(List<QiscusRoomMember> members) {
+        long lastDelivered = Long.MAX_VALUE;
+        long lastRead = Long.MAX_VALUE;
         QiscusAccount account = Qiscus.getQiscusAccount();
         for (QiscusRoomMember member : members) {
             if (!member.getEmail().equals(account.getEmail())) {
@@ -286,7 +286,7 @@ final class QiscusApiParser {
     }
 
     private static void determineCommentState(QiscusComment comment, List<QiscusRoomMember> members) {
-        Pair<Integer, Integer> lastMemberState = getPairedLastState(members);
+        Pair<Long, Long> lastMemberState = getPairedLastState(members);
         if (comment.getId() > lastMemberState.first) {
             comment.setState(QiscusComment.STATE_ON_QISCUS);
         } else if (comment.getId() > lastMemberState.second) {

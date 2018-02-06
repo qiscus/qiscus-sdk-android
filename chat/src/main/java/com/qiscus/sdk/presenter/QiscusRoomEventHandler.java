@@ -34,7 +34,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Kelas yang handle perubahan-perubahan state comment di suatu room, dan juga typing
@@ -44,10 +44,10 @@ class QiscusRoomEventHandler {
     private QiscusChatRoom room;
 
     //comment terakhir yang sudah diterima semua anggota room
-    private AtomicInteger lastDeliveredCommentId;
+    private AtomicLong lastDeliveredCommentId;
 
     //comment terakhir yang sudah dibaca semua anggota room
-    private AtomicInteger lastReadCommentId;
+    private AtomicLong lastReadCommentId;
 
     //status terakhir masing-masing anggota room
     Map<String, QiscusRoomMember> memberState;
@@ -62,8 +62,8 @@ class QiscusRoomEventHandler {
         this.listener = listener;
 
         //Tidak diset 0 karena kita akan mencari nilai terkecil dari semua anggota room
-        lastDeliveredCommentId = new AtomicInteger(0);
-        lastReadCommentId = new AtomicInteger(0);
+        lastDeliveredCommentId = new AtomicLong(0);
+        lastReadCommentId = new AtomicLong(0);
 
         account = Qiscus.getQiscusAccount();
         setRoom(qiscusChatRoom);
@@ -94,8 +94,8 @@ class QiscusRoomEventHandler {
             memberState.clear();
         }
 
-        int minDelivered = Integer.MAX_VALUE;
-        int minRead = Integer.MAX_VALUE;
+        long minDelivered = Long.MAX_VALUE;
+        long minRead = Long.MAX_VALUE;
         for (QiscusRoomMember member : room.getMember()) {
             if (!member.getEmail().equals(account.getEmail())) {
                 if (member.getLastDeliveredCommentId() < minDelivered) {
@@ -137,7 +137,7 @@ class QiscusRoomEventHandler {
     }
 
     private void handleEvent(QiscusChatRoomEvent event) {
-        if (event.getTopicId() == room.getId()) {
+        if (event.getRoomId() == room.getId()) {
             switch (event.getEvent()) {
                 case TYPING:
                     listener.onUserTyping(event.getUser(), event.isTyping());
@@ -163,7 +163,7 @@ class QiscusRoomEventHandler {
      * @param commentId lastDeliveredCommentId nya
      * @return true jika commentId nya lebih besar dari yg sudah disimpan
      */
-    private boolean updateLastDelivered(String email, int commentId) {
+    private boolean updateLastDelivered(String email, long commentId) {
         QiscusRoomMember member = memberState.get(email);
         if (member != null && member.getLastDeliveredCommentId() < commentId) {
             member.setLastDeliveredCommentId(commentId);
@@ -180,7 +180,7 @@ class QiscusRoomEventHandler {
      * @param commentId lastReadCommentId nya
      * @return true jika commentId nya lebih besar dari yg sudah disimpan
      */
-    private boolean updateLastRead(String email, int commentId) {
+    private boolean updateLastRead(String email, long commentId) {
         QiscusRoomMember member = memberState.get(email);
         if (member != null && member.getLastReadCommentId() < commentId) {
             member.setLastDeliveredCommentId(commentId);
@@ -196,8 +196,8 @@ class QiscusRoomEventHandler {
      * jika berhasil di update akan men-trigger listener bahwa comment yg terakhir diterima atau dibaca telah berubah
      */
     private void tryUpdateLastState() {
-        int minDelivered = Integer.MAX_VALUE;
-        int minRead = Integer.MAX_VALUE;
+        long minDelivered = Long.MAX_VALUE;
+        long minRead = Long.MAX_VALUE;
         for (Map.Entry<String, QiscusRoomMember> member : memberState.entrySet()) {
             if (member.getValue().getLastDeliveredCommentId() < minDelivered) {
                 minDelivered = member.getValue().getLastDeliveredCommentId();
@@ -356,9 +356,9 @@ class QiscusRoomEventHandler {
 
         void onRoomMemberRemoved(QiscusRoomMember roomMember);
 
-        void onChangeLastDelivered(int lastDeliveredCommentId);
+        void onChangeLastDelivered(long lastDeliveredCommentId);
 
-        void onChangeLastRead(int lastReadCommentId);
+        void onChangeLastRead(long lastReadCommentId);
 
         void onUserTyping(String email, boolean typing);
     }

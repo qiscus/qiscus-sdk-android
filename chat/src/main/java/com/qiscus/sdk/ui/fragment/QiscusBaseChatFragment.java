@@ -1450,12 +1450,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Override
-    public void updateLastDeliveredComment(int lastDeliveredCommentId) {
+    public void updateLastDeliveredComment(long lastDeliveredCommentId) {
         chatAdapter.updateLastDeliveredComment(lastDeliveredCommentId);
     }
 
     @Override
-    public void updateLastReadComment(int lastReadCommentId) {
+    public void updateLastReadComment(long lastReadCommentId) {
         chatAdapter.updateLastReadComment(lastReadCommentId);
     }
 

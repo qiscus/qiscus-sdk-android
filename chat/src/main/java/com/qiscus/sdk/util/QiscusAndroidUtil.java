@@ -82,6 +82,10 @@ public final class QiscusAndroidUtil {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 
+    public static int compare(long x, long y) {
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    }
+
     public static int getRandomColor() {
         return Color.argb(100, random.nextInt(256), random.nextInt(256), random.nextInt(256));
     }

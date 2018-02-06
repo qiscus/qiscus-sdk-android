@@ -59,8 +59,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     protected QiscusChatRoom qiscusChatRoom;
     protected QiscusAccount qiscusAccount;
-    protected int lastDeliveredCommentId;
-    protected int lastReadCommentId;
+    protected long lastDeliveredCommentId;
+    protected long lastReadCommentId;
     protected boolean groupChat;
 
     private Map<String, QiscusRoomMember> members;
@@ -400,7 +400,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         return -1;
     }
 
-    public void updateLastDeliveredComment(int lastDeliveredCommentId) {
+    public void updateLastDeliveredComment(long lastDeliveredCommentId) {
         this.lastDeliveredCommentId = lastDeliveredCommentId;
         updateCommentState();
         notifyDataSetChanged();
@@ -425,7 +425,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         }
     }
 
-    public void updateLastReadComment(int lastReadCommentId) {
+    public void updateLastReadComment(long lastReadCommentId) {
         this.lastReadCommentId = lastReadCommentId;
         this.lastDeliveredCommentId = lastReadCommentId;
         updateCommentState();

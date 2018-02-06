@@ -362,7 +362,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .onErrorReturn(throwable -> null);
     }
 
-    private Observable<List<QiscusComment>> getCommentsFromNetwork(int lastCommentId) {
+    private Observable<List<QiscusComment>> getCommentsFromNetwork(long lastCommentId) {
         return QiscusApi.getInstance().getComments(room.getId(), lastCommentId)
                 .doOnNext(qiscusComment -> {
                     qiscusComment.setRoomId(room.getId());
@@ -750,7 +750,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Override
-    public void onChangeLastDelivered(int lastDeliveredCommentId) {
+    public void onChangeLastDelivered(long lastDeliveredCommentId) {
         QiscusAndroidUtil.runOnUIThread(() -> {
             if (view != null) {
                 view.updateLastDeliveredComment(lastDeliveredCommentId);
@@ -759,7 +759,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Override
-    public void onChangeLastRead(int lastReadCommentId) {
+    public void onChangeLastRead(long lastReadCommentId) {
         QiscusAndroidUtil.runOnUIThread(() -> {
             if (view != null) {
                 view.updateLastReadComment(lastReadCommentId);
@@ -800,9 +800,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         void refreshComment(QiscusComment qiscusComment);
 
-        void updateLastDeliveredComment(int lastDeliveredCommentId);
+        void updateLastDeliveredComment(long lastDeliveredCommentId);
 
-        void updateLastReadComment(int lastReadCommentId);
+        void updateLastReadComment(long lastReadCommentId);
 
         void onFileDownloaded(File file, String mimeType);
 

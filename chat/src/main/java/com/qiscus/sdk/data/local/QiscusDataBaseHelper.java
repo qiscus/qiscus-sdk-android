@@ -472,7 +472,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void saveLocalPath(long roomId, int commentId, String localPath) {
+    public void saveLocalPath(long roomId, long commentId, String localPath) {
         if (!isContainsFileOfComment(commentId)) {
             sqLiteDatabase.beginTransaction();
             try {
@@ -507,7 +507,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public boolean isContainsFileOfComment(int commentId) {
+    public boolean isContainsFileOfComment(long commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
                 + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
@@ -539,7 +539,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void updateLocalPath(long roomId, int commentId, String localPath) {
+    public void updateLocalPath(long roomId, long commentId, String localPath) {
         String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
         sqLiteDatabase.beginTransaction();
         try {
@@ -563,7 +563,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void addOrUpdateLocalPath(long roomId, int commentId, String localPath) {
+    public void addOrUpdateLocalPath(long roomId, long commentId, String localPath) {
         if (!isContainsFileOfComment(commentId)) {
             saveLocalPath(roomId, commentId, localPath);
         } else {
@@ -611,7 +611,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void updateLastDeliveredComment(long roomId, int commentId) {
+    public void updateLastDeliveredComment(long roomId, long commentId) {
         String sql = "UPDATE " + QiscusDb.CommentTable.TABLE_NAME
                 + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_DELIVERED
                 + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
@@ -631,7 +631,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void updateLastReadComment(long roomId, int commentId) {
+    public void updateLastReadComment(long roomId, long commentId) {
         String sql = "UPDATE " + QiscusDb.CommentTable.TABLE_NAME
                 + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_READ
                 + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
@@ -651,7 +651,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public File getLocalPath(int commentId) {
+    public File getLocalPath(long commentId) {
         String query = "SELECT * FROM "
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
                 + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId + "";
@@ -671,7 +671,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void deleteLocalPath(int commentId) {
+    public void deleteLocalPath(long commentId) {
         File file = getLocalPath(commentId);
         if (file != null) {
             file.delete();
@@ -689,7 +689,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getComment(int id, String uniqueId) {
+    public QiscusComment getComment(long id, String uniqueId) {
         String query;
         if (id == -1) {
             query = "SELECT * FROM "
