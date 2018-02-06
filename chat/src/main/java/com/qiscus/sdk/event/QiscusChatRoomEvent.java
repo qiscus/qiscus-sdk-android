@@ -23,37 +23,27 @@ package com.qiscus.sdk.event;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusChatRoomEvent {
-    private int roomId;
-    private int topicId;
-    private int commentId;
+    private long roomId;
+    private long commentId;
     private String commentUniqueId;
     private boolean typing;
     private String user;
     private Event event;
 
-    public int getRoomId() {
+    public long getRoomId() {
         return roomId;
     }
 
-    public QiscusChatRoomEvent setRoomId(int roomId) {
+    public QiscusChatRoomEvent setRoomId(long roomId) {
         this.roomId = roomId;
         return this;
     }
 
-    public int getTopicId() {
-        return topicId;
-    }
-
-    public QiscusChatRoomEvent setTopicId(int topicId) {
-        this.topicId = topicId;
-        return this;
-    }
-
-    public int getCommentId() {
+    public long getCommentId() {
         return event == Event.TYPING ? -1 : commentId;
     }
 
-    public QiscusChatRoomEvent setCommentId(int commentId) {
+    public QiscusChatRoomEvent setCommentId(long commentId) {
         this.commentId = commentId;
         return this;
     }
@@ -98,7 +88,6 @@ public class QiscusChatRoomEvent {
     public String toString() {
         return "QiscusChatRoomEvent{" +
                 "roomId=" + roomId +
-                ", topicId=" + topicId +
                 ", commentId=" + commentId +
                 ", commentUniqueId='" + commentUniqueId + '\'' +
                 ", typing=" + typing +

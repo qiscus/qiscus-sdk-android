@@ -19,11 +19,13 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.qiscus.sdk.util.QiscusNumberUtil;
+
 public class QiscusPushNotificationMessage implements Parcelable {
-    private int commentId;
+    private long commentId;
     private String message;
 
-    public QiscusPushNotificationMessage(int commentId, String message) {
+    public QiscusPushNotificationMessage(long commentId, String message) {
         this.commentId = commentId;
         this.message = message;
     }
@@ -34,7 +36,7 @@ public class QiscusPushNotificationMessage implements Parcelable {
     }
 
     protected QiscusPushNotificationMessage(Parcel in) {
-        commentId = in.readInt();
+        commentId = in.readLong();
         message = in.readString();
     }
 
@@ -50,11 +52,11 @@ public class QiscusPushNotificationMessage implements Parcelable {
         }
     };
 
-    public void setCommentId(int commentId) {
+    public void setCommentId(long commentId) {
         this.commentId = commentId;
     }
 
-    public int getCommentId() {
+    public long getCommentId() {
         return commentId;
     }
 
@@ -68,7 +70,7 @@ public class QiscusPushNotificationMessage implements Parcelable {
 
     @Override
     public int hashCode() {
-        int result = commentId;
+        int result = QiscusNumberUtil.convertToInt(commentId);
         result = 31 * result + (message != null ? message.hashCode() : 0);
         return result;
     }
@@ -93,7 +95,7 @@ public class QiscusPushNotificationMessage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(commentId);
+        dest.writeLong(commentId);
         dest.writeString(message);
     }
 }

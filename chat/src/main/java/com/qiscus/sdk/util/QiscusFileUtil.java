@@ -69,9 +69,9 @@ public final class QiscusFileUtil {
         return tempFile;
     }
 
-    public static File from(InputStream inputStream, String fileName, int topicId) throws
+    public static File from(InputStream inputStream, String fileName, long roomId) throws
             IOException {
-        File file = new File(generateFilePath(fileName, topicId));
+        File file = new File(generateFilePath(fileName, roomId));
         file = rename(file, fileName);
         FileOutputStream out = null;
         try {
@@ -138,8 +138,8 @@ public final class QiscusFileUtil {
         }
     }
 
-    public static File saveFile(File file, int topicId) {
-        String path = generateFilePath(Uri.fromFile(file), topicId);
+    public static File saveFile(File file, long roomId) {
+        String path = generateFilePath(Uri.fromFile(file), roomId);
         File outputFile = new File(path);
         if (outputFile.exists()) {
             path = QiscusFileUtil.addTimeStampToFileName(path);
@@ -155,7 +155,7 @@ public final class QiscusFileUtil {
         return newFile;
     }
 
-    private static String generateFilePath(Uri uri, int topicId) {
+    private static String generateFilePath(Uri uri, long roomId) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
                 QiscusImageUtil.isImage(uri.getPath()) ? QiscusImageUtil.IMAGE_PATH : FILES_PATH);
 
@@ -163,10 +163,10 @@ public final class QiscusFileUtil {
             file.mkdirs();
         }
 
-        return file.getAbsolutePath() + File.separator + addTopicToFileName(getFileName(uri), topicId);
+        return file.getAbsolutePath() + File.separator + addTopicToFileName(getFileName(uri), roomId);
     }
 
-    public static String generateFilePath(String fileName, int topicId) {
+    public static String generateFilePath(String fileName, long roomId) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
                 QiscusImageUtil.isImage(fileName) ? QiscusImageUtil.IMAGE_PATH : FILES_PATH);
 
@@ -174,16 +174,16 @@ public final class QiscusFileUtil {
             file.mkdirs();
         }
 
-        return file.getAbsolutePath() + File.separator + addTopicToFileName(fileName, topicId);
+        return file.getAbsolutePath() + File.separator + addTopicToFileName(fileName, roomId);
     }
 
-    public static String addTopicToFileName(String fileName, int topicId) {
-        int existedTopicId = getTopicFromFileName(fileName);
-        if (existedTopicId == -1) {
+    public static String addTopicToFileName(String fileName, long roomId) {
+        int existedroomId = getTopicFromFileName(fileName);
+        if (existedroomId == -1) {
             String[] fileNameSplit = splitFileName(fileName);
-            return fileNameSplit[0] + "-topic-" + topicId + "-topic" + fileNameSplit[1];
-        } else if (existedTopicId != topicId) {
-            return replaceTopicInFileName(fileName, topicId);
+            return fileNameSplit[0] + "-topic-" + roomId + "-topic" + fileNameSplit[1];
+        } else if (existedroomId != roomId) {
+            return replaceTopicInFileName(fileName, roomId);
         }
 
         return fileName;
@@ -194,10 +194,10 @@ public final class QiscusFileUtil {
         return fileNameSplit[0] + "-" + System.currentTimeMillis() + "" + fileNameSplit[1];
     }
 
-    private static String replaceTopicInFileName(String fileName, int topicId) {
+    private static String replaceTopicInFileName(String fileName, long roomId) {
         String[] fileNameSplit = splitFileName(fileName);
         int startTopicIndex = fileNameSplit[0].indexOf("-topic-");
-        return fileNameSplit[0].substring(0, startTopicIndex) + "-topic-" + topicId + "-topic" + fileNameSplit[1];
+        return fileNameSplit[0].substring(0, startTopicIndex) + "-topic-" + roomId + "-topic" + fileNameSplit[1];
     }
 
     public static int getTopicFromFileName(String fileName) {

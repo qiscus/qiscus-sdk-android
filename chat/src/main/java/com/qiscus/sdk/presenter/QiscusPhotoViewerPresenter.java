@@ -49,10 +49,10 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
         super(view);
     }
 
-    public void loadQiscusPhotos(int topicId) {
+    public void loadQiscusPhotos(long roomId) {
         view.showLoading();
         Qiscus.getDataStore()
-                .getObservableComments(topicId)
+                .getObservableComments(roomId)
                 .map(qiscusComments -> {
                     List<Pair<QiscusComment, File>> qiscusPhotos = new ArrayList<>();
                     for (QiscusComment qiscusComment : qiscusComments) {
@@ -89,7 +89,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
         }
         qiscusComment.setDownloading(true);
         downloadSubscription = QiscusApi.getInstance()
-                .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(),
+                .downloadFile(qiscusComment.getRoomId(), qiscusComment.getAttachmentUri().toString(),
                         qiscusComment.getAttachmentName(), percentage -> qiscusComment.setProgress((int) percentage))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -97,7 +97,7 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                 .doOnNext(file1 -> {
                     QiscusFileUtil.notifySystem(file1);
                     qiscusComment.setDownloading(false);
-                    Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(),
+                    Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getRoomId(), qiscusComment.getId(),
                             file1.getAbsolutePath());
                 })
                 .subscribe(file1 -> view.onFileDownloaded(Pair.create(qiscusComment, file1)), throwable -> {

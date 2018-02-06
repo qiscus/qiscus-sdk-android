@@ -88,6 +88,7 @@ import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusNumberUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.util.QiscusTextUtil;
@@ -900,7 +901,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onClearNotification() {
-        NotificationManagerCompat.from(getActivity()).cancel(qiscusChatRoom.getId());
+        NotificationManagerCompat.from(getActivity()).cancel(QiscusNumberUtil.convertToInt(qiscusChatRoom.getId()));
         QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
     }
 
@@ -939,8 +940,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
         if (qiscusComment != null) {
             QiscusPusherApi.getInstance()
-                    .setUserRead(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(),
-                            qiscusComment.getId(), qiscusComment.getUniqueId());
+                    .setUserRead(qiscusChatRoom.getId(), qiscusComment.getId());
         }
     }
 
@@ -1157,7 +1157,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void notifyServerTyping(boolean typing) {
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), typing);
+        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), typing);
     }
 
     public void sendQiscusComment(QiscusComment qiscusComment) {
@@ -1400,12 +1400,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Override
-    public void updateLastDeliveredComment(int lastDeliveredCommentId) {
+    public void updateLastDeliveredComment(long lastDeliveredCommentId) {
         chatAdapter.updateLastDeliveredComment(lastDeliveredCommentId);
     }
 
     @Override
-    public void updateLastReadComment(int lastReadCommentId) {
+    public void updateLastReadComment(long lastReadCommentId) {
         chatAdapter.updateLastReadComment(lastReadCommentId);
     }
 
@@ -1673,7 +1673,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (commentHighlightTask != null) {
             QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
         }
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
+        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), false);
         chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();

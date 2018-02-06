@@ -113,7 +113,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
             sender.setTextColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig()
                     .getRoomSenderNameColorInterceptor().getColor(originComment)));
             setBarColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig()
-                    .getRoomReplybarColorInterceptor().getColor(originComment)));
+                    .getRoomReplyBarColorInterceptor().getColor(originComment)));
             switch (originComment.getType()) {
                 case IMAGE:
                 case VIDEO:

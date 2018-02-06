@@ -19,6 +19,8 @@ package com.qiscus.sdk.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.qiscus.sdk.util.QiscusNumberUtil;
+
 import org.json.JSONObject;
 
 import java.util.List;
@@ -30,12 +32,10 @@ import java.util.List;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusChatRoom implements Parcelable {
-    protected int id;
+    protected long id;
     protected String distinctId;
     protected String uniqueId;
     protected String name;
-    @Deprecated protected String subtitle = "";
-    protected int lastTopicId;
     protected JSONObject options;
     protected boolean group;
     protected String avatarUrl;
@@ -43,19 +43,15 @@ public class QiscusChatRoom implements Parcelable {
     protected int unreadCount;
     protected QiscusComment lastComment;
 
-
     public QiscusChatRoom() {
 
     }
 
-
     protected QiscusChatRoom(Parcel in) {
-        id = in.readInt();
+        id = in.readLong();
         distinctId = in.readString();
         uniqueId = in.readString();
         name = in.readString();
-        subtitle = in.readString();
-        lastTopicId = in.readInt();
         try {
             options = new JSONObject(in.readString());
         } catch (Exception ignored) {
@@ -80,11 +76,11 @@ public class QiscusChatRoom implements Parcelable {
         }
     };
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -110,24 +106,6 @@ public class QiscusChatRoom implements Parcelable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Deprecated
-    public String getSubtitle() {
-        return subtitle;
-    }
-
-    @Deprecated
-    public void setSubtitle(String subtitle) {
-        this.subtitle = subtitle;
-    }
-
-    public int getLastTopicId() {
-        return lastTopicId;
-    }
-
-    public void setLastTopicId(int lastTopicId) {
-        this.lastTopicId = lastTopicId;
     }
 
     public JSONObject getOptions() {
@@ -180,7 +158,7 @@ public class QiscusChatRoom implements Parcelable {
 
     @Override
     public int hashCode() {
-        return id;
+        return QiscusNumberUtil.convertToInt(id);
     }
 
     @Override
@@ -195,12 +173,10 @@ public class QiscusChatRoom implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeLong(id);
         dest.writeString(distinctId);
         dest.writeString(uniqueId);
         dest.writeString(name);
-        dest.writeString(subtitle);
-        dest.writeInt(lastTopicId);
         if (options == null) {
             options = new JSONObject();
         }
@@ -219,8 +195,6 @@ public class QiscusChatRoom implements Parcelable {
                 ", distinctId='" + distinctId + '\'' +
                 ", uniqueId='" + uniqueId + '\'' +
                 ", name='" + name + '\'' +
-                ", subtitle='" + subtitle + '\'' +
-                ", lastTopicId=" + lastTopicId +
                 ", options=" + options +
                 ", group=" + group +
                 ", avatarUrl='" + avatarUrl + '\'' +

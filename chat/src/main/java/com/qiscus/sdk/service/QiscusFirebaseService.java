@@ -55,8 +55,7 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
                     }
                     if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
                         QiscusPusherApi.getInstance()
-                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
-                                        qiscusComment.getId(), qiscusComment.getUniqueId());
+                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
                     }
                     QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
                     QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault()

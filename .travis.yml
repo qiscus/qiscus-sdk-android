@@ -1,63 +1,31 @@
 language: android
 sudo: false
 jdk: oraclejdk8
-dist: precise
-env:
-  matrix:
-    - ANDROID_TARGET=android-18 ANDROID_ABI=armeabi-v7a
-  global:
-    # wait up to 10 minutes for adb to connect to emulator
-    - ADB_INSTALL_TIMEOUT=10
+dist: trusty
+group: stable
 
 android:
   components:
   - platform-tools
   - tools
   - build-tools-26.0.2
-  - android-26
+  - android-27
 
   # Additional components
   - extra-google-m2repository
   - extra-android-m2repository
   - extra-android-support
 
-  # Emulator for the tests
-  - sys-img-armeabi-v7a-android-18
-
 cache:
   directories:
-    - $HOME/.gradle/caches/2.8
-    - $HOME/.gradle/caches/jars-1
+    - $HOME/.gradle/caches
     - $HOME/.gradle/daemon
     - $HOME/.gradle/native
     - $HOME/.gradle/wrapper
+    - $HOME/.android/build-cache
 
-addons:
-  apt_packages:
-    - pandoc
-  artifacts:
-    paths:
-      - $(git ls-files -o | grep build/outputs | tr "\n" ":")
-
-before_script:
-  - echo no | android create avd --force --name test --target $ANDROID_TARGET --abi $ANDROID_ABI
-  - emulator -avd test -no-skin -no-audio -no-window &
+before_install:
+  - yes | sdkmanager "platforms;android-27"
 
 script:
   - ./gradlew check -PdisablePreDex --continue --stacktrace
-  - android-wait-for-emulator
-  - adb devices
-  - adb shell input keyevent 82 &
-  - ./gradlew connectedAndroidTest -PdisablePreDex --continue --stacktrace
-
-after_success:
-  - ./gradlew jacocoFullReport
-  - bash <(curl -s https://codecov.io/bash)
-
-after_failure:
-  - pandoc builder/build/reports/tests/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'
-
-after_script:
-  # print lint results details
-  - for f in app/build/outputs/lint-results.html; do pandoc $f -t plain; done
-  - for f in data/build/outputs/lint-results.html; do pandoc $f -t plain; done

@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.data.local;
-
-import java.io.File;
+package com.qiscus.sdk.util;
 
 /**
- * Created on : November 07, 2016
+ * Created on : February 06, 2018
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public interface QiscusFileStore {
-    void saveLocalPath(long roomId, long commentId, String localPath);
-
-    boolean isContainsFileOfComment(long commentId);
-
-    void updateLocalPath(long roomId, long commentId, String localPath);
-
-    void addOrUpdateLocalPath(long roomId, long commentId, String localPath);
-
-    File getLocalPath(long commentId);
-
-    void deleteLocalPath(long commentId);
+public final class QiscusNumberUtil {
+    public static int convertToInt(long number) {
+        return (int) (number % Integer.MAX_VALUE);
+    }
 }

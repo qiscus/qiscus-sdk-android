@@ -94,8 +94,7 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        QiscusComment comment = QiscusComment.generateCustomMessage(message, "lock_message", payload,
-                qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId());
+        QiscusComment comment = QiscusComment.generateCustomMessage(qiscusChatRoom.getId(), message, "lock_message", payload);
         sendQiscusComment(comment);
     }
 

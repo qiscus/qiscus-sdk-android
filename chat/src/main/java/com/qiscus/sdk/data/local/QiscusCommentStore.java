@@ -39,37 +39,37 @@ public interface QiscusCommentStore {
 
     void delete(QiscusComment qiscusComment);
 
-    void deleteCommentsByRoomId(int roomId);
+    void deleteCommentsByRoomId(long roomId);
 
-    void updateLastDeliveredComment(int roomId, int commentId);
+    void updateLastDeliveredComment(long roomId, long commentId);
 
-    void updateLastReadComment(int roomId, int commentId);
+    void updateLastReadComment(long roomId, long commentId);
 
-    QiscusComment getComment(int id, String uniqueId);
+    QiscusComment getComment(long id, String uniqueId);
 
-    List<QiscusComment> getComments(int topicId);
+    List<QiscusComment> getComments(long roomId);
 
-    List<QiscusComment> getComments(int topicId, int count);
+    List<QiscusComment> getComments(long roomId, int limit);
 
-    Observable<List<QiscusComment>> getObservableComments(int topicId);
+    Observable<List<QiscusComment>> getObservableComments(long roomId);
 
-    Observable<List<QiscusComment>> getObservableComments(int topicId, int count);
+    Observable<List<QiscusComment>> getObservableComments(long roomId, int limit);
 
-    List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count);
+    List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit);
 
-    Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, int topicId, int count);
+    Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit);
 
-    List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, int topicId);
+    List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, long roomId);
 
-    Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, int topicId);
+    Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, long roomId);
 
     QiscusComment getLatestComment();
 
-    QiscusComment getLatestComment(int roomId);
+    QiscusComment getLatestComment(long roomId);
 
-    QiscusComment getLatestDeliveredComment(int topicId);
+    QiscusComment getLatestDeliveredComment(long roomId);
 
-    QiscusComment getLatestReadComment(int topicId);
+    QiscusComment getLatestReadComment(long roomId);
 
     List<QiscusComment> getPendingComments();
 

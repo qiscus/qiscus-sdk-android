@@ -140,7 +140,7 @@ public final class QiscusResendCommentHelper {
                 })
                 .doOnNext(commentSend -> {
                     Qiscus.getDataStore()
-                            .addOrUpdateLocalPath(commentSend.getTopicId(), commentSend.getId(), file.getAbsolutePath());
+                            .addOrUpdateLocalPath(commentSend.getRoomId(), commentSend.getId(), file.getAbsolutePath());
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);
                 })

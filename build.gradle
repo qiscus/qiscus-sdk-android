@@ -15,8 +15,6 @@
  */
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply from: 'gradle/jacoco.gradle'
-
 buildscript {
     repositories {
         jcenter()
@@ -34,7 +32,7 @@ allprojects {
     repositories {
         jcenter()
         google()
-        maven { url  "https://dl.bintray.com/qiscustech/maven" }
+        maven { url "https://dl.bintray.com/qiscustech/maven" }
     }
 }
 
