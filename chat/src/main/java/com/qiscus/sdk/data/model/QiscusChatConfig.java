@@ -162,7 +162,7 @@ public class QiscusChatConfig {
     private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
     private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
     private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusComment -> R.color.qiscus_secondary_text;
-    private QiscusRoomReplybarColorInterceptor qiscusRoomReplybarColorInterceptor = qiscusComment -> R.color.qiscus_primary;
+    private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusComment -> getReplyBarColor();
 
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
@@ -729,9 +729,9 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusChatConfig setRoomReplybarColorInterceptor(QiscusRoomReplybarColorInterceptor
-                                                              qiscusRoomReplybarColorInterceptor) {
-        this.qiscusRoomReplybarColorInterceptor = qiscusRoomReplybarColorInterceptor;
+    public QiscusChatConfig setRoomReplyBarColorInterceptor(QiscusRoomReplyBarColorInterceptor
+                                                                    qiscusRoomReplyBarColorInterceptor) {
+        this.qiscusRoomReplyBarColorInterceptor = qiscusRoomReplyBarColorInterceptor;
         return this;
     }
 
@@ -1235,8 +1235,8 @@ public class QiscusChatConfig {
         return qiscusRoomSenderNameColorInterceptor;
     }
 
-    public QiscusRoomReplybarColorInterceptor getRoomReplybarColorInterceptor() {
-        return qiscusRoomReplybarColorInterceptor;
+    public QiscusRoomReplyBarColorInterceptor getRoomReplyBarColorInterceptor() {
+        return qiscusRoomReplyBarColorInterceptor;
     }
 
     public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {

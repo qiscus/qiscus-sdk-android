@@ -7,7 +7,7 @@ import android.support.annotation.ColorRes;
  * @since 1/10/18
  */
 
-public interface QiscusRoomReplybarColorInterceptor {
+public interface QiscusRoomReplyBarColorInterceptor {
     @ColorRes
     int getColor(QiscusComment qiscusComment);
 }
