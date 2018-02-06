@@ -16,9 +16,6 @@ android:
   - extra-android-m2repository
   - extra-android-support
 
-  # Emulator for the tests
-  - sys-img-armeabi-v7a-android-18
-
 cache:
   directories:
     - $HOME/.gradle/caches
@@ -27,27 +24,8 @@ cache:
     - $HOME/.gradle/wrapper
     - $HOME/.android/build-cache
 
-addons:
-  apt_packages:
-    - pandoc
-  artifacts:
-    paths:
-      - $(git ls-files -o | grep build/outputs | tr "\n" ":")
-
 before_install:
   - yes | sdkmanager "platforms;android-27"
 
 script:
   - ./gradlew check -PdisablePreDex --continue --stacktrace
-
-after_success:
-  - ./gradlew jacocoFullReport
-  - bash <(curl -s https://codecov.io/bash)
-
-after_failure:
-  - pandoc builder/build/reports/tests/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'
-
-after_script:
-  # print lint results details
-  - for f in app/build/outputs/lint-results.html; do pandoc $f -t plain; done
-  - for f in data/build/outputs/lint-results.html; do pandoc $f -t plain; done
