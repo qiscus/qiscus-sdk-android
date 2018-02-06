@@ -91,8 +91,7 @@ public class QiscusSyncService extends Service {
                                 .doOnNext(qiscusComment -> {
                                     if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
                                         QiscusPusherApi.getInstance()
-                                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getTopicId(),
-                                                        qiscusComment.getId(), qiscusComment.getUniqueId());
+                                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
                                     }
                                     QiscusComment savedQiscusComment = Qiscus.getDataStore()
                                             .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());

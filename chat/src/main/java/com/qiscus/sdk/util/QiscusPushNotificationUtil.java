@@ -80,7 +80,7 @@ public final class QiscusPushNotificationUtil {
 
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
 
-        Pair<Boolean, Integer> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
+        Pair<Boolean, Long> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
         if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
             updateUnreadCount(qiscusComment);
         }
@@ -112,7 +112,7 @@ public final class QiscusPushNotificationUtil {
         Qiscus.getDataStore().addOrUpdate(room);
     }
 
-    private static void fetchRoomData(int roomId) {
+    private static void fetchRoomData(long roomId) {
         QiscusApi.getInstance()
                 .getChatRoom(roomId)
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
@@ -235,7 +235,8 @@ public final class QiscusPushNotificationUtil {
         PendingIntent pendingIntent;
         Intent openIntent = new Intent(context, QiscusPushNotificationClickReceiver.class);
         openIntent.putExtra("data", comment);
-        pendingIntent = PendingIntent.getBroadcast(context, comment.getRoomId(), openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        pendingIntent = PendingIntent.getBroadcast(context, QiscusNumberUtil.convertToInt(comment.getRoomId()),
+                openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelId);
         notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
@@ -298,6 +299,6 @@ public final class QiscusPushNotificationUtil {
         }
 
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
-                .notify(comment.getRoomId(), notificationBuilder.build()));
+                .notify(QiscusNumberUtil.convertToInt(comment.getRoomId()), notificationBuilder.build()));
     }
 }

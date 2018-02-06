@@ -38,7 +38,7 @@ public interface QiscusChatRoomStore {
 
     void addOrUpdate(QiscusChatRoom qiscusChatRoom);
 
-    QiscusChatRoom getChatRoom(int id);
+    QiscusChatRoom getChatRoom(long roomId);
 
     QiscusChatRoom getChatRoom(String email);
 
@@ -52,19 +52,19 @@ public interface QiscusChatRoomStore {
 
     List<QiscusChatRoom> getChatRooms(List<Integer> roomIds, List<String> uniqueIds);
 
-    void deleteChatRoom(int roomId);
+    void deleteChatRoom(long roomId);
 
-    void addRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void addRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
 
-    boolean isContainsRoomMember(int roomId, String email);
+    boolean isContainsRoomMember(long roomId, String email);
 
-    void updateRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void updateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
 
-    void addOrUpdateRoomMember(int roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void addOrUpdateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
 
-    List<QiscusRoomMember> getRoomMembers(int roomId);
+    List<QiscusRoomMember> getRoomMembers(long roomId);
 
-    void deleteRoomMember(int roomId, String email);
+    void deleteRoomMember(long roomId, String email);
 
-    void deleteRoomMembers(int roomId);
+    void deleteRoomMembers(long roomId);
 }

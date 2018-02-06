@@ -151,12 +151,12 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> getChatRoom(int roomId) {
+    public Observable<QiscusChatRoom> getChatRoom(long roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(int roomId) {
+    public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
@@ -166,29 +166,29 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<List<QiscusChatRoom>> getChatRooms(List<Integer> roomIds, List<String> uniqueIds, boolean showMembers) {
+    public Observable<List<QiscusChatRoom>> getChatRooms(List<Long> roomIds, List<String> uniqueIds, boolean showMembers) {
         return api.getChatRooms(Qiscus.getToken(), roomIds, uniqueIds, showMembers)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<QiscusComment> getComments(int roomId, int topicId, int lastCommentId) {
-        return api.getComments(Qiscus.getToken(), topicId, lastCommentId, false)
+    public Observable<QiscusComment> getComments(long roomId, int lastCommentId) {
+        return api.getComments(Qiscus.getToken(), roomId, lastCommentId, false)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
-                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId, topicId));
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
-    public Observable<QiscusComment> getCommentsAfter(int roomId, int topicId, int lastCommentId) {
-        return api.getComments(Qiscus.getToken(), topicId, lastCommentId, true)
+    public Observable<QiscusComment> getCommentsAfter(long roomId, int lastCommentId) {
+        return api.getComments(Qiscus.getToken(), roomId, lastCommentId, true)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
-                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId, topicId));
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
         Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
         return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
-                qiscusComment.getTopicId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
+                qiscusComment.getRoomId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
                 qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :
                         qiscusComment.getExtras().toString())
                 .map(jsonElement -> {
@@ -213,8 +213,7 @@ public enum QiscusApi {
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusComment(jsonElement,
-                            jsonComment.get("room_id").getAsInt(), jsonComment.get("topic_id").getAsInt());
+                    return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
                 });
     }
 
@@ -259,7 +258,7 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<File> downloadFile(int topicId, String url, String fileName, ProgressListener progressListener) {
+    public Observable<File> downloadFile(long roomId, String url, String fileName, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
             InputStream inputStream = null;
             FileOutputStream fos = null;
@@ -268,7 +267,7 @@ public enum QiscusApi {
 
                 Response response = httpClient.newCall(request).execute();
 
-                File output = new File(QiscusFileUtil.generateFilePath(fileName, topicId));
+                File output = new File(QiscusFileUtil.generateFilePath(fileName, roomId));
                 fos = new FileOutputStream(output.getPath());
                 if (!response.isSuccessful()) {
                     throw new IOException();
@@ -310,13 +309,13 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<QiscusChatRoom> updateChatRoom(int roomId, String name, String avatarUrl, JSONObject options) {
+    public Observable<QiscusChatRoom> updateChatRoom(long roomId, String name, String avatarUrl, JSONObject options) {
         return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
 
-    public Observable<Void> updateCommentStatus(int roomId, int lastReadId, int lastReceivedId) {
+    public Observable<Void> updateCommentStatus(long roomId, int lastReadId, int lastReceivedId) {
         return api.updateCommentStatus(Qiscus.getToken(), roomId, lastReadId, lastReceivedId)
                 .map(jsonElement -> null);
     }
@@ -330,19 +329,18 @@ public enum QiscusApi {
         return searchComments(query, 0, lastCommentId);
     }
 
-    public Observable<List<QiscusComment>> searchComments(String query, int roomId, int lastCommentId) {
+    public Observable<List<QiscusComment>> searchComments(String query, long roomId, int lastCommentId) {
         return api.searchComments(Qiscus.getToken(), query, roomId, lastCommentId)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusComment(jsonElement,
-                            jsonComment.get("room_id").getAsInt(), jsonComment.get("topic_id").getAsInt());
+                    return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
                 .toList();
     }
 
-    public Observable<Void> clearCommentsByRoomIds(List<Integer> roomIds) {
+    public Observable<Void> clearCommentsByRoomIds(List<Long> roomIds) {
         return api.getChatRooms(Qiscus.getToken(), roomIds, null, false)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
@@ -413,11 +411,11 @@ public enum QiscusApi {
 
         @GET("/api/v2/mobile/get_room_by_id")
         Observable<JsonElement> getChatRoom(@Query("token") String token,
-                                            @Query("id") int roomId);
+                                            @Query("id") long roomId);
 
         @GET("/api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(@Query("token") String token,
-                                            @Query("topic_id") int topicId,
+                                            @Query("topic_id") long roomId,
                                             @Query("last_comment_id") int lastCommentId,
                                             @Query("after") boolean after);
 
@@ -425,7 +423,7 @@ public enum QiscusApi {
         @POST("/api/v2/mobile/post_comment")
         Observable<JsonElement> postComment(@Field("token") String token,
                                             @Field("comment") String message,
-                                            @Field("topic_id") int topicId,
+                                            @Field("topic_id") long roomId,
                                             @Field("unique_temp_id") String uniqueId,
                                             @Field("type") String type,
                                             @Field("payload") String payload,
@@ -438,7 +436,7 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/update_room")
         Observable<JsonElement> updateChatRoom(@Field("token") String token,
-                                               @Field("id") int id,
+                                               @Field("id") long id,
                                                @Field("room_name") String name,
                                                @Field("avatar_url") String avatarUrl,
                                                @Field("options") String options);
@@ -446,7 +444,7 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/update_comment_status")
         Observable<JsonElement> updateCommentStatus(@Field("token") String token,
-                                                    @Field("room_id") int roomId,
+                                                    @Field("room_id") long roomId,
                                                     @Field("last_comment_read_id") int lastReadId,
                                                     @Field("last_comment_received_id") int lastReceivedId);
 
@@ -459,7 +457,7 @@ public enum QiscusApi {
         @POST("/api/v2/mobile/search_messages")
         Observable<JsonElement> searchComments(@Query("token") String token,
                                                @Query("query") String query,
-                                               @Query("room_id") int roomId,
+                                               @Query("room_id") long roomId,
                                                @Query("last_comment_id") int lastCommentId);
 
         @GET("/api/v2/mobile/user_rooms")
@@ -471,7 +469,7 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/rooms_info")
         Observable<JsonElement> getChatRooms(@Field("token") String token,
-                                             @Field("room_id[]") List<Integer> roomIds,
+                                             @Field("room_id[]") List<Long> roomIds,
                                              @Field("room_unique_id[]") List<String> roomUniqueIds,
                                              @Field("show_participants") boolean showParticipants);
 

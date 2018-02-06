@@ -88,6 +88,7 @@ import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusNumberUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.util.QiscusTextUtil;
@@ -162,57 +163,95 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 4;
     protected static final int SHOW_MEDIA_DETAIL = 5;
 
-    @NonNull protected ViewGroup rootView;
-    @Nullable protected ViewGroup emptyChatHolder;
-    @NonNull protected SwipeRefreshLayout swipeRefreshLayout;
-    @NonNull protected QiscusRecyclerView messageRecyclerView;
+    @NonNull
+    protected ViewGroup rootView;
+    @Nullable
+    protected ViewGroup emptyChatHolder;
+    @NonNull
+    protected SwipeRefreshLayout swipeRefreshLayout;
+    @NonNull
+    protected QiscusRecyclerView messageRecyclerView;
 
-    @Nullable protected ViewGroup messageInputPanel;
-    @Nullable protected ViewGroup messageEditTextContainer;
-    @NonNull protected EditText messageEditText;
-    @NonNull protected ImageView sendButton;
-    @Nullable protected QiscusMentionSuggestionView mentionSuggestionView;
+    @Nullable
+    protected ViewGroup messageInputPanel;
+    @Nullable
+    protected ViewGroup messageEditTextContainer;
+    @NonNull
+    protected EditText messageEditText;
+    @NonNull
+    protected ImageView sendButton;
+    @Nullable
+    protected QiscusMentionSuggestionView mentionSuggestionView;
 
-    @Nullable protected View newMessageButton;
-    @NonNull protected View loadMoreProgressBar;
+    @Nullable
+    protected View newMessageButton;
+    @NonNull
+    protected View loadMoreProgressBar;
 
-    @Nullable protected ImageView emptyChatImageView;
-    @Nullable protected TextView emptyChatTitleView;
-    @Nullable protected TextView emptyChatDescView;
+    @Nullable
+    protected ImageView emptyChatImageView;
+    @Nullable
+    protected TextView emptyChatTitleView;
+    @Nullable
+    protected TextView emptyChatDescView;
 
-    @Nullable protected ViewGroup attachmentPanel;
+    @Nullable
+    protected ViewGroup attachmentPanel;
 
-    @Nullable protected View addImageLayout;
-    @Nullable protected ImageView addImageButton;
-    @Nullable protected TextView addImageTextView;
+    @Nullable
+    protected View addImageLayout;
+    @Nullable
+    protected ImageView addImageButton;
+    @Nullable
+    protected TextView addImageTextView;
 
-    @Nullable protected View takeImageLayout;
-    @Nullable protected ImageView takeImageButton;
-    @Nullable protected TextView takeImageTextView;
+    @Nullable
+    protected View takeImageLayout;
+    @Nullable
+    protected ImageView takeImageButton;
+    @Nullable
+    protected TextView takeImageTextView;
 
-    @Nullable protected View addFileLayout;
-    @Nullable protected ImageView addFileButton;
-    @Nullable protected TextView addFileTextView;
+    @Nullable
+    protected View addFileLayout;
+    @Nullable
+    protected ImageView addFileButton;
+    @Nullable
+    protected TextView addFileTextView;
 
-    @Nullable protected View recordAudioLayout;
-    @Nullable protected ImageView recordAudioButton;
-    @Nullable protected TextView recordAudioTextView;
+    @Nullable
+    protected View recordAudioLayout;
+    @Nullable
+    protected ImageView recordAudioButton;
+    @Nullable
+    protected TextView recordAudioTextView;
 
-    @Nullable protected View addContactLayout;
-    @Nullable protected ImageView addContactButton;
-    @Nullable protected TextView addContactTextView;
+    @Nullable
+    protected View addContactLayout;
+    @Nullable
+    protected ImageView addContactButton;
+    @Nullable
+    protected TextView addContactTextView;
 
-    @Nullable protected View addLocationLayout;
-    @Nullable protected ImageView addLocationButton;
-    @Nullable protected TextView addLocationTextView;
+    @Nullable
+    protected View addLocationLayout;
+    @Nullable
+    protected ImageView addLocationButton;
+    @Nullable
+    protected TextView addLocationTextView;
 
-    @Nullable protected ImageView hideAttachmentButton;
-    @Nullable protected ImageView toggleEmojiButton;
+    @Nullable
+    protected ImageView hideAttachmentButton;
+    @Nullable
+    protected ImageView toggleEmojiButton;
 
-    @Nullable protected QiscusAudioRecorderView recordAudioPanel;
-    @Nullable protected QiscusReplyPreviewView replyPreviewView;
+    @Nullable
+    protected QiscusAudioRecorderView recordAudioPanel;
+    @Nullable
+    protected QiscusReplyPreviewView replyPreviewView;
 
-    @Nullable protected View goToBottomButton;
+    @Nullable
+    protected View goToBottomButton;
 
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
@@ -898,7 +937,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onClearNotification() {
-        NotificationManagerCompat.from(getActivity()).cancel(qiscusChatRoom.getId());
+        NotificationManagerCompat.from(getActivity()).cancel(QiscusNumberUtil.convertToInt(qiscusChatRoom.getId()));
         QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
     }
 
@@ -937,8 +976,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
         if (qiscusComment != null) {
             QiscusPusherApi.getInstance()
-                    .setUserRead(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(),
-                            qiscusComment.getId(), qiscusComment.getUniqueId());
+                    .setUserRead(qiscusChatRoom.getId(), qiscusComment.getId());
         }
     }
 
@@ -1155,7 +1193,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void notifyServerTyping(boolean typing) {
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), typing);
+        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), typing);
     }
 
     public void sendQiscusComment(QiscusComment qiscusComment) {
@@ -1694,7 +1732,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (commentHighlightTask != null) {
             QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
         }
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId(), false);
+        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), false);
         chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();
@@ -1750,16 +1788,16 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         switch (requestCode) {
-            case RC_CAMERA_PERMISSION :
+            case RC_CAMERA_PERMISSION:
                 takeImage();
                 break;
-            case RC_AUDIO_PERMISSION :
+            case RC_AUDIO_PERMISSION:
                 recordAudio();
                 break;
-            case RC_FILE_PERMISSION :
+            case RC_FILE_PERMISSION:
                 addImage();
                 break;
-            case RC_LOCATION_PERMISSION :
+            case RC_LOCATION_PERMISSION:
                 addLocation();
                 break;
         }
@@ -1798,6 +1836,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     /**
      * Callback when an error happening while load comments
+     *
      * @param throwable the error
      */
     @Override

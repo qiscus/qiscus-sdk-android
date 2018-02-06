@@ -137,7 +137,7 @@ class QiscusRoomEventHandler {
     }
 
     private void handleEvent(QiscusChatRoomEvent event) {
-        if (event.getTopicId() == room.getLastTopicId()) {
+        if (event.getTopicId() == room.getId()) {
             switch (event.getEvent()) {
                 case TYPING:
                     listener.onUserTyping(event.getUser(), event.isTyping());

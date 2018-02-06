@@ -59,7 +59,7 @@ public enum QiscusCacheManager {
                 .apply();
     }
 
-    public boolean addMessageNotifItem(QiscusPushNotificationMessage message, int roomId) {
+    public boolean addMessageNotifItem(QiscusPushNotificationMessage message, long roomId) {
         List<QiscusPushNotificationMessage> notifItems = getMessageNotifItems(roomId);
         if (notifItems == null) {
             notifItems = new ArrayList<>();
@@ -75,13 +75,13 @@ public enum QiscusCacheManager {
         return false;
     }
 
-    public List<QiscusPushNotificationMessage> getMessageNotifItems(int roomId) {
+    public List<QiscusPushNotificationMessage> getMessageNotifItems(long roomId) {
         String json = sharedPreferences.getString("push_notif_message_" + roomId, "");
         return gson.fromJson(json, new TypeToken<List<QiscusPushNotificationMessage>>() {
         }.getType());
     }
 
-    public void clearMessageNotifItems(int roomId) {
+    public void clearMessageNotifItems(long roomId) {
         sharedPreferences.edit()
                 .remove("push_notif_message_" + roomId)
                 .apply();
@@ -91,25 +91,25 @@ public enum QiscusCacheManager {
         return sharedPreferences.getString("last_image_path", "");
     }
 
-    public void setLastChatActivity(boolean active, int roomId) {
+    public void setLastChatActivity(boolean active, long roomId) {
         sharedPreferences.edit()
                 .putBoolean("last_chat_status", active)
-                .putInt("last_active_chat", roomId)
+                .putLong("last_active_chat", roomId)
                 .apply();
     }
 
-    public Pair<Boolean, Integer> getLastChatActivity() {
+    public Pair<Boolean, Long> getLastChatActivity() {
         return Pair.create(sharedPreferences.getBoolean("last_chat_status", false),
-                sharedPreferences.getInt("last_active_chat", 0));
+                sharedPreferences.getLong("last_active_chat", 0));
     }
 
-    public void setDraftComment(int roomId, QiscusCommentDraft draft) {
+    public void setDraftComment(long roomId, QiscusCommentDraft draft) {
         sharedPreferences.edit()
                 .putString("draft_comment_" + roomId, gson.toJson(draft))
                 .apply();
     }
 
-    public QiscusCommentDraft getDraftComment(int roomId) {
+    public QiscusCommentDraft getDraftComment(long roomId) {
         String json = sharedPreferences.getString("draft_comment_" + roomId, null);
         if (json != null) {
             try {
@@ -126,7 +126,7 @@ public enum QiscusCacheManager {
         return null;
     }
 
-    public void clearDraftComment(int roomId) {
+    public void clearDraftComment(long roomId) {
         sharedPreferences.edit()
                 .remove("draft_comment_" + roomId)
                 .apply();

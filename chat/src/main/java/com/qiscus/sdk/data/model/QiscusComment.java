@@ -61,8 +61,7 @@ public class QiscusComment implements Parcelable {
     public static final int STATE_READ = 4;
 
     protected int id;
-    protected int roomId;
-    protected int topicId;
+    protected long roomId;
     protected String uniqueId;
     protected int commentBeforeId;
     protected String message;
@@ -101,12 +100,11 @@ public class QiscusComment implements Parcelable {
     private QiscusComment replyTo;
     private String caption;
 
-    public static QiscusComment generateMessage(String content, int roomId, int topicId) {
+    public static QiscusComment generateMessage(long roomId, String content) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
         QiscusComment qiscusComment = new QiscusComment();
         qiscusComment.setId(-1);
         qiscusComment.setRoomId(roomId);
-        qiscusComment.setTopicId(topicId);
         qiscusComment.setUniqueId("android_"
                 + System.currentTimeMillis()
                 + QiscusTextUtil.getRandomString(8)
@@ -122,8 +120,8 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
-    public static QiscusComment generateFileAttachmentMessage(String fileUrl, String caption, int roomId, int topicId) {
-        QiscusComment qiscusComment = generateMessage(String.format("[file] %s [/file]", fileUrl), roomId, topicId);
+    public static QiscusComment generateFileAttachmentMessage(long roomId, String fileUrl, String caption) {
+        QiscusComment qiscusComment = generateMessage(roomId, String.format("[file] %s [/file]", fileUrl));
         qiscusComment.setRawType("file_attachment");
         JSONObject json = new JSONObject();
         try {
@@ -135,8 +133,8 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
-    public static QiscusComment generateReplyMessage(String content, int roomId, int topicId, QiscusComment repliedComment) {
-        QiscusComment qiscusComment = generateMessage(content, roomId, topicId);
+    public static QiscusComment generateReplyMessage(long roomId, String content, QiscusComment repliedComment) {
+        QiscusComment qiscusComment = generateMessage(roomId, content);
         qiscusComment.setRawType("reply");
         qiscusComment.setReplyTo(repliedComment);
         JSONObject json = new JSONObject();
@@ -156,8 +154,8 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
-    public static QiscusComment generateContactMessage(QiscusContact contact, int roomId, int topicId) {
-        QiscusComment qiscusComment = generateMessage(contact.getName() + "\n" + contact.getValue(), roomId, topicId);
+    public static QiscusComment generateContactMessage(long roomId, QiscusContact contact) {
+        QiscusComment qiscusComment = generateMessage(roomId, contact.getName() + "\n" + contact.getValue());
         qiscusComment.setRawType("contact_person");
         qiscusComment.setContact(contact);
         JSONObject json = new JSONObject();
@@ -171,9 +169,9 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
-    public static QiscusComment generateLocationMessage(QiscusLocation location, int roomId, int topicId) {
-        QiscusComment qiscusComment = generateMessage(location.getName() + " - " + location.getAddress()
-                + "\n" + location.getMapUrl(), roomId, topicId);
+    public static QiscusComment generateLocationMessage(long roomId, QiscusLocation location) {
+        QiscusComment qiscusComment = generateMessage(roomId, location.getName() + " - " + location.getAddress()
+                + "\n" + location.getMapUrl());
         qiscusComment.setRawType("location");
         qiscusComment.setLocation(location);
         JSONObject json = new JSONObject();
@@ -189,8 +187,8 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
-    public static QiscusComment generatePostBackMessage(String content, String payload, int roomId, int topicId) {
-        QiscusComment qiscusComment = generateMessage(content, roomId, topicId);
+    public static QiscusComment generatePostBackMessage(long roomId, String content, String payload) {
+        QiscusComment qiscusComment = generateMessage(roomId, content);
         qiscusComment.setRawType("button_postback_response");
         qiscusComment.setExtraPayload(payload);
         return qiscusComment;
@@ -203,11 +201,10 @@ public class QiscusComment implements Parcelable {
      * @param type    your custom type
      * @param content your custom payload
      * @param roomId  room id for these comment
-     * @param topicId topic id for these comment
      * @return QiscusComment
      */
-    public static QiscusComment generateCustomMessage(String text, String type, JSONObject content, int roomId, int topicId) {
-        QiscusComment qiscusComment = generateMessage(text, roomId, topicId);
+    public static QiscusComment generateCustomMessage(long roomId, String text, String type, JSONObject content) {
+        QiscusComment qiscusComment = generateMessage(roomId, text);
         qiscusComment.setRawType("custom");
         JSONObject json = new JSONObject();
         try {
@@ -225,8 +222,7 @@ public class QiscusComment implements Parcelable {
 
     protected QiscusComment(Parcel in) {
         id = in.readInt();
-        roomId = in.readInt();
-        topicId = in.readInt();
+        roomId = in.readLong();
         uniqueId = in.readString();
         commentBeforeId = in.readInt();
         message = in.readString();
@@ -266,20 +262,12 @@ public class QiscusComment implements Parcelable {
         this.id = id;
     }
 
-    public int getRoomId() {
+    public long getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(int roomId) {
+    public void setRoomId(long roomId) {
         this.roomId = roomId;
-    }
-
-    public int getTopicId() {
-        return topicId;
-    }
-
-    public void setTopicId(int topicId) {
-        this.topicId = topicId;
     }
 
     public String getUniqueId() {
@@ -815,7 +803,6 @@ public class QiscusComment implements Parcelable {
         return "QiscusComment{" +
                 "id=" + id +
                 ", roomId=" + roomId +
-                ", topicId=" + topicId +
                 ", uniqueId='" + uniqueId + '\'' +
                 ", commentBeforeId=" + commentBeforeId +
                 ", message='" + message + '\'' +
@@ -835,8 +822,7 @@ public class QiscusComment implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
-        dest.writeInt(roomId);
-        dest.writeInt(topicId);
+        dest.writeLong(roomId);
         dest.writeString(uniqueId);
         dest.writeInt(commentBeforeId);
         dest.writeString(message);

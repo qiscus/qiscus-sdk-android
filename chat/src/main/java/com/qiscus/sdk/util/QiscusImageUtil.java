@@ -156,10 +156,10 @@ public final class QiscusImageUtil {
         return scaledBitmap;
     }
 
-    public static File compressImage(Uri imageUri, int topicId) {
+    public static File compressImage(Uri imageUri, long roomId) {
 
         FileOutputStream out = null;
-        String filename = generateFilePath(imageUri, topicId);
+        String filename = generateFilePath(imageUri, roomId);
         File outputFile = new File(filename);
         if (outputFile.exists()) {
             filename = QiscusFileUtil.addTimeStampToFileName(filename);
@@ -189,7 +189,7 @@ public final class QiscusImageUtil {
         return imageFile;
     }
 
-    private static String generateFilePath(Uri uri, int topicId) {
+    private static String generateFilePath(Uri uri, long roomId) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
                 QiscusImageUtil.isImage(uri.getPath()) ? IMAGE_PATH : QiscusFileUtil.FILES_PATH);
 
@@ -198,7 +198,7 @@ public final class QiscusImageUtil {
         }
 
         return file.getAbsolutePath() + File.separator
-                + QiscusFileUtil.addTopicToFileName(QiscusFileUtil.splitFileName(QiscusFileUtil.getFileName(uri))[0] + ".jpg", topicId);
+                + QiscusFileUtil.addTopicToFileName(QiscusFileUtil.splitFileName(QiscusFileUtil.getFileName(uri))[0] + ".jpg", roomId);
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {

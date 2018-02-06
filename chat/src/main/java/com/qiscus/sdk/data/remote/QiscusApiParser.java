@@ -76,7 +76,7 @@ final class QiscusApiParser {
         if (jsonElement != null) {
             JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("room").getAsJsonObject();
             QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
-            qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
+            qiscusChatRoom.setId(jsonChatRoom.get("id").getAsLong());
             qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
             qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
 
@@ -87,7 +87,6 @@ final class QiscusApiParser {
             }
 
             qiscusChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
-            qiscusChatRoom.setLastTopicId(jsonChatRoom.get("last_topic_id").getAsInt());
             try {
                 qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :
                         new JSONObject(jsonChatRoom.get("options").getAsString()));
@@ -118,8 +117,7 @@ final class QiscusApiParser {
                     .getAsJsonObject().get("comments").getAsJsonArray();
 
             if (comments.size() > 0) {
-                QiscusComment latestComment = parseQiscusComment(comments.get(0),
-                        qiscusChatRoom.getId(), qiscusChatRoom.getId());
+                QiscusComment latestComment = parseQiscusComment(comments.get(0), qiscusChatRoom.getId());
                 determineCommentState(latestComment, members);
                 qiscusChatRoom.setLastComment(latestComment);
             }
@@ -136,7 +134,7 @@ final class QiscusApiParser {
             for (JsonElement item : jsonRoomInfo) {
                 JsonObject jsonChatRoom = item.getAsJsonObject();
                 QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
-                qiscusChatRoom.setId(jsonChatRoom.get("id").getAsInt());
+                qiscusChatRoom.setId(jsonChatRoom.get("id").getAsLong());
                 qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
                 qiscusChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
 
@@ -147,7 +145,6 @@ final class QiscusApiParser {
                 }
 
                 qiscusChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
-                qiscusChatRoom.setLastTopicId(jsonChatRoom.get("id").getAsInt());
                 try {
                     qiscusChatRoom.setOptions(jsonChatRoom.get("options").isJsonNull() ? null :
                             new JSONObject(jsonChatRoom.get("options").getAsString()));
@@ -176,8 +173,7 @@ final class QiscusApiParser {
                     qiscusChatRoom.setMember(members);
                 }
 
-                QiscusComment latestComment = parseQiscusComment(jsonChatRoom.get("last_comment"),
-                        qiscusChatRoom.getId(), qiscusChatRoom.getId());
+                QiscusComment latestComment = parseQiscusComment(jsonChatRoom.get("last_comment"), qiscusChatRoom.getId());
                 if (qiscusChatRoom.getMember() != null) {
                     determineCommentState(latestComment, qiscusChatRoom.getMember());
                 }
@@ -197,7 +193,7 @@ final class QiscusApiParser {
             JsonArray comments = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("comments").getAsJsonArray();
             List<QiscusComment> qiscusComments = new ArrayList<>();
             for (JsonElement jsonComment : comments) {
-                qiscusComments.add(parseQiscusComment(jsonComment, qiscusChatRoom.getId(), qiscusChatRoom.getLastTopicId()));
+                qiscusComments.add(parseQiscusComment(jsonComment, qiscusChatRoom.getId()));
             }
 
             return Pair.create(qiscusChatRoom, qiscusComments);
@@ -206,10 +202,9 @@ final class QiscusApiParser {
         return null;
     }
 
-    static QiscusComment parseQiscusComment(JsonElement jsonElement, int roomId, int topicId) {
+    static QiscusComment parseQiscusComment(JsonElement jsonElement, long roomId) {
         QiscusComment qiscusComment = new QiscusComment();
         JsonObject jsonComment = jsonElement.getAsJsonObject();
-        qiscusComment.setTopicId(topicId);
         qiscusComment.setRoomId(roomId);
         qiscusComment.setId(jsonComment.get("id").getAsInt());
         qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
