@@ -8,8 +8,6 @@ env:
   global:
     # wait up to 10 minutes for adb to connect to emulator
     - ADB_INSTALL_TIMEOUT=10
-before_install:
-- yes | sdkmanager "platforms;android-27"
 
 android:
   components:
@@ -40,6 +38,9 @@ addons:
   artifacts:
     paths:
       - $(git ls-files -o | grep build/outputs | tr "\n" ":")
+
+before_install:
+  - yes | sdkmanager "platforms;android-27"
 
 before_script:
   - echo no | android create avd --force --name test --target $ANDROID_TARGET --abi $ANDROID_ABI
