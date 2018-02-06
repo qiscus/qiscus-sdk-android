@@ -38,7 +38,6 @@ final class QiscusDb {
         static final String COLUMN_DISTINCT_ID = "distinct_id";
         static final String COLUMN_UNIQUE_ID = "unique_id";
         static final String COLUMN_NAME = "name";
-        static final String COLUMN_SUBTITLE = "subtitle";
         static final String COLUMN_IS_GROUP = "is_group";
         static final String COLUMN_OPTIONS = "options";
         static final String COLUMN_AVATAR_URL = "avatar_url";
@@ -50,7 +49,6 @@ final class QiscusDb {
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
                         COLUMN_UNIQUE_ID + " TEXT," +
                         COLUMN_NAME + " TEXT," +
-                        COLUMN_SUBTITLE + " TEXT," +
                         COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
                         COLUMN_OPTIONS + " TEXT," +
                         COLUMN_AVATAR_URL + " TEXT," +

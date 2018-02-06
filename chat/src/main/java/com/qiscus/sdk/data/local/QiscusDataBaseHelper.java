@@ -199,10 +199,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusChatRoom> getChatRooms(int count) {
+    public List<QiscusChatRoom> getChatRooms(int limit) {
         String query = "SELECT * FROM "
                 + QiscusDb.RoomTable.TABLE_NAME + " "
-                + "LIMIT " + count;
+                + "LIMIT " + limit;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
         while (cursor.moveToNext()) {
@@ -220,9 +220,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusChatRoom>> getObservableChatRooms(int count) {
+    public Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit) {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getChatRooms(count));
+            subscriber.onNext(getChatRooms(limit));
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }
@@ -740,12 +740,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getComments(long roomId, int count) {
+    public List<QiscusComment> getComments(long roomId, int limit) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
-                + "LIMIT " + count;
+                + "LIMIT " + limit;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
@@ -770,21 +770,21 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableComments(final long roomId, final int count) {
+    public Observable<List<QiscusComment>> getObservableComments(final long roomId, final int limit) {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getComments(roomId, count));
+            subscriber.onNext(getComments(roomId, limit));
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }
 
     @Override
-    public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int count) {
+    public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
                 + QiscusDb.CommentTable.COLUMN_TIME + " <= " + qiscusComment.getTime().getTime() + " "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
-                + "LIMIT " + count;
+                + "LIMIT " + limit;
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
@@ -801,9 +801,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int count) {
+    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit) {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getOlderCommentsThan(qiscusComment, roomId, count));
+            subscriber.onNext(getOlderCommentsThan(qiscusComment, roomId, limit));
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }

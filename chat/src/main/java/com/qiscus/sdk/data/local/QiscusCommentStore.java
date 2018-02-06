@@ -49,15 +49,15 @@ public interface QiscusCommentStore {
 
     List<QiscusComment> getComments(long roomId);
 
-    List<QiscusComment> getComments(long roomId, int count);
+    List<QiscusComment> getComments(long roomId, int limit);
 
     Observable<List<QiscusComment>> getObservableComments(long roomId);
 
-    Observable<List<QiscusComment>> getObservableComments(long roomId, int count);
+    Observable<List<QiscusComment>> getObservableComments(long roomId, int limit);
 
-    List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int count);
+    List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit);
 
-    Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int count);
+    Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit);
 
     List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, long roomId);
 
