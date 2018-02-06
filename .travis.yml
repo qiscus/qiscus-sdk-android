@@ -8,6 +8,8 @@ env:
   global:
     # wait up to 10 minutes for adb to connect to emulator
     - ADB_INSTALL_TIMEOUT=10
+before_install:
+- yes | sdkmanager "platforms;android-27"
 
 android:
   components:
