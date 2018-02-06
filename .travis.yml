@@ -2,12 +2,7 @@ language: android
 sudo: false
 jdk: oraclejdk8
 dist: trusty
-env:
-  matrix:
-    - ANDROID_TARGET=android-18 ANDROID_ABI=armeabi-v7a
-  global:
-    # wait up to 10 minutes for adb to connect to emulator
-    - ADB_INSTALL_TIMEOUT=10
+group: stable
 
 android:
   components:
@@ -26,11 +21,11 @@ android:
 
 cache:
   directories:
-    - $HOME/.gradle/caches/2.8
-    - $HOME/.gradle/caches/jars-1
+    - $HOME/.gradle/caches
     - $HOME/.gradle/daemon
     - $HOME/.gradle/native
     - $HOME/.gradle/wrapper
+    - $HOME/.android/build-cache
 
 addons:
   apt_packages:
@@ -42,16 +37,8 @@ addons:
 before_install:
   - yes | sdkmanager "platforms;android-27"
 
-before_script:
-  - echo no | android create avd --force --name test --target $ANDROID_TARGET --abi $ANDROID_ABI
-  - emulator -avd test -no-skin -no-audio -no-window &
-
 script:
   - ./gradlew check -PdisablePreDex --continue --stacktrace
-  - android-wait-for-emulator
-  - adb devices
-  - adb shell input keyevent 82 &
-  - ./gradlew connectedAndroidTest -PdisablePreDex --continue --stacktrace
 
 after_success:
   - ./gradlew jacocoFullReport
