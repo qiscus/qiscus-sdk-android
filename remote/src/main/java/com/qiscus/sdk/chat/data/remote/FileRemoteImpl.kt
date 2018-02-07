@@ -145,7 +145,7 @@ class FileRemoteImpl(private val accountLocal: AccountLocal,
         }
 
         companion object {
-            private val SEGMENT_SIZE = 2048L
+            private const val SEGMENT_SIZE = 2048L
         }
 
     }
