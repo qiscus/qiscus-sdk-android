@@ -140,10 +140,6 @@ public final class QiscusFileUtil {
 
     public static File saveFile(File file, long roomId) {
         String path = generateFilePath(Uri.fromFile(file), roomId);
-        File outputFile = new File(path);
-        if (outputFile.exists()) {
-            path = QiscusFileUtil.addTimeStampToFileName(path);
-        }
         File newFile = new File(path);
         try {
             FileInputStream in = new FileInputStream(file);
@@ -163,7 +159,7 @@ public final class QiscusFileUtil {
             file.mkdirs();
         }
 
-        return file.getAbsolutePath() + File.separator + addTopicToFileName(getFileName(uri), roomId);
+        return file.getAbsolutePath() + File.separator + getFileName(uri);
     }
 
     public static String generateFilePath(String fileName, long roomId) {
@@ -174,7 +170,7 @@ public final class QiscusFileUtil {
             file.mkdirs();
         }
 
-        return file.getAbsolutePath() + File.separator + addTopicToFileName(fileName, roomId);
+        return file.getAbsolutePath() + File.separator + addNumberToFileName(file, fileName);
     }
 
     public static String addTopicToFileName(String fileName, long roomId) {
@@ -187,6 +183,25 @@ public final class QiscusFileUtil {
         }
 
         return fileName;
+    }
+
+    public static String addNumberToFileName(File file, String fileName) {
+        int existedNumber = getNumberFromFileName(file, fileName);
+        if (existedNumber == -2) {
+            String[] fileNameSplit = splitFileName(fileName);
+            return fileNameSplit[0] + "-" + 1 + fileNameSplit[1];
+        } else if (existedNumber > 0) {
+            return replaceNumberInFileName(fileName, existedNumber);
+        }
+
+        return fileName;
+    }
+
+    private static String replaceNumberInFileName(String fileName, int existedNumber) {
+        String[] fileNameSplit = splitFileName(fileName);
+        int startNumberIndex = fileNameSplit[0].lastIndexOf("-");
+        existedNumber = existedNumber + 1;
+        return fileNameSplit[0].substring(0, startNumberIndex) + "-" + existedNumber + fileNameSplit[1];
     }
 
     public static String addTimeStampToFileName(String fileName) {
@@ -210,6 +225,27 @@ public final class QiscusFileUtil {
                 return -2;
             }
         }
+        return -1;
+    }
+
+    public static int getNumberFromFileName(File file, String fileName) {
+        int startNumberIndex = fileName.lastIndexOf("-");
+        int lastNumberIndex = fileName.lastIndexOf(".");
+
+        for (File currentFile : file.listFiles()) {
+            if (currentFile.getName().equals(fileName) && startNumberIndex <= 0) {
+                return -2;
+            }
+        }
+
+        if (startNumberIndex >= 0 && lastNumberIndex >= 0) {
+            try {
+                return Integer.parseInt(fileName.substring(startNumberIndex + 1, lastNumberIndex));
+            } catch (Exception e) {
+                return -3;
+            }
+        }
+
         return -1;
     }
 

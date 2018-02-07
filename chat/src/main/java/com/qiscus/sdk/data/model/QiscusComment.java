@@ -99,6 +99,7 @@ public class QiscusComment implements Parcelable {
 
     private QiscusComment replyTo;
     private String caption;
+    private String attachmentName;
 
     public static QiscusComment generateMessage(long roomId, String content) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
@@ -120,12 +121,14 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
-    public static QiscusComment generateFileAttachmentMessage(long roomId, String fileUrl, String caption) {
+    public static QiscusComment generateFileAttachmentMessage(long roomId, String fileUrl, String caption, String name) {
         QiscusComment qiscusComment = generateMessage(roomId, String.format("[file] %s [/file]", fileUrl));
         qiscusComment.setRawType("file_attachment");
         JSONObject json = new JSONObject();
         try {
-            json.put("url", fileUrl).put("caption", caption);
+            json.put("url", fileUrl)
+                    .put("caption", caption)
+                    .put("file_name", name);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -464,6 +467,22 @@ public class QiscusComment implements Parcelable {
             }
         }
         return caption;
+    }
+
+    public String getFileName() {
+        if (!isAttachment()) {
+            throw new RuntimeException("Current comment is not an attachment");
+        }
+
+        if (attachmentName == null) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                attachmentName = payload.optString("file_name", "");
+            } catch (Exception ignored) {
+                //Do nothing
+            }
+        }
+        return attachmentName;
     }
 
     public String getAttachmentName() {

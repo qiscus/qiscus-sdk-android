@@ -160,10 +160,6 @@ public final class QiscusImageUtil {
 
         FileOutputStream out = null;
         String filename = generateFilePath(imageUri, roomId);
-        File outputFile = new File(filename);
-        if (outputFile.exists()) {
-            filename = QiscusFileUtil.addTimeStampToFileName(filename);
-        }
         try {
             out = new FileOutputStream(filename);
 
@@ -198,7 +194,7 @@ public final class QiscusImageUtil {
         }
 
         return file.getAbsolutePath() + File.separator
-                + QiscusFileUtil.addTopicToFileName(QiscusFileUtil.splitFileName(QiscusFileUtil.getFileName(uri))[0] + ".jpg", roomId);
+                + QiscusFileUtil.addNumberToFileName(file, QiscusFileUtil.splitFileName(QiscusFileUtil.getFileName(uri))[0] + ".jpg");
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
