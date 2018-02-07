@@ -364,6 +364,19 @@ public enum QiscusApi {
                 .map(qiscusChatRooms -> null);
     }
 
+    public Observable<List<QiscusComment>> deleteComments(List<String> commentUniqueIds,
+                                                          boolean isDeleteForEveryone,
+                                                          boolean isHardDelete) {
+        return api.deleteComments(Qiscus.getToken(), commentUniqueIds, isDeleteForEveryone, isHardDelete)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> {
+                    JsonObject jsonComment = jsonElement.getAsJsonObject();
+                    return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
+                })
+                .toList();
+    }
+
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -476,6 +489,12 @@ public enum QiscusApi {
         @DELETE("/api/v2/sdk/clear_room_messages")
         Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
                                                       @Query("room_channel_ids[]") List<String> roomUniqueIds);
+
+        @DELETE("/api/v2/sdk/delete_messages")
+        Observable<JsonElement> deleteComments(@Query("token") String token,
+                                               @Query("unique_ids[]") List<String> commentUniqueIds,
+                                               @Query("is_delete_for_everyone") boolean isDeleteForEveryone,
+                                               @Query("is_hard_delete") boolean isHardDelete);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
