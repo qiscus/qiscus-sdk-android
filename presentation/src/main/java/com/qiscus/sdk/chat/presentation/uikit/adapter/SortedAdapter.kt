@@ -47,27 +47,27 @@ abstract class SortedAdapter<E, H : RecyclerView.ViewHolder> : RecyclerView.Adap
 
     abstract fun compare(lhs: E, rhs: E): Int
 
-    open protected fun onInserted(position: Int, count: Int) {
+    protected open fun onInserted(position: Int, count: Int) {
 
     }
 
-    open protected fun onRemoved(position: Int, count: Int) {
+    protected open fun onRemoved(position: Int, count: Int) {
 
     }
 
-    open protected fun onMoved(fromPosition: Int, toPosition: Int) {
+    protected open fun onMoved(fromPosition: Int, toPosition: Int) {
 
     }
 
-    open protected fun onChanged(position: Int, count: Int) {
+    protected open fun onChanged(position: Int, count: Int) {
 
     }
 
-    open protected fun areContentsTheSame(oldE: E, newE: E): Boolean {
+    protected open fun areContentsTheSame(oldE: E, newE: E): Boolean {
         return oldE == newE
     }
 
-    open protected fun areItemsTheSame(oldE: E, newE: E): Boolean {
+    protected open fun areItemsTheSame(oldE: E, newE: E): Boolean {
         return oldE == newE
     }
 }
