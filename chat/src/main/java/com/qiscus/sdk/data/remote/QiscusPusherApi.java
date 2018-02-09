@@ -27,8 +27,10 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.event.QiscusDeleteMessageEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
@@ -48,11 +50,15 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
@@ -84,11 +90,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     private Runnable fallbackConnect = this::connect;
     private Runnable fallBackListenComment = this::listenComment;
+    private Runnable fallBackListenNotification = this::listenNotification;
     private Runnable fallBackListenRoom;
     private Runnable fallBackListenUserStatus;
 
     private ScheduledFuture<?> scheduledConnect;
     private ScheduledFuture<?> scheduledListenComment;
+    private ScheduledFuture<?> scheduledListenNotification;
     private ScheduledFuture<?> scheduledListenRoom;
     private ScheduledFuture<?> scheduledListenUserStatus;
 
@@ -174,6 +182,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             scheduledListenComment.cancel(true);
             scheduledListenComment = null;
         }
+        if (scheduledListenNotification != null) {
+            scheduledListenNotification.cancel(true);
+            scheduledListenNotification = null;
+        }
         if (scheduledListenRoom != null) {
             scheduledListenRoom.cancel(true);
             scheduledListenRoom = null;
@@ -207,6 +219,20 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             Log.e(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenComment = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenComment, RETRY_PERIOD);
+        }
+    }
+
+    private void listenNotification() {
+        QiscusLogger.print(TAG, "Listening notification...");
+        try {
+            mqttAndroidClient.subscribe("notification/" + Qiscus.getAppId().toLowerCase()
+                    + "/" + qiscusAccount.getToken(), 2);
+        } catch (MqttException e) {
+            //Do nothing
+        } catch (NullPointerException | IllegalArgumentException e) {
+            Log.e(TAG, "Failure listen notification, try again in " + RETRY_PERIOD + " ms");
+            connect();
+            scheduledListenNotification = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenNotification, RETRY_PERIOD);
         }
     }
 
@@ -342,7 +368,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     private void handleMessage(String topic, String message) {
-        if (topic.contains(qiscusAccount.getToken())) {
+        if (topic.startsWith("notification")) {
+            try {
+                handleNotification(new JSONObject(message));
+            } catch (JSONException e) {
+                QiscusLogger.print(e.getMessage());
+            }
+        } else if (topic.contains(qiscusAccount.getToken())) {
             QiscusComment qiscusComment = jsonToComment(message);
             if (qiscusComment == null) {
                 return;
@@ -399,6 +431,40 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    private void handleNotification(JSONObject jsonObject) {
+        if (jsonObject.optString("action_topic").equals("delete_message")) {
+            JSONObject payload = jsonObject.optJSONObject("payload");
+
+            JSONObject actorJson = payload.optJSONObject("actor");
+            QiscusRoomMember actor = new QiscusRoomMember();
+            actor.setEmail(actorJson.optString("email"));
+            actor.setUsername(actorJson.optString("name"));
+
+            List<QiscusDeleteMessageEvent.DeletedComment> deletedComments = new ArrayList<>();
+            JSONObject dataJson = payload.optJSONObject("data");
+            JSONArray deletedCommentsJson = dataJson.optJSONArray("deleted_messages");
+            int deletedCommentsJsonSize = deletedCommentsJson.length();
+            for (int i = 0; i < deletedCommentsJsonSize; i++) {
+                JSONObject deletedCommentJson = deletedCommentsJson.optJSONObject(i);
+                long roomId = Long.valueOf(deletedCommentJson.optString("room_id", "0"));
+
+                JSONArray commentUniqueIds = deletedCommentJson.optJSONArray("message_unique_ids");
+                int commentUniqueIdsSize = commentUniqueIds.length();
+                for (int j = 0; j < commentUniqueIdsSize; j++) {
+                    deletedComments.add(new QiscusDeleteMessageEvent.DeletedComment(roomId, commentUniqueIds.optString(j)));
+                }
+            }
+
+            QiscusDeleteMessageEvent event = new QiscusDeleteMessageEvent();
+            event.setActor(actor);
+            event.setHardDelete(dataJson.optBoolean("is_hard_delete"));
+            event.setDeletedComments(deletedComments);
+
+            QiscusDeleteCommentHandler.handle(event);
+            EventBus.getDefault().post(event);
+        }
+    }
+
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
 
@@ -412,6 +478,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             connecting = false;
             reconnectCounter = 0;
             listenComment();
+            listenNotification();
             if (fallBackListenRoom != null) {
                 scheduledListenRoom = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenRoom);
             }
