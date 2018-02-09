@@ -109,4 +109,10 @@
     <string name="qiscus_location">Location</string>
     <string name="qiscus_message_too_far">Sorry, Message too far to load it!</string>
     <string name="qiscus_nomedia" translatable="false">.nomedia</string>
+    <plurals name="qiscus_delete_comments_confirmation">
+        <item quantity="one">Delete message?</item>
+        <item quantity="other">Delete %d messages?</item>
+    </plurals>
+    <string name="qiscus_delete_for_me">Delete For Me</string>
+    <string name="qiscus_delete_for_everyone">Delete For Everyone</string>
 </resources>

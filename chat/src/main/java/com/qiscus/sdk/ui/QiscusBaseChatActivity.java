@@ -23,8 +23,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -242,6 +244,10 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             } else {
                 actionMode.getMenu().findItem(R.id.action_copy).setVisible(false);
             }
+
+            actionMode.getMenu()
+                    .findItem(R.id.action_delete)
+                    .setVisible(allMyComments(selectedComments));
         }
     }
 
@@ -252,6 +258,15 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                     && selectedComment.getType() != QiscusComment.Type.REPLY
                     && selectedComment.getType() != QiscusComment.Type.CONTACT
                     && selectedComment.getType() != QiscusComment.Type.LOCATION) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean allMyComments(List<QiscusComment> selectedComments) {
+        for (QiscusComment selectedComment : selectedComments) {
+            if (!selectedComment.isMyComment()) {
                 return false;
             }
         }
@@ -302,6 +317,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             forwardComments(selectedComments);
         } else if (i == R.id.action_info && selectedComments.size() > 0) {
             showCommentInfo(selectedComments.get(0));
+        } else if (i == R.id.action_delete && selectedComments.size() > 0) {
+            deleteComments(selectedComments);
         }
         mode.finish();
     }
@@ -376,6 +393,35 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                     "Set it using this method Qiscus.getChatConfig().setCommentInfoHandler()");
         }
         commentInfoHandler.showInfo(qiscusComment);
+    }
+
+    private void deleteComments(List<QiscusComment> selectedComments) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
+                        selectedComments.size(), selectedComments.size()))
+                .setPositiveButton(R.string.qiscus_delete_for_me, (dialog, which) -> {
+
+                    dialog.dismiss();
+                })
+                .setNeutralButton(R.string.qiscus_delete_for_everyone, (dialog, which) -> {
+
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.qiscus_cancel, (dialog, which) -> {
+
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .create();
+
+        alertDialog.setOnShowListener(dialog -> {
+            @ColorInt int accent = ContextCompat.getColor(this, chatConfig.getAccentColor());
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(accent);
+            alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(accent);
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(accent);
+        });
+
+        alertDialog.show();
     }
 
     @Override
