@@ -788,9 +788,41 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         });
     }
 
+    public void deleteCommentsForMe(List<QiscusComment> comments) {
+        deleteComments(comments, false);
+    }
+
+    public void deleteCommentsForEveryone(List<QiscusComment> comments) {
+        deleteComments(comments, true);
+    }
+
+    private void deleteComments(List<QiscusComment> comments, boolean forEveryone) {
+        view.showDeleteLoading();
+        Observable.from(comments)
+                .map(QiscusComment::getUniqueId)
+                .toList()
+                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteComments(uniqueIds, forEveryone, false))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(deletedComments -> {
+                    if (view != null) {
+                        view.dismissLoading();
+                    }
+                }, throwable -> {
+                    if (view != null) {
+                        view.dismissLoading();
+                        view.showError(QiscusTextUtil.getString(R.string.failed_to_delete_messages));
+                    }
+                    QiscusErrorLogger.print(throwable);
+                });
+    }
+
     public interface View extends QiscusPresenter.View {
 
         void showLoadMoreLoading();
+
+        void showDeleteLoading();
 
         void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments);
 

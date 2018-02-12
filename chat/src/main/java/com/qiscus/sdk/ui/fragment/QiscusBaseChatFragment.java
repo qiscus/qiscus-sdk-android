@@ -1569,6 +1569,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Override
+    public void showDeleteLoading() {
+        try {
+            loadMoreProgressBar.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void dismissLoading() {
         try {
             swipeRefreshLayout.setRefreshing(false);
@@ -1842,6 +1851,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onLoadCommentsError(Throwable throwable) {
 
+    }
+
+    public void deleteCommentsForMe(List<QiscusComment> selectedComments) {
+        qiscusChatPresenter.deleteCommentsForMe(selectedComments);
+    }
+
+    public void deleteCommentsForEveryone(List<QiscusComment> selectedComments) {
+        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments);
     }
 
     public interface CommentSelectedListener {

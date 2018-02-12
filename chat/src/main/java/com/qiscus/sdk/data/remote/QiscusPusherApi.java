@@ -536,6 +536,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             qiscusComment.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
             qiscusComment.setTime(dateFormat.parse(jsonObject.get("timestamp").getAsString()));
             qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+
+            if (jsonObject.has("is_deleted")) {
+                qiscusComment.setDeleted(jsonObject.get("is_deleted").getAsBoolean());
+            }
+
             qiscusComment.setRoomName(jsonObject.get("room_name").isJsonNull() ?
                     qiscusComment.getSender() : jsonObject.get("room_name").getAsString());
             if (jsonObject.has("room_avatar")) {

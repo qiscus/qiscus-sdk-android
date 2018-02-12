@@ -247,7 +247,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
             actionMode.getMenu()
                     .findItem(R.id.action_delete)
-                    .setVisible(allMyComments(selectedComments));
+                    .setVisible(deleteable(selectedComments));
         }
     }
 
@@ -264,9 +264,9 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         return true;
     }
 
-    private boolean allMyComments(List<QiscusComment> selectedComments) {
+    private boolean deleteable(List<QiscusComment> selectedComments) {
         for (QiscusComment selectedComment : selectedComments) {
-            if (!selectedComment.isMyComment()) {
+            if (!selectedComment.isMyComment() || selectedComment.isDeleted()) {
                 return false;
             }
         }
@@ -400,17 +400,22 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                 .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
                         selectedComments.size(), selectedComments.size()))
                 .setPositiveButton(R.string.qiscus_delete_for_me, (dialog, which) -> {
-
+                    QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                            .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+                    if (fragment != null) {
+                        fragment.deleteCommentsForMe(selectedComments);
+                    }
                     dialog.dismiss();
                 })
                 .setNeutralButton(R.string.qiscus_delete_for_everyone, (dialog, which) -> {
-
+                    QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                            .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+                    if (fragment != null) {
+                        fragment.deleteCommentsForEveryone(selectedComments);
+                    }
                     dialog.dismiss();
                 })
-                .setNegativeButton(R.string.qiscus_cancel, (dialog, which) -> {
-
-                    dialog.dismiss();
-                })
+                .setNegativeButton(R.string.qiscus_cancel, (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .create();
 

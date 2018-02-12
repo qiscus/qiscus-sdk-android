@@ -28,7 +28,9 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
+import com.qiscus.sdk.event.QiscusDeleteCommentsEvent;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -43,6 +45,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -374,7 +377,27 @@ public enum QiscusApi {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
-                .toList();
+                .toList()
+                .doOnNext(comments -> {
+                    QiscusAccount account = Qiscus.getQiscusAccount();
+                    QiscusRoomMember actor = new QiscusRoomMember();
+                    actor.setEmail(account.getEmail());
+                    actor.setUsername(account.getUsername());
+                    actor.setAvatar(account.getAvatar());
+
+                    List<QiscusDeleteCommentsEvent.DeletedComment> deletedComments = new ArrayList<>();
+                    for (QiscusComment comment : comments) {
+                        deletedComments.add(new QiscusDeleteCommentsEvent.DeletedComment(comment.getRoomId(),
+                                comment.getUniqueId()));
+                    }
+
+                    QiscusDeleteCommentsEvent event = new QiscusDeleteCommentsEvent();
+                    event.setActor(actor);
+                    event.setHardDelete(isHardDelete);
+                    event.setDeletedComments(deletedComments);
+
+                    QiscusDeleteCommentHandler.handle(event);
+                });
     }
 
     private interface Api {
