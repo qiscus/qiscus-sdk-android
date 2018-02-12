@@ -23,6 +23,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.event.QiscusDeleteCommentsEvent;
 import com.qiscus.sdk.event.QiscusUpdateCommentEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -60,6 +61,8 @@ public final class QiscusDeleteCommentHandler {
                         qiscusComment.setRawType("text");
                         Qiscus.getDataStore().addOrUpdate(qiscusComment);
                         EventBus.getDefault().post(new QiscusUpdateCommentEvent(qiscusComment));
+                        QiscusPushNotificationUtil
+                                .handleDeletedCommentNotification(Qiscus.getApps(), qiscusComment, false);
                     }
 
                 })

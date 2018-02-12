@@ -73,6 +73,10 @@ public final class QiscusPushNotificationUtil {
         QiscusAndroidUtil.runOnBackgroundThread(() -> handlePN(context, qiscusComment));
     }
 
+    public static void handleDeletedCommentNotification(Context context, QiscusComment qiscusComment, boolean hardDelete) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleDeletedComment(context, qiscusComment, hardDelete));
+    }
+
     private static void handlePN(Context context, QiscusComment qiscusComment) {
         if (Qiscus.getDataStore().isContains(qiscusComment)) {
             return;
@@ -300,5 +304,44 @@ public final class QiscusPushNotificationUtil {
 
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
                 .notify(QiscusNumberUtil.convertToInt(comment.getRoomId()), notificationBuilder.build()));
+    }
+
+    private static void handleDeletedComment(Context context, QiscusComment qiscusComment, boolean hardDelete) {
+        if (hardDelete) {
+            boolean removeItem = QiscusCacheManager.getInstance()
+                    .removeMessageNotifItem(new QiscusPushNotificationMessage(qiscusComment), qiscusComment.getRoomId());
+            if (removeItem) {
+                updateNotification(context, qiscusComment);
+            }
+        } else {
+            boolean updateItem = QiscusCacheManager.getInstance()
+                    .updateMessageNotifItem(new QiscusPushNotificationMessage(qiscusComment), qiscusComment.getRoomId());
+            if (updateItem) {
+                updateNotification(context, qiscusComment);
+            }
+        }
+    }
+
+    private static void updateNotification(Context context, QiscusComment qiscusComment) {
+        if (Qiscus.getChatConfig().isEnablePushNotification()
+                && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+            if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
+                Pair<Boolean, Long> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
+                if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
+                    updatePushNotification(context, qiscusComment);
+                }
+            } else {
+                updatePushNotification(context, qiscusComment);
+            }
+        }
+    }
+
+    private static void updatePushNotification(Context context, QiscusComment qiscusComment) {
+        if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
+            QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, qiscusComment, qiscusComment.getMessage()));
+        } else {
+            pushNotification(context, qiscusComment, qiscusComment.getMessage(),
+                    BitmapFactory.decodeResource(context.getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
+        }
     }
 }
