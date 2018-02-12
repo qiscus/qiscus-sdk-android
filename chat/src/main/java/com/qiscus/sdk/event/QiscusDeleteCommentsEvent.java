@@ -26,7 +26,7 @@ import java.util.List;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusDeleteMessageEvent {
+public class QiscusDeleteCommentsEvent {
     private QiscusRoomMember actor;
     private boolean hardDelete;
     private List<DeletedComment> deletedComments;
@@ -57,7 +57,7 @@ public class QiscusDeleteMessageEvent {
 
     @Override
     public String toString() {
-        return "QiscusDeleteMessageEvent{" +
+        return "QiscusDeleteCommentsEvent{" +
                 "actor=" + actor +
                 ", hardDelete=" + hardDelete +
                 ", deletedComments=" + deletedComments +

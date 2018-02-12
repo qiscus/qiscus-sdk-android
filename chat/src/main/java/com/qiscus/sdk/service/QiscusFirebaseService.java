@@ -26,6 +26,7 @@ import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
 
@@ -49,21 +50,37 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
                     QiscusPusherApi.getInstance().restartConnection();
                 }
                 if (remoteMessage.getData().containsKey("payload")) {
-                    QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
-                    if (qiscusComment == null) {
-                        return true;
+                    if (remoteMessage.getData().get("qiscus_sdk").equals("post_comment")) {
+                        handlePostCommentEvent(remoteMessage);
+                    } else if (remoteMessage.getData().get("qiscus_sdk").equals("delete_message")) {
+                        handleDeleteCommentsEvent(remoteMessage);
                     }
-                    if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
-                        QiscusPusherApi.getInstance()
-                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-                    }
-                    QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
-                    QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault()
-                            .post(new QiscusCommentReceivedEvent(qiscusComment)));
                 }
             }
             return true;
         }
         return false;
+    }
+
+    private static void handlePostCommentEvent(RemoteMessage remoteMessage) {
+        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
+        if (qiscusComment == null) {
+            return;
+        }
+        if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+            QiscusPusherApi.getInstance()
+                    .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
+        }
+        QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
+        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault()
+                .post(new QiscusCommentReceivedEvent(qiscusComment)));
+    }
+
+    private static void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {
+        try {
+            QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -35,6 +35,7 @@ import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
+import com.qiscus.sdk.event.QiscusUpdateCommentEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -541,6 +542,17 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
                     view.refreshComment(event.getQiscusComment());
+                }
+            });
+        }
+    }
+
+    @Subscribe
+    public void handleUpdateCommentEvent(QiscusUpdateCommentEvent event) {
+        if (event.getComment().getRoomId() == room.getId()) {
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.refreshComment(event.getComment());
                 }
             });
         }

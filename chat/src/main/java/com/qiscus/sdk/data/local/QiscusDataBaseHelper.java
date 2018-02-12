@@ -694,7 +694,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         if (id == -1) {
             query = "SELECT * FROM "
                     + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + id + "'";
+                    + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = '" + uniqueId + "'";
         } else {
             query = "SELECT * FROM "
                     + QiscusDb.CommentTable.TABLE_NAME + " WHERE "

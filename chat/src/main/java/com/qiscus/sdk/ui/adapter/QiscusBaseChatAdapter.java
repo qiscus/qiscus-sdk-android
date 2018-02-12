@@ -310,6 +310,26 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         notifyDataSetChanged();
     }
 
+    public void update(E e) {
+        int i = findPosition(e);
+        if (i >= 0) {
+            e.setSelected(data.get(i).isSelected());
+            data.updateItemAt(i, e);
+            notifyItemChanged(i);
+        }
+    }
+
+    public void update(final List<E> es) {
+        for (E e : es) {
+            int i = findPosition(e);
+            if (i >= 0) {
+                e.setSelected(data.get(i).isSelected());
+                data.updateItemAt(i, e);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
     public void mergeLocalAndRemoteData(List<E> es) {
         if (es == null || es.isEmpty()) {
             return;

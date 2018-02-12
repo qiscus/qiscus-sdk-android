@@ -18,6 +18,7 @@ package com.qiscus.sdk.data.remote;
 
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -30,7 +31,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.event.QiscusDeleteMessageEvent;
+import com.qiscus.sdk.event.QiscusDeleteCommentsEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
@@ -431,7 +432,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    private void handleNotification(JSONObject jsonObject) {
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static void handleNotification(JSONObject jsonObject) {
         if (jsonObject.optString("action_topic").equals("delete_message")) {
             JSONObject payload = jsonObject.optJSONObject("payload");
 
@@ -440,7 +442,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             actor.setEmail(actorJson.optString("email"));
             actor.setUsername(actorJson.optString("name"));
 
-            List<QiscusDeleteMessageEvent.DeletedComment> deletedComments = new ArrayList<>();
+            List<QiscusDeleteCommentsEvent.DeletedComment> deletedComments = new ArrayList<>();
             JSONObject dataJson = payload.optJSONObject("data");
             JSONArray deletedCommentsJson = dataJson.optJSONArray("deleted_messages");
             int deletedCommentsJsonSize = deletedCommentsJson.length();
@@ -451,11 +453,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 JSONArray commentUniqueIds = deletedCommentJson.optJSONArray("message_unique_ids");
                 int commentUniqueIdsSize = commentUniqueIds.length();
                 for (int j = 0; j < commentUniqueIdsSize; j++) {
-                    deletedComments.add(new QiscusDeleteMessageEvent.DeletedComment(roomId, commentUniqueIds.optString(j)));
+                    deletedComments.add(new QiscusDeleteCommentsEvent.DeletedComment(roomId, commentUniqueIds.optString(j)));
                 }
             }
 
-            QiscusDeleteMessageEvent event = new QiscusDeleteMessageEvent();
+            QiscusDeleteCommentsEvent event = new QiscusDeleteCommentsEvent();
             event.setActor(actor);
             event.setHardDelete(dataJson.optBoolean("is_hard_delete"));
             event.setDeletedComments(deletedComments);

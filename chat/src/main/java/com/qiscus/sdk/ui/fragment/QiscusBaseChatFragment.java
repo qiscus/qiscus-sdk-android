@@ -1446,7 +1446,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void refreshComment(QiscusComment qiscusComment) {
-        chatAdapter.addOrUpdate(qiscusComment);
+        chatAdapter.update(qiscusComment);
     }
 
     @Override

@@ -17,12 +17,14 @@
 package com.qiscus.sdk.data.remote;
 
 import android.support.annotation.RestrictTo;
-import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.event.QiscusDeleteMessageEvent;
+import com.qiscus.sdk.event.QiscusDeleteCommentsEvent;
+import com.qiscus.sdk.event.QiscusUpdateCommentEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+
+import org.greenrobot.eventbus.EventBus;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -40,8 +42,7 @@ public final class QiscusDeleteCommentHandler {
 
     }
 
-    public static void handle(QiscusDeleteMessageEvent event) {
-        Log.d("ZETRA", event.toString());
+    public static void handle(QiscusDeleteCommentsEvent event) {
         if (event.isHardDelete()) {
             handleHardDelete(event);
         } else {
@@ -49,15 +50,16 @@ public final class QiscusDeleteCommentHandler {
         }
     }
 
-    private static void handleSoftDelete(QiscusDeleteMessageEvent event) {
+    private static void handleSoftDelete(QiscusDeleteCommentsEvent event) {
         Observable.from(event.getDeletedComments())
                 .doOnNext(deletedComment -> {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
                             .getComment(-1, deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
-                        qiscusComment.setMessage("This message has been deleted");
+                        qiscusComment.setMessage("This message has been deleted.");
                         qiscusComment.setRawType("text");
                         Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                        EventBus.getDefault().post(new QiscusUpdateCommentEvent(qiscusComment));
                     }
 
                 })
@@ -67,7 +69,7 @@ public final class QiscusDeleteCommentHandler {
                 }, QiscusErrorLogger::print);
     }
 
-    private static void handleHardDelete(QiscusDeleteMessageEvent event) {
+    private static void handleHardDelete(QiscusDeleteCommentsEvent event) {
         Observable.from(event.getDeletedComments())
                 .doOnNext(deletedComment -> {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
