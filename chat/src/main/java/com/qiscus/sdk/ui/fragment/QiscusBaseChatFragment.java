@@ -1152,7 +1152,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void toggleSelectComment(QiscusComment qiscusComment) {
         qiscusComment.setSelected(!qiscusComment.isSelected());
-        refreshComment(qiscusComment);
+        chatAdapter.notifyDataSetChanged();
         if (commentSelectedListener != null) {
             commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
         }
@@ -1168,10 +1168,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void highlightComment(QiscusComment qiscusComment) {
         qiscusComment.setHighlighted(true);
-        refreshComment(qiscusComment);
+        chatAdapter.notifyDataSetChanged();
         commentHighlightTask = () -> {
             qiscusComment.setHighlighted(false);
-            refreshComment(qiscusComment);
+            chatAdapter.notifyDataSetChanged();
         };
         QiscusAndroidUtil.runOnUIThread(commentHighlightTask, 2000);
     }
@@ -1447,6 +1447,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void refreshComment(QiscusComment qiscusComment) {
         chatAdapter.update(qiscusComment);
+    }
+
+    @Override
+    public void notifyDataChanged() {
+        chatAdapter.notifyDataSetChanged();
     }
 
     @Override

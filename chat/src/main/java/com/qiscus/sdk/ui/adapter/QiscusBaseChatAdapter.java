@@ -289,9 +289,11 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     public void addOrUpdate(E e) {
         int i = findPosition(e);
         if (i >= 0) {
-            e.setSelected(data.get(i).isSelected());
-            data.updateItemAt(i, e);
-            notifyItemChanged(i);
+            if (!e.areContentsTheSame(data.get(i))) {
+                e.setSelected(data.get(i).isSelected());
+                data.updateItemAt(i, e);
+                notifyItemChanged(i);
+            }
         } else {
             add(e);
         }
@@ -301,8 +303,10 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         for (E e : es) {
             int i = findPosition(e);
             if (i >= 0) {
-                e.setSelected(data.get(i).isSelected());
-                data.updateItemAt(i, e);
+                if (!e.areContentsTheSame(data.get(i))) {
+                    e.setSelected(data.get(i).isSelected());
+                    data.updateItemAt(i, e);
+                }
             } else {
                 data.add(e);
             }
@@ -312,7 +316,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     public void update(E e) {
         int i = findPosition(e);
-        if (i >= 0) {
+        if (i >= 0 && !e.areContentsTheSame(data.get(i))) {
             e.setSelected(data.get(i).isSelected());
             data.updateItemAt(i, e);
             notifyItemChanged(i);
@@ -322,7 +326,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     public void update(final List<E> es) {
         for (E e : es) {
             int i = findPosition(e);
-            if (i >= 0) {
+            if (i >= 0 && !e.areContentsTheSame(data.get(i))) {
                 e.setSelected(data.get(i).isSelected());
                 data.updateItemAt(i, e);
             }

@@ -860,6 +860,24 @@ public class QiscusComment implements Parcelable {
         dest.writeString(extras.toString());
     }
 
+    public boolean areContentsTheSame(QiscusComment qiscusComment) {
+        return id == qiscusComment.id
+                && uniqueId.equals(qiscusComment.uniqueId)
+                && roomId == qiscusComment.roomId
+                && commentBeforeId == qiscusComment.commentBeforeId
+                && message.equals(qiscusComment.message)
+                && sender.equals(qiscusComment.sender)
+                && senderEmail.equals(qiscusComment.senderEmail)
+                && senderAvatar.equals(qiscusComment.senderAvatar)
+                && time.equals(qiscusComment.time)
+                && state == qiscusComment.state
+                && deleted == qiscusComment.deleted
+                && selected == qiscusComment.selected
+                && highlighted == qiscusComment.highlighted
+                && downloading == qiscusComment.downloading
+                && progress == qiscusComment.progress;
+    }
+
     public enum Type {
         TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
         CONTACT, LOCATION, CAROUSEL, CUSTOM

@@ -622,7 +622,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                                 file1.getAbsolutePath());
                     })
                     .subscribe(file1 -> {
-                        view.refreshComment(qiscusComment);
+                        view.notifyDataChanged();
                         if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                             qiscusComment.playAudio();
                         } else if (qiscusComment.getType() == QiscusComment.Type.FILE
@@ -843,6 +843,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void onCommentDeleted(QiscusComment qiscusComment);
 
         void refreshComment(QiscusComment qiscusComment);
+
+        void notifyDataChanged();
 
         void updateLastDeliveredComment(long lastDeliveredCommentId);
 
