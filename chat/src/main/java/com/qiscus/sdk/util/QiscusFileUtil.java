@@ -199,7 +199,7 @@ public final class QiscusFileUtil {
 
     private static String replaceNumberInFileName(String fileName, int existedNumber) {
         String[] fileNameSplit = splitFileName(fileName);
-        int startNumberIndex = fileNameSplit[0].lastIndexOf("-");
+        int startNumberIndex = fileNameSplit[0].lastIndexOf('-');
         existedNumber = existedNumber + 1;
         return fileNameSplit[0].substring(0, startNumberIndex) + "-" + existedNumber + fileNameSplit[1];
     }
@@ -229,8 +229,8 @@ public final class QiscusFileUtil {
     }
 
     public static int getNumberFromFileName(File file, String fileName) {
-        int startNumberIndex = fileName.lastIndexOf("-");
-        int lastNumberIndex = fileName.lastIndexOf(".");
+        int startNumberIndex = fileName.lastIndexOf('-');
+        int lastNumberIndex = fileName.lastIndexOf('.');
 
         for (File currentFile : file.listFiles()) {
             if (currentFile.getName().equals(fileName) && startNumberIndex <= 0) {
