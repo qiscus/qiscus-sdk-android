@@ -130,6 +130,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
             }
             downloadIconView.setVisibility(localPath == null ? View.VISIBLE : View.GONE);
         }
+
         fileNameView.setText(qiscusComment.getAttachmentName());
 
         if (fileTypeView != null) {

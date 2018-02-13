@@ -258,7 +258,7 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<File> downloadFile(long roomId, String url, String fileName, ProgressListener progressListener) {
+    public Observable<File> downloadFile(String url, String fileName, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
             InputStream inputStream = null;
             FileOutputStream fos = null;
@@ -267,7 +267,7 @@ public enum QiscusApi {
 
                 Response response = httpClient.newCall(request).execute();
 
-                File output = new File(QiscusFileUtil.generateFilePath(fileName, roomId));
+                File output = new File(QiscusFileUtil.generateFilePath(fileName));
                 fos = new FileOutputStream(output.getPath());
                 if (!response.isSuccessful()) {
                     throw new IOException();

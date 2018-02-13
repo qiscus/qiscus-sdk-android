@@ -89,8 +89,8 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
         }
         qiscusComment.setDownloading(true);
         downloadSubscription = QiscusApi.getInstance()
-                .downloadFile(qiscusComment.getRoomId(), qiscusComment.getAttachmentUri().toString(),
-                        qiscusComment.getAttachmentName(), percentage -> qiscusComment.setProgress((int) percentage))
+                .downloadFile(qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
+                        percentage -> qiscusComment.setProgress((int) percentage))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
