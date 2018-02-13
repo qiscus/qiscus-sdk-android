@@ -19,7 +19,6 @@ package com.qiscus.sdk.data.remote;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -134,7 +133,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void connect() {
         if (Qiscus.hasSetupUser() && !connecting && QiscusAndroidUtil.isNetworkAvailable()) {
-            Log.i(TAG, "Connecting...");
+            QiscusLogger.print(TAG, "Connecting...");
             connecting = true;
             qiscusAccount = Qiscus.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
@@ -216,7 +215,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } catch (MqttException e) {
             //Do nothing
         } catch (NullPointerException | IllegalArgumentException e) {
-            Log.e(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
+            QiscusErrorLogger.print(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenComment = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenComment, RETRY_PERIOD);
         }
@@ -229,7 +228,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } catch (MqttException e) {
             //Do nothing
         } catch (NullPointerException | IllegalArgumentException e) {
-            Log.e(TAG, "Failure listen notification, try again in " + RETRY_PERIOD + " ms");
+            QiscusErrorLogger.print(TAG, "Failure listen notification, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenNotification = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenNotification, RETRY_PERIOD);
         }
@@ -246,7 +245,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } catch (MqttException e) {
             //Do nothing
         } catch (NullPointerException | IllegalArgumentException e) {
-            Log.e(TAG, "Failure listen room, try again in " + RETRY_PERIOD + " ms");
+            QiscusErrorLogger.print(TAG, "Failure listen room, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenRoom = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenRoom, RETRY_PERIOD);
         }
