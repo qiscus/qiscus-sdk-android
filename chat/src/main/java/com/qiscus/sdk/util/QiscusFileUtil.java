@@ -69,9 +69,8 @@ public final class QiscusFileUtil {
         return tempFile;
     }
 
-    public static File from(InputStream inputStream, String fileName, long roomId) throws
-            IOException {
-        File file = new File(generateFilePath(fileName, roomId));
+    public static File from(InputStream inputStream, String fileName) throws IOException {
+        File file = new File(generateFilePath(fileName));
         file = rename(file, fileName);
         FileOutputStream out = null;
         try {
@@ -138,8 +137,8 @@ public final class QiscusFileUtil {
         }
     }
 
-    public static File saveFile(File file, long roomId) {
-        String path = generateFilePath(Uri.fromFile(file), roomId);
+    public static File saveFile(File file) {
+        String path = generateFilePath(file.getName());
         File newFile = new File(path);
         try {
             FileInputStream in = new FileInputStream(file);
@@ -151,18 +150,12 @@ public final class QiscusFileUtil {
         return newFile;
     }
 
-    private static String generateFilePath(Uri uri, long roomId) {
-        File file = new File(Environment.getExternalStorageDirectory().getPath(),
-                QiscusImageUtil.isImage(uri.getPath()) ? QiscusImageUtil.IMAGE_PATH : FILES_PATH);
-
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-
-        return file.getAbsolutePath() + File.separator + getFileName(uri);
+    public static String generateFilePath(String fileName) {
+        String[] fileNameSplit = splitFileName(fileName);
+        return generateFilePath(fileName, fileNameSplit[1]);
     }
 
-    public static String generateFilePath(String fileName, long roomId) {
+    public static String generateFilePath(String fileName, String extension) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
                 QiscusImageUtil.isImage(fileName) ? QiscusImageUtil.IMAGE_PATH : FILES_PATH);
 
@@ -170,83 +163,21 @@ public final class QiscusFileUtil {
             file.mkdirs();
         }
 
-        return file.getAbsolutePath() + File.separator + addNumberToFileName(file, fileName);
-    }
-
-    public static String addTopicToFileName(String fileName, long roomId) {
-        int existedroomId = getTopicFromFileName(fileName);
-        if (existedroomId == -1) {
-            String[] fileNameSplit = splitFileName(fileName);
-            return fileNameSplit[0] + "-topic-" + roomId + "-topic" + fileNameSplit[1];
-        } else if (existedroomId != roomId) {
-            return replaceTopicInFileName(fileName, roomId);
-        }
-
-        return fileName;
-    }
-
-    public static String addNumberToFileName(File file, String fileName) {
-        int existedNumber = getNumberFromFileName(file, fileName);
-        if (existedNumber == -2) {
-            String[] fileNameSplit = splitFileName(fileName);
-            return fileNameSplit[0] + "-" + 1 + fileNameSplit[1];
-        } else if (existedNumber > 0) {
-            return replaceNumberInFileName(fileName, existedNumber);
-        }
-
-        return fileName;
-    }
-
-    private static String replaceNumberInFileName(String fileName, int existedNumber) {
+        int index = 0;
+        String directory = file.getAbsolutePath() + File.separator;
         String[] fileNameSplit = splitFileName(fileName);
-        int startNumberIndex = fileNameSplit[0].lastIndexOf('-');
-        existedNumber = existedNumber + 1;
-        return fileNameSplit[0].substring(0, startNumberIndex) + "-" + existedNumber + fileNameSplit[1];
-    }
-
-    public static String addTimeStampToFileName(String fileName) {
-        String[] fileNameSplit = splitFileName(fileName);
-        return fileNameSplit[0] + "-" + System.currentTimeMillis() + "" + fileNameSplit[1];
-    }
-
-    private static String replaceTopicInFileName(String fileName, long roomId) {
-        String[] fileNameSplit = splitFileName(fileName);
-        int startTopicIndex = fileNameSplit[0].indexOf("-topic-");
-        return fileNameSplit[0].substring(0, startTopicIndex) + "-topic-" + roomId + "-topic" + fileNameSplit[1];
-    }
-
-    public static int getTopicFromFileName(String fileName) {
-        int startTopicIndex = fileName.indexOf("topic-");
-        int lastTopicIndex = fileName.lastIndexOf("-topic");
-        if (startTopicIndex >= 0 && lastTopicIndex >= 0) {
-            try {
-                return Integer.parseInt(fileName.substring(startTopicIndex + 6, lastTopicIndex));
-            } catch (Exception e) {
-                return -2;
+        while (true) {
+            File newFile;
+            if (index == 0) {
+                newFile = new File(directory + fileNameSplit[0] + extension);
+            } else {
+                newFile = new File(directory + fileNameSplit[0] + "-" + index + extension);
             }
-        }
-        return -1;
-    }
-
-    public static int getNumberFromFileName(File file, String fileName) {
-        int startNumberIndex = fileName.lastIndexOf('-');
-        int lastNumberIndex = fileName.lastIndexOf('.');
-
-        for (File currentFile : file.listFiles()) {
-            if (currentFile.getName().equals(fileName) && startNumberIndex <= 0) {
-                return -2;
+            if (!newFile.exists()) {
+                return newFile.getAbsolutePath();
             }
+            index++;
         }
-
-        if (startNumberIndex >= 0 && lastNumberIndex >= 0) {
-            try {
-                return Integer.parseInt(fileName.substring(startNumberIndex + 1, lastNumberIndex));
-            } catch (Exception e) {
-                return -3;
-            }
-        }
-
-        return -1;
     }
 
     public static File rename(File file, String newName) {

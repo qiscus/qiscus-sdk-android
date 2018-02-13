@@ -469,7 +469,7 @@ public class QiscusComment implements Parcelable {
         return caption;
     }
 
-    public String getFileName() {
+    public String getAttachmentName() {
         if (!isAttachment()) {
             throw new RuntimeException("Current comment is not an attachment");
         }
@@ -481,28 +481,28 @@ public class QiscusComment implements Parcelable {
             } catch (Exception ignored) {
                 //Do nothing
             }
+
+            if (!TextUtils.isEmpty(attachmentName)) {
+                return attachmentName;
+            }
+
+            int fileNameEndIndex = message.lastIndexOf(" [/file]");
+            int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
+
+            String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
+            try {
+                fileName = fileName.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+                fileName = fileName.replaceAll("\\+", "%2B");
+                attachmentName = URLDecoder.decode(fileName, "UTF-8");
+                return attachmentName;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            throw new RuntimeException("The filename '" + fileName + "' is not valid UTF-8");
         }
+
         return attachmentName;
-    }
-
-    public String getAttachmentName() {
-        if (!isAttachment()) {
-            throw new RuntimeException("Current comment is not an attachment");
-        }
-
-        int fileNameEndIndex = message.lastIndexOf(" [/file]");
-        int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
-
-        String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
-        try {
-            fileName = fileName.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
-            fileName = fileName.replaceAll("\\+", "%2B");
-            return URLDecoder.decode(fileName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        throw new RuntimeException("The filename '" + fileName + "' is not valid UTF-8");
     }
 
     public String getExtension() {

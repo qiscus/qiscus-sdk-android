@@ -156,15 +156,15 @@ public final class QiscusImageUtil {
         return scaledBitmap;
     }
 
-    public static File compressImage(Uri imageUri, long roomId) {
+    public static File compressImage(File imageFile) {
 
         FileOutputStream out = null;
-        String filename = generateFilePath(imageUri, roomId);
+        String filename = QiscusFileUtil.generateFilePath(imageFile.getName(), ".jpg");
         try {
             out = new FileOutputStream(filename);
 
             //write the compressed bitmap at the destination specified by filename.
-            QiscusImageUtil.getScaledBitmap(imageUri).compress(Bitmap.CompressFormat.JPEG,
+            QiscusImageUtil.getScaledBitmap(Uri.fromFile(imageFile)).compress(Bitmap.CompressFormat.JPEG,
                     Qiscus.getChatConfig().getQiscusImageCompressionConfig().getQuality(), out);
 
         } catch (FileNotFoundException e) {
@@ -179,22 +179,10 @@ public final class QiscusImageUtil {
             }
         }
 
-        File imageFile = new File(filename);
-        QiscusFileUtil.notifySystem(imageFile);
+        File compressedImage = new File(filename);
+        QiscusFileUtil.notifySystem(compressedImage);
 
-        return imageFile;
-    }
-
-    private static String generateFilePath(Uri uri, long roomId) {
-        File file = new File(Environment.getExternalStorageDirectory().getPath(),
-                QiscusImageUtil.isImage(uri.getPath()) ? IMAGE_PATH : QiscusFileUtil.FILES_PATH);
-
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-
-        return file.getAbsolutePath() + File.separator
-                + QiscusFileUtil.addNumberToFileName(file, QiscusFileUtil.splitFileName(QiscusFileUtil.getFileName(uri))[0] + ".jpg");
+        return compressedImage;
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
