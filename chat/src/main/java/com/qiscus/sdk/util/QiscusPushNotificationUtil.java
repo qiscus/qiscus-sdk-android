@@ -337,10 +337,18 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void updatePushNotification(Context context, QiscusComment qiscusComment) {
+        List<QiscusPushNotificationMessage> items = QiscusCacheManager.getInstance()
+                .getMessageNotifItems(qiscusComment.getRoomId());
+
+        if (items.isEmpty()) {
+            NotificationManagerCompat.from(context).cancel(QiscusNumberUtil.convertToInt(qiscusComment.getRoomId()));
+            return;
+        }
+        String lastMessage = items.get(items.size() - 1).getMessage();
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
-            QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, qiscusComment, qiscusComment.getMessage()));
+            QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, qiscusComment, lastMessage));
         } else {
-            pushNotification(context, qiscusComment, qiscusComment.getMessage(),
+            pushNotification(context, qiscusComment, lastMessage,
                     BitmapFactory.decodeResource(context.getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
         }
     }
