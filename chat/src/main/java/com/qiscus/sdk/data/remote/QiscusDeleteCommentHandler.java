@@ -20,12 +20,14 @@ import android.support.annotation.RestrictTo;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.event.QiscusDeleteCommentsEvent;
-import com.qiscus.sdk.event.QiscusUpdateCommentEvent;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -43,16 +45,16 @@ public final class QiscusDeleteCommentHandler {
 
     }
 
-    public static void handle(QiscusDeleteCommentsEvent event) {
-        if (event.isHardDelete()) {
-            handleHardDelete(event);
+    public static void handle(DeletedCommentsData deletedCommentsData) {
+        if (deletedCommentsData.isHardDelete()) {
+            handleHardDelete(deletedCommentsData);
         } else {
-            handleSoftDelete(event);
+            handleSoftDelete(deletedCommentsData);
         }
     }
 
-    private static void handleSoftDelete(QiscusDeleteCommentsEvent event) {
-        Observable.from(event.getDeletedComments())
+    private static void handleSoftDelete(DeletedCommentsData deletedCommentsData) {
+        Observable.from(deletedCommentsData.getDeletedComments())
                 .doOnNext(deletedComment -> {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
                             .getComment(-1, deletedComment.getCommentUniqueId());
@@ -60,7 +62,7 @@ public final class QiscusDeleteCommentHandler {
                         qiscusComment.setMessage("This message has been deleted.");
                         qiscusComment.setRawType("text");
                         Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                        EventBus.getDefault().post(new QiscusUpdateCommentEvent(qiscusComment));
+                        EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
                         QiscusPushNotificationUtil
                                 .handleDeletedCommentNotification(Qiscus.getApps(), qiscusComment, false);
                     }
@@ -72,18 +74,87 @@ public final class QiscusDeleteCommentHandler {
                 }, QiscusErrorLogger::print);
     }
 
-    private static void handleHardDelete(QiscusDeleteCommentsEvent event) {
-        Observable.from(event.getDeletedComments())
+    private static void handleHardDelete(DeletedCommentsData deletedCommentsData) {
+        Observable.from(deletedCommentsData.getDeletedComments())
                 .doOnNext(deletedComment -> {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
                             .getComment(-1, deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
                         Qiscus.getDataStore().delete(qiscusComment);
+                        EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
+                        QiscusPushNotificationUtil
+                                .handleDeletedCommentNotification(Qiscus.getApps(), qiscusComment, true);
                     }
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(deletedComment -> {
                 }, QiscusErrorLogger::print);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static class DeletedCommentsData {
+        private QiscusRoomMember actor;
+        private boolean hardDelete;
+        private List<DeletedComment> deletedComments;
+
+        public QiscusRoomMember getActor() {
+            return actor;
+        }
+
+        public void setActor(QiscusRoomMember actor) {
+            this.actor = actor;
+        }
+
+        public boolean isHardDelete() {
+            return hardDelete;
+        }
+
+        public void setHardDelete(boolean hardDelete) {
+            this.hardDelete = hardDelete;
+        }
+
+        public List<DeletedComment> getDeletedComments() {
+            return deletedComments;
+        }
+
+        public void setDeletedComments(List<DeletedComment> deletedComments) {
+            this.deletedComments = deletedComments;
+        }
+
+        @Override
+        public String toString() {
+            return "DeletedCommentsData{" +
+                    "actor=" + actor +
+                    ", hardDelete=" + hardDelete +
+                    ", deletedComments=" + deletedComments +
+                    '}';
+        }
+
+        public static class DeletedComment {
+            private long roomId;
+            private String commentUniqueId;
+
+            public DeletedComment(long roomId, String commentUniqueId) {
+                this.roomId = roomId;
+                this.commentUniqueId = commentUniqueId;
+            }
+
+            public long getRoomId() {
+                return roomId;
+            }
+
+            public String getCommentUniqueId() {
+                return commentUniqueId;
+            }
+
+            @Override
+            public String toString() {
+                return "DeletedComment{" +
+                        "roomId=" + roomId +
+                        ", commentUniqueId='" + commentUniqueId + '\'' +
+                        '}';
+            }
+        }
     }
 }

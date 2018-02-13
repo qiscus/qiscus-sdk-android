@@ -24,21 +24,24 @@ import com.qiscus.sdk.data.model.QiscusComment;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusUpdateCommentEvent {
-    private QiscusComment comment;
+public class QiscusCommentDeletedEvent {
+    private QiscusComment qiscusComment;
+    private boolean hardDelete;
 
-    public QiscusUpdateCommentEvent(QiscusComment comment) {
-        this.comment = comment;
+    public QiscusCommentDeletedEvent(QiscusComment qiscusComment) {
+        this.qiscusComment = qiscusComment;
     }
 
-    public QiscusComment getComment() {
-        return comment;
+    public QiscusCommentDeletedEvent(QiscusComment qiscusComment, boolean hardDelete) {
+        this.qiscusComment = qiscusComment;
+        this.hardDelete = hardDelete;
     }
 
-    @Override
-    public String toString() {
-        return "QiscusUpdateCommentEvent{" +
-                "comment=" + comment +
-                '}';
+    public QiscusComment getQiscusComment() {
+        return qiscusComment;
+    }
+
+    public boolean isHardDelete() {
+        return hardDelete;
     }
 }

@@ -32,10 +32,10 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
-import com.qiscus.sdk.event.QiscusUpdateCommentEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -548,11 +548,15 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Subscribe
-    public void handleUpdateCommentEvent(QiscusUpdateCommentEvent event) {
-        if (event.getComment().getRoomId() == room.getId()) {
+    public void handleDeleteCommentEvent(QiscusCommentDeletedEvent event) {
+        if (event.getQiscusComment().getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
-                    view.refreshComment(event.getComment());
+                    if (event.isHardDelete()) {
+                        view.onCommentDeleted(event.getQiscusComment());
+                    } else {
+                        view.refreshComment(event.getQiscusComment());
+                    }
                 }
             });
         }

@@ -31,7 +31,6 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.event.QiscusDeleteCommentsEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.event.QiscusUserStatusEvent;
@@ -368,13 +367,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     private void handleMessage(String topic, String message) {
-        if (topic.startsWith("notification")) {
+        if (topic.equals(qiscusAccount.getToken() + "/n")) {
             try {
                 handleNotification(new JSONObject(message));
             } catch (JSONException e) {
                 QiscusLogger.print(e.getMessage());
             }
-        } else if (topic.contains(qiscusAccount.getToken())) {
+        } else if (topic.equals(qiscusAccount.getToken() + "/c")) {
             QiscusComment qiscusComment = jsonToComment(message);
             if (qiscusComment == null) {
                 return;
@@ -441,7 +440,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             actor.setEmail(actorJson.optString("email"));
             actor.setUsername(actorJson.optString("name"));
 
-            List<QiscusDeleteCommentsEvent.DeletedComment> deletedComments = new ArrayList<>();
+            List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
             JSONObject dataJson = payload.optJSONObject("data");
             JSONArray deletedCommentsJson = dataJson.optJSONArray("deleted_messages");
             int deletedCommentsJsonSize = deletedCommentsJson.length();
@@ -452,17 +451,17 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 JSONArray commentUniqueIds = deletedCommentJson.optJSONArray("message_unique_ids");
                 int commentUniqueIdsSize = commentUniqueIds.length();
                 for (int j = 0; j < commentUniqueIdsSize; j++) {
-                    deletedComments.add(new QiscusDeleteCommentsEvent.DeletedComment(roomId, commentUniqueIds.optString(j)));
+                    deletedComments.add(new QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment(roomId, commentUniqueIds.optString(j)));
                 }
             }
 
-            QiscusDeleteCommentsEvent event = new QiscusDeleteCommentsEvent();
-            event.setActor(actor);
-            event.setHardDelete(dataJson.optBoolean("is_hard_delete"));
-            event.setDeletedComments(deletedComments);
+            QiscusDeleteCommentHandler.DeletedCommentsData deletedCommentsData
+                    = new QiscusDeleteCommentHandler.DeletedCommentsData();
+            deletedCommentsData.setActor(actor);
+            deletedCommentsData.setHardDelete(dataJson.optBoolean("is_hard_delete"));
+            deletedCommentsData.setDeletedComments(deletedComments);
 
-            QiscusDeleteCommentHandler.handle(event);
-            EventBus.getDefault().post(event);
+            QiscusDeleteCommentHandler.handle(deletedCommentsData);
         }
     }
 

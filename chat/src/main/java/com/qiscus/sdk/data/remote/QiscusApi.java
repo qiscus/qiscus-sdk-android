@@ -30,7 +30,6 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
-import com.qiscus.sdk.event.QiscusDeleteCommentsEvent;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -385,18 +384,19 @@ public enum QiscusApi {
                     actor.setUsername(account.getUsername());
                     actor.setAvatar(account.getAvatar());
 
-                    List<QiscusDeleteCommentsEvent.DeletedComment> deletedComments = new ArrayList<>();
+                    List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
                     for (QiscusComment comment : comments) {
-                        deletedComments.add(new QiscusDeleteCommentsEvent.DeletedComment(comment.getRoomId(),
+                        deletedComments.add(new QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment(comment.getRoomId(),
                                 comment.getUniqueId()));
                     }
 
-                    QiscusDeleteCommentsEvent event = new QiscusDeleteCommentsEvent();
-                    event.setActor(actor);
-                    event.setHardDelete(isHardDelete);
-                    event.setDeletedComments(deletedComments);
+                    QiscusDeleteCommentHandler.DeletedCommentsData deletedCommentsData
+                            = new QiscusDeleteCommentHandler.DeletedCommentsData();
+                    deletedCommentsData.setActor(actor);
+                    deletedCommentsData.setHardDelete(isHardDelete);
+                    deletedCommentsData.setDeletedComments(deletedComments);
 
-                    QiscusDeleteCommentHandler.handle(event);
+                    QiscusDeleteCommentHandler.handle(deletedCommentsData);
                 });
     }
 
