@@ -86,7 +86,7 @@ public enum QiscusCacheManager {
         if (notifItems != null) {
             int index = notifItems.indexOf(message);
             if (index >= 0) {
-                if (message.getMessage().equals(notifItems.get(index).getMessage())){
+                if (message.getMessage().equals(notifItems.get(index).getMessage())) {
                     return false;
                 }
 
