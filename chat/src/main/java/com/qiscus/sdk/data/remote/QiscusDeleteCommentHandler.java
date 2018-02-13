@@ -80,6 +80,13 @@ public final class QiscusDeleteCommentHandler {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
                             .getComment(-1, deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
+                        // Update chaining id and before id
+                        QiscusComment commentAfter = Qiscus.getDataStore().getCommentByBeforeId(qiscusComment.getId());
+                        if (commentAfter != null) {
+                            commentAfter.setCommentBeforeId(qiscusComment.getCommentBeforeId());
+                            Qiscus.getDataStore().addOrUpdate(commentAfter);
+                        }
+
                         Qiscus.getDataStore().delete(qiscusComment);
                         EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
                         QiscusPushNotificationUtil

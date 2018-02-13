@@ -719,6 +719,29 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public QiscusComment getCommentByBeforeId(long beforeId) {
+        String query = "SELECT * FROM "
+                    + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                    + QiscusDb.CommentTable.COLUMN_COMMENT_BEFORE_ID + " = '" + beforeId + "'";
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+
+        if (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            cursor.close();
+            return qiscusComment;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
+    @Override
     public List<QiscusComment> getComments(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "

@@ -47,6 +47,8 @@ public interface QiscusCommentStore {
 
     QiscusComment getComment(long id, String uniqueId);
 
+    QiscusComment getCommentByBeforeId(long beforeId);
+
     List<QiscusComment> getComments(long roomId);
 
     List<QiscusComment> getComments(long roomId, int limit);
