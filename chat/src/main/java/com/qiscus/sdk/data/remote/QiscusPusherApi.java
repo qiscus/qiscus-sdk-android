@@ -226,8 +226,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private void listenNotification() {
         QiscusLogger.print(TAG, "Listening notification...");
         try {
-            mqttAndroidClient.subscribe("notification/" + Qiscus.getAppId().toLowerCase()
-                    + "/" + qiscusAccount.getToken(), 2);
+            mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/n", 2);
         } catch (MqttException e) {
             //Do nothing
         } catch (NullPointerException | IllegalArgumentException e) {
