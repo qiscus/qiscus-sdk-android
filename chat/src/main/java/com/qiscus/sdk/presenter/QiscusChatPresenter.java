@@ -215,8 +215,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             return;
         }
 
+        String[] fileNameSplit = QiscusFileUtil.splitFileName(compressedFile.getName());
+        String fileName = fileNameSplit[0];
+
         QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),
-                compressedFile.getPath(), caption);
+                compressedFile.getPath(), caption, fileName);
         qiscusComment.setDownloading(true);
         view.onSendingComment(qiscusComment);
 
