@@ -451,7 +451,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 JSONArray commentUniqueIds = deletedCommentJson.optJSONArray("message_unique_ids");
                 int commentUniqueIdsSize = commentUniqueIds.length();
                 for (int j = 0; j < commentUniqueIdsSize; j++) {
-                    deletedComments.add(new QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment(roomId, commentUniqueIds.optString(j)));
+                    deletedComments.add(new QiscusDeleteCommentHandler.DeletedCommentsData
+                            .DeletedComment(roomId, commentUniqueIds.optString(j)));
                 }
             }
 
