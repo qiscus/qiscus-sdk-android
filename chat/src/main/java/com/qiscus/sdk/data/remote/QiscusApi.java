@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.local.QiscusEventCache;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -400,6 +401,22 @@ public enum QiscusApi {
                 });
     }
 
+    public Observable<List<JSONObject>> getEvents(long startEventId) {
+        return api.getEvents(Qiscus.getToken(), startEventId)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
+                .map(jsonEvent -> {
+                    try {
+                        return new JSONObject(jsonEvent.toString());
+                    } catch (JSONException e) {
+                        return null;
+                    }
+                })
+                .filter(jsonObject -> jsonObject != null)
+                .doOnNext(event -> QiscusEventCache.getInstance().setLastEventId(event.optLong("id")))
+                .doOnNext(QiscusPusherApi::handleNotification)
+                .toList();
+    }
+
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -509,15 +526,19 @@ public enum QiscusApi {
                                              @Field("room_unique_id[]") List<String> roomUniqueIds,
                                              @Field("show_participants") boolean showParticipants);
 
-        @DELETE("/api/v2/sdk/clear_room_messages")
+        @DELETE("/api/v2/mobile/clear_room_messages")
         Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
                                                       @Query("room_channel_ids[]") List<String> roomUniqueIds);
 
-        @DELETE("/api/v2/sdk/delete_messages")
+        @DELETE("/api/v2/mobile/delete_messages")
         Observable<JsonElement> deleteComments(@Query("token") String token,
                                                @Query("unique_ids[]") List<String> commentUniqueIds,
                                                @Query("is_delete_for_everyone") boolean isDeleteForEveryone,
                                                @Query("is_hard_delete") boolean isHardDelete);
+
+        @GET("/api/v2/mobile/sync_event")
+        Observable<JsonElement> getEvents(@Query("token") String token,
+                                          @Query("start_event_id") long startEventId);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
