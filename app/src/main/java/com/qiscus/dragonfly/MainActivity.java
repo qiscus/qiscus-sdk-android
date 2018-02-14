@@ -22,9 +22,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -33,13 +35,18 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
     private Button mLoginButton;
     private ProgressDialog mProgressDialog;
+    private TextView mVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mLoginButton = findViewById(R.id.bt_login);
+        mVersion = findViewById(R.id.tv_version);
         mLoginButton.setText(Qiscus.hasSetupUser() ? "Logout" : "Login");
+
+        String versionSDK = getString(R.string.qiscus_version) + " " + BuildConfig.VERSION_NAME;
+        mVersion.setText(versionSDK);
     }
 
     public void loginOrLogout(View view) {
