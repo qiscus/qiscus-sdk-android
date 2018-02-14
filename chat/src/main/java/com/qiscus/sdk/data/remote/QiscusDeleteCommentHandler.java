@@ -62,6 +62,8 @@ public final class QiscusDeleteCommentHandler {
                         qiscusComment.setMessage("This message has been deleted.");
                         qiscusComment.setRawType("text");
                         Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                        Qiscus.getDataStore().deleteLocalPath(qiscusComment.getId());
+
                         EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
                         QiscusPushNotificationUtil
                                 .handleDeletedCommentNotification(Qiscus.getApps(), qiscusComment, false);

@@ -590,6 +590,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } finally {
             sqLiteDatabase.endTransaction();
         }
+        deleteLocalPath(qiscusComment.getId());
     }
 
     @Override
