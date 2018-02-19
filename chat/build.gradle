@@ -135,7 +135,7 @@ dependencies {
 
     //Mqtt
     compile 'com.qiscus.mqtt:client:1.1.1'
-    compile 'com.qiscus.mqtt:android:1.1.1-q'
+    compile 'com.qiscus.mqtt:android:1.1.1-q1'
 
     //Push notification
     compile "com.google.firebase:firebase-core:${playServicesLibVersion}"
