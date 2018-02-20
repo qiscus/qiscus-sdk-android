@@ -63,6 +63,7 @@ public final class QiscusDeleteCommentHandler {
                         qiscusComment.setMessage("This message has been deleted.");
                         qiscusComment.setRawType("text");
 
+                        setRoomData(qiscusComment);
                         QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
                         qiscusComment.setRoomName(chatRoom.getName());
                         qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
@@ -92,10 +93,7 @@ public final class QiscusDeleteCommentHandler {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
                             .getComment(-1, deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
-                        QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
-                        qiscusComment.setRoomName(chatRoom.getName());
-                        qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
-                        qiscusComment.setGroupMessage(chatRoom.isGroup());
+                        setRoomData(qiscusComment);
                     }
 
                     return qiscusComment;
@@ -119,6 +117,15 @@ public final class QiscusDeleteCommentHandler {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {
                 }, QiscusErrorLogger::print);
+    }
+
+    private static void setRoomData(QiscusComment qiscusComment) {
+        QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+        if (chatRoom != null) {
+            qiscusComment.setRoomName(chatRoom.getName());
+            qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
+            qiscusComment.setGroupMessage(chatRoom.isGroup());
+        }
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
