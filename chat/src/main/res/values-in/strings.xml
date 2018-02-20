@@ -108,4 +108,11 @@
     <string name="qiscus_existing_contact">Tambah ke kontak</string>
     <string name="qiscus_location">Lokasi</string>
     <string name="qiscus_message_too_far">Maaf, pesan terlalu jauh untuk dimuat!</string>
+    <plurals name="qiscus_delete_comments_confirmation">
+        <item quantity="one">Hapus pesan?</item>
+        <item quantity="other">Hapus %d pesan?</item>
+    </plurals>
+    <string name="qiscus_delete_for_me">Hapus untuk ku</string>
+    <string name="qiscus_delete_for_everyone">Hapus untuk semua orang</string>
+    <string name="failed_to_delete_messages">Gagal menghapus pesan</string>
 </resources>

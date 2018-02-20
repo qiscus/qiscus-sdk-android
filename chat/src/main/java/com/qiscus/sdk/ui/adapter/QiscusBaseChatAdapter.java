@@ -289,9 +289,11 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     public void addOrUpdate(E e) {
         int i = findPosition(e);
         if (i >= 0) {
-            e.setSelected(data.get(i).isSelected());
-            data.updateItemAt(i, e);
-            notifyItemChanged(i);
+            if (!e.areContentsTheSame(data.get(i))) {
+                e.setSelected(data.get(i).isSelected());
+                data.updateItemAt(i, e);
+                notifyItemChanged(i);
+            }
         } else {
             add(e);
         }
@@ -301,10 +303,32 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         for (E e : es) {
             int i = findPosition(e);
             if (i >= 0) {
-                e.setSelected(data.get(i).isSelected());
-                data.updateItemAt(i, e);
+                if (!e.areContentsTheSame(data.get(i))) {
+                    e.setSelected(data.get(i).isSelected());
+                    data.updateItemAt(i, e);
+                }
             } else {
                 data.add(e);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    public void update(E e) {
+        int i = findPosition(e);
+        if (i >= 0 && !e.areContentsTheSame(data.get(i))) {
+            e.setSelected(data.get(i).isSelected());
+            data.updateItemAt(i, e);
+            notifyItemChanged(i);
+        }
+    }
+
+    public void update(final List<E> es) {
+        for (E e : es) {
+            int i = findPosition(e);
+            if (i >= 0 && !e.areContentsTheSame(data.get(i))) {
+                e.setSelected(data.get(i).isSelected());
+                data.updateItemAt(i, e);
             }
         }
         notifyDataSetChanged();
@@ -469,5 +493,16 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         for (int i = 0; i < size; i++) {
             data.get(i).destroy();
         }
+    }
+
+    public void clearCommentsBefore(long timestamp) {
+        int size = data.size();
+        for (int i = size - 1; i >= 0; i--) {
+            if (data.get(i).getTime().getTime() <= timestamp) {
+                data.get(i).destroy();
+                data.removeItemAt(i);
+            }
+        }
+        notifyDataSetChanged();
     }
 }
