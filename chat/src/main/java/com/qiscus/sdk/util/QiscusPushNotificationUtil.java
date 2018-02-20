@@ -182,32 +182,35 @@ public final class QiscusPushNotificationUtil {
                 break;
         }
 
+        QiscusPushNotificationMessage pushNotificationMessage =
+                new QiscusPushNotificationMessage(comment.getId(), messageText);
+        pushNotificationMessage.setRoomName(comment.getRoomName());
+        pushNotificationMessage.setRoomAvatar(comment.getRoomAvatar());
         if (!QiscusCacheManager.getInstance()
-                .addMessageNotifItem(new QiscusPushNotificationMessage(comment.getId(), messageText), comment.getRoomId())) {
+                .addMessageNotifItem(pushNotificationMessage, comment.getRoomId())) {
             return;
         }
 
-        String finalMessageText = messageText;
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
-            QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, comment, finalMessageText));
+            QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, comment, pushNotificationMessage));
         } else {
-            pushNotification(context, comment, finalMessageText,
+            pushNotification(context, comment, pushNotificationMessage,
                     BitmapFactory.decodeResource(context.getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
         }
     }
 
-    private static void loadAvatar(Context context, QiscusComment comment, String finalMessageText) {
+    private static void loadAvatar(Context context, QiscusComment comment, QiscusPushNotificationMessage pushNotificationMessage) {
         Nirmana.getInstance().get()
-                .load(comment.getRoomAvatar())
+                .load(pushNotificationMessage.getRoomAvatar())
                 .asBitmap()
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         QiscusAndroidUtil.runOnBackgroundThread(() -> {
                             try {
-                                pushNotification(context, comment, finalMessageText, QiscusImageUtil.getCircularBitmap(resource));
+                                pushNotification(context, comment, pushNotificationMessage, QiscusImageUtil.getCircularBitmap(resource));
                             } catch (Exception e) {
-                                pushNotification(context, comment, finalMessageText,
+                                pushNotification(context, comment, pushNotificationMessage,
                                         BitmapFactory.decodeResource(context.getResources(),
                                                 Qiscus.getChatConfig().getNotificationBigIcon()));
                             }
@@ -217,14 +220,15 @@ public final class QiscusPushNotificationUtil {
                     @Override
                     public void onLoadFailed(Exception e, Drawable errorDrawable) {
                         super.onLoadFailed(e, errorDrawable);
-                        QiscusAndroidUtil.runOnBackgroundThread(() -> pushNotification(context, comment, finalMessageText,
+                        QiscusAndroidUtil.runOnBackgroundThread(() -> pushNotification(context, comment, pushNotificationMessage,
                                 BitmapFactory.decodeResource(context.getResources(),
                                         Qiscus.getChatConfig().getNotificationBigIcon())));
                     }
                 });
     }
 
-    private static void pushNotification(Context context, QiscusComment comment, String messageText, Bitmap largeIcon) {
+    private static void pushNotification(Context context, QiscusComment comment,
+                                         QiscusPushNotificationMessage pushNotificationMessage, Bitmap largeIcon) {
 
         String notificationChannelId = Qiscus.getApps().getPackageName() + ".qiscus.sdk.notification.channel";
         if (BuildVersionUtil.isOreoOrHigher()) {
@@ -243,10 +247,10 @@ public final class QiscusPushNotificationUtil {
                 openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelId);
-        notificationBuilder.setContentTitle(Qiscus.getChatConfig().getNotificationTitleHandler().getTitle(comment))
+        notificationBuilder.setContentTitle(pushNotificationMessage.getRoomName())
                 .setContentIntent(pendingIntent)
-                .setContentText(messageText)
-                .setTicker(messageText)
+                .setContentText(pushNotificationMessage.getMessage())
+                .setTicker(pushNotificationMessage.getMessage())
                 .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
                 .setLargeIcon(largeIcon)
                 .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
@@ -256,7 +260,7 @@ public final class QiscusPushNotificationUtil {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         if (Qiscus.getChatConfig().isEnableReplyNotification() && isNougatOrHigher()) {
-            String getRepliedTo = comment.getRoomName();
+            String getRepliedTo = pushNotificationMessage.getRoomName();
             RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
                     .setLabel(QiscusTextUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
                     .build();
@@ -344,7 +348,7 @@ public final class QiscusPushNotificationUtil {
             NotificationManagerCompat.from(context).cancel(QiscusNumberUtil.convertToInt(qiscusComment.getRoomId()));
             return;
         }
-        String lastMessage = items.get(items.size() - 1).getMessage();
+        QiscusPushNotificationMessage lastMessage = items.get(items.size() - 1);
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
             QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, qiscusComment, lastMessage));
         } else {

@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.remote;
 import android.support.annotation.RestrictTo;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
@@ -64,6 +65,10 @@ public final class QiscusDeleteCommentHandler {
                         Qiscus.getDataStore().addOrUpdate(qiscusComment);
                         Qiscus.getDataStore().deleteLocalPath(qiscusComment.getId());
 
+                        QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+                        qiscusComment.setRoomName(chatRoom.getName());
+                        qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
+
                         EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
                         QiscusPushNotificationUtil
                                 .handleDeletedCommentNotification(Qiscus.getApps(), qiscusComment, false);
@@ -88,6 +93,10 @@ public final class QiscusDeleteCommentHandler {
                             commentAfter.setCommentBeforeId(qiscusComment.getCommentBeforeId());
                             Qiscus.getDataStore().addOrUpdate(commentAfter);
                         }
+
+                        QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+                        qiscusComment.setRoomName(chatRoom.getName());
+                        qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
 
                         Qiscus.getDataStore().delete(qiscusComment);
                         EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));

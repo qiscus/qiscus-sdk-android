@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.local;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -88,6 +89,11 @@ public enum QiscusCacheManager {
             if (index >= 0) {
                 if (message.getMessage().equals(notifItems.get(index).getMessage())) {
                     return false;
+                }
+
+                if (TextUtils.isEmpty(message.getRoomName()) && !TextUtils.isEmpty(notifItems.get(index).getRoomName())) {
+                    message.setRoomName(notifItems.get(index).getRoomName());
+                    message.setRoomAvatar(notifItems.get(index).getRoomAvatar());
                 }
 
                 notifItems.set(index, message);
