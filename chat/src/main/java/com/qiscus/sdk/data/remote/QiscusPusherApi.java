@@ -378,11 +378,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             if (qiscusComment == null) {
                 return;
             }
-            if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
-                setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-            }
-            QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
-            EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
+            handleReceivedComment(qiscusComment);
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
@@ -428,6 +424,25 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 EventBus.getDefault().post(event);
             }
         }
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static void handleReceivedComment(QiscusComment qiscusComment) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qiscusComment));
+    }
+
+    private static void handleComment(QiscusComment qiscusComment) {
+        QiscusComment savedComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
+            return;
+        }
+
+        if (!qiscusComment.isMyComment()) {
+            QiscusPusherApi.getInstance().setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
+        }
+
+        QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
+        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment)));
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)

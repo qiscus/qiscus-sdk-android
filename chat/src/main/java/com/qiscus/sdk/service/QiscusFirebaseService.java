@@ -21,11 +21,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
-import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
@@ -69,13 +65,7 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
         if (qiscusComment == null) {
             return;
         }
-        if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
-            QiscusPusherApi.getInstance()
-                    .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-        }
-        QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
-        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault()
-                .post(new QiscusCommentReceivedEvent(qiscusComment)));
+        QiscusPusherApi.handleReceivedComment(qiscusComment);
     }
 
     private static void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {

@@ -27,13 +27,11 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusSyncEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusLogger;
-import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -105,12 +103,18 @@ public class QiscusSyncService extends Service {
     private void syncComments() {
         QiscusApi.getInstance().sync()
                 .doOnNext(qiscusComment -> {
+                    QiscusComment savedQiscusComment = Qiscus.getDataStore()
+                            .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+
+                    if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
+                        return;
+                    }
+
                     if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
                         QiscusPusherApi.getInstance()
                                 .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
                     }
-                    QiscusComment savedQiscusComment = Qiscus.getDataStore()
-                            .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+
                     if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
                         qiscusComment.setState(savedQiscusComment.getState());
                     }
@@ -125,10 +129,7 @@ public class QiscusSyncService extends Service {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(qiscusComment -> {
-                    QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
-                    EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment));
-                }, throwable -> {
+                .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
                     QiscusLogger.print("Sync failed...");
