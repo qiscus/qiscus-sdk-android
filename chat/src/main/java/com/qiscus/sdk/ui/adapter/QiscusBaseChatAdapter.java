@@ -494,4 +494,15 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             data.get(i).destroy();
         }
     }
+
+    public void clearCommentsBefore(long timestamp) {
+        int size = data.size();
+        for (int i = size - 1; i >= 0; i--) {
+            if (data.get(i).getTime().getTime() <= timestamp) {
+                data.get(i).destroy();
+                data.removeItemAt(i);
+            }
+        }
+        notifyDataSetChanged();
+    }
 }

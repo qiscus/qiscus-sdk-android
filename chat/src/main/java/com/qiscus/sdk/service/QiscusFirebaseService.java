@@ -54,6 +54,8 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
                         handlePostCommentEvent(remoteMessage);
                     } else if (remoteMessage.getData().get("qiscus_sdk").equals("delete_message")) {
                         handleDeleteCommentsEvent(remoteMessage);
+                    } else if (remoteMessage.getData().get("qiscus_sdk").equals("clear_room")) {
+                        handleClearComments(remoteMessage);
                     }
                 }
             }
@@ -77,6 +79,14 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
     }
 
     private static void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {
+        try {
+            QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void handleClearComments(RemoteMessage remoteMessage) {
         try {
             QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
         } catch (Exception e) {

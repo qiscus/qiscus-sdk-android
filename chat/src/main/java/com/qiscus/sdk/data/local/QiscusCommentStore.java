@@ -39,7 +39,9 @@ public interface QiscusCommentStore {
 
     void delete(QiscusComment qiscusComment);
 
-    void deleteCommentsByRoomId(long roomId);
+    boolean deleteCommentsByRoomId(long roomId);
+
+    boolean deleteCommentsByRoomId(long roomId, long timestampOffset);
 
     void updateLastDeliveredComment(long roomId, long commentId);
 
@@ -52,6 +54,8 @@ public interface QiscusCommentStore {
     List<QiscusComment> getComments(long roomId);
 
     List<QiscusComment> getComments(long roomId, int limit);
+
+    List<QiscusComment> getComments(long roomId, long timestampOffset);
 
     Observable<List<QiscusComment>> getObservableComments(long roomId);
 

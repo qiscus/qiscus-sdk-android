@@ -30,6 +30,7 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -362,7 +363,12 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .doOnNext(json -> Qiscus.getDataStore().deleteCommentsByRoomId(json.get("id").getAsInt()))
+                .doOnNext(json -> {
+                    long roomId = json.get("id").getAsLong();
+                    if (Qiscus.getDataStore().deleteCommentsByRoomId(roomId)) {
+                        EventBus.getDefault().post(new QiscusClearCommentsEvent(roomId));
+                    }
+                })
                 .toList()
                 .map(qiscusChatRooms -> null);
     }

@@ -32,6 +32,7 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
@@ -569,6 +570,17 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
     }
 
+    @Subscribe
+    public void handleClearCommentsEvent(QiscusClearCommentsEvent event) {
+        if (event.getRoomId() == room.getId()) {
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.clearCommentsBefore(event.getTimestamp());
+                }
+            });
+        }
+    }
+
     private void onGotNewComment(QiscusComment qiscusComment) {
         if (qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
             QiscusAndroidUtil.runOnBackgroundThread(() -> commentSuccess(qiscusComment));
@@ -865,5 +877,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void onRealtimeStatusChanged(boolean connected);
 
         void onLoadCommentsError(Throwable throwable);
+
+        void clearCommentsBefore(long timestamp);
     }
 }

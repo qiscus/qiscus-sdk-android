@@ -462,6 +462,31 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             deletedCommentsData.setDeletedComments(deletedComments);
 
             QiscusDeleteCommentHandler.handle(deletedCommentsData);
+        } else if (jsonObject.optString("action_topic").equals("clear_room")) {
+            JSONObject payload = jsonObject.optJSONObject("payload");
+
+            JSONObject actorJson = payload.optJSONObject("actor");
+            QiscusRoomMember actor = new QiscusRoomMember();
+            actor.setEmail(actorJson.optString("email"));
+            actor.setUsername(actorJson.optString("name"));
+
+            List<Long> roomIds = new ArrayList<>();
+            JSONObject dataJson = payload.optJSONObject("data");
+            JSONArray clearedRoomsJson = dataJson.optJSONArray("deleted_rooms");
+            int clearedRoomsJsonSize = clearedRoomsJson.length();
+            for (int i = 0; i < clearedRoomsJsonSize; i++) {
+                JSONObject clearedRoomJson = clearedRoomsJson.optJSONObject(i);
+                roomIds.add(clearedRoomJson.optLong("id"));
+            }
+
+            QiscusClearCommentsHandler.ClearCommentsData clearCommentsData
+                    = new QiscusClearCommentsHandler.ClearCommentsData();
+            //id is nano timestamp, convert it to milliseconds by divide it
+            clearCommentsData.setTimestamp(jsonObject.optLong("id") / 1000000L);
+            clearCommentsData.setActor(actor);
+            clearCommentsData.setRoomIds(roomIds);
+
+            QiscusClearCommentsHandler.handle(clearCommentsData);
         }
     }
 

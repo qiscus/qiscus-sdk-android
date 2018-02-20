@@ -1849,6 +1849,21 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     /**
+     * will delete all comments on adapter that have timestamp before or same with {@code timestamp}
+     */
+    @Override
+    public void clearCommentsBefore(long timestamp) {
+        chatAdapter.clearCommentsBefore(timestamp);
+        if (chatAdapter.isEmpty()) {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.VISIBLE);
+            }
+        } else if (emptyChatHolder != null) {
+            emptyChatHolder.setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * Callback when an error happening while load comments
      *
      * @param throwable the error

@@ -594,14 +594,20 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void deleteCommentsByRoomId(long roomId) {
-        sqLiteDatabase.beginTransaction();
+    public boolean deleteCommentsByRoomId(long roomId) {
         List<QiscusComment> comments = getComments(roomId);
+
+        if (comments.isEmpty()) {
+            return false;
+        }
+
+        for (QiscusComment comment : comments) {
+            deleteLocalPath(comment.getId());
+        }
+
         String where = QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId;
+        sqLiteDatabase.beginTransaction();
         try {
-            for (QiscusComment comment : comments) {
-                deleteLocalPath(comment.getId());
-            }
             sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
@@ -609,6 +615,36 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } finally {
             sqLiteDatabase.endTransaction();
         }
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteCommentsByRoomId(long roomId, long timestampOffset) {
+        List<QiscusComment> comments = getComments(roomId, timestampOffset);
+
+        if (comments.isEmpty()) {
+            return false;
+        }
+
+        for (QiscusComment comment : comments) {
+            deleteLocalPath(comment.getId());
+        }
+
+        String where = QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + timestampOffset;
+
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+
+        return true;
     }
 
     @Override
@@ -722,8 +758,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public QiscusComment getCommentByBeforeId(long beforeId) {
         String query = "SELECT * FROM "
-                    + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                    + QiscusDb.CommentTable.COLUMN_COMMENT_BEFORE_ID + " = '" + beforeId + "'";
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_COMMENT_BEFORE_ID + " = '" + beforeId + "'";
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 
@@ -770,6 +806,28 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + limit;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
+        }
+        cursor.close();
+        return qiscusComments;
+    }
+
+    @Override
+    public List<QiscusComment> getComments(long roomId, long timestampOffset) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + timestampOffset
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
