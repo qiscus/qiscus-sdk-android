@@ -804,20 +804,20 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         });
     }
 
-    public void deleteCommentsForMe(List<QiscusComment> comments) {
-        deleteComments(comments, false);
+    public void deleteCommentsForMe(List<QiscusComment> comments, boolean hardDelete) {
+        deleteComments(comments, false, hardDelete);
     }
 
-    public void deleteCommentsForEveryone(List<QiscusComment> comments) {
-        deleteComments(comments, true);
+    public void deleteCommentsForEveryone(List<QiscusComment> comments, boolean hardDelete) {
+        deleteComments(comments, true, hardDelete);
     }
 
-    private void deleteComments(List<QiscusComment> comments, boolean forEveryone) {
+    private void deleteComments(List<QiscusComment> comments, boolean forEveryone, boolean hardDelete) {
         view.showDeleteLoading();
         Observable.from(comments)
                 .map(QiscusComment::getUniqueId)
                 .toList()
-                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteComments(uniqueIds, forEveryone, false))
+                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteComments(uniqueIds, forEveryone, hardDelete))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())

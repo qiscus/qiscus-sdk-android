@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -43,6 +42,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -246,9 +246,15 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                 actionMode.getMenu().findItem(R.id.action_copy).setVisible(false);
             }
 
-            actionMode.getMenu()
-                    .findItem(R.id.action_delete)
-                    .setVisible(deleteable(selectedComments));
+            if (chatConfig.getDeleteCommentConfig().isEnableDeleteComment()) {
+                actionMode.getMenu()
+                        .findItem(R.id.action_delete)
+                        .setVisible(deleteable(selectedComments));
+            } else {
+                actionMode.getMenu()
+                        .findItem(R.id.action_delete)
+                        .setVisible(false);
+            }
         }
     }
 
@@ -436,11 +442,11 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         AlertDialog alertDialog = alertDialogBuilder.create();
 
         alertDialog.setOnShowListener(dialog -> {
-            @ColorInt int accent = ContextCompat.getColor(this, chatConfig.getAccentColor());
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(accent);
-            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(accent);
+            QiscusDeleteCommentConfig deleteConfig = chatConfig.getDeleteCommentConfig();
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(deleteConfig.getDeleteForMeButtonColor());
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(deleteConfig.getCancelButtonColor());
             if (ableToDeleteForEveryone) {
-                alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(accent);
+                alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(deleteConfig.getDeleteForEveryoneButtonColor());
             }
         });
 

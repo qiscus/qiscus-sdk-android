@@ -1874,11 +1874,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     public void deleteCommentsForMe(List<QiscusComment> selectedComments) {
-        qiscusChatPresenter.deleteCommentsForMe(selectedComments);
+        qiscusChatPresenter.deleteCommentsForMe(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
     }
 
     public void deleteCommentsForEveryone(List<QiscusComment> selectedComments) {
-        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments);
+        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
     }
 
     public interface CommentSelectedListener {
