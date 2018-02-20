@@ -62,6 +62,7 @@ public final class QiscusDeleteCommentHandler {
                     if (qiscusComment != null) {
                         qiscusComment.setMessage("This message has been deleted.");
                         qiscusComment.setRawType("text");
+                        qiscusComment.setDeleted(true);
 
                         setRoomData(qiscusComment);
                         QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
