@@ -56,57 +56,66 @@ public final class QiscusDeleteCommentHandler {
 
     private static void handleSoftDelete(DeletedCommentsData deletedCommentsData) {
         Observable.from(deletedCommentsData.getDeletedComments())
-                .doOnNext(deletedComment -> {
+                .map(deletedComment -> {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
                             .getComment(-1, deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
                         qiscusComment.setMessage("This message has been deleted.");
                         qiscusComment.setRawType("text");
-                        Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                        Qiscus.getDataStore().deleteLocalPath(qiscusComment.getId());
 
                         QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
                         qiscusComment.setRoomName(chatRoom.getName());
                         qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
-
-                        EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
-                        QiscusPushNotificationUtil
-                                .handleDeletedCommentNotification(Qiscus.getApps(), qiscusComment, false);
                     }
-
+                    return qiscusComment;
                 })
+                .filter(qiscusComment -> qiscusComment != null)
+                .doOnNext(qiscusComment -> {
+                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                    Qiscus.getDataStore().deleteLocalPath(qiscusComment.getId());
+
+                    EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
+                })
+                .toList()
+                .doOnNext(comments -> QiscusPushNotificationUtil
+                        .handleDeletedCommentNotification(Qiscus.getApps(), comments, false))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(deletedComment -> {
+                .subscribe(comments -> {
                 }, QiscusErrorLogger::print);
     }
 
     private static void handleHardDelete(DeletedCommentsData deletedCommentsData) {
         Observable.from(deletedCommentsData.getDeletedComments())
-                .doOnNext(deletedComment -> {
+                .map(deletedComment -> {
                     QiscusComment qiscusComment = Qiscus.getDataStore()
                             .getComment(-1, deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
-                        // Update chaining id and before id
-                        QiscusComment commentAfter = Qiscus.getDataStore().getCommentByBeforeId(qiscusComment.getId());
-                        if (commentAfter != null) {
-                            commentAfter.setCommentBeforeId(qiscusComment.getCommentBeforeId());
-                            Qiscus.getDataStore().addOrUpdate(commentAfter);
-                        }
-
                         QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
                         qiscusComment.setRoomName(chatRoom.getName());
                         qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
-
-                        Qiscus.getDataStore().delete(qiscusComment);
-                        EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
-                        QiscusPushNotificationUtil
-                                .handleDeletedCommentNotification(Qiscus.getApps(), qiscusComment, true);
                     }
+
+                    return qiscusComment;
                 })
+                .filter(qiscusComment -> qiscusComment != null)
+                .doOnNext(qiscusComment -> {
+                    // Update chaining id and before id
+                    QiscusComment commentAfter = Qiscus.getDataStore().getCommentByBeforeId(qiscusComment.getId());
+                    if (commentAfter != null) {
+                        commentAfter.setCommentBeforeId(qiscusComment.getCommentBeforeId());
+                        Qiscus.getDataStore().addOrUpdate(commentAfter);
+                    }
+
+                    Qiscus.getDataStore().delete(qiscusComment);
+                    EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
+                })
+                .toList()
+                .doOnNext(comments -> QiscusPushNotificationUtil
+                        .handleDeletedCommentNotification(Qiscus.getApps(), comments, true))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(deletedComment -> {
+                .subscribe(comments -> {
                 }, QiscusErrorLogger::print);
     }
 

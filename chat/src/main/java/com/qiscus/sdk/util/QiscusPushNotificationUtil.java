@@ -73,8 +73,8 @@ public final class QiscusPushNotificationUtil {
         QiscusAndroidUtil.runOnBackgroundThread(() -> handlePN(context, qiscusComment));
     }
 
-    public static void handleDeletedCommentNotification(Context context, QiscusComment qiscusComment, boolean hardDelete) {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> handleDeletedComment(context, qiscusComment, hardDelete));
+    public static void handleDeletedCommentNotification(Context context, List<QiscusComment> comments, boolean hardDelete) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleDeletedComment(context, comments, hardDelete));
     }
 
     private static void handlePN(Context context, QiscusComment qiscusComment) {
@@ -310,16 +310,34 @@ public final class QiscusPushNotificationUtil {
                 .notify(QiscusNumberUtil.convertToInt(comment.getRoomId()), notificationBuilder.build()));
     }
 
-    private static void handleDeletedComment(Context context, QiscusComment qiscusComment, boolean hardDelete) {
+    private static void handleDeletedComment(Context context, List<QiscusComment> comments, boolean hardDelete) {
+        if (comments == null || comments.isEmpty()) {
+            return;
+        }
+
+        QiscusComment qiscusComment = comments.get(comments.size() - 1);
+
         if (hardDelete) {
-            boolean removeItem = QiscusCacheManager.getInstance()
-                    .removeMessageNotifItem(new QiscusPushNotificationMessage(qiscusComment), qiscusComment.getRoomId());
+            boolean removeItem = false;
+            for (QiscusComment comment : comments) {
+                if (QiscusCacheManager.getInstance()
+                        .removeMessageNotifItem(new QiscusPushNotificationMessage(comment), comment.getRoomId())) {
+                    removeItem = true;
+                }
+            }
+
             if (removeItem) {
                 updateNotification(context, qiscusComment);
             }
         } else {
-            boolean updateItem = QiscusCacheManager.getInstance()
-                    .updateMessageNotifItem(new QiscusPushNotificationMessage(qiscusComment), qiscusComment.getRoomId());
+            boolean updateItem = false;
+            for (QiscusComment comment : comments) {
+                if (QiscusCacheManager.getInstance()
+                        .updateMessageNotifItem(new QiscusPushNotificationMessage(comment), comment.getRoomId())) {
+                    updateItem = true;
+                }
+            }
+
             if (updateItem) {
                 updateNotification(context, qiscusComment);
             }
@@ -344,10 +362,11 @@ public final class QiscusPushNotificationUtil {
         List<QiscusPushNotificationMessage> items = QiscusCacheManager.getInstance()
                 .getMessageNotifItems(qiscusComment.getRoomId());
 
-        if (items.isEmpty()) {
-            NotificationManagerCompat.from(context).cancel(QiscusNumberUtil.convertToInt(qiscusComment.getRoomId()));
+        if (items == null || items.isEmpty()) {
+            QiscusAndroidUtil.runOnUIThread(() -> clearPushNotification(context, qiscusComment.getRoomId()));
             return;
         }
+
         QiscusPushNotificationMessage lastMessage = items.get(items.size() - 1);
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
             QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, qiscusComment, lastMessage));

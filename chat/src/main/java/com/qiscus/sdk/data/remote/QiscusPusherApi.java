@@ -432,7 +432,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static void handleNotification(JSONObject jsonObject) {
-        QiscusEventCache.getInstance().setLastEventId(jsonObject.optLong("id"));
+        long eventId = jsonObject.optLong("id");
+        if (eventId <= QiscusEventCache.getInstance().getLastEventId()) {
+            return;
+        }
+
+        QiscusEventCache.getInstance().setLastEventId(eventId);
 
         if (jsonObject.optString("action_topic").equals("delete_message")) {
             JSONObject payload = jsonObject.optJSONObject("payload");
