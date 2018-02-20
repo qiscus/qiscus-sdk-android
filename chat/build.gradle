@@ -19,6 +19,10 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.github.dcendents.android-maven'
 apply from: rootProject.file('gradle/quality.gradle')
 
+def versionMajor = 2
+def versionMinor = 21
+def versionPatch = 1
+
 ext {
     bintrayRepo = 'maven'
     bintrayName = 'chat'
@@ -32,7 +36,7 @@ ext {
     siteUrl = 'https://github.com/qiscus/qiscus-sdk-android'
     gitUrl = 'https://github.com/qiscus/qiscus-sdk-android.git'
 
-    libraryVersion = '2.21.0'
+    libraryVersion = "${versionMajor}.${versionMinor}.${versionPatch}"
 
     developerId = 'qiscustech'
     developerName = 'Qiscus Tech'
@@ -55,7 +59,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0"
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
     buildTypes {
         release {
@@ -131,7 +135,7 @@ dependencies {
 
     //Mqtt
     compile 'com.qiscus.mqtt:client:1.1.1'
-    compile 'com.qiscus.mqtt:android:1.1.1-q'
+    compile 'com.qiscus.mqtt:android:1.1.1-q1'
 
     //Push notification
     compile "com.google.firebase:firebase-core:${playServicesLibVersion}"

@@ -100,6 +100,7 @@ public class QiscusComment implements Parcelable {
 
     private QiscusComment replyTo;
     private String caption;
+    private String attachmentName;
 
     public static QiscusComment generateMessage(long roomId, String content) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
@@ -121,12 +122,14 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
-    public static QiscusComment generateFileAttachmentMessage(long roomId, String fileUrl, String caption) {
+    public static QiscusComment generateFileAttachmentMessage(long roomId, String fileUrl, String caption, String name) {
         QiscusComment qiscusComment = generateMessage(roomId, String.format("[file] %s [/file]", fileUrl));
         qiscusComment.setRawType("file_attachment");
         JSONObject json = new JSONObject();
         try {
-            json.put("url", fileUrl).put("caption", caption);
+            json.put("url", fileUrl)
+                    .put("caption", caption)
+                    .put("file_name", name);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -481,19 +484,35 @@ public class QiscusComment implements Parcelable {
             throw new RuntimeException("Current comment is not an attachment");
         }
 
-        int fileNameEndIndex = message.lastIndexOf(" [/file]");
-        int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
+        if (attachmentName == null) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                attachmentName = payload.optString("file_name", "");
+            } catch (Exception ignored) {
+                //Do nothing
+            }
 
-        String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
-        try {
-            fileName = fileName.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
-            fileName = fileName.replaceAll("\\+", "%2B");
-            return URLDecoder.decode(fileName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            if (!TextUtils.isEmpty(attachmentName)) {
+                return attachmentName;
+            }
+
+            int fileNameEndIndex = message.lastIndexOf(" [/file]");
+            int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
+
+            String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
+            try {
+                fileName = fileName.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+                fileName = fileName.replaceAll("\\+", "%2B");
+                attachmentName = URLDecoder.decode(fileName, "UTF-8");
+                return attachmentName;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            throw new RuntimeException("The filename '" + fileName + "' is not valid UTF-8");
         }
 
-        throw new RuntimeException("The filename '" + fileName + "' is not valid UTF-8");
+        return attachmentName;
     }
 
     public String getExtension() {

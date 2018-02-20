@@ -16,7 +16,6 @@
 
 package com.qiscus.sdk.presenter;
 
-import android.net.Uri;
 import android.support.v4.util.Pair;
 import android.webkit.MimeTypeMap;
 
@@ -203,13 +202,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         File compressedFile = file;
         if (QiscusImageUtil.isImage(file) && !file.getName().endsWith(".gif")) {
             try {
-                compressedFile = QiscusImageUtil.compressImage(Uri.fromFile(file), room.getId());
+                compressedFile = QiscusImageUtil.compressImage(file);
             } catch (NullPointerException e) {
                 view.showError(QiscusTextUtil.getString(R.string.qiscus_corrupted_file));
                 return;
             }
         } else {
-            compressedFile = QiscusFileUtil.saveFile(compressedFile, room.getId());
+            compressedFile = QiscusFileUtil.saveFile(compressedFile);
         }
 
         if (!file.exists()) { //File have been removed, so we can not upload it anymore
@@ -218,7 +217,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),
-                compressedFile.getPath(), caption);
+                compressedFile.getPath(), caption, file.getName());
         qiscusComment.setDownloading(true);
         view.onSendingComment(qiscusComment);
 
@@ -588,24 +587,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             roomEventHandler.onGotComment(qiscusComment);
         }
 
-        if (qiscusComment.isAttachment()) {
-            QiscusAndroidUtil.runOnBackgroundThread(() -> {
-                String path = QiscusFileUtil.generateFilePath(qiscusComment.getAttachmentName(), qiscusComment.getRoomId());
-                boolean exist = QiscusFileUtil.isContains(path);
-                if (!exist) {
-                    String message = qiscusComment.getMessage();
-                    int fileNameEndIndex = message.lastIndexOf(" [/file]");
-                    int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
-                    String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
-                    path = QiscusFileUtil.generateFilePath(fileName, qiscusComment.getRoomId());
-                    exist = QiscusFileUtil.isContains(path);
-                }
-                if (exist) {
-                    Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getRoomId(), qiscusComment.getId(), path);
-                }
-            });
-        }
-
         if (qiscusComment.getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnBackgroundThread(() -> {
                 if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())
@@ -626,8 +607,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (file == null) {
             qiscusComment.setDownloading(true);
             QiscusApi.getInstance()
-                    .downloadFile(qiscusComment.getRoomId(), qiscusComment.getAttachmentUri().toString(),
-                            qiscusComment.getAttachmentName(), percentage -> qiscusComment.setProgress((int) percentage))
+                    .downloadFile(qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
+                            percentage -> qiscusComment.setProgress((int) percentage))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
