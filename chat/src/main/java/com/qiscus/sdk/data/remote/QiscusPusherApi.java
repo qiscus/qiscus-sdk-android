@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.local.QiscusEventCache;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -431,6 +432,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static void handleNotification(JSONObject jsonObject) {
+        QiscusEventCache.getInstance().setLastEventId(jsonObject.optLong("id"));
+
         if (jsonObject.optString("action_topic").equals("delete_message")) {
             JSONObject payload = jsonObject.optJSONObject("payload");
 

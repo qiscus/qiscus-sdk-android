@@ -24,7 +24,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusEventCache;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -418,7 +417,6 @@ public enum QiscusApi {
                     }
                 })
                 .filter(jsonObject -> jsonObject != null)
-                .doOnNext(event -> QiscusEventCache.getInstance().setLastEventId(event.optLong("id")))
                 .doOnNext(QiscusPusherApi::handleNotification)
                 .toList();
     }
