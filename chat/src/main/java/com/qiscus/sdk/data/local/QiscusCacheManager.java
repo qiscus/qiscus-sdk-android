@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.local;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -79,6 +80,42 @@ public enum QiscusCacheManager {
         String json = sharedPreferences.getString("push_notif_message_" + roomId, "");
         return gson.fromJson(json, new TypeToken<List<QiscusPushNotificationMessage>>() {
         }.getType());
+    }
+
+    public boolean updateMessageNotifItem(QiscusPushNotificationMessage message, long roomId) {
+        List<QiscusPushNotificationMessage> notifItems = getMessageNotifItems(roomId);
+        if (notifItems != null) {
+            int index = notifItems.indexOf(message);
+            if (index >= 0) {
+                if (message.getMessage().equals(notifItems.get(index).getMessage())) {
+                    return false;
+                }
+
+                if (TextUtils.isEmpty(message.getRoomName()) && !TextUtils.isEmpty(notifItems.get(index).getRoomName())) {
+                    message.setRoomName(notifItems.get(index).getRoomName());
+                    message.setRoomAvatar(notifItems.get(index).getRoomAvatar());
+                }
+
+                notifItems.set(index, message);
+                sharedPreferences.edit()
+                        .putString("push_notif_message_" + roomId, gson.toJson(notifItems))
+                        .apply();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeMessageNotifItem(QiscusPushNotificationMessage message, long roomId) {
+        List<QiscusPushNotificationMessage> notifItems = getMessageNotifItems(roomId);
+        if (notifItems != null) {
+            boolean deleted = notifItems.remove(message);
+            sharedPreferences.edit()
+                    .putString("push_notif_message_" + roomId, gson.toJson(notifItems))
+                    .apply();
+            return deleted;
+        }
+        return false;
     }
 
     public void clearMessageNotifItems(long roomId) {

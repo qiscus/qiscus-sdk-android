@@ -16,4 +16,5 @@
 
 <resources>
     <string name="app_name" translatable="false">DragonFly</string>
+    <string name="qiscus_version">Qiscus SDK version</string>
 </resources>

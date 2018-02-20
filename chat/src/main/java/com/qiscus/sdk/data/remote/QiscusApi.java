@@ -28,6 +28,8 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusNonce;
+import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -43,6 +45,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -359,9 +362,63 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .doOnNext(json -> Qiscus.getDataStore().deleteCommentsByRoomId(json.get("id").getAsInt()))
+                .doOnNext(json -> {
+                    long roomId = json.get("id").getAsLong();
+                    if (Qiscus.getDataStore().deleteCommentsByRoomId(roomId)) {
+                        EventBus.getDefault().post(new QiscusClearCommentsEvent(roomId));
+                    }
+                })
                 .toList()
                 .map(qiscusChatRooms -> null);
+    }
+
+    public Observable<List<QiscusComment>> deleteComments(List<String> commentUniqueIds,
+                                                          boolean isDeleteForEveryone,
+                                                          boolean isHardDelete) {
+        return api.deleteComments(Qiscus.getToken(), commentUniqueIds, isDeleteForEveryone, isHardDelete)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> {
+                    JsonObject jsonComment = jsonElement.getAsJsonObject();
+                    return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
+                })
+                .toList()
+                .doOnNext(comments -> {
+                    QiscusAccount account = Qiscus.getQiscusAccount();
+                    QiscusRoomMember actor = new QiscusRoomMember();
+                    actor.setEmail(account.getEmail());
+                    actor.setUsername(account.getUsername());
+                    actor.setAvatar(account.getAvatar());
+
+                    List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
+                    for (QiscusComment comment : comments) {
+                        deletedComments.add(new QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment(comment.getRoomId(),
+                                comment.getUniqueId()));
+                    }
+
+                    QiscusDeleteCommentHandler.DeletedCommentsData deletedCommentsData
+                            = new QiscusDeleteCommentHandler.DeletedCommentsData();
+                    deletedCommentsData.setActor(actor);
+                    deletedCommentsData.setHardDelete(isHardDelete);
+                    deletedCommentsData.setDeletedComments(deletedComments);
+
+                    QiscusDeleteCommentHandler.handle(deletedCommentsData);
+                });
+    }
+
+    public Observable<List<JSONObject>> getEvents(long startEventId) {
+        return api.getEvents(Qiscus.getToken(), startEventId)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
+                .map(jsonEvent -> {
+                    try {
+                        return new JSONObject(jsonEvent.toString());
+                    } catch (JSONException e) {
+                        return null;
+                    }
+                })
+                .filter(jsonObject -> jsonObject != null)
+                .doOnNext(QiscusPusherApi::handleNotification)
+                .toList();
     }
 
     private interface Api {
@@ -473,9 +530,19 @@ public enum QiscusApi {
                                              @Field("room_unique_id[]") List<String> roomUniqueIds,
                                              @Field("show_participants") boolean showParticipants);
 
-        @DELETE("/api/v2/sdk/clear_room_messages")
+        @DELETE("/api/v2/mobile/clear_room_messages")
         Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
                                                       @Query("room_channel_ids[]") List<String> roomUniqueIds);
+
+        @DELETE("/api/v2/mobile/delete_messages")
+        Observable<JsonElement> deleteComments(@Query("token") String token,
+                                               @Query("unique_ids[]") List<String> commentUniqueIds,
+                                               @Query("is_delete_for_everyone") boolean isDeleteForEveryone,
+                                               @Query("is_hard_delete") boolean isHardDelete);
+
+        @GET("/api/v2/mobile/sync_event")
+        Observable<JsonElement> getEvents(@Query("token") String token,
+                                          @Query("start_event_id") long startEventId);
     }
 
     private static class CountingFileRequestBody extends RequestBody {

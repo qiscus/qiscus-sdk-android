@@ -24,6 +24,8 @@ import com.qiscus.sdk.util.QiscusNumberUtil;
 public class QiscusPushNotificationMessage implements Parcelable {
     private long commentId;
     private String message;
+    private String roomName;
+    private String roomAvatar;
 
     public QiscusPushNotificationMessage(long commentId, String message) {
         this.commentId = commentId;
@@ -33,11 +35,15 @@ public class QiscusPushNotificationMessage implements Parcelable {
     public QiscusPushNotificationMessage(QiscusComment qiscusComment) {
         this.commentId = qiscusComment.id;
         this.message = qiscusComment.message;
+        this.roomName = qiscusComment.roomName;
+        this.roomAvatar = qiscusComment.roomAvatar;
     }
 
     protected QiscusPushNotificationMessage(Parcel in) {
         commentId = in.readLong();
         message = in.readString();
+        roomName = in.readString();
+        roomAvatar = in.readString();
     }
 
     public static final Creator<QiscusPushNotificationMessage> CREATOR = new Creator<QiscusPushNotificationMessage>() {
@@ -68,6 +74,22 @@ public class QiscusPushNotificationMessage implements Parcelable {
         return message;
     }
 
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomAvatar(String roomAvatar) {
+        this.roomAvatar = roomAvatar;
+    }
+
+    public String getRoomAvatar() {
+        return roomAvatar;
+    }
+
     @Override
     public int hashCode() {
         int result = QiscusNumberUtil.convertToInt(commentId);
@@ -85,6 +107,8 @@ public class QiscusPushNotificationMessage implements Parcelable {
         return "QiscusPushNotificationMessage{" +
                 "commentId=" + commentId +
                 ", message='" + message + '\'' +
+                ", roomName='" + roomName + '\'' +
+                ", roomAvatar='" + roomAvatar + '\'' +
                 '}';
     }
 
@@ -97,5 +121,7 @@ public class QiscusPushNotificationMessage implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(commentId);
         dest.writeString(message);
+        dest.writeString(roomName);
+        dest.writeString(roomAvatar);
     }
 }

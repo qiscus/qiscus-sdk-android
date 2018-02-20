@@ -220,6 +220,8 @@ public class QiscusChatConfig {
 
     private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
 
+    private QiscusDeleteCommentConfig deleteCommentConfig = new QiscusDeleteCommentConfig();
+
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
         return this;
@@ -757,6 +759,11 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusChatConfig setDeleteCommentConfig(QiscusDeleteCommentConfig deleteCommentConfig) {
+        this.deleteCommentConfig = deleteCommentConfig;
+        return this;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1244,5 +1251,9 @@ public class QiscusChatConfig {
     @ColorRes
     public int getDialogPermissionNegativeButtonTextColor() {
         return dialogPermissionNegativeButtonTextColor;
+    }
+
+    public QiscusDeleteCommentConfig getDeleteCommentConfig() {
+        return deleteCommentConfig;
     }
 }

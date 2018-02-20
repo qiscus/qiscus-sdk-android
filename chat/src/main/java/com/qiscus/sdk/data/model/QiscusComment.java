@@ -70,6 +70,7 @@ public class QiscusComment implements Parcelable {
     protected String senderAvatar;
     protected Date time;
     protected int state;
+    protected boolean deleted;
     protected String roomName;
     protected String roomAvatar;
     protected boolean groupMessage;
@@ -234,6 +235,7 @@ public class QiscusComment implements Parcelable {
         senderAvatar = in.readString();
         time = new Date(in.readLong());
         state = in.readInt();
+        deleted = in.readByte() != 0;
         selected = in.readByte() != 0;
         rawType = in.readString();
         extraPayload = in.readString();
@@ -335,6 +337,14 @@ public class QiscusComment implements Parcelable {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public String getRoomName() {
@@ -830,6 +840,7 @@ public class QiscusComment implements Parcelable {
                 ", senderAvatar='" + senderAvatar + '\'' +
                 ", time=" + time +
                 ", state=" + state +
+                ", deleted=" + deleted +
                 '}';
     }
 
@@ -853,6 +864,7 @@ public class QiscusComment implements Parcelable {
         }
         dest.writeLong(time.getTime());
         dest.writeInt(state);
+        dest.writeByte((byte) (deleted ? 1 : 0));
         dest.writeByte((byte) (selected ? 1 : 0));
         dest.writeString(rawType);
         dest.writeString(extraPayload);
@@ -865,6 +877,24 @@ public class QiscusComment implements Parcelable {
             }
         }
         dest.writeString(extras.toString());
+    }
+
+    public boolean areContentsTheSame(QiscusComment qiscusComment) {
+        return id == qiscusComment.id
+                && uniqueId.equals(qiscusComment.uniqueId)
+                && roomId == qiscusComment.roomId
+                && commentBeforeId == qiscusComment.commentBeforeId
+                && message.equals(qiscusComment.message)
+                && sender.equals(qiscusComment.sender)
+                && senderEmail.equals(qiscusComment.senderEmail)
+                && senderAvatar.equals(qiscusComment.senderAvatar)
+                && time.equals(qiscusComment.time)
+                && state == qiscusComment.state
+                && deleted == qiscusComment.deleted
+                && selected == qiscusComment.selected
+                && highlighted == qiscusComment.highlighted
+                && downloading == qiscusComment.downloading
+                && progress == qiscusComment.progress;
     }
 
     public enum Type {

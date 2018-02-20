@@ -220,6 +220,10 @@ final class QiscusApiParser {
             e.printStackTrace();
         }
 
+        if (jsonComment.has("is_deleted")) {
+            qiscusComment.setDeleted(jsonComment.get("is_deleted").getAsBoolean());
+        }
+
         if (jsonComment.has("room_name")) {
             qiscusComment.setRoomName(jsonComment.get("room_name").getAsString());
         }

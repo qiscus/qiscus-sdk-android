@@ -21,11 +21,8 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
-import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
 
@@ -49,21 +46,41 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
                     QiscusPusherApi.getInstance().restartConnection();
                 }
                 if (remoteMessage.getData().containsKey("payload")) {
-                    QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
-                    if (qiscusComment == null) {
-                        return true;
+                    if (remoteMessage.getData().get("qiscus_sdk").equals("post_comment")) {
+                        handlePostCommentEvent(remoteMessage);
+                    } else if (remoteMessage.getData().get("qiscus_sdk").equals("delete_message")) {
+                        handleDeleteCommentsEvent(remoteMessage);
+                    } else if (remoteMessage.getData().get("qiscus_sdk").equals("clear_room")) {
+                        handleClearComments(remoteMessage);
                     }
-                    if (!qiscusComment.getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
-                        QiscusPusherApi.getInstance()
-                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-                    }
-                    QiscusPushNotificationUtil.handlePushNotification(Qiscus.getApps(), qiscusComment);
-                    QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault()
-                            .post(new QiscusCommentReceivedEvent(qiscusComment)));
                 }
             }
             return true;
         }
         return false;
+    }
+
+    private static void handlePostCommentEvent(RemoteMessage remoteMessage) {
+        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
+        if (qiscusComment == null) {
+            return;
+        }
+        QiscusPusherApi.handleReceivedComment(qiscusComment);
+    }
+
+    private static void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {
+        try {
+            QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void handleClearComments(RemoteMessage remoteMessage) {
+        try {
+            QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

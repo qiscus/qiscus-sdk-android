@@ -31,6 +31,8 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.event.QiscusClearCommentsEvent;
+import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
@@ -546,9 +548,35 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Subscribe
+    public void handleDeleteCommentEvent(QiscusCommentDeletedEvent event) {
+        if (event.getQiscusComment().getRoomId() == room.getId()) {
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    if (event.isHardDelete()) {
+                        view.onCommentDeleted(event.getQiscusComment());
+                    } else {
+                        view.refreshComment(event.getQiscusComment());
+                    }
+                }
+            });
+        }
+    }
+
+    @Subscribe
     public void onCommentReceivedEvent(QiscusCommentReceivedEvent event) {
         if (event.getQiscusComment().getRoomId() == room.getId()) {
             onGotNewComment(event.getQiscusComment());
+        }
+    }
+
+    @Subscribe
+    public void handleClearCommentsEvent(QiscusClearCommentsEvent event) {
+        if (event.getRoomId() == room.getId()) {
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.clearCommentsBefore(event.getTimestamp());
+                }
+            });
         }
     }
 
@@ -591,7 +619,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                                 file1.getAbsolutePath());
                     })
                     .subscribe(file1 -> {
-                        view.refreshComment(qiscusComment);
+                        view.notifyDataChanged();
                         if (qiscusComment.getType() == QiscusComment.Type.AUDIO) {
                             qiscusComment.playAudio();
                         } else if (qiscusComment.getType() == QiscusComment.Type.FILE
@@ -757,9 +785,41 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         });
     }
 
+    public void deleteCommentsForMe(List<QiscusComment> comments, boolean hardDelete) {
+        deleteComments(comments, false, hardDelete);
+    }
+
+    public void deleteCommentsForEveryone(List<QiscusComment> comments, boolean hardDelete) {
+        deleteComments(comments, true, hardDelete);
+    }
+
+    private void deleteComments(List<QiscusComment> comments, boolean forEveryone, boolean hardDelete) {
+        view.showDeleteLoading();
+        Observable.from(comments)
+                .map(QiscusComment::getUniqueId)
+                .toList()
+                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteComments(uniqueIds, forEveryone, hardDelete))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(deletedComments -> {
+                    if (view != null) {
+                        view.dismissLoading();
+                    }
+                }, throwable -> {
+                    if (view != null) {
+                        view.dismissLoading();
+                        view.showError(QiscusTextUtil.getString(R.string.failed_to_delete_messages));
+                    }
+                    QiscusErrorLogger.print(throwable);
+                });
+    }
+
     public interface View extends QiscusPresenter.View {
 
         void showLoadMoreLoading();
+
+        void showDeleteLoading();
 
         void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments);
 
@@ -781,6 +841,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         void refreshComment(QiscusComment qiscusComment);
 
+        void notifyDataChanged();
+
         void updateLastDeliveredComment(long lastDeliveredCommentId);
 
         void updateLastReadComment(long lastReadCommentId);
@@ -796,5 +858,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void onRealtimeStatusChanged(boolean connected);
 
         void onLoadCommentsError(Throwable throwable);
+
+        void clearCommentsBefore(long timestamp);
     }
 }

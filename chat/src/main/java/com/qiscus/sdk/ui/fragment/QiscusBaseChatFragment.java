@@ -39,7 +39,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +85,7 @@ import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusNumberUtil;
@@ -1069,7 +1069,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             startActivity(QiscusAccountLinkingActivity.generateIntent(getActivity(), params.optString("view_title"),
                     payload.getString("url"), payload.getString("redirect_url"), params.optString("success_message")));
         } catch (JSONException e) {
-            Log.e("Qiscus", e.getMessage());
+            QiscusErrorLogger.print(e);
         }
     }
 
@@ -1116,7 +1116,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void toggleSelectComment(QiscusComment qiscusComment) {
         qiscusComment.setSelected(!qiscusComment.isSelected());
-        refreshComment(qiscusComment);
+        chatAdapter.notifyDataSetChanged();
         if (commentSelectedListener != null) {
             commentSelectedListener.onCommentSelected(chatAdapter.getSelectedComments());
         }
@@ -1132,10 +1132,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void highlightComment(QiscusComment qiscusComment) {
         qiscusComment.setHighlighted(true);
-        refreshComment(qiscusComment);
+        chatAdapter.notifyDataSetChanged();
         commentHighlightTask = () -> {
             qiscusComment.setHighlighted(false);
-            refreshComment(qiscusComment);
+            chatAdapter.notifyDataSetChanged();
         };
         QiscusAndroidUtil.runOnUIThread(commentHighlightTask, 2000);
     }
@@ -1396,7 +1396,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void refreshComment(QiscusComment qiscusComment) {
-        chatAdapter.addOrUpdate(qiscusComment);
+        chatAdapter.update(qiscusComment);
+    }
+
+    @Override
+    public void notifyDataChanged() {
+        chatAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -1512,6 +1517,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void showLoadMoreLoading() {
         try {
             swipeRefreshLayout.setRefreshing(false);
+            loadMoreProgressBar.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void showDeleteLoading() {
+        try {
             loadMoreProgressBar.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1776,6 +1790,21 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     /**
+     * will delete all comments on adapter that have timestamp before or same with {@code timestamp}
+     */
+    @Override
+    public void clearCommentsBefore(long timestamp) {
+        chatAdapter.clearCommentsBefore(timestamp);
+        if (chatAdapter.isEmpty()) {
+            if (emptyChatHolder != null) {
+                emptyChatHolder.setVisibility(View.VISIBLE);
+            }
+        } else if (emptyChatHolder != null) {
+            emptyChatHolder.setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * Callback when an error happening while load comments
      *
      * @param throwable the error
@@ -1783,6 +1812,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onLoadCommentsError(Throwable throwable) {
 
+    }
+
+    public void deleteCommentsForMe(List<QiscusComment> selectedComments) {
+        qiscusChatPresenter.deleteCommentsForMe(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
+    }
+
+    public void deleteCommentsForEveryone(List<QiscusComment> selectedComments) {
+        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
     }
 
     public interface CommentSelectedListener {
