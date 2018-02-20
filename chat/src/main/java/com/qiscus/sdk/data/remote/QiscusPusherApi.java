@@ -484,8 +484,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
             QiscusClearCommentsHandler.ClearCommentsData clearCommentsData
                     = new QiscusClearCommentsHandler.ClearCommentsData();
-            //id is nano timestamp, convert it to milliseconds by divide it
-            clearCommentsData.setTimestamp(jsonObject.optLong("id") / 1000000L);
+            //timestamp is in nano seconds format, convert it to milliseconds by divide it
+            clearCommentsData.setTimestamp(jsonObject.optLong("timestamp") / 1000000L);
             clearCommentsData.setActor(actor);
             clearCommentsData.setRoomIds(roomIds);
 
