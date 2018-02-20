@@ -39,6 +39,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.CommentInfoHandler;
 import com.qiscus.sdk.data.model.ForwardCommentHandler;
+import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -266,7 +267,17 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     private boolean deleteable(List<QiscusComment> selectedComments) {
         for (QiscusComment selectedComment : selectedComments) {
-            if (!selectedComment.isMyComment() || selectedComment.isDeleted()) {
+            if (selectedComment.isDeleted()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean allMyComments(List<QiscusComment> selectedComments) {
+        QiscusAccount account = Qiscus.getQiscusAccount();
+        for (QiscusComment selectedComment : selectedComments) {
+            if (!selectedComment.getSenderEmail().equals(account.getEmail())) {
                 return false;
             }
         }
@@ -396,7 +407,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     }
 
     private void deleteComments(List<QiscusComment> selectedComments) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
                 .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
                         selectedComments.size(), selectedComments.size()))
                 .setPositiveButton(R.string.qiscus_delete_for_me, (dialog, which) -> {
@@ -407,23 +418,30 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                     }
                     dialog.dismiss();
                 })
-                .setNeutralButton(R.string.qiscus_delete_for_everyone, (dialog, which) -> {
-                    QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
-                            .findFragmentByTag(QiscusBaseChatFragment.class.getName());
-                    if (fragment != null) {
-                        fragment.deleteCommentsForEveryone(selectedComments);
-                    }
-                    dialog.dismiss();
-                })
                 .setNegativeButton(R.string.qiscus_cancel, (dialog, which) -> dialog.dismiss())
-                .setCancelable(true)
-                .create();
+                .setCancelable(true);
+
+        boolean ableToDeleteForEveryone = allMyComments(selectedComments);
+        if (ableToDeleteForEveryone) {
+            alertDialogBuilder.setNeutralButton(R.string.qiscus_delete_for_everyone, (dialog, which) -> {
+                QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                        .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+                if (fragment != null) {
+                    fragment.deleteCommentsForEveryone(selectedComments);
+                }
+                dialog.dismiss();
+            });
+        }
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
 
         alertDialog.setOnShowListener(dialog -> {
             @ColorInt int accent = ContextCompat.getColor(this, chatConfig.getAccentColor());
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(accent);
-            alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(accent);
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(accent);
+            if (ableToDeleteForEveryone) {
+                alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(accent);
+            }
         });
 
         alertDialog.show();
