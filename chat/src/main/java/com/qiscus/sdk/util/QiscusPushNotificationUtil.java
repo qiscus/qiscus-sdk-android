@@ -356,4 +356,9 @@ public final class QiscusPushNotificationUtil {
                     BitmapFactory.decodeResource(context.getResources(), Qiscus.getChatConfig().getNotificationBigIcon()));
         }
     }
+
+    public static void clearPushNotification(Context context, long roomId) {
+        NotificationManagerCompat.from(context).cancel(QiscusNumberUtil.convertToInt(roomId));
+        QiscusCacheManager.getInstance().clearMessageNotifItems(roomId);
+    }
 }

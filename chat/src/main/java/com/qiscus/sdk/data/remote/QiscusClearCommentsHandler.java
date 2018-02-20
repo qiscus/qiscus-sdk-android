@@ -22,6 +22,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -49,6 +50,7 @@ public final class QiscusClearCommentsHandler {
                     .doOnNext(roomId -> {
                         if (Qiscus.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {
                             EventBus.getDefault().post(new QiscusClearCommentsEvent(roomId, clearCommentsData.timestamp));
+                            QiscusPushNotificationUtil.clearPushNotification(Qiscus.getApps(), roomId);
                         }
                     })
                     .subscribeOn(Schedulers.io())
