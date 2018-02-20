@@ -66,6 +66,7 @@ public final class QiscusDeleteCommentHandler {
                         QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
                         qiscusComment.setRoomName(chatRoom.getName());
                         qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
+                        qiscusComment.setGroupMessage(chatRoom.isGroup());
                     }
                     return qiscusComment;
                 })
@@ -94,6 +95,7 @@ public final class QiscusDeleteCommentHandler {
                         QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
                         qiscusComment.setRoomName(chatRoom.getName());
                         qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
+                        qiscusComment.setGroupMessage(chatRoom.isGroup());
                     }
 
                     return qiscusComment;
