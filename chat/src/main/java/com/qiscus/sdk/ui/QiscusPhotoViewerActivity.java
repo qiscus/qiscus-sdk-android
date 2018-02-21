@@ -161,7 +161,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.media_action, menu);
+        getMenuInflater().inflate(R.menu.qiscus_media_action, menu);
         menu.findItem(R.id.action_forward)
                 .setVisible(Qiscus.getChatConfig().isEnableForwardComment());
         return super.onCreateOptionsMenu(menu);

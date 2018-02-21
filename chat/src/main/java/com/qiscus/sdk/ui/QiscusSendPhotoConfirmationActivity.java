@@ -240,7 +240,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.send_photo_action, menu);
+        getMenuInflater().inflate(R.menu.qiscus_send_photo_action, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
