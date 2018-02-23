@@ -397,12 +397,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (view != null) {
                         room = roomData.first;
                         view.initRoomData(roomData.first, roomData.second);
+                        view.dismissLoading();
                     }
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
                         view.onLoadCommentsError(throwable);
+                        view.dismissLoading();
                     }
                 });
     }
