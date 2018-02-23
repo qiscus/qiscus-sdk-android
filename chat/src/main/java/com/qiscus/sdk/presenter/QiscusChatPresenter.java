@@ -708,6 +708,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void clearUnreadCount() {
         room.setUnreadCount(0);
+        room.setLastComment(null);
         Qiscus.getDataStore().addOrUpdate(room);
     }
 
