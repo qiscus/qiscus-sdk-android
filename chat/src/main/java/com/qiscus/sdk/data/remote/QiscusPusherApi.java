@@ -24,6 +24,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.QiscusClearCommentsHandler;
+import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
+import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.data.local.QiscusEventCache;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -634,7 +637,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 .scheduleWithFixedDelay(() -> {
                     if (Qiscus.hasSetupUser()) {
                         if (Qiscus.isOnForeground()) {
-                            QiscusResendCommentHelper.tryResendPendingComment();
+                            QiscusResendCommentHandler.tryResendPendingComment();
                         }
                         if (isConnected()) {
                             if (Qiscus.isOnForeground()) {

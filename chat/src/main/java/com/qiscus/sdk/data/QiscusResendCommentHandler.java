@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.data.remote;
+package com.qiscus.sdk.data;
+
+import android.support.annotation.RestrictTo;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -42,7 +45,8 @@ import rx.schedulers.Schedulers;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public final class QiscusResendCommentHelper {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class QiscusResendCommentHandler {
 
     private static Map<QiscusComment, Subscription> pendingTask = new HashMap<>();
     private static Set<String> processingComment = new HashSet<>();
@@ -97,7 +101,7 @@ public final class QiscusResendCommentHelper {
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
         Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
-                .doOnNext(QiscusResendCommentHelper::commentSuccess)
+                .doOnNext(QiscusResendCommentHandler::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

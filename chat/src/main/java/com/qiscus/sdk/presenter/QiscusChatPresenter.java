@@ -30,7 +30,7 @@ import com.qiscus.sdk.data.model.QiscusLocation;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
@@ -334,7 +334,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     public void deleteComment(QiscusComment qiscusComment) {
         cancelPendingComment(qiscusComment);
-        QiscusResendCommentHelper.cancelPendingComment(qiscusComment);
+        QiscusResendCommentHandler.cancelPendingComment(qiscusComment);
         QiscusAndroidUtil.runOnBackgroundThread(() -> Qiscus.getDataStore().delete(qiscusComment));
         view.onCommentDeleted(qiscusComment);
     }

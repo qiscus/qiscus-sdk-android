@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.data.remote;
+package com.qiscus.sdk.data;
 
 import android.support.annotation.RestrictTo;
 
