@@ -51,6 +51,10 @@ public final class QiscusResendCommentHandler {
     private static Map<QiscusComment, Subscription> pendingTask = new HashMap<>();
     private static Set<String> processingComment = new HashSet<>();
 
+    private QiscusResendCommentHandler() {
+        
+    }
+
     public static void tryResendPendingComment() {
         Qiscus.getDataStore()
                 .getObservablePendingComments()
