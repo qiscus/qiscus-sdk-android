@@ -292,7 +292,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        mode.getMenuInflater().inflate(R.menu.comment_action, menu);
+        mode.getMenuInflater().inflate(R.menu.qiscus_comment_action, menu);
         return true;
     }
 

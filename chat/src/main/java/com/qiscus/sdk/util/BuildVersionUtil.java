@@ -15,7 +15,7 @@ public class BuildVersionUtil {
     }
 
     public static boolean isOreoOrHigher() {
-        return Build.VERSION.SDK_INT == 26;
+        return Build.VERSION.SDK_INT >= 26;
     }
 
     public static boolean isNougatOrHigher() {

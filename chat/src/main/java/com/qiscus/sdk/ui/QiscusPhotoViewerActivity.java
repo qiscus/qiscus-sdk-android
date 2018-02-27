@@ -111,8 +111,8 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         date = findViewById(R.id.date);
         ImageButton shareButton = findViewById(R.id.action_share);
         infoPanel = findViewById(R.id.info_panel);
-        fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
-        fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
+        fadein = AnimationUtils.loadAnimation(this, R.anim.qiscus_fadein);
+        fadeout = AnimationUtils.loadAnimation(this, R.anim.qiscus_fadeout);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.qiscus_downloading));
@@ -161,7 +161,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.media_action, menu);
+        getMenuInflater().inflate(R.menu.qiscus_media_action, menu);
         menu.findItem(R.id.action_forward)
                 .setVisible(Qiscus.getChatConfig().isEnableForwardComment());
         return super.onCreateOptionsMenu(menu);

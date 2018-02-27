@@ -397,12 +397,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (view != null) {
                         room = roomData.first;
                         view.initRoomData(roomData.first, roomData.second);
+                        view.dismissLoading();
                     }
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (view != null) {
                         view.onLoadCommentsError(throwable);
+                        view.dismissLoading();
                     }
                 });
     }
@@ -708,6 +710,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void clearUnreadCount() {
         room.setUnreadCount(0);
+        room.setLastComment(null);
         Qiscus.getDataStore().addOrUpdate(room);
     }
 
