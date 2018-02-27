@@ -21,7 +21,7 @@ apply from: rootProject.file('gradle/quality.gradle')
 
 def versionMajor = 2
 def versionMinor = 22
-def versionPatch = 0
+def versionPatch = 1
 
 ext {
     bintrayRepo = 'maven'
