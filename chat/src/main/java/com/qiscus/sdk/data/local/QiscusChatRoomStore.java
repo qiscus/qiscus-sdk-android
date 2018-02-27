@@ -50,7 +50,7 @@ public interface QiscusChatRoomStore {
 
     Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit);
 
-    List<QiscusChatRoom> getChatRooms(List<Integer> roomIds, List<String> uniqueIds);
+    List<QiscusChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds);
 
     void deleteChatRoom(long roomId);
 

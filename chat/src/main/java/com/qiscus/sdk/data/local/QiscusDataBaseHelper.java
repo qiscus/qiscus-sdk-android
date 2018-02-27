@@ -228,7 +228,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusChatRoom> getChatRooms(List<Integer> roomIds, List<String> uniqueIds) {
+    public List<QiscusChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds) {
         List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
         if (roomIds.isEmpty() && uniqueIds.isEmpty()) {
             return qiscusChatRooms;
