@@ -716,7 +716,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getComment(long id, String uniqueId) {
+    public QiscusComment getComment(String uniqueId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(uniqueId);

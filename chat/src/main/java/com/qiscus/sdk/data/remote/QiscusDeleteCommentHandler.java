@@ -57,8 +57,7 @@ public final class QiscusDeleteCommentHandler {
     private static void handleSoftDelete(DeletedCommentsData deletedCommentsData) {
         Observable.from(deletedCommentsData.getDeletedComments())
                 .map(deletedComment -> {
-                    QiscusComment qiscusComment = Qiscus.getDataStore()
-                            .getComment(-1, deletedComment.getCommentUniqueId());
+                    QiscusComment qiscusComment = Qiscus.getDataStore().getComment(deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
                         qiscusComment.setMessage("This message has been deleted.");
                         qiscusComment.setRawType("text");
@@ -91,8 +90,7 @@ public final class QiscusDeleteCommentHandler {
     private static void handleHardDelete(DeletedCommentsData deletedCommentsData) {
         Observable.from(deletedCommentsData.getDeletedComments())
                 .map(deletedComment -> {
-                    QiscusComment qiscusComment = Qiscus.getDataStore()
-                            .getComment(-1, deletedComment.getCommentUniqueId());
+                    QiscusComment qiscusComment = Qiscus.getDataStore().getComment(deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
                         setRoomData(qiscusComment);
                     }

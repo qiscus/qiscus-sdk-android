@@ -47,7 +47,7 @@ public interface QiscusCommentStore {
 
     void updateLastReadComment(long roomId, long commentId);
 
-    QiscusComment getComment(long id, String uniqueId);
+    QiscusComment getComment(String uniqueId);
 
     QiscusComment getCommentByBeforeId(long beforeId);
 
