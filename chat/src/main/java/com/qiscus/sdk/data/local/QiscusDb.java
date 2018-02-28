@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 13;
+    static final int DATABASE_VERSION = 14;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -45,7 +45,7 @@ final class QiscusDb {
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
-                        COLUMN_ID + " LONG," +
+                        COLUMN_ID + " LONG PRIMARY KEY," +
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
                         COLUMN_UNIQUE_ID + " TEXT," +
                         COLUMN_NAME + " TEXT," +
@@ -95,7 +95,7 @@ final class QiscusDb {
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
-                        COLUMN_USER_EMAIL + " TEXT," +
+                        COLUMN_USER_EMAIL + " TEXT PRIMARY KEY," +
                         COLUMN_USER_NAME + " TEXT," +
                         COLUMN_USER_AVATAR + " TEXT" +
                         " ); ";
@@ -131,7 +131,8 @@ final class QiscusDb {
                         COLUMN_USER_EMAIL + " TEXT," +
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
                         COLUMN_LAST_DELIVERED + " LONG DEFAULT 0," +
-                        COLUMN_LAST_READ + " LONG DEFAULT 0" +
+                        COLUMN_LAST_READ + " LONG DEFAULT 0," +
+                        "PRIMARY KEY (" + COLUMN_ROOM_ID + ", " + COLUMN_USER_EMAIL + ")" +
                         " ); ";
 
         static ContentValues toContentValues(long roomId, QiscusRoomMember roomMember) {
@@ -186,7 +187,7 @@ final class QiscusDb {
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         COLUMN_ID + " LONG," +
                         COLUMN_ROOM_ID + " LONG," +
-                        COLUMN_UNIQUE_ID + " TEXT," +
+                        COLUMN_UNIQUE_ID + " TEXT PRIMARY KEY," +
                         COLUMN_COMMENT_BEFORE_ID + " LONG," +
                         COLUMN_MESSAGE + " TEXT," +
                         COLUMN_SENDER + " TEXT," +

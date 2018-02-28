@@ -103,8 +103,7 @@ public class QiscusSyncService extends Service {
     private void syncComments() {
         QiscusApi.getInstance().sync()
                 .doOnNext(qiscusComment -> {
-                    QiscusComment savedQiscusComment = Qiscus.getDataStore()
-                            .getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+                    QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
 
                     if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
                         return;
