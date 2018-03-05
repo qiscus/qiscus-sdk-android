@@ -292,8 +292,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             if (!e.areContentsTheSame(data.get(i))) {
                 e.setSelected(data.get(i).isSelected());
                 data.updateItemAt(i, e);
-                notifyItemChanged(i);
             }
+            notifyItemChanged(i);
         } else {
             add(e);
         }
