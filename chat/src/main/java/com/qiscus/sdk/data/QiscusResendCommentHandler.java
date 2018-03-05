@@ -21,7 +21,6 @@ import android.support.annotation.RestrictTo;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
@@ -52,7 +51,7 @@ public final class QiscusResendCommentHandler {
     private static Set<String> processingComment = new HashSet<>();
 
     private QiscusResendCommentHandler() {
-        
+
     }
 
     public static void tryResendPendingComment() {
@@ -111,7 +110,6 @@ public final class QiscusResendCommentHandler {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
                     tryResendPendingComment(); //Process next pending comments
-                    EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend));
                 }, QiscusErrorLogger::print);
 
         pendingTask.put(qiscusComment, subscription);
@@ -155,9 +153,9 @@ public final class QiscusResendCommentHandler {
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(commentSend ->
-                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
-                        QiscusErrorLogger::print);
+                .subscribe(commentSend -> {
+
+                }, QiscusErrorLogger::print);
 
         pendingTask.put(qiscusComment, subscription);
     }
@@ -175,9 +173,9 @@ public final class QiscusResendCommentHandler {
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(commentSend ->
-                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
-                        QiscusErrorLogger::print);
+                .subscribe(commentSend -> {
+
+                }, QiscusErrorLogger::print);
 
         pendingTask.put(qiscusComment, subscription);
     }

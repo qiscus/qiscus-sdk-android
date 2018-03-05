@@ -21,6 +21,7 @@ import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -30,11 +31,11 @@ import com.qiscus.sdk.data.model.QiscusLocation;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.event.QiscusCommentResendEvent;
+import com.qiscus.sdk.event.QiscusCommentSentEvent;
 import com.qiscus.sdk.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -544,6 +545,17 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
                     view.refreshComment(event.getQiscusComment());
+                }
+            });
+        }
+    }
+
+    @Subscribe
+    public void onCommentSentEvent(QiscusCommentSentEvent event) {
+        if (event.getQiscusComment().getRoomId() == room.getId()) {
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.onSuccessSendComment(event.getQiscusComment());
                 }
             });
         }
