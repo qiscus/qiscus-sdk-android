@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
+import com.qiscus.sdk.data.QiscusEncryptionHandler;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -191,7 +192,14 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
         Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
-        return api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
+
+        //TODO implement encryption on worker thread to avoid lag
+        String finalMessage = qiscusComment.getMessage();
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
+            finalMessage = QiscusEncryptionHandler.encrypt(qiscusComment.getMessage());
+        }
+
+        return api.postComment(Qiscus.getToken(), finalMessage,
                 qiscusComment.getRoomId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
                 qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :
                         qiscusComment.getExtras().toString())
