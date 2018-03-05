@@ -62,7 +62,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             }
             QiscusComment comment = qiscusChatRoom.getLastComment();
             if (comment != null && comment.getId() > 0) {
-                addOrUpdate(comment);
+                add(comment);
             }
         }
     }
@@ -102,7 +102,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         QiscusComment comment = qiscusChatRoom.getLastComment();
         if (comment != null && comment.getId() > 0) {
-            addOrUpdate(comment);
+            add(comment);
         }
     }
 

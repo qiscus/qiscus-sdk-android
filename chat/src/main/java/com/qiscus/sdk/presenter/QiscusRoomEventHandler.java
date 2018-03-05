@@ -269,6 +269,12 @@ class QiscusRoomEventHandler {
                 qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
             }
 
+            //TODO handle lebih baik lagi biar ga ganti komen yg udah di simpan
+            QiscusComment savedComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
+            if (savedComment != null) {
+                qiscusComment.setMessage(savedComment.getMessage());
+                qiscusComment.setExtraPayload(savedComment.getExtraPayload());
+            }
             Qiscus.getDataStore().addOrUpdate(qiscusComment);
         }
     }
