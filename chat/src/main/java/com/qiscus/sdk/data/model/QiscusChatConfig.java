@@ -223,6 +223,8 @@ public class QiscusChatConfig {
 
     private QiscusDeleteCommentConfig deleteCommentConfig = new QiscusDeleteCommentConfig();
 
+    private boolean enableEndToEndEncryption = false;
+
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
         return this;
@@ -770,6 +772,10 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public void setEnableEndToEndEncryption(boolean enableEndToEndEncryption) {
+        this.enableEndToEndEncryption = enableEndToEndEncryption;
+    }
+
     @ColorRes
     public int getStatusBarColor() {
         return statusBarColor;
@@ -1266,5 +1272,9 @@ public class QiscusChatConfig {
 
     public QiscusDeleteCommentConfig getDeleteCommentConfig() {
         return deleteCommentConfig;
+    }
+
+    public boolean isEnableEndToEndEncryption() {
+        return enableEndToEndEncryption;
     }
 }
