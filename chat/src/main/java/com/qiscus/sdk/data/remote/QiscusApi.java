@@ -213,7 +213,13 @@ public enum QiscusApi {
         Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
 
         Observable<String> encryptMessage = Observable.just(qiscusComment.getMessage())
-                .map(message -> Qiscus.getChatConfig().isEnableEndToEndEncryption() ? QiscusEncryptionHandler.encrypt(message) : message)
+                .map(message -> {
+                    if (Qiscus.getChatConfig().isEnableEndToEndEncryption()
+                            && qiscusComment.getType() == QiscusComment.Type.TEXT) {
+                        return QiscusEncryptionHandler.encrypt(message);
+                    }
+                    return message;
+                })
                 .subscribeOn(Schedulers.computation());
 
         return encryptMessage.flatMap(message -> api.postComment(Qiscus.getToken(), message,
@@ -580,7 +586,7 @@ public enum QiscusApi {
     }
 
     private void decryptComment(QiscusComment qiscusComment) {
-        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption() && qiscusComment.getType() == QiscusComment.Type.TEXT) {
             QiscusEncryptionHandler.decrypt(qiscusComment);
         }
     }
@@ -588,7 +594,9 @@ public enum QiscusApi {
     private void decryptComments(List<QiscusComment> qiscusComments) {
         if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
             for (QiscusComment qiscusComment : qiscusComments) {
-                QiscusEncryptionHandler.decrypt(qiscusComment);
+                if (qiscusComment.getType() == QiscusComment.Type.TEXT) {
+                    QiscusEncryptionHandler.decrypt(qiscusComment);
+                }
             }
         }
     }
