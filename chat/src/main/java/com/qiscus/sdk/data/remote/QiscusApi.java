@@ -77,6 +77,7 @@ import retrofit2.http.Query;
 import rx.Emitter;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
+import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 18, 2016
@@ -193,16 +194,14 @@ public enum QiscusApi {
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
         Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
 
-        //TODO implement encryption on worker thread to avoid lag
-        String finalMessage = qiscusComment.getMessage();
-        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
-            finalMessage = QiscusEncryptionHandler.encrypt(qiscusComment.getMessage());
-        }
+        Observable<String> encryptMessage = Observable.just(qiscusComment.getMessage())
+                .map(message -> Qiscus.getChatConfig().isEnableEndToEndEncryption() ? QiscusEncryptionHandler.encrypt(message) : message)
+                .subscribeOn(Schedulers.computation());
 
-        return api.postComment(Qiscus.getToken(), finalMessage,
+        return encryptMessage.flatMap(message -> api.postComment(Qiscus.getToken(), message,
                 qiscusComment.getRoomId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
                 qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :
-                        qiscusComment.getExtras().toString())
+                        qiscusComment.getExtras().toString()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject()
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
