@@ -121,6 +121,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
         if (downloadIconView != null) {
+            // TODO do in background thread
             File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
             if (localPath == null) {
                 File file = new File(qiscusComment.getAttachmentUri().toString());

@@ -180,6 +180,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     protected void showSentImage(QiscusComment qiscusComment) {
+        // TODO do in background thread
         File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
         if (localPath == null) { //If the image not yet downloaded
             showDownloadIcon(true);

@@ -742,6 +742,7 @@ public class QiscusComment implements Parcelable {
 
     public int getAudioDuration() {
         if (player == null && isAudio()) {
+            // TODO do in background thread
             File localPath = Qiscus.getDataStore().getLocalPath(id);
             if (localPath == null) {
                 return 0;
@@ -754,6 +755,7 @@ public class QiscusComment implements Parcelable {
 
     public int getCurrentAudioPosition() {
         if (player == null && isAudio()) {
+            // TODO do in background thread
             File localPath = Qiscus.getDataStore().getLocalPath(id);
             if (localPath == null) {
                 return 0;
