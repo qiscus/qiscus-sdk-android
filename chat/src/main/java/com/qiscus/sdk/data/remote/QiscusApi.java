@@ -144,51 +144,69 @@ public enum QiscusApi {
     public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, JSONObject options) {
         return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId,
                 options == null ? null : options.toString())
-                .map(QiscusApiParser::parseQiscusChatRoom);
+                .map(QiscusApiParser::parseQiscusChatRoom)
+                .doOnNext(this::decryptLastComment);
     }
 
     public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
         return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options == null ? null : options.toString())
-                .map(QiscusApiParser::parseQiscusChatRoom);
+                .map(QiscusApiParser::parseQiscusChatRoom)
+                .doOnNext(this::decryptLastComment);
     }
 
     public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {
         return api.createOrGetGroupChatRoom(Qiscus.getToken(), uniqueId, name, avatarUrl, options == null ? null : options.toString())
-                .map(QiscusApiParser::parseQiscusChatRoom);
+                .map(QiscusApiParser::parseQiscusChatRoom)
+                .doOnNext(this::decryptLastComment);
     }
 
     public Observable<QiscusChatRoom> getChatRoom(long roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
-                .map(QiscusApiParser::parseQiscusChatRoom);
+                .map(QiscusApiParser::parseQiscusChatRoom)
+                .doOnNext(this::decryptLastComment);
     }
 
     public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
-                .map(QiscusApiParser::parseQiscusChatRoomWithComments);
+                .map(QiscusApiParser::parseQiscusChatRoomWithComments)
+                .doOnNext(data -> decryptLastComment(data.first))
+                .doOnNext(data -> decryptComments(data.second));
     }
 
     public Observable<List<QiscusChatRoom>> getChatRooms(int page, int limit, boolean showMembers) {
         return api.getChatRooms(Qiscus.getToken(), page, limit, showMembers)
-                .map(QiscusApiParser::parseQiscusChatRoomInfo);
+                .map(QiscusApiParser::parseQiscusChatRoomInfo)
+                .doOnNext(qiscusChatRooms -> {
+                    for (QiscusChatRoom qiscusChatRoom : qiscusChatRooms) {
+                        decryptLastComment(qiscusChatRoom);
+                    }
+                });
     }
 
     public Observable<List<QiscusChatRoom>> getChatRooms(List<Long> roomIds, List<String> uniqueIds, boolean showMembers) {
         return api.getChatRooms(Qiscus.getToken(), roomIds, uniqueIds, showMembers)
-                .map(QiscusApiParser::parseQiscusChatRoomInfo);
+                .map(QiscusApiParser::parseQiscusChatRoomInfo)
+                .doOnNext(qiscusChatRooms -> {
+                    for (QiscusChatRoom qiscusChatRoom : qiscusChatRooms) {
+                        decryptLastComment(qiscusChatRoom);
+                    }
+                });
     }
 
     public Observable<QiscusComment> getComments(long roomId, long lastCommentId) {
         return api.getComments(Qiscus.getToken(), roomId, lastCommentId, false)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
-                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId))
+                .doOnNext(this::decryptComment);
     }
 
     public Observable<QiscusComment> getCommentsAfter(long roomId, long lastCommentId) {
         return api.getComments(Qiscus.getToken(), roomId, lastCommentId, true)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
-                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId))
+                .doOnNext(this::decryptComment);
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
@@ -323,6 +341,7 @@ public enum QiscusApi {
     public Observable<QiscusChatRoom> updateChatRoom(long roomId, String name, String avatarUrl, JSONObject options) {
         return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
+                .doOnNext(this::decryptLastComment)
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
 
@@ -348,6 +367,7 @@ public enum QiscusApi {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
+                .doOnNext(this::decryptComment)
                 .toList();
     }
 
@@ -551,6 +571,26 @@ public enum QiscusApi {
         @GET("/api/v2/mobile/sync_event")
         Observable<JsonElement> getEvents(@Query("token") String token,
                                           @Query("start_event_id") long startEventId);
+    }
+
+    private void decryptLastComment(QiscusChatRoom qiscusChatRoom) {
+        if (qiscusChatRoom.getLastComment() != null) {
+            decryptComment(qiscusChatRoom.getLastComment());
+        }
+    }
+
+    private void decryptComment(QiscusComment qiscusComment) {
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
+            QiscusEncryptionHandler.decrypt(qiscusComment);
+        }
+    }
+
+    private void decryptComments(List<QiscusComment> qiscusComments) {
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
+            for (QiscusComment qiscusComment : qiscusComments) {
+                QiscusEncryptionHandler.decrypt(qiscusComment);
+            }
+        }
     }
 
     private static class CountingFileRequestBody extends RequestBody {
