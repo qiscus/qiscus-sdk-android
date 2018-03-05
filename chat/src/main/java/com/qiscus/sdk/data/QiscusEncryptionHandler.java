@@ -18,7 +18,6 @@ package com.qiscus.sdk.data;
 
 import android.support.annotation.RestrictTo;
 import android.util.Base64;
-import android.util.Log;
 
 import com.qiscus.sdk.data.model.QiscusComment;
 
@@ -45,11 +44,18 @@ public final class QiscusEncryptionHandler {
     }
 
     public static String encrypt(String message) {
-        Log.d("ZETRA", "Thread: " + Thread.currentThread().getName());
-        return Base64.encodeToString(message.getBytes(), Base64.DEFAULT);
+        try {
+            return Base64.encodeToString(message.getBytes(), Base64.DEFAULT);
+        } catch (Exception e) {
+            return message;
+        }
     }
 
     public static String decrypt(String message) {
-        return new String(Base64.decode(message.getBytes(), Base64.DEFAULT));
+        try {
+            return new String(Base64.decode(message.getBytes(), Base64.DEFAULT));
+        } catch (Exception e) {
+            return message;
+        }
     }
 }
