@@ -11,12 +11,11 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.QiscusSyncCommentHandler;
 import com.qiscus.sdk.data.local.QiscusEventCache;
 import com.qiscus.sdk.data.model.QiscusAccount;
-import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.event.QiscusSyncEvent;
 import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -81,38 +80,7 @@ public class QiscusSyncJobService extends JobService {
     }
 
     private void syncComments() {
-        QiscusApi.getInstance().sync()
-                .doOnNext(qiscusComment -> {
-                    QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
-
-                    if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
-                        return;
-                    }
-
-                    if (!qiscusComment.isMyComment()) {
-                        QiscusPusherApi.getInstance()
-                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-                    }
-
-                    if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
-                        qiscusComment.setState(savedQiscusComment.getState());
-                    }
-                })
-                .doOnSubscribe(() -> {
-                    EventBus.getDefault().post((QiscusSyncEvent.STARTED));
-                    QiscusLogger.print("Sync started...");
-                })
-                .doOnCompleted(() -> {
-                    EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
-                    QiscusLogger.print("Sync completed...");
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    EventBus.getDefault().post(QiscusSyncEvent.FAILED);
-                    QiscusLogger.print("Sync failed...");
-                });
+        QiscusSyncCommentHandler.sync();
     }
 
     private void stopSync() {

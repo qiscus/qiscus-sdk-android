@@ -19,6 +19,7 @@ package com.qiscus.sdk.service;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.QiscusNewCommentHandler;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 
@@ -65,7 +66,7 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
         if (qiscusComment == null) {
             return;
         }
-        QiscusPusherApi.handleReceivedComment(qiscusComment);
+        QiscusNewCommentHandler.handle(qiscusComment);
     }
 
     private static void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {

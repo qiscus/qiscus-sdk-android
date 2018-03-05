@@ -43,7 +43,6 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
-import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.service.QiscusPushNotificationClickReceiver;
 
 import org.json.JSONArray;
@@ -54,9 +53,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 import static com.qiscus.sdk.util.BuildVersionUtil.isNougatOrHigher;
 
@@ -78,17 +74,7 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void handlePN(Context context, QiscusComment qiscusComment) {
-        if (Qiscus.getDataStore().isContains(qiscusComment)) {
-            return;
-        }
-
-        Qiscus.getDataStore().addOrUpdate(qiscusComment);
-
         Pair<Boolean, Long> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
-        if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
-            updateUnreadCount(qiscusComment);
-        }
-
         if (Qiscus.getChatConfig().isEnablePushNotification()
                 && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
             if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
@@ -99,32 +85,6 @@ public final class QiscusPushNotificationUtil {
                 showPushNotification(context, qiscusComment);
             }
         }
-    }
-
-    private static void updateUnreadCount(QiscusComment qiscusComment) {
-        QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
-        if (room == null) {
-            fetchRoomData(qiscusComment.getRoomId());
-            return;
-        }
-
-        if (qiscusComment.isMyComment()) {
-            room.setUnreadCount(0);
-        } else {
-            room.setUnreadCount(room.getUnreadCount() + 1);
-        }
-        Qiscus.getDataStore().addOrUpdate(room);
-    }
-
-    private static void fetchRoomData(long roomId) {
-        QiscusApi.getInstance()
-                .getChatRoom(roomId)
-                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(qiscusChatRoom -> {
-                }, throwable -> {
-                });
     }
 
     private static void showPushNotification(Context context, QiscusComment comment) {
