@@ -48,6 +48,11 @@ public class RatchetMessageBuffer {
         return ((RatchetMessageBuffer) other).number == number &&
                 ((RatchetMessageBuffer) other).key.equals(key);
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
 
 

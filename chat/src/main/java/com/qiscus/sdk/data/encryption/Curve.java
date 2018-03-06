@@ -165,8 +165,9 @@ public class Curve {
         mula32(tmp1, v, s, 32, 1);
         divmod(tmp2, tmp1, 64, ORDER, 32);
 
-        for (w = 0, i = 0; i < 32; i++)
+        for (w = 0, i = 0; i < 32; i++) {
             w |= v[i] = tmp1[i];
+        }
         return w != 0;
     }
 
@@ -201,23 +202,23 @@ public class Curve {
 
         xtoy2(t1[0], t2[0], p[1]);    /* t2[0] = Py^2  */
         sqrt(t1[0], t2[0]);    /* t1[0] = Py or -Py  */
-        j = is_negative(t1[0]);        /*      ... check which  */
-        t2[0]._0 += 39420360;        /* t2[0] = Py^2 + Gy^2  */
+        j = isNegative(t1[0]);        /*      ... check which  */
+        t2[0].i0 += 39420360;        /* t2[0] = Py^2 + Gy^2  */
         mul(t2[1], BASE_2Y, t1[0]); /* t2[1] = 2 Py Gy or -2 Py Gy  */
         sub(t1[j], t2[0], t2[1]);    /* t1[0] = Py^2 + Gy^2 - 2 Py Gy  */
         add(t1[1 - j], t2[0], t2[1]); /* t1[1] = Py^2 + Gy^2 + 2 Py Gy  */
         cpy(t2[0], p[1]);        /* t2[0] = Px  */
-        t2[0]._0 -= 9;            /* t2[0] = Px - Gx  */
+        t2[0].i0 -= 9;            /* t2[0] = Px - Gx  */
         sqr(t2[1], t2[0]);        /* t2[1] = (Px - Gx)^2  */
         recip(t2[0], t2[1], 0);    /* t2[0] = 1/(Px - Gx)^2  */
         mul(s[0], t1[0], t2[0]);    /* s[0] = t1[0]/(Px - Gx)^2  */
         sub(s[0], s[0], p[1]);    /* s[0] = t1[0]/(Px - Gx)^2 - Px  */
-        s[0]._0 -= 9 + 486662;        /* s[0] = X(P+G)  */
+        s[0].i0 -= 9 + 486662;        /* s[0] = X(P+G)  */
         mul(s[1], t1[1], t2[0]);    /* s[1] = t1[1]/(Px - Gx)^2  */
         sub(s[1], s[1], p[1]);    /* s[1] = t1[1]/(Px - Gx)^2 - Px  */
-        s[1]._0 -= 9 + 486662;        /* s[1] = X(P-G)  */
-        mul_small(s[0], s[0], 1);    /* reduce s[0] */
-        mul_small(s[1], s[1], 1);    /* reduce s[1] */
+        s[1].i0 -= 9 + 486662;        /* s[1] = X(P-G)  */
+        mulSmall(s[0], s[0], 1);    /* reduce s[0] */
+        mulSmall(s[1], s[1], 1);    /* reduce s[1] */
 
 
         /* prepare the chain  */
@@ -297,27 +298,28 @@ public class Curve {
         public Long10(
                 long i0, long i1, long i2, long i3, long i4,
                 long i5, long i6, long i7, long i8, long i9) {
-            this._0 = i0;
-            this._1 = i1;
-            this._2 = i2;
-            this._3 = i3;
-            this._4 = i4;
-            this._5 = i5;
-            this._6 = i6;
-            this._7 = i7;
-            this._8 = i8;
-            this._9 = i9;
+            this.i0 = i0;
+            this.i1 = i1;
+            this.i2 = i2;
+            this.i3 = i3;
+            this.i4 = i4;
+            this.i5 = i5;
+            this.i6 = i6;
+            this.i7 = i7;
+            this.i8 = i8;
+            this.i9 = i9;
         }
 
-        public long _0, _1, _2, _3, _4, _5, _6, _7, _8, _9;
+        private long i0, i1, i2, i3, i4, i5, i6, i7, i8, i9;
     }
 
     /********************* radix 2^8 math *********************/
 
     private static void cpy32(byte[] d, byte[] s) {
         int i;
-        for (i = 0; i < 32; i++)
+        for (i = 0; i < 32; i++) {
             d[i] = s[i];
+        }
     }
 
     /* p[m..n+m-1] = q[m..n+m-1] + z * x */
@@ -378,7 +380,9 @@ public class Curve {
     }
 
     private static int numsize(byte[] x, int n) {
-        while (n-- != 0 && x[n] == 0) ;
+        while (n-- != 0 && x[n] == 0) {
+
+        }
         return n + 1;
     }
 
@@ -389,12 +393,14 @@ public class Curve {
      * requires that a[-1] and b[-1] are valid memory locations  */
     private static byte[] egcd32(byte[] x, byte[] y, byte[] a, byte[] b) {
         int an, bn = 32, qn, i;
-        for (i = 0; i < 32; i++)
+        for (i = 0; i < 32; i++) {
             x[i] = y[i] = 0;
+        }
         x[0] = 1;
         an = numsize(a, 32);
-        if (an == 0)
+        if (an == 0) {
             return y;    /* division by zero */
+        }
         byte[] temp = new byte[32];
         while (true) {
             qn = bn - an + 1;
@@ -420,35 +426,35 @@ public class Curve {
 
     /* Convert to internal format from little-endian byte format */
     private static void unpack(Long10 x, byte[] m) {
-        x._0 = ((m[0] & 0xFF)) | ((m[1] & 0xFF)) << 8 |
+        x.i0 = ((m[0] & 0xFF)) | ((m[1] & 0xFF)) << 8 |
                 (m[2] & 0xFF) << 16 | ((m[3] & 0xFF) & 3) << 24;
-        x._1 = ((m[3] & 0xFF) & ~3) >> 2 | (m[4] & 0xFF) << 6 |
+        x.i1 = ((m[3] & 0xFF) & ~3) >> 2 | (m[4] & 0xFF) << 6 |
                 (m[5] & 0xFF) << 14 | ((m[6] & 0xFF) & 7) << 22;
-        x._2 = ((m[6] & 0xFF) & ~7) >> 3 | (m[7] & 0xFF) << 5 |
+        x.i2 = ((m[6] & 0xFF) & ~7) >> 3 | (m[7] & 0xFF) << 5 |
                 (m[8] & 0xFF) << 13 | ((m[9] & 0xFF) & 31) << 21;
-        x._3 = ((m[9] & 0xFF) & ~31) >> 5 | (m[10] & 0xFF) << 3 |
+        x.i3 = ((m[9] & 0xFF) & ~31) >> 5 | (m[10] & 0xFF) << 3 |
                 (m[11] & 0xFF) << 11 | ((m[12] & 0xFF) & 63) << 19;
-        x._4 = ((m[12] & 0xFF) & ~63) >> 6 | (m[13] & 0xFF) << 2 |
+        x.i4 = ((m[12] & 0xFF) & ~63) >> 6 | (m[13] & 0xFF) << 2 |
                 (m[14] & 0xFF) << 10 | (m[15] & 0xFF) << 18;
-        x._5 = (m[16] & 0xFF) | (m[17] & 0xFF) << 8 |
+        x.i5 = (m[16] & 0xFF) | (m[17] & 0xFF) << 8 |
                 (m[18] & 0xFF) << 16 | ((m[19] & 0xFF) & 1) << 24;
-        x._6 = ((m[19] & 0xFF) & ~1) >> 1 | (m[20] & 0xFF) << 7 |
+        x.i6 = ((m[19] & 0xFF) & ~1) >> 1 | (m[20] & 0xFF) << 7 |
                 (m[21] & 0xFF) << 15 | ((m[22] & 0xFF) & 7) << 23;
-        x._7 = ((m[22] & 0xFF) & ~7) >> 3 | (m[23] & 0xFF) << 5 |
+        x.i7 = ((m[22] & 0xFF) & ~7) >> 3 | (m[23] & 0xFF) << 5 |
                 (m[24] & 0xFF) << 13 | ((m[25] & 0xFF) & 15) << 21;
-        x._8 = ((m[25] & 0xFF) & ~15) >> 4 | (m[26] & 0xFF) << 4 |
+        x.i8 = ((m[25] & 0xFF) & ~15) >> 4 | (m[26] & 0xFF) << 4 |
                 (m[27] & 0xFF) << 12 | ((m[28] & 0xFF) & 63) << 20;
-        x._9 = ((m[28] & 0xFF) & ~63) >> 6 | (m[29] & 0xFF) << 2 |
+        x.i9 = ((m[28] & 0xFF) & ~63) >> 6 | (m[29] & 0xFF) << 2 |
                 (m[30] & 0xFF) << 10 | (m[31] & 0xFF) << 18;
     }
 
     /* Check if reduced-form input >= 2^255-19 */
-    private static boolean is_overflow(Long10 x) {
+    private static boolean isOverflow(Long10 x) {
         return (
-                ((x._0 > P26 - 19)) &&
-                        ((x._1 & x._3 & x._5 & x._7 & x._9) == P25) &&
-                        ((x._2 & x._4 & x._6 & x._8) == P26)
-        ) || (x._9 > P25);
+                ((x.i0 > P26 - 19)) &&
+                        ((x.i1 & x.i3 & x.i5 & x.i7 & x.i9) == P25) &&
+                        ((x.i2 & x.i4 & x.i6 & x.i8) == P26)
+        ) || (x.i9 > P25);
     }
 
     /* Convert from internal format to little-endian byte format.  The
@@ -459,45 +465,45 @@ public class Curve {
     private static void pack(Long10 x, byte[] m) {
         int ld = 0, ud = 0;
         long t;
-        ld = (is_overflow(x) ? 1 : 0) - ((x._9 < 0) ? 1 : 0);
+        ld = (isOverflow(x) ? 1 : 0) - ((x.i9 < 0) ? 1 : 0);
         ud = ld * -(P25 + 1);
         ld *= 19;
-        t = ld + x._0 + (x._1 << 26);
+        t = ld + x.i0 + (x.i1 << 26);
         m[0] = (byte) t;
         m[1] = (byte) (t >> 8);
         m[2] = (byte) (t >> 16);
         m[3] = (byte) (t >> 24);
-        t = (t >> 32) + (x._2 << 19);
+        t = (t >> 32) + (x.i2 << 19);
         m[4] = (byte) t;
         m[5] = (byte) (t >> 8);
         m[6] = (byte) (t >> 16);
         m[7] = (byte) (t >> 24);
-        t = (t >> 32) + (x._3 << 13);
+        t = (t >> 32) + (x.i3 << 13);
         m[8] = (byte) t;
         m[9] = (byte) (t >> 8);
         m[10] = (byte) (t >> 16);
         m[11] = (byte) (t >> 24);
-        t = (t >> 32) + (x._4 << 6);
+        t = (t >> 32) + (x.i4 << 6);
         m[12] = (byte) t;
         m[13] = (byte) (t >> 8);
         m[14] = (byte) (t >> 16);
         m[15] = (byte) (t >> 24);
-        t = (t >> 32) + x._5 + (x._6 << 25);
+        t = (t >> 32) + x.i5 + (x.i6 << 25);
         m[16] = (byte) t;
         m[17] = (byte) (t >> 8);
         m[18] = (byte) (t >> 16);
         m[19] = (byte) (t >> 24);
-        t = (t >> 32) + (x._7 << 19);
+        t = (t >> 32) + (x.i7 << 19);
         m[20] = (byte) t;
         m[21] = (byte) (t >> 8);
         m[22] = (byte) (t >> 16);
         m[23] = (byte) (t >> 24);
-        t = (t >> 32) + (x._8 << 12);
+        t = (t >> 32) + (x.i8 << 12);
         m[24] = (byte) t;
         m[25] = (byte) (t >> 8);
         m[26] = (byte) (t >> 16);
         m[27] = (byte) (t >> 24);
-        t = (t >> 32) + ((x._9 + ud) << 6);
+        t = (t >> 32) + ((x.i9 + ud) << 6);
         m[28] = (byte) t;
         m[29] = (byte) (t >> 8);
         m[30] = (byte) (t >> 16);
@@ -506,89 +512,89 @@ public class Curve {
 
     /* Copy a number */
     private static void cpy(Long10 out, Long10 in) {
-        out._0 = in._0;
-        out._1 = in._1;
-        out._2 = in._2;
-        out._3 = in._3;
-        out._4 = in._4;
-        out._5 = in._5;
-        out._6 = in._6;
-        out._7 = in._7;
-        out._8 = in._8;
-        out._9 = in._9;
+        out.i0 = in.i0;
+        out.i1 = in.i1;
+        out.i2 = in.i2;
+        out.i3 = in.i3;
+        out.i4 = in.i4;
+        out.i5 = in.i5;
+        out.i6 = in.i6;
+        out.i7 = in.i7;
+        out.i8 = in.i8;
+        out.i9 = in.i9;
     }
 
     /* Set a number to value, which must be in range -185861411 .. 185861411 */
     private static void set(Long10 out, int in) {
-        out._0 = in;
-        out._1 = 0;
-        out._2 = 0;
-        out._3 = 0;
-        out._4 = 0;
-        out._5 = 0;
-        out._6 = 0;
-        out._7 = 0;
-        out._8 = 0;
-        out._9 = 0;
+        out.i0 = in;
+        out.i1 = 0;
+        out.i2 = 0;
+        out.i3 = 0;
+        out.i4 = 0;
+        out.i5 = 0;
+        out.i6 = 0;
+        out.i7 = 0;
+        out.i8 = 0;
+        out.i9 = 0;
     }
 
     /* Add/subtract two numbers.  The inputs must be in reduced form, and the
      * output isn't, so to do another addition or subtraction on the output,
      * first multiply it by one to reduce it. */
     private static void add(Long10 xy, Long10 x, Long10 y) {
-        xy._0 = x._0 + y._0;
-        xy._1 = x._1 + y._1;
-        xy._2 = x._2 + y._2;
-        xy._3 = x._3 + y._3;
-        xy._4 = x._4 + y._4;
-        xy._5 = x._5 + y._5;
-        xy._6 = x._6 + y._6;
-        xy._7 = x._7 + y._7;
-        xy._8 = x._8 + y._8;
-        xy._9 = x._9 + y._9;
+        xy.i0 = x.i0 + y.i0;
+        xy.i1 = x.i1 + y.i1;
+        xy.i2 = x.i2 + y.i2;
+        xy.i3 = x.i3 + y.i3;
+        xy.i4 = x.i4 + y.i4;
+        xy.i5 = x.i5 + y.i5;
+        xy.i6 = x.i6 + y.i6;
+        xy.i7 = x.i7 + y.i7;
+        xy.i8 = x.i8 + y.i8;
+        xy.i9 = x.i9 + y.i9;
     }
 
     private static void sub(Long10 xy, Long10 x, Long10 y) {
-        xy._0 = x._0 - y._0;
-        xy._1 = x._1 - y._1;
-        xy._2 = x._2 - y._2;
-        xy._3 = x._3 - y._3;
-        xy._4 = x._4 - y._4;
-        xy._5 = x._5 - y._5;
-        xy._6 = x._6 - y._6;
-        xy._7 = x._7 - y._7;
-        xy._8 = x._8 - y._8;
-        xy._9 = x._9 - y._9;
+        xy.i0 = x.i0 - y.i0;
+        xy.i1 = x.i1 - y.i1;
+        xy.i2 = x.i2 - y.i2;
+        xy.i3 = x.i3 - y.i3;
+        xy.i4 = x.i4 - y.i4;
+        xy.i5 = x.i5 - y.i5;
+        xy.i6 = x.i6 - y.i6;
+        xy.i7 = x.i7 - y.i7;
+        xy.i8 = x.i8 - y.i8;
+        xy.i9 = x.i9 - y.i9;
     }
 
     /* Multiply a number by a small integer in range -185861411 .. 185861411.
      * The output is in reduced form, the input x need not be.  x and xy may point
      * to the same buffer. */
-    private static Long10 mul_small(Long10 xy, Long10 x, long y) {
+    private static Long10 mulSmall(Long10 xy, Long10 x, long y) {
         long t;
-        t = (x._8 * y);
-        xy._8 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x._9 * y);
-        xy._9 = (t & ((1 << 25) - 1));
-        t = 19 * (t >> 25) + (x._0 * y);
-        xy._0 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x._1 * y);
-        xy._1 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + (x._2 * y);
-        xy._2 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x._3 * y);
-        xy._3 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + (x._4 * y);
-        xy._4 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x._5 * y);
-        xy._5 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + (x._6 * y);
-        xy._6 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x._7 * y);
-        xy._7 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + xy._8;
-        xy._8 = (t & ((1 << 26) - 1));
-        xy._9 += (t >> 26);
+        t = (x.i8 * y);
+        xy.i8 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + (x.i9 * y);
+        xy.i9 = (t & ((1 << 25) - 1));
+        t = 19 * (t >> 25) + (x.i0 * y);
+        xy.i0 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + (x.i1 * y);
+        xy.i1 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + (x.i2 * y);
+        xy.i2 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + (x.i3 * y);
+        xy.i3 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + (x.i4 * y);
+        xy.i4 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + (x.i5 * y);
+        xy.i5 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + (x.i6 * y);
+        xy.i6 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + (x.i7 * y);
+        xy.i7 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + xy.i8;
+        xy.i8 = (t & ((1 << 26) - 1));
+        xy.i9 += (t >> 26);
         return xy;
     }
 
@@ -600,111 +606,111 @@ public class Curve {
          * This seem to improve performance a bit...
          */
         long
-                x0 = x._0, x1 = x._1, x2 = x._2, x3 = x._3, x4 = x._4,
-                x5 = x._5, x6 = x._6, x7 = x._7, x8 = x._8, x9 = x._9;
+                x0 = x.i0, x1 = x.i1, x2 = x.i2, x3 = x.i3, x4 = x.i4,
+                x5 = x.i5, x6 = x.i6, x7 = x.i7, x8 = x.i8, x9 = x.i9;
         long
-                y0 = y._0, y1 = y._1, y2 = y._2, y3 = y._3, y4 = y._4,
-                y5 = y._5, y6 = y._6, y7 = y._7, y8 = y._8, y9 = y._9;
+                y0 = y.i0, y1 = y.i1, y2 = y.i2, y3 = y.i3, y4 = y.i4,
+                y5 = y.i5, y6 = y.i6, y7 = y.i7, y8 = y.i8, y9 = y.i9;
         long t;
         t = (x0 * y8) + (x2 * y6) + (x4 * y4) + (x6 * y2) +
                 (x8 * y0) + 2 * ((x1 * y7) + (x3 * y5) +
                 (x5 * y3) + (x7 * y1)) + 38 *
                 (x9 * y9);
-        xy._8 = (t & ((1 << 26) - 1));
+        xy.i8 = (t & ((1 << 26) - 1));
         t = (t >> 26) + (x0 * y9) + (x1 * y8) + (x2 * y7) +
                 (x3 * y6) + (x4 * y5) + (x5 * y4) +
                 (x6 * y3) + (x7 * y2) + (x8 * y1) +
                 (x9 * y0);
-        xy._9 = (t & ((1 << 25) - 1));
+        xy.i9 = (t & ((1 << 25) - 1));
         t = (x0 * y0) + 19 * ((t >> 25) + (x2 * y8) + (x4 * y6)
                 + (x6 * y4) + (x8 * y2)) + 38 *
                 ((x1 * y9) + (x3 * y7) + (x5 * y5) +
                         (x7 * y3) + (x9 * y1));
-        xy._0 = (t & ((1 << 26) - 1));
+        xy.i0 = (t & ((1 << 26) - 1));
         t = (t >> 26) + (x0 * y1) + (x1 * y0) + 19 * ((x2 * y9)
                 + (x3 * y8) + (x4 * y7) + (x5 * y6) +
                 (x6 * y5) + (x7 * y4) + (x8 * y3) +
                 (x9 * y2));
-        xy._1 = (t & ((1 << 25) - 1));
+        xy.i1 = (t & ((1 << 25) - 1));
         t = (t >> 25) + (x0 * y2) + (x2 * y0) + 19 * ((x4 * y8)
                 + (x6 * y6) + (x8 * y4)) + 2 * (x1 * y1)
                 + 38 * ((x3 * y9) + (x5 * y7) +
                 (x7 * y5) + (x9 * y3));
-        xy._2 = (t & ((1 << 26) - 1));
+        xy.i2 = (t & ((1 << 26) - 1));
         t = (t >> 26) + (x0 * y3) + (x1 * y2) + (x2 * y1) +
                 (x3 * y0) + 19 * ((x4 * y9) + (x5 * y8) +
                 (x6 * y7) + (x7 * y6) +
                 (x8 * y5) + (x9 * y4));
-        xy._3 = (t & ((1 << 25) - 1));
+        xy.i3 = (t & ((1 << 25) - 1));
         t = (t >> 25) + (x0 * y4) + (x2 * y2) + (x4 * y0) + 19 *
                 ((x6 * y8) + (x8 * y6)) + 2 * ((x1 * y3) +
                 (x3 * y1)) + 38 *
                 ((x5 * y9) + (x7 * y7) + (x9 * y5));
-        xy._4 = (t & ((1 << 26) - 1));
+        xy.i4 = (t & ((1 << 26) - 1));
         t = (t >> 26) + (x0 * y5) + (x1 * y4) + (x2 * y3) +
                 (x3 * y2) + (x4 * y1) + (x5 * y0) + 19 *
                 ((x6 * y9) + (x7 * y8) + (x8 * y7) +
                         (x9 * y6));
-        xy._5 = (t & ((1 << 25) - 1));
+        xy.i5 = (t & ((1 << 25) - 1));
         t = (t >> 25) + (x0 * y6) + (x2 * y4) + (x4 * y2) +
                 (x6 * y0) + 19 * (x8 * y8) + 2 * ((x1 * y5) +
                 (x3 * y3) + (x5 * y1)) + 38 *
                 ((x7 * y9) + (x9 * y7));
-        xy._6 = (t & ((1 << 26) - 1));
+        xy.i6 = (t & ((1 << 26) - 1));
         t = (t >> 26) + (x0 * y7) + (x1 * y6) + (x2 * y5) +
                 (x3 * y4) + (x4 * y3) + (x5 * y2) +
                 (x6 * y1) + (x7 * y0) + 19 * ((x8 * y9) +
                 (x9 * y8));
-        xy._7 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + xy._8;
-        xy._8 = (t & ((1 << 26) - 1));
-        xy._9 += (t >> 26);
+        xy.i7 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + xy.i8;
+        xy.i8 = (t & ((1 << 26) - 1));
+        xy.i9 += (t >> 26);
         return xy;
     }
 
     /* Square a number.  Optimization of  mul25519(x2, x, x)  */
     private static Long10 sqr(Long10 y, Long10 x) {
         long
-                x0 = x._0, x1 = x._1, x2 = x._2, x3 = x._3, x4 = x._4,
-                x5 = x._5, x6 = x._6, x7 = x._7, x8 = x._8, x9 = x._9;
+                x0 = x.i0, x1 = x.i1, x2 = x.i2, x3 = x.i3, x4 = x.i4,
+                x5 = x.i5, x6 = x.i6, x7 = x.i7, x8 = x.i8, x9 = x.i9;
         long t;
         t = (x4 * x4) + 2 * ((x0 * x8) + (x2 * x6)) + 38 *
                 (x9 * x9) + 4 * ((x1 * x7) + (x3 * x5));
-        y._8 = (t & ((1 << 26) - 1));
+        y.i8 = (t & ((1 << 26) - 1));
         t = (t >> 26) + 2 * ((x0 * x9) + (x1 * x8) + (x2 * x7) +
                 (x3 * x6) + (x4 * x5));
-        y._9 = (t & ((1 << 25) - 1));
+        y.i9 = (t & ((1 << 25) - 1));
         t = 19 * (t >> 25) + (x0 * x0) + 38 * ((x2 * x8) +
                 (x4 * x6) + (x5 * x5)) + 76 * ((x1 * x9)
                 + (x3 * x7));
-        y._0 = (t & ((1 << 26) - 1));
+        y.i0 = (t & ((1 << 26) - 1));
         t = (t >> 26) + 2 * (x0 * x1) + 38 * ((x2 * x9) +
                 (x3 * x8) + (x4 * x7) + (x5 * x6));
-        y._1 = (t & ((1 << 25) - 1));
+        y.i1 = (t & ((1 << 25) - 1));
         t = (t >> 25) + 19 * (x6 * x6) + 2 * ((x0 * x2) +
                 (x1 * x1)) + 38 * (x4 * x8) + 76 *
                 ((x3 * x9) + (x5 * x7));
-        y._2 = (t & ((1 << 26) - 1));
+        y.i2 = (t & ((1 << 26) - 1));
         t = (t >> 26) + 2 * ((x0 * x3) + (x1 * x2)) + 38 *
                 ((x4 * x9) + (x5 * x8) + (x6 * x7));
-        y._3 = (t & ((1 << 25) - 1));
+        y.i3 = (t & ((1 << 25) - 1));
         t = (t >> 25) + (x2 * x2) + 2 * (x0 * x4) + 38 *
                 ((x6 * x8) + (x7 * x7)) + 4 * (x1 * x3) + 76 *
                 (x5 * x9);
-        y._4 = (t & ((1 << 26) - 1));
+        y.i4 = (t & ((1 << 26) - 1));
         t = (t >> 26) + 2 * ((x0 * x5) + (x1 * x4) + (x2 * x3))
                 + 38 * ((x6 * x9) + (x7 * x8));
-        y._5 = (t & ((1 << 25) - 1));
+        y.i5 = (t & ((1 << 25) - 1));
         t = (t >> 25) + 19 * (x8 * x8) + 2 * ((x0 * x6) +
                 (x2 * x4) + (x3 * x3)) + 4 * (x1 * x5) +
                 76 * (x7 * x9);
-        y._6 = (t & ((1 << 26) - 1));
+        y.i6 = (t & ((1 << 26) - 1));
         t = (t >> 26) + 2 * ((x0 * x7) + (x1 * x6) + (x2 * x5) +
                 (x3 * x4)) + 38 * (x8 * x9);
-        y._7 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + y._8;
-        y._8 = (t & ((1 << 26) - 1));
-        y._9 += (t >> 26);
+        y.i7 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + y.i8;
+        y.i8 = (t & ((1 << 26) - 1));
+        y.i9 += (t >> 26);
         return y;
     }
 
@@ -785,8 +791,8 @@ public class Curve {
     }
 
     /* checks if x is "negative", requires reduced input */
-    private static int is_negative(Long10 x) {
-        return (int) (((is_overflow(x) || (x._9 < 0)) ? 1 : 0) ^ (x._0 & 1));
+    private static int isNegative(Long10 x) {
+        return (int) (((isOverflow(x) || (x.i9 < 0)) ? 1 : 0) ^ (x.i0 & 1));
     }
 
     /* a square root */
@@ -796,7 +802,7 @@ public class Curve {
         recip(v, t1, 1);    /* v = (2u)^((p-5)/8)    */
         sqr(x, v);        /* x = v^2        */
         mul(t2, t1, x);    /* t2 = 2uv^2        */
-        t2._0--;        /* t2 = 2uv^2-1        */
+        t2.i0--;        /* t2 = 2uv^2-1        */
         mul(t1, v, t2);    /* t1 = v(2uv^2-1)    */
         mul(x, u, t1);    /* x = uv(2uv^2-1)    */
     }
@@ -837,7 +843,7 @@ public class Curve {
         sqr(t2, t4);
         mul(bx, t1, t2);
         sub(t2, t1, t2);
-        mul_small(bz, t2, 121665);
+        mulSmall(bz, t2, 121665);
         add(t1, t1, bz);
         mul(bz, t1, t2);
     }
@@ -846,9 +852,9 @@ public class Curve {
      * t is a temporary  */
     private static void xtoy2(Long10 t, Long10 y2, Long10 x) {
         sqr(t, x);
-        mul_small(y2, x, 486662);
+        mulSmall(y2, x, 486662);
         add(t, t, y2);
-        t._0++;
+        t.i0++;
         mul(y2, t, x);
     }
 
@@ -866,10 +872,11 @@ public class Curve {
         int i, j;
 
         /* unpack the base */
-        if (gx != null)
+        if (gx != null) {
             unpack(dx, gx);
-        else
+        } else {
             set(dx, 9);
+        }
 
         /* 0G = point-at-infinity */
         set(x[0], 1);
@@ -911,17 +918,18 @@ public class Curve {
             recip(t3, z[1], 0);    /* where Q=P+G ... */
             mul(t2, x[1], t3);    /* t2 = Qx  */
             add(t2, t2, dx);    /* t2 = Qx + Px  */
-            t2._0 += 9 + 486662;    /* t2 = Qx + Px + Gx + 486662  */
-            dx._0 -= 9;        /* dx = Px - Gx  */
+            t2.i0 += 9 + 486662;    /* t2 = Qx + Px + Gx + 486662  */
+            dx.i0 -= 9;        /* dx = Px - Gx  */
             sqr(t3, dx);    /* t3 = (Px - Gx)^2  */
             mul(dx, t2, t3);    /* dx = t2 (Px - Gx)^2  */
             sub(dx, dx, t1);    /* dx = t2 (Px - Gx)^2 - Py^2  */
-            dx._0 -= 39420360;    /* dx = t2 (Px - Gx)^2 - Py^2 - Gy^2  */
+            dx.i0 -= 39420360;    /* dx = t2 (Px - Gx)^2 - Py^2 - Gy^2  */
             mul(t1, dx, BASE_R2Y);    /* t1 = -Py  */
-            if (is_negative(t1) != 0)    /* sign is 1, so just copy  */
+            if (isNegative(t1) != 0) {    /* sign is 1, so just copy  */
                 cpy32(s, k);
-            else            /* sign is -1, so negate  */
+            } else {            /* sign is -1, so negate  */
                 mulaSmall(s, ORDER_TIMES_8, 0, k, 32, -1);
+            }
 
             /* reduce s mod q
              * (is this needed?  do it just in case, it's fast anyway) */
@@ -933,8 +941,9 @@ public class Curve {
             byte[] temp3 = new byte[64];
             cpy32(temp1, ORDER);
             cpy32(s, egcd32(temp2, temp3, s, temp1));
-            if ((s[31] & 0x80) != 0)
+            if ((s[31] & 0x80) != 0) {
                 mulaSmall(s, s, 0, ORDER, 32, 1);
+            }
         }
     }
 

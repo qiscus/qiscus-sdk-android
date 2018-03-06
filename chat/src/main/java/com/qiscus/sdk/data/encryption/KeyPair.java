@@ -62,4 +62,9 @@ public final class KeyPair {
         return ((KeyPair) other).privateKey.equals(privateKey) &&
                 ((KeyPair) other).publicKey.equals(publicKey);
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

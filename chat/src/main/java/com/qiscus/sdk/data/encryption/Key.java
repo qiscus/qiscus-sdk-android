@@ -22,39 +22,39 @@ import java.util.Arrays;
 import static java.lang.System.arraycopy;
 
 public class Key {
-    protected byte[] key;
+    protected byte[] keyBytes;
 
     public static final int SIZE = 32;
     public static final int ESIZE = SIZE + 1;
 
 
     public Key() {
-        key = new byte[32];
+        keyBytes = new byte[32];
     }
 
     /**
      * Creates a new Key object
      *
-     * @param key Key byte sequence
+     * @param keyBytes Key byte sequence
      */
-    public Key(final byte[] key) throws IllegalDataSizeException {
-        this.key = new byte[32];
-        if (key.length != 32) {
+    public Key(final byte[] keyBytes) throws IllegalDataSizeException {
+        this.keyBytes = new byte[32];
+        if (keyBytes.length != 32) {
             throw new IllegalDataSizeException();
         }
-        System.arraycopy(key, 0, this.key, 0, 32);
+        arraycopy(keyBytes, 0, this.keyBytes, 0, 32);
     }
 
     /**
-     * Serializes the key
+     * Serializes the keyBytes
      *
-     * @return byte sequence containing serialized key
+     * @return byte sequence containing serialized keyBytes
      */
     public byte[] encode() {
         byte[] retval = new byte[33];
 
         retval[0] = 0x5;
-        System.arraycopy(key, 0, retval, 1, 32);
+        arraycopy(keyBytes, 0, retval, 1, 32);
         return retval;
     }
 
@@ -79,20 +79,20 @@ public class Key {
 
 
     /**
-     * Returns the raw key
+     * Returns the raw keyBytes
      *
-     * @return byte sequence containing the key
+     * @return byte sequence containing the keyBytes
      */
     public final byte[] raw() {
-        return key;
+        return keyBytes;
     }
 
     /**
-     * Clears the key
+     * Clears the keyBytes
      */
     public void clear() {
-        for (int i = 0; i < key.length; i++) {
-            key[i] = 0;
+        for (int i = 0; i < keyBytes.length; i++) {
+            keyBytes[i] = 0;
         }
     }
 
@@ -102,13 +102,6 @@ public class Key {
      * @param other Other Key object
      * @return whether this Key is the same with the other
      */
-    public boolean equals(Key other) {
-        if (other == null) {
-            return false;
-        }
-        return Arrays.equals(key, other.key);
-    }
-
     @Override
     public boolean equals(Object other) {
         if (this == other) {
@@ -122,14 +115,14 @@ public class Key {
             return false;
         }
 
-        return Arrays.equals(key, ((Key) other).key);
+        return Arrays.equals(keyBytes, ((Key) other).keyBytes);
     }
 
     @Override
     public int hashCode() {
         int h = 0;
-        for (int i = 0; i < key.length; i++) {
-            h |= key[i];
+        for (int i = 0; i < keyBytes.length; i++) {
+            h |= keyBytes[i];
         }
         return h;
     }
@@ -137,8 +130,8 @@ public class Key {
     public boolean isNull() {
         int c = 0;
 
-        for (int i = 0; i < key.length; i++) {
-            c += key[i];
+        for (int i = 0; i < keyBytes.length; i++) {
+            c += keyBytes[i];
             if (c > 0) {
                 return false;
             }

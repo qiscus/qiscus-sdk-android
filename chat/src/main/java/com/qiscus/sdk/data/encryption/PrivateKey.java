@@ -32,7 +32,7 @@ public class PrivateKey extends Key {
 
 
     public PrivateKey() {
-        key = new byte[Key.SIZE];
+        keyBytes = new byte[Key.SIZE];
         forSigning = new byte[Key.SIZE];
     }
 
@@ -53,7 +53,7 @@ public class PrivateKey extends Key {
         boolean done = false;
 
         byte[] pubKey = new byte[Key.SIZE];
-        Curve.keygen(pubKey, null, key);
+        Curve.keygen(pubKey, null, keyBytes);
 
         byte[] pubPoint = new byte[Key.SIZE];
         byte[] sig1 = new byte[0];
@@ -92,7 +92,7 @@ public class PrivateKey extends Key {
         byte[] retval = new byte[ESIZE];
 
         retval[0] = 0x5;
-        System.arraycopy(key, 0, retval, 1, Key.SIZE);
+        System.arraycopy(keyBytes, 0, retval, 1, Key.SIZE);
         System.arraycopy(forSigning, 0, retval, Key.SIZE + 1, Key.SIZE);
 
         return retval;
@@ -122,7 +122,7 @@ public class PrivateKey extends Key {
      */
     public final byte[] shareSecret(PublicKey other) {
         byte[] shared = new byte[Key.SIZE];
-        byte[] k = key.clone();
+        byte[] k = keyBytes.clone();
         k[31] &= 0x7F;
         k[31] |= 0x40;
         k[0] &= 0xF8;

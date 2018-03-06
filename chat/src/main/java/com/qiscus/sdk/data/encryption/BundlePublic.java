@@ -53,10 +53,6 @@ public class BundlePublic {
         throw new NullPointerException();
     }
 
-    public boolean equals(BundlePublic other) {
-        return identity.equals(other.identity);
-    }
-
     @Override
     public boolean equals(Object other) {
         if (this == other) {
@@ -68,7 +64,12 @@ public class BundlePublic {
         if (getClass() != other.getClass()) {
             return false;
         }
-        return equals((BundlePublic) other);
+        return identity.equals(((BundlePublic) other).identity);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     public boolean verify() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {

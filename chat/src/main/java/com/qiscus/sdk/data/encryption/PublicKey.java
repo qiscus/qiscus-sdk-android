@@ -47,7 +47,7 @@ public class PublicKey extends Key {
      * @return a hex string
      */
     public final String hexString() {
-        return new String(Hex.encodeHex(key));
+        return new String(Hex.encodeHex(keyBytes));
     }
 
     /**
@@ -71,10 +71,10 @@ public class PublicKey extends Key {
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(message);
-        md.update(key);
+        md.update(keyBytes);
         byte[] digest = md.digest();
 
-        Curve.verify(y, s2, digest, key);
+        Curve.verify(y, s2, digest, keyBytes);
 
         MessageDigest md2 = MessageDigest.getInstance("SHA-256");
         md2.update(y);

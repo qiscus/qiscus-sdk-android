@@ -24,21 +24,21 @@ import java.util.Arrays;
  */
 
 public class PreKeyId {
-    final byte[] preKeyId;
+    final byte[] preKeyIdBytes;
 
     public PreKeyId(byte[] id) throws InvalidKeyException {
         if (id.length != 32) {
             throw new InvalidKeyException();
         }
-        preKeyId = id.clone();
+        preKeyIdBytes = id.clone();
     }
 
     public PreKeyId(byte[] id, int offset) throws InvalidKeyException {
         if (id.length + offset < 32) {
             throw new InvalidKeyException();
         }
-        preKeyId = new byte[32];
-        System.arraycopy(id, offset, preKeyId, 0, 32);
+        preKeyIdBytes = new byte[32];
+        System.arraycopy(id, offset, preKeyIdBytes, 0, 32);
     }
 
 
@@ -54,21 +54,21 @@ public class PreKeyId {
             return false;
         }
 
-        return Arrays.equals(preKeyId, ((PreKeyId) other).preKeyId);
+        return Arrays.equals(preKeyIdBytes, ((PreKeyId) other).preKeyIdBytes);
     }
 
     @Override
     public int hashCode() {
         int result = 0;
-        for (int i = 0; i < preKeyId.length; i++) {
-            result |= hashCode(preKeyId[i]);
+        for (int i = 0; i < preKeyIdBytes.length; i++) {
+            result |= hashCode(preKeyIdBytes[i]);
         }
 
         return result;
     }
 
     public final byte[] raw() {
-        return preKeyId;
+        return preKeyIdBytes;
     }
 
     private static int hashCode(Object o) {

@@ -24,21 +24,21 @@ import java.util.Arrays;
  */
 public class HashId {
     public static final int SIZE = 64;
-    final byte[] hashId;
+    final byte[] hash;
 
     public HashId(byte[] id) throws InvalidKeyException {
         if (id.length != SIZE) {
             throw new InvalidKeyException();
         }
-        hashId = id.clone();
+        hash = id.clone();
     }
 
     public HashId(byte[] id, int offset) throws InvalidKeyException {
         if (id.length + offset < SIZE) {
             throw new InvalidKeyException();
         }
-        hashId = new byte[SIZE];
-        System.arraycopy(id, offset, hashId, 0, SIZE);
+        hash = new byte[SIZE];
+        System.arraycopy(id, offset, hash, 0, SIZE);
     }
 
     @Override
@@ -53,21 +53,21 @@ public class HashId {
             return false;
         }
 
-        return Arrays.equals(hashId, ((HashId) other).hashId);
+        return Arrays.equals(hash, ((HashId) other).hash);
     }
 
     @Override
     public int hashCode() {
         int result = 0;
-        for (int i = 0; i < hashId.length; i++) {
-            result |= hashCode(hashId[i]);
+        for (int i = 0; i < hash.length; i++) {
+            result |= hashCode(hash[i]);
         }
 
         return result;
     }
 
     public final byte[] raw() {
-        return hashId;
+        return hash;
     }
 
     private static int hashCode(Object o) {
