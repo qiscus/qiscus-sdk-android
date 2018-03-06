@@ -35,7 +35,7 @@ public class Kdf {
         return data;
     }
 
-    public static Kdf KdfSha512(byte[] secret, byte[] salt) {
+    public static Kdf kdfSha512(byte[] secret, byte[] salt) {
         Kdf kdf = new Kdf();
 
         byte[] data = kdf.prepareData(secret, salt);

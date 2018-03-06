@@ -93,7 +93,7 @@ public class Ratchet {
         }
 
         byte[] salt = Constants.getRidonSalt512();
-        Kdf kdf = Kdf.KdfSha512(dh, rk.raw());
+        Kdf kdf = Kdf.kdfSha512(dh, rk.raw());
         byte[] kdfResult = kdf.get(Constants.RidonRatchetInfo, 64);
 
         this.pairSender = pair;
@@ -233,7 +233,8 @@ public class Ratchet {
      * @param ad        Additional data
      * @return
      */
-    public byte[] encrypt(final byte[] plainText, final byte[] ad) throws NoSuchAlgorithmException, InvalidKeyException, IllegalDataSizeException, EncryptionFailedException, IOException {
+    public byte[] encrypt(final byte[] plainText, final byte[] ad) throws NoSuchAlgorithmException,
+            InvalidKeyException, IllegalDataSizeException, EncryptionFailedException, IOException {
         byte[] m = new byte[1];
         m[0] = 1;
 
@@ -282,7 +283,9 @@ public class Ratchet {
         }
     }
 
-    public byte[] trySkippedMessages(RatchetMessageHeader header, ByteArrayInputStream in, byte[] ad) throws IOException, DecryptionFailedException, IllegalDataSizeException, TooManySkippedMessagesException, AuthenticationException {
+    public byte[] trySkippedMessages(RatchetMessageHeader header, ByteArrayInputStream in, byte[] ad)
+            throws IOException, DecryptionFailedException, IllegalDataSizeException,
+            TooManySkippedMessagesException, AuthenticationException {
         Key mk = findSkippedKey(header);
         if (mk == null) {
             return null;
@@ -301,7 +304,9 @@ public class Ratchet {
         return aead.decrypt(data, adAll);
     }
 
-    public byte[] decrypt(byte[] cipherText, byte[] ad) throws DecryptionFailedException, IOException, InvalidKeyException, IllegalDataSizeException, TooManySkippedMessagesException, NoSuchAlgorithmException, AuthenticationException, InvalidKeyException {
+    public byte[] decrypt(byte[] cipherText, byte[] ad) throws DecryptionFailedException, IOException,
+            InvalidKeyException, IllegalDataSizeException, TooManySkippedMessagesException,
+            NoSuchAlgorithmException, AuthenticationException, InvalidKeyException {
         ByteArrayInputStream in = new ByteArrayInputStream(cipherText);
 
         byte[] hs = new byte[RatchetMessageHeader.SIZE];
@@ -350,7 +355,8 @@ public class Ratchet {
         return decrypted;
     }
 
-    public void skipMessages(int num) throws TooManySkippedMessagesException, NoSuchAlgorithmException, InvalidKeyException, IllegalDataSizeException {
+    public void skipMessages(int num) throws TooManySkippedMessagesException, NoSuchAlgorithmException,
+            InvalidKeyException, IllegalDataSizeException {
         if (messageNumberRecipient + Constants.MaxSkippedMessages < num) {
             throw new TooManySkippedMessagesException();
         }
@@ -393,7 +399,7 @@ public class Ratchet {
         byte[] dh = pairSender.privateKey.shareSecret(remote);
 
         byte[] salt = Constants.getRidonSalt512();
-        Kdf kdf = Kdf.KdfSha512(dh, rootKey.raw());
+        Kdf kdf = Kdf.kdfSha512(dh, rootKey.raw());
         byte[] kdfResult = kdf.get(Constants.RidonRatchetInfo, 64);
 
         KeyPair pair = new KeyPair();
@@ -407,7 +413,7 @@ public class Ratchet {
         pairSender = pair;
 
         dh = pairSender.privateKey.shareSecret(publicRecipient);
-        kdf = Kdf.KdfSha512(dh, rootKey.raw());
+        kdf = Kdf.kdfSha512(dh, rootKey.raw());
         kdfResult = kdf.get(Constants.RidonRatchetInfo, 64);
 
         pair = new KeyPair();

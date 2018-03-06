@@ -29,7 +29,8 @@ public class SesameSenderDevice {
     Bundle bundle;
     String userId;
 
-    public SesameSenderDevice(HashId id, String userId) throws IllegalDataSizeException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public SesameSenderDevice(HashId id, String userId) throws IllegalDataSizeException,
+            NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         pair = new KeyPair();
         bundle = new Bundle();
         bundle.populatePreKeys();

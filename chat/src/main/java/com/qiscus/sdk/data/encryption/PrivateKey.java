@@ -143,7 +143,7 @@ public class PrivateKey extends Key {
         byte[] shared = shareSecret(other);
 
         byte[] salt = Constants.getRidonSalt512();
-        Kdf kdf = Kdf.KdfSha512(shared, salt);
+        Kdf kdf = Kdf.kdfSha512(shared, salt);
         byte[] kdfResult = kdf.get(info, length);
         return kdfResult;
     }

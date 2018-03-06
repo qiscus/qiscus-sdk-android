@@ -52,7 +52,8 @@ public class BundlePublicCollection {
         return map.keySet();
     }
 
-    public static BundlePublicCollection decode(byte[] raw) throws IOException, IllegalDataSizeException, InvalidKeyException, SignatureException {
+    public static BundlePublicCollection decode(byte[] raw) throws IOException, IllegalDataSizeException,
+            InvalidKeyException, SignatureException {
         BundlePublicCollection me = new BundlePublicCollection();
         ByteArrayInputStream input = new ByteArrayInputStream(raw);
         byte[] b = new byte[4];

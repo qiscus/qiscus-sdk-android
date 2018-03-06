@@ -48,7 +48,7 @@ public class Aead {
 
     private void generateKeys() {
         byte[] salt = Constants.getRidonSalt512();
-        Kdf kdf = Kdf.KdfSha512(key, salt);
+        Kdf kdf = Kdf.kdfSha512(key, salt);
         byte[] kdfResult = kdf.get(info, 64);
 
         System.arraycopy(kdfResult, 0, opKey, 0, 16);
@@ -109,7 +109,8 @@ public class Aead {
      * @return decrypted byte array
      * @throws EncryptionFailedException
      */
-    public byte[] decrypt(byte[] cipherText, byte[] ad) throws DecryptionFailedException, IllegalDataSizeException, AuthenticationException {
+    public byte[] decrypt(byte[] cipherText, byte[] ad) throws DecryptionFailedException,
+            IllegalDataSizeException, AuthenticationException {
         generateKeys();
 
         if (cipherText.length <= 64) {

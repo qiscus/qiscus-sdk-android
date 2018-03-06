@@ -53,7 +53,8 @@ public class SesameConversation {
      * @param recipientName   The recipient username
      * @param recipientPublic The recipient public bundles for all devices
      */
-    public SesameConversation(String senderName, HashId selfDeviceId, Bundle senderBundle, String recipientName, BundlePublicCollection recipientPublic) {
+    public SesameConversation(String senderName, HashId selfDeviceId, Bundle senderBundle,
+                              String recipientName, BundlePublicCollection recipientPublic) {
         this.senderName = senderName;
         this.senderBundle = senderBundle;
         this.selfDeviceId = selfDeviceId;
@@ -105,7 +106,8 @@ public class SesameConversation {
         }
     }
 
-    public byte[] initializeRecipient(HashId id, byte[] message) throws SignatureException, IllegalDataSizeException, InvalidKeyException, NoSuchAlgorithmException, EncryptionFailedException {
+    public byte[] initializeRecipient(HashId id, byte[] message) throws SignatureException,
+            IllegalDataSizeException, InvalidKeyException, NoSuchAlgorithmException, EncryptionFailedException {
         ByteBuffer b = ByteBuffer.wrap(message, 0, 8);
         if (b.getInt() != Constants.RidonMagix) {
             throw new SignatureException();
@@ -124,7 +126,8 @@ public class SesameConversation {
         BundlePublic pub = recipientPublic.get(id);
         X3dhMessage x3dhMessage = X3dhMessage.decode(msg);
 
-        final byte[] sharedKeyRecipient = X3dhMessage.getSharedKeyRecipient(x3dhMessage.ephKey, x3dhMessage.preKeyId, senderBundle.bundlePrivate, pub, Constants.RidonSesameSharedKey);
+        final byte[] sharedKeyRecipient = X3dhMessage.getSharedKeyRecipient(x3dhMessage.ephKey,
+                x3dhMessage.preKeyId, senderBundle.bundlePrivate, pub, Constants.RidonSesameSharedKey);
         KeyPair pair = new KeyPair(senderBundle.bundlePrivate.spk, senderBundle.bundlePublic.spk.publicKey);
 
         Ratchet r = ratchets.get(id);
@@ -224,7 +227,8 @@ public class SesameConversation {
         return null;
     }
 
-    public byte[] encrypt(byte[] data) throws EncryptionFailedException, NoSuchAlgorithmException, IllegalDataSizeException, InvalidKeyException, IOException {
+    public byte[] encrypt(byte[] data) throws EncryptionFailedException, NoSuchAlgorithmException,
+            IllegalDataSizeException, InvalidKeyException, IOException {
         prepEncrypt();
         HashMap<HashId, byte[]> retval = new HashMap<>();
         HashId id = fetchActiveSession(recipientName);
@@ -290,7 +294,8 @@ public class SesameConversation {
         return retval;
     }
 
-    public byte[] doEncrypt(HashId id, byte[] data) throws IOException, EncryptionFailedException, IllegalDataSizeException, NoSuchAlgorithmException, InvalidKeyException, IOException {
+    public byte[] doEncrypt(HashId id, byte[] data) throws IOException, EncryptionFailedException,
+            IllegalDataSizeException, NoSuchAlgorithmException, InvalidKeyException, IOException {
         SesameConversationSecret secret = secrets.get(id);
         if (secret == null) {
             throw new EncryptionFailedException();
@@ -345,7 +350,9 @@ public class SesameConversation {
         }
     }
 
-    public byte[] decrypt(byte[] raw) throws NoSuchAlgorithmException, IllegalDataSizeException, EncryptionFailedException, SignatureException, InvalidKeyException, DecryptionFailedException, IOException, SesameMessageRecipientMismatchException, AuthenticationException, TooManySkippedMessagesException {
+    public byte[] decrypt(byte[] raw) throws NoSuchAlgorithmException, IllegalDataSizeException,
+            EncryptionFailedException, SignatureException, InvalidKeyException, DecryptionFailedException,
+            IOException, SesameMessageRecipientMismatchException, AuthenticationException, TooManySkippedMessagesException {
         ByteArrayInputStream input = new ByteArrayInputStream(raw);
         byte[] b = new byte[HashId.SIZE];
         input.read(b);

@@ -61,7 +61,8 @@ public class SignedPreKeyPublic {
         return ret;
     }
 
-    public static SignedPreKeyPublic decode(byte[] raw, int offset) throws InvalidKeyException, IllegalDataSizeException, SignatureException {
+    public static SignedPreKeyPublic decode(byte[] raw, int offset) throws InvalidKeyException,
+            IllegalDataSizeException, SignatureException {
         if (raw[offset] == 0x5 && raw.length >= (64 + 33) + offset) {
             PublicKey publicKey = PublicKey.decode(raw, offset);
             byte[] sig = new byte[64];

@@ -40,7 +40,8 @@ public class X3dhMessage {
      * @param message  An plaintext
      * @param ad       An additional data
      */
-    public X3dhMessage(PublicKey identity, PublicKey ephKey, PreKeyId preKeyId, byte[] key, byte[] message, byte[] ad) throws EncryptionFailedException {
+    public X3dhMessage(PublicKey identity, PublicKey ephKey, PreKeyId preKeyId, byte[] key, byte[] message, byte[] ad)
+            throws EncryptionFailedException {
 
         this.identity = identity;
         this.ephKey = ephKey;
@@ -142,7 +143,8 @@ public class X3dhMessage {
      * @param info An info string
      * @return A SharedKey object
      */
-    public static final SharedKey getSharedKeySender(KeyPair pair, BundlePrivate me, BundlePublic you, String info) throws NoSuchAlgorithmException {
+    public static final SharedKey getSharedKeySender(KeyPair pair, BundlePrivate me, BundlePublic you, String info)
+            throws NoSuchAlgorithmException {
         byte[] dh1 = me.identity.shareSecret(you.spk.publicKey);
         byte[] dh2 = pair.privateKey.shareSecret(you.identity);
         byte[] dh3 = pair.privateKey.shareSecret(you.spk.publicKey);
@@ -186,7 +188,7 @@ public class X3dhMessage {
         }
 
         byte[] salt = Constants.getRidonSalt512();
-        Kdf kdf = Kdf.KdfSha512(keys, salt);
+        Kdf kdf = Kdf.kdfSha512(keys, salt);
         byte[] kdfResult = kdf.get(info, 32);
 
         SharedKey sk = new SharedKey(kdfResult, preKeyId);
@@ -204,7 +206,9 @@ public class X3dhMessage {
      * @param info An info string
      * @return A shared key
      */
-    public static final byte[] getSharedKeyRecipient(PublicKey ephKey, PreKeyId preKeyId, BundlePrivate me, BundlePublic you, String info) throws NoSuchAlgorithmException {
+    public static final byte[] getSharedKeyRecipient(PublicKey ephKey, PreKeyId preKeyId,
+                                                     BundlePrivate me, BundlePublic you, String info)
+            throws NoSuchAlgorithmException {
         byte[] dh1 = me.spk.shareSecret(you.identity);
         byte[] dh2 = me.identity.shareSecret(ephKey);
         byte[] dh3 = me.spk.shareSecret(ephKey);
@@ -242,7 +246,7 @@ public class X3dhMessage {
         }
 
         byte[] salt = Constants.getRidonSalt512();
-        Kdf kdf = Kdf.KdfSha512(keys, salt);
+        Kdf kdf = Kdf.kdfSha512(keys, salt);
         byte[] kdfResult = kdf.get(info, 32);
 
         if (oneTimePrivate != null) {

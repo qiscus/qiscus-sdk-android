@@ -62,83 +62,83 @@ public class Curve {
 
     /********* KEY AGREEMENT *********/
 
-	/* Private key clamping
+    /* Private key clamping
      *   k [out] your private key for key agreement
-	 *   k  [in]  32 random bytes
-	 */
-    public static final void clamp(byte[] k) {
+     *   k  [in]  32 random bytes
+     */
+    public static void clamp(byte[] k) {
         k[31] &= 0x7F;
         k[31] |= 0x40;
         k[0] &= 0xF8;
     }
 
     /* Key-pair generation
-     *   P  [out] your public key
+     *   p  [out] your public key
      *   s  [out] your private key for signing
      *   k  [out] your private key for key agreement
      *   k  [in]  32 random bytes
      * s may be NULL if you don't care
      *
      * WARNING: if s is not NULL, this function has data-dependent timing */
-    public static final void keygen(byte[] P, byte[] s, byte[] k) {
+    public static void keygen(byte[] p, byte[] s, byte[] k) {
         clamp(k);
-        core(P, s, k, null);
+        core(p, s, k, null);
     }
 
     /* Key agreement
-     *   Z  [out] shared secret (needs hashing before use)
+     *   z  [out] shared secret (needs hashing before use)
      *   k  [in]  your private key for key agreement
-     *   P  [in]  peer's public key
+     *   z  [in]  peer's public key
      */
-    public static final void curve(byte[] Z, byte[] k, byte[] P) {
-        core(Z, null, k, P);
+    public static void curve(byte[] z, byte[] k, byte[] p) {
+        core(z, null, k, p);
     }
 
     /********* DIGITAL SIGNATURES *********/
 
-	/* deterministic EC-KCDSA
+    /* deterministic EC-KCDSA
      *
-	 *    s is the private key for signing
-	 *    P is the corresponding public key
-	 *    Z is the context data (signer public key or certificate, etc)
-	 *
-	 * signing:
-	 *
-	 *    m = hash(Z, message)
-	 *    x = hash(m, s)
-	 *    keygen25519(Y, NULL, x);
-	 *    r = hash(Y);
-	 *    h = m XOR r
-	 *    sign25519(v, h, x, s);
-	 *
-	 *    output (v,r) as the signature
-	 *
-	 * verification:
-	 *
-	 *    m = hash(Z, message);
-	 *    h = m XOR r
-	 *    verify25519(Y, v, h, P)
-	 *
-	 *    confirm  r == hash(Y)
-	 *
-	 * It would seem to me that it would be simpler to have the signer directly do
-	 * h = hash(m, Y) and send that to the recipient instead of r, who can verify
-	 * the signature by checking h == hash(m, Y).  If there are any problems with
-	 * such a scheme, please let me know.
-	 *
-	 * Also, EC-KCDSA (like most DS algorithms) picks x random, which is a waste of
-	 * perfectly good entropy, but does allow Y to be calculated in advance of (or
-	 * parallel to) hashing the message.
-	 */
+     *    s is the private key for signing
+     *    p is the corresponding public key
+     *    p is the context data (signer public key or certificate, etc)
+     *
+     * signing:
+     *
+     *    m = hash(z, message)
+     *    x = hash(m, s)
+     *    keygen25519(Y, NULL, x);
+     *    r = hash(Y);
+     *    h = m XOR r
+     *    sign25519(v, h, x, s);
+     *
+     *    output (v,r) as the signature
+     *
+     * verification:
+     *
+     *    m = hash(z, message);
+     *    h = m XOR r
+     *    verify25519(Y, v, h, p)
+     *
+     *    confirm  r == hash(Y)
+     *
+     * It would seem to me that it would be simpler to have the signer directly do
+     * h = hash(m, Y) and send that to the recipient instead of r, who can verify
+     * the signature by checking h == hash(m, Y).  If there are any problems with
+     * such a scheme, please let me know.
+     *
+     * Also, EC-KCDSA (like most DS algorithms) picks x random, which is a waste of
+     * perfectly good entropy, but does allow Y to be calculated in advance of (or
+     * parallel to) hashing the message.
+     */
 
-	/* Signature generation primitive, calculates (x-h)s mod q
-	 *   v  [out] signature value
-	 *   h  [in]  signature hash (of message, signature pub key, and context data)
-	 *   x  [in]  signature private key
-	 *   s  [in]  private key for signing
-	 * returns true on success, false on failure (use different x or h)
-	 */
-    public static final boolean sign(byte[] v, byte[] h, byte[] x, byte[] s) {
+    /* Signature generation primitive, calculates (x-h)s mod q
+     *   v  [out] signature value
+     *   h  [in]  signature hash (of message, signature pub key, and context data)
+     *   x  [in]  signature private key
+     *   s  [in]  private key for signing
+     * returns true on success, false on failure (use different x or h)
+     */
+    public static boolean sign(byte[] v, byte[] h, byte[] x, byte[] s) {
         // v = (x - h) s  mod q
         int w, i;
         byte[] h1 = new byte[32], x1 = new byte[32];
@@ -158,8 +158,8 @@ public class Curve {
         // If v is negative, add the group order to it to become positive.
         // If v was already positive we don't have to worry about overflow
         // when adding the order because v < ORDER and 2*ORDER < 2^256
-        mula_small(v, x1, 0, h1, 32, -1);
-        mula_small(v, v, 0, ORDER, 32, 1);
+        mulaSmall(v, x1, 0, h1, 32, -1);
+        mulaSmall(v, v, 0, ORDER, 32, 1);
 
         // tmp1 = (x-h)*s mod q
         mula32(tmp1, v, s, 32, 1);
@@ -170,57 +170,57 @@ public class Curve {
         return w != 0;
     }
 
-    /* Signature verification primitive, calculates Y = vP + hG
+    /* Signature verification primitive, calculates y = vp + hg
      *   Y  [out] signature public key
      *   v  [in]  signature value
      *   h  [in]  signature hash
      *   P  [in]  public key
      */
-    public static final void verify(byte[] Y, byte[] v, byte[] h, byte[] P) {
-		/* Y = v abs(P) + h G  */
+    public static void verify(byte[] y, byte[] v, byte[] h, byte[] publicKey) {
+        /* Y = v abs(p) + h G  */
         byte[] d = new byte[32];
-        long10[]
-                p = new long10[]{new long10(), new long10()},
-                s = new long10[]{new long10(), new long10()},
-                yx = new long10[]{new long10(), new long10(), new long10()},
-                yz = new long10[]{new long10(), new long10(), new long10()},
-                t1 = new long10[]{new long10(), new long10(), new long10()},
-                t2 = new long10[]{new long10(), new long10(), new long10()};
+        Long10[]
+                p = new Long10[]{new Long10(), new Long10()},
+                s = new Long10[]{new Long10(), new Long10()},
+                yx = new Long10[]{new Long10(), new Long10(), new Long10()},
+                yz = new Long10[]{new Long10(), new Long10(), new Long10()},
+                t1 = new Long10[]{new Long10(), new Long10(), new Long10()},
+                t2 = new Long10[]{new Long10(), new Long10(), new Long10()};
 
         int vi = 0, hi = 0, di = 0, nvh = 0, i, j, k;
 
-		/* set p[0] to G and p[1] to P  */
+        /* set p[0] to G and p[1] to P  */
 
         set(p[0], 9);
-        unpack(p[1], P);
+        unpack(p[1], publicKey);
 
-		/* set s[0] to P+G and s[1] to P-G  */
+        /* set s[0] to P+G and s[1] to P-G  */
 
-		/* s[0] = (Py^2 + Gy^2 - 2 Py Gy)/(Px - Gx)^2 - Px - Gx - 486662  */
-		/* s[1] = (Py^2 + Gy^2 + 2 Py Gy)/(Px - Gx)^2 - Px - Gx - 486662  */
+        /* s[0] = (Py^2 + Gy^2 - 2 Py Gy)/(Px - Gx)^2 - Px - Gx - 486662  */
+        /* s[1] = (Py^2 + Gy^2 + 2 Py Gy)/(Px - Gx)^2 - Px - Gx - 486662  */
 
-        x_to_y2(t1[0], t2[0], p[1]);	/* t2[0] = Py^2  */
-        sqrt(t1[0], t2[0]);	/* t1[0] = Py or -Py  */
-        j = is_negative(t1[0]);		/*      ... check which  */
-        t2[0]._0 += 39420360;		/* t2[0] = Py^2 + Gy^2  */
-        mul(t2[1], BASE_2Y, t1[0]);/* t2[1] = 2 Py Gy or -2 Py Gy  */
-        sub(t1[j], t2[0], t2[1]);	/* t1[0] = Py^2 + Gy^2 - 2 Py Gy  */
-        add(t1[1 - j], t2[0], t2[1]);/* t1[1] = Py^2 + Gy^2 + 2 Py Gy  */
-        cpy(t2[0], p[1]);		/* t2[0] = Px  */
-        t2[0]._0 -= 9;			/* t2[0] = Px - Gx  */
-        sqr(t2[1], t2[0]);		/* t2[1] = (Px - Gx)^2  */
-        recip(t2[0], t2[1], 0);	/* t2[0] = 1/(Px - Gx)^2  */
-        mul(s[0], t1[0], t2[0]);	/* s[0] = t1[0]/(Px - Gx)^2  */
-        sub(s[0], s[0], p[1]);	/* s[0] = t1[0]/(Px - Gx)^2 - Px  */
-        s[0]._0 -= 9 + 486662;		/* s[0] = X(P+G)  */
-        mul(s[1], t1[1], t2[0]);	/* s[1] = t1[1]/(Px - Gx)^2  */
-        sub(s[1], s[1], p[1]);	/* s[1] = t1[1]/(Px - Gx)^2 - Px  */
-        s[1]._0 -= 9 + 486662;		/* s[1] = X(P-G)  */
-        mul_small(s[0], s[0], 1);	/* reduce s[0] */
-        mul_small(s[1], s[1], 1);	/* reduce s[1] */
+        xtoy2(t1[0], t2[0], p[1]);    /* t2[0] = Py^2  */
+        sqrt(t1[0], t2[0]);    /* t1[0] = Py or -Py  */
+        j = is_negative(t1[0]);        /*      ... check which  */
+        t2[0]._0 += 39420360;        /* t2[0] = Py^2 + Gy^2  */
+        mul(t2[1], BASE_2Y, t1[0]); /* t2[1] = 2 Py Gy or -2 Py Gy  */
+        sub(t1[j], t2[0], t2[1]);    /* t1[0] = Py^2 + Gy^2 - 2 Py Gy  */
+        add(t1[1 - j], t2[0], t2[1]); /* t1[1] = Py^2 + Gy^2 + 2 Py Gy  */
+        cpy(t2[0], p[1]);        /* t2[0] = Px  */
+        t2[0]._0 -= 9;            /* t2[0] = Px - Gx  */
+        sqr(t2[1], t2[0]);        /* t2[1] = (Px - Gx)^2  */
+        recip(t2[0], t2[1], 0);    /* t2[0] = 1/(Px - Gx)^2  */
+        mul(s[0], t1[0], t2[0]);    /* s[0] = t1[0]/(Px - Gx)^2  */
+        sub(s[0], s[0], p[1]);    /* s[0] = t1[0]/(Px - Gx)^2 - Px  */
+        s[0]._0 -= 9 + 486662;        /* s[0] = X(P+G)  */
+        mul(s[1], t1[1], t2[0]);    /* s[1] = t1[1]/(Px - Gx)^2  */
+        sub(s[1], s[1], p[1]);    /* s[1] = t1[1]/(Px - Gx)^2 - Px  */
+        s[1]._0 -= 9 + 486662;        /* s[1] = X(P-G)  */
+        mul_small(s[0], s[0], 1);    /* reduce s[0] */
+        mul_small(s[1], s[1], 1);    /* reduce s[1] */
 
 
-		/* prepare the chain  */
+        /* prepare the chain  */
         for (i = 0; i < 32; i++) {
             vi = (vi >> 8) ^ (v[i] & 0xFF) ^ ((v[i] & 0xFF) << 1);
             hi = (hi >> 8) ^ (h[i] & 0xFF) ^ ((h[i] & 0xFF) << 1);
@@ -238,7 +238,7 @@ public class Curve {
 
         di = ((nvh & (di & 0x80) << 1) ^ vi) >> 8;
 
-		/* initialize state */
+        /* initialize state */
         set(yx[0], 1);
         cpy(yx[1], p[di]);
         cpy(yx[2], s[0]);
@@ -246,35 +246,35 @@ public class Curve {
         set(yz[1], 1);
         set(yz[2], 1);
 
-		/* y[0] is (even)P + (even)G
-		 * y[1] is (even)P + (odd)G  if current d-bit is 0
-		 * y[1] is (odd)P + (even)G  if current d-bit is 1
-		 * y[2] is (odd)P + (odd)G
-		 */
+        /* y[0] is (even)P + (even)G
+         * y[1] is (even)P + (odd)G  if current d-bit is 0
+         * y[1] is (odd)P + (even)G  if current d-bit is 1
+         * y[2] is (odd)P + (odd)G
+         */
 
         vi = 0;
         hi = 0;
 
-		/* and go for it! */
+        /* and go for it! */
         for (i = 32; i-- != 0; ) {
             vi = (vi << 8) | (v[i] & 0xFF);
             hi = (hi << 8) | (h[i] & 0xFF);
             di = (di << 8) | (d[i] & 0xFF);
 
             for (j = 8; j-- != 0; ) {
-                mont_prep(t1[0], t2[0], yx[0], yz[0]);
-                mont_prep(t1[1], t2[1], yx[1], yz[1]);
-                mont_prep(t1[2], t2[2], yx[2], yz[2]);
+                montPrep(t1[0], t2[0], yx[0], yz[0]);
+                montPrep(t1[1], t2[1], yx[1], yz[1]);
+                montPrep(t1[2], t2[2], yx[2], yz[2]);
 
                 k = ((vi ^ vi >> 1) >> j & 1)
                         + ((hi ^ hi >> 1) >> j & 1);
-                mont_dbl(yx[2], yz[2], t1[k], t2[k], yx[0], yz[0]);
+                montDbl(yx[2], yz[2], t1[k], t2[k], yx[0], yz[0]);
 
                 k = (di >> j & 2) ^ ((di >> j & 1) << 1);
-                mont_add(t1[1], t2[1], t1[k], t2[k], yx[1], yz[1],
+                montAdd(t1[1], t2[1], t1[k], t2[k], yx[1], yz[1],
                         p[di >> j & 1]);
 
-                mont_add(t1[2], t2[2], t1[0], t2[0], yx[2], yz[2],
+                montAdd(t1[2], t2[2], t1[0], t2[0], yx[2], yz[2],
                         s[((vi ^ hi) >> j & 2) >> 1]);
             }
         }
@@ -283,30 +283,30 @@ public class Curve {
         recip(t1[0], yz[k], 0);
         mul(t1[1], yx[k], t1[0]);
 
-        pack(t1[1], Y);
+        pack(t1[1], y);
     }
 
     ///////////////////////////////////////////////////////////////////////////
 
     /* sahn0:
      * Using this class instead of long[10] to avoid bounds checks. */
-    private static final class long10 {
-        public long10() {
+    private static final class Long10 {
+        public Long10() {
         }
 
-        public long10(
-                long _0, long _1, long _2, long _3, long _4,
-                long _5, long _6, long _7, long _8, long _9) {
-            this._0 = _0;
-            this._1 = _1;
-            this._2 = _2;
-            this._3 = _3;
-            this._4 = _4;
-            this._5 = _5;
-            this._6 = _6;
-            this._7 = _7;
-            this._8 = _8;
-            this._9 = _9;
+        public Long10(
+                long i0, long i1, long i2, long i3, long i4,
+                long i5, long i6, long i7, long i8, long i9) {
+            this._0 = i0;
+            this._1 = i1;
+            this._2 = i2;
+            this._3 = i3;
+            this._4 = i4;
+            this._5 = i5;
+            this._6 = i6;
+            this._7 = i7;
+            this._8 = i8;
+            this._9 = i9;
         }
 
         public long _0, _1, _2, _3, _4, _5, _6, _7, _8, _9;
@@ -314,16 +314,16 @@ public class Curve {
 
     /********************* radix 2^8 math *********************/
 
-    private static final void cpy32(byte[] d, byte[] s) {
+    private static void cpy32(byte[] d, byte[] s) {
         int i;
         for (i = 0; i < 32; i++)
             d[i] = s[i];
     }
 
     /* p[m..n+m-1] = q[m..n+m-1] + z * x */
-	/* n is the size of x */
-	/* n+m is the size of p and q */
-    private static final int mula_small(byte[] p, byte[] q, int m, byte[] x, int n, int z) {
+    /* n is the size of x */
+    /* n+m is the size of p and q */
+    private static int mulaSmall(byte[] p, byte[] q, int m, byte[] x, int n, int z) {
         int v = 0;
         for (int i = 0; i < n; ++i) {
             v += (q[i + m] & 0xFF) + z * (x[i] & 0xFF);
@@ -336,13 +336,13 @@ public class Curve {
     /* p += x * y * z  where z is a small integer
      * x is size 32, y is size t, p is size 32+t
      * y is allowed to overlap with p+32 if you don't care about the upper half  */
-    private static final int mula32(byte[] p, byte[] x, byte[] y, int t, int z) {
+    private static int mula32(byte[] p, byte[] x, byte[] y, int t, int z) {
         final int n = 31;
         int w = 0;
         int i = 0;
         for (; i < t; i++) {
             int zy = z * (y[i] & 0xFF);
-            w += mula_small(p, p, i, x, n, zy) +
+            w += mulaSmall(p, p, i, x, n, zy) +
                     (p[i + n] & 0xFF) + zy * (x[n] & 0xFF);
             p[i + n] = (byte) w;
             w >>= 8;
@@ -356,7 +356,7 @@ public class Curve {
      * requires t > 0 && d[t-1] != 0
      * requires that r[-1] and d[-1] are valid memory locations
      * q may overlap with r+t */
-    private static final void divmod(byte[] q, byte[] r, int n, byte[] d, int t) {
+    private static void divmod(byte[] q, byte[] r, int n, byte[] d, int t) {
         int rn = 0;
         int dt = ((d[t - 1] & 0xFF) << 8);
         if (t > 1) {
@@ -368,18 +368,17 @@ public class Curve {
                 z |= (r[n - 1] & 0xFF);
             }
             z /= dt;
-            rn += mula_small(r, r, n - t + 1, d, t, -z);
+            rn += mulaSmall(r, r, n - t + 1, d, t, -z);
             q[n - t + 1] = (byte) ((z + rn) & 0xFF); /* rn is 0 or -1 (underflow) */
-            mula_small(r, r, n - t + 1, d, t, -rn);
+            mulaSmall(r, r, n - t + 1, d, t, -rn);
             rn = (r[n] & 0xFF);
             r[n] = 0;
         }
         r[t - 1] = (byte) rn;
     }
 
-    private static final int numsize(byte[] x, int n) {
-        while (n-- != 0 && x[n] == 0)
-            ;
+    private static int numsize(byte[] x, int n) {
+        while (n-- != 0 && x[n] == 0) ;
         return n + 1;
     }
 
@@ -388,14 +387,14 @@ public class Curve {
      * as 32-byte signed.
      * x and y must have 64 bytes space for temporary use.
      * requires that a[-1] and b[-1] are valid memory locations  */
-    private static final byte[] egcd32(byte[] x, byte[] y, byte[] a, byte[] b) {
+    private static byte[] egcd32(byte[] x, byte[] y, byte[] a, byte[] b) {
         int an, bn = 32, qn, i;
         for (i = 0; i < 32; i++)
             x[i] = y[i] = 0;
         x[0] = 1;
         an = numsize(a, 32);
         if (an == 0)
-            return y;	/* division by zero */
+            return y;    /* division by zero */
         byte[] temp = new byte[32];
         while (true) {
             qn = bn - an + 1;
@@ -416,11 +415,11 @@ public class Curve {
 
     /********************* radix 2^25.5 GF(2^255-19) math *********************/
 
-    private static final int P25 = 33554431;	/* (1 << 25) - 1 */
-    private static final int P26 = 67108863;	/* (1 << 26) - 1 */
+    private static final int P25 = 33554431;    /* (1 << 25) - 1 */
+    private static final int P26 = 67108863;    /* (1 << 26) - 1 */
 
     /* Convert to internal format from little-endian byte format */
-    private static final void unpack(long10 x, byte[] m) {
+    private static void unpack(Long10 x, byte[] m) {
         x._0 = ((m[0] & 0xFF)) | ((m[1] & 0xFF)) << 8 |
                 (m[2] & 0xFF) << 16 | ((m[3] & 0xFF) & 3) << 24;
         x._1 = ((m[3] & 0xFF) & ~3) >> 2 | (m[4] & 0xFF) << 6 |
@@ -444,7 +443,7 @@ public class Curve {
     }
 
     /* Check if reduced-form input >= 2^255-19 */
-    private static final boolean is_overflow(long10 x) {
+    private static boolean is_overflow(Long10 x) {
         return (
                 ((x._0 > P26 - 19)) &&
                         ((x._1 & x._3 & x._5 & x._7 & x._9) == P25) &&
@@ -457,7 +456,7 @@ public class Curve {
      *     unpack, mul, sqr
      *     set --  if input in range 0 .. P25
      * If you're unsure if the number is reduced, first multiply it by 1.  */
-    private static final void pack(long10 x, byte[] m) {
+    private static void pack(Long10 x, byte[] m) {
         int ld = 0, ud = 0;
         long t;
         ld = (is_overflow(x) ? 1 : 0) - ((x._9 < 0) ? 1 : 0);
@@ -506,7 +505,7 @@ public class Curve {
     }
 
     /* Copy a number */
-    private static final void cpy(long10 out, long10 in) {
+    private static void cpy(Long10 out, Long10 in) {
         out._0 = in._0;
         out._1 = in._1;
         out._2 = in._2;
@@ -520,7 +519,7 @@ public class Curve {
     }
 
     /* Set a number to value, which must be in range -185861411 .. 185861411 */
-    private static final void set(long10 out, int in) {
+    private static void set(Long10 out, int in) {
         out._0 = in;
         out._1 = 0;
         out._2 = 0;
@@ -536,7 +535,7 @@ public class Curve {
     /* Add/subtract two numbers.  The inputs must be in reduced form, and the
      * output isn't, so to do another addition or subtraction on the output,
      * first multiply it by one to reduce it. */
-    private static final void add(long10 xy, long10 x, long10 y) {
+    private static void add(Long10 xy, Long10 x, Long10 y) {
         xy._0 = x._0 + y._0;
         xy._1 = x._1 + y._1;
         xy._2 = x._2 + y._2;
@@ -549,7 +548,7 @@ public class Curve {
         xy._9 = x._9 + y._9;
     }
 
-    private static final void sub(long10 xy, long10 x, long10 y) {
+    private static void sub(Long10 xy, Long10 x, Long10 y) {
         xy._0 = x._0 - y._0;
         xy._1 = x._1 - y._1;
         xy._2 = x._2 - y._2;
@@ -565,7 +564,7 @@ public class Curve {
     /* Multiply a number by a small integer in range -185861411 .. 185861411.
      * The output is in reduced form, the input x need not be.  x and xy may point
      * to the same buffer. */
-    private static final long10 mul_small(long10 xy, long10 x, long y) {
+    private static Long10 mul_small(Long10 xy, Long10 x, long y) {
         long t;
         t = (x._8 * y);
         xy._8 = (t & ((1 << 26) - 1));
@@ -595,67 +594,67 @@ public class Curve {
 
     /* Multiply two numbers.  The output is in reduced form, the inputs need not
      * be. */
-    private static final long10 mul(long10 xy, long10 x, long10 y) {
-		/* sahn0:
-		 * Using local variables to avoid class access.
-		 * This seem to improve performance a bit...
-		 */
+    private static Long10 mul(Long10 xy, Long10 x, Long10 y) {
+        /* sahn0:
+         * Using local variables to avoid class access.
+         * This seem to improve performance a bit...
+         */
         long
-                x_0 = x._0, x_1 = x._1, x_2 = x._2, x_3 = x._3, x_4 = x._4,
-                x_5 = x._5, x_6 = x._6, x_7 = x._7, x_8 = x._8, x_9 = x._9;
+                x0 = x._0, x1 = x._1, x2 = x._2, x3 = x._3, x4 = x._4,
+                x5 = x._5, x6 = x._6, x7 = x._7, x8 = x._8, x9 = x._9;
         long
-                y_0 = y._0, y_1 = y._1, y_2 = y._2, y_3 = y._3, y_4 = y._4,
-                y_5 = y._5, y_6 = y._6, y_7 = y._7, y_8 = y._8, y_9 = y._9;
+                y0 = y._0, y1 = y._1, y2 = y._2, y3 = y._3, y4 = y._4,
+                y5 = y._5, y6 = y._6, y7 = y._7, y8 = y._8, y9 = y._9;
         long t;
-        t = (x_0 * y_8) + (x_2 * y_6) + (x_4 * y_4) + (x_6 * y_2) +
-                (x_8 * y_0) + 2 * ((x_1 * y_7) + (x_3 * y_5) +
-                (x_5 * y_3) + (x_7 * y_1)) + 38 *
-                (x_9 * y_9);
+        t = (x0 * y8) + (x2 * y6) + (x4 * y4) + (x6 * y2) +
+                (x8 * y0) + 2 * ((x1 * y7) + (x3 * y5) +
+                (x5 * y3) + (x7 * y1)) + 38 *
+                (x9 * y9);
         xy._8 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x_0 * y_9) + (x_1 * y_8) + (x_2 * y_7) +
-                (x_3 * y_6) + (x_4 * y_5) + (x_5 * y_4) +
-                (x_6 * y_3) + (x_7 * y_2) + (x_8 * y_1) +
-                (x_9 * y_0);
+        t = (t >> 26) + (x0 * y9) + (x1 * y8) + (x2 * y7) +
+                (x3 * y6) + (x4 * y5) + (x5 * y4) +
+                (x6 * y3) + (x7 * y2) + (x8 * y1) +
+                (x9 * y0);
         xy._9 = (t & ((1 << 25) - 1));
-        t = (x_0 * y_0) + 19 * ((t >> 25) + (x_2 * y_8) + (x_4 * y_6)
-                + (x_6 * y_4) + (x_8 * y_2)) + 38 *
-                ((x_1 * y_9) + (x_3 * y_7) + (x_5 * y_5) +
-                        (x_7 * y_3) + (x_9 * y_1));
+        t = (x0 * y0) + 19 * ((t >> 25) + (x2 * y8) + (x4 * y6)
+                + (x6 * y4) + (x8 * y2)) + 38 *
+                ((x1 * y9) + (x3 * y7) + (x5 * y5) +
+                        (x7 * y3) + (x9 * y1));
         xy._0 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x_0 * y_1) + (x_1 * y_0) + 19 * ((x_2 * y_9)
-                + (x_3 * y_8) + (x_4 * y_7) + (x_5 * y_6) +
-                (x_6 * y_5) + (x_7 * y_4) + (x_8 * y_3) +
-                (x_9 * y_2));
+        t = (t >> 26) + (x0 * y1) + (x1 * y0) + 19 * ((x2 * y9)
+                + (x3 * y8) + (x4 * y7) + (x5 * y6) +
+                (x6 * y5) + (x7 * y4) + (x8 * y3) +
+                (x9 * y2));
         xy._1 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + (x_0 * y_2) + (x_2 * y_0) + 19 * ((x_4 * y_8)
-                + (x_6 * y_6) + (x_8 * y_4)) + 2 * (x_1 * y_1)
-                + 38 * ((x_3 * y_9) + (x_5 * y_7) +
-                (x_7 * y_5) + (x_9 * y_3));
+        t = (t >> 25) + (x0 * y2) + (x2 * y0) + 19 * ((x4 * y8)
+                + (x6 * y6) + (x8 * y4)) + 2 * (x1 * y1)
+                + 38 * ((x3 * y9) + (x5 * y7) +
+                (x7 * y5) + (x9 * y3));
         xy._2 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x_0 * y_3) + (x_1 * y_2) + (x_2 * y_1) +
-                (x_3 * y_0) + 19 * ((x_4 * y_9) + (x_5 * y_8) +
-                (x_6 * y_7) + (x_7 * y_6) +
-                (x_8 * y_5) + (x_9 * y_4));
+        t = (t >> 26) + (x0 * y3) + (x1 * y2) + (x2 * y1) +
+                (x3 * y0) + 19 * ((x4 * y9) + (x5 * y8) +
+                (x6 * y7) + (x7 * y6) +
+                (x8 * y5) + (x9 * y4));
         xy._3 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + (x_0 * y_4) + (x_2 * y_2) + (x_4 * y_0) + 19 *
-                ((x_6 * y_8) + (x_8 * y_6)) + 2 * ((x_1 * y_3) +
-                (x_3 * y_1)) + 38 *
-                ((x_5 * y_9) + (x_7 * y_7) + (x_9 * y_5));
+        t = (t >> 25) + (x0 * y4) + (x2 * y2) + (x4 * y0) + 19 *
+                ((x6 * y8) + (x8 * y6)) + 2 * ((x1 * y3) +
+                (x3 * y1)) + 38 *
+                ((x5 * y9) + (x7 * y7) + (x9 * y5));
         xy._4 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x_0 * y_5) + (x_1 * y_4) + (x_2 * y_3) +
-                (x_3 * y_2) + (x_4 * y_1) + (x_5 * y_0) + 19 *
-                ((x_6 * y_9) + (x_7 * y_8) + (x_8 * y_7) +
-                        (x_9 * y_6));
+        t = (t >> 26) + (x0 * y5) + (x1 * y4) + (x2 * y3) +
+                (x3 * y2) + (x4 * y1) + (x5 * y0) + 19 *
+                ((x6 * y9) + (x7 * y8) + (x8 * y7) +
+                        (x9 * y6));
         xy._5 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + (x_0 * y_6) + (x_2 * y_4) + (x_4 * y_2) +
-                (x_6 * y_0) + 19 * (x_8 * y_8) + 2 * ((x_1 * y_5) +
-                (x_3 * y_3) + (x_5 * y_1)) + 38 *
-                ((x_7 * y_9) + (x_9 * y_7));
+        t = (t >> 25) + (x0 * y6) + (x2 * y4) + (x4 * y2) +
+                (x6 * y0) + 19 * (x8 * y8) + 2 * ((x1 * y5) +
+                (x3 * y3) + (x5 * y1)) + 38 *
+                ((x7 * y9) + (x9 * y7));
         xy._6 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + (x_0 * y_7) + (x_1 * y_6) + (x_2 * y_5) +
-                (x_3 * y_4) + (x_4 * y_3) + (x_5 * y_2) +
-                (x_6 * y_1) + (x_7 * y_0) + 19 * ((x_8 * y_9) +
-                (x_9 * y_8));
+        t = (t >> 26) + (x0 * y7) + (x1 * y6) + (x2 * y5) +
+                (x3 * y4) + (x4 * y3) + (x5 * y2) +
+                (x6 * y1) + (x7 * y0) + 19 * ((x8 * y9) +
+                (x9 * y8));
         xy._7 = (t & ((1 << 25) - 1));
         t = (t >> 25) + xy._8;
         xy._8 = (t & ((1 << 26) - 1));
@@ -664,151 +663,151 @@ public class Curve {
     }
 
     /* Square a number.  Optimization of  mul25519(x2, x, x)  */
-    private static final long10 sqr(long10 x2, long10 x) {
+    private static Long10 sqr(Long10 y, Long10 x) {
         long
-                x_0 = x._0, x_1 = x._1, x_2 = x._2, x_3 = x._3, x_4 = x._4,
-                x_5 = x._5, x_6 = x._6, x_7 = x._7, x_8 = x._8, x_9 = x._9;
+                x0 = x._0, x1 = x._1, x2 = x._2, x3 = x._3, x4 = x._4,
+                x5 = x._5, x6 = x._6, x7 = x._7, x8 = x._8, x9 = x._9;
         long t;
-        t = (x_4 * x_4) + 2 * ((x_0 * x_8) + (x_2 * x_6)) + 38 *
-                (x_9 * x_9) + 4 * ((x_1 * x_7) + (x_3 * x_5));
-        x2._8 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + 2 * ((x_0 * x_9) + (x_1 * x_8) + (x_2 * x_7) +
-                (x_3 * x_6) + (x_4 * x_5));
-        x2._9 = (t & ((1 << 25) - 1));
-        t = 19 * (t >> 25) + (x_0 * x_0) + 38 * ((x_2 * x_8) +
-                (x_4 * x_6) + (x_5 * x_5)) + 76 * ((x_1 * x_9)
-                + (x_3 * x_7));
-        x2._0 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + 2 * (x_0 * x_1) + 38 * ((x_2 * x_9) +
-                (x_3 * x_8) + (x_4 * x_7) + (x_5 * x_6));
-        x2._1 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + 19 * (x_6 * x_6) + 2 * ((x_0 * x_2) +
-                (x_1 * x_1)) + 38 * (x_4 * x_8) + 76 *
-                ((x_3 * x_9) + (x_5 * x_7));
-        x2._2 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + 2 * ((x_0 * x_3) + (x_1 * x_2)) + 38 *
-                ((x_4 * x_9) + (x_5 * x_8) + (x_6 * x_7));
-        x2._3 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + (x_2 * x_2) + 2 * (x_0 * x_4) + 38 *
-                ((x_6 * x_8) + (x_7 * x_7)) + 4 * (x_1 * x_3) + 76 *
-                (x_5 * x_9);
-        x2._4 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + 2 * ((x_0 * x_5) + (x_1 * x_4) + (x_2 * x_3))
-                + 38 * ((x_6 * x_9) + (x_7 * x_8));
-        x2._5 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + 19 * (x_8 * x_8) + 2 * ((x_0 * x_6) +
-                (x_2 * x_4) + (x_3 * x_3)) + 4 * (x_1 * x_5) +
-                76 * (x_7 * x_9);
-        x2._6 = (t & ((1 << 26) - 1));
-        t = (t >> 26) + 2 * ((x_0 * x_7) + (x_1 * x_6) + (x_2 * x_5) +
-                (x_3 * x_4)) + 38 * (x_8 * x_9);
-        x2._7 = (t & ((1 << 25) - 1));
-        t = (t >> 25) + x2._8;
-        x2._8 = (t & ((1 << 26) - 1));
-        x2._9 += (t >> 26);
-        return x2;
+        t = (x4 * x4) + 2 * ((x0 * x8) + (x2 * x6)) + 38 *
+                (x9 * x9) + 4 * ((x1 * x7) + (x3 * x5));
+        y._8 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + 2 * ((x0 * x9) + (x1 * x8) + (x2 * x7) +
+                (x3 * x6) + (x4 * x5));
+        y._9 = (t & ((1 << 25) - 1));
+        t = 19 * (t >> 25) + (x0 * x0) + 38 * ((x2 * x8) +
+                (x4 * x6) + (x5 * x5)) + 76 * ((x1 * x9)
+                + (x3 * x7));
+        y._0 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + 2 * (x0 * x1) + 38 * ((x2 * x9) +
+                (x3 * x8) + (x4 * x7) + (x5 * x6));
+        y._1 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + 19 * (x6 * x6) + 2 * ((x0 * x2) +
+                (x1 * x1)) + 38 * (x4 * x8) + 76 *
+                ((x3 * x9) + (x5 * x7));
+        y._2 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + 2 * ((x0 * x3) + (x1 * x2)) + 38 *
+                ((x4 * x9) + (x5 * x8) + (x6 * x7));
+        y._3 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + (x2 * x2) + 2 * (x0 * x4) + 38 *
+                ((x6 * x8) + (x7 * x7)) + 4 * (x1 * x3) + 76 *
+                (x5 * x9);
+        y._4 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + 2 * ((x0 * x5) + (x1 * x4) + (x2 * x3))
+                + 38 * ((x6 * x9) + (x7 * x8));
+        y._5 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + 19 * (x8 * x8) + 2 * ((x0 * x6) +
+                (x2 * x4) + (x3 * x3)) + 4 * (x1 * x5) +
+                76 * (x7 * x9);
+        y._6 = (t & ((1 << 26) - 1));
+        t = (t >> 26) + 2 * ((x0 * x7) + (x1 * x6) + (x2 * x5) +
+                (x3 * x4)) + 38 * (x8 * x9);
+        y._7 = (t & ((1 << 25) - 1));
+        t = (t >> 25) + y._8;
+        y._8 = (t & ((1 << 26) - 1));
+        y._9 += (t >> 26);
+        return y;
     }
 
     /* Calculates a reciprocal.  The output is in reduced form, the inputs need not
      * be.  Simply calculates  y = x^(p-2)  so it's not too fast. */
-	/* When sqrtassist is true, it instead calculates y = x^((p-5)/8) */
-    private static final void recip(long10 y, long10 x, int sqrtassist) {
-        long10
-                t0 = new long10(),
-                t1 = new long10(),
-                t2 = new long10(),
-                t3 = new long10(),
-                t4 = new long10();
+    /* When sqrtassist is true, it instead calculates y = x^((p-5)/8) */
+    private static void recip(Long10 y, Long10 x, int sqrtassist) {
+        Long10
+                t0 = new Long10(),
+                t1 = new Long10(),
+                t2 = new Long10(),
+                t3 = new Long10(),
+                t4 = new Long10();
         int i;
-		/* the chain for x^(2^255-21) is straight from djb's implementation */
-        sqr(t1, x);	/*  2 == 2 * 1	*/
-        sqr(t2, t1);	/*  4 == 2 * 2	*/
-        sqr(t0, t2);	/*  8 == 2 * 4	*/
-        mul(t2, t0, x);	/*  9 == 8 + 1	*/
-        mul(t0, t2, t1);	/* 11 == 9 + 2	*/
-        sqr(t1, t0);	/* 22 == 2 * 11	*/
-        mul(t3, t1, t2);	/* 31 == 22 + 9
-					== 2^5   - 2^0	*/
-        sqr(t1, t3);	/* 2^6   - 2^1	*/
-        sqr(t2, t1);	/* 2^7   - 2^2	*/
-        sqr(t1, t2);	/* 2^8   - 2^3	*/
-        sqr(t2, t1);	/* 2^9   - 2^4	*/
-        sqr(t1, t2);	/* 2^10  - 2^5	*/
-        mul(t2, t1, t3);	/* 2^10  - 2^0	*/
-        sqr(t1, t2);	/* 2^11  - 2^1	*/
-        sqr(t3, t1);	/* 2^12  - 2^2	*/
+        /* the chain for x^(2^255-21) is straight from djb's implementation */
+        sqr(t1, x);    /*  2 == 2 * 1    */
+        sqr(t2, t1);    /*  4 == 2 * 2    */
+        sqr(t0, t2);    /*  8 == 2 * 4    */
+        mul(t2, t0, x);    /*  9 == 8 + 1    */
+        mul(t0, t2, t1);    /* 11 == 9 + 2    */
+        sqr(t1, t0);    /* 22 == 2 * 11    */
+        mul(t3, t1, t2);    /* 31 == 22 + 9
+                    == 2^5   - 2^0    */
+        sqr(t1, t3);    /* 2^6   - 2^1    */
+        sqr(t2, t1);    /* 2^7   - 2^2    */
+        sqr(t1, t2);    /* 2^8   - 2^3    */
+        sqr(t2, t1);    /* 2^9   - 2^4    */
+        sqr(t1, t2);    /* 2^10  - 2^5    */
+        mul(t2, t1, t3);    /* 2^10  - 2^0    */
+        sqr(t1, t2);    /* 2^11  - 2^1    */
+        sqr(t3, t1);    /* 2^12  - 2^2    */
         for (i = 1; i < 5; i++) {
             sqr(t1, t3);
             sqr(t3, t1);
-        } /* t3 */		/* 2^20  - 2^10	*/
-        mul(t1, t3, t2);	/* 2^20  - 2^0	*/
-        sqr(t3, t1);	/* 2^21  - 2^1	*/
-        sqr(t4, t3);	/* 2^22  - 2^2	*/
+        } /* t3 */        /* 2^20  - 2^10    */
+        mul(t1, t3, t2);    /* 2^20  - 2^0    */
+        sqr(t3, t1);    /* 2^21  - 2^1    */
+        sqr(t4, t3);    /* 2^22  - 2^2    */
         for (i = 1; i < 10; i++) {
             sqr(t3, t4);
             sqr(t4, t3);
-        } /* t4 */		/* 2^40  - 2^20	*/
-        mul(t3, t4, t1);	/* 2^40  - 2^0	*/
+        } /* t4 */        /* 2^40  - 2^20    */
+        mul(t3, t4, t1);    /* 2^40  - 2^0    */
         for (i = 0; i < 5; i++) {
             sqr(t1, t3);
             sqr(t3, t1);
-        } /* t3 */		/* 2^50  - 2^10	*/
-        mul(t1, t3, t2);	/* 2^50  - 2^0	*/
-        sqr(t2, t1);	/* 2^51  - 2^1	*/
-        sqr(t3, t2);	/* 2^52  - 2^2	*/
+        } /* t3 */        /* 2^50  - 2^10    */
+        mul(t1, t3, t2);    /* 2^50  - 2^0    */
+        sqr(t2, t1);    /* 2^51  - 2^1    */
+        sqr(t3, t2);    /* 2^52  - 2^2    */
         for (i = 1; i < 25; i++) {
             sqr(t2, t3);
             sqr(t3, t2);
-        } /* t3 */		/* 2^100 - 2^50 */
-        mul(t2, t3, t1);	/* 2^100 - 2^0	*/
-        sqr(t3, t2);	/* 2^101 - 2^1	*/
-        sqr(t4, t3);	/* 2^102 - 2^2	*/
+        } /* t3 */        /* 2^100 - 2^50 */
+        mul(t2, t3, t1);    /* 2^100 - 2^0    */
+        sqr(t3, t2);    /* 2^101 - 2^1    */
+        sqr(t4, t3);    /* 2^102 - 2^2    */
         for (i = 1; i < 50; i++) {
             sqr(t3, t4);
             sqr(t4, t3);
-        } /* t4 */		/* 2^200 - 2^100 */
-        mul(t3, t4, t2);	/* 2^200 - 2^0	*/
+        } /* t4 */        /* 2^200 - 2^100 */
+        mul(t3, t4, t2);    /* 2^200 - 2^0    */
         for (i = 0; i < 25; i++) {
             sqr(t4, t3);
             sqr(t3, t4);
-        } /* t3 */		/* 2^250 - 2^50	*/
-        mul(t2, t3, t1);	/* 2^250 - 2^0	*/
-        sqr(t1, t2);	/* 2^251 - 2^1	*/
-        sqr(t2, t1);	/* 2^252 - 2^2	*/
+        } /* t3 */        /* 2^250 - 2^50    */
+        mul(t2, t3, t1);    /* 2^250 - 2^0    */
+        sqr(t1, t2);    /* 2^251 - 2^1    */
+        sqr(t2, t1);    /* 2^252 - 2^2    */
         if (sqrtassist != 0) {
-            mul(y, x, t2);	/* 2^252 - 3 */
+            mul(y, x, t2);    /* 2^252 - 3 */
         } else {
-            sqr(t1, t2);	/* 2^253 - 2^3	*/
-            sqr(t2, t1);	/* 2^254 - 2^4	*/
-            sqr(t1, t2);	/* 2^255 - 2^5	*/
-            mul(y, t1, t0);	/* 2^255 - 21	*/
+            sqr(t1, t2);    /* 2^253 - 2^3    */
+            sqr(t2, t1);    /* 2^254 - 2^4    */
+            sqr(t1, t2);    /* 2^255 - 2^5    */
+            mul(y, t1, t0);    /* 2^255 - 21    */
         }
     }
 
     /* checks if x is "negative", requires reduced input */
-    private static final int is_negative(long10 x) {
+    private static int is_negative(Long10 x) {
         return (int) (((is_overflow(x) || (x._9 < 0)) ? 1 : 0) ^ (x._0 & 1));
     }
 
     /* a square root */
-    private static final void sqrt(long10 x, long10 u) {
-        long10 v = new long10(), t1 = new long10(), t2 = new long10();
-        add(t1, u, u);	/* t1 = 2u		*/
-        recip(v, t1, 1);	/* v = (2u)^((p-5)/8)	*/
-        sqr(x, v);		/* x = v^2		*/
-        mul(t2, t1, x);	/* t2 = 2uv^2		*/
-        t2._0--;		/* t2 = 2uv^2-1		*/
-        mul(t1, v, t2);	/* t1 = v(2uv^2-1)	*/
-        mul(x, u, t1);	/* x = uv(2uv^2-1)	*/
+    private static void sqrt(Long10 x, Long10 u) {
+        Long10 v = new Long10(), t1 = new Long10(), t2 = new Long10();
+        add(t1, u, u);    /* t1 = 2u        */
+        recip(v, t1, 1);    /* v = (2u)^((p-5)/8)    */
+        sqr(x, v);        /* x = v^2        */
+        mul(t2, t1, x);    /* t2 = 2uv^2        */
+        t2._0--;        /* t2 = 2uv^2-1        */
+        mul(t1, v, t2);    /* t1 = v(2uv^2-1)    */
+        mul(x, u, t1);    /* x = uv(2uv^2-1)    */
     }
 
     /********************* Elliptic curve *********************/
 
-	/* y^2 = x^3 + 486662 x^2 + x  over GF(2^255-19) */
+    /* y^2 = x^3 + 486662 x^2 + x  over GF(2^255-19) */
 
-	/* t1 = ax + az
-	 * t2 = ax - az  */
-    private static final void mont_prep(long10 t1, long10 t2, long10 ax, long10 az) {
+    /* t1 = ax + az
+     * t2 = ax - az  */
+    private static void montPrep(Long10 t1, Long10 t2, Long10 ax, Long10 az) {
         add(t1, ax, az);
         sub(t2, ax, az);
     }
@@ -819,7 +818,7 @@ public class Curve {
      *  X(Q) = (t3+t4)/(t3-t4)
      *  X(P-Q) = dx
      * clobbers t1 and t2, preserves t3 and t4  */
-    private static final void mont_add(long10 t1, long10 t2, long10 t3, long10 t4, long10 ax, long10 az, long10 dx) {
+    private static void montAdd(Long10 t1, Long10 t2, Long10 t3, Long10 t4, Long10 ax, Long10 az, Long10 dx) {
         mul(ax, t2, t3);
         mul(az, t1, t4);
         add(t1, ax, az);
@@ -833,7 +832,7 @@ public class Curve {
      *  X(B) = bx/bz
      *  X(Q) = (t3+t4)/(t3-t4)
      * clobbers t1 and t2, preserves t3 and t4  */
-    private static final void mont_dbl(long10 t1, long10 t2, long10 t3, long10 t4, long10 bx, long10 bz) {
+    private static void montDbl(Long10 t1, Long10 t2, Long10 t3, Long10 t4, Long10 bx, Long10 bz) {
         sqr(t1, t3);
         sqr(t2, t4);
         mul(bx, t1, t2);
@@ -845,7 +844,7 @@ public class Curve {
 
     /* Y^2 = X^3 + 486662 X^2 + X
      * t is a temporary  */
-    private static final void x_to_y2(long10 t, long10 y2, long10 x) {
+    private static void xtoy2(Long10 t, Long10 y2, Long10 x) {
         sqr(t, x);
         mul_small(y2, x, 486662);
         add(t, t, y2);
@@ -854,29 +853,29 @@ public class Curve {
     }
 
     /* P = kG   and  s = sign(P)/k  */
-    private static final void core(byte[] Px, byte[] s, byte[] k, byte[] Gx) {
-        long10
-                dx = new long10(),
-                t1 = new long10(),
-                t2 = new long10(),
-                t3 = new long10(),
-                t4 = new long10();
-        long10[]
-                x = new long10[]{new long10(), new long10()},
-                z = new long10[]{new long10(), new long10()};
+    private static void core(byte[] px, byte[] s, byte[] k, byte[] gx) {
+        Long10
+                dx = new Long10(),
+                t1 = new Long10(),
+                t2 = new Long10(),
+                t3 = new Long10(),
+                t4 = new Long10();
+        Long10[]
+                x = new Long10[]{new Long10(), new Long10()},
+                z = new Long10[]{new Long10(), new Long10()};
         int i, j;
 
-		/* unpack the base */
-        if (Gx != null)
-            unpack(dx, Gx);
+        /* unpack the base */
+        if (gx != null)
+            unpack(dx, gx);
         else
             set(dx, 9);
 
-		/* 0G = point-at-infinity */
+        /* 0G = point-at-infinity */
         set(x[0], 1);
         set(z[0], 0);
 
-		/* 1G = G */
+        /* 1G = G */
         cpy(x[1], dx);
         set(z[1], 1);
 
@@ -885,57 +884,57 @@ public class Curve {
                 i = 0;
             }
             for (j = 8; j-- != 0; ) {
-				/* swap arguments depending on bit */
+                /* swap arguments depending on bit */
                 int bit1 = (k[i] & 0xFF) >> j & 1;
                 int bit0 = ~(k[i] & 0xFF) >> j & 1;
-                long10 ax = x[bit0];
-                long10 az = z[bit0];
-                long10 bx = x[bit1];
-                long10 bz = z[bit1];
+                Long10 ax = x[bit0];
+                Long10 az = z[bit0];
+                Long10 bx = x[bit1];
+                Long10 bz = z[bit1];
 
-				/* a' = a + b	*/
-				/* b' = 2 b	*/
-                mont_prep(t1, t2, ax, az);
-                mont_prep(t3, t4, bx, bz);
-                mont_add(t1, t2, t3, t4, ax, az, dx);
-                mont_dbl(t1, t2, t3, t4, bx, bz);
+                /* a' = a + b    */
+                /* b' = 2 b    */
+                montPrep(t1, t2, ax, az);
+                montPrep(t3, t4, bx, bz);
+                montAdd(t1, t2, t3, t4, ax, az, dx);
+                montDbl(t1, t2, t3, t4, bx, bz);
             }
         }
 
         recip(t1, z[0], 0);
         mul(dx, x[0], t1);
-        pack(dx, Px);
+        pack(dx, px);
 
-		/* calculate s such that s abs(P) = G  .. assumes G is std base point */
+        /* calculate s such that s abs(P) = G  .. assumes G is std base point */
         if (s != null) {
-            x_to_y2(t2, t1, dx);	/* t1 = Py^2  */
-            recip(t3, z[1], 0);	/* where Q=P+G ... */
-            mul(t2, x[1], t3);	/* t2 = Qx  */
-            add(t2, t2, dx);	/* t2 = Qx + Px  */
-            t2._0 += 9 + 486662;	/* t2 = Qx + Px + Gx + 486662  */
-            dx._0 -= 9;		/* dx = Px - Gx  */
-            sqr(t3, dx);	/* t3 = (Px - Gx)^2  */
-            mul(dx, t2, t3);	/* dx = t2 (Px - Gx)^2  */
-            sub(dx, dx, t1);	/* dx = t2 (Px - Gx)^2 - Py^2  */
-            dx._0 -= 39420360;	/* dx = t2 (Px - Gx)^2 - Py^2 - Gy^2  */
-            mul(t1, dx, BASE_R2Y);	/* t1 = -Py  */
-            if (is_negative(t1) != 0)	/* sign is 1, so just copy  */
+            xtoy2(t2, t1, dx);    /* t1 = Py^2  */
+            recip(t3, z[1], 0);    /* where Q=P+G ... */
+            mul(t2, x[1], t3);    /* t2 = Qx  */
+            add(t2, t2, dx);    /* t2 = Qx + Px  */
+            t2._0 += 9 + 486662;    /* t2 = Qx + Px + Gx + 486662  */
+            dx._0 -= 9;        /* dx = Px - Gx  */
+            sqr(t3, dx);    /* t3 = (Px - Gx)^2  */
+            mul(dx, t2, t3);    /* dx = t2 (Px - Gx)^2  */
+            sub(dx, dx, t1);    /* dx = t2 (Px - Gx)^2 - Py^2  */
+            dx._0 -= 39420360;    /* dx = t2 (Px - Gx)^2 - Py^2 - Gy^2  */
+            mul(t1, dx, BASE_R2Y);    /* t1 = -Py  */
+            if (is_negative(t1) != 0)    /* sign is 1, so just copy  */
                 cpy32(s, k);
-            else			/* sign is -1, so negate  */
-                mula_small(s, ORDER_TIMES_8, 0, k, 32, -1);
+            else            /* sign is -1, so negate  */
+                mulaSmall(s, ORDER_TIMES_8, 0, k, 32, -1);
 
-			/* reduce s mod q
-			 * (is this needed?  do it just in case, it's fast anyway) */
+            /* reduce s mod q
+             * (is this needed?  do it just in case, it's fast anyway) */
             //divmod((dstptr) t1, s, 32, order25519, 32);
 
-			/* take reciprocal of s mod q */
+            /* take reciprocal of s mod q */
             byte[] temp1 = new byte[32];
             byte[] temp2 = new byte[64];
             byte[] temp3 = new byte[64];
             cpy32(temp1, ORDER);
             cpy32(s, egcd32(temp2, temp3, s, temp1));
             if ((s[31] & 0x80) != 0)
-                mula_small(s, s, 0, ORDER, 32, 1);
+                mulaSmall(s, s, 0, ORDER, 32, 1);
         }
     }
 
@@ -952,11 +951,11 @@ public class Curve {
     };
 
     /* constants 2Gy and 1/(2Gy) */
-    private static final long10 BASE_2Y = new long10(
+    private static final Long10 BASE_2Y = new Long10(
             39999547, 18689728, 59995525, 1648697, 57546132,
             24010086, 19059592, 5425144, 63499247, 16420658
     );
-    private static final long10 BASE_R2Y = new long10(
+    private static final Long10 BASE_R2Y = new Long10(
             5744, 8160848, 4790893, 13779497, 35730846,
             12541209, 49101323, 30047407, 40071253, 6226132
     );
