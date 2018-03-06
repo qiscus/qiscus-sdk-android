@@ -87,7 +87,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private void commentSuccess(QiscusComment qiscusComment) {
         pendingTask.remove(qiscusComment);
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
         if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
             qiscusComment.setState(savedQiscusComment.getState());
         }
@@ -111,7 +111,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
 
         qiscusComment.setState(state);
-        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
             if (savedQiscusComment.getState() < qiscusComment.getState()) {
                 qiscusComment.setState(state);

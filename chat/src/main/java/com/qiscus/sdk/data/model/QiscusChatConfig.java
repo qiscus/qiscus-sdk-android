@@ -187,7 +187,7 @@ public class QiscusChatConfig {
                     .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                     .doOnNext(comment -> {
                         comment.setState(QiscusComment.STATE_ON_QISCUS);
-                        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getId(), comment.getUniqueId());
+                        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
                         if (savedQiscusComment != null && savedQiscusComment.getState() > comment.getState()) {
                             comment.setState(savedQiscusComment.getState());
                         }

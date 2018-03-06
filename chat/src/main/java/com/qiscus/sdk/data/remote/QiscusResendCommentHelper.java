@@ -178,7 +178,7 @@ public final class QiscusResendCommentHelper {
         pendingTask.remove(qiscusComment);
         processingComment.remove(qiscusComment.getUniqueId());
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
         if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
             qiscusComment.setState(savedQiscusComment.getState());
         }
@@ -202,7 +202,7 @@ public final class QiscusResendCommentHelper {
         }
 
         qiscusComment.setState(state);
-        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getId(), qiscusComment.getUniqueId());
+        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
         if (savedQiscusComment != null) {
             if (savedQiscusComment.getState() < qiscusComment.getState()) {
                 qiscusComment.setState(state);
