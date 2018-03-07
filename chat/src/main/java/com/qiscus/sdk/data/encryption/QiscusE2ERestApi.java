@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.encryption;
 
 import android.support.annotation.RestrictTo;
+import android.util.Base64;
 
 import com.google.gson.JsonElement;
 import com.qiscus.sdk.Qiscus;
@@ -90,7 +91,8 @@ public enum QiscusE2ERestApi {
                         .get("public_key").getAsString())
                 .map(encodedBundle -> {
                     try {
-                        return BundlePublicCollection.decode(encodedBundle.getBytes());
+                        byte[] decodedBundle = Base64.decode(encodedBundle.getBytes(), Base64.DEFAULT);
+                        return BundlePublicCollection.decode(decodedBundle);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (IllegalDataSizeException e) {
@@ -109,7 +111,7 @@ public enum QiscusE2ERestApi {
         return Observable.just(bundlePublicCollection)
                 .map(bundlePublicCollection1 -> {
                     try {
-                        return new String(bundlePublicCollection1.encode());
+                        return Base64.encodeToString(bundlePublicCollection1.encode(), Base64.DEFAULT);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -123,7 +125,8 @@ public enum QiscusE2ERestApi {
                         .get("public_key").getAsString())
                 .map(encodedBundle -> {
                     try {
-                        return BundlePublicCollection.decode(encodedBundle.getBytes());
+                        byte[] decodedBundle = Base64.decode(encodedBundle.getBytes(), Base64.DEFAULT);
+                        return BundlePublicCollection.decode(decodedBundle);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (IllegalDataSizeException e) {

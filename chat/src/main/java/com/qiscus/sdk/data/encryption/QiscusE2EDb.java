@@ -18,6 +18,7 @@ package com.qiscus.sdk.data.encryption;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Base64;
 
 import com.qiscus.sdk.data.encryption.core.BundlePublicCollection;
 import com.qiscus.sdk.data.encryption.core.IllegalDataSizeException;
@@ -51,7 +52,7 @@ final class QiscusE2EDb {
             ContentValues values = new ContentValues();
             values.put(COLUMN_USER_ID, userId);
             try {
-                values.put(COLUMN_BUNDLE_PUBLIC, new String(bundlePublicCollection.encode()));
+                values.put(COLUMN_BUNDLE_PUBLIC, Base64.encode(bundlePublicCollection.encode(), Base64.DEFAULT));
             } catch (IOException e) {
                 e.printStackTrace();
                 values.put(COLUMN_BUNDLE_PUBLIC, "");
@@ -61,7 +62,9 @@ final class QiscusE2EDb {
 
         static BundlePublicCollection parseCursor(Cursor cursor) {
             try {
-                return BundlePublicCollection.decode(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BUNDLE_PUBLIC)).getBytes());
+                byte[] decodedBundle = Base64.decode(cursor.getString(
+                        cursor.getColumnIndexOrThrow(COLUMN_BUNDLE_PUBLIC)), Base64.DEFAULT);
+                return BundlePublicCollection.decode(decodedBundle);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (IllegalDataSizeException e) {
