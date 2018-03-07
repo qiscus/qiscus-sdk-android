@@ -38,6 +38,12 @@ public class SesameSenderDevice {
         this.userId = userId;
     }
 
+    public SesameSenderDevice(HashId hashId, String userId, Bundle bundle) {
+        this.id = hashId;
+        this.userId = userId;
+        this.bundle = bundle;
+    }
+
     public Bundle getBundle() {
         return bundle;
     }

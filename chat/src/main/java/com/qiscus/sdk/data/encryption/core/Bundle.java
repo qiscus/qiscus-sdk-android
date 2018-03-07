@@ -33,6 +33,11 @@ public class Bundle {
         bundlePublic = new BundlePublic(pair.publicKey, spk.getPublic());
     }
 
+    public Bundle(BundlePrivate bundlePrivate, BundlePublic bundlePublic) {
+        this.bundlePrivate = bundlePrivate;
+        this.bundlePublic = bundlePublic;
+    }
+
     public void populatePreKeys() throws IllegalDataSizeException, NoSuchAlgorithmException, InvalidKeyException {
         for (int i = 0; i < Constants.MaxPreKeys; i++) {
             KeyPair pair = new KeyPair();
