@@ -5,7 +5,7 @@ Add Qiscus SDK to your apps without emoji library, change gradle file to like th
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.22.1-without-emoji'
+    compile 'com.qiscus.sdk:chat:2.22.2-without-emoji'
 }
 ```
 
@@ -108,7 +108,7 @@ Qiscus.getChatConfig()
 
 ### Advance Customization
 
-For advance customization, you can modify everything on the chat interface by forking our repository or just right away modifying our **[CustomChatActivity.java](https://github.com/qiscus/qiscus-sdk-android/blob/develop/app/src/main/java/com/qiscus/dragonfly/CustomChatActivity.java)** based on your needs.
+For advance customization, you can only use our Core SDK API for the data flow and use your own full UI. By using this approach you will have full control over the UI. We have sample on how you can do it and there are documentation on list of core api that we provide in the SDK. check it here [https://bitbucket.org/qiscus/qiscus-sdk-core-android-sample](https://bitbucket.org/qiscus/qiscus-sdk-core-android-sample/overview)
 
 ## Event Handler
 
