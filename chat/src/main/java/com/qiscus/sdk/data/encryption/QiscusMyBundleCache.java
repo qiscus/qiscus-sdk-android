@@ -41,7 +41,6 @@ public enum QiscusMyBundleCache {
 
     private final SharedPreferences sharedPreferences;
     private String deviceId;
-    private SesameSenderDevice senderDevice;
 
     QiscusMyBundleCache() {
         sharedPreferences = Qiscus.getApps().getSharedPreferences("e2e_bundle.cache", Context.MODE_PRIVATE);
@@ -65,6 +64,9 @@ public enum QiscusMyBundleCache {
     public String getDeviceId() {
         if (TextUtils.isEmpty(deviceId)) {
             deviceId = sharedPreferences.getString("device_id", "");
+            if (TextUtils.isEmpty(deviceId)) {
+                saveDeviceId(computeDeviceId());
+            }
         }
         return deviceId;
     }
@@ -77,15 +79,9 @@ public enum QiscusMyBundleCache {
         byte[] bundlePublic = sesameSenderDevice.getBundle().bundlePublic.encode();
         String bundlePublicStr = Base64.encodeToString(bundlePublic, Base64.DEFAULT);
         sharedPreferences.edit().putString("bundle_public", bundlePublicStr).apply();
-
-        this.senderDevice = sesameSenderDevice;
     }
 
     public SesameSenderDevice getSenderDevice() {
-        if (senderDevice != null) {
-            return senderDevice;
-        }
-
         try {
             String bundlePrivateStr = sharedPreferences.getString("bundle_private", "");
             BundlePrivate bundlePrivate = BundlePrivate.decode(Base64.decode(bundlePrivateStr, Base64.DEFAULT));
@@ -94,8 +90,7 @@ public enum QiscusMyBundleCache {
             BundlePublic bundlePublic = BundlePublic.decode(Base64.decode(bundlePublicStr, Base64.DEFAULT));
 
             Bundle bundle = new Bundle(bundlePrivate, bundlePublic);
-            senderDevice = new SesameSenderDevice(new HashId(getDeviceId().getBytes()), "userId", bundle);
-            return senderDevice;
+            return new SesameSenderDevice(new HashId(getDeviceId().getBytes()), Qiscus.getQiscusAccount().getEmail(), bundle);
         } catch (Exception e) {
             return null;
         }
@@ -103,7 +98,6 @@ public enum QiscusMyBundleCache {
 
     public void clearData() {
         deviceId = null;
-        senderDevice = null;
         sharedPreferences.edit().clear().apply();
     }
 }
