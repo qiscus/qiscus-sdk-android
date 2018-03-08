@@ -27,6 +27,8 @@ import com.qiscus.sdk.data.encryption.core.IllegalDataSizeException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
@@ -36,9 +38,9 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import rx.Observable;
@@ -118,7 +120,12 @@ public enum QiscusE2ERestApi {
                     return null;
                 })
                 .filter(encodedBundle -> encodedBundle != null)
-                .flatMap(encodedBundle -> api.saveBundlePublicCollection(encodedBundle))
+                .map(encodedBundle -> {
+                    Map<String, Object> requestBody = new HashMap<>();
+                    requestBody.put("public_key", encodedBundle);
+                    return requestBody;
+                })
+                .flatMap(requestBody -> api.saveBundlePublicCollection(requestBody))
                 .map(json -> json.getAsJsonObject()
                         .get("data").getAsJsonObject()
                         .get("user_public_key").getAsJsonObject()
@@ -145,8 +152,8 @@ public enum QiscusE2ERestApi {
         @GET("/api/v1/user-public-key/{user_id}")
         Observable<JsonElement> getBundlePublicCollection(@Path("user_id") String userId);
 
-        @FormUrlEncoded
+        @Headers("Content-Type: application/json")
         @POST("/api/v1/user-public-key")
-        Observable<JsonElement> saveBundlePublicCollection(@Field("public_key") String bundlePublicCollection);
+        Observable<JsonElement> saveBundlePublicCollection(@Body Map<String, Object> body);
     }
 }
