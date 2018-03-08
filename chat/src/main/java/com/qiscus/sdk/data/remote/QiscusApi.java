@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.remote;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -216,7 +217,24 @@ public enum QiscusApi {
                 .map(message -> {
                     if (Qiscus.getChatConfig().isEnableEndToEndEncryption()
                             && qiscusComment.getType() == QiscusComment.Type.TEXT) {
-                        return QiscusEncryptionHandler.encrypt(message);
+                        QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+                        if (chatRoom == null || chatRoom.isGroup()) {
+                            return message;
+                        }
+
+                        String recipientId = "";
+                        for (QiscusRoomMember qiscusRoomMember : chatRoom.getMember()) {
+                            if (!qiscusRoomMember.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                                recipientId = qiscusRoomMember.getEmail();
+                                break;
+                            }
+                        }
+
+                        if (TextUtils.isEmpty(recipientId)) {
+                            return message;
+                        }
+
+                        return QiscusEncryptionHandler.encrypt(recipientId, message);
                     }
                     return message;
                 })
@@ -593,11 +611,7 @@ public enum QiscusApi {
 
     private void decryptComments(List<QiscusComment> qiscusComments) {
         if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
-            for (QiscusComment qiscusComment : qiscusComments) {
-                if (qiscusComment.getType() == QiscusComment.Type.TEXT) {
-                    QiscusEncryptionHandler.decrypt(qiscusComment);
-                }
-            }
+            QiscusEncryptionHandler.decrypt(qiscusComments);
         }
     }
 
