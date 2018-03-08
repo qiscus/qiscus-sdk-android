@@ -52,7 +52,7 @@ final class QiscusE2EDb {
             ContentValues values = new ContentValues();
             values.put(COLUMN_USER_ID, userId);
             try {
-                values.put(COLUMN_BUNDLE_PUBLIC, Base64.encode(bundlePublicCollection.encode(), Base64.DEFAULT));
+                values.put(COLUMN_BUNDLE_PUBLIC, Base64.encodeToString(bundlePublicCollection.encode(), Base64.DEFAULT));
             } catch (IOException e) {
                 e.printStackTrace();
                 values.put(COLUMN_BUNDLE_PUBLIC, "");
