@@ -26,6 +26,9 @@ import android.os.Handler;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.qiscus.jupuk.Jupuk;
+import com.qiscus.sdk.data.QiscusEncryptionHandler;
+import com.qiscus.sdk.data.encryption.QiscusE2EDataStore;
+import com.qiscus.sdk.data.encryption.QiscusMyBundleCache;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.data.local.QiscusDataStore;
@@ -39,6 +42,7 @@ import com.qiscus.sdk.service.QiscusSyncJobService;
 import com.qiscus.sdk.service.QiscusSyncService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusLogger;
 import com.qiscus.sdk.util.BuildVersionUtil;
@@ -148,6 +152,9 @@ public class Qiscus {
         configureFcmToken();
 
         EmojiManager.install(new EmojiOneProvider());
+
+        initKeyPair();
+
         QiscusLogger.print("init Qiscus with app Id " + appId);
     }
 
@@ -192,9 +199,11 @@ public class Qiscus {
                     if (Qiscus.hasSetupUser()) {
                         Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
                         configureFcmToken();
+                        initKeyPair();
                     } else {
                         Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
                         configureFcmToken();
+                        initKeyPair();
                         EventBus.getDefault().post(QiscusUserEvent.LOGIN);
                     }
                 });
@@ -500,6 +509,16 @@ public class Qiscus {
         }
     }
 
+    private static void initKeyPair() {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+            try {
+                QiscusEncryptionHandler.initKeyPair();
+            } catch (Exception e) {
+                QiscusErrorLogger.print(e);
+            }
+        });
+    }
+
     public static String getProviderAuthorities() {
         return authorities;
     }
@@ -537,6 +556,8 @@ public class Qiscus {
         localDataManager.clearData();
         dataStore.clear();
         QiscusCacheManager.getInstance().clearData();
+        QiscusMyBundleCache.getInstance().clearData();
+        QiscusE2EDataStore.getInstance().clear();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
 
@@ -644,9 +665,11 @@ public class Qiscus {
                         if (Qiscus.hasSetupUser()) {
                             Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
                             configureFcmToken();
+                            initKeyPair();
                         } else {
                             Qiscus.localDataManager.saveAccountInfo(qiscusAccount);
                             configureFcmToken();
+                            initKeyPair();
                             EventBus.getDefault().post(QiscusUserEvent.LOGIN);
                         }
                     });
