@@ -57,8 +57,15 @@ public enum QiscusE2EDataStore {
         return Observable.create(subscriber -> {
             sqLiteDatabase.beginTransaction();
             try {
-                sqLiteDatabase.insert(QiscusE2EDb.BundleTable.TABLE_NAME, null,
-                        QiscusE2EDb.BundleTable.toContentValues(userId, bundlePublicCollection));
+                if (isContains(userId)) {
+                    String where = QiscusE2EDb.BundleTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId);
+
+                    sqLiteDatabase.update(QiscusE2EDb.BundleTable.TABLE_NAME,
+                            QiscusE2EDb.BundleTable.toContentValues(userId, bundlePublicCollection), where, null);
+                } else {
+                    sqLiteDatabase.insert(QiscusE2EDb.BundleTable.TABLE_NAME, null,
+                            QiscusE2EDb.BundleTable.toContentValues(userId, bundlePublicCollection));
+                }
                 sqLiteDatabase.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -83,6 +90,29 @@ public enum QiscusE2EDataStore {
         } else {
             cursor.close();
             return null;
+        }
+    }
+
+    private boolean isContains(String userId) {
+        String query = "SELECT * FROM "
+                + QiscusE2EDb.BundleTable.TABLE_NAME + " WHERE "
+                + QiscusE2EDb.BundleTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId);
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        boolean contains = cursor.getCount() > 0;
+        cursor.close();
+        return contains;
+    }
+
+    public void clear() {
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.delete(QiscusE2EDb.BundleTable.TABLE_NAME, null, null);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 }
