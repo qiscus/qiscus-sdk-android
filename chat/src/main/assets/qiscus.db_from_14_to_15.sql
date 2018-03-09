@@ -1,0 +1,2 @@
+ALTER TABLE comments ADD COLUMN TESTING TEXT;
+UPDATE comments SET TESTING = sender_email;

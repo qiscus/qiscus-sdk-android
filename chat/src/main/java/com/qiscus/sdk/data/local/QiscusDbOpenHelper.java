@@ -114,12 +114,4 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
             }
         }
     }
-
-//    private void clearOldData(SQLiteDatabase db) {
-//        db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomTable.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.MemberTable.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomMemberTable.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.CommentTable.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.FilesTable.TABLE_NAME);
-//    }
 }
