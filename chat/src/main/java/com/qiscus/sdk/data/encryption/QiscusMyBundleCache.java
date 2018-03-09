@@ -57,11 +57,11 @@ public enum QiscusMyBundleCache {
     private String computeDeviceId() {
         StringBuilder deviceId = new StringBuilder("android_");
         deviceId.append(Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID))
-                .append("_").append(Qiscus.getApps().getPackageName());
+                .append('_').append(Qiscus.getApps().getPackageName());
         if (deviceId.length() > 64) {
             deviceId = new StringBuilder(deviceId.substring(0, 64));
         } else {
-            deviceId.append("_");
+            deviceId.append('_');
             char ch = 'a';
             while (deviceId.length() < 64) {
                 deviceId.append(ch);
