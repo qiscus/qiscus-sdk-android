@@ -88,7 +88,7 @@ public final class QiscusNewCommentHandler {
     }
 
     private static void handleOpponentComment(QiscusComment comment) {
-        if (Qiscus.getChatConfig().isEnableEndToEndEncryption() && comment.getType() == QiscusComment.Type.TEXT) {
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
             QiscusEncryptionHandler.decrypt(comment);
         }
         updateUnreadCount(comment.getRoomId());

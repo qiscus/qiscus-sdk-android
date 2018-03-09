@@ -604,7 +604,7 @@ public enum QiscusApi {
     }
 
     private void decryptComment(QiscusComment qiscusComment) {
-        if (Qiscus.getChatConfig().isEnableEndToEndEncryption() && qiscusComment.getType() == QiscusComment.Type.TEXT) {
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
             QiscusEncryptionHandler.decrypt(qiscusComment);
         }
     }

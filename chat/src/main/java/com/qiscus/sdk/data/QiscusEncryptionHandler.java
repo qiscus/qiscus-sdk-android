@@ -67,58 +67,8 @@ public final class QiscusEncryptionHandler {
         }
     }
 
-    //TODO implement the encryption algorithm
     public static void encrypt(String recipientId, QiscusComment comment) {
         comment.setMessage(encrypt(recipientId, comment.getMessage()));
-    }
-
-    //TODO implement the decryption algorithm
-    public static void decrypt(QiscusComment comment) {
-        comment.setMessage(decrypt(comment.getSenderEmail(), comment.getMessage()));
-    }
-
-    public static void decrypt(List<QiscusComment> comments) {
-        Map<String, List<QiscusComment>> data = new HashMap<>();
-        for (QiscusComment comment : comments) {
-            if (comment.getType() == QiscusComment.Type.TEXT) {
-                String userId = comment.getSenderEmail();
-                if (!data.containsKey(userId)) {
-                    data.put(userId, new ArrayList<>());
-                }
-                data.get(userId).add(comment);
-            }
-        }
-
-        try {
-            for (String userId : data.keySet()) {
-                SesameConversation conversation = createConversation(userId);
-                for (QiscusComment comment : data.get(userId)) {
-                    byte[] unpackedData = unpackData(comment.getMessage());
-                    int index = comments.indexOf(comment);
-                    if (index >= 0) {
-                        comments.get(index).setMessage(new String(conversation.decrypt(unpackedData)));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static byte[] unpackData(String message) throws IOException, InvalidKeyException {
-        byte[] rawData = Base64.decode(message.getBytes(), Base64.DEFAULT);
-        HashMap<HashId, byte[]> unpacked = SesameConversation.unpackEncrypted(rawData);
-        Set<HashId> hashIds = unpacked.keySet();
-        Iterator<HashId> it = hashIds.iterator();
-        byte[] data = null;
-        while (it.hasNext()) {
-            HashId id = it.next();
-            if (id.equals(QiscusMyBundleCache.getInstance().getSenderDevice().id)) {
-                data = unpacked.get(id);
-                break;
-            }
-        }
-        return data;
     }
 
     public static String encrypt(String recipientId, String message) {
@@ -133,25 +83,55 @@ public final class QiscusEncryptionHandler {
         }
     }
 
-    public static String decrypt(String senderId, String message) {
-        try {
-            byte[] rawData = Base64.decode(message.getBytes(), Base64.DEFAULT);
-            HashMap<HashId, byte[]> unpacked = SesameConversation.unpackEncrypted(rawData);
-            Set<HashId> hashIds = unpacked.keySet();
-            Iterator<HashId> it = hashIds.iterator();
-            byte[] data = null;
-            while (it.hasNext()) {
-                HashId id = it.next();
-                if (id.equals(QiscusMyBundleCache.getInstance().getSenderDevice().id)) {
-                    data = unpacked.get(id);
-                    break;
+    public static void decrypt(QiscusComment comment) {
+        if (comment.isMyComment() || !comment.getRawType().equals("text")) {
+            return;
+        }
+        comment.setMessage(decrypt(comment.getSenderEmail(), comment.getMessage()));
+    }
+
+    public static void decrypt(List<QiscusComment> comments) {
+        QiscusAccount account = Qiscus.getQiscusAccount();
+        Map<String, List<QiscusComment>> data = new HashMap<>();
+        for (QiscusComment comment : comments) {
+            if (!comment.getSenderEmail().equals(account.getEmail()) && comment.getRawType().equals("text")) {
+                String userId = comment.getSenderEmail();
+                if (!data.containsKey(userId)) {
+                    data.put(userId, new ArrayList<>());
+                }
+                data.get(userId).add(comment);
+            }
+        }
+
+        for (String userId : data.keySet()) {
+            BundlePublicCollection bundle = getBundle(userId);
+            for (QiscusComment comment : data.get(userId)) {
+                try {
+                    byte[] unpackedData = unpackData(comment.getMessage());
+                    if (unpackedData == null) {
+                        continue;
+                    }
+
+                    int index = comments.indexOf(comment);
+                    if (index >= 0) {
+                        SesameConversation conversation = createConversation(userId, bundle);
+                        comments.get(index).setMessage(new String(conversation.decrypt(unpackedData)));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            if (data == null) {
+        }
+    }
+
+    public static String decrypt(String senderId, String message) {
+        try {
+            byte[] unpackedData = unpackData(message);
+            if (unpackedData == null) {
                 return message;
             }
             SesameConversation conversation = createConversation(senderId);
-            byte[] decrypted = conversation.decrypt(data);
+            byte[] decrypted = conversation.decrypt(unpackedData);
             return new String(decrypted);
         } catch (Exception e) {
             e.printStackTrace();
@@ -178,6 +158,23 @@ public final class QiscusEncryptionHandler {
                 }, QiscusErrorLogger::print);
     }
 
+    private static byte[] unpackData(String message) throws IOException, InvalidKeyException {
+        byte[] rawData = Base64.decode(message.getBytes(), Base64.DEFAULT);
+        HashMap<HashId, byte[]> unpacked = SesameConversation.unpackEncrypted(rawData);
+        Set<HashId> hashIds = unpacked.keySet();
+        Iterator<HashId> it = hashIds.iterator();
+        byte[] data = null;
+        while (it.hasNext()) {
+            HashId id = it.next();
+            if (id.equals(QiscusMyBundleCache.getInstance().getSenderDevice().id)) {
+                data = unpacked.get(id);
+                break;
+            }
+        }
+        return data;
+    }
+
+    //TODO better way to get bundle without everytime request to server
     private static BundlePublicCollection getBundle(String userId) {
         return QiscusE2EDataStore.getInstance()
                 .getBundlePublicCollection(userId)
@@ -197,6 +194,10 @@ public final class QiscusEncryptionHandler {
     }
 
     private static SesameConversation createConversation(String userId) throws Exception {
+        return createConversation(userId, getBundle(userId));
+    }
+
+    private static SesameConversation createConversation(String userId, BundlePublicCollection bundle) throws Exception {
         QiscusAccount account = Qiscus.getQiscusAccount();
         SesameSenderDevice senderDevice = QiscusMyBundleCache.getInstance().getSenderDevice();
         return new SesameConversation(
@@ -204,7 +205,7 @@ public final class QiscusEncryptionHandler {
                 senderDevice.id,
                 senderDevice.getBundle(),
                 userId,
-                getBundle(userId)
+                bundle
         );
     }
 }
