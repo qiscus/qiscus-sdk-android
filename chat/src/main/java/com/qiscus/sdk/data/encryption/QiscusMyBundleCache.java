@@ -18,6 +18,7 @@ package com.qiscus.sdk.data.encryption;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.provider.Settings;
 import android.support.annotation.RestrictTo;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -44,19 +45,36 @@ public enum QiscusMyBundleCache {
 
     QiscusMyBundleCache() {
         sharedPreferences = Qiscus.getApps().getSharedPreferences("e2e_bundle.cache", Context.MODE_PRIVATE);
-        saveDeviceId(computeDeviceId());
     }
 
     public static QiscusMyBundleCache getInstance() {
         return INSTANCE;
     }
 
-    //TODO implement method to generate device id
+    /**
+     * @return 64 unique character per device
+     */
     private String computeDeviceId() {
-        return "8d74beec1be996322ad76813bafb92d40839895d6dd7ee808b17ca201eac98be";
+        StringBuilder deviceId = new StringBuilder("android_");
+        deviceId.append(Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID))
+                .append("_").append(Qiscus.getApps().getPackageName());
+        if (deviceId.length() > 64) {
+            deviceId = new StringBuilder(deviceId.substring(0, 64));
+        } else {
+            deviceId.append("_");
+            char ch = 'a';
+            while (deviceId.length() < 64) {
+                deviceId.append(ch);
+                ch++;
+                if (ch > 'z') {
+                    ch = 'a';
+                }
+            }
+        }
+        return deviceId.toString();
     }
 
-    public void saveDeviceId(String deviceId) {
+    private void saveDeviceId(String deviceId) {
         this.deviceId = deviceId;
         sharedPreferences.edit().putString("device_id", deviceId).apply();
     }
