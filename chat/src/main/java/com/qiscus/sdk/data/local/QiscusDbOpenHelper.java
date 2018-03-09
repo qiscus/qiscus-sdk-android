@@ -107,7 +107,7 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
         StringBuilder statement = new StringBuilder();
         while ((line = reader.readLine()) != null) {
             statement.append(line);
-            statement.append("\n");
+            statement.append(System.getProperty("line.separator"));
             if (line.endsWith(";")) {
                 db.execSQL(statement.toString());
                 statement = new StringBuilder();
