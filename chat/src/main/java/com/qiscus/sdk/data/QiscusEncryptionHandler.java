@@ -145,8 +145,21 @@ public final class QiscusEncryptionHandler {
 
         //Save bundle public collection to server
         byte[] bundlePublicRaw = senderDevice.getBundle().bundlePublic.encode();
-        BundlePublicCollection bundlePublicCollection =
-                new BundlePublicCollection(new HashId(deviceId.getBytes()), BundlePublic.decode(bundlePublicRaw));
+
+        BundlePublicCollection bundlePublicCollection = null;
+        try {
+            bundlePublicCollection = getBundle(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            QiscusErrorLogger.print(e);
+        }
+
+        if (bundlePublicCollection != null) {
+            bundlePublicCollection.put(new HashId(deviceId.getBytes()), BundlePublic.decode(bundlePublicRaw));
+        } else {
+            bundlePublicCollection =
+                    new BundlePublicCollection(new HashId(deviceId.getBytes()), BundlePublic.decode(bundlePublicRaw));
+        }
 
         QiscusE2ERestApi.getInstance()
                 .saveBundlePublicCollection(bundlePublicCollection)
