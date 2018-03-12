@@ -216,7 +216,8 @@ public enum QiscusApi {
         Observable<String> encryptMessage = Observable.just(qiscusComment.getMessage())
                 .map(message -> {
                     if (Qiscus.getChatConfig().isEnableEndToEndEncryption()
-                            && qiscusComment.getType() == QiscusComment.Type.TEXT) {
+                            && (qiscusComment.getType() == QiscusComment.Type.TEXT
+                            || qiscusComment.getType() == QiscusComment.Type.LINK)) {
                         QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
                         if (chatRoom == null || chatRoom.isGroup()) {
                             return message;
