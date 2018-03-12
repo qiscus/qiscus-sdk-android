@@ -772,8 +772,9 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public void setEnableEndToEndEncryption(boolean enableEndToEndEncryption) {
+    public QiscusChatConfig setEnableEndToEndEncryption(boolean enableEndToEndEncryption) {
         this.enableEndToEndEncryption = enableEndToEndEncryption;
+        return this;
     }
 
     @ColorRes
