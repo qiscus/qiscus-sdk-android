@@ -30,6 +30,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusReplyPanelConfig;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.util.QiscusImageUtil;
@@ -113,6 +114,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
             configureColor(originComment);
             sender.setText(Qiscus.getChatConfig().getRoomSenderNameInterceptor()
                     .getSenderName(originComment));
+            QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
             switch (originComment.getType()) {
                 case IMAGE:
                 case VIDEO:
@@ -124,9 +126,14 @@ public class QiscusReplyPreviewView extends LinearLayout {
                     } else {
                         showImage(localPath);
                     }
-                    content.setText(TextUtils.isEmpty(originComment.getCaption()) ?
-                            originComment.getAttachmentName() :
-                            new QiscusSpannableBuilder(originComment.getCaption(), members).build().toString());
+                    if (mentionConfig.isEnableMention()) {
+                        content.setText(TextUtils.isEmpty(originComment.getCaption()) ?
+                                originComment.getAttachmentName() :
+                                new QiscusSpannableBuilder(originComment.getCaption(), members).build().toString());
+                    } else {
+                        content.setText(TextUtils.isEmpty(originComment.getCaption()) ?
+                                originComment.getAttachmentName() : originComment.getCaption());
+                    }
                     break;
                 case AUDIO:
                     image.setVisibility(GONE);
@@ -156,7 +163,11 @@ public class QiscusReplyPreviewView extends LinearLayout {
                 default:
                     image.setVisibility(GONE);
                     icon.setVisibility(GONE);
-                    content.setText(new QiscusSpannableBuilder(originComment.getMessage(), members).build().toString());
+                    if (mentionConfig.isEnableMention()) {
+                        content.setText(new QiscusSpannableBuilder(originComment.getMessage(), members).build().toString());
+                    } else {
+                        content.setText(originComment.getMessage());
+                    }
                     break;
 
             }

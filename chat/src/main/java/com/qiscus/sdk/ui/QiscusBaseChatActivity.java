@@ -43,6 +43,7 @@ import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -347,24 +348,40 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                 roomMembers.put(member.getEmail(), member);
             }
         }
-        StringBuilder text = new StringBuilder();
+        QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
+        String textCopied;
         if (selectedComments.size() == 1) {
             QiscusComment qiscusComment = selectedComments.get(0);
-            text = new StringBuilder(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
-                    new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
-                            .build().toString());
-        } else {
-            for (QiscusComment qiscusComment : selectedComments) {
-                text.append(qiscusComment.getSender()).append(": ");
-                text.append(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
+            if (mentionConfig.isEnableMention()) {
+                textCopied = (qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
                         new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
                                 .build().toString());
-                text.append('\n');
+            } else {
+                textCopied = qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() : qiscusComment.getMessage();
             }
+        } else {
+            StringBuilder text = new StringBuilder();
+            if (mentionConfig.isEnableMention()) {
+                for (QiscusComment qiscusComment : selectedComments) {
+                    text.append(qiscusComment.getSender()).append(": ");
+                    text.append(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
+                            new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
+                                    .build().toString());
+                    text.append('\n');
+                }
+            } else {
+                for (QiscusComment qiscusComment : selectedComments) {
+                    text.append(qiscusComment.getSender()).append(": ");
+                    text.append(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
+                            qiscusComment.getMessage());
+                    text.append('\n');
+                }
+            }
+            textCopied = text.toString();
         }
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText(getString(R.string.qiscus_chat_activity_label_clipboard), text.toString());
+        ClipData clip = ClipData.newPlainText(getString(R.string.qiscus_chat_activity_label_clipboard), textCopied);
         if (clipboard != null) {
             clipboard.setPrimaryClip(clip);
         }

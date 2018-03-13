@@ -36,6 +36,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.adapter.ReplyItemClickListener;
@@ -140,6 +141,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
             barView.setBackgroundColor(ContextCompat.getColor(Qiscus.getApps(),
                     Qiscus.getChatConfig().getRoomReplyBarColorInterceptor().getColor(originComment)));
         }
+        QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
         switch (originComment.getType()) {
             case IMAGE:
             case VIDEO:
@@ -155,15 +157,20 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                 if (originIconView != null) {
                     originIconView.setVisibility(View.GONE);
                 }
-                originMessageTextView.setText(TextUtils.isEmpty(originComment.getCaption()) ?
-                        originComment.getAttachmentName() : QiscusTextUtil.createQiscusSpannableText(
-                        originComment.getCaption(),
-                        roomMembers,
-                        originMessageColor,
-                        originMessageColor,
-                        originMessageColor,
-                        null
-                ));
+                if (mentionConfig.isEnableMention()) {
+                    originMessageTextView.setText(TextUtils.isEmpty(originComment.getCaption()) ?
+                            originComment.getAttachmentName() : QiscusTextUtil.createQiscusSpannableText(
+                            originComment.getCaption(),
+                            roomMembers,
+                            originMessageColor,
+                            originMessageColor,
+                            originMessageColor,
+                            null
+                    ));
+                } else {
+                    originMessageTextView.setText(TextUtils.isEmpty(originComment.getCaption()) ?
+                            originComment.getAttachmentName() : originComment.getCaption());
+                }
                 break;
             case AUDIO:
                 if (originImageView != null) {
@@ -213,14 +220,18 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                 if (originIconView != null) {
                     originIconView.setVisibility(View.GONE);
                 }
-                originMessageTextView.setText(QiscusTextUtil.createQiscusSpannableText(
-                        originComment.getMessage(),
-                        roomMembers,
-                        originMessageColor,
-                        originMessageColor,
-                        originMessageColor,
-                        null
-                ));
+                if (mentionConfig.isEnableMention()) {
+                    originMessageTextView.setText(QiscusTextUtil.createQiscusSpannableText(
+                            originComment.getMessage(),
+                            roomMembers,
+                            originMessageColor,
+                            originMessageColor,
+                            originMessageColor,
+                            null
+                    ));
+                } else {
+                    originMessageTextView.setText(originComment.getMessage());
+                }
                 break;
 
         }
