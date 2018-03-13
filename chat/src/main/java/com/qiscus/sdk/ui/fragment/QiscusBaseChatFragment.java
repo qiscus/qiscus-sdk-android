@@ -1437,6 +1437,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onCommentDeleted(QiscusComment qiscusComment) {
         chatAdapter.remove(qiscusComment);
+        chatAdapter.notifyDataSetChanged();
     }
 
     @Override
