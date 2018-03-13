@@ -19,7 +19,6 @@ package com.qiscus.sdk.ui.view;
 import android.content.Context;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -31,6 +30,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusReplyPanelConfig;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusSpannableBuilder;
@@ -49,6 +49,7 @@ import java.util.Map;
  */
 public class QiscusReplyPreviewView extends LinearLayout {
 
+    private View rootView;
     private View bar;
     private TextView sender;
     private TextView content;
@@ -71,6 +72,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
 
     private void injectViews() {
         inflate(getContext(), R.layout.view_qiscus_reply_preview, this);
+        rootView = findViewById(R.id.root_view);
         bar = findViewById(R.id.bar);
         sender = findViewById(R.id.origin_sender);
         content = findViewById(R.id.origin_content);
@@ -108,12 +110,9 @@ public class QiscusReplyPreviewView extends LinearLayout {
             content.setText(null);
             setVisibility(GONE);
         } else {
+            configureColor(originComment);
             sender.setText(Qiscus.getChatConfig().getRoomSenderNameInterceptor()
                     .getSenderName(originComment));
-            sender.setTextColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig()
-                    .getRoomSenderNameColorInterceptor().getColor(originComment)));
-            setBarColor(ContextCompat.getColor(Qiscus.getApps(), Qiscus.getChatConfig()
-                    .getRoomReplyBarColorInterceptor().getColor(originComment)));
             switch (originComment.getType()) {
                 case IMAGE:
                 case VIDEO:
@@ -165,6 +164,17 @@ public class QiscusReplyPreviewView extends LinearLayout {
         }
     }
 
+    private void configureColor(QiscusComment originComment) {
+        QiscusReplyPanelConfig config = Qiscus.getChatConfig().getStartReplyInterceptor()
+                .getReplyPanelConfig(originComment);
+        setSenderColor(config.getSenderNameColor());
+        setContentColor(config.getMessageColor());
+        setBackgroundColor(config.getBackgroundColor());
+        setBarColor(config.getBarColor());
+        setCancelIcon(config.getCancelIconResourceId());
+        setCancelIconTint(config.getCancelIconTintColor());
+    }
+
     public void setBarColor(@ColorInt int color) {
         bar.setBackgroundColor(color);
     }
@@ -177,10 +187,17 @@ public class QiscusReplyPreviewView extends LinearLayout {
         content.setTextColor(color);
     }
 
+    public void setBackgroundColor(@ColorInt int color) {
+        rootView.setBackgroundColor(color);
+    }
+
     public void setCancelIcon(@DrawableRes int iconResource) {
         icon.setImageResource(iconResource);
     }
 
+    public void setCancelIconTint(@ColorInt int tintColor) {
+        icon.setColorFilter(tintColor);
+    }
 
     private void showImage(File file) {
         Nirmana.getInstance().get()

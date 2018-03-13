@@ -163,6 +163,7 @@ public class QiscusChatConfig {
     private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
     private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusComment -> R.color.qiscus_secondary_text;
     private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusComment -> getReplyBarColor();
+    private QiscusStartReplyInterceptor startReplyInterceptor = qiscusComment -> new QiscusReplyPanelConfig();
 
     private NotificationClickListener notificationClickListener =
             (context, qiscusComment) -> QiscusApi.getInstance()
@@ -726,7 +727,7 @@ public class QiscusChatConfig {
     }
 
     public QiscusChatConfig setRoomSenderNameColorInterceptor(QiscusRoomSenderNameColorInterceptor
-                                                                qiscusRoomSenderNameColorInterceptor) {
+                                                                      qiscusRoomSenderNameColorInterceptor) {
         this.qiscusRoomSenderNameColorInterceptor = qiscusRoomSenderNameColorInterceptor;
         return this;
     }
@@ -767,6 +768,11 @@ public class QiscusChatConfig {
 
     public QiscusChatConfig setDeleteCommentConfig(QiscusDeleteCommentConfig deleteCommentConfig) {
         this.deleteCommentConfig = deleteCommentConfig;
+        return this;
+    }
+
+    public QiscusChatConfig setStartReplyInterceptor(QiscusStartReplyInterceptor startReplyInterceptor) {
+        this.startReplyInterceptor = startReplyInterceptor;
         return this;
     }
 
@@ -1266,5 +1272,9 @@ public class QiscusChatConfig {
 
     public QiscusDeleteCommentConfig getDeleteCommentConfig() {
         return deleteCommentConfig;
+    }
+
+    public QiscusStartReplyInterceptor getStartReplyInterceptor() {
+        return startReplyInterceptor;
     }
 }
