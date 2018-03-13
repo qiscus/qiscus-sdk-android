@@ -61,14 +61,18 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
         QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
-        Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
-                qiscusComment.getMessage(),
-                roomMembers,
-                messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
-                messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
-                messageFromMe ? mentionConfig.getRightMentionMeColor() : mentionConfig.getLeftMentionMeColor(),
-                mentionConfig.getMentionClickHandler()
-        );
-        messageTextView.setText(spannable);
+        if (mentionConfig.isEnableMention()) {
+            Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
+                    qiscusComment.getMessage(),
+                    roomMembers,
+                    messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
+                    messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
+                    messageFromMe ? mentionConfig.getRightMentionMeColor() : mentionConfig.getLeftMentionMeColor(),
+                    mentionConfig.getMentionClickHandler()
+            );
+            messageTextView.setText(spannable);
+        } else {
+            messageTextView.setText(qiscusComment.getMessage());
+        }
     }
 }
