@@ -925,11 +925,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (addLocationLayout != null) {
             addLocationLayout.setVisibility(chatConfig.isEnableAddLocation() ? View.VISIBLE : View.GONE);
         }
-        if (replyPreviewView != null) {
-            replyPreviewView.setBarColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplyBarColor()));
-            replyPreviewView.setSenderColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplySenderColor()));
-            replyPreviewView.setContentColor(ContextCompat.getColor(Qiscus.getApps(), chatConfig.getReplyMessageColor()));
-        }
     }
 
     protected Animation onLoadAnimation() {
@@ -1442,6 +1437,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onCommentDeleted(QiscusComment qiscusComment) {
         chatAdapter.remove(qiscusComment);
+        chatAdapter.notifyDataSetChanged();
     }
 
     @Override

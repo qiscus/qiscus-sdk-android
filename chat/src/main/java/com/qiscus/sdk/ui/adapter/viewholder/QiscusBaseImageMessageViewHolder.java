@@ -159,15 +159,19 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         if (captionView != null) {
             captionView.setVisibility(TextUtils.isEmpty(qiscusComment.getCaption()) ? View.GONE : View.VISIBLE);
             QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
-            Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
-                    qiscusComment.getCaption(),
-                    roomMembers,
-                    messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
-                    messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
-                    messageFromMe ? mentionConfig.getRightMentionMeColor() : mentionConfig.getLeftMentionMeColor(),
-                    mentionConfig.getMentionClickHandler()
-            );
-            captionView.setText(spannable);
+            if (mentionConfig.isEnableMention()) {
+                Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
+                        qiscusComment.getCaption(),
+                        roomMembers,
+                        messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
+                        messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
+                        messageFromMe ? mentionConfig.getRightMentionMeColor() : mentionConfig.getLeftMentionMeColor(),
+                        mentionConfig.getMentionClickHandler()
+                );
+                captionView.setText(spannable);
+            } else {
+                captionView.setText(qiscusComment.getCaption());
+            }
         }
     }
 
