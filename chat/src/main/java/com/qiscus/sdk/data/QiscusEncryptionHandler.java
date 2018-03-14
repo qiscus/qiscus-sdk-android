@@ -84,28 +84,52 @@ public final class QiscusEncryptionHandler {
     }
 
     public static void decrypt(QiscusComment comment) {
-        if (comment.isMyComment() || !comment.getRawType().equals("text")) {
+        if (!comment.getRawType().equals("text")) {
             return;
         }
+
+        //Don't decrypt if we already have it
+        QiscusComment decryptedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
+        if (decryptedComment != null) {
+            comment.setMessage(decryptedComment.getMessage());
+            return;
+        }
+
+        if (comment.isMyComment()) {
+            return;
+        }
+
         comment.setMessage(decrypt(comment.getSenderEmail(), comment.getMessage()));
     }
 
     public static void decrypt(List<QiscusComment> comments) {
         QiscusAccount account = Qiscus.getQiscusAccount();
-        Map<String, List<QiscusComment>> data = new HashMap<>();
+        Map<String, List<QiscusComment>> needToDecrypt = new HashMap<>();
+
         for (QiscusComment comment : comments) {
-            if (!comment.getSenderEmail().equals(account.getEmail()) && comment.getRawType().equals("text")) {
+            if (!comment.getRawType().equals("text")) {
+                continue;
+            }
+
+            //Don't decrypt if we already have it
+            QiscusComment decryptedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
+            if (decryptedComment != null) {
+                comment.setMessage(decryptedComment.getMessage());
+                continue;
+            }
+
+            if (!comment.getSenderEmail().equals(account.getEmail())) {
                 String userId = comment.getSenderEmail();
-                if (!data.containsKey(userId)) {
-                    data.put(userId, new ArrayList<>());
+                if (!needToDecrypt.containsKey(userId)) {
+                    needToDecrypt.put(userId, new ArrayList<>());
                 }
-                data.get(userId).add(comment);
+                needToDecrypt.get(userId).add(comment);
             }
         }
 
-        for (String userId : data.keySet()) {
+        for (String userId : needToDecrypt.keySet()) {
             BundlePublicCollection bundle = getBundle(userId);
-            for (QiscusComment comment : data.get(userId)) {
+            for (QiscusComment comment : needToDecrypt.get(userId)) {
                 try {
                     byte[] unpackedData = unpackData(comment.getMessage());
                     if (unpackedData == null) {
