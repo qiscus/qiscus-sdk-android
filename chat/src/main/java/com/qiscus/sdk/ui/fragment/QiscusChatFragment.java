@@ -38,6 +38,7 @@ import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom,
                                                  String startingMessage,
-                                                 File shareFile,
+                                                 List<File> shareFiles,
                                                  boolean autoSendExtra,
                                                  List<QiscusComment> comments,
                                                  QiscusComment scrollToComment) {
@@ -69,7 +70,7 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
         bundle.putString(EXTRA_STARTING_MESSAGE, startingMessage);
-        bundle.putSerializable(EXTRA_SHARE_FILE, shareFile);
+        bundle.putSerializable(EXTRA_SHARE_FILES, (Serializable) shareFiles);
         bundle.putBoolean(EXTRA_AUTO_SEND, autoSendExtra);
         bundle.putParcelableArrayList(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
         bundle.putParcelable(EXTRA_SCROLL_TO_COMMENT, scrollToComment);

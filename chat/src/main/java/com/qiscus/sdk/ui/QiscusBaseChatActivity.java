@@ -67,7 +67,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         QiscusUserStatusPresenter.View {
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
-    protected static final String EXTRA_SHARING_FILE = "extra_share_file";
+    protected static final String EXTRA_SHARING_FILES = "extra_share_files";
     protected static final String EXTRA_AUTO_SEND = "auto_send";
     protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
     protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
@@ -75,7 +75,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
     protected String startingMessage;
-    protected File shareFile;
+    protected List<File> shareFiles;
     protected boolean autoSendExtra;
     protected List<QiscusComment> forwardCommentsData;
     protected QiscusComment scrollToComment;
@@ -118,7 +118,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected void onViewReady(Bundle savedInstanceState) {
         resolveChatRoom(savedInstanceState);
         resolveStartingMessage();
-        resolveShareFile();
+        resolveShareFiles();
         resolveAutoSendExtra();
         resolveForwardComments();
         resolveScrollToComment();
@@ -153,10 +153,10 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         }
     }
 
-    protected void resolveShareFile() {
-        if (getIntent().hasExtra(EXTRA_SHARING_FILE)) {
-            shareFile = (File) getIntent().getSerializableExtra(EXTRA_SHARING_FILE);
-            getIntent().removeExtra(EXTRA_SHARING_FILE);
+    protected void resolveShareFiles() {
+        if (getIntent().hasExtra(EXTRA_SHARING_FILES)) {
+            shareFiles = (List<File>) getIntent().getSerializableExtra(EXTRA_SHARING_FILES);
+            getIntent().removeExtra(EXTRA_SHARING_FILES);
         }
     }
 

@@ -149,7 +149,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected static final String CHAT_ROOM_DATA = "chat_room_data";
     protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
-    protected static final String EXTRA_SHARE_FILE = "extra_share_file";
+    protected static final String EXTRA_SHARE_FILES = "extra_share_files";
     protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
     protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
     protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
@@ -252,7 +252,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected QiscusChatConfig chatConfig;
     protected QiscusChatRoom qiscusChatRoom;
     protected String startingMessage;
-    protected File shareFile;
+    protected List<File> shareFiles;
     protected boolean autoSendExtra;
     protected List<QiscusComment> forwardComments;
     protected T chatAdapter;
@@ -631,9 +631,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void handleExtra() {
-        if (startingMessage != null && !startingMessage.isEmpty() && shareFile != null) {
+        if (startingMessage != null && !startingMessage.isEmpty() && shareFiles != null && !shareFiles.isEmpty()) {
             qiscusChatPresenter.sendComment(startingMessage);
-            sendFile(shareFile);
+            QiscusAndroidUtil.runOnUIThread(() -> sendFiles(shareFiles), 800);
             return;
         }
 
@@ -642,8 +642,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 QiscusAndroidUtil.runOnUIThread(() -> qiscusChatPresenter.sendComment(startingMessage), 800);
             }
 
-            if (shareFile != null) {
-                QiscusAndroidUtil.runOnUIThread(() -> sendFile(shareFile), 800);
+            if (shareFiles != null && !shareFiles.isEmpty()) {
+                QiscusAndroidUtil.runOnUIThread(() -> sendFiles(shareFiles), 800);
             }
         } else {
             if (startingMessage != null && !startingMessage.isEmpty()) {
@@ -652,15 +652,17 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
             }
 
-            if (shareFile != null) {
-                if (QiscusImageUtil.isImage(shareFile)) {
+            if (shareFiles != null && !shareFiles.isEmpty()) {
+                if (QiscusImageUtil.isImage(shareFiles.get(0))) {
                     List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
-                    qiscusPhotos.add(new QiscusPhoto(shareFile));
+                    for (File shareFile : shareFiles) {
+                        qiscusPhotos.add(new QiscusPhoto(shareFile));
+                    }
                     startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
                             qiscusChatRoom, qiscusPhotos),
                             SEND_PICTURE_CONFIRMATION_REQUEST);
                 } else {
-                    QiscusAndroidUtil.runOnUIThread(() -> sendFile(shareFile), 800);
+                    QiscusAndroidUtil.runOnUIThread(() -> sendFiles(shareFiles), 800);
                 }
             }
         }
@@ -745,8 +747,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void resolveShareFile() {
-        shareFile = (File) getArguments().getSerializable(EXTRA_SHARE_FILE);
-        getArguments().remove(EXTRA_SHARE_FILE);
+        shareFiles = (List<File>) getArguments().getSerializable(EXTRA_SHARE_FILES);
+        getArguments().remove(EXTRA_SHARE_FILES);
     }
 
     protected void resolveAutoSendExtra() {
@@ -1178,6 +1180,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     public void sendFile(File file) {
         qiscusChatPresenter.sendFile(file);
+    }
+
+    public void sendFiles(List<File> files) {
+        for (File file : files) {
+            sendFile(file);
+        }
     }
 
     public void sendFile(File file, String caption) {
