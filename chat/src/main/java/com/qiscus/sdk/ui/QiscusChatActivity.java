@@ -36,6 +36,7 @@ import com.qiscus.sdk.ui.view.QiscusCircularImageView;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,13 +56,13 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     }
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
-                                        String startingMessage, File shareFile,
+                                        String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {
         Intent intent = new Intent(context, QiscusChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
-        intent.putExtra(EXTRA_SHARING_FILE, shareFile);
+        intent.putExtra(EXTRA_SHARING_FILES, (Serializable) shareFiles);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
         intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
         intent.putExtra(EXTRA_SCROLL_TO_COMMENT, scrollToComment);
@@ -113,7 +114,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFile,
+        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFiles,
                 autoSendExtra, forwardCommentsData, scrollToComment);
     }
 

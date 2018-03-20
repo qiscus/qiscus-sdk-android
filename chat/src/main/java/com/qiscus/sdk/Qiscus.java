@@ -768,7 +768,7 @@ public class Qiscus {
         private String distinctId;
         private JSONObject options;
         private String message;
-        private File shareFile;
+        private List<File> shareFiles;
         private boolean autoSendExtra;
         private List<QiscusComment> comments;
         private QiscusComment scrollToComment;
@@ -776,6 +776,7 @@ public class Qiscus {
         private ChatActivityBuilder(String email) {
             this.email = email;
             autoSendExtra = true;
+            shareFiles = new ArrayList<>();
         }
 
         /**
@@ -842,7 +843,7 @@ public class Qiscus {
          * @return builder
          */
         public ChatActivityBuilder withShareFile(File shareFile) {
-            this.shareFile = shareFile;
+            shareFiles.add(shareFile);
             return this;
         }
 
@@ -904,7 +905,7 @@ public class Qiscus {
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
-                                    shareFile, autoSendExtra, comments, scrollToComment));
+                                    shareFiles, autoSendExtra, comments, scrollToComment));
         }
     }
 
@@ -929,7 +930,7 @@ public class Qiscus {
         private String distinctId;
         private JSONObject options;
         private String message;
-        private File shareFile;
+        private List<File> shareFiles;
         private boolean autoSendExtra;
         private List<QiscusComment> comments;
         private QiscusComment scrollToComment;
@@ -937,6 +938,7 @@ public class Qiscus {
         private ChatFragmentBuilder(String email) {
             this.email = email;
             autoSendExtra = true;
+            shareFiles = new ArrayList<>();
         }
 
         /**
@@ -1003,7 +1005,7 @@ public class Qiscus {
          * @return builder
          */
         public ChatFragmentBuilder withShareFile(File shareFile) {
-            this.shareFile = shareFile;
+            shareFiles.add(shareFile);
             return this;
         }
 
@@ -1062,7 +1064,7 @@ public class Qiscus {
                     .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
-                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFile,
+                            QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFiles,
                                     autoSendExtra, comments, scrollToComment));
         }
     }

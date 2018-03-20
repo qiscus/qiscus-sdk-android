@@ -59,7 +59,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
         Intent intent = new Intent(context, QiscusGroupChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
-        intent.putExtra(EXTRA_SHARING_FILE, shareFile);
+        intent.putExtra(EXTRA_SHARING_FILES, shareFile);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
         intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
         intent.putExtra(EXTRA_SCROLL_TO_COMMENT, scrollToComment);
