@@ -56,7 +56,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private TextView content;
     private ImageView image;
     private ImageView icon;
-    private View closeView;
+    private ImageView closeView;
     private QiscusComment originComment;
 
     private Map<String, QiscusRoomMember> members = new HashMap<>();
@@ -111,7 +111,6 @@ public class QiscusReplyPreviewView extends LinearLayout {
             content.setText(null);
             setVisibility(GONE);
         } else {
-            configureColor(originComment);
             sender.setText(Qiscus.getChatConfig().getRoomSenderNameInterceptor()
                     .getSenderName(originComment));
             QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
@@ -171,6 +170,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
                     break;
 
             }
+            configureColor(originComment);
             setVisibility(VISIBLE);
         }
     }
@@ -196,6 +196,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
 
     public void setContentColor(@ColorInt int color) {
         content.setTextColor(color);
+        icon.setColorFilter(color);
     }
 
     public void setBackgroundColor(@ColorInt int color) {
@@ -203,11 +204,11 @@ public class QiscusReplyPreviewView extends LinearLayout {
     }
 
     public void setCancelIcon(@DrawableRes int iconResource) {
-        icon.setImageResource(iconResource);
+        closeView.setImageResource(iconResource);
     }
 
     public void setCancelIconTint(@ColorInt int tintColor) {
-        icon.setColorFilter(tintColor);
+        closeView.setColorFilter(tintColor);
     }
 
     private void showImage(File file) {
