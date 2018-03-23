@@ -31,6 +31,10 @@ import com.qiscus.sdk.data.encryption.core.SesameSenderDevice;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -84,7 +88,7 @@ public final class QiscusEncryptionHandler {
     }
 
     public static void decrypt(QiscusComment comment) {
-        if (!comment.getRawType().equals("text")) {
+        if (!comment.getRawType().equals("text") && !comment.getRawType().equals("reply")) {
             return;
         }
 
@@ -100,6 +104,24 @@ public final class QiscusEncryptionHandler {
         }
 
         comment.setMessage(decrypt(comment.getSenderEmail(), comment.getMessage()));
+
+        //We need to update payload with saved comment
+        if (comment.getType() == QiscusComment.Type.REPLY) {
+            QiscusComment repliedComment = comment.getReplyTo();
+            if (repliedComment.getRawType().equals("text")) {
+                QiscusComment savedRepliedComment = Qiscus.getDataStore().getComment(repliedComment.getId());
+                if (savedRepliedComment != null) {
+                    try {
+                        JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                        payload.put("replied_comment_message", savedRepliedComment.getMessage());
+                        comment.setExtraPayload(payload.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    repliedComment.setMessage(savedRepliedComment.getMessage());
+                }
+            }
+        }
     }
 
     public static void decrypt(List<QiscusComment> comments) {
@@ -107,7 +129,7 @@ public final class QiscusEncryptionHandler {
         Map<String, List<QiscusComment>> needToDecrypt = new HashMap<>();
 
         for (QiscusComment comment : comments) {
-            if (!comment.getRawType().equals("text")) {
+            if (!comment.getRawType().equals("text") && !comment.getRawType().equals("reply")) {
                 continue;
             }
 

@@ -19,7 +19,6 @@ package com.qiscus.sdk.data.remote;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
-import android.text.TextUtils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -213,38 +212,17 @@ public enum QiscusApi {
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
         Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
 
-        Observable<String> encryptMessage = Observable.just(qiscusComment.getMessage())
-                .map(message -> {
-                    if (Qiscus.getChatConfig().isEnableEndToEndEncryption()
-                            && (qiscusComment.getType() == QiscusComment.Type.TEXT
-                            || qiscusComment.getType() == QiscusComment.Type.LINK)) {
-                        QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
-                        if (chatRoom == null || chatRoom.isGroup()) {
-                            return message;
-                        }
+        Observable<JsonElement> task;
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
+            task = postEncryptedComment(qiscusComment);
+        } else {
+            task = api.postComment(Qiscus.getToken(), qiscusComment.getMessage(),
+                    qiscusComment.getRoomId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
+                    qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :
+                            qiscusComment.getExtras().toString());
+        }
 
-                        String recipientId = "";
-                        for (QiscusRoomMember qiscusRoomMember : chatRoom.getMember()) {
-                            if (!qiscusRoomMember.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
-                                recipientId = qiscusRoomMember.getEmail();
-                                break;
-                            }
-                        }
-
-                        if (TextUtils.isEmpty(recipientId)) {
-                            return message;
-                        }
-
-                        return QiscusEncryptionHandler.encrypt(recipientId, message);
-                    }
-                    return message;
-                })
-                .subscribeOn(Schedulers.computation());
-
-        return encryptMessage.flatMap(message -> api.postComment(Qiscus.getToken(), message,
-                qiscusComment.getRoomId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
-                qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :
-                        qiscusComment.getExtras().toString()))
+        return task
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject()
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
@@ -254,6 +232,58 @@ public enum QiscusApi {
                     return qiscusComment;
                 })
                 .doOnNext(comment -> EventBus.getDefault().post(new QiscusCommentSentEvent(comment)));
+    }
+
+    private Observable<JsonElement> postEncryptedComment(QiscusComment qiscusComment) {
+        Observable<String> recipientId = getRecipientId(qiscusComment).cache().subscribeOn(Schedulers.io());
+
+        Observable<String> encryptMessage = recipientId.map(recipient -> {
+            if (recipient.isEmpty()) {
+                return qiscusComment.getMessage();
+            }
+            return QiscusEncryptionHandler.encrypt(recipient, qiscusComment.getMessage());
+        }).subscribeOn(Schedulers.computation());
+
+        Observable<String> encryptPayload = recipientId.map(recipient -> {
+            if (recipient.isEmpty()) {
+                return qiscusComment.getExtraPayload();
+            }
+            if (qiscusComment.getType() == QiscusComment.Type.REPLY) {
+                try {
+                    JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
+                    payload.put("text", QiscusEncryptionHandler.encrypt(recipient, payload.optString("text")));
+                    return payload.toString();
+                } catch (JSONException e) {
+                    return qiscusComment.getExtraPayload();
+                }
+            }
+            return qiscusComment.getExtraPayload();
+        }).subscribeOn(Schedulers.computation());
+
+
+        Observable<Observable<JsonElement>> task = Observable.zip(encryptMessage, encryptPayload, (message, payload) ->
+                api.postComment(Qiscus.getToken(), message, qiscusComment.getRoomId(), qiscusComment.getUniqueId(),
+                        qiscusComment.getRawType(), payload, qiscusComment.getExtras() == null ?
+                                null : qiscusComment.getExtras().toString()));
+
+        return Observable.concat(task);
+    }
+
+    private Observable<String> getRecipientId(QiscusComment qiscusComment) {
+        return Observable.create(subscriber -> {
+            String recipient = "";
+            QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+            if (chatRoom != null && !chatRoom.isGroup()) {
+                for (QiscusRoomMember qiscusRoomMember : chatRoom.getMember()) {
+                    if (!qiscusRoomMember.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+                        recipient = qiscusRoomMember.getEmail();
+                        break;
+                    }
+                }
+            }
+            subscriber.onNext(recipient);
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
     }
 
     public Observable<QiscusComment> sync(long lastCommentId) {
