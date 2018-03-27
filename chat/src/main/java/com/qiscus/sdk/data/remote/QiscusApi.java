@@ -248,16 +248,13 @@ public enum QiscusApi {
             if (recipient.isEmpty()) {
                 return qiscusComment.getExtraPayload();
             }
-            if (qiscusComment.getType() == QiscusComment.Type.REPLY) {
-                try {
-                    JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
-                    payload.put("text", QiscusEncryptionHandler.encrypt(recipient, payload.optString("text")));
-                    return payload.toString();
-                } catch (JSONException e) {
-                    return qiscusComment.getExtraPayload();
-                }
+
+            try {
+                JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
+                return QiscusEncryptionHandler.encrypt(recipient, qiscusComment.getRawType(), payload);
+            } catch (Exception e) {
+                return qiscusComment.getExtraPayload();
             }
-            return qiscusComment.getExtraPayload();
         }).subscribeOn(Schedulers.computation());
 
 

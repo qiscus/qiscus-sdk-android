@@ -33,7 +33,6 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -87,8 +86,50 @@ public final class QiscusEncryptionHandler {
         }
     }
 
+    public static String encrypt(String recipientId, String rawType, JSONObject payload) {
+        try {
+            switch (rawType) {
+                case "reply":
+                    payload.put("text", encrypt(recipientId, payload.optString("text")));
+                    break;
+                case "file_attachment":
+                    payload.put("url", encrypt(recipientId, payload.optString("url")));
+                    payload.put("file_name", encrypt(recipientId, payload.optString("file_name")));
+                    payload.put("caption", encrypt(recipientId, payload.optString("caption")));
+                    break;
+                case "contact_person":
+                    payload.put("name", encrypt(recipientId, payload.optString("name")));
+                    payload.put("value", encrypt(recipientId, payload.optString("value")));
+                    break;
+                case "location":
+                    payload.put("name", encrypt(recipientId, payload.optString("name")));
+                    payload.put("address", encrypt(recipientId, payload.optString("address")));
+                    payload.put("latitude", encrypt(recipientId, payload.optString("latitude")));
+                    payload.put("longitude", encrypt(recipientId, payload.optString("longitude")));
+                    payload.put("map_url", encrypt(recipientId, payload.optString("map_url")));
+                    break;
+                case "custom":
+                    payload.put("content", encrypt(recipientId, payload.optJSONObject("content").toString()));
+                    break;
+            }
+        } catch (Exception ignored) {
+            // Ignored
+        }
+        return payload.toString();
+    }
+
+    private static boolean decryptAble(QiscusComment comment) {
+        String rawType = comment.getRawType();
+        return rawType.equals("text")
+                || rawType.equals("reply")
+                || rawType.equals("file_attachment")
+                || rawType.equals("contact_person")
+                || rawType.equals("location")
+                || rawType.equals("custom");
+    }
+
     public static void decrypt(QiscusComment comment) {
-        if (!comment.getRawType().equals("text") && !comment.getRawType().equals("reply")) {
+        if (!decryptAble(comment)) {
             return;
         }
 
@@ -96,32 +137,75 @@ public final class QiscusEncryptionHandler {
         QiscusComment decryptedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
         if (decryptedComment != null) {
             comment.setMessage(decryptedComment.getMessage());
+            comment.setExtraPayload(decryptedComment.getExtraPayload());
             return;
         }
 
+        //We only can decrypt opponent's comment
         if (comment.isMyComment()) {
             return;
         }
 
+        //Decrypt message
         comment.setMessage(decrypt(comment.getSenderEmail(), comment.getMessage()));
+
+        //Decrypt payload
+        if (!comment.getRawType().equals("text")) {
+            try {
+                comment.setExtraPayload(decrypt(comment.getSenderEmail(), comment.getRawType(),
+                        new JSONObject(comment.getExtraPayload())));
+            } catch (Exception ignored) {
+                // ignored
+            }
+        }
 
         //We need to update payload with saved comment
         if (comment.getType() == QiscusComment.Type.REPLY) {
-            QiscusComment repliedComment = comment.getReplyTo();
-            if (repliedComment.getRawType().equals("text")) {
-                QiscusComment savedRepliedComment = Qiscus.getDataStore().getComment(repliedComment.getId());
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                QiscusComment savedRepliedComment = Qiscus.getDataStore()
+                        .getComment(payload.optLong("replied_comment_id"));
                 if (savedRepliedComment != null) {
-                    try {
-                        JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
-                        payload.put("replied_comment_message", savedRepliedComment.getMessage());
-                        comment.setExtraPayload(payload.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    repliedComment.setMessage(savedRepliedComment.getMessage());
+                    payload.put("replied_comment_message", savedRepliedComment.getMessage());
+                    payload.put("replied_comment_payload", new JSONObject(savedRepliedComment.getExtraPayload()));
+                    comment.setExtraPayload(payload.toString());
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+    }
+
+    public static String decrypt(String senderId, String rawType, JSONObject payload) {
+        try {
+            switch (rawType) {
+                case "reply":
+                    payload.put("text", decrypt(senderId, payload.optString("text")));
+                    break;
+                case "file_attachment":
+                    payload.put("url", decrypt(senderId, payload.optString("url")));
+                    payload.put("file_name", decrypt(senderId, payload.optString("file_name")));
+                    payload.put("caption", decrypt(senderId, payload.optString("caption")));
+                    break;
+                case "contact_person":
+                    payload.put("name", decrypt(senderId, payload.optString("name")));
+                    payload.put("value", decrypt(senderId, payload.optString("value")));
+                    break;
+                case "location":
+                    payload.put("name", decrypt(senderId, payload.optString("name")));
+                    payload.put("address", decrypt(senderId, payload.optString("address")));
+                    payload.put("map_url", decrypt(senderId, payload.optString("map_url")));
+                    payload.put("latitude", Double.parseDouble(decrypt(senderId, payload.optString("latitude"))));
+                    payload.put("longitude", Double.parseDouble(decrypt(senderId, payload.optString("longitude"))));
+                    break;
+                case "custom":
+                    payload.put("content", new JSONObject(decrypt(senderId, payload.optString("content"))));
+                    break;
+            }
+        } catch (Exception ignored) {
+            // Ignored
+        }
+        return payload.toString();
     }
 
     public static void decrypt(List<QiscusComment> comments) {
