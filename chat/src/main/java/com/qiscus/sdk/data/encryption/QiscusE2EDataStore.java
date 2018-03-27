@@ -23,6 +23,7 @@ import android.support.annotation.RestrictTo;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.encryption.core.BundlePublicCollection;
+import com.qiscus.sdk.data.encryption.core.SesameConversation;
 
 import rx.Emitter;
 import rx.Observable;
@@ -57,7 +58,7 @@ public enum QiscusE2EDataStore {
         return Observable.create(subscriber -> {
             sqLiteDatabase.beginTransaction();
             try {
-                if (isContains(userId)) {
+                if (isContainBundle(userId)) {
                     String where = QiscusE2EDb.BundleTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId);
 
                     sqLiteDatabase.update(QiscusE2EDb.BundleTable.TABLE_NAME,
@@ -93,10 +94,68 @@ public enum QiscusE2EDataStore {
         }
     }
 
-    private boolean isContains(String userId) {
+    private boolean isContainBundle(String userId) {
         String query = "SELECT * FROM "
                 + QiscusE2EDb.BundleTable.TABLE_NAME + " WHERE "
                 + QiscusE2EDb.BundleTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId);
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        boolean contains = cursor.getCount() > 0;
+        cursor.close();
+        return contains;
+    }
+
+    public Observable<SesameConversation> getSesameConversation(String userId) {
+        return Observable.create(subscriber -> {
+            subscriber.onNext(getConversation(userId));
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
+    public Observable<SesameConversation> saveSesameConversation(String userId, SesameConversation conversation) {
+        return Observable.create(subscriber -> {
+            sqLiteDatabase.beginTransaction();
+            try {
+                if (isContainConversation(userId)) {
+                    String where = QiscusE2EDb.ConversationTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId);
+
+                    sqLiteDatabase.update(QiscusE2EDb.ConversationTable.TABLE_NAME,
+                            QiscusE2EDb.ConversationTable.toContentValues(userId, conversation), where, null);
+                } else {
+                    sqLiteDatabase.insert(QiscusE2EDb.ConversationTable.TABLE_NAME, null,
+                            QiscusE2EDb.ConversationTable.toContentValues(userId, conversation));
+                }
+                sqLiteDatabase.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                sqLiteDatabase.endTransaction();
+            }
+            subscriber.onNext(getConversation(userId));
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
+    private SesameConversation getConversation(String userId) {
+        String query = "SELECT * FROM "
+                + QiscusE2EDb.ConversationTable.TABLE_NAME + " WHERE "
+                + QiscusE2EDb.ConversationTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId);
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        if (cursor.moveToNext()) {
+            SesameConversation conversation = QiscusE2EDb.ConversationTable.parseCursor(cursor);
+            cursor.close();
+            return conversation;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
+    private boolean isContainConversation(String userId) {
+        String query = "SELECT * FROM "
+                + QiscusE2EDb.ConversationTable.TABLE_NAME + " WHERE "
+                + QiscusE2EDb.ConversationTable.COLUMN_USER_ID + " = " + DatabaseUtils.sqlEscapeString(userId);
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
@@ -108,6 +167,7 @@ public enum QiscusE2EDataStore {
         sqLiteDatabase.beginTransaction();
         try {
             sqLiteDatabase.delete(QiscusE2EDb.BundleTable.TABLE_NAME, null, null);
+            sqLiteDatabase.delete(QiscusE2EDb.ConversationTable.TABLE_NAME, null, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

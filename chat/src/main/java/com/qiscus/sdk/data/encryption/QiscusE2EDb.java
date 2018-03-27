@@ -22,6 +22,7 @@ import android.util.Base64;
 
 import com.qiscus.sdk.data.encryption.core.BundlePublicCollection;
 import com.qiscus.sdk.data.encryption.core.IllegalDataSizeException;
+import com.qiscus.sdk.data.encryption.core.SesameConversation;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -74,6 +75,42 @@ final class QiscusE2EDb {
             } catch (SignatureException e) {
                 e.printStackTrace();
             }
+            return null;
+        }
+    }
+
+    abstract static class ConversationTable {
+        static final String TABLE_NAME = "conversations";
+        static final String COLUMN_USER_ID = "user_id";
+        static final String COLUMN_RAW_DATA = "raw_data";
+
+        static final String CREATE =
+                "CREATE TABLE " + TABLE_NAME + " (" +
+                        COLUMN_USER_ID + " TEXT PRIMARY KEY," +
+                        COLUMN_RAW_DATA + " BLOB NOT NULL" +
+                        " ); ";
+
+        static ContentValues toContentValues(String userId, SesameConversation conversation) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_USER_ID, userId);
+            try {
+                values.put(COLUMN_RAW_DATA, conversation.encode());
+            } catch (IOException e) {
+                e.printStackTrace();
+                values.put(COLUMN_RAW_DATA, new byte[0]);
+            }
+            return values;
+        }
+
+        static SesameConversation parseCursor(Cursor cursor) {
+            try {
+                return SesameConversation.decode(cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RAW_DATA)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
             return null;
         }
     }
