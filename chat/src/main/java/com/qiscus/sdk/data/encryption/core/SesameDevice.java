@@ -16,12 +16,13 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * This class represents a Sesame device
  */
-public class SesameDevice {
+public class SesameDevice implements Serializable {
     final HashId id;
     final PublicKey publicKey;
     Date staleTime;

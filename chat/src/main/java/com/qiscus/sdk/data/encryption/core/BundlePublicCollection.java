@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.encryption.core;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
@@ -30,7 +31,7 @@ import java.util.Set;
  * This class stores a mapping between a device id and a public bundle
  */
 
-public class BundlePublicCollection {
+public class BundlePublicCollection implements Serializable {
     HashMap<HashId, BundlePublic> map = new HashMap<>();
 
     public BundlePublicCollection() {

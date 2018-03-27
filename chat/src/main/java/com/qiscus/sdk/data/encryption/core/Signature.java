@@ -16,9 +16,10 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.security.SignatureException;
 
-public final class Signature {
+public final class Signature implements Serializable {
     final byte[] sig;
 
     /**

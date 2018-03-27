@@ -18,11 +18,12 @@ package com.qiscus.sdk.data.encryption.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.util.Random;
 
-public final class KeyPair {
+public final class KeyPair implements Serializable {
     public final PrivateKey privateKey;
     public final PublicKey publicKey;
 

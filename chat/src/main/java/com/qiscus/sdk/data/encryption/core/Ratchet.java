@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.encryption.core;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -34,7 +35,7 @@ import static javax.crypto.Mac.getInstance;
 /**
  * This represents a Ratchet mechanism
  */
-public class Ratchet {
+public class Ratchet implements Serializable {
     public KeyPair pairSender;
     public PublicKey publicRecipient;
 

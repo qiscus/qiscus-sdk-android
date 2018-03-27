@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 /**
  * This class represents a Sesame contact
  */
-public class SesameContact {
+public class SesameContact implements Serializable {
     public String id;
 
     HashMap<HashId, SesameDevice> devices = new HashMap<>();

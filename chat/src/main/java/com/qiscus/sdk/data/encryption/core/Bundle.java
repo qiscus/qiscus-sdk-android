@@ -16,12 +16,13 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 
-public class Bundle {
+public class Bundle implements Serializable {
     public final BundlePrivate bundlePrivate;
     public final BundlePublic bundlePublic;
 

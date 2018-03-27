@@ -16,11 +16,13 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
+
 /**
  * This class represents a Sesame conversation secret
  */
 
-public class SesameConversationSecret {
+public class SesameConversationSecret implements Serializable {
     int size = 0;
     byte[] message = new byte[0];
     byte[] ad = new byte[0];

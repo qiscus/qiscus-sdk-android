@@ -19,6 +19,11 @@ package com.qiscus.sdk.data.encryption.core;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -34,7 +39,7 @@ import java.util.Set;
  * This class represents a Sesame conversation
  */
 
-public class SesameConversation {
+public class SesameConversation implements Serializable {
     final Bundle senderBundle;
     final String senderName;
     final HashId selfDeviceId;
@@ -381,5 +386,43 @@ public class SesameConversation {
         byte[] decrypted = ratchet.decrypt(data, secret.ad);
         resetActiveSession(senderId);
         return decrypted;
+    }
+
+    public byte[] encode() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out;
+        byte[] raw;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(this);
+            out.flush();
+            raw = bos.toByteArray();
+        } finally {
+            try {
+                bos.close();
+            } catch (IOException ignored) {
+                // ignore close exception
+            }
+        }
+        return raw;
+    }
+
+    public static SesameConversation decode(byte[] raw) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(raw);
+        ObjectInput in = null;
+        SesameConversation conversation;
+        try {
+            in = new ObjectInputStream(bis);
+            conversation = (SesameConversation) in.readObject();
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+        return conversation;
     }
 }

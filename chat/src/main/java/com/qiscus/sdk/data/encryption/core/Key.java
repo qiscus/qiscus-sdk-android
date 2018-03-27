@@ -16,12 +16,13 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
 
-public class Key {
+public class Key implements Serializable {
     protected byte[] keyBytes;
 
     public static final int SIZE = 32;

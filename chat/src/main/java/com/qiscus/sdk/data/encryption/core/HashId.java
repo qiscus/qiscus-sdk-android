@@ -16,13 +16,14 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
 
 /**
  * This class represents a hash id
  */
-public class HashId {
+public class HashId implements Serializable {
     public static final int SIZE = 64;
     final byte[] hash;
 

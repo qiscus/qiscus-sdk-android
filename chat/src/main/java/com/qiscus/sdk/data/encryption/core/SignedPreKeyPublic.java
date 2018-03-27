@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -23,7 +24,7 @@ import java.security.SignatureException;
 /**
  * This class is a representation of public part of SignedPreKey
  */
-public class SignedPreKeyPublic {
+public class SignedPreKeyPublic implements Serializable {
     public PublicKey publicKey;
     public Signature signature;
 

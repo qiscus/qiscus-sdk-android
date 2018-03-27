@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
 
@@ -23,7 +24,7 @@ import java.util.Arrays;
  * This class represents a prekey id
  */
 
-public class PreKeyId {
+public class PreKeyId implements Serializable {
     final byte[] preKeyIdBytes;
 
     public PreKeyId(byte[] id) throws InvalidKeyException {

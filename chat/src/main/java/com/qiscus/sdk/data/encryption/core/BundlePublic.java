@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -25,7 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class BundlePublic {
+public class BundlePublic implements Serializable {
     public final PublicKey identity;
     public final SignedPreKeyPublic spk;
     Map<PreKeyId, PublicKey> preKeys = new HashMap<>();
