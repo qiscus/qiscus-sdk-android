@@ -125,6 +125,7 @@
                 android:layout_toEndOf="@+id/ic_contact"
                 android:layout_toRightOf="@+id/ic_contact"
                 android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/qiscus_secondary_text"
                 android:textSize="14sp"/>
         </RelativeLayout>
