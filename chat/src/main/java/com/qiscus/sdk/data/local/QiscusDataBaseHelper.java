@@ -46,6 +46,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void add(QiscusChatRoom qiscusChatRoom) {
+        sqLiteDatabase.beginTransaction();
         try {
             sqLiteDatabase.insertWithOnConflict(QiscusDb.RoomTable.TABLE_NAME, null,
                     QiscusDb.RoomTable.toContentValues(qiscusChatRoom), SQLiteDatabase.CONFLICT_ABORT);
