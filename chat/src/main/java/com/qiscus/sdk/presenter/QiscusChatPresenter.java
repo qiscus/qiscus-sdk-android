@@ -111,19 +111,15 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             }
         }
 
-        qiscusComment.setState(state);
+        //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
-        if (savedQiscusComment != null) {
-            if (savedQiscusComment.getState() < qiscusComment.getState()) {
-                qiscusComment.setState(state);
-                Qiscus.getDataStore().addOrUpdate(qiscusComment);
-            } else {
-                qiscusComment.setState(savedQiscusComment.getState());
-            }
-        } else {
-            qiscusComment.setState(state);
-            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        if (savedQiscusComment != null && savedQiscusComment.getState() > QiscusComment.STATE_SENDING) {
+            return;
         }
+
+        //Simpen statenya
+        qiscusComment.setState(state);
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
     }
 
     public void cancelPendingComment(QiscusComment qiscusComment) {

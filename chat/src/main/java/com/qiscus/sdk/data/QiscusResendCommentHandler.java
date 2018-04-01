@@ -47,8 +47,8 @@ import rx.schedulers.Schedulers;
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class QiscusResendCommentHandler {
 
-    private static Map<QiscusComment, Subscription> pendingTask = new HashMap<>();
-    private static Set<String> processingComment = new HashSet<>();
+    private static final Map<QiscusComment, Subscription> pendingTask = new HashMap<>();
+    private static final Set<String> processingComment = new HashSet<>();
 
     private QiscusResendCommentHandler() {
 
@@ -207,18 +207,14 @@ public final class QiscusResendCommentHandler {
             }
         }
 
-        qiscusComment.setState(state);
+        //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
-        if (savedQiscusComment != null) {
-            if (savedQiscusComment.getState() < qiscusComment.getState()) {
-                qiscusComment.setState(state);
-                Qiscus.getDataStore().addOrUpdate(qiscusComment);
-            } else {
-                qiscusComment.setState(savedQiscusComment.getState());
-            }
-        } else {
-            qiscusComment.setState(state);
-            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+        if (savedQiscusComment != null && savedQiscusComment.getState() > QiscusComment.STATE_SENDING) {
+            return;
         }
+
+        //Simpen statenya
+        qiscusComment.setState(state);
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
     }
 }

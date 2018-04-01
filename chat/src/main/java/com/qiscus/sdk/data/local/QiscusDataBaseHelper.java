@@ -25,6 +25,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,25 +46,26 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void add(QiscusChatRoom qiscusChatRoom) {
-        if (!isContains(qiscusChatRoom)) {
-            sqLiteDatabase.beginTransaction();
-            try {
-                sqLiteDatabase.insert(QiscusDb.RoomTable.TABLE_NAME, null, QiscusDb.RoomTable.toContentValues(qiscusChatRoom));
-                sqLiteDatabase.setTransactionSuccessful();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                sqLiteDatabase.endTransaction();
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.RoomTable.TABLE_NAME, null,
+                    QiscusDb.RoomTable.toContentValues(qiscusChatRoom), SQLiteDatabase.CONFLICT_ABORT);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
+        }
+
+        if (qiscusChatRoom.getMember() != null) {
+            for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
+                addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
             }
-            if (qiscusChatRoom.getMember() != null) {
-                for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-                    addRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId());
-                }
-            }
-            QiscusComment comment = qiscusChatRoom.getLastComment();
-            if (comment != null && comment.getId() > 0) {
-                add(comment);
-            }
+        }
+
+        QiscusComment comment = qiscusChatRoom.getLastComment();
+        if (comment != null && comment.getId() > 0) {
+            addOrUpdate(comment);
         }
     }
 
@@ -88,7 +90,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.update(QiscusDb.RoomTable.TABLE_NAME, QiscusDb.RoomTable.toContentValues(qiscusChatRoom), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -277,7 +279,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -286,17 +288,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public void addRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
         distinctId = distinctId == null ? "default" : distinctId;
-        if (!isContainsRoomMember(roomId, qiscusRoomMember.getEmail())) {
-            sqLiteDatabase.beginTransaction();
-            try {
-                sqLiteDatabase.insert(QiscusDb.RoomMemberTable.TABLE_NAME, null,
-                        QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember));
-                sqLiteDatabase.setTransactionSuccessful();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                sqLiteDatabase.endTransaction();
-            }
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.RoomMemberTable.TABLE_NAME, null,
+                    QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember), SQLiteDatabase.CONFLICT_ABORT);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
         addOrUpdate(qiscusRoomMember);
     }
@@ -327,7 +327,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                     QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -337,11 +337,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void addOrUpdateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
-        if (!isContainsRoomMember(roomId, qiscusRoomMember.getEmail())) {
-            addRoomMember(roomId, qiscusRoomMember, distinctId);
-        } else {
-            updateRoomMember(roomId, qiscusRoomMember, distinctId);
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.RoomMemberTable.TABLE_NAME, null,
+                    QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember), SQLiteDatabase.CONFLICT_REPLACE);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
+
+        addOrUpdate(qiscusRoomMember);
     }
 
     @Override
@@ -372,7 +379,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -387,7 +394,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -395,16 +402,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void add(QiscusRoomMember qiscusRoomMember) {
-        if (!isContains(qiscusRoomMember)) {
-            sqLiteDatabase.beginTransaction();
-            try {
-                sqLiteDatabase.insert(QiscusDb.MemberTable.TABLE_NAME, null, QiscusDb.MemberTable.toContentValues(qiscusRoomMember));
-                sqLiteDatabase.setTransactionSuccessful();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                sqLiteDatabase.endTransaction();
-            }
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.MemberTable.TABLE_NAME, null,
+                    QiscusDb.MemberTable.toContentValues(qiscusRoomMember), SQLiteDatabase.CONFLICT_ABORT);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 
@@ -429,7 +435,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.update(QiscusDb.MemberTable.TABLE_NAME, QiscusDb.MemberTable.toContentValues(qiscusRoomMember), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -437,10 +443,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void addOrUpdate(QiscusRoomMember qiscusRoomMember) {
-        if (!isContains(qiscusRoomMember)) {
-            add(qiscusRoomMember);
-        } else {
-            update(qiscusRoomMember);
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.MemberTable.TABLE_NAME, null,
+                    QiscusDb.MemberTable.toContentValues(qiscusRoomMember), SQLiteDatabase.CONFLICT_REPLACE);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 
@@ -464,32 +475,29 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void add(QiscusComment qiscusComment) {
-        if (!isContains(qiscusComment)) {
-            sqLiteDatabase.beginTransaction();
-            try {
-                sqLiteDatabase.insert(QiscusDb.CommentTable.TABLE_NAME, null, QiscusDb.CommentTable.toContentValues(qiscusComment));
-                sqLiteDatabase.setTransactionSuccessful();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                sqLiteDatabase.endTransaction();
-            }
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
+                    QiscusDb.CommentTable.toContentValues(qiscusComment), SQLiteDatabase.CONFLICT_ABORT);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 
     @Override
     public void saveLocalPath(long roomId, long commentId, String localPath) {
-        if (!isContainsFileOfComment(commentId)) {
-            sqLiteDatabase.beginTransaction();
-            try {
-                sqLiteDatabase.insert(QiscusDb.FilesTable.TABLE_NAME, null,
-                        QiscusDb.FilesTable.toContentValues(roomId, commentId, localPath));
-                sqLiteDatabase.setTransactionSuccessful();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                sqLiteDatabase.endTransaction();
-            }
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.FilesTable.TABLE_NAME, null,
+                    QiscusDb.FilesTable.toContentValues(roomId, commentId, localPath), SQLiteDatabase.CONFLICT_ABORT);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 
@@ -526,7 +534,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -542,7 +550,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                     QiscusDb.FilesTable.toContentValues(roomId, commentId, localPath), where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -550,19 +558,29 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void addOrUpdate(QiscusComment qiscusComment) {
-        if (!isContains(qiscusComment)) {
-            add(qiscusComment);
-        } else {
-            update(qiscusComment);
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
+                    QiscusDb.CommentTable.toContentValues(qiscusComment), SQLiteDatabase.CONFLICT_REPLACE);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 
     @Override
     public void addOrUpdateLocalPath(long roomId, long commentId, String localPath) {
-        if (!isContainsFileOfComment(commentId)) {
-            saveLocalPath(roomId, commentId, localPath);
-        } else {
-            updateLocalPath(roomId, commentId, localPath);
+        sqLiteDatabase.beginTransaction();
+        try {
+            sqLiteDatabase.insertWithOnConflict(QiscusDb.FilesTable.TABLE_NAME, null,
+                    QiscusDb.FilesTable.toContentValues(roomId, commentId, localPath), SQLiteDatabase.CONFLICT_REPLACE);
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
     }
 
@@ -575,7 +593,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -600,7 +618,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -628,7 +646,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -650,7 +668,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.execSQL(sql);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -670,7 +688,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.execSQL(sql);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -709,7 +727,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, where, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -1066,7 +1084,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         } finally {
             sqLiteDatabase.endTransaction();
         }
