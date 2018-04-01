@@ -38,6 +38,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -76,9 +77,9 @@ public final class QiscusEncryptionHandler {
 
     public static String encrypt(String recipientId, String message) {
         try {
-            SesameConversation conversation = createConversation(recipientId);
-            conversation.initializeSender();
+            SesameConversation conversation = getConversation(recipientId, true);
             byte[] encrypted = conversation.encrypt(message.getBytes());
+            saveConversation(recipientId, conversation);
             return Base64.encodeToString(encrypted, Base64.DEFAULT);
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +119,7 @@ public final class QiscusEncryptionHandler {
         return payload.toString();
     }
 
-    private static boolean decryptAble(QiscusComment comment) {
+    private static boolean decryptAbleType(QiscusComment comment) {
         String rawType = comment.getRawType();
         return rawType.equals("text")
                 || rawType.equals("reply")
@@ -129,7 +130,7 @@ public final class QiscusEncryptionHandler {
     }
 
     public static void decrypt(QiscusComment comment) {
-        if (!decryptAble(comment)) {
+        if (!decryptAbleType(comment)) {
             return;
         }
 
@@ -213,17 +214,6 @@ public final class QiscusEncryptionHandler {
         Map<String, List<QiscusComment>> needToDecrypt = new HashMap<>();
 
         for (QiscusComment comment : comments) {
-            if (!comment.getRawType().equals("text") && !comment.getRawType().equals("reply")) {
-                continue;
-            }
-
-            //Don't decrypt if we already have it
-            QiscusComment decryptedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
-            if (decryptedComment != null) {
-                comment.setMessage(decryptedComment.getMessage());
-                continue;
-            }
-
             if (!comment.getSenderEmail().equals(account.getEmail())) {
                 String userId = comment.getSenderEmail();
                 if (!needToDecrypt.containsKey(userId)) {
@@ -234,21 +224,11 @@ public final class QiscusEncryptionHandler {
         }
 
         for (String userId : needToDecrypt.keySet()) {
-            BundlePublicCollection bundle = getBundle(userId);
             for (QiscusComment comment : needToDecrypt.get(userId)) {
-                try {
-                    byte[] unpackedData = unpackData(comment.getMessage());
-                    if (unpackedData == null) {
-                        continue;
-                    }
-
-                    int index = comments.indexOf(comment);
-                    if (index >= 0) {
-                        SesameConversation conversation = createConversation(userId, bundle);
-                        comments.get(index).setMessage(new String(conversation.decrypt(unpackedData)));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                int index = comments.indexOf(comment);
+                if (index >= 0) {
+                    decrypt(comment);
+                    comments.set(index, comment);
                 }
             }
         }
@@ -260,8 +240,9 @@ public final class QiscusEncryptionHandler {
             if (unpackedData == null) {
                 return message;
             }
-            SesameConversation conversation = createConversation(senderId);
+            SesameConversation conversation = getConversation(senderId, false);
             byte[] decrypted = conversation.decrypt(unpackedData);
+            saveConversation(senderId, conversation);
             return new String(decrypted);
         } catch (Exception e) {
             e.printStackTrace();
@@ -278,7 +259,7 @@ public final class QiscusEncryptionHandler {
 
         BundlePublicCollection bundlePublicCollection = null;
         try {
-            bundlePublicCollection = getBundle(userId);
+            bundlePublicCollection = getRemoteBundle(userId);
         } catch (Exception e) {
             e.printStackTrace();
             QiscusErrorLogger.print(e);
@@ -317,38 +298,81 @@ public final class QiscusEncryptionHandler {
         return data;
     }
 
-    //TODO better way to get bundle without everytime request to server
-    private static BundlePublicCollection getBundle(String userId) {
-        return QiscusE2EDataStore.getInstance()
-                .getBundlePublicCollection(userId)
-                .flatMap(bundlePublicCollection -> {
-                    //Disabled to always get it from server
-                    /*if (bundlePublicCollection != null) {
-                        return Observable.just(bundlePublicCollection);
-                    }*/
-                    return QiscusE2ERestApi.getInstance()
-                            .getBundlePublicCollection(userId)
-                            .flatMap(bundlePublicCollection1 ->
-                                    QiscusE2EDataStore.getInstance()
-                                            .saveBundlePublicCollection(userId, bundlePublicCollection1));
-                })
-                .toBlocking()
-                .first();
+    private static SesameConversation getConversation(String userId, boolean forEncrypt) throws Exception {
+        SesameConversation conversation = QiscusE2EDataStore.getInstance().getSesameConversation(userId).toBlocking().first();
+        if (conversation == null) {
+            return createConversation(userId, forEncrypt);
+        } else {
+            byte[] localBundle = getLocalBundle(userId).encode();
+            byte[] remoteBundle = getRemoteBundle(userId).encode();
+
+            //Kalau recipient bundle udah berubah
+            if (!Arrays.equals(localBundle, remoteBundle)) {
+                return createConversation(userId, forEncrypt);
+            }
+
+            String myUserId = Qiscus.getQiscusAccount().getEmail();
+            localBundle = getLocalBundle(myUserId).encode();
+            remoteBundle = getRemoteBundle(myUserId).encode();
+
+            //Kalau bundle user sekarang juga sudah berubah, e.g nambah device
+            if (!Arrays.equals(localBundle, remoteBundle)) {
+                return createConversation(userId, forEncrypt);
+            }
+        }
+        return conversation;
     }
 
-    private static SesameConversation createConversation(String userId) throws Exception {
-        return createConversation(userId, getBundle(userId));
-    }
-
-    private static SesameConversation createConversation(String userId, BundlePublicCollection bundle) throws Exception {
+    private static SesameConversation createConversation(String userId, boolean forEncrypt) throws Exception {
         QiscusAccount account = Qiscus.getQiscusAccount();
         SesameSenderDevice senderDevice = QiscusMyBundleCache.getInstance().getSenderDevice();
-        return new SesameConversation(
+        BundlePublicCollection bundlePublicCollection = getLocalBundle(userId);
+
+        SesameConversation conversation = new SesameConversation(
                 account.getEmail(),
                 senderDevice.id,
                 senderDevice.getBundle(),
                 userId,
-                bundle
+                bundlePublicCollection
         );
+
+        if (forEncrypt) {
+            conversation.initializeSender();
+        }
+
+        saveConversation(userId, conversation);
+
+        return conversation;
+    }
+
+    private static void saveConversation(String userId, SesameConversation conversation) {
+        QiscusE2EDataStore.getInstance()
+                .saveSesameConversation(userId, conversation)
+                .subscribeOn(Schedulers.io())
+                .subscribe(conversation1 -> {
+                }, QiscusErrorLogger::print);
+    }
+
+    private static BundlePublicCollection getRemoteBundle(String userId) {
+        return QiscusE2ERestApi.getInstance()
+                .getBundlePublicCollection(userId)
+                .flatMap(bundlePublicCollection ->
+                        QiscusE2EDataStore.getInstance()
+                                .saveBundlePublicCollection(userId, bundlePublicCollection))
+                .toBlocking()
+                .first();
+    }
+
+    private static BundlePublicCollection getLocalBundle(String userId) {
+        BundlePublicCollection bundlePublicCollection = QiscusE2EDataStore.getInstance()
+                .getBundlePublicCollection(userId)
+                .toBlocking()
+                .first();
+
+        if (bundlePublicCollection == null) {
+            return getRemoteBundle(userId);
+        }
+
+        return bundlePublicCollection;
     }
 }
