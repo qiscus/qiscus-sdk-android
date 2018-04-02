@@ -45,8 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import rx.schedulers.Schedulers;
-
 /**
  * Created on : March 01, 2018
  * Author     : zetbaitsu
@@ -277,9 +275,8 @@ public final class QiscusEncryptionHandler {
                 .flatMap(bundlePublicCollection1 ->
                         QiscusE2EDataStore.getInstance().saveBundlePublicCollection(userId, bundlePublicCollection1))
                 .doOnNext(bundlePublicCollection1 -> QiscusMyBundleCache.getInstance().saveSenderDevice(senderDevice))
-                .subscribeOn(Schedulers.io())
-                .subscribe(bundlePublicCollection1 -> {
-                }, QiscusErrorLogger::print);
+                .toCompletable()
+                .await();
     }
 
     private static byte[] unpackData(String message) throws IOException, InvalidKeyException {
@@ -348,9 +345,8 @@ public final class QiscusEncryptionHandler {
     private static void saveConversation(String userId, SesameConversation conversation) {
         QiscusE2EDataStore.getInstance()
                 .saveSesameConversation(userId, conversation)
-                .subscribeOn(Schedulers.io())
-                .subscribe(conversation1 -> {
-                }, QiscusErrorLogger::print);
+                .toCompletable()
+                .await();
     }
 
     private static BundlePublicCollection getRemoteBundle(String userId) {
