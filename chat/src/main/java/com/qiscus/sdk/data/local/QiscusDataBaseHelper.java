@@ -361,9 +361,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         List<QiscusRoomMember> members = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusRoomMember member = getMember(QiscusDb.RoomMemberTable.getUserEmail(cursor));
-            member.setLastDeliveredCommentId(QiscusDb.RoomMemberTable.getLastDeliveredCommentId(cursor));
-            member.setLastReadCommentId(QiscusDb.RoomMemberTable.getLastReadCommentId(cursor));
-            members.add(member);
+            if (member != null) {
+                member.setLastDeliveredCommentId(QiscusDb.RoomMemberTable.getLastDeliveredCommentId(cursor));
+                member.setLastReadCommentId(QiscusDb.RoomMemberTable.getLastReadCommentId(cursor));
+                members.add(member);
+            }
         }
         cursor.close();
         return members;
