@@ -111,7 +111,7 @@ public class SesameConversation implements Serializable {
         }
     }
 
-    public byte[] initializeRecipient(HashId id, byte[] message) throws SignatureException,
+    public byte[] initializeRecipient(HashId id, byte[] message, boolean skipInitSecrets) throws SignatureException,
             IllegalDataSizeException, InvalidKeyException, NoSuchAlgorithmException, EncryptionFailedException {
         ByteBuffer b = ByteBuffer.wrap(message, 0, 8);
         if (b.getInt() != Constants.RidonMagix) {
@@ -126,6 +126,10 @@ public class SesameConversation implements Serializable {
 
         System.arraycopy(message, 16, msg, 0, size);
         System.arraycopy(message, size + 16, data, 0, remaining);
+
+        if (skipInitSecrets) {
+            return data;
+        }
 
         populateSecrets(false);
         BundlePublic pub = recipientPublic.get(id);
@@ -317,8 +321,15 @@ public class SesameConversation implements Serializable {
         ret.write(selfDeviceId.raw());
         ret.write(id.raw());
 
+        byte[] hasX3dh = new byte[1];
+
         if (secret.size > 0 && secret.size == secret.message.length) {
-            ByteBuffer b = ByteBuffer.allocate(8);
+            // This message contains x3dh message
+            hasX3dh[0] = 1;
+            ByteBuffer b = ByteBuffer.allocate(1);
+            b.put(hasX3dh);
+            ret.write(b.array());
+            b = ByteBuffer.allocate(8);
             b.putInt(Constants.RidonMagix);
             ret.write(b.array());
             b.clear();
@@ -326,6 +337,12 @@ public class SesameConversation implements Serializable {
             ret.write(b.array());
             b.clear();
             ret.write(secret.message);
+        } else {
+            // This message does not contain x3dh message
+            hasX3dh[0] = 0;
+            ByteBuffer b = ByteBuffer.allocate(1);
+            b.put(hasX3dh);
+            ret.write(b.array());
         }
         ret.write(msg);
 
@@ -370,11 +387,19 @@ public class SesameConversation implements Serializable {
             throw new SesameMessageRecipientMismatchException();
         }
 
+        boolean hasX3dhMessage = false;
+        b = new byte[1];
+        input.read(b);
+
+        if (b[0] == 1) {
+            hasX3dhMessage = true;
+        }
+
         byte[] data = new byte[input.available()];
         input.read(data);
         SesameConversationSecret secret = secrets.get(senderId);
-        if (secret == null) {
-            final byte[] msgData = initializeRecipient(senderId, data);
+        if (hasX3dhMessage || secret == null) {
+            final byte[] msgData = initializeRecipient(senderId, data, secret != null);
             secret = secrets.get(senderId); // this should be populated now after init
             data = msgData;
         }
