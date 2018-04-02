@@ -21,7 +21,7 @@ apply from: rootProject.file('gradle/quality.gradle')
 
 def versionMajor = 2
 def versionMinor = 23
-def versionPatch = 0
+def versionPatch = 1
 
 ext {
     bintrayRepo = 'maven'
@@ -152,7 +152,7 @@ dependencies {
     compile 'com.google.android:flexbox:0.3.1'
 
     //File picker
-    compile 'com.qiscus.utils:jupuk:1.0.1'
+    compile 'com.qiscus.utils:jupuk:1.0.2'
 
     //Place picker
     compile "com.google.android.gms:play-services-places:${playServicesLibVersion}"
