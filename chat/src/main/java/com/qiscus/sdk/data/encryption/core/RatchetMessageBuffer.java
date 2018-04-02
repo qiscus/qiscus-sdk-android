@@ -16,10 +16,11 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 
-public class RatchetMessageBuffer {
+public class RatchetMessageBuffer implements Serializable {
     public final int number;
     public final Key key;
 
