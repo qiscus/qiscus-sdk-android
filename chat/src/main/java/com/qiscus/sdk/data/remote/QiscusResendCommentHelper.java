@@ -25,10 +25,10 @@ import com.qiscus.sdk.util.QiscusErrorLogger;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import retrofit2.HttpException;
 import rx.Observable;
@@ -44,22 +44,22 @@ import rx.schedulers.Schedulers;
  */
 public final class QiscusResendCommentHelper {
 
-    private static final Map<QiscusComment, Subscription> pendingTask = new HashMap<>();
-    private static final Set<String> processingComment = new HashSet<>();
+    private static final Map<String, Subscription> pendingTask = new ConcurrentHashMap<>();
+    private static final Set<String> processingComment = new ConcurrentSkipListSet<>();
 
     public static void tryResendPendingComment() {
         Qiscus.getDataStore()
                 .getObservablePendingComments()
                 .flatMap(Observable::from)
                 .doOnNext(qiscusComment -> {
-                    if (qiscusComment.isAttachment() && !pendingTask.containsKey(qiscusComment)) {
+                    if (qiscusComment.isAttachment() && !pendingTask.containsKey(qiscusComment.getUniqueId())) {
                         resendFile(qiscusComment);
                     }
                 })
                 .filter(qiscusComment -> !qiscusComment.isAttachment())
                 .take(1)
                 .doOnNext(qiscusComment -> {
-                    if (!pendingTask.containsKey(qiscusComment)) {
+                    if (!pendingTask.containsKey(qiscusComment.getUniqueId())) {
                         resendComment(qiscusComment);
                     }
                 })
@@ -70,14 +70,12 @@ public final class QiscusResendCommentHelper {
     }
 
     public static void cancelPendingComment(QiscusComment qiscusComment) {
-        if (pendingTask.containsKey(qiscusComment)) {
-            Subscription subscription = pendingTask.get(qiscusComment);
-            if (!subscription.isUnsubscribed()) {
-                subscription.unsubscribe();
-            }
-            pendingTask.remove(qiscusComment);
-            processingComment.remove(qiscusComment.getUniqueId());
+        Subscription subscription = pendingTask.get(qiscusComment.getUniqueId());
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
         }
+        pendingTask.remove(qiscusComment.getUniqueId());
+        processingComment.remove(qiscusComment.getUniqueId());
     }
 
     private static void resendComment(QiscusComment qiscusComment) {
@@ -106,7 +104,7 @@ public final class QiscusResendCommentHelper {
                     EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend));
                 }, QiscusErrorLogger::print);
 
-        pendingTask.put(qiscusComment, subscription);
+        pendingTask.put(qiscusComment.getUniqueId(), subscription);
         processingComment.add(qiscusComment.getUniqueId());
     }
 
@@ -151,7 +149,7 @@ public final class QiscusResendCommentHelper {
                                 EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
                         QiscusErrorLogger::print);
 
-        pendingTask.put(qiscusComment, subscription);
+        pendingTask.put(qiscusComment.getUniqueId(), subscription);
     }
 
     private static void forwardFile(QiscusComment qiscusComment) {
@@ -171,11 +169,11 @@ public final class QiscusResendCommentHelper {
                                 EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
                         QiscusErrorLogger::print);
 
-        pendingTask.put(qiscusComment, subscription);
+        pendingTask.put(qiscusComment.getUniqueId(), subscription);
     }
 
     private static void commentSuccess(QiscusComment qiscusComment) {
-        pendingTask.remove(qiscusComment);
+        pendingTask.remove(qiscusComment.getUniqueId());
         processingComment.remove(qiscusComment.getUniqueId());
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
@@ -186,7 +184,7 @@ public final class QiscusResendCommentHelper {
     }
 
     private static void commentFail(Throwable throwable, QiscusComment qiscusComment) {
-        pendingTask.remove(qiscusComment);
+        pendingTask.remove(qiscusComment.getUniqueId());
         if (!Qiscus.getDataStore().isContains(qiscusComment)) { //Have been deleted
             return;
         }
