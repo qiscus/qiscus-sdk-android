@@ -292,8 +292,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             if (!e.areContentsTheSame(data.get(i))) {
                 e.setSelected(data.get(i).isSelected());
                 data.updateItemAt(i, e);
-                notifyItemChanged(i);
             }
+            notifyItemChanged(i);
         } else {
             add(e);
         }
@@ -316,9 +316,11 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     public void update(E e) {
         int i = findPosition(e);
-        if (i >= 0 && !e.areContentsTheSame(data.get(i))) {
-            e.setSelected(data.get(i).isSelected());
-            data.updateItemAt(i, e);
+        if (i >= 0) {
+            if (!e.areContentsTheSame(data.get(i))) {
+                e.setSelected(data.get(i).isSelected());
+                data.updateItemAt(i, e);
+            }
             notifyItemChanged(i);
         }
     }
