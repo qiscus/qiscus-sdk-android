@@ -17,6 +17,8 @@
 package com.qiscus.sdk.data;
 
 import android.support.annotation.RestrictTo;
+import android.support.v4.util.Pair;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.qiscus.sdk.Qiscus;
@@ -37,12 +39,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -69,52 +68,55 @@ public final class QiscusEncryptionHandler {
         }
     }
 
-    public static void encrypt(String recipientId, QiscusComment comment) {
-        comment.setMessage(encrypt(recipientId, comment.getMessage()));
+    private static boolean encryptAbleMessage(String rawType) {
+        return TextUtils.isEmpty(rawType)
+                || rawType.equals("text")
+                || rawType.equals("file_attachment")
+                || rawType.equals("custom");
     }
 
-    public static String encrypt(String recipientId, String message) {
-        try {
-            SesameConversation conversation = getConversation(recipientId, true);
-            byte[] encrypted = conversation.encrypt(message.getBytes());
-            saveConversation(recipientId, conversation);
-            return Base64.encodeToString(encrypted, Base64.DEFAULT);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return message;
+    public static Pair<String, String> createEncryptedPayload(String recipientId, QiscusComment comment) throws Exception {
+        String message = encryptAbleMessage(comment.getRawType()) ? encrypt(recipientId, comment.getMessage()) : comment.getMessage();
+        String payload = "";
+        if (!TextUtils.isEmpty(comment.getExtraPayload())) {
+            payload = encrypt(recipientId, comment.getRawType(), new JSONObject(comment.getExtraPayload()));
         }
+        return Pair.create(message, payload);
     }
 
-    public static String encrypt(String recipientId, String rawType, JSONObject payload) {
-        try {
-            switch (rawType) {
-                case "reply":
-                    payload.put("text", encrypt(recipientId, payload.optString("text")));
-                    break;
-                case "file_attachment":
-                    payload.put("url", encrypt(recipientId, payload.optString("url")));
-                    payload.put("file_name", encrypt(recipientId, payload.optString("file_name")));
-                    payload.put("caption", encrypt(recipientId, payload.optString("caption")));
-                    break;
-                case "contact_person":
-                    payload.put("name", encrypt(recipientId, payload.optString("name")));
-                    payload.put("value", encrypt(recipientId, payload.optString("value")));
-                    break;
-                case "location":
-                    payload.put("name", encrypt(recipientId, payload.optString("name")));
-                    payload.put("address", encrypt(recipientId, payload.optString("address")));
-                    payload.put("latitude", encrypt(recipientId, payload.optString("latitude")));
-                    payload.put("longitude", encrypt(recipientId, payload.optString("longitude")));
-                    payload.put("map_url", encrypt(recipientId, payload.optString("map_url")));
-                    break;
-                case "custom":
-                    payload.put("content", encrypt(recipientId, payload.optJSONObject("content").toString()));
-                    break;
-            }
-        } catch (Exception ignored) {
-            // Ignored
+    private static String encrypt(String recipientId, String rawType, JSONObject payload) throws Exception {
+        switch (rawType) {
+            case "reply":
+                payload.put("text", encrypt(recipientId, payload.optString("text")));
+                break;
+            case "file_attachment":
+                payload.put("url", encrypt(recipientId, payload.optString("url")));
+                payload.put("file_name", encrypt(recipientId, payload.optString("file_name")));
+                payload.put("caption", encrypt(recipientId, payload.optString("caption")));
+                break;
+            case "contact_person":
+                payload.put("name", encrypt(recipientId, payload.optString("name")));
+                payload.put("value", encrypt(recipientId, payload.optString("value")));
+                break;
+            case "location":
+                payload.put("name", encrypt(recipientId, payload.optString("name")));
+                payload.put("address", encrypt(recipientId, payload.optString("address")));
+                payload.put("latitude", encrypt(recipientId, payload.optString("latitude")));
+                payload.put("longitude", encrypt(recipientId, payload.optString("longitude")));
+                payload.put("map_url", encrypt(recipientId, payload.optString("map_url")));
+                break;
+            case "custom":
+                payload.put("content", encrypt(recipientId, payload.optJSONObject("content").toString()));
+                break;
         }
         return payload.toString();
+    }
+
+    private static String encrypt(String recipientId, String message) throws Exception {
+        SesameConversation conversation = getConversation(recipientId, true);
+        byte[] encrypted = conversation.encrypt(message.getBytes());
+        saveConversation(recipientId, conversation);
+        return Base64.encodeToString(encrypted, Base64.DEFAULT);
     }
 
     private static boolean decryptAbleType(QiscusComment comment) {
@@ -146,7 +148,9 @@ public final class QiscusEncryptionHandler {
         }
 
         //Decrypt message
-        comment.setMessage(decrypt(comment.getSenderEmail(), comment.getMessage()));
+        if (encryptAbleMessage(comment.getRawType())) {
+            comment.setMessage(decrypt(comment.getSenderEmail(), comment.getMessage()));
+        }
 
         //Decrypt payload
         if (!comment.getRawType().equals("text")) {
@@ -162,11 +166,16 @@ public final class QiscusEncryptionHandler {
         if (comment.getType() == QiscusComment.Type.REPLY) {
             try {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                comment.setMessage(payload.optString("text", comment.getMessage()));
                 QiscusComment savedRepliedComment = Qiscus.getDataStore()
                         .getComment(payload.optLong("replied_comment_id"));
                 if (savedRepliedComment != null) {
                     payload.put("replied_comment_message", savedRepliedComment.getMessage());
-                    payload.put("replied_comment_payload", new JSONObject(savedRepliedComment.getExtraPayload()));
+                    try {
+                        payload.put("replied_comment_payload", new JSONObject(savedRepliedComment.getExtraPayload()));
+                    } catch (Exception ignored) {
+                        //ignored
+                    }
                     comment.setExtraPayload(payload.toString());
                 }
             } catch (Exception e) {
@@ -175,7 +184,7 @@ public final class QiscusEncryptionHandler {
         }
     }
 
-    public static String decrypt(String senderId, String rawType, JSONObject payload) {
+    private static String decrypt(String senderId, String rawType, JSONObject payload) {
         try {
             switch (rawType) {
                 case "reply":
@@ -207,32 +216,7 @@ public final class QiscusEncryptionHandler {
         return payload.toString();
     }
 
-    public static void decrypt(List<QiscusComment> comments) {
-        QiscusAccount account = Qiscus.getQiscusAccount();
-        Map<String, List<QiscusComment>> needToDecrypt = new HashMap<>();
-
-        for (QiscusComment comment : comments) {
-            if (!comment.getSenderEmail().equals(account.getEmail())) {
-                String userId = comment.getSenderEmail();
-                if (!needToDecrypt.containsKey(userId)) {
-                    needToDecrypt.put(userId, new ArrayList<>());
-                }
-                needToDecrypt.get(userId).add(comment);
-            }
-        }
-
-        for (String userId : needToDecrypt.keySet()) {
-            for (QiscusComment comment : needToDecrypt.get(userId)) {
-                int index = comments.indexOf(comment);
-                if (index >= 0) {
-                    decrypt(comment);
-                    comments.set(index, comment);
-                }
-            }
-        }
-    }
-
-    public static String decrypt(String senderId, String message) {
+    private static String decrypt(String senderId, String message) {
         try {
             byte[] unpackedData = unpackData(message);
             if (unpackedData == null) {
