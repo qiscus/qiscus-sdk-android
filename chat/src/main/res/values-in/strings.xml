@@ -115,4 +115,5 @@
     <string name="qiscus_delete_for_me">Hapus untuk ku</string>
     <string name="qiscus_delete_for_everyone">Hapus untuk semua orang</string>
     <string name="failed_to_delete_messages">Gagal menghapus pesan</string>
+    <string name="qiscus_encrypted_place_holder">Terenkripsi</string>
 </resources>

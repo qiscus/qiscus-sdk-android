@@ -84,6 +84,8 @@ public final class QiscusNewCommentHandler {
         if (savedComment != null) {
             comment.setMessage(savedComment.getMessage());
             comment.setExtraPayload(savedComment.getExtraPayload());
+        } else {
+            QiscusEncryptionHandler.setPlaceHolder(comment);
         }
     }
 

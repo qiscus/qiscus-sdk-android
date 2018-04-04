@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.encryption.QiscusE2EDataStore;
 import com.qiscus.sdk.data.encryption.QiscusE2ERestApi;
 import com.qiscus.sdk.data.encryption.QiscusMyBundleCache;
@@ -34,6 +35,7 @@ import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.json.JSONObject;
 
@@ -52,6 +54,8 @@ import java.util.Set;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class QiscusEncryptionHandler {
+    private static final String ENCRYPTED_PLACE_HOLDER = QiscusTextUtil.getString(R.string.qiscus_encrypted_place_holder);
+
     private QiscusEncryptionHandler() {
 
     }
@@ -144,6 +148,7 @@ public final class QiscusEncryptionHandler {
 
         //We only can decrypt opponent's comment
         if (comment.isMyComment()) {
+            setPlaceHolder(comment);
             return;
         }
 
@@ -228,8 +233,76 @@ public final class QiscusEncryptionHandler {
             return new String(decrypted);
         } catch (Exception e) {
             e.printStackTrace();
-            return message;
+            return ENCRYPTED_PLACE_HOLDER;
         }
+    }
+
+    public static void decryptOldComment(QiscusComment comment) {
+        if (!decryptAbleType(comment)) {
+            return;
+        }
+
+        //Don't decrypt if we already have it
+        QiscusComment decryptedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
+        if (decryptedComment != null) {
+            comment.setMessage(decryptedComment.getMessage());
+            comment.setExtraPayload(decryptedComment.getExtraPayload());
+            return;
+        }
+
+        setPlaceHolder(comment);
+    }
+
+    public static void setPlaceHolder(QiscusComment comment) {
+        comment.setMessage(ENCRYPTED_PLACE_HOLDER);
+
+        String rawType = comment.getRawType();
+        JSONObject payload = null;
+        if (!TextUtils.isEmpty(comment.getExtraPayload())) {
+            try {
+                payload = new JSONObject(comment.getExtraPayload());
+            } catch (Exception ignored) {
+                //Ignored
+            }
+        }
+
+        if (payload == null) {
+            return;
+        }
+
+        try {
+            switch (rawType) {
+                case "reply":
+                    payload.put("text", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("replied_comment_message", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("replied_comment_type", "text");
+                    payload.put("replied_comment_payload", new JSONObject());
+                    break;
+                case "file_attachment":
+                    payload.put("url", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("file_name", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("caption", ENCRYPTED_PLACE_HOLDER);
+                    break;
+                case "contact_person":
+                    payload.put("name", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("value", ENCRYPTED_PLACE_HOLDER);
+                    break;
+                case "location":
+                    payload.put("name", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("address", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("map_url", ENCRYPTED_PLACE_HOLDER);
+                    payload.put("latitude", 0.0);
+                    payload.put("longitude", 0.0);
+                    break;
+                case "custom":
+                    payload.put("content", new JSONObject());
+                    break;
+            }
+        } catch (Exception ignored) {
+            // Ignored
+        }
+
+        comment.setExtraPayload(payload.toString());
     }
 
     private static void saveSenderDevice(SesameSenderDevice senderDevice) throws Exception {

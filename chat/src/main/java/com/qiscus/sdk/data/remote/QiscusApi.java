@@ -624,22 +624,14 @@ public enum QiscusApi {
             return;
         }
         if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
-            QiscusComment decryptedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
-            if (decryptedComment != null) {
-                comment.setMessage(decryptedComment.getMessage());
-                comment.setExtraPayload(decryptedComment.getExtraPayload());
-            }
+            QiscusEncryptionHandler.decryptOldComment(comment);
         }
     }
 
     private void replaceWithLocalComments(List<QiscusComment> qiscusComments) {
         if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
             for (QiscusComment comment : qiscusComments) {
-                QiscusComment decryptedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
-                if (decryptedComment != null) {
-                    comment.setMessage(decryptedComment.getMessage());
-                    comment.setExtraPayload(decryptedComment.getExtraPayload());
-                }
+                QiscusEncryptionHandler.decryptOldComment(comment);
             }
         }
     }
