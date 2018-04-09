@@ -152,7 +152,7 @@ dependencies {
     compile 'com.google.android:flexbox:0.3.1'
 
     //File picker
-    compile 'com.qiscus.utils:jupuk:1.0.2'
+    compile 'com.qiscus.utils:jupuk:1.0.3'
 
     //Place picker
     compile "com.google.android.gms:play-services-places:${playServicesLibVersion}"
