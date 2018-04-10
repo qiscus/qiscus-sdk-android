@@ -47,7 +47,7 @@ ext {
     allLicenses = ["Apache-2.0"]
 
     //library version
-    androidSupportLibVersion = "27.1.0"
+    androidSupportLibVersion = "27.1.1"
     playServicesLibVersion = "11.8.0"
     okhttpLibVersion = '3.9.1'
     retrofitLibVersion = '2.3.0'
