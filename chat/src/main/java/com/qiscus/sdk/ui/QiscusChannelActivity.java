@@ -18,11 +18,14 @@ package com.qiscus.sdk.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
+import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 
 import java.io.File;
 import java.io.Serializable;
@@ -81,5 +84,36 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity {
         tvSubtitle.setText(subtitle);
         tvSubtitle.setVisibility(View.VISIBLE);
         showRoomImage();
+    }
+
+    /**
+     * Only can hard delete for every one
+     */
+    @Override
+    protected void deleteComments(List<QiscusComment> selectedComments) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
+                        selectedComments.size(), selectedComments.size()))
+                .setNegativeButton(R.string.qiscus_cancel, (dialog, which) -> dialog.dismiss())
+                .setCancelable(true);
+
+        alertDialogBuilder.setPositiveButton(R.string.qiscus_delete_for_everyone, (dialog, which) -> {
+            QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                    .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+            if (fragment != null) {
+                fragment.deleteCommentsForEveryone(selectedComments);
+            }
+            dialog.dismiss();
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.setOnShowListener(dialog -> {
+            QiscusDeleteCommentConfig deleteConfig = chatConfig.getDeleteCommentConfig();
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(deleteConfig.getCancelButtonColor());
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(deleteConfig.getDeleteForEveryoneButtonColor());
+        });
+
+        alertDialog.show();
     }
 }
