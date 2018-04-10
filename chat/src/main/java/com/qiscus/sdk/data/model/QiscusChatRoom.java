@@ -38,10 +38,12 @@ public class QiscusChatRoom implements Parcelable {
     protected String name;
     protected JSONObject options;
     protected boolean group;
+    protected boolean channel;
     protected String avatarUrl;
     protected List<QiscusRoomMember> member;
     protected int unreadCount;
     protected QiscusComment lastComment;
+    protected int memberCount;
 
     public QiscusChatRoom() {
 
@@ -58,10 +60,12 @@ public class QiscusChatRoom implements Parcelable {
             //Do nothing
         }
         group = in.readByte() != 0;
+        channel = in.readByte() != 0;
         avatarUrl = in.readString();
         member = in.createTypedArrayList(QiscusRoomMember.CREATOR);
         unreadCount = in.readInt();
         lastComment = in.readParcelable(QiscusComment.class.getClassLoader());
+        memberCount = in.readInt();
     }
 
     public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
@@ -124,6 +128,14 @@ public class QiscusChatRoom implements Parcelable {
         this.group = group;
     }
 
+    public boolean isChannel() {
+        return channel;
+    }
+
+    public void setChannel(boolean channel) {
+        this.channel = channel;
+    }
+
     public String getAvatarUrl() {
         return avatarUrl;
     }
@@ -156,6 +168,14 @@ public class QiscusChatRoom implements Parcelable {
         this.lastComment = lastComment;
     }
 
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
     @Override
     public int hashCode() {
         return QiscusNumberUtil.convertToInt(id);
@@ -182,10 +202,12 @@ public class QiscusChatRoom implements Parcelable {
         }
         dest.writeString(options.toString());
         dest.writeByte((byte) (group ? 1 : 0));
+        dest.writeByte((byte) (channel ? 1 : 0));
         dest.writeString(avatarUrl);
         dest.writeTypedList(member);
         dest.writeInt(unreadCount);
         dest.writeParcelable(lastComment, flags);
+        dest.writeInt(memberCount);
     }
 
     @Override
@@ -197,10 +219,12 @@ public class QiscusChatRoom implements Parcelable {
                 ", name='" + name + '\'' +
                 ", options=" + options +
                 ", group=" + group +
+                ", channel=" + channel +
                 ", avatarUrl='" + avatarUrl + '\'' +
                 ", member=" + member +
                 ", unreadCount=" + unreadCount +
                 ", lastComment=" + lastComment +
+                ", memberCount=" + memberCount +
                 '}';
     }
 }
