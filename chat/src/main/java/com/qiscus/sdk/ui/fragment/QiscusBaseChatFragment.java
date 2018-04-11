@@ -1752,7 +1752,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (commentHighlightTask != null) {
             QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
         }
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), false);
+        notifyServerTyping(false);
         chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();
