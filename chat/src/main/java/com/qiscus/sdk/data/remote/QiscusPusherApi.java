@@ -240,7 +240,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
         try {
             long roomId = qiscusChatRoom.getId();
-            mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
+            if (!qiscusChatRoom.isChannel()) {
+                mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
+            }
             mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
             mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
         } catch (MqttException e) {
