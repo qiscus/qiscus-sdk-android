@@ -321,7 +321,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void setUserRead(long roomId, long commentId) {
-        if (isFromChannel(roomId))
+        if (!isFromChannel(roomId))
         QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -335,7 +335,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void setUserDelivery(long roomId, long commentId) {
-        if (isFromChannel(roomId))
+        if (!isFromChannel(roomId))
         QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
