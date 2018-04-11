@@ -57,6 +57,13 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         QiscusLogger.print("Upgrade database from : " + oldVersion + " to : " + newVersion);
 
+        // Before version 14, we just clear old data
+        if (oldVersion < 14) {
+            clearOldData(db);
+            onCreate(db);
+            return;
+        }
+
         /* Upgrade DB using SQL scripts place at assets directory
          * format filename : qiscus.db_from_{oldVersion}_to_{newVersion}.sql
          * example : qiscus.db_from_14_to_15.sql
@@ -118,6 +125,19 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
 
+    private void clearOldData(SQLiteDatabase db) {
+        db.beginTransaction();
+        try {
+            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomTable.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.MemberTable.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomMemberTable.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.CommentTable.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.FilesTable.TABLE_NAME);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 }
