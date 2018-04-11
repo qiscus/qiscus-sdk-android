@@ -64,6 +64,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -321,9 +322,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void setUserRead(long roomId, long commentId) {
-        rx.Observable.fromCallable(() ->
-                Qiscus.getDataStore().getChatRoom(roomId) )
-                .filter(room -> room != null )
+        Observable.fromCallable(() -> Qiscus.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
                 .filter(room -> !room.isChannel())
                 .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0))
                 .subscribeOn(Schedulers.io())
@@ -333,9 +333,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void setUserDelivery(long roomId, long commentId) {
-        rx.Observable.fromCallable(() ->
-                Qiscus.getDataStore().getChatRoom(roomId) )
-                .filter(room -> room != null )
+        Observable.fromCallable(() -> Qiscus.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
                 .filter(room -> !room.isChannel())
                 .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId))
                 .subscribeOn(Schedulers.io())
