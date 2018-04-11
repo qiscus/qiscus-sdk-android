@@ -1050,6 +1050,20 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public List<QiscusComment> searchComments(String query, long roomId, long lastCommentId) {
+
+        // TODO: 4/11/18
+        return null;
+    }
+
+    @Override
+    public List<QiscusComment> searchComments(String query, long lastCommentId) {
+
+        // TODO: 4/11/18
+        return null;
+    }
+
+    @Override
     public void clear() {
         sqLiteDatabase.beginTransaction();
         try {

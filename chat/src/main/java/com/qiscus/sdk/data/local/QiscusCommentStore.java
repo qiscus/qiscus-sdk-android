@@ -80,4 +80,9 @@ public interface QiscusCommentStore {
     List<QiscusComment> getPendingComments();
 
     Observable<List<QiscusComment>> getObservablePendingComments();
+
+    List<QiscusComment> searchComments(String query, long roomId, long lastCommentId);
+
+    List<QiscusComment> searchComments(String query, long lastCommentId);
+
 }
