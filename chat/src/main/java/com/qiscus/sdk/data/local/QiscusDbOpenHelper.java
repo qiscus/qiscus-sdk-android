@@ -114,6 +114,7 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
                     statement = new StringBuilder();
                 }
             }
+            db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
