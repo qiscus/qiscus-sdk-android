@@ -1050,14 +1050,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> searchComments(String q, long roomId) {
-        String query = "SELECT * FROM "
+    public List<QiscusComment> searchComments(String query, long roomId, int limit, int offset) {
+        String sql = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
-                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + q + "%' "
-                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' "
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
+                + " LIMIT " + limit + " OFFSET " + offset;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1073,13 +1074,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> searchComments(String q) {
-        String query = "SELECT * FROM "
+    public List<QiscusComment> searchComments(String query, int limit, int offset) {
+        String sql = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + q + "%' "
-                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' "
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
+                + " LIMIT " + limit + " OFFSET " + offset;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
