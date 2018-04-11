@@ -17,13 +17,25 @@
 package com.qiscus.sdk.data.local;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
+
+import com.qiscus.sdk.util.QiscusLogger;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 class QiscusDbOpenHelper extends SQLiteOpenHelper {
 
+    private Context context;
+
     QiscusDbOpenHelper(Context context) {
         super(context, QiscusDb.DATABASE_NAME, null, QiscusDb.DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -43,21 +55,69 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        clearOldData(db);
-        onCreate(db);
+        QiscusLogger.print("Upgrade database from : " + oldVersion + " to : " + newVersion);
+        /**
+         * Upgrade DB using SQL scripts place at assets directory
+         * format filename : qiscus.db_from_{oldVersion}_to_{newVersion}.sql
+         * example : qiscus.db_from_14_to_15.sql
+         */
+        try {
+            for (int i = oldVersion; i < newVersion; i++) {
+                String migrationName = String.format("qiscus.db_from_%d_to_%d.sql", i, (i + 1));
+                QiscusLogger.print("Looking for migration file : " + migrationName);
+                readAndExecSQL(db, context, migrationName);
+            }
+
+        } catch (Exception e) {
+            QiscusLogger.print("Exception running upgrade scripts : " + e.getMessage());
+        }
     }
 
-    private void clearOldData(SQLiteDatabase db) {
+    private void readAndExecSQL(SQLiteDatabase db, Context context, String migrationName) {
+        if (TextUtils.isEmpty(migrationName)) {
+            QiscusLogger.print("SQL Script migration name is empty...");
+            return;
+        }
+
+        QiscusLogger.print("SQL Script found...");
+        AssetManager assets = context.getAssets();
+        BufferedReader reader = null;
+
+        try {
+            InputStream inputStream = assets.open(migrationName);
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            reader = new BufferedReader(inputStreamReader);
+            execSQLScript(db, reader);
+        } catch (IOException e) {
+            QiscusLogger.print("Failed read SQL Script : " + e.getMessage());
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    QiscusLogger.print("Failed close reader : " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    private void execSQLScript(SQLiteDatabase db, BufferedReader reader) throws IOException {
         db.beginTransaction();
         try {
-            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomTable.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.MemberTable.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.RoomMemberTable.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.CommentTable.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + QiscusDb.FilesTable.TABLE_NAME);
+            String line;
+            StringBuilder statement = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                statement.append(line);
+                statement.append(System.getProperty("line.separator"));
+                if (line.endsWith(";")) {
+                    db.execSQL(statement.toString());
+                    statement = new StringBuilder();
+                }
+            }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
+
     }
 }
