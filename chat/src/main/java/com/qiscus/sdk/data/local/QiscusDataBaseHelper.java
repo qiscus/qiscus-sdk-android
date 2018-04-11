@@ -1050,17 +1050,48 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> searchComments(String query, long roomId, long lastCommentId) {
+    public List<QiscusComment> searchComments(String q, long roomId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + q + "%' "
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
-        // TODO: 4/11/18
-        return null;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
+        }
+        cursor.close();
+        return qiscusComments;
     }
 
     @Override
-    public List<QiscusComment> searchComments(String query, long lastCommentId) {
+    public List<QiscusComment> searchComments(String q) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + q + "%' "
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
-        // TODO: 4/11/18
-        return null;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
+        }
+        cursor.close();
+        return qiscusComments;
     }
 
     @Override
