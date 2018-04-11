@@ -1190,7 +1190,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void notifyServerTyping(boolean typing) {
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), typing);
+        if (!qiscusChatRoom.isChannel()) {
+            QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), typing);
+        }
     }
 
     public void sendQiscusComment(QiscusComment qiscusComment) {
