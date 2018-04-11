@@ -62,12 +62,18 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected long lastDeliveredCommentId;
     protected long lastReadCommentId;
     protected boolean groupChat;
+    protected boolean channelRoom;
 
     private Map<String, QiscusRoomMember> members;
 
     public QiscusBaseChatAdapter(Context context, boolean groupChat) {
+        this(context, groupChat, false);
+    }
+
+    public QiscusBaseChatAdapter(Context context, boolean groupChat, boolean channelRoom) {
         this.context = context;
         this.groupChat = groupChat;
+        this.channelRoom = channelRoom;
         data = new SortedList<>(getItemClass(), new SortedList.Callback<E>() {
             @Override
             public int compare(E lhs, E rhs) {
@@ -127,6 +133,14 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     public void setGroupChat(boolean groupChat) {
         this.groupChat = groupChat;
+    }
+
+    public boolean isChannelRoom() {
+        return channelRoom;
+    }
+
+    public void setChannelRoom(boolean channelRoom) {
+        this.channelRoom = channelRoom;
     }
 
     public QiscusChatRoom getQiscusChatRoom() {
@@ -192,6 +206,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     @Override
     public void onBindViewHolder(H holder, int position) {
         holder.setGroupChat(groupChat);
+        holder.setChannelRoom(channelRoom);
         holder.setRoomMembers(members);
 
         determineIsNeedToShowDate(holder, position);
