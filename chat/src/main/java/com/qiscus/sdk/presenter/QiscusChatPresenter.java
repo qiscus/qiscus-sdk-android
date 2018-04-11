@@ -585,7 +585,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             roomEventHandler.onGotComment(qiscusComment);
         }
 
-        if (qiscusComment.getRoomId() == room.getId() && !room.isChannel()) {
+        if (qiscusComment.getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnBackgroundThread(() -> {
                 if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())
                         && QiscusCacheManager.getInstance().getLastChatActivity().first) {

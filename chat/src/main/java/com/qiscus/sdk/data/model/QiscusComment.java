@@ -559,13 +559,6 @@ public class QiscusComment implements Parcelable {
         return false;
     }
 
-    public boolean isFromChannel() {
-        boolean fromChannel = false;
-        QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(getRoomId());
-        if (room != null && room.isChannel()) fromChannel = true;
-        return fromChannel;
-    }
-
     private boolean containsUrl() {
         if (urls == null) {
             urls = QiscusTextUtil.extractUrl(message);

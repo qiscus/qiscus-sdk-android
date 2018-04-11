@@ -971,8 +971,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private void notifyLatestRead() {
         QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
-        if (qiscusComment != null ) {
-            if (!qiscusChatRoom.isChannel() )
+        if (qiscusComment != null) {
             QiscusPusherApi.getInstance()
                     .setUserRead(qiscusChatRoom.getId(), qiscusComment.getId());
         }
