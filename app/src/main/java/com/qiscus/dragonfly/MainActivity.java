@@ -27,6 +27,8 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.BuildConfig;
+import com.qiscus.sdk.ui.QiscusChatActivity;
+import com.qiscus.sdk.ui.QiscusGroupChatActivity;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -135,6 +137,24 @@ public class MainActivity extends AppCompatActivity {
                 .map(qiscusChatRoom -> CustomChatActivity.generateIntent(this, qiscusChatRoom))
                 .subscribe(intent -> {
                     setupCustomChatConfig();
+                    startActivity(intent);
+                    dismissLoading();
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    showError(QiscusErrorLogger.getMessage(throwable));
+                    dismissLoading();
+                });
+    }
+
+    public void openChannel(View view) {
+        showLoading();
+        Qiscus.buildGroupChatRoomWith("Cat Familiy")
+                .build()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(qiscusChatRoom -> QiscusChatActivity.generateIntent(this, qiscusChatRoom))
+                .subscribe(intent -> {
+                    revertCustomChatConfig();
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
