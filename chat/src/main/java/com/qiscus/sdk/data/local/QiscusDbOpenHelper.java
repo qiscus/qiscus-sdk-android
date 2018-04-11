@@ -31,11 +31,11 @@ import java.io.InputStreamReader;
 
 class QiscusDbOpenHelper extends SQLiteOpenHelper {
 
-    private Context mContext;
+    private Context context;
 
     QiscusDbOpenHelper(Context context) {
         super(context, QiscusDb.DATABASE_NAME, null, QiscusDb.DATABASE_VERSION);
-        mContext = context;
+        this.context = context;
     }
 
     @Override
@@ -65,7 +65,7 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
             for (int i = oldVersion; i < newVersion; i++) {
                 String migrationName = String.format("qiscus.db_from_%d_to_%d.sql", i, (i + 1));
                 QiscusLogger.print("Looking for migration file : " + migrationName);
-                readAndExecSQL(db, mContext, migrationName);
+                readAndExecSQL(db, context, migrationName);
             }
 
         } catch (Exception e) {
@@ -102,15 +102,21 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     }
 
     private void execSQLScript(SQLiteDatabase db, BufferedReader reader) throws IOException {
-        String line;
-        StringBuilder statement = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            statement.append(line);
-            statement.append(System.getProperty("line.separator"));
-            if (line.endsWith(";")) {
-                db.execSQL(statement.toString());
-                statement = new StringBuilder();
+        db.beginTransaction();
+        try {
+            String line;
+            StringBuilder statement = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                statement.append(line);
+                statement.append(System.getProperty("line.separator"));
+                if (line.endsWith(";")) {
+                    db.execSQL(statement.toString());
+                    statement = new StringBuilder();
+                }
             }
+        } finally {
+            db.endTransaction();
         }
+
     }
 }
