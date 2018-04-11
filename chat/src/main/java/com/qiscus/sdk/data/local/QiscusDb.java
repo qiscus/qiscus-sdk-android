@@ -42,6 +42,8 @@ final class QiscusDb {
         static final String COLUMN_OPTIONS = "options";
         static final String COLUMN_AVATAR_URL = "avatar_url";
         static final String COLUMN_UNREAD_COUNT = "unread_count";
+        static final String COLUMN_IS_CHANNEL = "is_channel";
+        static final String COLUMN_MEMBER_COUNT = "member_count";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
@@ -52,7 +54,9 @@ final class QiscusDb {
                         COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
                         COLUMN_OPTIONS + " TEXT," +
                         COLUMN_AVATAR_URL + " TEXT," +
-                        COLUMN_UNREAD_COUNT + " INTEGER DEFAULT 0" +
+                        COLUMN_UNREAD_COUNT + " INTEGER DEFAULT 0," +
+                        COLUMN_IS_CHANNEL + " INTEGER DEFAULT 0," +
+                        COLUMN_MEMBER_COUNT + " INTEGER DEFAULT 0" +
                         " ); ";
 
         static ContentValues toContentValues(QiscusChatRoom qiscusChatRoom) {
@@ -65,6 +69,8 @@ final class QiscusDb {
             values.put(COLUMN_OPTIONS, qiscusChatRoom.getOptions() == null ? null : qiscusChatRoom.getOptions().toString());
             values.put(COLUMN_AVATAR_URL, qiscusChatRoom.getAvatarUrl());
             values.put(COLUMN_UNREAD_COUNT, qiscusChatRoom.getUnreadCount());
+            values.put(COLUMN_IS_CHANNEL, qiscusChatRoom.isChannel());
+            values.put(COLUMN_MEMBER_COUNT, qiscusChatRoom.getMemberCount());
             return values;
         }
 
@@ -83,6 +89,8 @@ final class QiscusDb {
             }
             qiscusChatRoom.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AVATAR_URL)));
             qiscusChatRoom.setUnreadCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_UNREAD_COUNT)));
+            qiscusChatRoom.setChannel(cursor.getShort(cursor.getColumnIndexOrThrow(COLUMN_IS_CHANNEL)) == 1);
+            qiscusChatRoom.setMemberCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MEMBER_COUNT)));
             return qiscusChatRoom;
         }
     }

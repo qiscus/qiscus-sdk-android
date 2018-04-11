@@ -18,32 +18,27 @@ package com.qiscus.sdk.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
+import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
 /**
- * Created on : November 24, 2016
+ * Created on : April 10, 2018
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusGroupChatActivity extends QiscusChatActivity {
-
+public class QiscusChannelActivity extends QiscusGroupChatActivity {
     protected String subtitle;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
@@ -55,17 +50,18 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
                                         String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {
+
         if (!qiscusChatRoom.isGroup()) {
             return QiscusChatActivity.generateIntent(context, qiscusChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
         }
 
-        if (qiscusChatRoom.isChannel()) {
-            return QiscusChannelActivity.generateIntent(context, qiscusChatRoom, startingMessage,
+        if (!qiscusChatRoom.isChannel()) {
+            return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
         }
 
-        Intent intent = new Intent(context, QiscusGroupChatActivity.class);
+        Intent intent = new Intent(context, QiscusChannelActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILES, (Serializable) shareFiles);
@@ -73,6 +69,12 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
         intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
         intent.putExtra(EXTRA_SCROLL_TO_COMMENT, scrollToComment);
         return intent;
+    }
+
+    @Override
+    protected void generateSubtitle() {
+        subtitle = getResources().getQuantityString(R.plurals.qiscus_channel_participant_count_subtitle,
+                qiscusChatRoom.getMemberCount(), qiscusChatRoom.getMemberCount());
     }
 
     @Override
@@ -84,43 +86,34 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
         showRoomImage();
     }
 
-    protected void generateSubtitle() {
-        subtitle = "";
-        int count = 0;
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
-                count++;
-                subtitle += member.getUsername().split(" ")[0];
-                if (count < qiscusChatRoom.getMember().size() - 1) {
-                    subtitle += ", ";
-                }
-            }
-            if (count >= 10) {
-                break;
-            }
-        }
-        subtitle += String.format(" %s", getString(R.string.qiscus_group_member_closing));
-        if (count == 0) subtitle = getString(R.string.qiscus_group_member_only_you);
-    }
-
+    /**
+     * Only can hard delete for every one
+     */
     @Override
-    public void onUserStatusChanged(String user, boolean online, Date lastActive) {
+    protected void deleteComments(List<QiscusComment> selectedComments) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
+                        selectedComments.size(), selectedComments.size()))
+                .setNegativeButton(R.string.qiscus_cancel, (dialog, which) -> dialog.dismiss())
+                .setCancelable(true);
 
-    }
+        alertDialogBuilder.setPositiveButton(R.string.qiscus_delete_for_everyone, (dialog, which) -> {
+            QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                    .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+            if (fragment != null) {
+                fragment.deleteCommentsForEveryone(selectedComments);
+            }
+            dialog.dismiss();
+        });
 
-    @Override
-    public void onUserTyping(String user, boolean typing) {
-        if (typing) {
-            Observable.from(qiscusChatRoom.getMember())
-                    .filter(qiscusRoomMember -> qiscusRoomMember.getEmail().equals(user))
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .compose(bindToLifecycle())
-                    .subscribe(qiscusRoomMember -> tvSubtitle.setText(getString(R.string.qiscus_group_member_typing,
-                            qiscusRoomMember.getUsername())), throwable -> {
-                    });
-        } else {
-            tvSubtitle.setText(subtitle);
-        }
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.setOnShowListener(dialog -> {
+            QiscusDeleteCommentConfig deleteConfig = chatConfig.getDeleteCommentConfig();
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(deleteConfig.getCancelButtonColor());
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(deleteConfig.getDeleteForEveryoneButtonColor());
+        });
+
+        alertDialog.show();
     }
 }
