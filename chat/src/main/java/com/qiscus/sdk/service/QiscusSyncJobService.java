@@ -13,6 +13,7 @@ import android.support.annotation.RequiresApi;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusEventCache;
 import com.qiscus.sdk.data.model.QiscusAccount;
+import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
@@ -90,6 +91,7 @@ public class QiscusSyncJobService extends JobService {
                     }
 
                     if (!qiscusComment.isMyComment()) {
+                        if (!qiscusComment.isFromChannel())
                         QiscusPusherApi.getInstance()
                                 .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
                     }

@@ -438,6 +438,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
 
         if (!qiscusComment.isMyComment()) {
+            if (!qiscusComment.isFromChannel())
             QiscusPusherApi.getInstance().setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
         }
 
