@@ -20,8 +20,8 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply from: rootProject.file('gradle/quality.gradle')
 
 def versionMajor = 2
-def versionMinor = 23
-def versionPatch = 2
+def versionMinor = 24
+def versionPatch = 0
 
 ext {
     bintrayRepo = 'maven'
@@ -128,6 +128,7 @@ dependencies {
 
     //Network
     api "com.squareup.okhttp3:okhttp:${okhttpLibVersion}"
+    api "com.squareup.okhttp3:logging-interceptor:${okhttpLibVersion}"
     api "com.squareup.retrofit2:retrofit:${retrofitLibVersion}"
     api "com.squareup.retrofit2:converter-gson:${retrofitLibVersion}"
     api "com.squareup.retrofit2:adapter-rxjava:${retrofitLibVersion}"
@@ -152,7 +153,7 @@ dependencies {
     api 'com.google.android:flexbox:0.3.1'
 
     //File picker
-    api 'com.qiscus.utils:jupuk:1.0.3'
+    api 'com.qiscus.utils:jupuk:1.0.4'
 
     //Place picker
     api "com.google.android.gms:play-services-places:${playServicesLibVersion}"

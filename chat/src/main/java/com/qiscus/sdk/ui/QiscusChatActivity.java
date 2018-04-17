@@ -50,15 +50,19 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     protected QiscusAccount qiscusAccount;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
-        Intent intent = new Intent(context, QiscusChatActivity.class);
-        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
-        return intent;
+        return generateIntent(context, qiscusChatRoom, null, null,
+                false, null, null);
     }
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
                                         String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {
+        if (qiscusChatRoom.isGroup()) {
+            return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom, startingMessage,
+                    shareFiles, autoSendExtra, comments, scrollToComment);
+        }
+
         Intent intent = new Intent(context, QiscusChatActivity.class);
         intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);

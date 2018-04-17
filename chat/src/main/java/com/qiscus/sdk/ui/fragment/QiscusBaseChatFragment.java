@@ -1154,7 +1154,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void notifyServerTyping(boolean typing) {
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), typing);
+        if (!qiscusChatRoom.isChannel()) {
+            QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), typing);
+        }
     }
 
     public void sendQiscusComment(QiscusComment qiscusComment) {
@@ -1691,7 +1693,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (commentHighlightTask != null) {
             QiscusAndroidUtil.cancelRunOnUIThread(commentHighlightTask);
         }
-        QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), false);
+        notifyServerTyping(false);
         chatAdapter.detachView();
         if (recordAudioPanel != null) {
             recordAudioPanel.cancelRecord();

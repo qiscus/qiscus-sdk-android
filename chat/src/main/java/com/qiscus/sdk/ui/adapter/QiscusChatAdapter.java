@@ -75,6 +75,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
         super(context, groupChat);
     }
 
+    public QiscusChatAdapter(Context context, boolean groupChat, boolean channelRoom) {
+        super(context, groupChat, channelRoom);
+    }
+
     @Override
     protected Class<QiscusComment> getItemClass() {
         return QiscusComment.class;

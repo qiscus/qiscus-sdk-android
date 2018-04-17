@@ -39,6 +39,9 @@
             android:name=".ui.QiscusGroupChatActivity"
             android:theme="@style/QiscusTheme" />
         <activity
+            android:name=".ui.QiscusChannelActivity"
+            android:theme="@style/QiscusTheme" />
+        <activity
             android:name=".ui.QiscusAccountLinkingActivity"
             android:theme="@style/QiscusTheme" />
         <activity
