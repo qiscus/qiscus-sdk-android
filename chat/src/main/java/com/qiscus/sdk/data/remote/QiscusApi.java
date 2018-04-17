@@ -22,6 +22,7 @@ import android.support.v4.util.Pair;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
@@ -61,6 +62,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.internal.Util;
+import okhttp3.logging.HttpLoggingInterceptor;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
@@ -99,6 +101,7 @@ public enum QiscusApi {
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .addInterceptor(this::headersInterceptor)
+                .addInterceptor(makeLoggingInterceptor(Qiscus.isEnableLog()))
                 .build();
 
         api = new Retrofit.Builder()
@@ -115,8 +118,15 @@ public enum QiscusApi {
                 .addHeader("QISCUS_SDK_APP_ID", Qiscus.getAppId())
                 .addHeader("QISCUS_SDK_TOKEN", Qiscus.hasSetupUser() ? Qiscus.getToken() : "")
                 .addHeader("QISCUS_SDK_USER_EMAIL", Qiscus.hasSetupUser() ? Qiscus.getQiscusAccount().getEmail() : "")
+                .addHeader("QISCUS_SDK_VERSION", "ANDROID_" + BuildConfig.VERSION_NAME)
                 .build();
         return chain.proceed(req);
+    }
+
+    private HttpLoggingInterceptor makeLoggingInterceptor(boolean isDebug) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(isDebug ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        return logging;
     }
 
     public static QiscusApi getInstance() {

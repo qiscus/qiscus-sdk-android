@@ -116,4 +116,7 @@
     <string name="qiscus_delete_for_everyone">Hapus untuk semua orang</string>
     <string name="failed_to_delete_messages">Gagal menghapus pesan</string>
     <string name="qiscus_encrypted_place_holder">Terenkripsi</string>
+    <plurals name="qiscus_channel_participant_count_subtitle">
+        <item quantity="other">%d Partisipan</item>
+    </plurals>
 </resources>

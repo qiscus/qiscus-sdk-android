@@ -61,6 +61,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     protected boolean messageFromMe;
     protected boolean needToShowFirstMessageBubbleIndicator;
     protected boolean groupChat;
+    protected boolean channelRoom;
 
     protected Drawable rightBubbleDrawable;
     protected Drawable leftBubbleDrawable;
@@ -164,6 +165,10 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         this.groupChat = groupChat;
     }
 
+    public void setChannelRoom(boolean channelRoom) {
+        this.channelRoom = channelRoom;
+    }
+
     public void setRoomMembers(Map<String, QiscusRoomMember> roomMembers) {
         this.roomMembers = roomMembers;
     }
@@ -263,6 +268,11 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     }
 
     protected void showIconReadOrNot(QiscusComment qiscusComment) {
+        if (channelRoom) {
+            showIconReadOrNotForChannelRoom(qiscusComment);
+            return;
+        }
+
         if (messageStateIndicatorView != null) {
             switch (qiscusComment.getState()) {
                 case QiscusComment.STATE_PENDING:
@@ -281,6 +291,28 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
                 case QiscusComment.STATE_READ:
                     messageStateIndicatorView.setColorFilter(readIconColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_read);
+                    break;
+                case QiscusComment.STATE_FAILED:
+                    messageStateIndicatorView.setColorFilter(failedToSendMessageColor);
+                    messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending_failed);
+                    break;
+            }
+        }
+    }
+
+    protected void showIconReadOrNotForChannelRoom(QiscusComment qiscusComment) {
+        if (messageStateIndicatorView != null) {
+            switch (qiscusComment.getState()) {
+                case QiscusComment.STATE_PENDING:
+                case QiscusComment.STATE_SENDING:
+                    messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
+                    messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_info_time);
+                    break;
+                case QiscusComment.STATE_ON_QISCUS:
+                case QiscusComment.STATE_DELIVERED:
+                case QiscusComment.STATE_READ:
+                    messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
+                    messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending);
                     break;
                 case QiscusComment.STATE_FAILED:
                     messageStateIndicatorView.setColorFilter(failedToSendMessageColor);

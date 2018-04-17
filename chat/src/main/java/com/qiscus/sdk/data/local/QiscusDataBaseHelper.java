@@ -1076,6 +1076,53 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public List<QiscusComment> searchComments(String query, long roomId, int limit, int offset) {
+        String sql = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' "
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
+                + " LIMIT " + limit + " OFFSET " + offset;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
+        }
+        cursor.close();
+        return qiscusComments;
+    }
+
+    @Override
+    public List<QiscusComment> searchComments(String query, int limit, int offset) {
+        String sql = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' "
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
+                + " LIMIT " + limit + " OFFSET " + offset;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        List<QiscusComment> qiscusComments = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            qiscusComments.add(qiscusComment);
+        }
+        cursor.close();
+        return qiscusComments;
+    }
+
+    @Override
     public void clear() {
         sqLiteDatabase.beginTransaction();
         try {

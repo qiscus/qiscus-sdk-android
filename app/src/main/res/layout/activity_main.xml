@@ -65,6 +65,13 @@
             android:layout_marginTop="8dp"
             android:onClick="openAdvanceCustomChat"
             android:text="Open Advanced Custom Chat" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="openChannel"
+            android:text="Open Channel" />
     </LinearLayout>
 
     <TextView

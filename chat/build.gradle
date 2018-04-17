@@ -21,7 +21,7 @@ apply from: rootProject.file('gradle/quality.gradle')
 
 def versionMajor = 2
 def versionMinor = 23
-def versionPatch = 1
+def versionPatch = 2
 
 ext {
     bintrayRepo = 'maven'
@@ -47,8 +47,8 @@ ext {
     allLicenses = ["Apache-2.0"]
 
     //library version
-    androidSupportLibVersion = "27.1.0"
-    playServicesLibVersion = "11.8.0"
+    androidSupportLibVersion = "27.1.1"
+    playServicesLibVersion = "12.0.1"
     okhttpLibVersion = '3.9.1'
     retrofitLibVersion = '2.3.0'
 }
@@ -93,8 +93,8 @@ buildscript {
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
     }
 }
 
@@ -107,51 +107,52 @@ apply from: '../buildsystem/bintrayv1.gradle'
 apply from: '../buildsystem/installv1.gradle'
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar'])
 
     //Android Support Libraries
-    compile "com.android.support:support-v4:${androidSupportLibVersion}"
-    compile "com.android.support:appcompat-v7:${androidSupportLibVersion}"
-    compile "com.android.support:recyclerview-v7:${androidSupportLibVersion}"
-    compile "com.android.support:design:${androidSupportLibVersion}"
-    compile "com.android.support:cardview-v7:${androidSupportLibVersion}"
-    compile "com.android.support:customtabs:${androidSupportLibVersion}"
-    compile "com.android.support:support-v13:${androidSupportLibVersion}"
+    api "com.android.support:support-v4:${androidSupportLibVersion}"
+    api "com.android.support:appcompat-v7:${androidSupportLibVersion}"
+    api "com.android.support:recyclerview-v7:${androidSupportLibVersion}"
+    api "com.android.support:design:${androidSupportLibVersion}"
+    api "com.android.support:cardview-v7:${androidSupportLibVersion}"
+    api "com.android.support:customtabs:${androidSupportLibVersion}"
+    api "com.android.support:support-v13:${androidSupportLibVersion}"
 
     //The core of Reactive Programming
-    compile 'io.reactivex:rxjava:1.3.4'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.trello:rxlifecycle:1.0'
-    compile 'com.trello:rxlifecycle-android:1.0'
-    compile 'com.trello:rxlifecycle-components:1.0'
+    api 'io.reactivex:rxjava:1.3.4'
+    api 'io.reactivex:rxandroid:1.2.1'
+    api 'com.trello:rxlifecycle:1.0'
+    api 'com.trello:rxlifecycle-android:1.0'
+    api 'com.trello:rxlifecycle-components:1.0'
 
     //Network
-    compile "com.squareup.okhttp3:okhttp:${okhttpLibVersion}"
-    compile "com.squareup.retrofit2:retrofit:${retrofitLibVersion}"
-    compile "com.squareup.retrofit2:converter-gson:${retrofitLibVersion}"
-    compile "com.squareup.retrofit2:adapter-rxjava:${retrofitLibVersion}"
-    compile 'com.schinizer:rxunfurl:0.2.0'
+    api "com.squareup.okhttp3:okhttp:${okhttpLibVersion}"
+    api "com.squareup.okhttp3:logging-interceptor:${okhttpLibVersion}"
+    api "com.squareup.retrofit2:retrofit:${retrofitLibVersion}"
+    api "com.squareup.retrofit2:converter-gson:${retrofitLibVersion}"
+    api "com.squareup.retrofit2:adapter-rxjava:${retrofitLibVersion}"
+    api 'com.schinizer:rxunfurl:0.2.0'
 
     //Mqtt
-    compile 'com.qiscus.mqtt:client:1.1.1'
-    compile 'com.qiscus.mqtt:android:1.1.1-q1'
+    api 'com.qiscus.mqtt:client:1.1.1'
+    api 'com.qiscus.mqtt:android:1.1.1-q1'
 
     //Push notification
-    compile "com.google.firebase:firebase-core:${playServicesLibVersion}"
-    compile "com.google.firebase:firebase-messaging:${playServicesLibVersion}"
+    api "com.google.firebase:firebase-core:${playServicesLibVersion}"
+    api "com.google.firebase:firebase-messaging:${playServicesLibVersion}"
 
     //Image loader
-    compile 'com.qiscus.nirmana:nirmana:1.0.0'
+    api 'com.qiscus.nirmana:nirmana:1.0.0'
 
-    compile 'org.greenrobot:eventbus:3.0.0'
+    api 'org.greenrobot:eventbus:3.0.0'
 
     //Custom EditText
-    compile 'com.qiscus.utils:manggil:1.0.1'
+    api 'com.qiscus.utils:manggil:1.0.1'
 
-    compile 'com.google.android:flexbox:0.3.1'
+    api 'com.google.android:flexbox:0.3.1'
 
     //File picker
-    compile 'com.qiscus.utils:jupuk:1.0.2'
+    api 'com.qiscus.utils:jupuk:1.0.4'
 
     //Place picker
     compile "com.google.android.gms:play-services-places:${playServicesLibVersion}"

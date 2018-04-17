@@ -221,7 +221,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
 
-                if (qiscusChatRoom.isGroup() && qiscusComment.isMyComment()) {
+                if (qiscusChatRoom.isGroup() && qiscusComment.isMyComment() && !qiscusChatRoom.isChannel()) {
                     actionMode.getMenu().findItem(R.id.action_info)
                             .setVisible(Qiscus.getChatConfig().isEnableCommentInfo());
                 } else {
@@ -429,7 +429,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         commentInfoHandler.showInfo(qiscusComment);
     }
 
-    private void deleteComments(List<QiscusComment> selectedComments) {
+    protected void deleteComments(List<QiscusComment> selectedComments) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
                 .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
                         selectedComments.size(), selectedComments.size()))

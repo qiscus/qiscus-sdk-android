@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -117,4 +116,9 @@
     <string name="qiscus_delete_for_everyone">Delete For Everyone</string>
     <string name="failed_to_delete_messages">Failed to delete messages</string>
     <string name="qiscus_encrypted_place_holder">Encrypted</string>
+    <plurals name="qiscus_channel_participant_count_subtitle">
+        <item quantity="zero">%d Participant</item>
+        <item quantity="one">%d Participant</item>
+        <item quantity="other">%d Participants</item>
+    </plurals>
 </resources>

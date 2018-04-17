@@ -95,21 +95,31 @@ final class QiscusApiParser {
             }
             qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
 
-            JsonArray jsonMembers = jsonElement.getAsJsonObject().get("results")
-                    .getAsJsonObject().get("room").getAsJsonObject().get("participants").getAsJsonArray();
+            if (jsonChatRoom.has("is_public_channel")) {
+                qiscusChatRoom.setChannel(jsonChatRoom.get("is_public_channel").getAsBoolean());
+            }
+
+            if (jsonChatRoom.has("room_total_participants")) {
+                qiscusChatRoom.setMemberCount(jsonChatRoom.get("room_total_participants").getAsInt());
+            }
+
+            JsonElement participants = jsonChatRoom.get("participants");
             List<QiscusRoomMember> members = new ArrayList<>();
-            for (JsonElement jsonMember : jsonMembers) {
-                QiscusRoomMember member = new QiscusRoomMember();
-                member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
-                if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
-                    member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsInt());
+            if (participants.isJsonArray()) {
+                JsonArray jsonMembers = participants.getAsJsonArray();
+                for (JsonElement jsonMember : jsonMembers) {
+                    QiscusRoomMember member = new QiscusRoomMember();
+                    member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
+                    member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                    member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+                    if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
+                        member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsInt());
+                    }
+                    if (jsonMember.getAsJsonObject().has("last_comment_read_id")) {
+                        member.setLastReadCommentId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsInt());
+                    }
+                    members.add(member);
                 }
-                if (jsonMember.getAsJsonObject().has("last_comment_read_id")) {
-                    member.setLastReadCommentId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsInt());
-                }
-                members.add(member);
             }
             qiscusChatRoom.setMember(members);
 
@@ -154,9 +164,17 @@ final class QiscusApiParser {
                 qiscusChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
                 qiscusChatRoom.setUnreadCount(jsonChatRoom.get("unread_count").getAsInt());
 
-                if (jsonChatRoom.has("participants")) {
+                if (jsonChatRoom.has("is_public_channel")) {
+                    qiscusChatRoom.setChannel(jsonChatRoom.get("is_public_channel").getAsBoolean());
+                }
+
+                if (jsonChatRoom.has("room_total_participants")) {
+                    qiscusChatRoom.setMemberCount(jsonChatRoom.get("room_total_participants").getAsInt());
+                }
+
+                List<QiscusRoomMember> members = new ArrayList<>();
+                if (jsonChatRoom.has("participants") && jsonChatRoom.get("participants").isJsonArray()) {
                     JsonArray jsonMembers = jsonChatRoom.get("participants").getAsJsonArray();
-                    List<QiscusRoomMember> members = new ArrayList<>();
                     for (JsonElement jsonMember : jsonMembers) {
                         QiscusRoomMember member = new QiscusRoomMember();
                         member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
@@ -170,8 +188,8 @@ final class QiscusApiParser {
                         }
                         members.add(member);
                     }
-                    qiscusChatRoom.setMember(members);
                 }
+                qiscusChatRoom.setMember(members);
 
                 QiscusComment latestComment = parseQiscusComment(jsonChatRoom.get("last_comment"), qiscusChatRoom.getId());
                 if (qiscusChatRoom.getMember() != null) {

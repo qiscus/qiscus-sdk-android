@@ -66,6 +66,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -242,9 +243,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
         try {
             long roomId = qiscusChatRoom.getId();
-            mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
-            mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
-            mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
+            if (!qiscusChatRoom.isChannel()) {
+                mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
+                mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
+                mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
+            }
         } catch (MqttException e) {
             //Do nothing
         } catch (NullPointerException | IllegalArgumentException e) {
@@ -321,7 +324,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void setUserRead(long roomId, long commentId) {
-        QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0)
+        Observable.fromCallable(() -> Qiscus.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
+                .filter(room -> !room.isChannel())
+                .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
@@ -329,7 +335,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void setUserDelivery(long roomId, long commentId) {
-        QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId)
+        Observable.fromCallable(() -> Qiscus.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
+                .filter(room -> !room.isChannel())
+                .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
