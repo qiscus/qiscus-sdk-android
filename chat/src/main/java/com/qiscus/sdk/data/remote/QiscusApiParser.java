@@ -261,9 +261,9 @@ final class QiscusApiParser {
         if (jsonComment.has("type")) {
             qiscusComment.setRawType(jsonComment.get("type").getAsString());
             qiscusComment.setExtraPayload(jsonComment.get("payload").toString());
-            if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
-                    || qiscusComment.getType() == QiscusComment.Type.REPLY
-                    || qiscusComment.getType() == QiscusComment.Type.CARD) {
+            if (qiscusComment.getRawType().equals("buttons")
+                    || qiscusComment.getRawType().equals("reply")
+                    || qiscusComment.getRawType().equals("card")) {
                 JsonObject payload = jsonComment.get("payload").getAsJsonObject();
                 if (payload.has("text")) {
                     String text = payload.get("text").getAsString();

@@ -75,7 +75,6 @@ public final class QiscusEncryptionHandler {
     private static boolean encryptAbleMessage(String rawType) {
         return TextUtils.isEmpty(rawType)
                 || rawType.equals("text")
-                || rawType.equals("file_attachment")
                 || rawType.equals("custom");
     }
 
@@ -168,7 +167,7 @@ public final class QiscusEncryptionHandler {
         }
 
         //We need to update payload with saved comment
-        if (comment.getType() == QiscusComment.Type.REPLY) {
+        if (comment.getRawType().equals("reply")) {
             try {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
                 comment.setMessage(payload.optString("text", comment.getMessage()));
@@ -183,6 +182,14 @@ public final class QiscusEncryptionHandler {
                     }
                     comment.setExtraPayload(payload.toString());
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (comment.getRawType().equals("file_attachment")) {
+            // We need to replace text with url from payload
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                comment.setMessage(String.format("[file] %s [/file]", payload.optString("url")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
