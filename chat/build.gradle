@@ -128,6 +128,7 @@ dependencies {
 
     //Network
     api "com.squareup.okhttp3:okhttp:${okhttpLibVersion}"
+    api "com.squareup.okhttp3:logging-interceptor:${okhttpLibVersion}"
     api "com.squareup.retrofit2:retrofit:${retrofitLibVersion}"
     api "com.squareup.retrofit2:converter-gson:${retrofitLibVersion}"
     api "com.squareup.retrofit2:adapter-rxjava:${retrofitLibVersion}"
