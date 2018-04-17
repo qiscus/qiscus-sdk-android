@@ -193,6 +193,27 @@ public final class QiscusEncryptionHandler {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (comment.getRawType().equals("location")) {
+            // We need to replace text with data from payload
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                comment.setMessage(
+                        payload.optString("name") + " - " + payload.optString("address")
+                                + "\n" + payload.optString("map_url")
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (comment.getRawType().equals("contact_person")) {
+            // We need to replace text with data from payload
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                comment.setMessage(
+                        payload.optString("name") + " - " + payload.optString("value")
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -214,9 +235,9 @@ public final class QiscusEncryptionHandler {
                 case "location":
                     payload.put("name", decrypt(senderId, payload.optString("name")));
                     payload.put("address", decrypt(senderId, payload.optString("address")));
-                    payload.put("map_url", decrypt(senderId, payload.optString("map_url")));
                     payload.put("latitude", Double.parseDouble(decrypt(senderId, payload.optString("latitude"))));
                     payload.put("longitude", Double.parseDouble(decrypt(senderId, payload.optString("longitude"))));
+                    payload.put("map_url", decrypt(senderId, payload.optString("map_url")));
                     break;
                 case "custom":
                     payload.put("content", new JSONObject(decrypt(senderId, payload.optString("content"))));
