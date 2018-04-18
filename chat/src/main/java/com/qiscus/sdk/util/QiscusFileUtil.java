@@ -328,10 +328,8 @@ public final class QiscusFileUtil {
             }
         } else {
             final File parent = file.getParentFile();
-            if (parent != null) {
-                if (!parent.mkdirs() && !parent.isDirectory()) {
-                    throw new IOException("Directory '" + parent + "' could not be created");
-                }
+            if (parent != null && !parent.mkdirs() && !parent.isDirectory()) {
+                throw new IOException("Directory '" + parent + "' could not be created");
             }
         }
         return new FileOutputStream(file, append);
