@@ -105,8 +105,10 @@ public final class QiscusEncryptionHandler {
             case "location":
                 payload.put("name", encrypt(recipientId, payload.optString("name")));
                 payload.put("address", encrypt(recipientId, payload.optString("address")));
-                payload.put("latitude", encrypt(recipientId, payload.optString("latitude")));
-                payload.put("longitude", encrypt(recipientId, payload.optString("longitude")));
+                payload.put("encrypted_latitude", encrypt(recipientId, payload.optString("latitude")));
+                payload.put("encrypted_longitude", encrypt(recipientId, payload.optString("longitude")));
+                payload.put("latitude", 0.0);
+                payload.put("longitude", 0.0);
                 payload.put("map_url", encrypt(recipientId, payload.optString("map_url")));
                 break;
             case "custom":
@@ -237,8 +239,12 @@ public final class QiscusEncryptionHandler {
                 case "location":
                     payload.put("name", decrypt(senderId, payload.optString("name")));
                     payload.put("address", decrypt(senderId, payload.optString("address")));
-                    payload.put("latitude", Double.parseDouble(decrypt(senderId, payload.optString("latitude"))));
-                    payload.put("longitude", Double.parseDouble(decrypt(senderId, payload.optString("longitude"))));
+                    Double latitude = Double.parseDouble(decrypt(senderId, payload.optString("encrypted_latitude")));
+                    Double longitude = Double.parseDouble(decrypt(senderId, payload.optString("encrypted_longitude")));
+                    payload.put("latitude", latitude);
+                    payload.put("longitude", longitude);
+                    payload.put("encrypted_latitude", latitude.toString());
+                    payload.put("encrypted_longitude", longitude.toString());
                     payload.put("map_url", decrypt(senderId, payload.optString("map_url")));
                     break;
                 case "custom":
@@ -322,6 +328,8 @@ public final class QiscusEncryptionHandler {
                     payload.put("address", ENCRYPTED_PLACE_HOLDER);
                     payload.put("latitude", 0.0);
                     payload.put("longitude", 0.0);
+                    payload.put("encrypted_latitude", "0.0");
+                    payload.put("encrypted_longitude", "0.0");
                     payload.put("map_url", ENCRYPTED_PLACE_HOLDER);
                     break;
                 case "custom":
