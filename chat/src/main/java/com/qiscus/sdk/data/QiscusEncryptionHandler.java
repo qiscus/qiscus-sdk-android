@@ -318,9 +318,9 @@ public final class QiscusEncryptionHandler {
                 case "location":
                     payload.put("name", ENCRYPTED_PLACE_HOLDER);
                     payload.put("address", ENCRYPTED_PLACE_HOLDER);
-                    payload.put("map_url", ENCRYPTED_PLACE_HOLDER);
                     payload.put("latitude", 0.0);
                     payload.put("longitude", 0.0);
+                    payload.put("map_url", ENCRYPTED_PLACE_HOLDER);
                     break;
                 case "custom":
                     payload.put("content", new JSONObject());
