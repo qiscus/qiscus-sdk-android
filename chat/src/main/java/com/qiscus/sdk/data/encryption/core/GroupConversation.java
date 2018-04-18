@@ -183,7 +183,9 @@ public class GroupConversation {
      * @throws SignatureException
      * @throws IOException
      */
-    public byte[] encrypt(byte[] plainText) throws InvalidKeyException, IllegalDataSizeException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException, SignatureException, IOException {
+    public byte[] encrypt(byte[] plainText) throws InvalidKeyException, IllegalDataSizeException,
+            NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchPaddingException,
+            BadPaddingException, IllegalBlockSizeException, SignatureException, IOException {
         byte[] iv = new byte[16];
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
         SecretKeySpec keySpec = new SecretKeySpec(getMessageKey(), "AES");
@@ -220,7 +222,8 @@ public class GroupConversation {
      * @throws SignatureException
      * @throws InvalidKeyException
      */
-    public byte[] decrypt(byte[] cipherText) throws DecryptionFailedException, AuthenticationException, IllegalDataSizeException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    public byte[] decrypt(byte[] cipherText) throws DecryptionFailedException, AuthenticationException,
+            IllegalDataSizeException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         byte[] iv = new byte[16];
 
         if (cipherText.length <= 64) {
