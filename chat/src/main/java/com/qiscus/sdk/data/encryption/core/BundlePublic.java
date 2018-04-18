@@ -54,6 +54,17 @@ public class BundlePublic implements Serializable {
         throw new NullPointerException();
     }
 
+    public PreKey fetch(PreKeyId preKeyId) {
+        PublicKey k = preKeys.get(preKeyId);
+        if (k == null) {
+            return null;
+        }
+
+        PreKey retval = new PreKey(preKeyId, k);
+        preKeys.remove(preKeyId);
+        return retval;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {

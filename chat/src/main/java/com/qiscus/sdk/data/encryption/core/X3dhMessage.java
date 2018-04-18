@@ -88,7 +88,8 @@ public class X3dhMessage {
      */
     public byte[] encode() {
         int size = 2 * 33 + // pub keys
-                32 + //prekey
+                1 + // prekey indicator
+                ((preKeyId == null) ? 0 : 32) + //prekey (if any)
                 message.length;
 
         byte[] data = new byte[size];
@@ -97,8 +98,13 @@ public class X3dhMessage {
         count += 33;
         System.arraycopy(ephKey.encode(), 0, data, count, 33);
         count += 33;
-        System.arraycopy(preKeyId.raw(), 0, data, count, 32);
-        count += 32;
+        if (preKeyId != null) {
+            data[count++] = 1;
+            System.arraycopy(preKeyId.raw(), 0, data, count, 32);
+            count += 32;
+        } else {
+            data[count++] = 0;
+        }
         System.arraycopy(message, 0, data, count, message.length);
         return data;
     }
@@ -121,8 +127,12 @@ public class X3dhMessage {
         count += 33;
         PublicKey ephKey = PublicKey.decode(raw, count);
         count += 33;
-        PreKeyId preKeyId = new PreKeyId(raw, count);
-        count += 32;
+        boolean hasPreKeyId = (raw[count++] == 1);
+        PreKeyId preKeyId = null;
+        if (hasPreKeyId) {
+            preKeyId = new PreKeyId(raw, count);
+            count += 32;
+        }
         byte[] message = new byte[raw.length - count];
         System.arraycopy(raw, count, message, 0, message.length);
         return new X3dhMessage(identity, ephKey, preKeyId, message);
@@ -145,22 +155,30 @@ public class X3dhMessage {
      */
     public static final SharedKey getSharedKeySender(KeyPair pair, BundlePrivate me, BundlePublic you, String info)
             throws NoSuchAlgorithmException {
+        return getSharedKeySender(pair, me, you, info, null);
+    }
+
+    /**
+     * Retrieves a shared key by a sender
+     *
+     * @param pair     A random ephemeral key pair
+     * @param me       A key bundle owned by sender
+     * @param you      A key bundle owned by recipient
+     * @param info     An info string
+     * @param preKeyId preKeyId
+     * @return A SharedKey object
+     */
+    public static final SharedKey getSharedKeySender(KeyPair pair, BundlePrivate me, BundlePublic you,
+                                                     String info, PreKeyId preKeyId) throws NoSuchAlgorithmException {
         byte[] dh1 = me.identity.shareSecret(you.spk.publicKey);
         byte[] dh2 = pair.privateKey.shareSecret(you.identity);
         byte[] dh3 = pair.privateKey.shareSecret(you.spk.publicKey);
 
-        PreKey preKey = null;
-        PreKeyId preKeyId = null;
-        try {
-            preKey = you.pop();
-            preKeyId = preKey.keyId;
-        } catch (NullPointerException e) {
-            // empty
-        }
+        PreKey preKey = you.fetch(preKeyId);
 
         byte[] keys;
         int count = 0;
-        if (preKeyId != null) {
+        if (preKeyId != null && preKey != null) {
             byte[] dh4 = pair.privateKey.shareSecret(preKey.publicKey);
             keys = new byte[dh1.length + dh2.length + dh3.length + dh4.length];
             System.arraycopy(dh1, 0, keys, count, dh1.length);
@@ -208,30 +226,39 @@ public class X3dhMessage {
      */
     public static final byte[] getSharedKeyRecipient(PublicKey ephKey, PreKeyId preKeyId,
                                                      BundlePrivate me, BundlePublic you, String info)
-            throws NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException, InvalidKeyException {
         byte[] dh1 = me.spk.shareSecret(you.identity);
         byte[] dh2 = me.identity.shareSecret(ephKey);
         byte[] dh3 = me.spk.shareSecret(ephKey);
 
-        PrivateKey oneTimePrivate = me.fetch(preKeyId);
-
         byte[] keys;
         int count = 0;
-        if (oneTimePrivate != null) {
-            byte[] dh4 = oneTimePrivate.shareSecret(ephKey);
 
-            keys = new byte[dh1.length + dh2.length + dh3.length + dh4.length];
-            System.arraycopy(dh1, 0, keys, count, dh1.length);
-            count += dh1.length;
-            System.arraycopy(dh2, 0, keys, count, dh2.length);
-            count += dh2.length;
-            System.arraycopy(dh3, 0, keys, count, dh3.length);
-            count += dh3.length;
-            System.arraycopy(dh4, 0, keys, count, dh4.length);
-            clearKey(dh1);
-            clearKey(dh2);
-            clearKey(dh3);
-            clearKey(dh4);
+        if (preKeyId != null) {
+            PrivateKey oneTimePrivate = me.fetch(preKeyId);
+
+            if (oneTimePrivate != null) {
+                byte[] dh4 = oneTimePrivate.shareSecret(ephKey);
+
+                keys = new byte[dh1.length + dh2.length + dh3.length + dh4.length];
+                System.arraycopy(dh1, 0, keys, count, dh1.length);
+                count += dh1.length;
+                System.arraycopy(dh2, 0, keys, count, dh2.length);
+                count += dh2.length;
+                System.arraycopy(dh3, 0, keys, count, dh3.length);
+                count += dh3.length;
+                System.arraycopy(dh4, 0, keys, count, dh4.length);
+                clearKey(dh1);
+                clearKey(dh2);
+                clearKey(dh3);
+                clearKey(dh4);
+            } else {
+                throw new InvalidKeyException();
+            }
+            if (oneTimePrivate != null) {
+                oneTimePrivate.clear();
+            }
+
         } else {
             keys = new byte[dh1.length + dh2.length + dh3.length];
             System.arraycopy(dh1, 0, keys, count, dh1.length);
@@ -249,9 +276,6 @@ public class X3dhMessage {
         Kdf kdf = Kdf.kdfSha512(keys, salt);
         byte[] kdfResult = kdf.get(info, 32);
 
-        if (oneTimePrivate != null) {
-            oneTimePrivate.clear();
-        }
         return kdfResult;
     }
 }

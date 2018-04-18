@@ -67,11 +67,18 @@ public class SesameConversation implements Serializable {
         this.recipientPublic = recipientPublic;
     }
 
+    /**
+     * Initializes Sesame as sender
+     *
+     * @throws IllegalDataSizeException
+     * @throws NoSuchAlgorithmException
+     * @throws EncryptionFailedException
+     */
     public void initializeSender() throws IllegalDataSizeException, NoSuchAlgorithmException, EncryptionFailedException {
         populateSecrets(true);
     }
 
-    public void populateSecrets(boolean isSender) throws NoSuchAlgorithmException, IllegalDataSizeException, EncryptionFailedException {
+    private void populateSecrets(boolean isSender) throws NoSuchAlgorithmException, IllegalDataSizeException, EncryptionFailedException {
         secrets = new HashMap<>();
         ratchets = new HashMap<>();
         Set<HashId> pubIds = recipientPublic.getIds();
@@ -111,7 +118,7 @@ public class SesameConversation implements Serializable {
         }
     }
 
-    public byte[] initializeRecipient(HashId id, byte[] message, boolean skipInitSecrets) throws SignatureException,
+    private byte[] initializeRecipient(HashId id, byte[] message, boolean skipInitSecrets) throws SignatureException,
             IllegalDataSizeException, InvalidKeyException, NoSuchAlgorithmException, EncryptionFailedException {
         ByteBuffer b = ByteBuffer.wrap(message, 0, 8);
         if (b.getInt() != Constants.RidonMagix) {
@@ -201,7 +208,7 @@ public class SesameConversation implements Serializable {
         }
     }
 
-    public void prepEncrypt() {
+    private void prepEncrypt() {
         if (senderName == recipientName) {
             return;
         }
@@ -215,7 +222,7 @@ public class SesameConversation implements Serializable {
         }
     }
 
-    public void addNewContactIfEmpty(String id) {
+    private void addNewContactIfEmpty(String id) {
         SesameContact contact = new SesameContact(id);
 
         Set<HashId> pubIds = recipientPublic.getIds();
@@ -228,7 +235,7 @@ public class SesameConversation implements Serializable {
         contacts.put(id, contact);
     }
 
-    public HashId fetchActiveSession(String id) {
+    private HashId fetchActiveSession(String id) {
         SesameContact contact = contacts.get(id);
         if (contact != null && contact.activeSessions.size() > 0) {
             return contact.activeSessions.get(0);
@@ -236,6 +243,28 @@ public class SesameConversation implements Serializable {
         return null;
     }
 
+    /**
+     * Encrypts plain text. It returns a byte array formatted as follows:
+     * <p>
+     * type      description
+     * int       the number of encrypted data
+     * <p>
+     * then followed with the data below for a number of times specified above
+     * <p>
+     * type      description
+     * int       the length of the encrypted data
+     * byte[]    the actual encrypted data with the size specified above
+     * <p>
+     * This returned data can be unpacked into a HashMap using ::unpackEncrypted() function
+     *
+     * @param data the plain text
+     * @return byte array containing formatted data
+     * @throws EncryptionFailedException
+     * @throws NoSuchAlgorithmException
+     * @throws IllegalDataSizeException
+     * @throws InvalidKeyException
+     * @throws IOException
+     */
     public byte[] encrypt(byte[] data) throws EncryptionFailedException, NoSuchAlgorithmException,
             IllegalDataSizeException, InvalidKeyException, IOException {
         prepEncrypt();
@@ -285,6 +314,13 @@ public class SesameConversation implements Serializable {
         ByteArrayInputStream input = new ByteArrayInputStream(raw);
         HashMap<HashId, byte[]> retval = new HashMap<>();
 
+        /**
+         * Data format:
+         * int    num of encrypted data
+         * ---for each encrypted data
+         *     int     length of the data
+         *     byte[]  actual data
+         */
         byte[] b = new byte[4];
         input.read(b);
         ByteBuffer buffer = ByteBuffer.wrap(b);
@@ -297,13 +333,14 @@ public class SesameConversation implements Serializable {
             int len = buffer.getInt();
             byte[] data = new byte[len];
             input.read(data);
+            // Get the recipient hash id which is placed just after the sender hash id
             System.arraycopy(data, HashId.SIZE, h, 0, HashId.SIZE);
             retval.put(new HashId(h), data);
         }
         return retval;
     }
 
-    public byte[] doEncrypt(HashId id, byte[] data) throws IOException, EncryptionFailedException,
+    private byte[] doEncrypt(HashId id, byte[] data) throws IOException, EncryptionFailedException,
             IllegalDataSizeException, NoSuchAlgorithmException, InvalidKeyException, IOException {
         SesameConversationSecret secret = secrets.get(id);
         if (secret == null) {
@@ -349,7 +386,7 @@ public class SesameConversation implements Serializable {
         return ret.toByteArray();
     }
 
-    public void resetActiveSession(HashId id) {
+    private void resetActiveSession(HashId id) {
         SesameConversationSecret secret = secrets.get(id);
         if (secret != null && secret.message.length > 0) {
             secret.message = new byte[0];
