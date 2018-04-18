@@ -101,6 +101,7 @@ public class QiscusComment implements Parcelable {
     private QiscusComment replyTo;
     private String caption;
     private String attachmentName;
+    private String attachmentEncryptionKey;
 
     public static QiscusComment generateMessage(long roomId, String content) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
@@ -523,6 +524,22 @@ public class QiscusComment implements Parcelable {
         }
 
         return attachmentName;
+    }
+
+    public String getAttachmentEncryptionKey() {
+        if (!isAttachment()) {
+            throw new RuntimeException("Current comment is not an attachment");
+        }
+
+        if (attachmentEncryptionKey == null) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                attachmentEncryptionKey = payload.optString("encryption_key", "");
+            } catch (Exception ignored) {
+                //Do nothing
+            }
+        }
+        return attachmentEncryptionKey;
     }
 
     public String getExtension() {

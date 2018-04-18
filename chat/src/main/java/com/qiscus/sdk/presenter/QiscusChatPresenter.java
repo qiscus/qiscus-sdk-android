@@ -620,7 +620,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             qiscusComment.setDownloading(true);
             QiscusApi.getInstance()
                     .downloadFile(qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
-                            percentage -> qiscusComment.setProgress((int) percentage))
+                            qiscusComment.getAttachmentEncryptionKey(), percentage -> qiscusComment.setProgress((int) percentage))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())

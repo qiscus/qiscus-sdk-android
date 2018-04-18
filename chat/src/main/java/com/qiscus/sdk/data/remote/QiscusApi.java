@@ -48,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -365,9 +366,10 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<File> downloadFile(String url, String fileName, ProgressListener progressListener) {
+    public Observable<File> downloadFile(String url, String fileName, String key, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
-            InputStream inputStream = null;
+            InputStream responseInputStream = null;
+            InputStream fileInputStream = null;
             FileOutputStream fos = null;
             try {
                 Request request = new Request.Builder().url(url).build();
@@ -379,22 +381,48 @@ public enum QiscusApi {
                 if (!response.isSuccessful()) {
                     throw new IOException();
                 } else {
+                    boolean enableEncryption = Qiscus.getChatConfig().isEnableEndToEndEncryption();
                     ResponseBody responseBody = response.body();
                     long fileLength = responseBody.contentLength();
+                    if (enableEncryption) {
+                        fileLength *= 2;
+                    }
 
-                    inputStream = responseBody.byteStream();
+                    // Write downloaded file
+                    responseInputStream = responseBody.byteStream();
                     byte[] buffer = new byte[4096];
                     long total = 0;
                     int count;
-                    while ((count = inputStream.read(buffer)) != -1) {
+                    long currentProgress = 0;
+                    while ((count = responseInputStream.read(buffer)) != -1) {
                         total += count;
-                        long totalCurrent = total;
+                        currentProgress = total;
                         if (fileLength > 0) {
-                            progressListener.onProgress((totalCurrent * 100 / fileLength));
+                            progressListener.onProgress((currentProgress * 100 / fileLength));
                         }
                         fos.write(buffer, 0, count);
                     }
                     fos.flush();
+
+                    if (enableEncryption) {
+                        HashId hashId = new HashId(Base64.decode(key, Base64.DEFAULT));
+                        File decryptedFile = QiscusFileEncryptionHandler.decrypt(hashId, output);
+
+                        // Overwrite file with decrypted file
+                        fileInputStream = new FileInputStream(decryptedFile);
+                        total = 0;
+                        while ((count = fileInputStream.read(buffer)) != -1) {
+                            total += count;
+                            currentProgress += count;
+                            if (fileLength > 0) {
+                                progressListener.onProgress((currentProgress * 100 / fileLength));
+                            }
+                            fos.write(buffer, 0, count);
+                        }
+                        fos.flush();
+
+                        decryptedFile.delete();
+                    }
 
                     subscriber.onNext(output);
                     subscriber.onCompleted();
@@ -406,8 +434,11 @@ public enum QiscusApi {
                     if (fos != null) {
                         fos.close();
                     }
-                    if (inputStream != null) {
-                        inputStream.close();
+                    if (responseInputStream != null) {
+                        responseInputStream.close();
+                    }
+                    if (fileInputStream != null) {
+                        fileInputStream.close();
                     }
                 } catch (IOException ignored) {
                     //Do nothing
