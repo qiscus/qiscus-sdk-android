@@ -25,6 +25,7 @@ import android.provider.OpenableColumns;
 
 import com.qiscus.sdk.Qiscus;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -238,5 +239,101 @@ public final class QiscusFileUtil {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         mediaScanIntent.setData(Uri.fromFile(file));
         Qiscus.getApps().sendBroadcast(mediaScanIntent);
+    }
+
+    /**
+     * Reads the contents of a file into a byte array.
+     * The file is always closed.
+     *
+     * @param file the file to read, must not be {@code null}
+     * @return the file contents, never {@code null}
+     * @throws IOException in case of an I/O error
+     */
+    public static byte[] readFileToByteArray(final File file) throws IOException {
+        try (InputStream in = openInputStream(file)) {
+            final long fileLength = file.length();
+            // file.length() may return 0 for system-dependent entities, treat 0 as unknown length - see IO-453
+            return fileLength > 0 ? toByteArray(in, fileLength) : toByteArray(in);
+        }
+    }
+
+    public static FileInputStream openInputStream(final File file) throws IOException {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new IOException("File '" + file + "' exists but is a directory");
+            }
+            if (!file.canRead()) {
+                throw new IOException("File '" + file + "' cannot be read");
+            }
+        } else {
+            throw new FileNotFoundException("File '" + file + "' does not exist");
+        }
+        return new FileInputStream(file);
+    }
+
+    public static byte[] toByteArray(final InputStream input, final long size) throws IOException {
+
+        if (size > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Size cannot be greater than Integer max value: " + size);
+        }
+
+        return toByteArray(input, (int) size);
+    }
+
+    public static byte[] toByteArray(final InputStream input, final int size) throws IOException {
+
+        if (size < 0) {
+            throw new IllegalArgumentException("Size must be equal or greater than zero: " + size);
+        }
+
+        if (size == 0) {
+            return new byte[0];
+        }
+
+        final byte[] data = new byte[size];
+        int offset = 0;
+        int read;
+
+        while (offset < size && (read = input.read(data, offset, size - offset)) != EOF) {
+            offset += read;
+        }
+
+        if (offset != size) {
+            throw new IOException("Unexpected read size. current: " + offset + ", expected: " + size);
+        }
+
+        return data;
+    }
+
+    public static byte[] toByteArray(final InputStream input) throws IOException {
+        try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            copy(input, output);
+            return output.toByteArray();
+        }
+    }
+
+    public static void writeByteArrayToFile(final File file, final byte[] data) throws IOException {
+        try (OutputStream out = openOutputStream(file, false)) {
+            out.write(data, 0, data.length);
+        }
+    }
+
+    public static FileOutputStream openOutputStream(final File file, final boolean append) throws IOException {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new IOException("File '" + file + "' exists but is a directory");
+            }
+            if (!file.canWrite()) {
+                throw new IOException("File '" + file + "' cannot be written to");
+            }
+        } else {
+            final File parent = file.getParentFile();
+            if (parent != null) {
+                if (!parent.mkdirs() && !parent.isDirectory()) {
+                    throw new IOException("Directory '" + parent + "' could not be created");
+                }
+            }
+        }
+        return new FileOutputStream(file, append);
     }
 }

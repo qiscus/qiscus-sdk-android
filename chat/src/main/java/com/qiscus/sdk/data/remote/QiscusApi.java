@@ -19,6 +19,7 @@ package com.qiscus.sdk.data.remote;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.util.Base64;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,6 +28,8 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
 import com.qiscus.sdk.data.QiscusEncryptionHandler;
+import com.qiscus.sdk.data.QiscusFileEncryptionHandler;
+import com.qiscus.sdk.data.encryption.core.HashId;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -311,15 +314,30 @@ public enum QiscusApi {
         return sync(latestComment.getId());
     }
 
-    public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
+    public Observable<Pair<Uri, String>> uploadFile(File file, ProgressListener progressListener) {
         return Observable.create(subscriber -> {
-            long fileLength = file.length();
+            File finalFile = file;
+            String key = "";
+            boolean enableEncryption = Qiscus.getChatConfig().isEnableEndToEndEncryption();
+            if (enableEncryption) {
+                try {
+                    HashId hashId = HashId.random();
+                    key = Base64.encodeToString(hashId.raw(), Base64.DEFAULT);
+                    finalFile = QiscusFileEncryptionHandler.encrypt(hashId, finalFile);
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                    subscriber.onCompleted();
+                    return;
+                }
+            }
+            long fileLength = finalFile.length();
 
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("token", Qiscus.getToken())
-                    .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
+                    .addFormDataPart("encrypted", String.valueOf(enableEncryption))
+                    .addFormDataPart("file", finalFile.getName(),
+                            new CountingFileRequestBody(finalFile, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
                                 progressListener.onProgress(progress);
                             }))
@@ -334,11 +352,15 @@ public enum QiscusApi {
                 JSONObject responseJ = new JSONObject(response.body().string());
                 String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
 
-                subscriber.onNext(Uri.parse(result));
+                subscriber.onNext(Pair.create(Uri.parse(result), key));
                 subscriber.onCompleted();
             } catch (IOException | JSONException e) {
                 QiscusErrorLogger.print("UploadFile", e);
                 subscriber.onError(e);
+            } finally {
+                if (enableEncryption) {
+                    finalFile.delete();
+                }
             }
         }, Emitter.BackpressureMode.BUFFER);
     }

@@ -138,8 +138,9 @@ public final class QiscusResendCommentHandler {
 
         Subscription subscription = QiscusApi.getInstance()
                 .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
-                .flatMap(uri -> {
-                    qiscusComment.updateAttachmentUrl(uri.toString());
+                .flatMap(data -> {
+                    qiscusComment.updateAttachmentUrl(data.first.toString());
+                    qiscusComment.setAttachmentEncryptionKey(data.second);
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
                 .doOnNext(commentSend -> {

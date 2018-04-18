@@ -449,6 +449,16 @@ public class QiscusComment implements Parcelable {
         }
     }
 
+    public void setAttachmentEncryptionKey(String key) {
+        try {
+            JSONObject json = new JSONObject(getExtraPayload());
+            json.put("encryption_key", key);
+            setExtraPayload(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean isAttachment() {
         String trimmedMessage = message.trim();
         return (trimmedMessage.startsWith("[file]") && trimmedMessage.endsWith("[/file]"))

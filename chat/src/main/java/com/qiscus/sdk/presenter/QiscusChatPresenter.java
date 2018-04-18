@@ -222,8 +222,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         Subscription subscription = QiscusApi.getInstance()
                 .uploadFile(compressedFile, percentage -> qiscusComment.setProgress((int) percentage))
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                .flatMap(uri -> {
-                    qiscusComment.updateAttachmentUrl(uri.toString());
+                .flatMap(data -> {
+                    qiscusComment.updateAttachmentUrl(data.first.toString());
+                    qiscusComment.setAttachmentEncryptionKey(data.second);
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
                 .doOnNext(commentSend -> {
@@ -270,8 +271,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         Subscription subscription = QiscusApi.getInstance()
                 .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                .flatMap(uri -> {
-                    qiscusComment.updateAttachmentUrl(uri.toString());
+                .flatMap(data -> {
+                    qiscusComment.updateAttachmentUrl(data.first.toString());
+                    qiscusComment.setAttachmentEncryptionKey(data.second);
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
                 .doOnNext(commentSend -> {
