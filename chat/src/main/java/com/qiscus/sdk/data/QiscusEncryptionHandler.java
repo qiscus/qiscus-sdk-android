@@ -96,6 +96,7 @@ public final class QiscusEncryptionHandler {
                 payload.put("url", encrypt(recipientId, payload.optString("url")));
                 payload.put("file_name", encrypt(recipientId, payload.optString("file_name")));
                 payload.put("caption", encrypt(recipientId, payload.optString("caption")));
+                payload.put("encryption_key", encrypt(recipientId, payload.optString("encryption_key")));
                 break;
             case "contact_person":
                 payload.put("name", encrypt(recipientId, payload.optString("name")));
@@ -227,6 +228,7 @@ public final class QiscusEncryptionHandler {
                     payload.put("url", decrypt(senderId, payload.optString("url")));
                     payload.put("file_name", decrypt(senderId, payload.optString("file_name")));
                     payload.put("caption", decrypt(senderId, payload.optString("caption")));
+                    payload.put("encryption_key", decrypt(senderId, payload.optString("encryption_key")));
                     break;
                 case "contact_person":
                     payload.put("name", decrypt(senderId, payload.optString("name")));
