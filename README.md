@@ -30,6 +30,7 @@ When you try our chat SDK, you will find the default built-in features such as:
 * Reply message 
 * Pending messages
 * Emoji support
+* Delete Message
 
 You also can access more advance and customizable features such as :
 
@@ -313,6 +314,26 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
           }
        });
 ```
+
+## Channel
+
+Channel is a room that behave similar like a group chat, in channel anyone can join using the room uniqueId, there are several limitation on channel like : no typing indicator, no read/deliver status, no comment info, and “delete for me” is not available. Here how you can create or join a Channel Room:
+
+```java
+Qiscus.buildGroupChatRoomWith("ChannelName")
+      .withAvatar("http://avatar.url.com/channel.jpg")
+      .build(new Qiscus.ChatBuilderListener() {
+          @Override
+          public void onSuccess(QiscusChatRoom qiscusChatRoom) {
+              startActivity(QiscusChannelActivity.generateIntent(MainActivity.this, qiscusChatRoom));
+          }
+
+          @Override
+          public void onError(Throwable throwable) {
+              //do anything if error occurs
+          }
+       });
+``` 
 
 ### Room Participant Management
 
