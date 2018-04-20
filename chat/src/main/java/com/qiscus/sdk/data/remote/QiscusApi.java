@@ -431,7 +431,7 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<Long> getTotalUnreadCount(){
+    public Observable<Long> getTotalUnreadCount() {
         return api.getTotalUnreadCount(Qiscus.getToken())
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
