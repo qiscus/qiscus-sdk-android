@@ -65,8 +65,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private QiscusChatRoom room;
     private QiscusAccount qiscusAccount;
-    private Func2<QiscusComment, QiscusComment, Integer> commentComparator = (lhs, rhs) -> lhs.getId() != -1 && rhs.getId() != -1 ?
-            QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime());
+    private Func2<QiscusComment, QiscusComment, Integer> commentComparator = (lhs, rhs) -> rhs.getTime().compareTo(lhs.getTime());
 
     private Map<QiscusComment, Subscription> pendingTask;
 
@@ -350,8 +349,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     roomEventHandler.setRoom(roomData.first);
                     roomEventHandler.transformCommentState(roomData.second, false);
 
-                    Collections.sort(roomData.second, (lhs, rhs) -> lhs.getId() != -1 && rhs.getId() != -1 ?
-                            QiscusAndroidUtil.compare(rhs.getId(), lhs.getId()) : rhs.getTime().compareTo(lhs.getTime()));
+                    Collections.sort(roomData.second, (lhs, rhs) -> rhs.getTime().compareTo(lhs.getTime()));
 
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
                 })
