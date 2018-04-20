@@ -314,6 +314,26 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
        });
 ```
 
+## Channel
+
+Channel is a room that behave similar like a group chat, in channel anyone can join using the room uniqueId, there are several limitation on channel like : no typing indicator, no read/deliver status, no comment info, and “delete for me” is not available. Here how you can create or join a Channel Room:
+
+```java
+Qiscus.buildGroupChatRoomWith("ChannelName")
+      .withAvatar("http://avatar.url.com/channel.jpg")
+      .build(new Qiscus.ChatBuilderListener() {
+          @Override
+          public void onSuccess(QiscusChatRoom qiscusChatRoom) {
+              startActivity(QiscusChannelActivity.generateIntent(MainActivity.this, qiscusChatRoom));
+          }
+
+          @Override
+          public void onError(Throwable throwable) {
+              //do anything if error occurs
+          }
+       });
+``` 
+
 ### Room Participant Management
 
 In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi). 
