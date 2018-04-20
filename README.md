@@ -30,6 +30,7 @@ When you try our chat SDK, you will find the default built-in features such as:
 * Reply message 
 * Pending messages
 * Emoji support
+* Delete Message
 
 You also can access more advance and customizable features such as :
 
