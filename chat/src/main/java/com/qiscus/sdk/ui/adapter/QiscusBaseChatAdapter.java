@@ -31,7 +31,6 @@ import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 
 import java.util.ArrayList;
@@ -185,7 +184,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         } else if (rhs.getId() == -1 && lhs.getId() == -1) { //Not completed comments
             return rhs.getTime().compareTo(lhs.getTime());
         } else if (rhs.getId() != -1 && lhs.getId() != -1) { //Completed comments
-            return QiscusAndroidUtil.compare(rhs.getId(), lhs.getId());
+            return rhs.getTime().compareTo(lhs.getTime());
         } else if (rhs.getId() == -1) {
             return 1;
         } else if (lhs.getId() == -1) {

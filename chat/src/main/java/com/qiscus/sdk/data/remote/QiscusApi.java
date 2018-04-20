@@ -46,9 +46,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
@@ -209,6 +213,13 @@ public enum QiscusApi {
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
                     qiscusComment.setId(jsonComment.get("id").getAsLong());
                     qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
+                    try {
+                        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
+                    } catch (Exception e) {
+                        // Ignore
+                    }
                     QiscusLogger.print("Sent Comment...");
                     return qiscusComment;
                 })
@@ -431,6 +442,13 @@ public enum QiscusApi {
                 .toList();
     }
 
+    public Observable<Long> getTotalUnreadCount() {
+        return api.getTotalUnreadCount(Qiscus.getToken())
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
+                .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
+    }
+
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -553,6 +571,9 @@ public enum QiscusApi {
         @GET("/api/v2/mobile/sync_event")
         Observable<JsonElement> getEvents(@Query("token") String token,
                                           @Query("start_event_id") long startEventId);
+
+        @GET("/api/v2/sdk/total_unread_count")
+        Observable<JsonElement> getTotalUnreadCount(@Query("token") String token);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
