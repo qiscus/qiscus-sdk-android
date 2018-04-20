@@ -431,6 +431,13 @@ public enum QiscusApi {
                 .toList();
     }
 
+    public Observable<Long> getTotalUnreadCount() {
+        return api.getTotalUnreadCount(Qiscus.getToken())
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
+                .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
+    }
+
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -553,6 +560,9 @@ public enum QiscusApi {
         @GET("/api/v2/mobile/sync_event")
         Observable<JsonElement> getEvents(@Query("token") String token,
                                           @Query("start_event_id") long startEventId);
+
+        @GET("/api/v2/sdk/total_unread_count")
+        Observable<JsonElement> getTotalUnreadCount(@Query("token") String token);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
