@@ -757,6 +757,27 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         }
     }
 
+    private QiscusComment getComment(long id) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ID + " = " + id;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        if (cursor.moveToNext()) {
+            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+            cursor.close();
+            return qiscusComment;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
     @Override
     public QiscusComment getComment(long id) {
         if (id < 0) {
@@ -923,10 +944,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, long roomId) {
+        QiscusComment savedComment = getComment(qiscusComment.getId());
+        if (savedComment == null) {
+            return new ArrayList<>();
+        }
+
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND ("
-                + QiscusDb.CommentTable.COLUMN_ID + " >= " + qiscusComment.getId() + " OR "
+                + QiscusDb.CommentTable.COLUMN_TIME + " >= " + savedComment.getTime().getTime() + " OR "
                 + QiscusDb.CommentTable.COLUMN_ID + " = -1) "
                 + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
@@ -958,7 +984,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC "
+                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + "LIMIT " + 1;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
@@ -1004,7 +1030,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
                 + " AND " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
                 + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_DELIVERED
-                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC"
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
@@ -1028,7 +1054,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
                 + " AND " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
                 + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_READ
-                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_ID + " DESC"
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
