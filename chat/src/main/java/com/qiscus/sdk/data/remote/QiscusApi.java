@@ -347,7 +347,7 @@ public enum QiscusApi {
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("token", Qiscus.getToken())
-                    .addFormDataPart("encrypted", String.valueOf(enableEncryption))
+                    .addFormDataPart("is_encrypted", String.valueOf(enableEncryption))
                     .addFormDataPart("file", finalFile.getName(),
                             new CountingFileRequestBody(finalFile, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
