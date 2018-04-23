@@ -757,27 +757,6 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         }
     }
 
-    private QiscusComment getComment(long id) {
-        String query = "SELECT * FROM "
-                + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_ID + " = " + id;
-
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-        if (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
-            if (qiscusRoomMember != null) {
-                qiscusComment.setSender(qiscusRoomMember.getUsername());
-                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
-            }
-            cursor.close();
-            return qiscusComment;
-        } else {
-            cursor.close();
-            return null;
-        }
-    }
-
     @Override
     public QiscusComment getComment(long id) {
         if (id < 0) {
