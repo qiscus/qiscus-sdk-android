@@ -304,10 +304,21 @@ final class QiscusApiParser {
             }
         }
 
+        if (lastDelivered == Long.MAX_VALUE) {
+            lastDelivered = 0;
+        }
+
+        if (lastRead == Long.MAX_VALUE) {
+            lastRead = 0;
+        }
+
         return Pair.create(lastDelivered, lastRead);
     }
 
     private static void determineCommentState(QiscusComment comment, List<QiscusRoomMember> members) {
+        if (members == null || members.isEmpty()) {
+            return;
+        }
         Pair<Long, Long> lastMemberState = getPairedLastState(members);
         if (comment.getId() > lastMemberState.first) {
             comment.setState(QiscusComment.STATE_ON_QISCUS);
