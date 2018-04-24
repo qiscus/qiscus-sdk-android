@@ -71,6 +71,7 @@ public class QiscusComment implements Parcelable {
     protected Date time;
     protected int state;
     protected boolean deleted;
+    protected boolean hardDeleted;
     protected String roomName;
     protected String roomAvatar;
     protected boolean groupMessage;
@@ -236,6 +237,7 @@ public class QiscusComment implements Parcelable {
         time = new Date(in.readLong());
         state = in.readInt();
         deleted = in.readByte() != 0;
+        hardDeleted = in.readByte() != 0;
         selected = in.readByte() != 0;
         rawType = in.readString();
         extraPayload = in.readString();
@@ -345,6 +347,14 @@ public class QiscusComment implements Parcelable {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public boolean isHardDeleted() {
+        return hardDeleted;
+    }
+
+    public void setHardDeleted(boolean hardDeleted) {
+        this.hardDeleted = hardDeleted;
     }
 
     public String getRoomName() {
@@ -841,6 +851,7 @@ public class QiscusComment implements Parcelable {
                 ", time=" + time +
                 ", state=" + state +
                 ", deleted=" + deleted +
+                ", hardDeleted=" + hardDeleted +
                 '}';
     }
 
@@ -865,6 +876,7 @@ public class QiscusComment implements Parcelable {
         dest.writeLong(time.getTime());
         dest.writeInt(state);
         dest.writeByte((byte) (deleted ? 1 : 0));
+        dest.writeByte((byte) (hardDeleted ? 1 : 0));
         dest.writeByte((byte) (selected ? 1 : 0));
         dest.writeString(rawType);
         dest.writeString(extraPayload);
@@ -891,6 +903,7 @@ public class QiscusComment implements Parcelable {
                 && time.equals(qiscusComment.time)
                 && state == qiscusComment.state
                 && deleted == qiscusComment.deleted
+                && hardDeleted == qiscusComment.hardDeleted
                 && selected == qiscusComment.selected
                 && highlighted == qiscusComment.highlighted
                 && downloading == qiscusComment.downloading

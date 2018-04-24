@@ -64,10 +64,6 @@ public final class QiscusDeleteCommentHandler {
                         qiscusComment.setDeleted(true);
 
                         setRoomData(qiscusComment);
-                        QiscusChatRoom chatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
-                        qiscusComment.setRoomName(chatRoom.getName());
-                        qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
-                        qiscusComment.setGroupMessage(chatRoom.isGroup());
                     }
                     return qiscusComment;
                 })
@@ -92,6 +88,10 @@ public final class QiscusDeleteCommentHandler {
                 .map(deletedComment -> {
                     QiscusComment qiscusComment = Qiscus.getDataStore().getComment(deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
+                        qiscusComment.setMessage("This message has been deleted.");
+                        qiscusComment.setRawType("text");
+                        qiscusComment.setDeleted(true);
+                        qiscusComment.setHardDeleted(true);
                         setRoomData(qiscusComment);
                     }
 
@@ -106,7 +106,8 @@ public final class QiscusDeleteCommentHandler {
                         Qiscus.getDataStore().addOrUpdate(commentAfter);
                     }
 
-                    Qiscus.getDataStore().delete(qiscusComment);
+                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                    Qiscus.getDataStore().deleteLocalPath(qiscusComment.getId());
                     EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
                 })
                 .toList()
