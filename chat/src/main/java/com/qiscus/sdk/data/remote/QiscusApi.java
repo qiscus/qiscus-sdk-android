@@ -420,6 +420,10 @@ public enum QiscusApi {
                         File decryptedFile = QiscusFileEncryptionHandler.decrypt(hashId, output);
 
                         // Overwrite file with decrypted file
+                        buffer = new byte[4096];
+                        output.delete();
+                        output = new File(QiscusFileUtil.generateFilePath(fileName));
+                        fos = new FileOutputStream(output.getPath());
                         fileInputStream = new FileInputStream(decryptedFile);
                         total = 0;
                         while ((count = fileInputStream.read(buffer)) != -1) {
