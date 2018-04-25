@@ -155,9 +155,9 @@ dependencies {
     api 'com.qiscus.utils:jupuk:1.0.4'
 
     //Place picker
-    compile "com.google.android.gms:play-services-places:${playServicesLibVersion}"
+    api "com.google.android.gms:play-services-places:${playServicesLibVersion}"
 
     //Encryption
-    compile 'at.favre.lib:hkdf:1.0.0'
-    compile 'commons-codec:commons-codec:1.11'
+    api 'at.favre.lib:hkdf:1.0.0'
+    api 'commons-codec:commons-codec:1.11'
 }
