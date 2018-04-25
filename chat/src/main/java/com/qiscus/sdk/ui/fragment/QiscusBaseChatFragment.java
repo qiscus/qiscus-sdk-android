@@ -647,7 +647,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         handleForward();
     }
 
-    private void handleForward() {
+    protected void handleForward() {
         if (forwardComments != null) {
             QiscusAndroidUtil.runOnUIThread(() -> qiscusChatPresenter.forward(forwardComments), 800);
         }
@@ -655,14 +655,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private void handleExtra() {
         if (startingMessage != null && !startingMessage.isEmpty() && shareFiles != null && !shareFiles.isEmpty()) {
-            qiscusChatPresenter.sendComment(startingMessage);
+            sendMessage(startingMessage);
             QiscusAndroidUtil.runOnUIThread(() -> sendFiles(shareFiles), 800);
             return;
         }
 
         if (autoSendExtra) {
             if (startingMessage != null && !startingMessage.isEmpty()) {
-                QiscusAndroidUtil.runOnUIThread(() -> qiscusChatPresenter.sendComment(startingMessage), 800);
+                QiscusAndroidUtil.runOnUIThread(() -> sendMessage(startingMessage), 800);
             }
 
             if (shareFiles != null && !shareFiles.isEmpty()) {

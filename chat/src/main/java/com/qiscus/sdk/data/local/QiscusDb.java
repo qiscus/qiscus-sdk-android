@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 15;
+    static final int DATABASE_VERSION = 16;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -187,6 +187,7 @@ final class QiscusDb {
         static final String COLUMN_TIME = "time";
         static final String COLUMN_STATE = "state";
         static final String COLUMN_DELETED = "deleted";
+        static final String COLUMN_HARD_DELETED = "hard_deleted";
         static final String COLUMN_TYPE = "type";
         static final String COLUMN_PAYLOAD = "payload";
         static final String COLUMN_EXTRAS = "extras";
@@ -204,6 +205,7 @@ final class QiscusDb {
                         COLUMN_TIME + " LONG NOT NULL," +
                         COLUMN_STATE + " INTEGER NOT NULL," +
                         COLUMN_DELETED + " INTEGER DEFAULT 0," +
+                        COLUMN_HARD_DELETED + " INTEGER DEFAULT 0," +
                         COLUMN_TYPE + " TEXT," +
                         COLUMN_PAYLOAD + " TEXT, " +
                         COLUMN_EXTRAS + " TEXT " +
@@ -222,6 +224,7 @@ final class QiscusDb {
             values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
             values.put(COLUMN_STATE, qiscusComment.getState());
             values.put(COLUMN_DELETED, qiscusComment.isDeleted() ? 1 : 0);
+            values.put(COLUMN_HARD_DELETED, qiscusComment.isHardDeleted() ? 1 : 0);
             values.put(COLUMN_TYPE, qiscusComment.getRawType());
             values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
             values.put(COLUMN_EXTRAS, qiscusComment.getExtras() == null ? null :
@@ -242,6 +245,7 @@ final class QiscusDb {
             qiscusComment.setTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
             qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             qiscusComment.setDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETED)) == 1);
+            qiscusComment.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
             qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
             try {

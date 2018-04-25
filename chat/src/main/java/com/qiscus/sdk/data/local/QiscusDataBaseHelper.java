@@ -809,7 +809,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public List<QiscusComment> getComments(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
+                + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
@@ -831,7 +832,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public List<QiscusComment> getComments(long roomId, int limit) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
+                + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + limit;
 
@@ -855,7 +857,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
-                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + timestampOffset
+                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + timestampOffset + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
@@ -894,7 +897,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
-                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + qiscusComment.getTime().getTime()
+                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + qiscusComment.getTime().getTime() + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + limit;
 
@@ -932,8 +936,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND ("
                 + QiscusDb.CommentTable.COLUMN_TIME + " >= " + savedComment.getTime().getTime() + " OR "
-                + QiscusDb.CommentTable.COLUMN_ID + " = -1) "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
+                + QiscusDb.CommentTable.COLUMN_ID + " = -1) " + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
@@ -962,9 +967,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public QiscusComment getLatestComment() {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
-                + "ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
-                + "LIMIT " + 1;
+                + QiscusDb.CommentTable.COLUMN_ID + " != -1 " + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
+                + " LIMIT " + 1;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;
@@ -984,7 +990,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public QiscusComment getLatestComment(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME
-                + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
+                + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
@@ -1085,7 +1092,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String sql = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
-                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' "
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' " + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + " LIMIT " + limit + " OFFSET " + offset;
 
@@ -1108,7 +1116,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public List<QiscusComment> searchComments(String query, int limit, int offset) {
         String sql = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' "
+                + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' " + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + " LIMIT " + limit + " OFFSET " + offset;
 
