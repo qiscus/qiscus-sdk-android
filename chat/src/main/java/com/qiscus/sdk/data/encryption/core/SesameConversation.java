@@ -87,7 +87,6 @@ public class SesameConversation implements Serializable {
             HashId id = it.next();
             BundlePublic bundlePublic = recipientPublic.get(id);
 
-            Ratchet r = new Ratchet();
             if (isSender) {
                 KeyPair ephKey = new KeyPair();
                 SharedKey sk = X3dhMessage.getSharedKeySender(ephKey,
@@ -95,7 +94,6 @@ public class SesameConversation implements Serializable {
                         bundlePublic,
                         Constants.RidonSesameSharedKey);
 
-                r.initSender(bundlePublic.spk.publicKey, new Key(sk.key));
                 byte[] m = Constants.RidonSecretMessage.getBytes();
 
                 byte[] ad = new byte[PublicKey.ESIZE * 2];
@@ -111,10 +109,13 @@ public class SesameConversation implements Serializable {
                 byte[] msgEncoded = msg.encode();
                 SesameConversationSecret secret = new SesameConversationSecret(msgEncoded, msgEncoded.length, adHash);
                 secrets.put(id, secret);
+
+                Ratchet r = new Ratchet();
+                r.initSender(bundlePublic.spk.publicKey, new Key(sk.key));
+                ratchets.put(id, r);
             } else {
                 secrets.put(id, new SesameConversationSecret());
             }
-            ratchets.put(id, r);
         }
     }
 
@@ -134,11 +135,10 @@ public class SesameConversation implements Serializable {
         System.arraycopy(message, 16, msg, 0, size);
         System.arraycopy(message, size + 16, data, 0, remaining);
 
-        if (skipInitSecrets) {
-            return data;
+        if (!skipInitSecrets) {
+            populateSecrets(false);
         }
 
-        populateSecrets(false);
         BundlePublic pub = recipientPublic.get(id);
         X3dhMessage x3dhMessage = X3dhMessage.decode(msg);
 
@@ -147,8 +147,11 @@ public class SesameConversation implements Serializable {
         KeyPair pair = new KeyPair(senderBundle.bundlePrivate.spk, senderBundle.bundlePublic.spk.publicKey);
 
         Ratchet r = ratchets.get(id);
-        r.initRecipient(pair, new Key(sharedKeyRecipient));
-        ratchets.put(id, r);
+        if (r == null) {
+            r = new Ratchet();
+            r.initRecipient(pair, new Key(sharedKeyRecipient));
+            ratchets.put(id, r);
+        }
 
         byte[] ad = new byte[Key.ESIZE * 2];
         System.arraycopy(pub.identity.encode(), 0, ad, 0, Key.ESIZE);
@@ -278,9 +281,12 @@ public class SesameConversation implements Serializable {
             Set<HashId> ids = secrets.keySet();
             Iterator<HashId> it = ids.iterator();
             while (it.hasNext()) {
-                HashId hashId = it.next();
-                SesameConversationSecret secret = secrets.get(hashId);
-                retval.put(hashId, doEncrypt(hashId, data));
+                try {
+                    HashId hashId = it.next();
+                    retval.put(hashId, doEncrypt(hashId, data));
+                } catch (Exception e) {
+                    //Do nothing
+                }
             }
         }
 
