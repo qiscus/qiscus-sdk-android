@@ -519,20 +519,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     public void loadCommentsAfter(QiscusComment comment) {
         QiscusApi.getInstance().getCommentsAfter(room.getId(), comment.getId())
-                .doOnNext(qiscusComment -> {
-                    qiscusComment.setRoomId(room.getId());
-                    roomEventHandler.transformCommentState(qiscusComment, false);
-                })
-                .toSortedList(commentComparator)
-                .doOnNext(Collections::reverse)
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(comments -> {
-                    if (view != null) {
-                        view.onLoadMore(comments);
-                    }
-                }, Throwable::printStackTrace);
+                .subscribe(comments -> { }, Throwable::printStackTrace);
     }
 
     @Subscribe

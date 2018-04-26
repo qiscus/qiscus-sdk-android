@@ -19,7 +19,9 @@ package com.qiscus.sdk.data;
 import android.support.annotation.RestrictTo;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.local.QiscusDataStore;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.remote.QiscusApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,8 +49,10 @@ public class QiscusCommentBuffer {
     private static final AtomicBoolean started = new AtomicBoolean(false);
 
     public static void push(QiscusComment comment) {
-        data.add(comment);
-        lastPushTime.set(System.currentTimeMillis());
+        if (!data.contains(comment)) {
+            data.add(comment);
+            lastPushTime.set(System.currentTimeMillis());
+        }
     }
 
     public static void pull() {
@@ -68,14 +72,19 @@ public class QiscusCommentBuffer {
                     return;
                 }
 
-                if (System.currentTimeMillis() - lastPushTime.get() >= 1000 && !data.isEmpty()) {
-                    if (valid(data)) {
+                long duration = System.currentTimeMillis() - lastPushTime.get();
+                if (duration >= 1000 && !data.isEmpty()) {
+                    long commentIdNeedToSync = 0;
+                    if (duration < 10000 && data.size() <= 20) {
+                        commentIdNeedToSync = validateData();
+                    }
+                    if (commentIdNeedToSync == 0) {
                         List<QiscusComment> copy = new ArrayList<>(data);
                         Collections.sort(copy, (o1, o2) -> o1.getTime().compareTo(o2.getTime()));
                         data.clear();
                         subscriber.onNext(copy);
-                    } else {
-                        synchronizeData();
+                    } else if (commentIdNeedToSync > 0) {
+                        synchronizeData(commentIdNeedToSync);
                     }
                     continue;
                 }
@@ -99,12 +108,57 @@ public class QiscusCommentBuffer {
                 .subscribe(QiscusNewCommentHandler::handle, throwable -> started.set(false));
     }
 
-    private static void synchronizeData() {
-        //TODO
+    private static void synchronizeData(long commentId) {
+        List<QiscusComment> comments = QiscusApi.getInstance()
+                .sync(commentId)
+                .toList()
+                .toBlocking()
+                .first();
+
+        for (QiscusComment comment : comments) {
+            push(comment);
+        }
     }
 
-    private static boolean valid(Queue<QiscusComment> data) {
-        //TODO
-        return true;
+    /**
+     * @return comment id will be used to sync, 0 if comments is valid, -1 if comments is empty
+     */
+    private static long validateData() {
+        if (data.isEmpty()) {
+            return -1;
+        }
+
+        QiscusComment minimumComment = data.peek();
+        for (QiscusComment comment : data) {
+            if (comment.getId() < minimumComment.getId()) {
+                minimumComment = comment;
+            }
+        }
+
+        QiscusDataStore dataStore = Qiscus.getDataStore();
+        if (minimumComment.getCommentBeforeId() > 0 && !dataStore.isCommentsEmpty()) {
+            QiscusComment beforeComment = dataStore.getComment(minimumComment.getCommentBeforeId());
+            if (beforeComment == null) {
+                return minimumComment.getCommentBeforeId();
+            }
+        }
+
+        for (QiscusComment comment : data) {
+            if (comment.getId() > minimumComment.getId()
+                    && !containsCommentWithId(comment.getCommentBeforeId())) {
+                return comment.getCommentBeforeId();
+            }
+        }
+
+        return 0;
+    }
+
+    private static boolean containsCommentWithId(long id) {
+        for (QiscusComment comment : data) {
+            if (comment.getId() == id) {
+                return true;
+            }
+        }
+        return false;
     }
 }
