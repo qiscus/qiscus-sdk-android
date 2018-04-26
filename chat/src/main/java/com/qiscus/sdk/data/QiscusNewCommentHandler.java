@@ -33,9 +33,12 @@ import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Created on : February 26, 2018
@@ -45,12 +48,14 @@ import rx.schedulers.Schedulers;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class QiscusNewCommentHandler {
+    private static final ScheduledThreadPoolExecutor taskExecutor = new ScheduledThreadPoolExecutor(1);
+
     private QiscusNewCommentHandler() {
 
     }
 
     public static void handle(QiscusComment comment) {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> handleNewComment(comment));
+        taskExecutor.schedule(() -> handleNewComment(comment), 0, MILLISECONDS);
     }
 
     private static void handleNewComment(QiscusComment comment) {

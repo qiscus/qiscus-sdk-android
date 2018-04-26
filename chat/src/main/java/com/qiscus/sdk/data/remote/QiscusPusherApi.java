@@ -25,8 +25,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.QiscusClearCommentsHandler;
+import com.qiscus.sdk.data.QiscusCommentBuffer;
 import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
-import com.qiscus.sdk.data.QiscusNewCommentHandler;
 import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.data.local.QiscusEventCache;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -393,7 +393,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             if (qiscusComment == null) {
                 return;
             }
-            QiscusNewCommentHandler.handle(qiscusComment);
+            QiscusCommentBuffer.push(qiscusComment);
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qiscusAccount.getEmail())) {
@@ -629,6 +629,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         scheduledUserStatus = Qiscus.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
                     if (Qiscus.hasSetupUser()) {
+                        QiscusCommentBuffer.pull();
                         if (Qiscus.isOnForeground()) {
                             QiscusResendCommentHandler.tryResendPendingComment();
                         }

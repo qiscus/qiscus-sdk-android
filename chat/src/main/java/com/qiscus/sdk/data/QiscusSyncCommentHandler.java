@@ -52,7 +52,7 @@ public final class QiscusSyncCommentHandler {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(QiscusNewCommentHandler::handle, throwable -> {
+                .subscribe(QiscusCommentBuffer::push, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
                     QiscusLogger.print("Sync failed...");
