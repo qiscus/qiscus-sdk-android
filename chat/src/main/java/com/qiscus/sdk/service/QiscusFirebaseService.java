@@ -20,7 +20,6 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.QiscusCommentBuffer;
-import com.qiscus.sdk.data.QiscusNewCommentHandler;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
 
