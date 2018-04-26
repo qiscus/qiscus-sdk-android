@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.QiscusCommentBuffer;
 import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
 import com.qiscus.sdk.data.QiscusEncryptionHandler;
 import com.qiscus.sdk.data.QiscusFileEncryptionHandler;
@@ -224,7 +225,7 @@ public enum QiscusApi {
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId))
-                .doOnNext(QiscusEncryptionHandler::decrypt);
+                .doOnNext(QiscusCommentBuffer::push);
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
