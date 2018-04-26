@@ -29,6 +29,8 @@ import rx.Observable;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusCommentStore {
+    boolean isCommentsEmpty();
+
     void add(QiscusComment qiscusComment);
 
     boolean isContains(QiscusComment qiscusComment);
