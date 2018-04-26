@@ -304,7 +304,7 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> sync(long lastCommentId) {
-        return api.sync(Qiscus.getToken(), lastCommentId)
+        return api.sync(Qiscus.getToken(), lastCommentId - 1)
                 .onErrorReturn(throwable -> {
                     QiscusErrorLogger.print("Sync", throwable);
                     return null;
