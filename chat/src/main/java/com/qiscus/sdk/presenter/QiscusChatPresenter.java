@@ -51,13 +51,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import retrofit2.HttpException;
 import rx.Observable;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
@@ -67,9 +63,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private QiscusChatRoom room;
     private QiscusAccount qiscusAccount;
     private Func2<QiscusComment, QiscusComment, Integer> commentComparator = (lhs, rhs) -> rhs.getTime().compareTo(lhs.getTime());
-
-    private Map<QiscusComment, Subscription> pendingTask;
-
     private QiscusRoomEventHandler roomEventHandler;
 
     public QiscusChatPresenter(View view, QiscusChatRoom room) {
@@ -79,13 +72,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         }
         this.room = room;
         qiscusAccount = Qiscus.getQiscusAccount();
-        pendingTask = new HashMap<>();
-
         roomEventHandler = new QiscusRoomEventHandler(room, this);
     }
 
     private void commentSuccess(QiscusComment qiscusComment) {
-        pendingTask.remove(qiscusComment);
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
         if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
@@ -94,65 +84,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
     }
 
-    private void commentFail(Throwable throwable, QiscusComment qiscusComment) {
-        pendingTask.remove(qiscusComment);
-        if (!Qiscus.getDataStore().isContains(qiscusComment)) { //Have been deleted
-            return;
-        }
-
-        int state = QiscusComment.STATE_PENDING;
-        if (throwable instanceof HttpException) { //Error response from server
-            //Means something wrong with server, e.g user is not member of these room anymore
-            HttpException httpException = (HttpException) throwable;
-            if (httpException.code() >= 400) {
-                qiscusComment.setDownloading(false);
-                state = QiscusComment.STATE_FAILED;
-            }
-        }
-
-        //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update
-        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
-        if (savedQiscusComment != null && savedQiscusComment.getState() > QiscusComment.STATE_SENDING) {
-            return;
-        }
-
-        //Simpen statenya
-        qiscusComment.setState(state);
-        Qiscus.getDataStore().addOrUpdate(qiscusComment);
-    }
-
-    public void cancelPendingComment(QiscusComment qiscusComment) {
-        if (pendingTask.containsKey(qiscusComment)) {
-            Subscription subscription = pendingTask.get(qiscusComment);
-            if (!subscription.isUnsubscribed()) {
-                subscription.unsubscribe();
-            }
-            pendingTask.remove(qiscusComment);
-        }
-    }
-
     private void sendComment(QiscusComment qiscusComment) {
+        qiscusComment.setState(QiscusComment.STATE_PENDING);
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
         view.onSendingComment(qiscusComment);
-        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
-                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                .doOnNext(this::commentSuccess)
-                .doOnError(throwable -> commentFail(throwable, qiscusComment))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(commentSend -> {
-                    if (commentSend.getRoomId() == room.getId()) {
-                        view.onSuccessSendComment(commentSend);
-                    }
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    throwable.printStackTrace();
-                    if (qiscusComment.getRoomId() == room.getId()) {
-                        view.onFailedSendComment(qiscusComment);
-                    }
-                });
-
-        pendingTask.put(qiscusComment, subscription);
+        QiscusResendCommentHandler.tryResendPendingComment();
     }
 
     public void sendComment(String content) {
@@ -181,13 +117,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void resendComment(QiscusComment qiscusComment) {
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
+        qiscusComment.setState(QiscusComment.STATE_PENDING);
         qiscusComment.setTime(new Date());
-        if (qiscusComment.isAttachment()) {
-            resendFile(qiscusComment);
-        } else {
-            sendComment(qiscusComment);
-        }
+        sendComment(qiscusComment);
     }
 
     public void sendFile(File file) {
@@ -214,124 +146,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),
                 compressedFile.getPath(), caption, file.getName());
-        qiscusComment.setDownloading(true);
-        view.onSendingComment(qiscusComment);
-
-        File finalCompressedFile = compressedFile;
-        Subscription subscription = QiscusApi.getInstance()
-                .uploadFile(compressedFile, percentage -> qiscusComment.setProgress((int) percentage))
-                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                .flatMap(data -> {
-                    qiscusComment.updateAttachmentUrl(data.first.toString());
-                    qiscusComment.setAttachmentEncryptionKey(data.second);
-                    return QiscusApi.getInstance().postComment(qiscusComment);
-                })
-                .doOnNext(commentSend -> {
-                    Qiscus.getDataStore()
-                            .addOrUpdateLocalPath(commentSend.getRoomId(), commentSend.getId(), finalCompressedFile.getAbsolutePath());
-                    qiscusComment.setDownloading(false);
-                    commentSuccess(commentSend);
-                })
-                .doOnError(throwable -> commentFail(throwable, qiscusComment))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(commentSend -> {
-                    if (commentSend.getRoomId() == room.getId()) {
-                        view.onSuccessSendComment(commentSend);
-                    }
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    throwable.printStackTrace();
-                    if (qiscusComment.getRoomId() == room.getId()) {
-                        view.onFailedSendComment(qiscusComment);
-                    }
-                });
-
-        pendingTask.put(qiscusComment, subscription);
-    }
-
-    private void resendFile(QiscusComment qiscusComment) {
-        if (qiscusComment.getAttachmentUri().toString().startsWith("http")) { //We forward file message
-            forwardFile(qiscusComment);
-            return;
-        }
-
-        File file = new File(qiscusComment.getAttachmentUri().toString());
-        if (!file.exists()) { //File have been removed, so we can not upload it anymore
-            qiscusComment.setDownloading(false);
-            qiscusComment.setState(QiscusComment.STATE_FAILED);
-            Qiscus.getDataStore().addOrUpdate(qiscusComment);
-            view.onFailedSendComment(qiscusComment);
-            return;
-        }
-
-        qiscusComment.setProgress(0);
-        Subscription subscription = QiscusApi.getInstance()
-                .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
-                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                .flatMap(data -> {
-                    qiscusComment.updateAttachmentUrl(data.first.toString());
-                    qiscusComment.setAttachmentEncryptionKey(data.second);
-                    return QiscusApi.getInstance().postComment(qiscusComment);
-                })
-                .doOnNext(commentSend -> {
-                    Qiscus.getDataStore()
-                            .addOrUpdateLocalPath(commentSend.getRoomId(), commentSend.getId(), file.getAbsolutePath());
-                    qiscusComment.setDownloading(false);
-                    commentSuccess(commentSend);
-                })
-                .doOnError(throwable -> commentFail(throwable, qiscusComment))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(commentSend -> {
-                    if (commentSend.getRoomId() == room.getId()) {
-                        view.onSuccessSendComment(commentSend);
-                    }
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    throwable.printStackTrace();
-                    if (qiscusComment.getRoomId() == room.getId()) {
-                        view.onFailedSendComment(qiscusComment);
-                    }
-                });
-
-        pendingTask.put(qiscusComment, subscription);
-    }
-
-    private void forwardFile(QiscusComment qiscusComment) {
-        qiscusComment.setProgress(100);
-        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
-                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                .doOnNext(commentSend -> {
-                    qiscusComment.setDownloading(false);
-                    commentSuccess(commentSend);
-                })
-                .doOnError(throwable -> {
-                    qiscusComment.setDownloading(false);
-                    commentFail(throwable, qiscusComment);
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(commentSend -> {
-                    if (commentSend.getRoomId() == room.getId()) {
-                        view.onSuccessSendComment(commentSend);
-                    }
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    throwable.printStackTrace();
-                    if (qiscusComment.getRoomId() == room.getId()) {
-                        view.onFailedSendComment(qiscusComment);
-                    }
-                });
-
-        pendingTask.put(qiscusComment, subscription);
+        sendComment(qiscusComment);
     }
 
     public void deleteComment(QiscusComment qiscusComment) {
-        cancelPendingComment(qiscusComment);
         QiscusResendCommentHandler.cancelPendingComment(qiscusComment);
         QiscusAndroidUtil.runOnBackgroundThread(() -> Qiscus.getDataStore().delete(qiscusComment));
         view.onCommentDeleted(qiscusComment);
@@ -521,7 +339,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         QiscusApi.getInstance().getCommentsAfter(room.getId(), comment.getId())
                 .subscribeOn(Schedulers.newThread())
                 .compose(bindToLifecycle())
-                .subscribe(comments -> { }, Throwable::printStackTrace);
+                .subscribe(comments -> {
+                }, Throwable::printStackTrace);
     }
 
     @Subscribe
@@ -529,7 +348,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (event.getQiscusComment().getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
-                    view.refreshComment(event.getQiscusComment());
+                    if (event.getEvent() == QiscusCommentResendEvent.Event.SENDING) {
+                        view.refreshComment(event.getQiscusComment());
+                    } else if (event.getEvent() == QiscusCommentResendEvent.Event.SENT) {
+                        view.onSuccessSendComment(event.getQiscusComment());
+                    } else if (event.getEvent() == QiscusCommentResendEvent.Event.FAILED) {
+                        view.onFailedSendComment(event.getQiscusComment());
+                    }
                 }
             });
         }
@@ -715,9 +540,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     @Override
     public void detachView() {
         super.detachView();
-        for (Map.Entry<QiscusComment, Subscription> entry : pendingTask.entrySet()) {
-            roomEventHandler.transformCommentState(entry.getKey(), true);
-        }
         roomEventHandler.detach();
         clearUnreadCount();
         room = null;

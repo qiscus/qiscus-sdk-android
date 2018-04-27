@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusChatActivity;
@@ -185,24 +186,12 @@ public class QiscusChatConfig {
                     });
 
     private ReplyNotificationHandler replyNotificationHandler =
-            (context, qiscusComment) -> QiscusApi.getInstance().postComment(qiscusComment)
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                    .doOnNext(comment -> {
-                        comment.setState(QiscusComment.STATE_ON_QISCUS);
-                        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
-                        if (savedQiscusComment != null && savedQiscusComment.getState() > comment.getState()) {
-                            comment.setState(savedQiscusComment.getState());
-                        }
-                        Qiscus.getDataStore().addOrUpdate(comment);
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(commentSend -> {
-                        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusComment.getRoomId());
-                    }, throwable -> {
-                        QiscusErrorLogger.print("ReplyNotification", throwable);
-                        Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
-                    });
+            (context, qiscusComment) -> {
+                qiscusComment.setState(QiscusComment.STATE_PENDING);
+                Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                QiscusResendCommentHandler.tryResendPendingComment();
+                QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusComment.getRoomId());
+            };
 
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;

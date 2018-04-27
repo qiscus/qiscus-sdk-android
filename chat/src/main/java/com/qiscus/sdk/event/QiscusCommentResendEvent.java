@@ -26,12 +26,22 @@ import com.qiscus.sdk.data.model.QiscusComment;
  */
 public class QiscusCommentResendEvent {
     private QiscusComment qiscusComment;
+    private Event event;
 
-    public QiscusCommentResendEvent(QiscusComment qiscusComment) {
+    public QiscusCommentResendEvent(QiscusComment qiscusComment, Event event) {
         this.qiscusComment = qiscusComment;
+        this.event = event;
     }
 
     public QiscusComment getQiscusComment() {
         return qiscusComment;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public enum Event {
+        SENDING, SENT, FAILED
     }
 }
