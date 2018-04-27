@@ -58,12 +58,6 @@ public final class QiscusResendCommentHandler {
         Qiscus.getDataStore()
                 .getObservablePendingComments()
                 .flatMap(Observable::from)
-                .doOnNext(qiscusComment -> {
-                    if (qiscusComment.isAttachment() && !pendingTask.containsKey(qiscusComment.getUniqueId())) {
-                        resendFile(qiscusComment);
-                    }
-                })
-                .filter(qiscusComment -> !qiscusComment.isAttachment())
                 .take(1)
                 .doOnNext(qiscusComment -> {
                     if (!pendingTask.containsKey(qiscusComment.getUniqueId())) {
@@ -86,11 +80,6 @@ public final class QiscusResendCommentHandler {
     }
 
     private static void resendComment(QiscusComment qiscusComment) {
-        if (qiscusComment.isAttachment()) {
-            resendFile(qiscusComment);
-            return;
-        }
-
         //Wait until this success
         if (!processingComment.isEmpty() && !processingComment.contains(qiscusComment.getUniqueId())) {
             return;
@@ -98,6 +87,11 @@ public final class QiscusResendCommentHandler {
 
         qiscusComment.setState(QiscusComment.STATE_SENDING);
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
+
+        if (qiscusComment.isAttachment()) {
+            resendFile(qiscusComment);
+            return;
+        }
 
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
@@ -115,9 +109,6 @@ public final class QiscusResendCommentHandler {
     }
 
     private static void resendFile(QiscusComment qiscusComment) {
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
-        Qiscus.getDataStore().addOrUpdate(qiscusComment);
-
         if (qiscusComment.getAttachmentUri().toString().startsWith("http")) { //We forward file message
             forwardFile(qiscusComment);
             return;
@@ -129,6 +120,9 @@ public final class QiscusResendCommentHandler {
             qiscusComment.setState(QiscusComment.STATE_FAILED);
             Qiscus.getDataStore().addOrUpdate(qiscusComment);
             EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+
+            pendingTask.remove(qiscusComment.getUniqueId());
+            processingComment.remove(qiscusComment.getUniqueId());
             return;
         }
 
@@ -153,10 +147,11 @@ public final class QiscusResendCommentHandler {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
-
+                    tryResendPendingComment(); //Process next pending comments
                 }, QiscusErrorLogger::print);
 
         pendingTask.put(qiscusComment.getUniqueId(), subscription);
+        processingComment.add(qiscusComment.getUniqueId());
     }
 
     private static void forwardFile(QiscusComment qiscusComment) {
@@ -173,10 +168,11 @@ public final class QiscusResendCommentHandler {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
-
+                    tryResendPendingComment(); //Process next pending comments
                 }, QiscusErrorLogger::print);
 
         pendingTask.put(qiscusComment.getUniqueId(), subscription);
+        processingComment.add(qiscusComment.getUniqueId());
     }
 
     private static void commentSuccess(QiscusComment qiscusComment) {
