@@ -264,6 +264,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             return;
         }
 
+        qiscusComment.setDownloading(true);
         qiscusComment.setProgress(0);
         Subscription subscription = QiscusApi.getInstance()
                 .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
