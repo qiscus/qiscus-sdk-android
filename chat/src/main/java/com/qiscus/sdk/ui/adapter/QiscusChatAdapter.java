@@ -241,16 +241,19 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
                 return new QiscusLinkViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_IMAGE_ME:
             case TYPE_IMAGE_OTHER:
-                return new QiscusImageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+                return new QiscusImageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener,
+                        uploadIconClickListener);
             case TYPE_VIDEO_ME:
             case TYPE_VIDEO_OTHER:
-                return new QiscusVideoViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+                return new QiscusVideoViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener,
+                        uploadIconClickListener);
             case TYPE_AUDIO_ME:
             case TYPE_AUDIO_OTHER:
                 return new QiscusAudioViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_FILE_ME:
             case TYPE_FILE_OTHER:
-                return new QiscusFileViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
+                return new QiscusFileViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener,
+                        uploadIconClickListener);
             case TYPE_ACCOUNT_LINKING:
                 return new QiscusAccountLinkingViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);
             case TYPE_BUTTONS:
