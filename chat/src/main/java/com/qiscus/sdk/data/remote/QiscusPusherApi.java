@@ -630,9 +630,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 .scheduleWithFixedDelay(() -> {
                     if (Qiscus.hasSetupUser()) {
                         QiscusCommentBuffer.pull();
-                        if (Qiscus.isOnForeground()) {
-                            QiscusResendCommentHandler.tryResendPendingComment();
-                        }
+                        QiscusResendCommentHandler.tryResendPendingComment();
                         if (isConnected()) {
                             if (Qiscus.isOnForeground()) {
                                 setOfflineCounter = 0;
