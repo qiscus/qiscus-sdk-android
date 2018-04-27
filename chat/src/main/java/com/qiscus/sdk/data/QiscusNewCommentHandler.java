@@ -101,7 +101,6 @@ public final class QiscusNewCommentHandler {
         updateUnreadCount(comment.getRoomId());
         notifyDelivered(comment);
         updateLastReadMember(comment);
-        pushNotification(comment);
         saveComment(comment);
     }
 
@@ -196,6 +195,7 @@ public final class QiscusNewCommentHandler {
     private static void addComment(QiscusComment comment) {
         Qiscus.getDataStore().add(comment);
         postEvent(new QiscusCommentReceivedEvent(comment));
+        pushNotification(comment);
     }
 
     private static void postEvent(QiscusCommentReceivedEvent event) {
