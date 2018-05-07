@@ -208,5 +208,7 @@ public final class QiscusResendCommentHelper {
         //Simpen statenya
         qiscusComment.setState(state);
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
+
+        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
     }
 }

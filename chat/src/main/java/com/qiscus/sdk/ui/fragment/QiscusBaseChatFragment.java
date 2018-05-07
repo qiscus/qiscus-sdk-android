@@ -75,6 +75,7 @@ import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
 import com.qiscus.sdk.ui.QiscusSendPhotoConfirmationActivity;
 import com.qiscus.sdk.ui.adapter.CommentChainingListener;
+import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.adapter.QiscusBaseChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
@@ -113,7 +114,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         implements SwipeRefreshLayout.OnRefreshListener, QiscusChatScrollListener.Listener,
         QiscusChatPresenter.View, QiscusAudioRecorderView.RecordListener,
         QiscusPermissionsUtil.PermissionCallbacks, QiscusChatButtonView.ChatButtonClickListener,
-        CommentChainingListener, QiscusCarouselItemView.CarouselItemClickListener {
+        CommentChainingListener, QiscusCarouselItemView.CarouselItemClickListener, OnUploadIconClickListener {
 
     protected static final int RC_PERMISSIONS = 127;
     protected static final int RC_CAMERA_PERMISSION = 128;
@@ -585,6 +586,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 onItemCommentClick((QiscusComment) chatAdapter.getData().get(position)));
         chatAdapter.setOnLongItemClickListener((view, position) ->
                 onItemCommentLongClick((QiscusComment) chatAdapter.getData().get(position)));
+        chatAdapter.setUploadIconClickListener(this);
         chatAdapter.setReplyItemClickListener(comment -> scrollToComment(comment.getReplyTo()));
         chatAdapter.setChatButtonClickListener(this);
         chatAdapter.setCarouselItemClickListener(this);
@@ -1826,6 +1828,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     public void deleteCommentsForEveryone(List<QiscusComment> selectedComments) {
         qiscusChatPresenter.deleteCommentsForEveryone(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
+    }
+
+    @Override
+    public void onUploadIconClick(View view, int position) {
+        qiscusChatPresenter.resendComment((QiscusComment) chatAdapter.getData().get(position));
     }
 
     public interface CommentSelectedListener {

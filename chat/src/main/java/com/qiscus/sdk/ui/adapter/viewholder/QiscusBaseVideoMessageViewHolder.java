@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 
@@ -35,6 +36,12 @@ public abstract class QiscusBaseVideoMessageViewHolder extends QiscusBaseImageMe
     public QiscusBaseVideoMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
+    }
+
+    public QiscusBaseVideoMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                            OnLongItemClickListener longItemClickListener,
+                                            OnUploadIconClickListener downloadIconClickListener) {
+        super(itemView, itemClickListener, longItemClickListener, downloadIconClickListener);
     }
 
     @Override
