@@ -38,6 +38,7 @@ final class QiscusE2EDbOpenHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(QiscusE2EDb.BundleTable.CREATE);
             db.execSQL(QiscusE2EDb.ConversationTable.CREATE);
+            db.execSQL(QiscusE2EDb.GroupConversationTable.CREATE);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -55,6 +56,7 @@ final class QiscusE2EDbOpenHelper extends SQLiteOpenHelper {
         try {
             db.execSQL("DROP TABLE IF EXISTS " + QiscusE2EDb.BundleTable.TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + QiscusE2EDb.ConversationTable.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + QiscusE2EDb.GroupConversationTable.TABLE_NAME);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

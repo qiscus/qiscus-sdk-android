@@ -23,6 +23,7 @@ import android.support.annotation.RestrictTo;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.encryption.core.BundlePublicCollection;
+import com.qiscus.sdk.data.encryption.core.GroupConversation;
 import com.qiscus.sdk.data.encryption.core.SesameConversation;
 
 import rx.Emitter;
@@ -163,11 +164,70 @@ public enum QiscusE2EDataStore {
         return contains;
     }
 
+    public Observable<GroupConversation> getGroupConversation(long roomId) {
+        return Observable.create(subscriber -> {
+            subscriber.onNext(getLocalGroupConversation(roomId));
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
+    public Observable<GroupConversation> saveGroupConversation(long roomId, GroupConversation conversation) {
+        return Observable.create(subscriber -> {
+            sqLiteDatabase.beginTransaction();
+            try {
+                if (isContainGroupConversation(roomId)) {
+                    String where = QiscusE2EDb.GroupConversationTable.COLUMN_ROOM_ID + " = " + roomId;
+
+                    sqLiteDatabase.update(QiscusE2EDb.GroupConversationTable.TABLE_NAME,
+                            QiscusE2EDb.GroupConversationTable.toContentValues(roomId, conversation), where, null);
+                } else {
+                    sqLiteDatabase.insert(QiscusE2EDb.GroupConversationTable.TABLE_NAME, null,
+                            QiscusE2EDb.GroupConversationTable.toContentValues(roomId, conversation));
+                }
+                sqLiteDatabase.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                sqLiteDatabase.endTransaction();
+            }
+            subscriber.onNext(getLocalGroupConversation(roomId));
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
+    private GroupConversation getLocalGroupConversation(long roomId) {
+        String query = "SELECT * FROM "
+                + QiscusE2EDb.GroupConversationTable.TABLE_NAME + " WHERE "
+                + QiscusE2EDb.GroupConversationTable.COLUMN_ROOM_ID + " = " + roomId;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        if (cursor.moveToNext()) {
+            GroupConversation conversation = QiscusE2EDb.GroupConversationTable.parseCursor(cursor);
+            cursor.close();
+            return conversation;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
+    private boolean isContainGroupConversation(long roomId) {
+        String query = "SELECT * FROM "
+                + QiscusE2EDb.GroupConversationTable.TABLE_NAME + " WHERE "
+                + QiscusE2EDb.GroupConversationTable.COLUMN_ROOM_ID + " = " + roomId;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        boolean contains = cursor.getCount() > 0;
+        cursor.close();
+        return contains;
+    }
+
     public void clear() {
         sqLiteDatabase.beginTransaction();
         try {
             sqLiteDatabase.delete(QiscusE2EDb.BundleTable.TABLE_NAME, null, null);
             sqLiteDatabase.delete(QiscusE2EDb.ConversationTable.TABLE_NAME, null, null);
+            sqLiteDatabase.delete(QiscusE2EDb.GroupConversationTable.TABLE_NAME, null, null);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

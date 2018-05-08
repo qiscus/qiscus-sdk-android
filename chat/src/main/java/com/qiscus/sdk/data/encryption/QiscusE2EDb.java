@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.util.Base64;
 
 import com.qiscus.sdk.data.encryption.core.BundlePublicCollection;
+import com.qiscus.sdk.data.encryption.core.GroupConversation;
 import com.qiscus.sdk.data.encryption.core.IllegalDataSizeException;
 import com.qiscus.sdk.data.encryption.core.SesameConversation;
 
@@ -36,7 +37,7 @@ import java.security.SignatureException;
  */
 final class QiscusE2EDb {
     static final String DATABASE_NAME = "qiscus_encryption.db";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
 
     abstract static class BundleTable {
         static final String TABLE_NAME = "bundle_public_collection";
@@ -105,6 +106,42 @@ final class QiscusE2EDb {
         static SesameConversation parseCursor(Cursor cursor) {
             try {
                 return SesameConversation.decode(cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RAW_DATA)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+    abstract static class GroupConversationTable {
+        static final String TABLE_NAME = "group_conversations";
+        static final String COLUMN_ROOM_ID = "room_id";
+        static final String COLUMN_RAW_DATA = "raw_data";
+
+        static final String CREATE =
+                "CREATE TABLE " + TABLE_NAME + " (" +
+                        COLUMN_ROOM_ID + " LONG PRIMARY KEY," +
+                        COLUMN_RAW_DATA + " BLOB NOT NULL" +
+                        " ); ";
+
+        static ContentValues toContentValues(long roomId, GroupConversation groupConversation) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ROOM_ID, roomId);
+            try {
+                values.put(COLUMN_RAW_DATA, groupConversation.encode());
+            } catch (IOException e) {
+                e.printStackTrace();
+                values.put(COLUMN_RAW_DATA, new byte[0]);
+            }
+            return values;
+        }
+
+        static GroupConversation parseCursor(Cursor cursor) {
+            try {
+                return GroupConversation.decode(cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RAW_DATA)));
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
