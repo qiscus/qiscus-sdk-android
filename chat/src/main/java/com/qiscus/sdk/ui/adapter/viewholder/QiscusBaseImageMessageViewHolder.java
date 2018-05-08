@@ -34,10 +34,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.view.ClickableMovementMethod;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
 import com.qiscus.sdk.util.QiscusImageUtil;
@@ -69,6 +70,12 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
 
     public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener) {
+        this(itemView, itemClickListener, longItemClickListener, null);
+    }
+
+    public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                            OnLongItemClickListener longItemClickListener,
+                                            OnUploadIconClickListener uploadIconClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         thumbnailView = getThumbnailView(itemView);
         captionView = getCaptionView(itemView);
@@ -79,6 +86,16 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
             captionView.setMovementMethod(ClickableMovementMethod.getInstance());
             captionView.setClickable(false);
             captionView.setLongClickable(false);
+        }
+
+        if (downloadIconView != null) {
+            downloadIconView.setOnClickListener(v -> {
+                if (uploadIconClickListener != null && qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+                    uploadIconClickListener.onUploadIconClick(v, getAdapterPosition());
+                } else {
+                    onClick(messageBubbleView);
+                }
+            });
         }
     }
 
@@ -130,7 +147,12 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected void showProgressOrNot(QiscusComment qiscusComment) {
         if (progressView != null) {
             progressView.setProgress(qiscusComment.getProgress());
-            progressView.setVisibility(qiscusComment.isDownloading() ? View.VISIBLE : View.GONE);
+            progressView.setVisibility(
+                    qiscusComment.isDownloading()
+                            || qiscusComment.getState() == QiscusComment.STATE_PENDING
+                            || qiscusComment.getState() == QiscusComment.STATE_SENDING
+                            ? View.VISIBLE : View.GONE
+            );
         }
     }
 

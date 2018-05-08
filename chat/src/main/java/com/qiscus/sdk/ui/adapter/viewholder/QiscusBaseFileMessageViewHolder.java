@@ -28,6 +28,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
@@ -54,11 +55,26 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
 
     public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                            OnLongItemClickListener longItemClickListener) {
+        this(itemView, itemClickListener, longItemClickListener, null);
+    }
+
+    public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                           OnLongItemClickListener longItemClickListener,
+                                           OnUploadIconClickListener uploadIconClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         fileNameView = getFileNameView(itemView);
         fileTypeView = getFileTypeView(itemView);
         progressView = getProgressView(itemView);
         downloadIconView = getDownloadIconView(itemView);
+        if (downloadIconView != null) {
+            downloadIconView.setOnClickListener(v -> {
+                if (uploadIconClickListener != null && qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+                    uploadIconClickListener.onUploadIconClick(v, getAdapterPosition());
+                } else {
+                    onClick(messageBubbleView);
+                }
+            });
+        }
     }
 
     @Override
@@ -103,7 +119,12 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     protected void showProgressOrNot(QiscusComment qiscusComment) {
         if (progressView != null) {
             progressView.setProgress(qiscusComment.getProgress());
-            progressView.setVisibility(qiscusComment.isDownloading() ? View.VISIBLE : View.GONE);
+            progressView.setVisibility(
+                    qiscusComment.isDownloading()
+                            || qiscusComment.getState() == QiscusComment.STATE_PENDING
+                            || qiscusComment.getState() == QiscusComment.STATE_SENDING
+                            ? View.VISIBLE : View.GONE
+            );
         }
     }
 
