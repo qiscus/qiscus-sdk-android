@@ -75,6 +75,9 @@ public class GroupConversation {
      * @return byte array containing sender id and sender key
      */
     public byte[] getSenderKey() throws IOException {
+        // Make sure the sender key is obtained from the latest chain key
+        System.arraycopy(chainKeySender.raw(), 0, senderKey, 0, 32);
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         output.write(senderId.raw());
         output.write(senderKey);
@@ -116,14 +119,14 @@ public class GroupConversation {
         byte[] data = new byte[HashId.SIZE];
 
         System.arraycopy(senderKey, 0, data, 0, 64);
-        senderId = new HashId(data);
+        HashId msgSenderId = new HashId(data);
 
         data = new byte[32];
         System.arraycopy(senderKey, 64, data, 0, 32);
-        chainKeyMap.put(senderId, new Key(data));
+        chainKeyMap.put(msgSenderId, new Key(data));
 
         System.arraycopy(senderKey, 64 + 32, data, 0, 32);
-        signatureMap.put(senderId, new PublicKey(data));
+        signatureMap.put(msgSenderId, new PublicKey(data));
 
     }
 
@@ -239,6 +242,7 @@ public class GroupConversation {
         System.arraycopy(cipherText, pos, check, 0, 64);
         Signature signature = new Signature(check);
         PublicKey k = signatureMap.get(sender);
+
         if (k == null) {
             throw new InvalidKeyException();
         }
