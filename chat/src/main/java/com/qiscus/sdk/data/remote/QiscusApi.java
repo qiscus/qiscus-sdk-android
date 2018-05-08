@@ -20,7 +20,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 import android.util.Base64;
-import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -184,7 +183,8 @@ public enum QiscusApi {
                 .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom.getLastComment()));
     }
 
-    private Observable<QiscusChatRoom> createEncryptedGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
+    private Observable<QiscusChatRoom> createEncryptedGroupChatRoom(String name, List<String> emails,
+                                                                    String avatarUrl, JSONObject options) {
         Observable<QiscusChatRoom> singleRooms = Observable.from(emails)
                 .flatMap(email -> {
                     QiscusChatRoom savedRoom = Qiscus.getDataStore().getChatRoom(email);
