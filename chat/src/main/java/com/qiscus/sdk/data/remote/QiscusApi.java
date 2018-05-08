@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,6 +31,10 @@ import com.qiscus.sdk.data.QiscusCommentBuffer;
 import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
 import com.qiscus.sdk.data.QiscusEncryptionHandler;
 import com.qiscus.sdk.data.QiscusFileEncryptionHandler;
+import com.qiscus.sdk.data.QiscusResendCommentHandler;
+import com.qiscus.sdk.data.encryption.QiscusE2EDataStore;
+import com.qiscus.sdk.data.encryption.QiscusMyBundleCache;
+import com.qiscus.sdk.data.encryption.core.GroupConversation;
 import com.qiscus.sdk.data.encryption.core.HashId;
 import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusChatRoom;
@@ -87,6 +92,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 import rx.Emitter;
 import rx.Observable;
+import rx.Single;
 import rx.exceptions.OnErrorThrowable;
 import rx.schedulers.Schedulers;
 
@@ -168,9 +174,67 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
+            return createEncryptedGroupChatRoom(name, emails, avatarUrl, options);
+        }
+
         return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
                 .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom.getLastComment()));
+    }
+
+    private Observable<QiscusChatRoom> createEncryptedGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
+        Observable<QiscusChatRoom> singleRooms = Observable.from(emails)
+                .flatMap(email -> {
+                    QiscusChatRoom savedRoom = Qiscus.getDataStore().getChatRoom(email);
+                    if (savedRoom != null) {
+                        return Observable.just(savedRoom);
+                    }
+                    return getChatRoom(email, null, null)
+                            .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
+                });
+
+        Single<GroupConversation> createGroupConversationTask = Single.create(subscriber -> {
+            String deviceId = QiscusMyBundleCache.getInstance().getDeviceId();
+            GroupConversation groupConversation = new GroupConversation();
+            try {
+                groupConversation.initSender(new HashId(deviceId.getBytes()));
+            } catch (Exception e) {
+                subscriber.onError(e);
+                return;
+            }
+            subscriber.onSuccess(groupConversation);
+        });
+
+        Single<GroupConversation> groupConversationCache = createGroupConversationTask.cache();
+
+        Single<String> senderKeySingle = Single.create(subscriber -> {
+            GroupConversation groupConversation = groupConversationCache.toBlocking().value();
+            try {
+                subscriber.onSuccess(Base64.encodeToString(groupConversation.getSenderKey(), Base64.DEFAULT));
+            } catch (Exception e) {
+                subscriber.onError(e);
+            }
+        });
+
+        String senderKey = senderKeySingle.toBlocking().value();
+
+        return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options == null ? null : options.toString())
+                .map(QiscusApiParser::parseQiscusChatRoom)
+                .flatMap(groupRoom -> singleRooms.doOnNext(qiscusChatRoom -> {
+                    QiscusComment qiscusComment = QiscusComment.generateGroupSenderKeyMessage(qiscusChatRoom.getId(),
+                            groupRoom.getId(), name, senderKey);
+                    qiscusComment.setState(QiscusComment.STATE_PENDING);
+                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                    QiscusResendCommentHandler.tryResendPendingComment();
+                }).toList().map(qiscusChatRooms -> groupRoom))
+                .flatMap(groupRoom -> {
+                    GroupConversation groupConversation = groupConversationCache.toBlocking().value();
+                    return QiscusE2EDataStore.getInstance()
+                            .saveGroupConversation(groupRoom.getId(), groupConversation)
+                            .map(groupConversation1 -> groupRoom);
+                })
+                .doOnNext(groupRoom -> replaceWithLocalComment(groupRoom.getLastComment()));
     }
 
     public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {

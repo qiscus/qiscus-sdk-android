@@ -222,6 +222,25 @@ public class QiscusComment implements Parcelable {
         return qiscusComment;
     }
 
+    public static QiscusComment generateGroupSenderKeyMessage(long roomId, long groupRoomId, String groupRoomName, String senderKey) {
+        QiscusComment qiscusComment = generateMessage(roomId, "Sender key for " + groupRoomName + " room.");
+        qiscusComment.setRawType("custom");
+        JSONObject json = new JSONObject();
+        JSONObject content = new JSONObject();
+        try {
+            content.put("group_room_id", groupRoomId)
+                    .put("group_room_name", groupRoomName)
+                    .put("sender_key", senderKey);
+
+            json.put("type", "qiscus_group_sender_key")
+                    .put("content", content);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setExtraPayload(json.toString());
+        return qiscusComment;
+    }
+
     public QiscusComment() {
 
     }
