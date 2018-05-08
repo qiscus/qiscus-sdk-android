@@ -54,7 +54,7 @@ import java.util.Set;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class QiscusEncryptionHandler {
-    private static final String ENCRYPTED_PLACE_HOLDER = QiscusTextUtil.getString(R.string.qiscus_encrypted_place_holder);
+    static final String ENCRYPTED_PLACE_HOLDER = QiscusTextUtil.getString(R.string.qiscus_encrypted_place_holder);
 
     private QiscusEncryptionHandler() {
 
@@ -72,7 +72,7 @@ public final class QiscusEncryptionHandler {
         }
     }
 
-    private static boolean encryptAbleMessage(String rawType) {
+    static boolean encryptAbleMessage(String rawType) {
         return TextUtils.isEmpty(rawType)
                 || rawType.equals("text")
                 || rawType.equals("custom");
@@ -125,7 +125,7 @@ public final class QiscusEncryptionHandler {
         return Base64.encodeToString(encrypted, Base64.DEFAULT);
     }
 
-    private static boolean decryptAbleType(QiscusComment comment) {
+    static boolean decryptAbleType(QiscusComment comment) {
         String rawType = comment.getRawType();
         return rawType.equals("text")
                 || rawType.equals("reply")
@@ -374,7 +374,7 @@ public final class QiscusEncryptionHandler {
                 .await();
     }
 
-    private static byte[] unpackData(String message) throws IOException, InvalidKeyException {
+    static byte[] unpackData(String message) throws IOException, InvalidKeyException {
         byte[] rawData = Base64.decode(message.getBytes(), Base64.DEFAULT);
         HashMap<HashId, byte[]> unpacked = SesameConversation.unpackEncrypted(rawData);
         Set<HashId> hashIds = unpacked.keySet();

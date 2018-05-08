@@ -31,6 +31,7 @@ import com.qiscus.sdk.data.QiscusCommentBuffer;
 import com.qiscus.sdk.data.QiscusDeleteCommentHandler;
 import com.qiscus.sdk.data.QiscusEncryptionHandler;
 import com.qiscus.sdk.data.QiscusFileEncryptionHandler;
+import com.qiscus.sdk.data.QiscusGroupEncryptionHandler;
 import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.data.encryption.QiscusE2EDataStore;
 import com.qiscus.sdk.data.encryption.QiscusMyBundleCache;
@@ -329,6 +330,10 @@ public enum QiscusApi {
 
         Observable<Pair<String, String>> encryptComment = recipientId.flatMap(recipient -> {
             if (recipient.isEmpty()) {
+                QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+                if (savedChatRoom.isGroup()) {
+                    return createEncryptedGroupPayload(qiscusComment.getRoomId(), qiscusComment);
+                }
                 return Observable.just(Pair.create(qiscusComment.getMessage(), qiscusComment.getExtraPayload()));
             }
             return createEncryptedPayload(recipient, qiscusComment);
@@ -343,6 +348,17 @@ public enum QiscusApi {
         return Observable.create(subscriber -> {
             try {
                 subscriber.onNext(QiscusEncryptionHandler.createEncryptedPayload(recipientId, qiscusComment));
+            } catch (Exception e) {
+                subscriber.onError(e);
+            }
+            subscriber.onCompleted();
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
+    private Observable<Pair<String, String>> createEncryptedGroupPayload(long roomId, QiscusComment qiscusComment) {
+        return Observable.create(subscriber -> {
+            try {
+                subscriber.onNext(QiscusGroupEncryptionHandler.createEncryptedPayload(roomId, qiscusComment));
             } catch (Exception e) {
                 subscriber.onError(e);
             }

@@ -18,6 +18,7 @@ package com.qiscus.sdk.data;
 
 import android.support.annotation.RestrictTo;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -29,8 +30,11 @@ import com.qiscus.sdk.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -96,7 +100,11 @@ public final class QiscusNewCommentHandler {
 
     private static void handleOpponentComment(QiscusComment comment) {
         if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
-            QiscusEncryptionHandler.decrypt(comment);
+            if (comment.isGroupMessage()) {
+                QiscusGroupEncryptionHandler.decrypt(comment);
+            } else {
+                QiscusEncryptionHandler.decrypt(comment);
+            }
         }
         updateUnreadCount(comment.getRoomId());
         notifyDelivered(comment);
@@ -187,6 +195,7 @@ public final class QiscusNewCommentHandler {
         QiscusComment savedComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
         if (savedComment == null) {
             addComment(comment);
+            handleSenderKeyComment(comment);
         } else {
             updateComment(comment);
         }
@@ -196,6 +205,24 @@ public final class QiscusNewCommentHandler {
         Qiscus.getDataStore().add(comment);
         postEvent(new QiscusCommentReceivedEvent(comment));
         pushNotification(comment);
+    }
+
+    private static void handleSenderKeyComment(QiscusComment comment) {
+        if (comment.getType() == QiscusComment.Type.CUSTOM) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                if (payload.optString("type").equals("qiscus_group_sender_key")) {
+                    JSONObject content = payload.optJSONObject("content");
+                    long roomId = content.optLong("group_room_id");
+                    String senderKey = content.optString("sender_key");
+                    if (!TextUtils.isEmpty(senderKey)) {
+                        QiscusGroupEncryptionHandler.updateRecipient(roomId, senderKey);
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static void postEvent(QiscusCommentReceivedEvent event) {
