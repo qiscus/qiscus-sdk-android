@@ -16,8 +16,14 @@
 
 package com.qiscus.sdk.data.encryption.core;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -35,7 +41,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import static javax.crypto.Mac.getInstance;
 
-public class GroupConversation {
+public class GroupConversation implements Serializable {
     private HashId senderId;
 
     // This is only used by the sender
@@ -53,7 +59,7 @@ public class GroupConversation {
      *
      * @throws IllegalDataSizeException
      */
-    void initSender(HashId senderId) throws IllegalDataSizeException {
+    public void initSender(HashId senderId) throws IllegalDataSizeException {
         SecureRandom random = new SecureRandom();
 
         byte[] k = new byte[32];
@@ -287,5 +293,43 @@ public class GroupConversation {
         }
 
         throw new DecryptionFailedException();
+    }
+
+    public byte[] encode() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out;
+        byte[] raw;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(this);
+            out.flush();
+            raw = bos.toByteArray();
+        } finally {
+            try {
+                bos.close();
+            } catch (IOException ignored) {
+                // ignore close exception
+            }
+        }
+        return raw;
+    }
+
+    public static GroupConversation decode(byte[] raw) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(raw);
+        ObjectInput in = null;
+        GroupConversation groupConversation;
+        try {
+            in = new ObjectInputStream(bis);
+            groupConversation = (GroupConversation) in.readObject();
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+        return groupConversation;
     }
 }
