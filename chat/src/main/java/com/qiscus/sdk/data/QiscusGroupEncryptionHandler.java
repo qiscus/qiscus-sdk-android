@@ -50,7 +50,7 @@ public final class QiscusGroupEncryptionHandler {
     public static void initSenderKey(long roomId) {
         QiscusAndroidUtil.runOnBackgroundThread(() -> {
             try {
-                getConversation(roomId, true);
+                getConversation(roomId);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -99,7 +99,7 @@ public final class QiscusGroupEncryptionHandler {
     }
 
     private static String encrypt(long roomId, String message) throws Exception {
-        GroupConversation conversation = getConversation(roomId, true);
+        GroupConversation conversation = getConversation(roomId);
         byte[] encrypted = conversation.encrypt(message.getBytes());
         saveConversation(roomId, conversation);
         return Base64.encodeToString(encrypted, Base64.DEFAULT);
@@ -112,20 +112,20 @@ public final class QiscusGroupEncryptionHandler {
                 .await();
     }
 
-    private static GroupConversation getConversation(long roomId, boolean needReply) throws Exception {
+    private static GroupConversation getConversation(long roomId) throws Exception {
         GroupConversation conversation = QiscusE2EDataStore.getInstance().getGroupConversation(roomId).toBlocking().first();
         if (conversation == null) {
-            return createConversation(roomId, needReply);
+            return createConversation(roomId);
         }
 
         return conversation;
     }
 
-    private static GroupConversation createConversation(long roomId, boolean needReply) throws Exception {
+    private static GroupConversation createConversation(long roomId) throws Exception {
         String deviceId = QiscusMyBundleCache.getInstance().getDeviceId();
         GroupConversation groupConversation = new GroupConversation();
         groupConversation.initSender(new HashId(deviceId.getBytes()));
-        notifyMembers(roomId, Base64.encodeToString(groupConversation.getSenderKey(), Base64.DEFAULT), needReply);
+        notifyMembers(roomId, Base64.encodeToString(groupConversation.getSenderKey(), Base64.DEFAULT), true);
         saveConversation(roomId, groupConversation);
         return groupConversation;
     }
@@ -291,7 +291,7 @@ public final class QiscusGroupEncryptionHandler {
     private static String decrypt(long roomId, String message) {
         try {
             byte[] rawData = Base64.decode(message.getBytes(), Base64.DEFAULT);
-            GroupConversation conversation = getConversation(roomId, true);
+            GroupConversation conversation = getConversation(roomId);
             byte[] decrypted = conversation.decrypt(rawData);
             saveConversation(roomId, conversation);
             return new String(decrypted);
@@ -305,7 +305,7 @@ public final class QiscusGroupEncryptionHandler {
         try {
             GroupConversation conversation = QiscusE2EDataStore.getInstance().getGroupConversation(roomId).toBlocking().first();
             if (conversation == null) {
-                conversation = createConversation(roomId, false);
+                conversation = createConversation(roomId);
             } else if (needReply) {
                 notifyMembers(roomId, Base64.encodeToString(conversation.getSenderKey(), Base64.DEFAULT), false);
             }
