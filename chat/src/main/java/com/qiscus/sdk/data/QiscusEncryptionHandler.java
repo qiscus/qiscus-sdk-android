@@ -261,7 +261,7 @@ public final class QiscusEncryptionHandler {
         try {
             byte[] unpackedData = unpackData(message);
             if (unpackedData == null) {
-                return message;
+                return ENCRYPTED_PLACE_HOLDER;
             }
             SesameConversation conversation = getConversation(senderId, false);
             byte[] decrypted = conversation.decrypt(unpackedData);
