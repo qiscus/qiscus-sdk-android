@@ -170,7 +170,7 @@ public enum QiscusApi {
         return api.createOrGetChatRoom(Qiscus.getToken(), Collections.singletonList(withEmail), distinctId,
                 options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
-                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom.getLastComment()));
+                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment()));
     }
 
     public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
@@ -180,7 +180,7 @@ public enum QiscusApi {
 
         return api.createGroupChatRoom(Qiscus.getToken(), name, emails, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
-                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom.getLastComment()));
+                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment()));
     }
 
     private Observable<QiscusChatRoom> createEncryptedGroupChatRoom(String name, List<String> emails,
@@ -235,26 +235,26 @@ public enum QiscusApi {
                             .saveGroupConversation(groupRoom.getId(), groupConversation)
                             .map(groupConversation1 -> groupRoom);
                 })
-                .doOnNext(groupRoom -> replaceWithLocalComment(groupRoom.getLastComment()));
+                .doOnNext(groupRoom -> replaceWithLocalComment(groupRoom, groupRoom.getLastComment()));
     }
 
     public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {
         return api.createOrGetGroupChatRoom(Qiscus.getToken(), uniqueId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
-                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom.getLastComment()));
+                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment()));
     }
 
     public Observable<QiscusChatRoom> getChatRoom(long roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
                 .map(QiscusApiParser::parseQiscusChatRoom)
-                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom.getLastComment()));
+                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment()));
     }
 
     public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
         return api.getChatRoom(Qiscus.getToken(), roomId)
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments)
-                .doOnNext(data -> replaceWithLocalComment(data.first.getLastComment()))
-                .doOnNext(data -> replaceWithLocalComments(data.second));
+                .doOnNext(data -> replaceWithLocalComment(data.first, data.first.getLastComment()))
+                .doOnNext(data -> replaceWithLocalComments(data.first, data.second));
     }
 
     public Observable<List<QiscusChatRoom>> getChatRooms(int page, int limit, boolean showMembers) {
@@ -262,7 +262,7 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
                 .doOnNext(qiscusChatRooms -> {
                     for (QiscusChatRoom qiscusChatRoom : qiscusChatRooms) {
-                        replaceWithLocalComment(qiscusChatRoom.getLastComment());
+                        replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment());
                     }
                 });
     }
@@ -272,7 +272,7 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
                 .doOnNext(qiscusChatRooms -> {
                     for (QiscusChatRoom qiscusChatRoom : qiscusChatRooms) {
-                        replaceWithLocalComment(qiscusChatRoom.getLastComment());
+                        replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment());
                     }
                 });
     }
@@ -282,7 +282,19 @@ public enum QiscusApi {
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId))
-                .doOnNext(this::replaceWithLocalComment);
+                .toList()
+                .flatMap(comments -> {
+                    QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(roomId);
+                    if (savedChatRoom == null) {
+                        return getChatRoom(roomId)
+                                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
+                                .doOnNext(qiscusChatRoom -> replaceWithLocalComments(qiscusChatRoom, comments))
+                                .flatMap(qiscusChatRoom -> Observable.from(comments));
+                    }
+                    return Observable.just(savedChatRoom)
+                            .doOnNext(qiscusChatRoom -> replaceWithLocalComments(qiscusChatRoom, comments))
+                            .flatMap(qiscusChatRoom -> Observable.from(comments));
+                });
     }
 
     public Observable<QiscusComment> getCommentsAfter(long roomId, long lastCommentId) {
@@ -546,7 +558,7 @@ public enum QiscusApi {
     public Observable<QiscusChatRoom> updateChatRoom(long roomId, String name, String avatarUrl, JSONObject options) {
         return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
-                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom.getLastComment()))
+                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment()))
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
 
@@ -572,7 +584,18 @@ public enum QiscusApi {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
-                .doOnNext(this::replaceWithLocalComment)
+                .flatMap(qiscusComment -> {
+                    QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+                    if (savedChatRoom == null) {
+                        return getChatRoom(roomId)
+                                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
+                                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusComment))
+                                .map(qiscusChatRoom -> qiscusComment);
+                    }
+                    return Observable.just(savedChatRoom)
+                            .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusComment))
+                            .map(qiscusChatRoom -> qiscusComment);
+                })
                 .toList();
     }
 
@@ -788,8 +811,8 @@ public enum QiscusApi {
         Observable<JsonElement> getTotalUnreadCount(@Query("token") String token);
     }
 
-    private void replaceWithLocalComment(QiscusComment comment) {
-        if (comment == null) {
+    private void replaceWithLocalComment(QiscusChatRoom qiscusChatRoom, QiscusComment comment) {
+        if (qiscusChatRoom.isChannel() || comment == null) {
             return;
         }
         if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
@@ -797,8 +820,8 @@ public enum QiscusApi {
         }
     }
 
-    private void replaceWithLocalComments(List<QiscusComment> qiscusComments) {
-        if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
+    private void replaceWithLocalComments(QiscusChatRoom qiscusChatRoom, List<QiscusComment> qiscusComments) {
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption() && !qiscusChatRoom.isChannel()) {
             for (QiscusComment comment : qiscusComments) {
                 QiscusEncryptionHandler.decryptOldComment(comment);
             }

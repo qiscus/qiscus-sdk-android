@@ -185,6 +185,12 @@ public final class QiscusGroupEncryptionHandler {
             return;
         }
 
+        //Only decrypt if room is group type
+        QiscusChatRoom chatRoom = getChatRoom(comment.getRoomId());
+        if (!chatRoom.isGroup() || chatRoom.isChannel()) {
+            return;
+        }
+
         //Decrypt message
         if (QiscusEncryptionHandler.encryptAbleMessage(comment.getRawType())) {
             comment.setMessage(decrypt(comment.getRoomId(), comment.getMessage()));
