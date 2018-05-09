@@ -331,7 +331,7 @@ public enum QiscusApi {
         Observable<Pair<String, String>> encryptComment = recipientId.flatMap(recipient -> {
             if (recipient.isEmpty()) {
                 QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
-                if (savedChatRoom.isGroup()) {
+                if (savedChatRoom.isGroup() && !savedChatRoom.isChannel()) {
                     return createEncryptedGroupPayload(qiscusComment.getRoomId(), qiscusComment);
                 }
                 return Observable.just(Pair.create(qiscusComment.getMessage(), qiscusComment.getExtraPayload()));
