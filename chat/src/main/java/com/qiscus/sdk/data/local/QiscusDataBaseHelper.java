@@ -505,7 +505,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public boolean isCommentsEmpty() {
-        String query = "SELECT * FROM " + QiscusDb.CommentTable.TABLE_NAME;
+        String query = "SELECT * FROM " + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
+                + QiscusDb.CommentTable.COLUMN_ID + " != -1 " + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         boolean empty = cursor.getCount() <= 0;
