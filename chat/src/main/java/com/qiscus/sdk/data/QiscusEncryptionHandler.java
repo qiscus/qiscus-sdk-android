@@ -289,7 +289,7 @@ public final class QiscusEncryptionHandler {
         setPlaceHolder(comment);
     }
 
-    public static void setPlaceHolder(QiscusComment comment) {
+    static void setPlaceHolder(QiscusComment comment) {
         comment.setMessage(ENCRYPTED_PLACE_HOLDER);
 
         String rawType = comment.getRawType();
