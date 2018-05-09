@@ -21,6 +21,7 @@ import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.data.QiscusGroupEncryptionHandler;
 import com.qiscus.sdk.data.QiscusResendCommentHandler;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -71,6 +72,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             EventBus.getDefault().register(this);
         }
         this.room = room;
+        if (Qiscus.getChatConfig().isEnableEndToEndEncryption() && room.isGroup() && !room.isChannel()) {
+            QiscusGroupEncryptionHandler.initSenderKey(room.getId());
+        }
         qiscusAccount = Qiscus.getQiscusAccount();
         roomEventHandler = new QiscusRoomEventHandler(room, this);
     }

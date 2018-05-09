@@ -215,8 +215,9 @@ public final class QiscusNewCommentHandler {
                     JSONObject content = payload.optJSONObject("content");
                     long roomId = content.optLong("group_room_id");
                     String senderKey = content.optString("sender_key");
+                    boolean needReply = content.optBoolean("need_reply");
                     if (!TextUtils.isEmpty(senderKey)) {
-                        QiscusGroupEncryptionHandler.updateRecipient(roomId, senderKey);
+                        QiscusGroupEncryptionHandler.updateRecipient(roomId, senderKey, needReply);
                     }
                 }
             } catch (JSONException e) {

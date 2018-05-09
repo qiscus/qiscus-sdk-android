@@ -224,7 +224,7 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoom)
                 .flatMap(groupRoom -> singleRooms.doOnNext(qiscusChatRoom -> {
                     QiscusComment qiscusComment = QiscusComment.generateGroupSenderKeyMessage(qiscusChatRoom.getId(),
-                            groupRoom.getId(), name, senderKey);
+                            groupRoom.getId(), name, senderKey, false);
                     qiscusComment.setState(QiscusComment.STATE_PENDING);
                     Qiscus.getDataStore().addOrUpdate(qiscusComment);
                     QiscusResendCommentHandler.tryResendPendingComment();
