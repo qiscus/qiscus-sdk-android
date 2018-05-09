@@ -19,14 +19,15 @@ package com.qiscus.sdk.data;
 import android.support.annotation.RestrictTo;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.local.QiscusDataStore;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,13 +45,18 @@ import rx.schedulers.Schedulers;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class QiscusCommentBuffer {
-    private static final Queue<QiscusComment> data = new ConcurrentLinkedQueue<>();
+    private static final Map<Long, Queue<QiscusComment>> data = new ConcurrentHashMap<>();
     private static final AtomicLong lastPushTime = new AtomicLong(System.currentTimeMillis());
     private static final AtomicBoolean started = new AtomicBoolean(false);
 
     public static void push(QiscusComment comment) {
-        if (!data.contains(comment)) {
-            data.add(comment);
+        if (!data.containsKey(comment.getRoomId())) {
+            data.put(comment.getRoomId(), new ConcurrentLinkedQueue<>());
+        }
+
+        Queue<QiscusComment> comments = data.get(comment.getRoomId());
+        if (!comments.contains(comment)) {
+            comments.add(comment);
             lastPushTime.set(System.currentTimeMillis());
         }
     }
@@ -74,17 +80,24 @@ public class QiscusCommentBuffer {
 
                 long duration = System.currentTimeMillis() - lastPushTime.get();
                 if (duration >= 1000 && !data.isEmpty()) {
-                    long commentIdNeedToSync = 0;
-                    if (duration < 10000 && data.size() <= 20) {
-                        commentIdNeedToSync = validateData();
-                    }
-                    if (commentIdNeedToSync == 0) {
-                        List<QiscusComment> copy = new ArrayList<>(data);
-                        Collections.sort(copy, (o1, o2) -> o1.getTime().compareTo(o2.getTime()));
-                        data.clear();
-                        subscriber.onNext(copy);
-                    } else if (commentIdNeedToSync > 0) {
-                        synchronizeData(commentIdNeedToSync);
+                    for (Map.Entry<Long, Queue<QiscusComment>> entry : data.entrySet()) {
+                        long roomId = entry.getKey();
+                        Queue<QiscusComment> comments = entry.getValue();
+
+                        long commentIdNeedToSync = 0;
+                        if (duration < 10000 && comments.size() > 1 && comments.size() <= 20) {
+                            commentIdNeedToSync = validateData(comments);
+                        }
+
+                        if (commentIdNeedToSync == 0) {
+                            List<QiscusComment> copy = new ArrayList<>(comments);
+                            Collections.sort(copy, (o1, o2) -> o1.getTime().compareTo(o2.getTime()));
+                            data.get(roomId).clear();
+                            data.remove(roomId);
+                            subscriber.onNext(copy);
+                        } else if (commentIdNeedToSync > 0) {
+                            synchronizeData(commentIdNeedToSync);
+                        }
                     }
                     continue;
                 }
@@ -123,29 +136,22 @@ public class QiscusCommentBuffer {
     /**
      * @return comment id will be used to sync, 0 if comments is valid, -1 if comments is empty
      */
-    private static long validateData() {
-        if (data.isEmpty()) {
+    private static long validateData(Queue<QiscusComment> comments) {
+        if (comments.isEmpty()) {
             return -1;
         }
 
-        QiscusComment minimumComment = data.peek();
-        for (QiscusComment comment : data) {
+        QiscusComment minimumComment = comments.peek();
+        for (QiscusComment comment : comments) {
             if (comment.getId() < minimumComment.getId()) {
                 minimumComment = comment;
             }
         }
 
-        QiscusDataStore dataStore = Qiscus.getDataStore();
-        if (minimumComment.getCommentBeforeId() > 0 && !dataStore.isCommentsEmpty()) {
-            QiscusComment beforeComment = dataStore.getComment(minimumComment.getCommentBeforeId());
-            if (beforeComment == null) {
-                return minimumComment.getCommentBeforeId();
-            }
-        }
-
-        for (QiscusComment comment : data) {
+        // Mencari comment yang terloncati didalam comments
+        for (QiscusComment comment : comments) {
             if (comment.getId() > minimumComment.getId()
-                    && !containsCommentWithId(comment.getCommentBeforeId())) {
+                    && !containsCommentWithId(comments, comment.getCommentBeforeId())) {
                 return comment.getCommentBeforeId();
             }
         }
@@ -153,8 +159,8 @@ public class QiscusCommentBuffer {
         return 0;
     }
 
-    private static boolean containsCommentWithId(long id) {
-        for (QiscusComment comment : data) {
+    private static boolean containsCommentWithId(Queue<QiscusComment> comments, long id) {
+        for (QiscusComment comment : comments) {
             if (comment.getId() == id) {
                 return true;
             }
