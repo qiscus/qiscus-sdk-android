@@ -57,6 +57,20 @@ public final class QiscusGroupEncryptionHandler {
         });
     }
 
+    public static void reInitSenderKey(long roomId, boolean needReply) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+            try {
+                String deviceId = QiscusMyBundleCache.getInstance().getDeviceId();
+                GroupConversation groupConversation = new GroupConversation();
+                groupConversation.initSender(new HashId(deviceId.getBytes()));
+                notifyMembers(roomId, Base64.encodeToString(groupConversation.getSenderKey(), Base64.DEFAULT), needReply);
+                saveConversation(roomId, groupConversation);
+            } catch (Exception e) {
+                //Do nothing;
+            }
+        });
+    }
+
     public static Pair<String, String> createEncryptedPayload(long roomId, QiscusComment comment) throws Exception {
         String message = QiscusEncryptionHandler.encryptAbleMessage(comment.getRawType())
                 ? encrypt(roomId, comment.getMessage()) : comment.getMessage();
@@ -142,6 +156,7 @@ public final class QiscusGroupEncryptionHandler {
                         return Observable.just(savedRoom);
                     }
                     return QiscusApi.getInstance().getChatRoom(email, null, null)
+                            .doOnNext(qiscusChatRoom -> qiscusChatRoom.setLastComment(null))
                             .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
                 });
 
@@ -161,6 +176,7 @@ public final class QiscusGroupEncryptionHandler {
         }
 
         return QiscusApi.getInstance().getChatRoom(roomId)
+                .doOnNext(qiscusChatRoom -> qiscusChatRoom.setLastComment(null))
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                 .toBlocking()
                 .first();

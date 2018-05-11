@@ -343,8 +343,6 @@ class QiscusRoomEventHandler {
             tryUpdateLastState();
 
             listener.onRoomMemberRemoved(member);
-            QiscusAndroidUtil.runOnBackgroundThread(() ->
-                    Qiscus.getDataStore().deleteRoomMember(room.getId(), member.getEmail()));
         }
     }
 

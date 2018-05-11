@@ -138,6 +138,7 @@ public final class QiscusNewCommentHandler {
 
         if (chatRoom != null) {
             chatRoom.setUnreadCount(chatRoom.getUnreadCount() + 1);
+            chatRoom.setLastComment(null);
             Qiscus.getDataStore().addOrUpdate(chatRoom);
         }
     }
@@ -145,6 +146,7 @@ public final class QiscusNewCommentHandler {
     private static void fetchAndSaveRoom(long roomId) {
         QiscusApi.getInstance()
                 .getChatRoom(roomId)
+                .doOnNext(qiscusChatRoom -> qiscusChatRoom.setLastComment(null))
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -180,6 +182,8 @@ public final class QiscusNewCommentHandler {
             return;
         }
 
+        chatRoom.setLastComment(null);
+
         List<QiscusRoomMember> members = chatRoom.getMember();
         for (QiscusRoomMember member : members) {
             if (member.getEmail().equals(comment.getSenderEmail()) && member.getLastReadCommentId() < comment.getId()) {
@@ -196,6 +200,7 @@ public final class QiscusNewCommentHandler {
         if (savedComment == null) {
             addComment(comment);
             handleSenderKeyComment(comment);
+            handleGroupEventComment(comment);
         } else {
             updateComment(comment);
         }
@@ -222,6 +227,60 @@ public final class QiscusNewCommentHandler {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private static void handleGroupEventComment(QiscusComment comment) {
+        if (comment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
+            try {
+                QiscusAccount account = Qiscus.getQiscusAccount();
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                String subjectEmail = payload.optString("subject_email");
+                String objectEmail = payload.optString("object_email");
+
+                boolean enableEncryption = Qiscus.getChatConfig().isEnableEndToEndEncryption();
+                QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(comment.getRoomId());
+                QiscusRoomMember member = new QiscusRoomMember();
+
+                switch (payload.optString("type")) {
+                    case "add_member":
+                        if (enableEncryption) {
+                            if (objectEmail.equals(account.getEmail())) {
+                                QiscusGroupEncryptionHandler.reInitSenderKey(comment.getRoomId(), true);
+                            } else if (room != null) {
+                                member.setEmail(objectEmail);
+                                member.setUsername(payload.optString("object_username"));
+                                Qiscus.getDataStore().addOrUpdateRoomMember(room.getId(), member, room.getDistinctId());
+                            }
+                        }
+                        break;
+                    case "join_room":
+                        if (enableEncryption) {
+                            if (subjectEmail.equals(account.getEmail())) {
+                                QiscusGroupEncryptionHandler.reInitSenderKey(comment.getRoomId(), true);
+                            } else if (room != null) {
+                                member.setEmail(subjectEmail);
+                                member.setUsername(payload.optString("subject_username"));
+                                Qiscus.getDataStore().addOrUpdateRoomMember(room.getId(), member, room.getDistinctId());
+                            }
+                        }
+                        break;
+                    case "remove_member":
+                        Qiscus.getDataStore().deleteRoomMember(comment.getRoomId(), objectEmail);
+                        if (enableEncryption && !objectEmail.equals(account.getEmail())) {
+                            QiscusGroupEncryptionHandler.reInitSenderKey(comment.getRoomId(), false);
+                        }
+                        break;
+                    case "left_room":
+                        Qiscus.getDataStore().deleteRoomMember(comment.getRoomId(), subjectEmail);
+                        if (enableEncryption && !subjectEmail.equals(account.getEmail())) {
+                            QiscusGroupEncryptionHandler.reInitSenderKey(comment.getRoomId(), false);
+                        }
+                        break;
+                }
+            } catch (Exception e) {
+                //Do nothing
             }
         }
     }
