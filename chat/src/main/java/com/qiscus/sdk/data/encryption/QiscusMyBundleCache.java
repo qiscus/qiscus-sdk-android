@@ -55,7 +55,9 @@ public enum QiscusMyBundleCache {
      * @return 64 unique character per device
      */
     private String computeDeviceId() {
-        StringBuilder deviceId = new StringBuilder("android_");
+        StringBuilder deviceId = new StringBuilder("android_")
+                .append(Qiscus.getQiscusAccount().getEmail())
+                .append("_");
         deviceId.append(Settings.Secure.getString(Qiscus.getApps().getContentResolver(), Settings.Secure.ANDROID_ID))
                 .append('_').append(Qiscus.getApps().getPackageName());
         if (deviceId.length() > 64) {
