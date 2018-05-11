@@ -287,6 +287,7 @@ public enum QiscusApi {
                     QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(roomId);
                     if (savedChatRoom == null) {
                         return getChatRoom(roomId)
+                                .doOnNext(qiscusChatRoom -> qiscusChatRoom.setLastComment(null))
                                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                                 .doOnNext(qiscusChatRoom -> replaceWithLocalComments(qiscusChatRoom, comments))
                                 .flatMap(qiscusChatRoom -> Observable.from(comments));
@@ -558,7 +559,7 @@ public enum QiscusApi {
     public Observable<QiscusChatRoom> updateChatRoom(long roomId, String name, String avatarUrl, JSONObject options) {
         return api.updateChatRoom(Qiscus.getToken(), roomId, name, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom)
-                .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusChatRoom.getLastComment()))
+                .doOnNext(qiscusChatRoom -> qiscusChatRoom.setLastComment(null))
                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
     }
 
@@ -588,6 +589,7 @@ public enum QiscusApi {
                     QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
                     if (savedChatRoom == null) {
                         return getChatRoom(roomId)
+                                .doOnNext(qiscusChatRoom -> qiscusChatRoom.setLastComment(null))
                                 .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                                 .doOnNext(qiscusChatRoom -> replaceWithLocalComment(qiscusChatRoom, qiscusComment))
                                 .map(qiscusChatRoom -> qiscusComment);
