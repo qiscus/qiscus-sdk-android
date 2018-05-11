@@ -949,6 +949,7 @@ public class QiscusComment implements Parcelable {
                 && message.equals(qiscusComment.message)
                 && sender.equals(qiscusComment.sender)
                 && senderEmail.equals(qiscusComment.senderEmail)
+                && senderAvatar != null
                 && senderAvatar.equals(qiscusComment.senderAvatar)
                 && time.equals(qiscusComment.time)
                 && state == qiscusComment.state
