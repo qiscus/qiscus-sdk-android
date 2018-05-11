@@ -67,6 +67,6 @@ public final class QiscusErrorLogger {
         } else if (throwable instanceof IOException) { //Error from network
             return "Can not connect to qiscus server!";
         }
-        return throwable.getMessage();
+        return throwable.getMessage() == null ? throwable.getClass().getSimpleName() : throwable.getMessage();
     }
 }
