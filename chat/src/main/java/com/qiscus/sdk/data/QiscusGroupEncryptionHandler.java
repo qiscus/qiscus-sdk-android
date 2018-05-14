@@ -169,6 +169,44 @@ public final class QiscusGroupEncryptionHandler {
         }).toList().toCompletable().await();
     }
 
+    private static void sendSenderKey(String recipientEmail, long roomId, String senderKey, boolean needReply) {
+        QiscusChatRoom groupRoom = getChatRoom(roomId);
+        Observable.fromCallable(() -> Qiscus.getDataStore().getChatRoom(recipientEmail))
+                .flatMap(savedRoom -> {
+                    if (savedRoom != null) {
+                        return Observable.just(savedRoom);
+                    }
+                    return QiscusApi.getInstance().getChatRoom(recipientEmail, null, null)
+                            .doOnNext(qiscusChatRoom -> qiscusChatRoom.setLastComment(null))
+                            .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
+                })
+                .doOnNext(qiscusChatRoom -> {
+                    QiscusComment qiscusComment = QiscusComment.generateGroupSenderKeyMessage(qiscusChatRoom.getId(),
+                            groupRoom.getId(), groupRoom.getName(), senderKey, needReply);
+                    qiscusComment.setState(QiscusComment.STATE_PENDING);
+                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                    QiscusResendCommentHandler.tryResendPendingComment();
+                })
+                .toCompletable().await();
+
+    }
+
+    private static void exchangeSenderKey(String recipientEmail, long roomId) {
+        try {
+            GroupConversation conversation = QiscusE2EDataStore.getInstance()
+                    .getGroupConversation(roomId).toBlocking().first();
+            if (conversation == null) {
+                conversation = createConversation(roomId);
+            } else {
+                sendSenderKey(recipientEmail, roomId,
+                        Base64.encodeToString(conversation.getSenderKey(), Base64.DEFAULT), true);
+            }
+            saveConversation(roomId, conversation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private static QiscusChatRoom getChatRoom(long roomId) {
         QiscusChatRoom savedChatRoom = Qiscus.getDataStore().getChatRoom(roomId);
         if (savedChatRoom != null) {
@@ -209,14 +247,14 @@ public final class QiscusGroupEncryptionHandler {
 
         //Decrypt message
         if (QiscusEncryptionHandler.encryptAbleMessage(comment.getRawType())) {
-            comment.setMessage(decrypt(comment.getRoomId(), comment.getMessage()));
+            comment.setMessage(decrypt(comment.getRoomId(), comment.getSenderEmail(), comment.getMessage()));
         }
 
         //Decrypt payload
         if (!comment.getRawType().equals("text")) {
             try {
-                comment.setExtraPayload(decrypt(comment.getRoomId(), comment.getRawType(),
-                        new JSONObject(comment.getExtraPayload())));
+                comment.setExtraPayload(decrypt(comment.getRoomId(), comment.getSenderEmail(),
+                        comment.getRawType(), new JSONObject(comment.getExtraPayload())));
             } catch (Exception ignored) {
                 // ignored
             }
@@ -273,35 +311,35 @@ public final class QiscusGroupEncryptionHandler {
         }
     }
 
-    private static String decrypt(long roomId, String rawType, JSONObject payload) {
+    private static String decrypt(long roomId, String senderEmail, String rawType, JSONObject payload) {
         try {
             switch (rawType) {
                 case "reply":
-                    payload.put("text", decrypt(roomId, payload.optString("text")));
+                    payload.put("text", decrypt(roomId, senderEmail, payload.optString("text")));
                     break;
                 case "file_attachment":
-                    payload.put("url", decrypt(roomId, payload.optString("url")));
-                    payload.put("file_name", decrypt(roomId, payload.optString("file_name")));
-                    payload.put("caption", decrypt(roomId, payload.optString("caption")));
-                    payload.put("encryption_key", decrypt(roomId, payload.optString("encryption_key")));
+                    payload.put("url", decrypt(roomId, senderEmail, payload.optString("url")));
+                    payload.put("file_name", decrypt(roomId, senderEmail, payload.optString("file_name")));
+                    payload.put("caption", decrypt(roomId, senderEmail, payload.optString("caption")));
+                    payload.put("encryption_key", decrypt(roomId, senderEmail, payload.optString("encryption_key")));
                     break;
                 case "contact_person":
-                    payload.put("name", decrypt(roomId, payload.optString("name")));
-                    payload.put("value", decrypt(roomId, payload.optString("value")));
+                    payload.put("name", decrypt(roomId, senderEmail, payload.optString("name")));
+                    payload.put("value", decrypt(roomId, senderEmail, payload.optString("value")));
                     break;
                 case "location":
-                    payload.put("name", decrypt(roomId, payload.optString("name")));
-                    payload.put("address", decrypt(roomId, payload.optString("address")));
-                    Double latitude = Double.parseDouble(decrypt(roomId, payload.optString("encrypted_latitude")));
-                    Double longitude = Double.parseDouble(decrypt(roomId, payload.optString("encrypted_longitude")));
+                    payload.put("name", decrypt(roomId, senderEmail, payload.optString("name")));
+                    payload.put("address", decrypt(roomId, senderEmail, payload.optString("address")));
+                    Double latitude = Double.parseDouble(decrypt(roomId, senderEmail, payload.optString("encrypted_latitude")));
+                    Double longitude = Double.parseDouble(decrypt(roomId, senderEmail, payload.optString("encrypted_longitude")));
                     payload.put("latitude", latitude);
                     payload.put("longitude", longitude);
                     payload.put("encrypted_latitude", latitude.toString());
                     payload.put("encrypted_longitude", longitude.toString());
-                    payload.put("map_url", decrypt(roomId, payload.optString("map_url")));
+                    payload.put("map_url", decrypt(roomId, senderEmail, payload.optString("map_url")));
                     break;
                 case "custom":
-                    payload.put("content", new JSONObject(decrypt(roomId, payload.optString("content"))));
+                    payload.put("content", new JSONObject(decrypt(roomId, senderEmail, payload.optString("content"))));
                     break;
             }
         } catch (Exception ignored) {
@@ -310,7 +348,7 @@ public final class QiscusGroupEncryptionHandler {
         return payload.toString();
     }
 
-    private static String decrypt(long roomId, String message) {
+    private static String decrypt(long roomId, String senderEmail, String message) {
         try {
             byte[] rawData = Base64.decode(message.getBytes(), Base64.DEFAULT);
             GroupConversation conversation = getConversation(roomId);
@@ -319,17 +357,18 @@ public final class QiscusGroupEncryptionHandler {
             return new String(decrypted);
         } catch (Exception e) {
             e.printStackTrace();
+            exchangeSenderKey(senderEmail, roomId);
             return QiscusEncryptionHandler.ENCRYPTED_PLACE_HOLDER;
         }
     }
 
-    public static void updateRecipient(long roomId, String senderKey, boolean needReply) {
+    public static void updateRecipient(String sender, long roomId, String senderKey, boolean needReply) {
         try {
             GroupConversation conversation = QiscusE2EDataStore.getInstance().getGroupConversation(roomId).toBlocking().first();
             if (conversation == null) {
                 conversation = createConversation(roomId);
             } else if (needReply) {
-                notifyMembers(roomId, Base64.encodeToString(conversation.getSenderKey(), Base64.DEFAULT), false);
+                sendSenderKey(sender, roomId, Base64.encodeToString(conversation.getSenderKey(), Base64.DEFAULT), false);
             }
             conversation.initRecipient(Base64.decode(senderKey, Base64.DEFAULT));
             saveConversation(roomId, conversation);

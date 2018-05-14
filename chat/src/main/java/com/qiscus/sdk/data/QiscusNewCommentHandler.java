@@ -221,8 +221,9 @@ public final class QiscusNewCommentHandler {
                     long roomId = content.optLong("group_room_id");
                     String senderKey = content.optString("sender_key");
                     boolean needReply = content.optBoolean("need_reply");
+                    String sender = comment.getSenderEmail();
                     if (!TextUtils.isEmpty(senderKey)) {
-                        QiscusGroupEncryptionHandler.updateRecipient(roomId, senderKey, needReply);
+                        QiscusGroupEncryptionHandler.updateRecipient(sender, roomId, senderKey, needReply);
                     }
                 }
             } catch (JSONException e) {
