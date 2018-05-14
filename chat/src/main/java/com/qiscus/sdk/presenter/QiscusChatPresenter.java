@@ -65,6 +65,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private QiscusAccount qiscusAccount;
     private Func2<QiscusComment, QiscusComment, Integer> commentComparator = (lhs, rhs) -> rhs.getTime().compareTo(lhs.getTime());
     private QiscusRoomEventHandler roomEventHandler;
+    private boolean enableEncryption = Qiscus.getChatConfig().isEnableEndToEndEncryption();
 
     public QiscusChatPresenter(View view, QiscusChatRoom room) {
         super(view);
@@ -72,7 +73,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             EventBus.getDefault().register(this);
         }
         this.room = room;
-        if (Qiscus.getChatConfig().isEnableEndToEndEncryption() && room.isGroup() && !room.isChannel()) {
+        if (enableEncryption && room.isGroup() && !room.isChannel()) {
             QiscusGroupEncryptionHandler.initSenderKey(room.getId());
         }
         qiscusAccount = Qiscus.getQiscusAccount();
@@ -169,6 +170,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                             view.onLoadCommentsError(throwable);
                         }
                     });
+                })
+                .doOnNext(roomData -> {
+                    //We only use data from local for initial comment
+                    //Because we can not decrypt these comments
+                    if (enableEncryption) {
+                        roomData.first.setLastComment(null);
+                        roomData.second.clear();
+                    }
                 })
                 .doOnNext(roomData -> {
                     roomEventHandler.setRoom(roomData.first);
