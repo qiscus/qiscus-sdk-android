@@ -26,6 +26,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.encryption.QiscusE2EDataStore;
 import com.qiscus.sdk.data.encryption.QiscusE2ERestApi;
 import com.qiscus.sdk.data.encryption.QiscusMyBundleCache;
+import com.qiscus.sdk.data.encryption.core.AuthenticationException;
 import com.qiscus.sdk.data.encryption.core.BundlePublic;
 import com.qiscus.sdk.data.encryption.core.BundlePublicCollection;
 import com.qiscus.sdk.data.encryption.core.HashId;
@@ -267,6 +268,21 @@ public final class QiscusEncryptionHandler {
             byte[] decrypted = conversation.decrypt(unpackedData);
             saveConversation(senderId, conversation);
             return new String(decrypted);
+        } catch (AuthenticationException e) { //Trying with user as recipient
+            try {
+                byte[] unpackedData = unpackData(message);
+                if (unpackedData == null) {
+                    return ENCRYPTED_PLACE_HOLDER;
+                }
+
+                SesameConversation conversation = createConversation(senderId, false);
+                byte[] decrypted = conversation.decrypt(unpackedData);
+                saveConversation(senderId, conversation);
+                return new String(decrypted);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+                return ENCRYPTED_PLACE_HOLDER;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ENCRYPTED_PLACE_HOLDER;
