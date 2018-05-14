@@ -18,6 +18,8 @@ package com.qiscus.sdk.data;
 
 import android.support.annotation.RestrictTo;
 
+import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusSyncEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
@@ -25,6 +27,7 @@ import com.qiscus.sdk.util.QiscusLogger;
 
 import org.greenrobot.eventbus.EventBus;
 
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -56,6 +59,45 @@ public final class QiscusSyncCommentHandler {
                     QiscusErrorLogger.print(throwable);
                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
                     QiscusLogger.print("Sync failed...");
+                });
+    }
+
+    public static void synchronizeData() {
+        synchronizeRoom();
+        synchronizeComment();
+    }
+
+    public static void synchronizeRoom() {
+        QiscusApi.getInstance().getChatRooms(0, 100, true)
+                .flatMap(Observable::from)
+                .doOnNext(qiscusChatRoom -> {
+                    //If we already have valid comment in local, don't use comment from server
+                    if (Qiscus.getDataStore().getLatestSentComment(qiscusChatRoom.getId()) != null) {
+                        qiscusChatRoom.setLastComment(null);
+                    }
+                })
+                .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(qiscusChatRoom -> {
+                }, throwable -> {
+                });
+    }
+
+    private static void synchronizeComment() {
+        Qiscus.getDataStore().getObservableChatRooms(1000)
+                .flatMap(Observable::from)
+                .flatMap(qiscusChatRoom -> {
+                    QiscusComment lastComment = Qiscus.getDataStore().getLatestSentComment(qiscusChatRoom.getId());
+                    if (lastComment != null) {
+                        return QiscusApi.getInstance().getCommentsAfter(qiscusChatRoom.getId(), lastComment.getId());
+                    }
+                    return Observable.empty();
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(qiscusComment -> {
+                }, throwable -> {
                 });
     }
 }

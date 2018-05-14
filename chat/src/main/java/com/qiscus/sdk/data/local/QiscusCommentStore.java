@@ -77,6 +77,8 @@ public interface QiscusCommentStore {
 
     QiscusComment getLatestComment(long roomId);
 
+    QiscusComment getLatestSentComment(long roomId);
+
     QiscusComment getLatestDeliveredComment(long roomId);
 
     QiscusComment getLatestReadComment(long roomId);

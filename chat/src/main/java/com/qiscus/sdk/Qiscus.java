@@ -27,6 +27,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.qiscus.jupuk.Jupuk;
 import com.qiscus.sdk.data.QiscusEncryptionHandler;
+import com.qiscus.sdk.data.QiscusSyncCommentHandler;
 import com.qiscus.sdk.data.encryption.QiscusE2EDataStore;
 import com.qiscus.sdk.data.encryption.QiscusMyBundleCache;
 import com.qiscus.sdk.data.local.QiscusCacheManager;
@@ -547,6 +548,14 @@ public class Qiscus {
         if (!hasSetupUser()) {
             throw new RuntimeException("Please set Qiscus user before start the chatting!");
         }
+    }
+
+    /**
+     * Trigger synchronizing comments in all room
+     */
+    public static void synchronizeData() {
+        checkUserSetup();
+        QiscusSyncCommentHandler.synchronizeData();
     }
 
     /**
