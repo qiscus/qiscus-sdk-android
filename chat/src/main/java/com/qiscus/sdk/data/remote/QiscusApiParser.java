@@ -248,6 +248,8 @@ final class QiscusApiParser {
 
         if (jsonComment.has("chat_type")) {
             qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("chat_type").getAsString()));
+        } else if (jsonComment.has("room_type")) {
+            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
         }
 
         if (jsonComment.has("unique_id")) {
