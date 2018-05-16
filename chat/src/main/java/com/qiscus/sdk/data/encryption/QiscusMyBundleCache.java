@@ -62,7 +62,7 @@ public enum QiscusMyBundleCache {
                 .append('_')
                 .append(Qiscus.getApps().getPackageName());
 
-        if (deviceId.length() > 64) {
+        if (deviceId.length() >= 64) {
             deviceId = new StringBuilder(deviceId.substring(0, 64));
         } else {
             deviceId.append('_');
