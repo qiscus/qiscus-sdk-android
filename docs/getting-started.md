@@ -15,7 +15,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.24.0'
+    compile 'com.qiscus.sdk:chat:2.24.3'
 }
 ```
 
@@ -156,6 +156,26 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
        });
 ``` 
 
+## Channel
+
+Channel is a room that behave similar like a group chat, in channel anyone can join using the room uniqueId, there are several limitation on channel like : no typing indicator, no read/deliver status, no comment info, and “delete for me” is not available. Here how you can create or join a Channel Room:
+
+```java
+Qiscus.buildGroupChatRoomWith("ChannelName")
+      .withAvatar("http://avatar.url.com/channel.jpg")
+      .build(new Qiscus.ChatBuilderListener() {
+          @Override
+          public void onSuccess(QiscusChatRoom qiscusChatRoom) {
+              startActivity(QiscusChannelActivity.generateIntent(MainActivity.this, qiscusChatRoom));
+          }
+
+          @Override
+          public void onError(Throwable throwable) {
+              //do anything if error occurs
+          }
+       });
+```
+
 ## More About Rooms
 
 After successfully creating your room, you may need to do advanced development for your chat app. This may include inviting more participant to your room, entering a specific room without invitation, and so on. Hence, in this section you will learn about the following things :
@@ -224,7 +244,7 @@ In some cases, you may need to add additional participants into your room chat o
 
 ## Enable Push Notification
 
-To enable Push Norification in your app, you need to first install FCM to your apps, you can follow [Firebase steps](https://firebase.google.com/docs/cloud-messaging/android/client) if you have not set it up. Otherwise, you can skip this step if your apps already use FCM. After the FCM is ready, you need to put your api key to qiscus dashboard.
+To enable Push Notification in your app, you need to first install FCM to your apps, you can follow [Firebase steps](https://firebase.google.com/docs/cloud-messaging/android/client) if you have not set it up. Otherwise, you can skip this step if your apps already use FCM. After the FCM is ready, you need to put your api key to qiscus dashboard.
 
 Now let's integrate with Qiscus client sdk, first enable FCM at Qiscus chat config.
 

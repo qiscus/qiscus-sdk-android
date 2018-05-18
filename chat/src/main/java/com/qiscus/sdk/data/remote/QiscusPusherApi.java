@@ -245,6 +245,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
+            } else {
+                mqttAndroidClient.subscribe(Qiscus.getAppId() + "/" + qiscusChatRoom.getUniqueId() + "/c", 2);
             }
         } catch (MqttException e) {
             //Do nothing
@@ -261,6 +263,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/t");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/d");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/r");
+            mqttAndroidClient.unsubscribe(Qiscus.getAppId() + "/" + qiscusChatRoom.getUniqueId() + "/c");
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
         }
@@ -382,7 +385,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             } catch (JSONException e) {
                 QiscusLogger.print(e.getMessage());
             }
-        } else if (topic.equals(qiscusAccount.getToken() + "/c")) {
+        } else if (topic.equals(qiscusAccount.getToken() + "/c")
+                || (topic.startsWith(Qiscus.getAppId()) && topic.endsWith("/c"))) {
             QiscusComment qiscusComment = jsonToComment(message);
             if (qiscusComment == null) {
                 return;

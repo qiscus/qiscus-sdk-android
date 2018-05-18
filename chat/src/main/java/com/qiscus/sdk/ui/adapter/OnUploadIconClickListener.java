@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    repositories {
-        jcenter()
-        google()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+package com.qiscus.sdk.ui.adapter;
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
+import android.view.View;
 
-allprojects {
-    repositories {
-        jcenter()
-        google()
-        maven { url "https://dl.bintray.com/qiscustech/maven" }
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+/**
+ * Created on : April 27, 2018
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
+ */
+public interface OnUploadIconClickListener {
+    void onUploadIconClick(View view, int position);
 }

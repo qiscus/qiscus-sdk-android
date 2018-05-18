@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
@@ -37,6 +38,12 @@ public class QiscusFileViewHolder extends QiscusBaseFileMessageViewHolder {
 
     public QiscusFileViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
+    }
+
+    public QiscusFileViewHolder(View itemView, OnItemClickListener itemClickListener,
+                                OnLongItemClickListener longItemClickListener,
+                                OnUploadIconClickListener downloadIconClickListener) {
+        super(itemView, itemClickListener, longItemClickListener, downloadIconClickListener);
     }
 
     @Nullable

@@ -96,7 +96,12 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
     protected void showProgressOrNot(QiscusComment qiscusComment) {
         if (progressView != null) {
             progressView.setProgress(qiscusComment.getProgress());
-            progressView.setVisibility(qiscusComment.isDownloading() ? View.VISIBLE : View.GONE);
+            progressView.setVisibility(
+                    qiscusComment.isDownloading()
+                            || qiscusComment.getState() == QiscusComment.STATE_PENDING
+                            || qiscusComment.getState() == QiscusComment.STATE_SENDING
+                            ? View.VISIBLE : View.GONE
+            );
         }
     }
 
