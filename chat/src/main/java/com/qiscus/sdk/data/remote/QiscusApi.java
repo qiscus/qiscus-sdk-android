@@ -169,8 +169,10 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusChatRoom> getChatRoom(long roomId) {
-        return api.getChatRoom(Qiscus.getToken(), roomId)
-                .map(QiscusApiParser::parseQiscusChatRoom);
+        return api.getChatRooms(Qiscus.getToken(), Collections.singletonList(roomId), new ArrayList<>(), true)
+                .map(QiscusApiParser::parseQiscusChatRoomInfo)
+                .flatMap(Observable::from)
+                .take(1);
     }
 
     public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
