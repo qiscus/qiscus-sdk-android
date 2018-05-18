@@ -169,7 +169,7 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusChatRoom> getChatRoom(long roomId) {
-        return api.getChatRooms(Qiscus.getToken(), Collections.singletonList(roomId), new ArrayList<>(),true)
+        return api.getChatRooms(Qiscus.getToken(), Collections.singletonList(roomId), new ArrayList<>(), true)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
                 .flatMap(Observable::from)
                 .take(1);
