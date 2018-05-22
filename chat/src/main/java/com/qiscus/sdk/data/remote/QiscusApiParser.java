@@ -32,14 +32,9 @@ import com.qiscus.sdk.util.QiscusTextUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * Created on : February 02, 2017
@@ -48,12 +43,6 @@ import java.util.TimeZone;
  * GitHub     : https://github.com/zetbaitsu
  */
 final class QiscusApiParser {
-    private static DateFormat dateFormat;
-
-    static {
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     static QiscusNonce parseNonce(JsonElement jsonElement) {
         JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
@@ -232,11 +221,9 @@ final class QiscusApiParser {
         qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
         qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
 
-        try {
-            qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        //timestamp is in nano seconds format, convert it to milliseconds by divide it
+        long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
+        qiscusComment.setTime(new Date(timestamp));
 
         if (jsonComment.has("is_deleted")) {
             qiscusComment.setDeleted(jsonComment.get("is_deleted").getAsBoolean());

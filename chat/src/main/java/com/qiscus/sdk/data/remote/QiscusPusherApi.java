@@ -54,12 +54,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -74,13 +72,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private static final String TAG = QiscusPusherApi.class.getSimpleName();
     private static final long RETRY_PERIOD = 2000;
 
-    private static DateFormat dateFormat;
     private static Gson gson;
     private static long reconnectCounter;
 
     static {
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
     }
 
@@ -593,7 +588,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
             qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
             qiscusComment.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
-            qiscusComment.setTime(dateFormat.parse(jsonObject.get("timestamp").getAsString()));
+
+            //timestamp is in nano seconds format, convert it to milliseconds by divide it
+            long timestamp = jsonObject.get("unix_nano_timestamp").getAsLong() / 1000000L;
+            qiscusComment.setTime(new Date(timestamp));
             qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
 
             if (jsonObject.has("is_deleted")) {
