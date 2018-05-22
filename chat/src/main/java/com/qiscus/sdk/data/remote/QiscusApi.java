@@ -46,13 +46,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
@@ -169,8 +166,10 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusChatRoom> getChatRoom(long roomId) {
-        return api.getChatRoom(Qiscus.getToken(), roomId)
-                .map(QiscusApiParser::parseQiscusChatRoom);
+        return api.getChatRooms(Qiscus.getToken(), Collections.singletonList(roomId), new ArrayList<>(), true)
+                .map(QiscusApiParser::parseQiscusChatRoomInfo)
+                .flatMap(Observable::from)
+                .take(1);
     }
 
     public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
@@ -213,13 +212,10 @@ public enum QiscusApi {
                             .get("results").getAsJsonObject().get("comment").getAsJsonObject();
                     qiscusComment.setId(jsonComment.get("id").getAsLong());
                     qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsInt());
-                    try {
-                        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        qiscusComment.setTime(dateFormat.parse(jsonComment.get("timestamp").getAsString()));
-                    } catch (Exception e) {
-                        // Ignore
-                    }
+
+                    //timestamp is in nano seconds format, convert it to milliseconds by divide it
+                    long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
+                    qiscusComment.setTime(new Date(timestamp));
                     QiscusLogger.print("Sent Comment...");
                     return qiscusComment;
                 })
