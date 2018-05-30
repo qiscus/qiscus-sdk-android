@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.remote;
 
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
@@ -32,6 +33,7 @@ import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
+import com.qiscus.sdk.util.BuildVersionUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -117,6 +119,10 @@ public enum QiscusApi {
                 .addHeader("QISCUS_SDK_TOKEN", Qiscus.hasSetupUser() ? Qiscus.getToken() : "")
                 .addHeader("QISCUS_SDK_USER_EMAIL", Qiscus.hasSetupUser() ? Qiscus.getQiscusAccount().getEmail() : "")
                 .addHeader("QISCUS_SDK_VERSION", "ANDROID_" + BuildConfig.VERSION_NAME)
+                .addHeader("QISCUS_SDK_PLATFORM", "ANDROID")
+                .addHeader("QISCUS_SDK_DEVICE_BRAND", Build.MANUFACTURER)
+                .addHeader("QISCUS_SDK_DEVICE_MODEL", Build.MODEL)
+                .addHeader("QISCUS_SDK_DEVICE_OS_VERSION", BuildVersionUtil.OS_VERSION_NAME)
                 .build();
         return chain.proceed(req);
     }
