@@ -57,7 +57,7 @@ public final class BuildVersionUtil {
             }
 
             if (fieldValue == Build.VERSION.SDK_INT) {
-                builder.append(" ").append(fieldName);
+                builder.append(' ').append(fieldName);
                 builder.append(" SDK ").append(fieldValue);
             }
         }
