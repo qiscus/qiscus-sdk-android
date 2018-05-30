@@ -451,6 +451,11 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
     }
 
+    public Observable<QiscusChatRoom> addRoomMember(long roomId, List<String> emails) {
+        return api.addRoomMember(Qiscus.getToken(), roomId, emails)
+                .flatMap(jsonElement -> getChatRoom(roomId));
+    }
+
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -576,6 +581,12 @@ public enum QiscusApi {
 
         @GET("/api/v2/sdk/total_unread_count")
         Observable<JsonElement> getTotalUnreadCount(@Query("token") String token);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/add_room_participants")
+        Observable<JsonElement> addRoomMember(@Field("token") String token,
+                                              @Field("room_id") long roomId,
+                                              @Field("emails[]") List<String> emails);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
