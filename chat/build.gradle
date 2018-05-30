@@ -20,8 +20,8 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply from: rootProject.file('gradle/quality.gradle')
 
 def versionMajor = 2
-def versionMinor = 24
-def versionPatch = 4
+def versionMinor = 25
+def versionPatch = 0
 
 ext {
     bintrayRepo = 'maven'

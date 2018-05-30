@@ -17,6 +17,7 @@
 package com.qiscus.sdk.data.remote;
 
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
@@ -32,6 +33,7 @@ import com.qiscus.sdk.data.model.QiscusNonce;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.event.QiscusCommentSentEvent;
+import com.qiscus.sdk.util.BuildVersionUtil;
 import com.qiscus.sdk.util.QiscusDateUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
@@ -117,6 +119,10 @@ public enum QiscusApi {
                 .addHeader("QISCUS_SDK_TOKEN", Qiscus.hasSetupUser() ? Qiscus.getToken() : "")
                 .addHeader("QISCUS_SDK_USER_EMAIL", Qiscus.hasSetupUser() ? Qiscus.getQiscusAccount().getEmail() : "")
                 .addHeader("QISCUS_SDK_VERSION", "ANDROID_" + BuildConfig.VERSION_NAME)
+                .addHeader("QISCUS_SDK_PLATFORM", "ANDROID")
+                .addHeader("QISCUS_SDK_DEVICE_BRAND", Build.MANUFACTURER)
+                .addHeader("QISCUS_SDK_DEVICE_MODEL", Build.MODEL)
+                .addHeader("QISCUS_SDK_DEVICE_OS_VERSION", BuildVersionUtil.OS_VERSION_NAME)
                 .build();
         return chain.proceed(req);
     }
@@ -445,6 +451,16 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
     }
 
+    public Observable<QiscusChatRoom> addRoomMember(long roomId, List<String> emails) {
+        return api.addRoomMember(Qiscus.getToken(), roomId, emails)
+                .flatMap(jsonElement -> getChatRoom(roomId));
+    }
+
+    public Observable<QiscusChatRoom> removeRoomMember(long roomId, List<String> emails) {
+        return api.removeRoomMember(Qiscus.getToken(), roomId, emails)
+                .flatMap(jsonElement -> getChatRoom(roomId));
+    }
+
     private interface Api {
 
         @POST("/api/v2/auth/nonce")
@@ -570,6 +586,18 @@ public enum QiscusApi {
 
         @GET("/api/v2/sdk/total_unread_count")
         Observable<JsonElement> getTotalUnreadCount(@Query("token") String token);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/add_room_participants")
+        Observable<JsonElement> addRoomMember(@Field("token") String token,
+                                              @Field("room_id") long roomId,
+                                              @Field("emails[]") List<String> emails);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/remove_room_participants")
+        Observable<JsonElement> removeRoomMember(@Field("token") String token,
+                                                 @Field("room_id") long roomId,
+                                                 @Field("emails[]") List<String> emails);
     }
 
     private static class CountingFileRequestBody extends RequestBody {

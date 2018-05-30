@@ -103,7 +103,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.24.4'
+    compile 'com.qiscus.sdk:chat:2.25.0'
 }
 ```
 
@@ -430,7 +430,7 @@ Add Qiscus SDK to your apps without emoji library, change gradle file to like th
 
 ```groovy
 dependencies {
-    compile 'com.qiscus.sdk:chat:2.24.4-without-emoji'
+    compile 'com.qiscus.sdk:chat:2.25.0-without-emoji'
 }
 ```
 
