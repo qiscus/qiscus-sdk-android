@@ -32,6 +32,7 @@ import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusRawDataExtractor;
 
 import org.json.JSONObject;
@@ -52,7 +53,7 @@ public final class QiscusGroupEncryptionHandler {
             try {
                 getConversation(roomId);
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         });
     }
@@ -66,7 +67,7 @@ public final class QiscusGroupEncryptionHandler {
                 notifyMembers(roomId, Base64.encodeToString(groupConversation.getSenderKey(), Base64.DEFAULT), needReply);
                 saveConversation(roomId, groupConversation);
             } catch (Exception e) {
-                //Do nothing;
+                QiscusErrorLogger.stackTrace(e);
             }
         });
     }
@@ -203,7 +204,7 @@ public final class QiscusGroupEncryptionHandler {
             }
             saveConversation(roomId, conversation);
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.stackTrace(e);
         }
     }
 
@@ -255,8 +256,8 @@ public final class QiscusGroupEncryptionHandler {
             try {
                 comment.setExtraPayload(decrypt(comment.getRoomId(), comment.getSenderEmail(),
                         comment.getRawType(), new JSONObject(comment.getExtraPayload())));
-            } catch (Exception ignored) {
-                // ignored
+            } catch (Exception e) {
+                QiscusErrorLogger.stackTrace(e);
             }
         }
 
@@ -271,13 +272,13 @@ public final class QiscusGroupEncryptionHandler {
                     payload.put("replied_comment_message", savedRepliedComment.getMessage());
                     try {
                         payload.put("replied_comment_payload", new JSONObject(savedRepliedComment.getExtraPayload()));
-                    } catch (Exception ignored) {
-                        //ignored
+                    } catch (Exception e) {
+                        QiscusErrorLogger.stackTrace(e);
                     }
                     comment.setExtraPayload(payload.toString());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         } else if (comment.getRawType().equals("file_attachment")) {
             // We need to replace text with url from payload
@@ -285,7 +286,7 @@ public final class QiscusGroupEncryptionHandler {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
                 comment.setMessage(String.format("[file] %s [/file]", payload.optString("url")));
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         } else if (comment.getRawType().equals("location")) {
             // We need to replace text with data from payload
@@ -296,7 +297,7 @@ public final class QiscusGroupEncryptionHandler {
                                 + "\n" + payload.optString("map_url")
                 );
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         } else if (comment.getRawType().equals("contact_person")) {
             // We need to replace text with data from payload
@@ -306,7 +307,7 @@ public final class QiscusGroupEncryptionHandler {
                         payload.optString("name") + " - " + payload.optString("value")
                 );
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         }
     }
@@ -342,8 +343,8 @@ public final class QiscusGroupEncryptionHandler {
                     payload.put("content", new JSONObject(decrypt(roomId, senderEmail, payload.optString("content"))));
                     break;
             }
-        } catch (Exception ignored) {
-            // Ignored
+        } catch (Exception e) {
+            QiscusErrorLogger.stackTrace(e);
         }
         return payload.toString();
     }
@@ -356,7 +357,7 @@ public final class QiscusGroupEncryptionHandler {
             saveConversation(roomId, conversation);
             return new String(decrypted);
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.stackTrace(e);
             exchangeSenderKey(senderEmail, roomId);
             return QiscusEncryptionHandler.ENCRYPTED_PLACE_HOLDER;
         }
@@ -373,7 +374,7 @@ public final class QiscusGroupEncryptionHandler {
             conversation.initRecipient(Base64.decode(senderKey, Base64.DEFAULT));
             saveConversation(roomId, conversation);
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.stackTrace(e);
         }
     }
 }
