@@ -165,8 +165,8 @@ public final class QiscusEncryptionHandler {
             try {
                 comment.setExtraPayload(decrypt(comment.getSenderEmail(), comment.getRawType(),
                         new JSONObject(comment.getExtraPayload())));
-            } catch (Exception ignored) {
-                // ignored
+            } catch (Exception e) {
+                QiscusErrorLogger.stackTrace(e);
             }
         }
 
@@ -181,13 +181,13 @@ public final class QiscusEncryptionHandler {
                     payload.put("replied_comment_message", savedRepliedComment.getMessage());
                     try {
                         payload.put("replied_comment_payload", new JSONObject(savedRepliedComment.getExtraPayload()));
-                    } catch (Exception ignored) {
-                        //ignored
+                    } catch (Exception e) {
+                        QiscusErrorLogger.stackTrace(e);
                     }
                     comment.setExtraPayload(payload.toString());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         } else if (comment.getRawType().equals("file_attachment")) {
             // We need to replace text with url from payload
@@ -195,7 +195,7 @@ public final class QiscusEncryptionHandler {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
                 comment.setMessage(String.format("[file] %s [/file]", payload.optString("url")));
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         } else if (comment.getRawType().equals("location")) {
             // We need to replace text with data from payload
@@ -206,7 +206,7 @@ public final class QiscusEncryptionHandler {
                                 + "\n" + payload.optString("map_url")
                 );
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         } else if (comment.getRawType().equals("contact_person")) {
             // We need to replace text with data from payload
@@ -216,7 +216,7 @@ public final class QiscusEncryptionHandler {
                         payload.optString("name") + " - " + payload.optString("value")
                 );
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.stackTrace(e);
             }
         }
     }
@@ -252,8 +252,8 @@ public final class QiscusEncryptionHandler {
                     payload.put("content", new JSONObject(decrypt(senderId, payload.optString("content"))));
                     break;
             }
-        } catch (Exception ignored) {
-            // Ignored
+        } catch (Exception e) {
+            QiscusErrorLogger.stackTrace(e);
         }
         return payload.toString();
     }
@@ -284,7 +284,7 @@ public final class QiscusEncryptionHandler {
                 return ENCRYPTED_PLACE_HOLDER;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.stackTrace(e);
             return ENCRYPTED_PLACE_HOLDER;
         }
     }
@@ -313,8 +313,8 @@ public final class QiscusEncryptionHandler {
         if (!TextUtils.isEmpty(comment.getExtraPayload())) {
             try {
                 payload = new JSONObject(comment.getExtraPayload());
-            } catch (Exception ignored) {
-                //Ignored
+            } catch (Exception e) {
+                QiscusErrorLogger.stackTrace(e);
             }
         }
 
@@ -352,8 +352,8 @@ public final class QiscusEncryptionHandler {
                     payload.put("content", new JSONObject());
                     break;
             }
-        } catch (Exception ignored) {
-            // Ignored
+        } catch (Exception e) {
+            QiscusErrorLogger.stackTrace(e);
         }
 
         comment.setExtraPayload(payload.toString());
@@ -370,7 +370,7 @@ public final class QiscusEncryptionHandler {
         try {
             bundlePublicCollection = getRemoteBundle(userId);
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.stackTrace(e);
             QiscusErrorLogger.print(e);
         }
 

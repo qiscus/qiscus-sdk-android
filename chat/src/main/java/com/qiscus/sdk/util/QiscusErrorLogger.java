@@ -69,4 +69,11 @@ public final class QiscusErrorLogger {
         }
         return throwable.getMessage() == null ? throwable.getClass().getSimpleName() : throwable.getMessage();
     }
+
+    public static void stackTrace(Throwable throwable) {
+        if (Qiscus.isEnableLog()) {
+            Log.e(TAG, getMessage(throwable));
+            throwable.printStackTrace();
+        }
+    }
 }
