@@ -216,7 +216,7 @@ public final class QiscusNewCommentHandler {
 
     private static void addComment(QiscusComment comment) {
         Qiscus.getDataStore().add(comment);
-        if (!comment.isEncrypted() && isSenderKey(comment)) {
+        if (!comment.isEncrypted() && !isSenderKey(comment)) {
             postEvent(new QiscusCommentReceivedEvent(comment));
             pushNotification(comment);
         }
