@@ -1022,6 +1022,30 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
+    public QiscusComment getLatestNotEncryptedComment(long roomId) {
+        String query = "SELECT * FROM "
+                + QiscusDb.CommentTable.TABLE_NAME
+                + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
+                + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0 + " AND "
+                + QiscusDb.CommentTable.COLUMN_ENCRYPTED + " = " + 0
+                + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
+                + " LIMIT " + 1;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        QiscusComment qiscusComment = null;
+        while (cursor.moveToNext()) {
+            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
+            QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
+            if (qiscusRoomMember != null) {
+                qiscusComment.setSender(qiscusRoomMember.getUsername());
+                qiscusComment.setSenderAvatar(qiscusRoomMember.getAvatar());
+            }
+        }
+        cursor.close();
+        return qiscusComment;
+    }
+
+    @Override
     public QiscusComment getLatestSentComment(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME

@@ -103,6 +103,7 @@ public class QiscusComment implements Parcelable {
     private String caption;
     private String attachmentName;
     private String attachmentEncryptionKey;
+    private boolean encrypted;
 
     public static QiscusComment generateMessage(long roomId, String content) {
         QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
@@ -269,6 +270,7 @@ public class QiscusComment implements Parcelable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        encrypted = in.readByte() != 0;
     }
 
     public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
@@ -489,6 +491,14 @@ public class QiscusComment implements Parcelable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
     }
 
     public boolean isAttachment() {
@@ -902,6 +912,7 @@ public class QiscusComment implements Parcelable {
                 ", state=" + state +
                 ", deleted=" + deleted +
                 ", hardDeleted=" + hardDeleted +
+                ", encrypted=" + encrypted +
                 '}';
     }
 
@@ -939,6 +950,7 @@ public class QiscusComment implements Parcelable {
             }
         }
         dest.writeString(extras.toString());
+        dest.writeByte((byte) (encrypted ? 1 : 0));
     }
 
     public boolean areContentsTheSame(QiscusComment qiscusComment) {
@@ -958,7 +970,8 @@ public class QiscusComment implements Parcelable {
                 && selected == qiscusComment.selected
                 && highlighted == qiscusComment.highlighted
                 && downloading == qiscusComment.downloading
-                && progress == qiscusComment.progress;
+                && progress == qiscusComment.progress
+                && encrypted == qiscusComment.encrypted;
     }
 
     public enum Type {

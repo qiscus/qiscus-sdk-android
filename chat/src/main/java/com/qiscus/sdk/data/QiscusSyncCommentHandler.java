@@ -85,7 +85,7 @@ public final class QiscusSyncCommentHandler {
     }
 
     private static void synchronizeComment() {
-        Qiscus.getDataStore().getObservableChatRooms(1000)
+        Qiscus.getDataStore().getObservableChatRooms(-1)
                 .flatMap(Observable::from)
                 .flatMap(qiscusChatRoom -> {
                     QiscusComment lastComment = Qiscus.getDataStore().getLatestSentComment(qiscusChatRoom.getId());

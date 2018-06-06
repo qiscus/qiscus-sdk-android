@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 16;
+    static final int DATABASE_VERSION = 17;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -191,6 +191,7 @@ final class QiscusDb {
         static final String COLUMN_TYPE = "type";
         static final String COLUMN_PAYLOAD = "payload";
         static final String COLUMN_EXTRAS = "extras";
+        static final String COLUMN_ENCRYPTED = "encrypted";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
@@ -208,7 +209,8 @@ final class QiscusDb {
                         COLUMN_HARD_DELETED + " INTEGER DEFAULT 0," +
                         COLUMN_TYPE + " TEXT," +
                         COLUMN_PAYLOAD + " TEXT, " +
-                        COLUMN_EXTRAS + " TEXT " +
+                        COLUMN_EXTRAS + " TEXT, " +
+                        COLUMN_ENCRYPTED + " INTEGER DEFAULT 0 " +
                         " ); ";
 
         static ContentValues toContentValues(QiscusComment qiscusComment) {
@@ -229,6 +231,7 @@ final class QiscusDb {
             values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
             values.put(COLUMN_EXTRAS, qiscusComment.getExtras() == null ? null :
                     qiscusComment.getExtras().toString());
+            values.put(COLUMN_ENCRYPTED, qiscusComment.isEncrypted() ? 1 : 0);
             return values;
         }
 
@@ -254,6 +257,7 @@ final class QiscusDb {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            qiscusComment.setEncrypted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ENCRYPTED)) == 1);
             return qiscusComment;
         }
     }

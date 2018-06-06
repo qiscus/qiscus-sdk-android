@@ -307,14 +307,15 @@ public final class QiscusEncryptionHandler {
 
     static void setPlaceHolder(QiscusComment comment) {
         comment.setMessage(ENCRYPTED_PLACE_HOLDER);
+        comment.setEncrypted(true);
 
         String rawType = comment.getRawType();
         JSONObject payload = null;
         if (!TextUtils.isEmpty(comment.getExtraPayload())) {
             try {
                 payload = new JSONObject(comment.getExtraPayload());
-            } catch (Exception e) {
-                QiscusErrorLogger.stackTrace(e);
+            } catch (Exception ignored) {
+                //ignored
             }
         }
 

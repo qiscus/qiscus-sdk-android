@@ -218,6 +218,15 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void loadComments(int count) {
         Observable.merge(getInitRoomData(), getLocalComments(count, true).map(comments -> Pair.create(room, comments)))
                 .filter(qiscusChatRoomListPair -> qiscusChatRoomListPair != null)
+                .map(data -> {
+                    List<QiscusComment> comments = new ArrayList<>();
+                    for (QiscusComment comment : data.second) {
+                        if (!comment.isEncrypted()) {
+                            comments.add(comment);
+                        }
+                    }
+                    return Pair.create(data.first, comments);
+                })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
@@ -298,16 +307,24 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     updateRepliedSender(comments);
                     roomEventHandler.transformCommentState(comments, true);
                 })
-                .flatMap(comments -> isValidOlderComments(comments, qiscusComment) ?
-                        Observable.from(comments).toSortedList(commentComparator) :
-                        getCommentsFromNetwork(qiscusComment.getId()).map(comments1 -> {
-                            for (QiscusComment localComment : comments) {
-                                if (localComment.getState() <= QiscusComment.STATE_SENDING) {
-                                    comments1.add(localComment);
-                                }
+                .flatMap(comments -> {
+                    if (Qiscus.getChatConfig().isEnableEndToEndEncryption() || isValidOlderComments(comments, qiscusComment)) {
+                        return Observable.from(comments).toSortedList(commentComparator);
+                    }
+
+                    return getCommentsFromNetwork(qiscusComment.getId()).map(comments1 -> {
+                        for (QiscusComment localComment : comments) {
+                            if (localComment.getState() <= QiscusComment.STATE_SENDING) {
+                                comments1.add(localComment);
                             }
-                            return comments1;
-                        }))
+                        }
+                        return comments1;
+                    });
+
+                })
+                .flatMap(Observable::from)
+                .filter(qiscusComment1 -> !qiscusComment1.isEncrypted())
+                .toList()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
@@ -431,7 +448,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     QiscusPusherApi.getInstance().setUserRead(room.getId(), qiscusComment.getId());
                 }
             });
-            view.onNewComment(qiscusComment);
+            if (!qiscusComment.isEncrypted()) {
+                view.onNewComment(qiscusComment);
+            }
         }
     }
 
@@ -515,6 +534,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .flatMap(comments -> isValidChainingComments(comments) ?
                         Observable.from(comments).toSortedList(commentComparator) :
                         Observable.just(new ArrayList<QiscusComment>()))
+                .flatMap(Observable::from)
+                .filter(qiscusComment1 -> !qiscusComment1.isEncrypted())
+                .toList()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())

@@ -93,12 +93,21 @@ public final class QiscusNewCommentHandler {
         if (savedComment != null) {
             comment.setMessage(savedComment.getMessage());
             comment.setExtraPayload(savedComment.getExtraPayload());
+            comment.setEncrypted(savedComment.isEncrypted());
         } else {
             QiscusEncryptionHandler.setPlaceHolder(comment);
         }
     }
 
     private static void handleOpponentComment(QiscusComment comment) {
+        decryptComment(comment);
+        updateUnreadCount(comment.getRoomId());
+        notifyDelivered(comment);
+        updateLastReadMember(comment);
+        saveComment(comment);
+    }
+
+    private static void decryptComment(QiscusComment comment) {
         if (Qiscus.getChatConfig().isEnableEndToEndEncryption()) {
             if (comment.isGroupMessage()) {
                 QiscusGroupEncryptionHandler.decrypt(comment);
@@ -106,10 +115,9 @@ public final class QiscusNewCommentHandler {
                 QiscusEncryptionHandler.decrypt(comment);
             }
         }
-        updateUnreadCount(comment.getRoomId());
-        notifyDelivered(comment);
-        updateLastReadMember(comment);
-        saveComment(comment);
+        if (comment.getMessage().equals(QiscusEncryptionHandler.ENCRYPTED_PLACE_HOLDER)) {
+            comment.setEncrypted(true);
+        }
     }
 
     private static void clearUnreadCount(long roomId) {
@@ -208,8 +216,10 @@ public final class QiscusNewCommentHandler {
 
     private static void addComment(QiscusComment comment) {
         Qiscus.getDataStore().add(comment);
-        postEvent(new QiscusCommentReceivedEvent(comment));
-        pushNotification(comment);
+        if (!comment.isEncrypted()) {
+            postEvent(new QiscusCommentReceivedEvent(comment));
+            pushNotification(comment);
+        }
     }
 
     private static void handleSenderKeyComment(QiscusComment comment) {
