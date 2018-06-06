@@ -94,7 +94,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     private void sendComment(QiscusComment qiscusComment) {
         qiscusComment.setState(QiscusComment.STATE_PENDING);
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
-        view.onSendingComment(qiscusComment);
+        if (!qiscusComment.isEncrypted() && !isSenderKey(qiscusComment)) {
+            view.onSendingComment(qiscusComment);
+        }
         QiscusResendCommentHandler.tryResendPendingComment();
     }
 
@@ -394,9 +396,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (event.getQiscusComment().getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
-                    if (event.getEvent() == QiscusCommentResendEvent.Event.SENDING) {
+                    if (event.getEvent() == QiscusCommentResendEvent.Event.SENDING
+                            && !event.getQiscusComment().isEncrypted() && !isSenderKey(event.getQiscusComment())) {
                         view.refreshComment(event.getQiscusComment());
-                    } else if (event.getEvent() == QiscusCommentResendEvent.Event.SENT) {
+                    } else if (event.getEvent() == QiscusCommentResendEvent.Event.SENT
+                            && !event.getQiscusComment().isEncrypted() && !isSenderKey(event.getQiscusComment())) {
                         view.onSuccessSendComment(event.getQiscusComment());
                     } else if (event.getEvent() == QiscusCommentResendEvent.Event.FAILED) {
                         view.onFailedSendComment(event.getQiscusComment());
@@ -410,7 +414,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     public void onCommentSentEvent(QiscusCommentSentEvent event) {
         if (event.getQiscusComment().getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnUIThread(() -> {
-                if (view != null) {
+                if (view != null && !event.getQiscusComment().isEncrypted() && !isSenderKey(event.getQiscusComment())) {
                     view.onSuccessSendComment(event.getQiscusComment());
                 }
             });
