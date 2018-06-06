@@ -1027,7 +1027,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME
                 + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
                 + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0 + " AND "
-                + QiscusDb.CommentTable.COLUMN_ENCRYPTED + " = " + 0
+                + QiscusDb.CommentTable.COLUMN_ENCRYPTED + " = " + 0 + " AND ("
+                + QiscusDb.CommentTable.COLUMN_PAYLOAD + " NOT LIKE '%qiscus_group_sender_key%'" + " OR "
+                + QiscusDb.CommentTable.COLUMN_PAYLOAD + " IS NULL)"
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 

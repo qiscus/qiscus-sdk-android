@@ -216,10 +216,24 @@ public final class QiscusNewCommentHandler {
 
     private static void addComment(QiscusComment comment) {
         Qiscus.getDataStore().add(comment);
-        if (!comment.isEncrypted()) {
+        if (!comment.isEncrypted() && isSenderKey(comment)) {
             postEvent(new QiscusCommentReceivedEvent(comment));
             pushNotification(comment);
         }
+    }
+
+    private static boolean isSenderKey(QiscusComment comment) {
+        if (comment.getType() == QiscusComment.Type.CUSTOM) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                if (payload.optString("type").equals("qiscus_group_sender_key")) {
+                    return true;
+                }
+            } catch (JSONException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     private static void handleSenderKeyComment(QiscusComment comment) {

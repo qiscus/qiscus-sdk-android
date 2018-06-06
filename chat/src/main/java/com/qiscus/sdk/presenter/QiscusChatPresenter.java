@@ -42,10 +42,12 @@ import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusFileUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -215,13 +217,27 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .subscribeOn(Schedulers.io());
     }
 
+    private boolean isSenderKey(QiscusComment comment) {
+        if (comment.getType() == QiscusComment.Type.CUSTOM) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(comment);
+                if (payload.optString("type").equals("qiscus_group_sender_key")) {
+                    return true;
+                }
+            } catch (JSONException e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
     public void loadComments(int count) {
         Observable.merge(getInitRoomData(), getLocalComments(count, true).map(comments -> Pair.create(room, comments)))
                 .filter(qiscusChatRoomListPair -> qiscusChatRoomListPair != null)
                 .map(data -> {
                     List<QiscusComment> comments = new ArrayList<>();
                     for (QiscusComment comment : data.second) {
-                        if (!comment.isEncrypted()) {
+                        if (!comment.isEncrypted() && !isSenderKey(comment)) {
                             comments.add(comment);
                         }
                     }
@@ -323,7 +339,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
                 })
                 .flatMap(Observable::from)
-                .filter(qiscusComment1 -> !qiscusComment1.isEncrypted())
+                .filter(qiscusComment1 -> !qiscusComment1.isEncrypted() && !isSenderKey(qiscusComment1))
                 .toList()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -448,7 +464,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     QiscusPusherApi.getInstance().setUserRead(room.getId(), qiscusComment.getId());
                 }
             });
-            if (!qiscusComment.isEncrypted()) {
+            if (!qiscusComment.isEncrypted() && !isSenderKey(qiscusComment)) {
                 view.onNewComment(qiscusComment);
             }
         }
@@ -535,7 +551,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                         Observable.from(comments).toSortedList(commentComparator) :
                         Observable.just(new ArrayList<QiscusComment>()))
                 .flatMap(Observable::from)
-                .filter(qiscusComment1 -> !qiscusComment1.isEncrypted())
+                .filter(qiscusComment1 -> !qiscusComment1.isEncrypted() && !isSenderKey(qiscusComment1))
                 .toList()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
