@@ -94,6 +94,10 @@ class QiscusRoomEventHandler {
             memberState.clear();
         }
 
+        if (room.getMember().isEmpty()) {
+            return;
+        }
+
         long minDelivered = Long.MAX_VALUE;
         long minRead = Long.MAX_VALUE;
         for (QiscusRoomMember member : room.getMember()) {
