@@ -115,7 +115,8 @@ public final class QiscusNewCommentHandler {
                 QiscusEncryptionHandler.decrypt(comment);
             }
         }
-        if (comment.getMessage().equals(QiscusEncryptionHandler.ENCRYPTED_PLACE_HOLDER)) {
+        if (comment.getMessage().equals(QiscusEncryptionHandler.ENCRYPTED_PLACE_HOLDER)
+                || (comment.isAttachment() && QiscusEncryptionHandler.ENCRYPTED_PLACE_HOLDER.equals(comment.getAttachmentName()))) {
             comment.setEncrypted(true);
         }
     }
