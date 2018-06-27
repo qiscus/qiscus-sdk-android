@@ -607,7 +607,7 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/block_user")
         Observable<JsonElement> blockUser(@Field("token") String token,
-                                          @Field("user_email") String user_email);
+                                          @Field("user_email") String userEmail);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
