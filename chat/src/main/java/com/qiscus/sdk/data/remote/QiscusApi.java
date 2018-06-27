@@ -461,6 +461,11 @@ public enum QiscusApi {
                 .flatMap(jsonElement -> getChatRoom(roomId));
     }
 
+    public Observable<QiscusAccount> blockUser(String userEmail) {
+        return api.blockUser(Qiscus.getToken(), userEmail)
+                .map(QiscusApiParser::parseQiscusAccount);
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
@@ -598,6 +603,11 @@ public enum QiscusApi {
         Observable<JsonElement> removeRoomMember(@Field("token") String token,
                                                  @Field("room_id") long roomId,
                                                  @Field("emails[]") List<String> emails);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/block_user")
+        Observable<JsonElement> blockUser(@Field("token") String token,
+                                          @Field("user_email") String userEmail);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
