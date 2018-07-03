@@ -466,6 +466,11 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
+    public Observable<QiscusAccount> unblockUser(String userEmail) {
+        return api.unblockUser(Qiscus.getToken(), userEmail)
+                .map(QiscusApiParser::parseQiscusAccount);
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
@@ -607,6 +612,11 @@ public enum QiscusApi {
         @FormUrlEncoded
         @POST("/api/v2/mobile/block_user")
         Observable<JsonElement> blockUser(@Field("token") String token,
+                                          @Field("user_email") String userEmail);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/unblock_user")
+        Observable<JsonElement> unblockUser(@Field("token") String token,
                                           @Field("user_email") String userEmail);
     }
 
