@@ -142,6 +142,19 @@ Qiscus.hasSetupUser(); // return true or false
 Qiscus.clearUser();
 ```
 
+### Block User
+
+```
+QiscusApi.getInstance().blockUser(userEmail).
+.subscribeOn(Schedulers.io()) // need to run this task on IO thread
+        .observeOn(AndroidSchedulers.mainThread()) // deliver result on main thread or UI thread
+        .subscribe(user -> {
+            // on success,get data of blocked user. just do nothing.
+        }, throwable -> {
+            // on error        
+        });
+```
+
 ## Message
 
 Create message objects with various type of payloads.
