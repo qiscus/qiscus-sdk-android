@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -63,12 +64,20 @@ public class ChatActivity extends QiscusBaseChatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onLoadView() {
         toolbar = findViewById(com.qiscus.sdk.R.id.toolbar);
         tvTitle = findViewById(com.qiscus.sdk.R.id.tv_title);
         tvSubtitle = findViewById(com.qiscus.sdk.R.id.tv_subtitle);
         ivAvatar = findViewById(com.qiscus.sdk.R.id.profile_picture);
-        findViewById(com.qiscus.sdk.R.id.back).setOnClickListener(v -> onBackPressed());
         setSupportActionBar(toolbar);
     }
 

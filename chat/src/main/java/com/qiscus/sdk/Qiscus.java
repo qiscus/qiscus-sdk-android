@@ -101,7 +101,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, "https://api.qiscus.com", "ssl://mqtt.qiscus.com:1885");
+        initWithCustomServer(application, qiscusAppId, "https://api.qiscus.com/", "ssl://mqtt.qiscus.com:1885");
     }
 
     /**
@@ -113,7 +113,7 @@ public class Qiscus {
      * public class SampleApps extends Application {
      *  public void onCreate() {
      *      super.onCreate();
-     *      Qiscus.initWithCustomServer(this, my-app-id, "http://myserver.com", "ssl://mqtt.myserver.com:1885");
+     *      Qiscus.initWithCustomServer(this, my-app-id, "http://myserver.com/", "ssl://mqtt.myserver.com:1885");
      *  }
      * }
      * }
@@ -127,6 +127,9 @@ public class Qiscus {
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
         appInstance = application;
         appId = qiscusAppId;
+        if (!serverBaseUrl.endsWith("/")) {
+            serverBaseUrl += '/';
+        }
         appServer = serverBaseUrl;
         Qiscus.mqttBrokerUrl = mqttBrokerUrl;
         appHandler = new Handler(appInstance.getApplicationContext().getMainLooper());

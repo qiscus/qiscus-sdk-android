@@ -77,10 +77,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             EventBus.getDefault().register(this);
         }
         this.room = room;
+        if (this.room.getMember().isEmpty()) {
+            this.room = Qiscus.getDataStore().getChatRoom(room.getId());
+        }
         qiscusAccount = Qiscus.getQiscusAccount();
         pendingTask = new HashMap<>();
 
-        roomEventHandler = new QiscusRoomEventHandler(room, this);
+        roomEventHandler = new QiscusRoomEventHandler(this.room, this);
     }
 
     private void commentSuccess(QiscusComment qiscusComment) {

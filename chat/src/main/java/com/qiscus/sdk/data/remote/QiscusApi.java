@@ -90,9 +90,8 @@ import rx.exceptions.OnErrorThrowable;
 public enum QiscusApi {
     INSTANCE;
     private final OkHttpClient httpClient;
-
-    private String baseUrl;
     private final Api api;
+    private String baseUrl;
 
     QiscusApi() {
         baseUrl = Qiscus.getAppServer();
@@ -113,6 +112,10 @@ public enum QiscusApi {
                 .create(Api.class);
     }
 
+    public static QiscusApi getInstance() {
+        return INSTANCE;
+    }
+
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
         Request req = chain.request().newBuilder()
                 .addHeader("QISCUS_SDK_APP_ID", Qiscus.getAppId())
@@ -131,10 +134,6 @@ public enum QiscusApi {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(isDebug ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
         return logging;
-    }
-
-    public static QiscusApi getInstance() {
-        return INSTANCE;
     }
 
     public Observable<QiscusNonce> requestNonce() {
@@ -461,37 +460,47 @@ public enum QiscusApi {
                 .flatMap(jsonElement -> getChatRoom(roomId));
     }
 
+    public Observable<QiscusAccount> blockUser(String userEmail) {
+        return api.blockUser(Qiscus.getToken(), userEmail)
+                .map(QiscusApiParser::parseQiscusAccount);
+    }
+
+    public Observable<QiscusAccount> unblockUser(String userEmail) {
+        return api.unblockUser(Qiscus.getToken(), userEmail)
+                .map(QiscusApiParser::parseQiscusAccount);
+    }
+
     private interface Api {
 
-        @POST("/api/v2/auth/nonce")
+        @POST("api/v2/auth/nonce")
         Observable<JsonElement> requestNonce();
 
         @FormUrlEncoded
-        @POST("/api/v2/auth/verify_identity_token")
+        @POST("api/v2/auth/verify_identity_token")
         Observable<JsonElement> login(@Field("identity_token") String token);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/login_or_register")
+        @POST("api/v2/mobile/login_or_register")
         Observable<JsonElement> loginOrRegister(@Field("email") String email,
                                                 @Field("password") String password,
                                                 @Field("username") String username,
                                                 @Field("avatar_url") String avatarUrl);
 
         @FormUrlEncoded
-        @PATCH("/api/v2/mobile/my_profile")
+        @PATCH("api/v2/mobile/my_profile")
         Observable<JsonElement> updateProfile(@Field("token") String token,
                                               @Field("name") String name,
                                               @Field("avatar_url") String avatarUrl);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/get_or_create_room_with_target")
+        @POST("api/v2/mobile/get_or_create_room_with_target")
         Observable<JsonElement> createOrGetChatRoom(@Field("token") String token,
                                                     @Field("emails[]") List<String> emails,
                                                     @Field("distinct_id") String distinctId,
                                                     @Field("options") String options);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/create_room")
+        @POST("api/v2/mobile/create_room")
         Observable<JsonElement> createGroupChatRoom(@Field("token") String token,
                                                     @Field("name") String name,
                                                     @Field("participants[]") List<String> emails,
@@ -499,25 +508,25 @@ public enum QiscusApi {
                                                     @Field("options") String options);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/get_or_create_room_with_unique_id")
+        @POST("api/v2/mobile/get_or_create_room_with_unique_id")
         Observable<JsonElement> createOrGetGroupChatRoom(@Field("token") String token,
                                                          @Field("unique_id") String uniqueId,
                                                          @Field("name") String name,
                                                          @Field("avatar_url") String avatarUrl,
                                                          @Field("options") String options);
 
-        @GET("/api/v2/mobile/get_room_by_id")
+        @GET("api/v2/mobile/get_room_by_id")
         Observable<JsonElement> getChatRoom(@Query("token") String token,
                                             @Query("id") long roomId);
 
-        @GET("/api/v2/mobile/load_comments")
+        @GET("api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(@Query("token") String token,
                                             @Query("topic_id") long roomId,
                                             @Query("last_comment_id") long lastCommentId,
                                             @Query("after") boolean after);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/post_comment")
+        @POST("api/v2/mobile/post_comment")
         Observable<JsonElement> postComment(@Field("token") String token,
                                             @Field("comment") String message,
                                             @Field("topic_id") long roomId,
@@ -526,12 +535,12 @@ public enum QiscusApi {
                                             @Field("payload") String payload,
                                             @Field("extras") String extras);
 
-        @GET("/api/v2/mobile/sync")
+        @GET("api/v2/mobile/sync")
         Observable<JsonElement> sync(@Query("token") String token,
                                      @Query("last_received_comment_id") long lastCommentId);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/update_room")
+        @POST("api/v2/mobile/update_room")
         Observable<JsonElement> updateChatRoom(@Field("token") String token,
                                                @Field("id") long id,
                                                @Field("room_name") String name,
@@ -539,71 +548,85 @@ public enum QiscusApi {
                                                @Field("options") String options);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/update_comment_status")
+        @POST("api/v2/mobile/update_comment_status")
         Observable<JsonElement> updateCommentStatus(@Field("token") String token,
                                                     @Field("room_id") long roomId,
                                                     @Field("last_comment_read_id") long lastReadId,
                                                     @Field("last_comment_received_id") long lastReceivedId);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/set_user_device_token")
+        @POST("api/v2/mobile/set_user_device_token")
         Observable<JsonElement> registerFcmToken(@Field("token") String token,
                                                  @Field("device_platform") String devicePlatform,
                                                  @Field("device_token") String fcmToken);
 
-        @POST("/api/v2/mobile/search_messages")
+        @POST("api/v2/mobile/search_messages")
         Observable<JsonElement> searchComments(@Query("token") String token,
                                                @Query("query") String query,
                                                @Query("room_id") long roomId,
                                                @Query("last_comment_id") long lastCommentId);
 
-        @GET("/api/v2/mobile/user_rooms")
+        @GET("api/v2/mobile/user_rooms")
         Observable<JsonElement> getChatRooms(@Query("token") String token,
                                              @Query("page") int page,
                                              @Query("limit") int limit,
                                              @Query("show_participants") boolean showParticipants);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/rooms_info")
+        @POST("api/v2/mobile/rooms_info")
         Observable<JsonElement> getChatRooms(@Field("token") String token,
                                              @Field("room_id[]") List<Long> roomIds,
                                              @Field("room_unique_id[]") List<String> roomUniqueIds,
                                              @Field("show_participants") boolean showParticipants);
 
-        @DELETE("/api/v2/mobile/clear_room_messages")
+        @DELETE("api/v2/mobile/clear_room_messages")
         Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
                                                       @Query("room_channel_ids[]") List<String> roomUniqueIds);
 
-        @DELETE("/api/v2/mobile/delete_messages")
+        @DELETE("api/v2/mobile/delete_messages")
         Observable<JsonElement> deleteComments(@Query("token") String token,
                                                @Query("unique_ids[]") List<String> commentUniqueIds,
                                                @Query("is_delete_for_everyone") boolean isDeleteForEveryone,
                                                @Query("is_hard_delete") boolean isHardDelete);
 
-        @GET("/api/v2/mobile/sync_event")
+        @GET("api/v2/mobile/sync_event")
         Observable<JsonElement> getEvents(@Query("token") String token,
                                           @Query("start_event_id") long startEventId);
 
-        @GET("/api/v2/sdk/total_unread_count")
+        @GET("api/v2/sdk/total_unread_count")
         Observable<JsonElement> getTotalUnreadCount(@Query("token") String token);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/add_room_participants")
+        @POST("api/v2/mobile/add_room_participants")
         Observable<JsonElement> addRoomMember(@Field("token") String token,
                                               @Field("room_id") long roomId,
                                               @Field("emails[]") List<String> emails);
 
         @FormUrlEncoded
-        @POST("/api/v2/mobile/remove_room_participants")
+        @POST("api/v2/mobile/remove_room_participants")
         Observable<JsonElement> removeRoomMember(@Field("token") String token,
                                                  @Field("room_id") long roomId,
                                                  @Field("emails[]") List<String> emails);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/block_user")
+        Observable<JsonElement> blockUser(@Field("token") String token,
+                                          @Field("user_email") String userEmail);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/unblock_user")
+        Observable<JsonElement> unblockUser(@Field("token") String token,
+                                            @Field("user_email") String userEmail);
+    }
+
+    public interface ProgressListener {
+        void onProgress(long total);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
+        private static final int SEGMENT_SIZE = 2048;
         private final File file;
         private final ProgressListener progressListener;
-        private static final int SEGMENT_SIZE = 2048;
 
         private CountingFileRequestBody(File file, ProgressListener progressListener) {
             this.file = file;
@@ -639,9 +662,5 @@ public enum QiscusApi {
             }
         }
 
-    }
-
-    public interface ProgressListener {
-        void onProgress(long total);
     }
 }
