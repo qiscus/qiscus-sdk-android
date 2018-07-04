@@ -145,14 +145,13 @@ Qiscus.clearUser();
 ### Block User
 
 ```
-QiscusApi.getInstance().blockUser(userEmail).
-.subscribeOn(Schedulers.io()) // need to run this task on IO thread
-        .observeOn(AndroidSchedulers.mainThread()) // deliver result on main thread or UI thread
-        .subscribe(user -> {
-            // on success,get data of blocked user. just do nothing.
-        }, throwable -> {
-            // on error        
-        });
+QiscusApi.getInstance().blockUser(userEmail);
+```
+
+### Unblock User
+
+```
+QiscusApi.getInstance().unblockUser(userEMail);
 ```
 
 ## Message
