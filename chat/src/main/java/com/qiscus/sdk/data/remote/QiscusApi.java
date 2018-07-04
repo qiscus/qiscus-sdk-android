@@ -90,9 +90,8 @@ import rx.exceptions.OnErrorThrowable;
 public enum QiscusApi {
     INSTANCE;
     private final OkHttpClient httpClient;
-
-    private String baseUrl;
     private final Api api;
+    private String baseUrl;
 
     QiscusApi() {
         baseUrl = Qiscus.getAppServer();
@@ -113,6 +112,10 @@ public enum QiscusApi {
                 .create(Api.class);
     }
 
+    public static QiscusApi getInstance() {
+        return INSTANCE;
+    }
+
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
         Request req = chain.request().newBuilder()
                 .addHeader("QISCUS_SDK_APP_ID", Qiscus.getAppId())
@@ -131,10 +134,6 @@ public enum QiscusApi {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(isDebug ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
         return logging;
-    }
-
-    public static QiscusApi getInstance() {
-        return INSTANCE;
     }
 
     public Observable<QiscusNonce> requestNonce() {
@@ -466,6 +465,11 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
+    public Observable<QiscusAccount> unblockUser(String userEmail) {
+        return api.unblockUser(Qiscus.getToken(), userEmail)
+                .map(QiscusApiParser::parseQiscusAccount);
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
@@ -608,12 +612,21 @@ public enum QiscusApi {
         @POST("/api/v2/mobile/block_user")
         Observable<JsonElement> blockUser(@Field("token") String token,
                                           @Field("user_email") String userEmail);
+
+        @FormUrlEncoded
+        @POST("/api/v2/mobile/unblock_user")
+        Observable<JsonElement> unblockUser(@Field("token") String token,
+                                            @Field("user_email") String userEmail);
+    }
+
+    public interface ProgressListener {
+        void onProgress(long total);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
+        private static final int SEGMENT_SIZE = 2048;
         private final File file;
         private final ProgressListener progressListener;
-        private static final int SEGMENT_SIZE = 2048;
 
         private CountingFileRequestBody(File file, ProgressListener progressListener) {
             this.file = file;
@@ -649,9 +662,5 @@ public enum QiscusApi {
             }
         }
 
-    }
-
-    public interface ProgressListener {
-        void onProgress(long total);
     }
 }
