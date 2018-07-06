@@ -266,7 +266,7 @@ public enum QiscusApi {
                     .build();
 
             Request request = new Request.Builder()
-                    .url(baseUrl + "/api/v2/mobile/upload")
+                    .url(baseUrl + "api/v2/mobile/upload")
                     .post(requestBody).build();
 
             try {
