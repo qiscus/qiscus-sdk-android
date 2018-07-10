@@ -44,6 +44,7 @@ import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -110,6 +111,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 qiscusComment.setDownloading(false);
                 state = QiscusComment.STATE_FAILED;
             }
+        } else if (throwable instanceof JSONException) {
+            //if throwable from JSONException, e.g response from server not json as expected
+            qiscusComment.setDownloading(false);
+            state = QiscusComment.STATE_FAILED;
         }
 
         //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update
