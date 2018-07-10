@@ -470,12 +470,12 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
-    public Observable<List<QiscusAccount>> listBlockedUser(){
-        return listBlockedUser(0,100);
+    public Observable<List<QiscusAccount>> listBlockedUser() {
+        return listBlockedUser(0, 100);
     }
 
-    public Observable<List<QiscusAccount>> listBlockedUser(long page,long limit ) {
-        return api.listblockedUser(Qiscus.getToken(),page,limit)
+    public Observable<List<QiscusAccount>> listBlockedUser(long page, long limit) {
+        return api.listblockedUser(Qiscus.getToken(), page, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("blocked_user").getAsJsonArray()))
                 .map(jsonElement -> {
