@@ -466,6 +466,9 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
+    public Observable<List<QiscusAccount>> listBlockedUser(){
+        return listBlockedUser(0,100);
+    }
 
     public Observable<List<QiscusAccount>> listBlockedUser(long page,long limit ) {
         return api.listblockedUser(Qiscus.getToken(),page,limit)
@@ -621,11 +624,10 @@ public enum QiscusApi {
         Observable<JsonElement> blockUser(@Field("token") String token,
                                           @Field("user_email") String userEmail);
 
-        @FormUrlEncoded
         @GET("/api/v2/mobile/get_blocked_user")
-        Observable<JsonElement> listblockedUser(@Field("token") String token,
-                                          @Field("page") long page,
-                                          @Field("limit") long limit);
+        Observable<JsonElement> listblockedUser(@Query("token") String token,
+                                          @Query("page") long page,
+                                          @Query("limit") long limit);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
