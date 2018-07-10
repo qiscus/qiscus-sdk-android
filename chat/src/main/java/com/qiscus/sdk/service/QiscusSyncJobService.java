@@ -12,7 +12,6 @@ import android.support.annotation.RequiresApi;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.local.QiscusEventCache;
-import com.qiscus.sdk.data.model.QiscusAccount;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.data.remote.QiscusPusherApi;
@@ -25,9 +24,6 @@ import com.qiscus.sdk.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -39,9 +35,25 @@ import rx.schedulers.Schedulers;
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class QiscusSyncJobService extends JobService {
+
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();
 
-    private ComponentName componentName;
+    public static void syncJob(Context context) {
+        QiscusLogger.print(TAG, "syncJob...");
+
+        ComponentName componentName = new ComponentName(context, QiscusSyncJobService.class);
+        JobInfo jobInfo = new JobInfo.Builder(Qiscus.getQiscusAccount().getId(), componentName)
+                .setMinimumLatency(Qiscus.getHeartBeat())
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+                .build();
+
+        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if (jobScheduler != null) {
+            jobScheduler.schedule(jobInfo);
+        }
+
+    }
 
     @Override
     public void onCreate() {
@@ -54,8 +66,7 @@ public class QiscusSyncJobService extends JobService {
 
         if (Qiscus.hasSetupUser()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-            componentName = new ComponentName(this, QiscusSyncJobService.class);
-            syncJob();
+            syncJob(this);
         }
 
     }
@@ -127,7 +138,7 @@ public class QiscusSyncJobService extends JobService {
         switch (userEvent) {
             case LOGIN:
                 QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                syncJob();
+                syncJob(this);
                 break;
             case LOGOUT:
                 stopSync();
@@ -150,7 +161,7 @@ public class QiscusSyncJobService extends JobService {
         if (Qiscus.hasSetupUser()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
-            jobFinished(params, true);
+            syncJob(this);
         }
 
         return true;
@@ -158,26 +169,9 @@ public class QiscusSyncJobService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
+        QiscusLogger.print(TAG, "Job stopped...");
 
-        return false;
-    }
-
-    private void syncJob() {
-        QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
-
-        Random rand = new Random();
-        int randomValue = rand.nextInt(50);
-
-        JobInfo jobInfo = new JobInfo.Builder(qiscusAccount.getId() + randomValue, componentName)
-                .setPeriodic(TimeUnit.MINUTES.toMillis(15))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .build();
-
-        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.schedule(jobInfo);
-        }
-
+        return true;
     }
 
 }

@@ -90,9 +90,8 @@ import rx.exceptions.OnErrorThrowable;
 public enum QiscusApi {
     INSTANCE;
     private final OkHttpClient httpClient;
-
-    private String baseUrl;
     private final Api api;
+    private String baseUrl;
 
     QiscusApi() {
         baseUrl = Qiscus.getAppServer();
@@ -113,6 +112,10 @@ public enum QiscusApi {
                 .create(Api.class);
     }
 
+    public static QiscusApi getInstance() {
+        return INSTANCE;
+    }
+
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
         Request req = chain.request().newBuilder()
                 .addHeader("QISCUS_SDK_APP_ID", Qiscus.getAppId())
@@ -131,10 +134,6 @@ public enum QiscusApi {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(isDebug ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
         return logging;
-    }
-
-    public static QiscusApi getInstance() {
-        return INSTANCE;
     }
 
     public Observable<QiscusNonce> requestNonce() {
@@ -267,7 +266,7 @@ public enum QiscusApi {
                     .build();
 
             Request request = new Request.Builder()
-                    .url(baseUrl + "/api/v2/mobile/upload")
+                    .url(baseUrl + "api/v2/mobile/upload")
                     .post(requestBody).build();
 
             try {
@@ -466,6 +465,14 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
+    public Observable<QiscusAccount> unblockUser(String userEmail) {
+        return api.unblockUser(Qiscus.getToken(), userEmail)
+                .map(QiscusApiParser::parseQiscusAccount);
+    }
+
+    public Observable<List<QiscusAccount>> listBlockedUser(){
+        return listBlockedUser(0,100);
+    }
 
     public Observable<List<QiscusAccount>> listBlockedUser(long page,long limit ) {
         return api.listblockedUser(Qiscus.getToken(),page,limit)
@@ -622,16 +629,24 @@ public enum QiscusApi {
                                           @Field("user_email") String userEmail);
 
         @FormUrlEncoded
+        @POST("/api/v2/mobile/unblock_user")
+        Observable<JsonElement> unblockUser(@Field("token") String token,
+                                            @Field("user_email") String userEmail);
+
+
         @GET("/api/v2/mobile/get_blocked_user")
-        Observable<JsonElement> listblockedUser(@Field("token") String token,
-                                          @Field("page") long page,
-                                          @Field("limit") long limit);
+        Observable<JsonElement> listblockedUser(@Query("token") String token,
+                                            @Query("page") long page,
+                                            @Query("limit") long limit);
+    }
+    public interface ProgressListener {
+        void onProgress(long total);
     }
 
     private static class CountingFileRequestBody extends RequestBody {
+        private static final int SEGMENT_SIZE = 2048;
         private final File file;
         private final ProgressListener progressListener;
-        private static final int SEGMENT_SIZE = 2048;
 
         private CountingFileRequestBody(File file, ProgressListener progressListener) {
             this.file = file;
@@ -667,9 +682,5 @@ public enum QiscusApi {
             }
         }
 
-    }
-
-    public interface ProgressListener {
-        void onProgress(long total);
     }
 }

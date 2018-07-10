@@ -142,6 +142,18 @@ Qiscus.hasSetupUser(); // return true or false
 Qiscus.clearUser();
 ```
 
+### Block User
+
+```
+QiscusApi.getInstance().blockUser(userEmail);
+```
+
+### Unblock User
+
+```
+QiscusApi.getInstance().unblockUser(userEMail);
+```
+
 ## Message
 
 Create message objects with various type of payloads.
