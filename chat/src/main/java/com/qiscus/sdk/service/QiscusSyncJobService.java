@@ -35,6 +35,7 @@ import rx.schedulers.Schedulers;
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class QiscusSyncJobService extends JobService {
+
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();
 
     public static void syncJob(Context context) {
@@ -160,7 +161,7 @@ public class QiscusSyncJobService extends JobService {
         if (Qiscus.hasSetupUser()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
-            jobFinished(params, true);
+            syncJob(this);
         }
 
         return true;
@@ -170,7 +171,7 @@ public class QiscusSyncJobService extends JobService {
     public boolean onStopJob(JobParameters params) {
         QiscusLogger.print(TAG, "Job stopped...");
 
-        return false;
+        return true;
     }
 
 }
