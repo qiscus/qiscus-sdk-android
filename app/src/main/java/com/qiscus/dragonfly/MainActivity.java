@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void unblockUser(View view) {
-        QiscusApi.getInstance().unbl("rya.meyvriska24@gmail.com")
+        QiscusApi.getInstance().unblockUser("rya.meyvriska24@gmail.com")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(blockedUsers -> {
