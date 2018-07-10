@@ -48,7 +48,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -112,8 +111,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 qiscusComment.setDownloading(false);
                 state = QiscusComment.STATE_FAILED;
             }
-        } else if (throwable instanceof JSONException || throwable instanceof IOException) {
-            //if throwable from JSONException or IOException, e.g response from server not json as expected
+        } else if (throwable instanceof JSONException) {
+            //if throwable from JSONException, e.g response from server not json as expected
             qiscusComment.setDownloading(false);
             state = QiscusComment.STATE_FAILED;
         }
