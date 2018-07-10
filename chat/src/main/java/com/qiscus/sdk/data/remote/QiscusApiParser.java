@@ -61,6 +61,15 @@ final class QiscusApiParser {
         return qiscusAccount;
     }
 
+    static QiscusAccount parseOtherQiscusAccount(JsonObject jsonAccount) {
+        QiscusAccount qiscusAccount = new QiscusAccount();
+        qiscusAccount.setId(jsonAccount.get("id").getAsInt());
+        qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
+        qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
+        qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
+        return qiscusAccount;
+    }
+
     static QiscusChatRoom parseQiscusChatRoom(JsonElement jsonElement) {
         if (jsonElement != null) {
             JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("room").getAsJsonObject();
