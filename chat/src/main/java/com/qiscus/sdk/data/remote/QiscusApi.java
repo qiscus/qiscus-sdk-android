@@ -462,12 +462,16 @@ public enum QiscusApi {
 
     public Observable<QiscusAccount> blockUser(String userEmail) {
         return api.blockUser(Qiscus.getToken(), userEmail)
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(jsonElement -> jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("user").getAsJsonObject())
+                .map(QiscusApiParser::parseOtherQiscusAccount);
     }
 
     public Observable<QiscusAccount> unblockUser(String userEmail) {
         return api.unblockUser(Qiscus.getToken(), userEmail)
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(jsonElement -> jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("user").getAsJsonObject())
+                .map(QiscusApiParser::parseOtherQiscusAccount);
     }
 
     public Observable<List<QiscusAccount>> listBlockedUser() {
@@ -477,7 +481,7 @@ public enum QiscusApi {
     public Observable<List<QiscusAccount>> listBlockedUser(long page, long limit) {
         return api.listblockedUser(Qiscus.getToken(), page, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
-                        .getAsJsonObject().get("blocked_user").getAsJsonArray()))
+                        .getAsJsonObject().get("blocked_users").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonAccount = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseOtherQiscusAccount(jsonAccount);
@@ -634,7 +638,7 @@ public enum QiscusApi {
                                             @Field("user_email") String userEmail);
 
 
-        @GET("/api/v2/mobile/get_blocked_user")
+        @GET("/api/v2/mobile/get_blocked_users")
         Observable<JsonElement> listblockedUser(@Query("token") String token,
                                             @Query("page") long page,
                                             @Query("limit") long limit);
