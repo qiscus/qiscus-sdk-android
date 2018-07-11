@@ -466,7 +466,7 @@ public enum QiscusApi {
                         .getAsJsonObject().get("user").getAsJsonObject())
                 .map(jsonElement -> {
                     JsonObject jsonAccount = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusAccount(jsonAccount,false);
+                    return QiscusApiParser.parseQiscusAccount(jsonAccount, false);
                 });
     }
 
@@ -476,7 +476,7 @@ public enum QiscusApi {
                         .getAsJsonObject().get("user").getAsJsonObject())
                 .map(jsonElement -> {
                     JsonObject jsonAccount = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusAccount(jsonAccount,false);
+                    return QiscusApiParser.parseQiscusAccount(jsonAccount, false);
                 });
     }
 
@@ -490,7 +490,7 @@ public enum QiscusApi {
                         .getAsJsonObject().get("blocked_users").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonAccount = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusAccount(jsonAccount,false);
+                    return QiscusApiParser.parseQiscusAccount(jsonAccount, false);
                 })
                 .toList();
     }
