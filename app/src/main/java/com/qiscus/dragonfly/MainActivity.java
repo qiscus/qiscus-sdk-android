@@ -210,11 +210,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openBlock(View view) {
-        QiscusApi.getInstance().listBlockedUser(1,100)
+        QiscusApi.getInstance().listBlockedUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(blockedUsers -> {
-                    Log.d(MainActivity.class.getSimpleName(), "Room: " + blockedUsers.toString());
+                    Log.d(MainActivity.class.getSimpleName(), "Users: " + blockedUsers.toString());
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     showError(QiscusErrorLogger.getMessage(throwable));
