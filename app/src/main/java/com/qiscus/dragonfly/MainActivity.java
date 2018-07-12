@@ -27,7 +27,6 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.QiscusChannelActivity;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
@@ -207,44 +206,5 @@ public class MainActivity extends AppCompatActivity {
         Qiscus.getChatConfig()
                 .setSendButtonIcon(R.drawable.ic_qiscus_send_on)
                 .setShowAttachmentPanelIcon(R.drawable.ic_qiscus_send_off);
-    }
-
-    public void openBlock(View view) {
-        QiscusApi.getInstance().getBlockedUser()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(blockedUsers -> {
-                    Log.d(MainActivity.class.getSimpleName(), "Users: " + blockedUsers.toString());
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
-                    dismissLoading();
-                });
-    }
-
-    public void blockUser(View view) {
-        QiscusApi.getInstance().blockUser("rya.meyvriska24@gmail.com")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(blockedUsers -> {
-                    Log.d(MainActivity.class.getSimpleName(), "Room: " + blockedUsers.toString());
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
-                    dismissLoading();
-                });
-    }
-
-    public void unblockUser(View view) {
-        QiscusApi.getInstance().unblockUser("rya.meyvriska24@gmail.com")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(blockedUsers -> {
-                    Log.d(MainActivity.class.getSimpleName(), "Room: " + blockedUsers.toString());
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
-                    dismissLoading();
-                });
     }
 }

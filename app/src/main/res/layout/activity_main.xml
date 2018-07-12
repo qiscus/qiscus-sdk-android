@@ -72,25 +72,7 @@
             android:layout_marginTop="8dp"
             android:onClick="openChannel"
             android:text="Open Channel" />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="blockUser"
-            android:text="Block User" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="unblockUser"
-            android:text="Unblock User" />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="openBlock"
-            android:text="Open List Blocked User" />
     </LinearLayout>
 
     <TextView
@@ -98,7 +80,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        />
+        android:layout_centerInParent="true" />
 
 </RelativeLayout>

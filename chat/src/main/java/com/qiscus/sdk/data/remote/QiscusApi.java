@@ -462,36 +462,32 @@ public enum QiscusApi {
 
     public Observable<QiscusAccount> blockUser(String userEmail) {
         return api.blockUser(Qiscus.getToken(), userEmail)
-                .map(jsonElement -> jsonElement.getAsJsonObject().get("results")
-                        .getAsJsonObject().get("user").getAsJsonObject())
-                .map(jsonElement -> {
-                    JsonObject jsonAccount = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusAccount(jsonAccount, false);
-                });
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.getAsJsonObject("user"))
+                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
     }
 
     public Observable<QiscusAccount> unblockUser(String userEmail) {
         return api.unblockUser(Qiscus.getToken(), userEmail)
-                .map(jsonElement -> jsonElement.getAsJsonObject().get("results")
-                        .getAsJsonObject().get("user").getAsJsonObject())
-                .map(jsonElement -> {
-                    JsonObject jsonAccount = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusAccount(jsonAccount, false);
-                });
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.getAsJsonObject("user"))
+                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
     }
 
-    public Observable<List<QiscusAccount>> getBlockedUser() {
-        return getBlockedUser(0, 100);
+    public Observable<List<QiscusAccount>> getBlockedUsers() {
+        return getBlockedUsers(0, 100);
     }
 
-    public Observable<List<QiscusAccount>> getBlockedUser(long page, long limit) {
+    public Observable<List<QiscusAccount>> getBlockedUsers(long page, long limit) {
         return api.getBlockedUsers(Qiscus.getToken(), page, limit)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
-                        .getAsJsonObject().get("blocked_users").getAsJsonArray()))
-                .map(jsonElement -> {
-                    JsonObject jsonAccount = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusAccount(jsonAccount, false);
-                })
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
                 .toList();
     }
 
@@ -649,6 +645,7 @@ public enum QiscusApi {
                                                 @Query("page") long page,
                                                 @Query("limit") long limit);
     }
+
     public interface ProgressListener {
         void onProgress(long total);
     }

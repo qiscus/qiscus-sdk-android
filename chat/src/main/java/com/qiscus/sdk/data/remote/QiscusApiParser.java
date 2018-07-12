@@ -52,7 +52,6 @@ final class QiscusApiParser {
 
     static QiscusAccount parseQiscusAccount(JsonElement jsonElement) {
         JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user").getAsJsonObject();
-
         return parseQiscusAccount(jsonAccount, true);
     }
 
