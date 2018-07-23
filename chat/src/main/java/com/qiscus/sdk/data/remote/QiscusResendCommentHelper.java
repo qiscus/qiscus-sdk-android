@@ -23,6 +23,7 @@ import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.Map;
@@ -44,8 +45,8 @@ import rx.schedulers.Schedulers;
  */
 public final class QiscusResendCommentHelper {
 
-    private static final Map<String, Subscription> pendingTask = new ConcurrentHashMap<>();
-    private static final Set<String> processingComment = new ConcurrentSkipListSet<>();
+    public static Map<String, Subscription> pendingTask = new ConcurrentHashMap<>();
+    public static Set<String> processingComment = new ConcurrentSkipListSet<>();
 
     public static void tryResendPendingComment() {
         Qiscus.getDataStore()
@@ -197,6 +198,11 @@ public final class QiscusResendCommentHelper {
                 state = QiscusComment.STATE_FAILED;
                 processingComment.remove(qiscusComment.getUniqueId());
             }
+        } else if (throwable instanceof JSONException) {
+            //error if response not valid json
+            qiscusComment.setDownloading(false);
+            state = QiscusComment.STATE_FAILED;
+            processingComment.remove(qiscusComment.getUniqueId());
         }
 
         //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update

@@ -54,11 +54,14 @@
 
         <service android:name=".service.QiscusSyncService" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
-
         <service
             android:name=".service.QiscusSyncJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true"/>
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".service.QiscusNetworkCheckerJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
             android:name=".service.QiscusStartServiceReceiver"
@@ -74,6 +77,13 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.qiscus.OPEN_COMMENT_PN" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".service.QiscusNetworkStateReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
