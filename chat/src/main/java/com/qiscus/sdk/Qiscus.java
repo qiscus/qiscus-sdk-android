@@ -174,10 +174,14 @@ public class Qiscus {
     /**
      * start network checker job service if in oreo or higher
      */
-    private static void startNetworkCheckerService() {
+    public static void startNetworkCheckerService() {
         if (BuildVersionUtil.isOreoOrHigher()) {
-            appInstance.getApplicationContext()
-                    .startService(new Intent(appInstance.getApplicationContext(), QiscusNetworkCheckerJobService.class));
+            try {
+                appInstance.getApplicationContext()
+                        .startService(new Intent(appInstance.getApplicationContext(), QiscusNetworkCheckerJobService.class));
+            } catch (IllegalStateException e) {
+                //Prevent crash because trying to start service while application on background
+            }
         }
     }
 
