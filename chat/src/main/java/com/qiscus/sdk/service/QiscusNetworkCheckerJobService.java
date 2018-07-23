@@ -64,7 +64,9 @@ public class QiscusNetworkCheckerJobService extends JobService {
     public void onCreate() {
         super.onCreate();
         QiscusLogger.print(TAG, "onCreate: ");
-        scheduleJob(this);
+        if (Qiscus.hasSetupUser()) {
+            scheduleJob(this);
+        }
         networkStateReceiver = new QiscusNetworkStateReceiver();
     }
 
