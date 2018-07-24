@@ -9,9 +9,6 @@ import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusLogger;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-
 /**
  * @author Yuana andhikayuana@gmail.com
  * @since Jul, Mon 23 2018 14.45
