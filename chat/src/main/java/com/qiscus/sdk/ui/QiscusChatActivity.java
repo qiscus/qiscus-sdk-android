@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -118,10 +119,14 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     }
 
     protected void showRoomImage() {
-        Nirmana.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
-                .error(R.drawable.ic_qiscus_avatar)
+        RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.ic_qiscus_avatar)
-                .dontAnimate()
+                .error(R.drawable.ic_qiscus_avatar)
+                .dontAnimate();
+
+        Nirmana.getInstance().get()
+                .setDefaultRequestOptions(requestOptions)
+                .load(qiscusChatRoom.getAvatarUrl())
                 .into(ivAvatar);
     }
 

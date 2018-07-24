@@ -52,12 +52,18 @@ final class QiscusApiParser {
 
     static QiscusAccount parseQiscusAccount(JsonElement jsonElement) {
         JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user").getAsJsonObject();
+        return parseQiscusAccount(jsonAccount, true);
+    }
+
+    static QiscusAccount parseQiscusAccount(JsonObject jsonAccount, Boolean isSelf) {
         QiscusAccount qiscusAccount = new QiscusAccount();
         qiscusAccount.setId(jsonAccount.get("id").getAsInt());
         qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
         qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
-        qiscusAccount.setToken(jsonAccount.get("token").getAsString());
         qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
+        if (isSelf) {
+            qiscusAccount.setToken(jsonAccount.get("token").getAsString());
+        }
         return qiscusAccount;
     }
 

@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -46,23 +47,25 @@ import java.util.Map;
 public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> extends RecyclerView.ViewHolder implements
         View.OnClickListener, View.OnLongClickListener {
 
-    @Nullable protected ImageView firstMessageBubbleIndicatorView;
-    @NonNull protected View messageBubbleView;
-    @Nullable protected TextView dateView;
-    @Nullable protected TextView timeView;
-    @Nullable protected ImageView messageStateIndicatorView;
-    @Nullable protected ImageView avatarView;
-    @Nullable protected TextView senderNameView;
-
-    private OnItemClickListener itemClickListener;
-    private OnLongItemClickListener longItemClickListener;
-
+    @Nullable
+    protected ImageView firstMessageBubbleIndicatorView;
+    @NonNull
+    protected View messageBubbleView;
+    @Nullable
+    protected TextView dateView;
+    @Nullable
+    protected TextView timeView;
+    @Nullable
+    protected ImageView messageStateIndicatorView;
+    @Nullable
+    protected ImageView avatarView;
+    @Nullable
+    protected TextView senderNameView;
     protected boolean needToShowDate;
     protected boolean messageFromMe;
     protected boolean needToShowFirstMessageBubbleIndicator;
     protected boolean groupChat;
     protected boolean channelRoom;
-
     protected Drawable rightBubbleDrawable;
     protected Drawable leftBubbleDrawable;
     protected int rightBubbleColor;
@@ -78,8 +81,9 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     protected int dateColor;
     protected int senderNameColor;
     protected Drawable selectionBackground;
-
     protected Map<String, QiscusRoomMember> roomMembers;
+    private OnItemClickListener itemClickListener;
+    private OnLongItemClickListener longItemClickListener;
 
     public QiscusBaseMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                        OnLongItemClickListener longItemClickListener) {
@@ -145,12 +149,12 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
     @Nullable
     protected abstract TextView getSenderNameView(View itemView);
 
-    public void setNeedToShowDate(boolean needToShowDate) {
-        this.needToShowDate = needToShowDate;
-    }
-
     public boolean isNeedToShowDate() {
         return needToShowDate;
+    }
+
+    public void setNeedToShowDate(boolean needToShowDate) {
+        this.needToShowDate = needToShowDate;
     }
 
     public void setMessageFromMe(boolean messageFromMe) {
@@ -198,9 +202,9 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
                 senderNameView.setVisibility(View.VISIBLE);
                 senderNameView.setTextColor(ContextCompat
                         .getColor(Qiscus.getApps(), Qiscus
-                        .getChatConfig()
-                        .getRoomSenderNameColorInterceptor()
-                        .getColor(qiscusComment)));
+                                .getChatConfig()
+                                .getRoomSenderNameColorInterceptor()
+                                .getColor(qiscusComment)));
                 senderNameView.setText(String.format("~ %s", Qiscus
                         .getChatConfig()
                         .getRoomSenderNameInterceptor()
@@ -217,10 +221,11 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
             if (needToShowFirstMessageBubbleIndicator) {
                 avatarView.setVisibility(View.VISIBLE);
                 Nirmana.getInstance().get()
+                        .setDefaultRequestOptions(new RequestOptions()
+                                .dontAnimate()
+                                .placeholder(R.drawable.ic_qiscus_avatar)
+                                .error(R.drawable.ic_qiscus_avatar))
                         .load(qiscusComment.getSenderAvatar())
-                        .dontAnimate()
-                        .placeholder(R.drawable.ic_qiscus_avatar)
-                        .error(R.drawable.ic_qiscus_avatar)
                         .into(avatarView);
             } else {
                 avatarView.setVisibility(View.GONE);

@@ -72,6 +72,7 @@
             android:layout_marginTop="8dp"
             android:onClick="openChannel"
             android:text="Open Channel" />
+
     </LinearLayout>
 
     <TextView
@@ -79,7 +80,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        />
+        android:layout_centerInParent="true" />
 
 </RelativeLayout>

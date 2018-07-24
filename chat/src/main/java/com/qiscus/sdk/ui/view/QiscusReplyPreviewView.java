@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -213,25 +214,27 @@ public class QiscusReplyPreviewView extends LinearLayout {
 
     private void showImage(File file) {
         Nirmana.getInstance().get()
-                .load(file)
+                .setDefaultRequestOptions(new RequestOptions()
+                        .centerCrop()
+                        .dontAnimate()
+                        .placeholder(R.drawable.qiscus_image_placeholder)
+                        .error(R.drawable.qiscus_image_placeholder))
                 .asBitmap()
-                .centerCrop()
-                .dontAnimate()
+                .load(file)
                 .thumbnail(0.5f)
-                .placeholder(R.drawable.qiscus_image_placeholder)
-                .error(R.drawable.qiscus_image_placeholder)
                 .into(image);
     }
 
     private void showBlurryImage(QiscusComment qiscusComment) {
         Nirmana.getInstance().get()
-                .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                .setDefaultRequestOptions(new RequestOptions()
+                        .centerCrop()
+                        .dontAnimate()
+                        .placeholder(R.drawable.qiscus_image_placeholder)
+                        .error(R.drawable.qiscus_image_placeholder))
                 .asBitmap()
-                .centerCrop()
-                .dontAnimate()
+                .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
                 .thumbnail(0.5f)
-                .placeholder(R.drawable.qiscus_image_placeholder)
-                .error(R.drawable.qiscus_image_placeholder)
                 .into(image);
     }
 

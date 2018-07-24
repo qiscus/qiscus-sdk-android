@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
@@ -109,10 +110,12 @@ public class ChatActivity extends QiscusBaseChatActivity {
     protected void showRoomImage() {
         for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
             if (!member.getEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
-                Nirmana.getInstance().get().load(member.getAvatar())
-                        .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
-                        .placeholder(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
-                        .dontAnimate()
+                Nirmana.getInstance().get()
+                        .setDefaultRequestOptions(new RequestOptions()
+                                .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
+                                .placeholder(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
+                                .dontAnimate())
+                        .load(member.getAvatar())
                         .into(ivAvatar);
                 break;
             }

@@ -35,13 +35,14 @@ import com.qiscus.sdk.data.model.QiscusChatRoom;
 import com.qiscus.sdk.data.model.QiscusComment;
 import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.event.QiscusUserEvent;
+import com.qiscus.sdk.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.service.QiscusSyncJobService;
 import com.qiscus.sdk.service.QiscusSyncService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.util.BuildVersionUtil;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 import com.qiscus.sdk.util.QiscusLogger;
-import com.qiscus.sdk.util.BuildVersionUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
@@ -144,6 +145,7 @@ public class Qiscus {
         Jupuk.init(application);
 
         startPusherService();
+        startNetworkCheckerService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
 
         configureFcmToken();
@@ -160,6 +162,20 @@ public class Qiscus {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
+            } catch (IllegalStateException e) {
+                //Prevent crash because trying to start service while application on background
+            }
+        }
+    }
+
+    /**
+     * start network checker job service if in oreo or higher
+     */
+    public static void startNetworkCheckerService() {
+        if (BuildVersionUtil.isOreoOrHigher()) {
+            try {
+                appInstance.getApplicationContext()
+                        .startService(new Intent(appInstance.getApplicationContext(), QiscusNetworkCheckerJobService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
             }
@@ -435,6 +451,15 @@ public class Qiscus {
     }
 
     /**
+     * Get the current qiscus heartbeat duration
+     *
+     * @return Heartbeat duration in milliseconds
+     */
+    public static long getHeartBeat() {
+        return heartBeat;
+    }
+
+    /**
      * Set the heartbeat of qiscus synchronization chat data. Default value is 500ms
      *
      * @param heartBeat Heartbeat duration in milliseconds
@@ -445,12 +470,10 @@ public class Qiscus {
     }
 
     /**
-     * Get the current qiscus heartbeat duration
-     *
-     * @return Heartbeat duration in milliseconds
+     * @return current fcm token, null if not set
      */
-    public static long getHeartBeat() {
-        return heartBeat;
+    public static String getFcmToken() {
+        return localDataManager.getFcmToken();
     }
 
     /**
@@ -468,13 +491,6 @@ public class Qiscus {
         }
 
         localDataManager.setFcmToken(fcmToken);
-    }
-
-    /**
-     * @return current fcm token, null if not set
-     */
-    public static String getFcmToken() {
-        return localDataManager.getFcmToken();
     }
 
     private static void configureFcmToken() {
@@ -538,6 +554,89 @@ public class Qiscus {
         dataStore.clear();
         QiscusCacheManager.getInstance().clearData();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
+    }
+
+    /**
+     * Get the log qiscus
+     *
+     * @return enableLog status in boolean
+     */
+    public static boolean isEnableLog() {
+        return Qiscus.enableLog;
+    }
+
+    /**
+     * Set the log of qiscus data. Default value is false
+     *
+     * @param enableLog boolean
+     */
+
+    public static void setEnableLog(boolean enableLog) {
+        Qiscus.enableLog = enableLog;
+    }
+
+    public interface SetUserListener {
+        /**
+         * Called if saving user succeed
+         *
+         * @param qiscusAccount Saved qiscus account
+         */
+        void onSuccess(QiscusAccount qiscusAccount);
+
+        /**
+         * Called if error happened while saving qiscus user account. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
+    public interface ChatBuilderListener {
+        /**
+         * Called if building chat room succeed
+         *
+         * @param qiscusChatRoom Built chat room
+         */
+        void onSuccess(QiscusChatRoom qiscusChatRoom);
+
+        /**
+         * Called if error happened while building chat room. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
+    public interface ChatActivityBuilderListener {
+        /**
+         * Called if building Chat Activity succeed
+         *
+         * @param intent Intent for start chat activity
+         */
+        void onSuccess(Intent intent);
+
+        /**
+         * Called if error happened while building chat activity. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
+    public interface ChatFragmentBuilderListener {
+        /**
+         * Called if building Chat Fragment succeed
+         *
+         * @param qiscusChatFragment Chat Fragment instance
+         */
+        void onSuccess(QiscusChatFragment qiscusChatFragment);
+
+        /**
+         * Called if error happened while building chat fragment. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
     }
 
     private static class LocalDataManager {
@@ -653,22 +752,6 @@ public class Qiscus {
         }
     }
 
-    public interface SetUserListener {
-        /**
-         * Called if saving user succeed
-         *
-         * @param qiscusAccount Saved qiscus account
-         */
-        void onSuccess(QiscusAccount qiscusAccount);
-
-        /**
-         * Called if error happened while saving qiscus user account. e.g network error
-         *
-         * @param throwable The cause of error
-         */
-        void onError(Throwable throwable);
-    }
-
     public static class ChatBuilder {
         private String email;
         private String distinctId;
@@ -745,22 +828,6 @@ public class Qiscus {
                     .getChatRoom(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
-    }
-
-    public interface ChatBuilderListener {
-        /**
-         * Called if building chat room succeed
-         *
-         * @param qiscusChatRoom Built chat room
-         */
-        void onSuccess(QiscusChatRoom qiscusChatRoom);
-
-        /**
-         * Called if error happened while building chat room. e.g network error
-         *
-         * @param throwable The cause of error
-         */
-        void onError(Throwable throwable);
     }
 
     public static class ChatActivityBuilder {
@@ -909,22 +976,6 @@ public class Qiscus {
         }
     }
 
-    public interface ChatActivityBuilderListener {
-        /**
-         * Called if building Chat Activity succeed
-         *
-         * @param intent Intent for start chat activity
-         */
-        void onSuccess(Intent intent);
-
-        /**
-         * Called if error happened while building chat activity. e.g network error
-         *
-         * @param throwable The cause of error
-         */
-        void onError(Throwable throwable);
-    }
-
     public static class ChatFragmentBuilder {
         private String email;
         private String distinctId;
@@ -1069,22 +1120,6 @@ public class Qiscus {
         }
     }
 
-    public interface ChatFragmentBuilderListener {
-        /**
-         * Called if building Chat Fragment succeed
-         *
-         * @param qiscusChatFragment Chat Fragment instance
-         */
-        void onSuccess(QiscusChatFragment qiscusChatFragment);
-
-        /**
-         * Called if error happened while building chat fragment. e.g network error
-         *
-         * @param throwable The cause of error
-         */
-        void onError(Throwable throwable);
-    }
-
     public static class GroupChatBuilder {
         private Set<String> emails;
         private String name;
@@ -1223,25 +1258,6 @@ public class Qiscus {
                     .getGroupChatRoom(uniqueId, name, avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
-    }
-
-    /**
-     * Set the log of qiscus data. Default value is false
-     *
-     * @param enableLog boolean
-     */
-
-    public static void setEnableLog(boolean enableLog) {
-        Qiscus.enableLog = enableLog;
-    }
-
-    /**
-     * Get the log qiscus
-     *
-     * @return enableLog status in boolean
-     */
-    public static boolean isEnableLog() {
-        return Qiscus.enableLog;
     }
 
 }

@@ -27,8 +27,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 
@@ -115,12 +116,14 @@ public class QiscusCarouselItemView extends FrameLayout {
             }
         });
 
-        Glide.with(imageView.getContext())
-                .load(payload.optString("image", ""))
-                .dontAnimate()
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+        RequestOptions requestOptions = new RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .placeholder(R.drawable.qiscus_image_placeholder)
-                .error(R.drawable.qiscus_image_placeholder)
+                .error(R.drawable.qiscus_image_placeholder);
+
+        Nirmana.getInstance().get()
+                .setDefaultRequestOptions(requestOptions)
+                .load(payload.optString("image", ""))
                 .into(imageView);
 
         titleView.setTextColor(titleTextColor);

@@ -462,12 +462,33 @@ public enum QiscusApi {
 
     public Observable<QiscusAccount> blockUser(String userEmail) {
         return api.blockUser(Qiscus.getToken(), userEmail)
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.getAsJsonObject("user"))
+                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
     }
 
     public Observable<QiscusAccount> unblockUser(String userEmail) {
         return api.unblockUser(Qiscus.getToken(), userEmail)
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.getAsJsonObject("user"))
+                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
+    }
+
+    public Observable<List<QiscusAccount>> getBlockedUsers() {
+        return getBlockedUsers(0, 100);
+    }
+
+    public Observable<List<QiscusAccount>> getBlockedUsers(long page, long limit) {
+        return api.getBlockedUsers(Qiscus.getToken(), page, limit)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .toList();
     }
 
     private interface Api {
@@ -617,6 +638,12 @@ public enum QiscusApi {
         @POST("/api/v2/mobile/unblock_user")
         Observable<JsonElement> unblockUser(@Field("token") String token,
                                             @Field("user_email") String userEmail);
+
+
+        @GET("/api/v2/mobile/get_blocked_users")
+        Observable<JsonElement> getBlockedUsers(@Query("token") String token,
+                                                @Query("page") long page,
+                                                @Query("limit") long limit);
     }
 
     public interface ProgressListener {

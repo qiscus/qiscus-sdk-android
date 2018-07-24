@@ -23,8 +23,10 @@ import com.qiscus.sdk.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -197,6 +199,11 @@ public final class QiscusResendCommentHelper {
                 state = QiscusComment.STATE_FAILED;
                 processingComment.remove(qiscusComment.getUniqueId());
             }
+        } else if (throwable instanceof JSONException) {
+            //error if response not valid json
+            qiscusComment.setDownloading(false);
+            state = QiscusComment.STATE_FAILED;
+            processingComment.remove(qiscusComment.getUniqueId());
         }
 
         //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update
@@ -210,5 +217,17 @@ public final class QiscusResendCommentHelper {
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
 
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+    }
+
+    public static void cancelAll() {
+        List<QiscusComment> pendingComments = Qiscus.getDataStore().getPendingComments();
+        for (QiscusComment qiscusComment : pendingComments) {
+            Subscription subscription = pendingTask.get(qiscusComment.getUniqueId());
+            if (subscription != null && !subscription.isUnsubscribed()) {
+                subscription.unsubscribe();
+            }
+        }
+        pendingTask.clear();
+        processingComment.clear();
     }
 }

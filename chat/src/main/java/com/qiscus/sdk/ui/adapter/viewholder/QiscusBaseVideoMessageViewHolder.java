@@ -18,11 +18,12 @@ package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.view.View;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 
 import java.io.File;
 
@@ -47,10 +48,11 @@ public abstract class QiscusBaseVideoMessageViewHolder extends QiscusBaseImageMe
     @Override
     protected void showLocalFileImage(File localPath) {
         Nirmana.getInstance().get()
+                .setDefaultRequestOptions(new RequestOptions()
+                        .dontAnimate()
+                        .placeholder(R.drawable.qiscus_image_placeholder)
+                        .error(R.drawable.qiscus_image_placeholder))
                 .load(localPath)
-                .dontAnimate()
-                .placeholder(R.drawable.qiscus_image_placeholder)
-                .error(R.drawable.qiscus_image_placeholder)
                 .into(thumbnailView);
     }
 }

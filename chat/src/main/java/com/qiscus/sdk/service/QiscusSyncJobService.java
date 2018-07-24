@@ -37,12 +37,17 @@ import rx.schedulers.Schedulers;
 public class QiscusSyncJobService extends JobService {
 
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();
+    private static final int STATIC_JOB_ID = 100;
+
+    public static int getJobId() {
+        return Qiscus.getQiscusAccount().getId() + STATIC_JOB_ID;
+    }
 
     public static void syncJob(Context context) {
         QiscusLogger.print(TAG, "syncJob...");
 
         ComponentName componentName = new ComponentName(context, QiscusSyncJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(Qiscus.getQiscusAccount().getId(), componentName)
+        JobInfo jobInfo = new JobInfo.Builder(getJobId(), componentName)
                 .setMinimumLatency(Qiscus.getHeartBeat())
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)

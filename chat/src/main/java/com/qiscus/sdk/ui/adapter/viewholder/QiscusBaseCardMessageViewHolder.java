@@ -27,8 +27,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -52,11 +53,16 @@ import java.util.List;
  */
 public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMessageViewHolder {
 
-    @NonNull protected View cardView;
-    @Nullable protected ImageView imageView;
-    @Nullable protected TextView titleView;
-    @Nullable protected TextView descriptionView;
-    @Nullable protected ViewGroup buttonsContainer;
+    @NonNull
+    protected View cardView;
+    @Nullable
+    protected ImageView imageView;
+    @Nullable
+    protected TextView titleView;
+    @Nullable
+    protected TextView descriptionView;
+    @Nullable
+    protected ViewGroup buttonsContainer;
 
     protected int titleTextColor;
     protected int descriptionTextColor;
@@ -142,12 +148,13 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
                 .launchUrl(cardView.getContext(), Uri.parse(payload.optString("url"))));
 
         if (imageView != null) {
-            Glide.with(imageView.getContext())
+            Nirmana.getInstance().get()
+                    .setDefaultRequestOptions(new RequestOptions()
+                            .dontAnimate()
+                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                            .placeholder(R.drawable.qiscus_image_placeholder)
+                            .error(R.drawable.qiscus_image_placeholder))
                     .load(payload.optString("image", ""))
-                    .dontAnimate()
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .placeholder(R.drawable.qiscus_image_placeholder)
-                    .error(R.drawable.qiscus_image_placeholder)
                     .into(imageView);
         }
         if (titleView != null) {

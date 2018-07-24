@@ -26,6 +26,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
@@ -33,8 +35,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -221,11 +223,11 @@ public final class QiscusPushNotificationUtil {
 
     private static void loadAvatar(Context context, QiscusComment comment, QiscusPushNotificationMessage pushNotificationMessage) {
         Nirmana.getInstance().get()
-                .load(pushNotificationMessage.getRoomAvatar())
                 .asBitmap()
+                .load(pushNotificationMessage.getRoomAvatar())
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         QiscusAndroidUtil.runOnBackgroundThread(() -> {
                             try {
                                 pushNotification(context, comment, pushNotificationMessage, QiscusImageUtil.getCircularBitmap(resource));
@@ -238,8 +240,8 @@ public final class QiscusPushNotificationUtil {
                     }
 
                     @Override
-                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                        super.onLoadFailed(e, errorDrawable);
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
                         QiscusAndroidUtil.runOnBackgroundThread(() -> pushNotification(context, comment, pushNotificationMessage,
                                 BitmapFactory.decodeResource(context.getResources(),
                                         Qiscus.getChatConfig().getNotificationBigIcon())));

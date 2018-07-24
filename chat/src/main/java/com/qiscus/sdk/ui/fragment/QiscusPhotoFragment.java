@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.view.QiscusTouchImageView;
@@ -73,9 +74,10 @@ public class QiscusPhotoFragment extends RxFragment {
         resolveImageFile(savedInstanceState);
         if (QiscusImageUtil.isImage(imageFile)) {
             Nirmana.getInstance().get()
+                    .setDefaultRequestOptions(new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true))
                     .load(imageFile)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
                     .into(imageView);
         } else {
             Nirmana.getInstance().get().load(imageFile).into(imageView);
