@@ -25,8 +25,7 @@ public class QiscusNetworkStateReceiver extends BroadcastReceiver {
         boolean isConnected = QiscusAndroidUtil.isNetworkAvailable();
         QiscusLogger.print(TAG, "isConnected : " + isConnected);
         if (Qiscus.hasSetupUser() && Qiscus.getDataStore().getPendingComments().size() > 0) {
-            QiscusResendCommentHelper.pendingTask = new ConcurrentHashMap<>();
-            QiscusResendCommentHelper.processingComment = new ConcurrentSkipListSet<>();
+            QiscusResendCommentHelper.cancelAll();
             QiscusResendCommentHelper.tryResendPendingComment();
         }
     }

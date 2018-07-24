@@ -26,6 +26,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,8 +46,8 @@ import rx.schedulers.Schedulers;
  */
 public final class QiscusResendCommentHelper {
 
-    public static Map<String, Subscription> pendingTask = new ConcurrentHashMap<>();
-    public static Set<String> processingComment = new ConcurrentSkipListSet<>();
+    private static final Map<String, Subscription> pendingTask = new ConcurrentHashMap<>();
+    private static final Set<String> processingComment = new ConcurrentSkipListSet<>();
 
     public static void tryResendPendingComment() {
         Qiscus.getDataStore()
@@ -216,5 +217,17 @@ public final class QiscusResendCommentHelper {
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
 
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+    }
+
+    public static void cancelAll() {
+        List<QiscusComment> pendingComments = Qiscus.getDataStore().getPendingComments();
+        for (QiscusComment qiscusComment : pendingComments) {
+            Subscription subscription = pendingTask.get(qiscusComment.getUniqueId());
+            if (subscription != null && !subscription.isUnsubscribed()) {
+                subscription.unsubscribe();
+            }
+        }
+        pendingTask.clear();
+        processingComment.clear();
     }
 }
