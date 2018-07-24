@@ -134,7 +134,7 @@ public class QiscusSyncJobService extends JobService {
     private void stopSync() {
         JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
-            jobScheduler.cancel(getJobId());
+            jobScheduler.cancelAll();
         }
     }
 
