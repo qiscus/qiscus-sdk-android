@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -62,8 +63,11 @@ public class QiscusPhotoAdapter extends RecyclerView.Adapter<QiscusPhotoAdapter.
     public void onBindViewHolder(VH holder, int position) {
         File imageFile = qiscusPhotos.get(position).getPhotoFile();
         if (QiscusImageUtil.isImage(imageFile)) {
-            Nirmana.getInstance().get().load(imageFile)
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE).into(holder.imageView);
+            Nirmana.getInstance().get()
+                    .setDefaultRequestOptions(new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE))
+                    .load(imageFile)
+                    .into(holder.imageView);
         } else {
             Nirmana.getInstance().get().load(imageFile).into(holder.imageView);
         }

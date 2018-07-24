@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.data.model.QiscusComment;
@@ -37,10 +38,14 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  */
 public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
 
-    @NonNull protected ImageView mapImageView;
-    @NonNull protected TextView locationNameView;
-    @NonNull protected TextView locationAddressView;
-    @Nullable protected ImageView imageFrameView;
+    @NonNull
+    protected ImageView mapImageView;
+    @NonNull
+    protected TextView locationNameView;
+    @NonNull
+    protected TextView locationAddressView;
+    @Nullable
+    protected ImageView imageFrameView;
 
     public QiscusBaseLocationMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                                OnLongItemClickListener longItemClickListener) {
@@ -76,11 +81,12 @@ public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMess
     @Override
     protected void showMessage(QiscusComment qiscusComment) {
         Nirmana.getInstance().get()
+                .setDefaultRequestOptions(new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                        .error(R.drawable.ic_qiscus_placehalder_map)
+                        .placeholder(R.drawable.ic_qiscus_placehalder_map)
+                        .dontAnimate())
                 .load(qiscusComment.getLocation().getThumbnailUrl())
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .error(R.drawable.ic_qiscus_placehalder_map)
-                .placeholder(R.drawable.ic_qiscus_placehalder_map)
-                .dontAnimate()
                 .into(mapImageView);
         locationNameView.setText(qiscusComment.getLocation().getName());
         locationAddressView.setText(qiscusComment.getLocation().getAddress());

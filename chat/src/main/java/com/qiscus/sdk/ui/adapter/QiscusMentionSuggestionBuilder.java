@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.manggil.suggestions.SuggestionsResult;
 import com.qiscus.manggil.suggestions.interfaces.Suggestible;
 import com.qiscus.manggil.suggestions.interfaces.SuggestionsListBuilder;
@@ -77,10 +78,11 @@ public class QiscusMentionSuggestionBuilder implements SuggestionsListBuilder {
             ImageView imageView = view.findViewById(R.id.avatar);
             QiscusRoomMember member = (QiscusRoomMember) suggestion;
             Nirmana.getInstance().get()
+                    .setDefaultRequestOptions(new RequestOptions()
+                            .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
+                            .placeholder(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
+                            .dontAnimate())
                     .load(member.getAvatar())
-                    .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
-                    .placeholder(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
-                    .dontAnimate()
                     .into(imageView);
         }
 

@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -49,7 +50,11 @@ public class QiscusNetworkCheckerJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         QiscusLogger.print(TAG, "onStartJob: ");
-        registerReceiver(networkStateReceiver, new IntentFilter(CONNECTIVITY_ACTION));
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(CONNECTIVITY_ACTION);
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(networkStateReceiver, intentFilter);
         return true; //tell to the system to keep this job
     }
 

@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -55,12 +56,18 @@ import java.util.regex.Matcher;
  * GitHub     : https://github.com/zetbaitsu
  */
 public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMessageViewHolder {
-    @NonNull protected ViewGroup originMessageView;
-    @NonNull protected TextView originSenderTextView;
-    @NonNull protected TextView originMessageTextView;
-    @Nullable protected View barView;
-    @Nullable protected ImageView originIconView;
-    @Nullable protected ImageView originImageView;
+    @NonNull
+    protected ViewGroup originMessageView;
+    @NonNull
+    protected TextView originSenderTextView;
+    @NonNull
+    protected TextView originMessageTextView;
+    @Nullable
+    protected View barView;
+    @Nullable
+    protected ImageView originIconView;
+    @Nullable
+    protected ImageView originImageView;
 
     protected int barColor;
     protected int originSenderColor;
@@ -240,13 +247,14 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
     private void showImage(File file) {
         if (originImageView != null) {
             Nirmana.getInstance().get()
-                    .load(file)
+                    .setDefaultRequestOptions(new RequestOptions()
+                            .centerCrop()
+                            .dontAnimate()
+                            .placeholder(R.drawable.qiscus_image_placeholder)
+                            .error(R.drawable.qiscus_image_placeholder))
                     .asBitmap()
-                    .centerCrop()
-                    .dontAnimate()
+                    .load(file)
                     .thumbnail(0.5f)
-                    .placeholder(R.drawable.qiscus_image_placeholder)
-                    .error(R.drawable.qiscus_image_placeholder)
                     .into(originImageView);
         }
     }
@@ -254,13 +262,14 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
     private void showBlurryImage(QiscusComment qiscusComment) {
         if (originImageView != null) {
             Nirmana.getInstance().get()
-                    .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                    .setDefaultRequestOptions(new RequestOptions()
+                            .centerCrop()
+                            .dontAnimate()
+                            .placeholder(R.drawable.qiscus_image_placeholder)
+                            .error(R.drawable.qiscus_image_placeholder))
                     .asBitmap()
-                    .centerCrop()
-                    .dontAnimate()
+                    .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
                     .thumbnail(0.5f)
-                    .placeholder(R.drawable.qiscus_image_placeholder)
-                    .error(R.drawable.qiscus_image_placeholder)
                     .into(originImageView);
         }
     }
@@ -290,6 +299,23 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
         }
     }
 
+    private void clickify(int start, int end, ClickSpan.OnClickListener listener) {
+        CharSequence text = messageTextView.getText();
+        ClickSpan span = new ClickSpan(listener);
+
+        if (start == -1) {
+            return;
+        }
+
+        if (text instanceof Spannable) {
+            ((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            SpannableString s = SpannableString.valueOf(text);
+            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            messageTextView.setText(s);
+        }
+    }
+
     private static class ClickSpan extends ClickableSpan {
         private ClickSpan.OnClickListener listener;
 
@@ -306,23 +332,6 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
 
         public interface OnClickListener {
             void onClick();
-        }
-    }
-
-    private void clickify(int start, int end, ClickSpan.OnClickListener listener) {
-        CharSequence text = messageTextView.getText();
-        ClickSpan span = new ClickSpan(listener);
-
-        if (start == -1) {
-            return;
-        }
-
-        if (text instanceof Spannable) {
-            ((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        } else {
-            SpannableString s = SpannableString.valueOf(text);
-            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            messageTextView.setText(s);
         }
     }
 }

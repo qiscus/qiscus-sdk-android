@@ -18,6 +18,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -57,10 +59,12 @@
         <service
             android:name=".service.QiscusSyncJobService"
             android:exported="true"
+            android:label="QiscusSyncJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".service.QiscusNetworkCheckerJobService"
             android:exported="true"
+            android:label="QiscusNetworkCheckerJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
@@ -81,9 +85,12 @@
         </receiver>
         <receiver
             android:name=".service.QiscusNetworkStateReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="QiscusNetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
 

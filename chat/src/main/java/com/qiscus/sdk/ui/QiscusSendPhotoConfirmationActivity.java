@@ -41,6 +41,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.jupuk.Jupuk;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
@@ -72,10 +73,9 @@ import java.util.Map;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity implements ViewPager.OnPageChangeListener {
-    private static final String EXTRA_ROOM = "room_data";
     public static final String EXTRA_QISCUS_PHOTOS = "qiscus_photos";
     public static final String EXTRA_CAPTIONS = "captions";
-
+    private static final String EXTRA_ROOM = "room_data";
     private ViewGroup rootView;
     private MentionsEditText messageEditText;
 
@@ -124,10 +124,12 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         }
 
         tvTitle.setText(qiscusChatRoom.getName());
-        Nirmana.getInstance().get().load(qiscusChatRoom.getAvatarUrl())
-                .error(R.drawable.ic_qiscus_avatar)
-                .placeholder(R.drawable.ic_qiscus_avatar)
-                .dontAnimate()
+        Nirmana.getInstance().get()
+                .setDefaultRequestOptions(new RequestOptions()
+                        .error(R.drawable.ic_qiscus_avatar)
+                        .placeholder(R.drawable.ic_qiscus_avatar)
+                        .dontAnimate())
+                .load(qiscusChatRoom.getAvatarUrl())
                 .into(ivAvatar);
 
         viewPager = findViewById(R.id.view_pager);
