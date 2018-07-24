@@ -14,7 +14,11 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusLogger;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 
@@ -26,13 +30,17 @@ import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 public class QiscusNetworkCheckerJobService extends JobService {
 
     private static final String TAG = QiscusNetworkCheckerJobService.class.getSimpleName();
-
+    private static final int STATIC_JOB_ID = 200;
     private QiscusNetworkStateReceiver networkStateReceiver;
+
+    public static int getJobId() {
+        return Qiscus.getQiscusAccount().getId() + STATIC_JOB_ID;
+    }
 
     public static void scheduleJob(Context context) {
         Log.d(TAG, "scheduleJob: ");
         ComponentName componentName = new ComponentName(context, QiscusNetworkCheckerJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(Qiscus.getQiscusAccount().getId(), componentName)
+        JobInfo jobInfo = new JobInfo.Builder(getJobId(), componentName)
                 .setRequiresCharging(true)
                 .setMinimumLatency(5 * 1000)
                 .setOverrideDeadline(2000)
@@ -69,6 +77,11 @@ public class QiscusNetworkCheckerJobService extends JobService {
     public void onCreate() {
         super.onCreate();
         QiscusLogger.print(TAG, "onCreate: ");
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+
         if (Qiscus.hasSetupUser()) {
             scheduleJob(this);
         }
@@ -76,8 +89,37 @@ public class QiscusNetworkCheckerJobService extends JobService {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        QiscusLogger.print(TAG, "onDestroy");
+        EventBus.getDefault().unregister(this);
+        stopJob();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         QiscusLogger.print(TAG, "onStartCommand: ");
         return START_STICKY;
+    }
+
+    @Subscribe
+    public void onUserEvent(QiscusUserEvent userEvent) {
+        QiscusLogger.print(TAG, "onUserEvent");
+        switch (userEvent) {
+            case LOGIN:
+                scheduleJob(this);
+                break;
+            case LOGOUT:
+                stopJob();
+                break;
+        }
+    }
+
+    private void stopJob() {
+        QiscusLogger.print(TAG, "stopJob");
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if (jobScheduler != null) {
+            jobScheduler.cancel(getJobId());
+        }
     }
 }
