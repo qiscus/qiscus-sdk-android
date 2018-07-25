@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.github.dcendents.android-maven'
+apply from: '../dependencies.gradle'
+apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion compileSDKVersion
     defaultConfig {
-        applicationId "com.qiscus.dragonfly"
-        minSdkVersion 16
-        targetSdkVersion 27
+        minSdkVersion minSDKVersion
+        targetSdkVersion targetSDKVersion
         versionCode 1
-        versionName "1.0"
+        versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
     }
     buildTypes {
         release {
-            shrinkResources true
-            zipAlignEnabled true
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -57,15 +57,29 @@ android {
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
     }
 }
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+apply from: '../buildsystem/bintrayv1.gradle'
+apply from: '../buildsystem/installv1.gradle'
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(':chat')
-    implementation 'com.facebook.stetho:stetho:1.5.0'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

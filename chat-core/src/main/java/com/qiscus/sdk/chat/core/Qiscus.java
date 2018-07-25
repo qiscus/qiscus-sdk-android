@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2016 Qiscus.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,4 +14,11 @@
  * limitations under the License.
  */
 
-include ':app', ':chat', ':chat-core'
+package com.qiscus.sdk.chat.core;
+
+/**
+ * @author Yuana andhikayuana@gmail.com
+ * @since Jul, Wed 25 2018 15.35
+ **/
+public class Qiscus {
+}
