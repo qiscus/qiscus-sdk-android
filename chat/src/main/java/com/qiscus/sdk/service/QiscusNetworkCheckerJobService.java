@@ -30,8 +30,8 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.event.QiscusUserEvent;
-import com.qiscus.sdk.util.QiscusLogger;
+import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

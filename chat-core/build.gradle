@@ -66,18 +66,20 @@ buildscript {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
-
 apply from: '../buildsystem/bintrayv1.gradle'
 apply from: '../buildsystem/installv1.gradle'
-
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    api supportLibs
+    api firebaseLibs
+    api qiscusUtilLibs
+    api qiscusMqttLibs
+    api networkLibs
+    api eventBusLib
+    api rxLibs
+    api rxUrlExtractorLib
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

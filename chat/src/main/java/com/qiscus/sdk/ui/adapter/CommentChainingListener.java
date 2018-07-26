@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.ui.adapter;
 
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 /**
  * Created on : July 28, 2017

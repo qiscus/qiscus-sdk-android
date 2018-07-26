@@ -18,7 +18,7 @@ package com.qiscus.sdk.util;
 
 import android.support.annotation.RestrictTo;
 
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 import org.json.JSONException;
 import org.json.JSONObject;

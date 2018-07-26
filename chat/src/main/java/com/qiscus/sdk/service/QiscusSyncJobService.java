@@ -27,15 +27,15 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.local.QiscusEventCache;
-import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.event.QiscusSyncEvent;
-import com.qiscus.sdk.event.QiscusUserEvent;
+import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
+import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusLogger;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

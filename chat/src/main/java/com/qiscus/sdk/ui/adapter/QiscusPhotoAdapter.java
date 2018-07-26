@@ -28,7 +28,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusPhoto;
+import com.qiscus.sdk.chat.core.data.model.QiscusPhoto;
 import com.qiscus.sdk.util.QiscusImageUtil;
 
 import java.io.File;

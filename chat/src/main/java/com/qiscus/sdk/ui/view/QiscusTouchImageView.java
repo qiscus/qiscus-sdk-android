@@ -52,7 +52,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
-import com.qiscus.sdk.util.QiscusLogger;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 
 public class QiscusTouchImageView extends AppCompatImageView {

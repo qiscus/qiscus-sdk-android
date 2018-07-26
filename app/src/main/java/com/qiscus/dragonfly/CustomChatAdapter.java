@@ -19,7 +19,7 @@ package com.qiscus.dragonfly;
 import android.content.Context;
 import android.view.ViewGroup;
 
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 

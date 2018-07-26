@@ -34,7 +34,7 @@ import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;

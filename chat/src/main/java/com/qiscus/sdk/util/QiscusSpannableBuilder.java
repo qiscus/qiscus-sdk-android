@@ -22,8 +22,8 @@ import android.text.Spannable;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.MentionClickHandler;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
+import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
 import java.util.Map;
 

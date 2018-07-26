@@ -18,6 +18,8 @@ package com.qiscus.sdk.data.model;
 
 import android.support.v4.app.NotificationCompat;
 
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+
 /**
  * Created on : March 24, 2017
  * Author     : zetbaitsu

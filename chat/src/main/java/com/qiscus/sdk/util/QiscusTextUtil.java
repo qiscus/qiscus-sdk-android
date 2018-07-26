@@ -28,9 +28,9 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.model.MentionClickHandler;
-import com.qiscus.sdk.data.model.QiscusAccount;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
+import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
 import java.util.ArrayList;
 import java.util.List;

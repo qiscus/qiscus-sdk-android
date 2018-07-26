@@ -21,9 +21,9 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusLogger;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 /**
  * @author Yuana andhikayuana@gmail.com

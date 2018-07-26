@@ -18,6 +18,12 @@
  * @author andhikayuana@gmail.com
  */
 
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
 ext {
 
     minSDKVersion = 16
@@ -25,14 +31,19 @@ ext {
     compileSDKVersion = 27
 
     versions = [
-            support    : "27.1.1",
-            playService: "12.0.1",
-            okHttp     : "3.9.1",
-            retrofit   : "2.3.0",
+            support        : "27.1.1",
+            playService    : "12.0.1",
+            okHttp         : "3.9.1",
+            retrofit       : "2.3.0",
 
-            nirmana    : "1.2.0",
-            manggil    : "1.0.1",
-            jupuk      : "1.1.0"
+            nirmana        : "1.2.0",
+            manggil        : "1.0.1",
+            jupuk          : "1.1.0",
+
+            rxJava         : "1.3.4",
+            rxAndroid      : "1.2.1",
+
+            trelloLifecycle: "1.0"
     ]
 
     supportDeps = [
@@ -45,6 +56,11 @@ ext {
             customTabs  : "com.android.support:customtabs:$versions.support"
     ]
 
+    firebaseDeps = [
+            core     : "com.google.firebase:firebase-core:${versions.playService}",
+            messaging: "com.google.firebase:firebase-messaging:${versions.playService}"
+    ]
+
     qiscusUtilDeps = [
             nirmana: "com.qiscus.utils:nirmana:$versions.nirmana",
             manggil: "com.qiscus.utils:manggil:$versions.manggil",
@@ -53,12 +69,42 @@ ext {
 
     qiscusMqttDeps = [
             client : "com.qiscus.mqtt:client:1.1.1",
-            android : "com.qiscus.mqtt:android:1.1.1-q1"
+            android: "com.qiscus.mqtt:android:1.1.1-q1"
     ]
 
+    okHttpDeps = [
+            okHttp            : "com.squareup.okhttp3:okhttp:${versions.okHttp}",
+            loggingInterceptor: "com.squareup.okhttp3:logging-interceptor:${versions.okHttp}"
+    ]
+
+    retrofitDeps = [
+            retrofit    : "com.squareup.retrofit2:retrofit:${versions.retrofit}",
+            retrofitGson: "com.squareup.retrofit2:converter-gson:${versions.retrofit}",
+            retrofitRx  : "com.squareup.retrofit2:adapter-rxjava:${versions.retrofit}"
+    ]
+
+    rxDebs = [
+            rxJava   : "io.reactivex:rxjava:1.3.4",
+            rxAndroid: "io.reactivex:rxandroid:1.2.1"
+    ]
+
+    trelloLifecycleDebs = [
+            trelloLifecycle          : "com.trello:rxlifecycle:${versions.trelloLifecycle}",
+            trelloLifecycleAndroid   : "com.trello:rxlifecycle-android:${versions.trelloLifecycle}",
+            trelloLifecycleComponents: "com.trello:rxlifecycle-components:${versions.trelloLifecycle}"
+    ]
+
+    placesLib = "com.google.android.gms:play-services-places:${versions.playService}"
+    flexBoxLib = "com.google.android:flexbox:0.3.1"
+    eventBusLib = "org.greenrobot:eventbus:3.0.0"
+    rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
+
     supportLibs = supportDeps.values()
+    firebaseLibs = firebaseDeps.values()
     qiscusUtilLibs = qiscusUtilDeps.values()
     qiscusMqttLibs = qiscusMqttDeps.values()
+    networkLibs = okHttpDeps.values() + retrofitDeps.values()
+    rxLibs = rxDebs.values() + trelloLifecycleDebs.values()
 
 
 }

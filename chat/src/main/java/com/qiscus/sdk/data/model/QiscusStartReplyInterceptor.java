@@ -16,6 +16,8 @@
 
 package com.qiscus.sdk.data.model;
 
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+
 /**
  * Created on : March 12, 2018
  * Author     : zetbaitsu

@@ -30,7 +30,7 @@ import android.widget.TextView;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.remote.QiscusUrlScraper;
+import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusAndroidUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
 
