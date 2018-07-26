@@ -23,11 +23,9 @@ import android.support.v4.util.Pair;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.qiscus.sdk.BuildConfig;
-import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
@@ -35,14 +33,12 @@ import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentSentEvent;
+import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
-import com.qiscus.sdk.util.BuildVersionUtil;
-import com.qiscus.sdk.util.QiscusDateUtil;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusFileUtil;
-import com.qiscus.sdk.util.QiscusLogger;
-import com.qiscus.sdk.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
@@ -211,7 +207,7 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
-        Qiscus.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
+        QiscusCore.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
         return api.postComment(QiscusCore.getToken(), qiscusComment.getMessage(),
                 qiscusComment.getRoomId(), qiscusComment.getUniqueId(), qiscusComment.getRawType(),
                 qiscusComment.getExtraPayload(), qiscusComment.getExtras() == null ? null :

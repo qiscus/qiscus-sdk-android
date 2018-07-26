@@ -19,6 +19,7 @@ package com.qiscus.sdk.chat.core;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
@@ -34,6 +35,7 @@ import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -54,6 +56,8 @@ public class QiscusCore {
     private static QiscusDataStore dataStore;
     private static boolean enableLog;
     private static QiscusCoreChatConfig chatConfig;
+    private static Handler appHandler;
+    private static ScheduledThreadPoolExecutor taskExecutor;
 
     private QiscusCore() {
     }
@@ -105,10 +109,13 @@ public class QiscusCore {
         appId = qiscusAppId;
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
-        heartBeat = 60000;
+        appHandler = new Handler(QiscusCore.getApps().getApplicationContext().getMainLooper());
+        taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
         chatConfig = new QiscusCoreChatConfig();
+        heartBeat = 60000;
+        QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
         configureFcmToken();
     }
@@ -347,6 +354,16 @@ public class QiscusCore {
     }
 
     /**
+     * Needed to run something at main thread handler
+     *
+     * @return Main thread handler
+     */
+    public static Handler getAppsHandler() {
+        checkAppIdSetup();
+        return appHandler;
+    }
+
+    /**
      * @return current fcm token, null if not set
      */
     public static String getFcmToken() {
@@ -410,6 +427,25 @@ public class QiscusCore {
 
     public static void setEnableLog(boolean enableLog) {
         QiscusCore.enableLog = enableLog;
+    }
+
+    /**
+     * Check is apps opened on foreground
+     *
+     * @return true if apps on foreground, and false if on background
+     */
+    public static boolean isOnForeground() {
+        return QiscusActivityCallback.INSTANCE.isForeground();
+    }
+
+    /**
+     * Needed to run something at background thread handler
+     *
+     * @return ScheduledExecutorService instance
+     */
+    public static ScheduledThreadPoolExecutor getTaskExecutor() {
+        checkAppIdSetup();
+        return taskExecutor;
     }
 
     /**

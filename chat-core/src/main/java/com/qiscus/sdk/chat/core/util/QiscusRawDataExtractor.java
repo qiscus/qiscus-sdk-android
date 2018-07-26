@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.util;
+package com.qiscus.sdk.chat.core.util;
 
 import android.support.annotation.RestrictTo;
 

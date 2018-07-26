@@ -28,7 +28,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
-import com.qiscus.sdk.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 
 import org.json.JSONException;
 import org.json.JSONObject;

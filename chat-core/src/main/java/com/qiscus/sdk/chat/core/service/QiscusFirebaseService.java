@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.service;
+package com.qiscus.sdk.chat.core.service;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 
 import org.json.JSONObject;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
-
-    @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        if (handleMessageReceived(remoteMessage)) {
-            return;
-        }
-    }
 
     /**
      * Handle remote message from FCM to display push notification
@@ -41,7 +34,7 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
      */
     public static boolean handleMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getData().containsKey("qiscus_sdk")) {
-            if (Qiscus.hasSetupUser()) {
+            if (QiscusCore.hasSetupUser()) {
                 if (!QiscusPusherApi.getInstance().isConnected()) {
                     QiscusPusherApi.getInstance().restartConnection();
                 }
@@ -81,6 +74,13 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
             QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        if (handleMessageReceived(remoteMessage)) {
+            return;
         }
     }
 }

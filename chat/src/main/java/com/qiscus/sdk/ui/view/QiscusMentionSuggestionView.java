@@ -39,7 +39,7 @@ import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.QiscusMentionSuggestionBuilder;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -36,13 +36,15 @@ import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.chat.core.data.model.NotificationClickListener;
 import com.qiscus.sdk.chat.core.data.model.NotificationTitleHandler;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusCommentSendingInterceptor;
+import com.qiscus.sdk.chat.core.data.model.QiscusImageCompressionConfig;
 import com.qiscus.sdk.chat.core.data.model.ReplyNotificationHandler;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.QiscusGroupChatActivity;
-import com.qiscus.sdk.util.QiscusDateUtil;
-import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -164,11 +166,8 @@ public class QiscusChatConfig {
     private boolean enableReplyNotification = false;
     private QiscusNotificationBuilderInterceptor notificationBuilderInterceptor;
 
-    private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
-
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
     private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
-    private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
     private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusComment -> R.color.qiscus_secondary_text;
     private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusComment -> getReplyBarColor();
     private QiscusStartReplyInterceptor startReplyInterceptor = qiscusComment -> new QiscusReplyPanelConfig();
@@ -1055,11 +1054,11 @@ public class QiscusChatConfig {
     }
 
     public QiscusImageCompressionConfig getQiscusImageCompressionConfig() {
-        return qiscusImageCompressionConfig;
+        return QiscusCore.getChatConfig().getQiscusImageCompressionConfig();
     }
 
     public QiscusChatConfig setQiscusImageCompressionConfig(QiscusImageCompressionConfig qiscusImageCompressionConfig) {
-        this.qiscusImageCompressionConfig = qiscusImageCompressionConfig;
+        QiscusCore.getChatConfig().setQiscusImageCompressionConfig(qiscusImageCompressionConfig);
         return this;
     }
 
@@ -1227,12 +1226,12 @@ public class QiscusChatConfig {
     }
 
     public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
-        return qiscusCommentSendingInterceptor;
+        return QiscusCore.getChatConfig().getCommentSendingInterceptor();
     }
 
     public QiscusChatConfig setCommentSendingInterceptor(QiscusCommentSendingInterceptor
                                                                  qiscusCommentSendingInterceptor) {
-        this.qiscusCommentSendingInterceptor = qiscusCommentSendingInterceptor;
+        QiscusCore.getChatConfig().setCommentSendingInterceptor(qiscusCommentSendingInterceptor);
         return this;
     }
 

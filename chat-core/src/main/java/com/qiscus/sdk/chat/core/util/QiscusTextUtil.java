@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.util;
+package com.qiscus.sdk.chat.core.util;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -27,7 +27,7 @@ import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
@@ -48,10 +48,6 @@ public final class QiscusTextUtil {
     private static final Random random = new Random();
     private static final char[] symbols;
 
-    private QiscusTextUtil() {
-
-    }
-
     static {
         StringBuilder tmp = new StringBuilder();
         for (char ch = '0'; ch <= '9'; ch++) {
@@ -63,14 +59,18 @@ public final class QiscusTextUtil {
         symbols = tmp.toString().toCharArray();
     }
 
+    private QiscusTextUtil() {
+
+    }
+
     @NonNull
     public static String getString(@StringRes int resId) {
-        return Qiscus.getApps().getString(resId);
+        return QiscusCore.getApps().getString(resId);
     }
 
     @NonNull
     public static String getString(@StringRes int resId, Object... formatArgs) {
-        return Qiscus.getApps().getString(resId, formatArgs);
+        return QiscusCore.getApps().getString(resId, formatArgs);
     }
 
     public static String getRandomString(int length) {
@@ -134,7 +134,7 @@ public final class QiscusTextUtil {
             return new SpannableString("");
         }
 
-        QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
+        QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
 
         SpannableStringBuilder spannable = new SpannableStringBuilder();
         int length = message.length();

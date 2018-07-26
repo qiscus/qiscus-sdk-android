@@ -9,7 +9,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
 import com.qiscus.manggil.ui.MentionsEditText;
-import com.qiscus.sdk.util.BuildVersionUtil;
+import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 
 /**
  * Created on : August 08, 2017

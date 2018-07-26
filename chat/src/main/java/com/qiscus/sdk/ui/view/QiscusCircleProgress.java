@@ -30,7 +30,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 
 public class QiscusCircleProgress extends View implements QiscusProgressView {
     private Paint textPaint;

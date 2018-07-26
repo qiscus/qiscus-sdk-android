@@ -26,6 +26,17 @@ import android.os.Parcelable;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusContact implements Parcelable {
+    public static final Creator<QiscusContact> CREATOR = new Creator<QiscusContact>() {
+        @Override
+        public QiscusContact createFromParcel(Parcel in) {
+            return new QiscusContact(in);
+        }
+
+        @Override
+        public QiscusContact[] newArray(int size) {
+            return new QiscusContact[size];
+        }
+    };
     private String name;
     private String value;
     private String type;
@@ -41,18 +52,6 @@ public class QiscusContact implements Parcelable {
         value = in.readString();
         type = in.readString();
     }
-
-    public static final Creator<QiscusContact> CREATOR = new Creator<QiscusContact>() {
-        @Override
-        public QiscusContact createFromParcel(Parcel in) {
-            return new QiscusContact(in);
-        }
-
-        @Override
-        public QiscusContact[] newArray(int size) {
-            return new QiscusContact[size];
-        }
-    };
 
     public String getName() {
         return name;

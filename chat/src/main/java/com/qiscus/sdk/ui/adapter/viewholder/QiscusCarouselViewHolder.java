@@ -31,7 +31,7 @@ import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
-import com.qiscus.sdk.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 
 import org.json.JSONArray;
 import org.json.JSONException;

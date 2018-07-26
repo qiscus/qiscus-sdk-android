@@ -19,7 +19,7 @@ package com.qiscus.sdk.chat.core.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.qiscus.sdk.util.QiscusNumberUtil;
+import com.qiscus.sdk.chat.core.util.QiscusNumberUtil;
 
 import org.json.JSONObject;
 
@@ -32,6 +32,17 @@ import java.util.List;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusChatRoom implements Parcelable {
+    public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
+        @Override
+        public QiscusChatRoom createFromParcel(Parcel in) {
+            return new QiscusChatRoom(in);
+        }
+
+        @Override
+        public QiscusChatRoom[] newArray(int size) {
+            return new QiscusChatRoom[size];
+        }
+    };
     protected long id;
     protected String distinctId;
     protected String uniqueId;
@@ -67,18 +78,6 @@ public class QiscusChatRoom implements Parcelable {
         lastComment = in.readParcelable(QiscusComment.class.getClassLoader());
         memberCount = in.readInt();
     }
-
-    public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
-        @Override
-        public QiscusChatRoom createFromParcel(Parcel in) {
-            return new QiscusChatRoom(in);
-        }
-
-        @Override
-        public QiscusChatRoom[] newArray(int size) {
-            return new QiscusChatRoom[size];
-        }
-    };
 
     public long getId() {
         return id;

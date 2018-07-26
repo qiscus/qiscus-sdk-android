@@ -16,7 +16,6 @@
 
 package com.qiscus.sdk;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -27,17 +26,17 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
+import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.service.QiscusSyncJobService;
 import com.qiscus.sdk.service.QiscusSyncService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
-import com.qiscus.sdk.util.BuildVersionUtil;
-import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
@@ -63,12 +62,7 @@ import static com.qiscus.sdk.chat.core.QiscusCore.checkUserSetup;
  */
 public class Qiscus {
 
-    @SuppressLint("StaticFieldLeak")
-    private static Handler appHandler;
-    private static ScheduledThreadPoolExecutor taskExecutor;
     private static QiscusChatConfig chatConfig;
-
-
     private static String authorities;
 
     private Qiscus() {
@@ -93,7 +87,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        QiscusCore.init(application, qiscusAppId);
+        initWithCustomServer(application, qiscusAppId, "https://api.qiscus.com/", "ssl://mqtt.qiscus.com:1885");
     }
 
     /**
@@ -118,12 +112,8 @@ public class Qiscus {
      */
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
         QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl);
-        appHandler = new Handler(QiscusCore.getApps().getApplicationContext().getMainLooper());
-        taskExecutor = new ScheduledThreadPoolExecutor(5);
         chatConfig = new QiscusChatConfig();
-        QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
         authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
-
         startPusherService();
         startNetworkCheckerService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
@@ -135,6 +125,7 @@ public class Qiscus {
 
     public static void startPusherService() {
         checkAppIdSetup();
+        Application appInstance = QiscusCore.getApps();
         if (BuildVersionUtil.isOreoLower()) {
             appInstance.getApplicationContext()
                     .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
@@ -152,6 +143,7 @@ public class Qiscus {
      * start network checker job service if in oreo or higher
      */
     public static void startNetworkCheckerService() {
+        Application appInstance = QiscusCore.getApps();
         if (BuildVersionUtil.isOreoOrHigher()) {
             try {
                 appInstance.getApplicationContext()
@@ -241,8 +233,7 @@ public class Qiscus {
      * @return Main thread handler
      */
     public static Handler getAppsHandler() {
-        checkAppIdSetup();
-        return appHandler;
+        return QiscusCore.getAppsHandler();
     }
 
     /**
@@ -251,8 +242,7 @@ public class Qiscus {
      * @return ScheduledExecutorService instance
      */
     public static ScheduledThreadPoolExecutor getTaskExecutor() {
-        checkAppIdSetup();
-        return taskExecutor;
+        return QiscusCore.getTaskExecutor();
     }
 
     /**
@@ -435,7 +425,7 @@ public class Qiscus {
      * @param fcmToken the token
      */
     public static void setFcmToken(String fcmToken) {
-       QiscusCore.setFcmToken(fcmToken);
+        QiscusCore.setFcmToken(fcmToken);
     }
 
     public static String getProviderAuthorities() {
@@ -452,7 +442,7 @@ public class Qiscus {
      * @return true if apps on foreground, and false if on background
      */
     public static boolean isOnForeground() {
-        return QiscusActivityCallback.INSTANCE.isForeground();
+        return QiscusCore.isOnForeground();
     }
 
     /**

@@ -23,7 +23,6 @@ import android.support.annotation.RestrictTo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
@@ -35,13 +34,10 @@ import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusLogger;
-import com.qiscus.sdk.util.QiscusPushNotificationUtil;
-import com.qiscus.sdk.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -86,21 +82,17 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private String serverUri;
     private MqttAndroidClient mqttAndroidClient;
     private QiscusAccount qiscusAccount;
-
-    private Runnable fallbackConnect = this::connect;
-    private Runnable fallBackListenComment = this::listenComment;
-    private Runnable fallBackListenNotification = this::listenNotification;
     private Runnable fallBackListenRoom;
     private Runnable fallBackListenUserStatus;
-
     private ScheduledFuture<?> scheduledConnect;
     private ScheduledFuture<?> scheduledListenComment;
     private ScheduledFuture<?> scheduledListenNotification;
     private ScheduledFuture<?> scheduledListenRoom;
     private ScheduledFuture<?> scheduledListenUserStatus;
-
     private boolean connecting;
-
+    private Runnable fallbackConnect = this::connect;
+    private Runnable fallBackListenComment = this::listenComment;
+    private Runnable fallBackListenNotification = this::listenNotification;
     private ScheduledFuture<?> scheduledUserStatus;
 
     private int setOfflineCounter;
@@ -122,6 +114,157 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public static QiscusPusherApi getInstance() {
         return INSTANCE;
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static void handleReceivedComment(QiscusComment qiscusComment) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qiscusComment));
+    }
+
+    private static void handleComment(QiscusComment qiscusComment) {
+        QiscusComment savedComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
+        if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
+            return;
+        }
+
+        if (!qiscusComment.isMyComment()) {
+            QiscusPusherApi.getInstance().setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
+        }
+
+//        QiscusPushNotificationUtil.handlePushNotification(QiscusCore.getApps(), qiscusComment); todo
+        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment)));
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static void handleNotification(JSONObject jsonObject) {
+        long eventId = jsonObject.optLong("id");
+        if (eventId <= QiscusEventCache.getInstance().getLastEventId()) {
+            return;
+        }
+
+        QiscusEventCache.getInstance().setLastEventId(eventId);
+
+        if (jsonObject.optString("action_topic").equals("delete_message")) {
+            JSONObject payload = jsonObject.optJSONObject("payload");
+
+            JSONObject actorJson = payload.optJSONObject("actor");
+            QiscusRoomMember actor = new QiscusRoomMember();
+            actor.setEmail(actorJson.optString("email"));
+            actor.setUsername(actorJson.optString("name"));
+
+            List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
+            JSONObject dataJson = payload.optJSONObject("data");
+            JSONArray deletedCommentsJson = dataJson.optJSONArray("deleted_messages");
+            int deletedCommentsJsonSize = deletedCommentsJson.length();
+            for (int i = 0; i < deletedCommentsJsonSize; i++) {
+                JSONObject deletedCommentJson = deletedCommentsJson.optJSONObject(i);
+                long roomId = Long.valueOf(deletedCommentJson.optString("room_id", "0"));
+
+                JSONArray commentUniqueIds = deletedCommentJson.optJSONArray("message_unique_ids");
+                int commentUniqueIdsSize = commentUniqueIds.length();
+                for (int j = 0; j < commentUniqueIdsSize; j++) {
+                    deletedComments.add(new QiscusDeleteCommentHandler.DeletedCommentsData
+                            .DeletedComment(roomId, commentUniqueIds.optString(j)));
+                }
+            }
+
+            QiscusDeleteCommentHandler.DeletedCommentsData deletedCommentsData
+                    = new QiscusDeleteCommentHandler.DeletedCommentsData();
+            deletedCommentsData.setActor(actor);
+            deletedCommentsData.setHardDelete(dataJson.optBoolean("is_hard_delete"));
+            deletedCommentsData.setDeletedComments(deletedComments);
+
+            QiscusDeleteCommentHandler.handle(deletedCommentsData);
+        } else if (jsonObject.optString("action_topic").equals("clear_room")) {
+            JSONObject payload = jsonObject.optJSONObject("payload");
+
+            JSONObject actorJson = payload.optJSONObject("actor");
+            QiscusRoomMember actor = new QiscusRoomMember();
+            actor.setEmail(actorJson.optString("email"));
+            actor.setUsername(actorJson.optString("name"));
+
+            List<Long> roomIds = new ArrayList<>();
+            JSONObject dataJson = payload.optJSONObject("data");
+            JSONArray clearedRoomsJson = dataJson.optJSONArray("deleted_rooms");
+            int clearedRoomsJsonSize = clearedRoomsJson.length();
+            for (int i = 0; i < clearedRoomsJsonSize; i++) {
+                JSONObject clearedRoomJson = clearedRoomsJson.optJSONObject(i);
+                roomIds.add(clearedRoomJson.optLong("id"));
+            }
+
+            QiscusClearCommentsHandler.ClearCommentsData clearCommentsData
+                    = new QiscusClearCommentsHandler.ClearCommentsData();
+            //timestamp is in nano seconds format, convert it to milliseconds by divide it
+            clearCommentsData.setTimestamp(jsonObject.optLong("timestamp") / 1000000L);
+            clearCommentsData.setActor(actor);
+            clearCommentsData.setRoomIds(roomIds);
+
+            QiscusClearCommentsHandler.handle(clearCommentsData);
+        }
+    }
+
+    @Nullable
+    public static QiscusComment jsonToComment(JsonObject jsonObject) {
+        try {
+            QiscusComment qiscusComment = new QiscusComment();
+            qiscusComment.setId(jsonObject.get("id").getAsLong());
+            qiscusComment.setRoomId(jsonObject.get("room_id").getAsLong());
+            qiscusComment.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
+            qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsLong());
+            qiscusComment.setMessage(jsonObject.get("message").getAsString());
+            qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
+            qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
+            qiscusComment.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
+
+            //timestamp is in nano seconds format, convert it to milliseconds by divide it
+            long timestamp = jsonObject.get("unix_nano_timestamp").getAsLong() / 1000000L;
+            qiscusComment.setTime(new Date(timestamp));
+            qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+
+            if (jsonObject.has("is_deleted")) {
+                qiscusComment.setDeleted(jsonObject.get("is_deleted").getAsBoolean());
+            }
+
+            qiscusComment.setRoomName(jsonObject.get("room_name").isJsonNull() ?
+                    qiscusComment.getSender() : jsonObject.get("room_name").getAsString());
+            if (jsonObject.has("room_avatar")) {
+                qiscusComment.setRoomAvatar(jsonObject.get("room_avatar").getAsString());
+            }
+
+            qiscusComment.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
+            if (!qiscusComment.isGroupMessage()) {
+                qiscusComment.setRoomName(qiscusComment.getSender());
+            }
+            if (jsonObject.has("type")) {
+                qiscusComment.setRawType(jsonObject.get("type").getAsString());
+                qiscusComment.setExtraPayload(jsonObject.get("payload").toString());
+                if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
+                        || qiscusComment.getType() == QiscusComment.Type.REPLY
+                        || qiscusComment.getType() == QiscusComment.Type.CARD) {
+                    JsonObject payload = jsonObject.get("payload").getAsJsonObject();
+                    if (payload.has("text")) {
+                        String text = payload.get("text").getAsString();
+                        if (QiscusTextUtil.isNotBlank(text)) {
+                            qiscusComment.setMessage(text.trim());
+                        }
+                    }
+                }
+            }
+
+            if (jsonObject.has("extras") && !jsonObject.get("extras").isJsonNull()) {
+                qiscusComment.setExtras(new JSONObject(jsonObject.get("extras").getAsJsonObject().toString()));
+            }
+
+            return qiscusComment;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Nullable
+    public static QiscusComment jsonToComment(String json) {
+        return jsonToComment(gson.fromJson(json, JsonObject.class));
     }
 
     private void buildClient() {
@@ -437,93 +580,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public static void handleReceivedComment(QiscusComment qiscusComment) {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qiscusComment));
-    }
-
-    private static void handleComment(QiscusComment qiscusComment) {
-        QiscusComment savedComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-        if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
-            return;
-        }
-
-        if (!qiscusComment.isMyComment()) {
-            QiscusPusherApi.getInstance().setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-        }
-
-        QiscusPushNotificationUtil.handlePushNotification(QiscusCore.getApps(), qiscusComment);
-        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment)));
-    }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public static void handleNotification(JSONObject jsonObject) {
-        long eventId = jsonObject.optLong("id");
-        if (eventId <= QiscusEventCache.getInstance().getLastEventId()) {
-            return;
-        }
-
-        QiscusEventCache.getInstance().setLastEventId(eventId);
-
-        if (jsonObject.optString("action_topic").equals("delete_message")) {
-            JSONObject payload = jsonObject.optJSONObject("payload");
-
-            JSONObject actorJson = payload.optJSONObject("actor");
-            QiscusRoomMember actor = new QiscusRoomMember();
-            actor.setEmail(actorJson.optString("email"));
-            actor.setUsername(actorJson.optString("name"));
-
-            List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
-            JSONObject dataJson = payload.optJSONObject("data");
-            JSONArray deletedCommentsJson = dataJson.optJSONArray("deleted_messages");
-            int deletedCommentsJsonSize = deletedCommentsJson.length();
-            for (int i = 0; i < deletedCommentsJsonSize; i++) {
-                JSONObject deletedCommentJson = deletedCommentsJson.optJSONObject(i);
-                long roomId = Long.valueOf(deletedCommentJson.optString("room_id", "0"));
-
-                JSONArray commentUniqueIds = deletedCommentJson.optJSONArray("message_unique_ids");
-                int commentUniqueIdsSize = commentUniqueIds.length();
-                for (int j = 0; j < commentUniqueIdsSize; j++) {
-                    deletedComments.add(new QiscusDeleteCommentHandler.DeletedCommentsData
-                            .DeletedComment(roomId, commentUniqueIds.optString(j)));
-                }
-            }
-
-            QiscusDeleteCommentHandler.DeletedCommentsData deletedCommentsData
-                    = new QiscusDeleteCommentHandler.DeletedCommentsData();
-            deletedCommentsData.setActor(actor);
-            deletedCommentsData.setHardDelete(dataJson.optBoolean("is_hard_delete"));
-            deletedCommentsData.setDeletedComments(deletedComments);
-
-            QiscusDeleteCommentHandler.handle(deletedCommentsData);
-        } else if (jsonObject.optString("action_topic").equals("clear_room")) {
-            JSONObject payload = jsonObject.optJSONObject("payload");
-
-            JSONObject actorJson = payload.optJSONObject("actor");
-            QiscusRoomMember actor = new QiscusRoomMember();
-            actor.setEmail(actorJson.optString("email"));
-            actor.setUsername(actorJson.optString("name"));
-
-            List<Long> roomIds = new ArrayList<>();
-            JSONObject dataJson = payload.optJSONObject("data");
-            JSONArray clearedRoomsJson = dataJson.optJSONArray("deleted_rooms");
-            int clearedRoomsJsonSize = clearedRoomsJson.length();
-            for (int i = 0; i < clearedRoomsJsonSize; i++) {
-                JSONObject clearedRoomJson = clearedRoomsJson.optJSONObject(i);
-                roomIds.add(clearedRoomJson.optLong("id"));
-            }
-
-            QiscusClearCommentsHandler.ClearCommentsData clearCommentsData
-                    = new QiscusClearCommentsHandler.ClearCommentsData();
-            //timestamp is in nano seconds format, convert it to milliseconds by divide it
-            clearCommentsData.setTimestamp(jsonObject.optLong("timestamp") / 1000000L);
-            clearCommentsData.setActor(actor);
-            clearCommentsData.setRoomIds(roomIds);
-
-            QiscusClearCommentsHandler.handle(clearCommentsData);
-        }
-    }
-
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
 
@@ -579,79 +635,15 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    @Nullable
-    public static QiscusComment jsonToComment(JsonObject jsonObject) {
-        try {
-            QiscusComment qiscusComment = new QiscusComment();
-            qiscusComment.setId(jsonObject.get("id").getAsLong());
-            qiscusComment.setRoomId(jsonObject.get("room_id").getAsLong());
-            qiscusComment.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
-            qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsLong());
-            qiscusComment.setMessage(jsonObject.get("message").getAsString());
-            qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
-            qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
-            qiscusComment.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
-
-            //timestamp is in nano seconds format, convert it to milliseconds by divide it
-            long timestamp = jsonObject.get("unix_nano_timestamp").getAsLong() / 1000000L;
-            qiscusComment.setTime(new Date(timestamp));
-            qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-
-            if (jsonObject.has("is_deleted")) {
-                qiscusComment.setDeleted(jsonObject.get("is_deleted").getAsBoolean());
-            }
-
-            qiscusComment.setRoomName(jsonObject.get("room_name").isJsonNull() ?
-                    qiscusComment.getSender() : jsonObject.get("room_name").getAsString());
-            if (jsonObject.has("room_avatar")) {
-                qiscusComment.setRoomAvatar(jsonObject.get("room_avatar").getAsString());
-            }
-
-            qiscusComment.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
-            if (!qiscusComment.isGroupMessage()) {
-                qiscusComment.setRoomName(qiscusComment.getSender());
-            }
-            if (jsonObject.has("type")) {
-                qiscusComment.setRawType(jsonObject.get("type").getAsString());
-                qiscusComment.setExtraPayload(jsonObject.get("payload").toString());
-                if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
-                        || qiscusComment.getType() == QiscusComment.Type.REPLY
-                        || qiscusComment.getType() == QiscusComment.Type.CARD) {
-                    JsonObject payload = jsonObject.get("payload").getAsJsonObject();
-                    if (payload.has("text")) {
-                        String text = payload.get("text").getAsString();
-                        if (QiscusTextUtil.isNotBlank(text)) {
-                            qiscusComment.setMessage(text.trim());
-                        }
-                    }
-                }
-            }
-
-            if (jsonObject.has("extras") && !jsonObject.get("extras").isJsonNull()) {
-                qiscusComment.setExtras(new JSONObject(jsonObject.get("extras").getAsJsonObject().toString()));
-            }
-
-            return qiscusComment;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Nullable
-    public static QiscusComment jsonToComment(String json) {
-        return jsonToComment(gson.fromJson(json, JsonObject.class));
-    }
-
     private void scheduleUserStatus() {
         scheduledUserStatus = QiscusCore.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
                     if (QiscusCore.hasSetupUser()) {
-                        if (Qiscus.isOnForeground()) {
+                        if (QiscusCore.isOnForeground()) {
                             QiscusResendCommentHelper.tryResendPendingComment();
                         }
                         if (isConnected()) {
-                            if (Qiscus.isOnForeground()) {
+                            if (QiscusCore.isOnForeground()) {
                                 setOfflineCounter = 0;
                                 setUserStatus(true);
                             } else {

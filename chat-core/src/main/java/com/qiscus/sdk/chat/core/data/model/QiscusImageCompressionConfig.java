@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.data.model;
+package com.qiscus.sdk.chat.core.data.model;
 
 /**
  * Created on : March 01, 2017

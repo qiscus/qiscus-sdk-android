@@ -1,6 +1,4 @@
-package com.qiscus.sdk.data.model;
-
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+package com.qiscus.sdk.chat.core.data.model;
 
 /**
  * @author yuana

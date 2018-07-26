@@ -27,6 +27,17 @@ import android.text.TextUtils;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusLocation implements Parcelable {
+    public static final Creator<QiscusLocation> CREATOR = new Creator<QiscusLocation>() {
+        @Override
+        public QiscusLocation createFromParcel(Parcel in) {
+            return new QiscusLocation(in);
+        }
+
+        @Override
+        public QiscusLocation[] newArray(int size) {
+            return new QiscusLocation[size];
+        }
+    };
     private String name;
     private String address;
     private double latitude;
@@ -46,18 +57,6 @@ public class QiscusLocation implements Parcelable {
         mapUrl = in.readString();
         thumbnailUrl = in.readString();
     }
-
-    public static final Creator<QiscusLocation> CREATOR = new Creator<QiscusLocation>() {
-        @Override
-        public QiscusLocation createFromParcel(Parcel in) {
-            return new QiscusLocation(in);
-        }
-
-        @Override
-        public QiscusLocation[] newArray(int size) {
-            return new QiscusLocation[size];
-        }
-    };
 
     public String getName() {
         return name;
@@ -109,13 +108,13 @@ public class QiscusLocation implements Parcelable {
         return thumbnailUrl;
     }
 
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
     private void generateThumbnail() {
         thumbnailUrl = "http://maps.google.com/maps/api/staticmap?center="
                 + latitude + "," + longitude + "&zoom=17&size=512x300&sensor=false";
-    }
-
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
     }
 
     @Override

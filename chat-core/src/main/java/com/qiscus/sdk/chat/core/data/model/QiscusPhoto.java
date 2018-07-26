@@ -28,6 +28,17 @@ import java.io.File;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusPhoto implements Parcelable {
+    public static final Creator<QiscusPhoto> CREATOR = new Creator<QiscusPhoto>() {
+        @Override
+        public QiscusPhoto createFromParcel(Parcel in) {
+            return new QiscusPhoto(in);
+        }
+
+        @Override
+        public QiscusPhoto[] newArray(int size) {
+            return new QiscusPhoto[size];
+        }
+    };
     private File photoFile;
     private boolean selected;
 
@@ -44,18 +55,6 @@ public class QiscusPhoto implements Parcelable {
         photoFile = new File(in.readString());
         selected = in.readByte() != 0;
     }
-
-    public static final Creator<QiscusPhoto> CREATOR = new Creator<QiscusPhoto>() {
-        @Override
-        public QiscusPhoto createFromParcel(Parcel in) {
-            return new QiscusPhoto(in);
-        }
-
-        @Override
-        public QiscusPhoto[] newArray(int size) {
-            return new QiscusPhoto[size];
-        }
-    };
 
     public File getPhotoFile() {
         return photoFile;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.util;
+package com.qiscus.sdk.chat.core.util;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,7 +24,7 @@ import android.net.NetworkInfo;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
@@ -50,14 +50,14 @@ public final class QiscusAndroidUtil {
 
     public static void runOnUIThread(Runnable runnable, long delay) {
         if (delay == 0) {
-            Qiscus.getAppsHandler().post(runnable);
+            QiscusCore.getAppsHandler().post(runnable);
         } else {
-            Qiscus.getAppsHandler().postDelayed(runnable, delay);
+            QiscusCore.getAppsHandler().postDelayed(runnable, delay);
         }
     }
 
     public static void cancelRunOnUIThread(Runnable runnable) {
-        Qiscus.getAppsHandler().removeCallbacks(runnable);
+        QiscusCore.getAppsHandler().removeCallbacks(runnable);
     }
 
     public static ScheduledFuture<?> runOnBackgroundThread(Runnable runnable) {
@@ -66,14 +66,14 @@ public final class QiscusAndroidUtil {
 
     public static ScheduledFuture<?> runOnBackgroundThread(Runnable runnable, long delay) {
         if (delay == 0) {
-            return Qiscus.getTaskExecutor().schedule(runnable, 0, MILLISECONDS);
+            return QiscusCore.getTaskExecutor().schedule(runnable, 0, MILLISECONDS);
         }
-        return Qiscus.getTaskExecutor().schedule(runnable, delay, MILLISECONDS);
+        return QiscusCore.getTaskExecutor().schedule(runnable, delay, MILLISECONDS);
     }
 
     public static boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager)
-                Qiscus.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
+                QiscusCore.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm != null ? cm.getActiveNetworkInfo() : null;
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }

@@ -24,6 +24,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import java.util.Map;
 

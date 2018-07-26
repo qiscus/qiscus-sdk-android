@@ -19,9 +19,20 @@ package com.qiscus.sdk.chat.core.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.qiscus.sdk.util.QiscusNumberUtil;
+import com.qiscus.sdk.chat.core.util.QiscusNumberUtil;
 
 public class QiscusPushNotificationMessage implements Parcelable {
+    public static final Creator<QiscusPushNotificationMessage> CREATOR = new Creator<QiscusPushNotificationMessage>() {
+        @Override
+        public QiscusPushNotificationMessage createFromParcel(Parcel in) {
+            return new QiscusPushNotificationMessage(in);
+        }
+
+        @Override
+        public QiscusPushNotificationMessage[] newArray(int size) {
+            return new QiscusPushNotificationMessage[size];
+        }
+    };
     private long commentId;
     private String message;
     private String roomName;
@@ -46,48 +57,36 @@ public class QiscusPushNotificationMessage implements Parcelable {
         roomAvatar = in.readString();
     }
 
-    public static final Creator<QiscusPushNotificationMessage> CREATOR = new Creator<QiscusPushNotificationMessage>() {
-        @Override
-        public QiscusPushNotificationMessage createFromParcel(Parcel in) {
-            return new QiscusPushNotificationMessage(in);
-        }
-
-        @Override
-        public QiscusPushNotificationMessage[] newArray(int size) {
-            return new QiscusPushNotificationMessage[size];
-        }
-    };
-
-    public void setCommentId(long commentId) {
-        this.commentId = commentId;
-    }
-
     public long getCommentId() {
         return commentId;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setCommentId(long commentId) {
+        this.commentId = commentId;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getRoomName() {
         return roomName;
     }
 
-    public void setRoomAvatar(String roomAvatar) {
-        this.roomAvatar = roomAvatar;
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
 
     public String getRoomAvatar() {
         return roomAvatar;
+    }
+
+    public void setRoomAvatar(String roomAvatar) {
+        this.roomAvatar = roomAvatar;
     }
 
     @Override

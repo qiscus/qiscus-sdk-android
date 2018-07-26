@@ -41,9 +41,9 @@ import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.adapter.ReplyItemClickListener;
-import com.qiscus.sdk.util.QiscusImageUtil;
-import com.qiscus.sdk.util.QiscusPatterns;
-import com.qiscus.sdk.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusImageUtil;
+import com.qiscus.sdk.chat.core.util.QiscusPatterns;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import java.io.File;
 import java.util.regex.Matcher;

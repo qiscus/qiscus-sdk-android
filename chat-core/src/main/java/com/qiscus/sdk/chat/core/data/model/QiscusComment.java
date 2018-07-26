@@ -24,12 +24,12 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusFileUtil;
-import com.qiscus.sdk.util.QiscusRawDataExtractor;
-import com.qiscus.sdk.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
 
 import org.json.JSONException;
@@ -59,7 +59,17 @@ public class QiscusComment implements Parcelable {
     public static final int STATE_ON_QISCUS = 2;
     public static final int STATE_DELIVERED = 3;
     public static final int STATE_READ = 4;
+    public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
+        @Override
+        public QiscusComment createFromParcel(Parcel in) {
+            return new QiscusComment(in);
+        }
 
+        @Override
+        public QiscusComment[] newArray(int size) {
+            return new QiscusComment[size];
+        }
+    };
     protected long id;
     protected long roomId;
     protected String uniqueId;
@@ -75,43 +85,64 @@ public class QiscusComment implements Parcelable {
     protected String roomName;
     protected String roomAvatar;
     protected boolean groupMessage;
-
     protected boolean selected;
     protected boolean highlighted;
     protected boolean downloading;
     protected int progress;
-
-    private List<String> urls;
-    private PreviewData previewData;
-
-    private QiscusContact contact;
-    private QiscusLocation location;
-
-    private String rawType;
-    private String extraPayload;
-    private JSONObject extras;
-
     protected ProgressListener progressListener;
     protected DownloadingListener downloadingListener;
     protected PlayingAudioListener playingAudioListener;
     protected LinkPreviewListener linkPreviewListener;
-
+    private List<String> urls;
+    private PreviewData previewData;
+    private QiscusContact contact;
+    private QiscusLocation location;
+    private String rawType;
+    private String extraPayload;
+    private JSONObject extras;
     private MediaObserver observer;
     private MediaPlayer player;
-
     private QiscusComment replyTo;
     private String caption;
     private String attachmentName;
 
+    public QiscusComment() {
+
+    }
+
+    protected QiscusComment(Parcel in) {
+        id = in.readLong();
+        roomId = in.readLong();
+        uniqueId = in.readString();
+        commentBeforeId = in.readLong();
+        message = in.readString();
+        sender = in.readString();
+        senderEmail = in.readString();
+        senderAvatar = in.readString();
+        time = new Date(in.readLong());
+        state = in.readInt();
+        deleted = in.readByte() != 0;
+        hardDeleted = in.readByte() != 0;
+        selected = in.readByte() != 0;
+        rawType = in.readString();
+        extraPayload = in.readString();
+        replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
+        try {
+            extras = new JSONObject(in.readString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static QiscusComment generateMessage(long roomId, String content) {
-        QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
+        QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
         QiscusComment qiscusComment = new QiscusComment();
         qiscusComment.setId(-1);
         qiscusComment.setRoomId(roomId);
         qiscusComment.setUniqueId("android_"
                 + System.currentTimeMillis()
                 + QiscusTextUtil.getRandomString(8)
-                + Settings.Secure.getString(Qiscus.getApps().getContentResolver(),
+                + Settings.Secure.getString(QiscusCore.getApps().getContentResolver(),
                 Settings.Secure.ANDROID_ID));
         qiscusComment.setMessage(content);
         qiscusComment.setTime(new Date());
@@ -220,46 +251,6 @@ public class QiscusComment implements Parcelable {
         qiscusComment.setExtraPayload(json.toString());
         return qiscusComment;
     }
-
-    public QiscusComment() {
-
-    }
-
-    protected QiscusComment(Parcel in) {
-        id = in.readLong();
-        roomId = in.readLong();
-        uniqueId = in.readString();
-        commentBeforeId = in.readLong();
-        message = in.readString();
-        sender = in.readString();
-        senderEmail = in.readString();
-        senderAvatar = in.readString();
-        time = new Date(in.readLong());
-        state = in.readInt();
-        deleted = in.readByte() != 0;
-        hardDeleted = in.readByte() != 0;
-        selected = in.readByte() != 0;
-        rawType = in.readString();
-        extraPayload = in.readString();
-        replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
-        try {
-            extras = new JSONObject(in.readString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
-        @Override
-        public QiscusComment createFromParcel(Parcel in) {
-            return new QiscusComment(in);
-        }
-
-        @Override
-        public QiscusComment[] newArray(int size) {
-            return new QiscusComment[size];
-        }
-    };
 
     public long getId() {
         return id;
@@ -397,12 +388,12 @@ public class QiscusComment implements Parcelable {
         this.highlighted = highlighted;
     }
 
-    public void setRawType(String rawType) {
-        this.rawType = rawType;
-    }
-
     public String getRawType() {
         return rawType;
+    }
+
+    public void setRawType(String rawType) {
+        this.rawType = rawType;
     }
 
     public String getExtraPayload() {
@@ -422,7 +413,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public boolean isMyComment() {
-        return getSenderEmail().equals(Qiscus.getQiscusAccount().getEmail());
+        return getSenderEmail().equals(QiscusCore.getQiscusAccount().getEmail());
     }
 
     public QiscusComment getReplyTo() {
@@ -703,7 +694,7 @@ public class QiscusComment implements Parcelable {
 
     private void setupPlayer() {
         if (player == null) {
-            File localPath = Qiscus.getDataStore().getLocalPath(id);
+            File localPath = QiscusCore.getDataStore().getLocalPath(id);
             if (localPath != null) {
                 try {
                     player = new MediaPlayer();
@@ -752,7 +743,7 @@ public class QiscusComment implements Parcelable {
 
     public int getAudioDuration() {
         if (player == null && isAudio()) {
-            File localPath = Qiscus.getDataStore().getLocalPath(id);
+            File localPath = QiscusCore.getDataStore().getLocalPath(id);
             if (localPath == null) {
                 return 0;
             } else {
@@ -764,7 +755,7 @@ public class QiscusComment implements Parcelable {
 
     public int getCurrentAudioPosition() {
         if (player == null && isAudio()) {
-            File localPath = Qiscus.getDataStore().getLocalPath(id);
+            File localPath = QiscusCore.getDataStore().getLocalPath(id);
             if (localPath == null) {
                 return 0;
             } else {

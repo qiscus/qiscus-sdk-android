@@ -36,11 +36,11 @@ import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusFileUtil;
-import com.qiscus.sdk.util.QiscusImageUtil;
-import com.qiscus.sdk.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusImageUtil;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk;
+package com.qiscus.sdk.chat.core;
 
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 
 import java.util.concurrent.ScheduledFuture;
 

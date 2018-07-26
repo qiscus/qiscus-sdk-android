@@ -18,15 +18,12 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.support.annotation.RestrictTo;
 
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -77,8 +74,8 @@ public final class QiscusDeleteCommentHandler {
                     EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
                 })
                 .toList()
-                .doOnNext(comments -> QiscusPushNotificationUtil
-                        .handleDeletedCommentNotification(QiscusCore.getApps(), comments, false))
+//                .doOnNext(comments -> QiscusPushNotificationUtil todo
+//                        .handleDeletedCommentNotification(QiscusCore.getApps(), comments, false))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {
@@ -113,8 +110,8 @@ public final class QiscusDeleteCommentHandler {
                     EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
                 })
                 .toList()
-                .doOnNext(comments -> QiscusPushNotificationUtil
-                        .handleDeletedCommentNotification(QiscusCore.getApps(), comments, true))
+//                .doOnNext(comments -> QiscusPushNotificationUtil todo
+//                        .handleDeletedCommentNotification(QiscusCore.getApps(), comments, true))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {

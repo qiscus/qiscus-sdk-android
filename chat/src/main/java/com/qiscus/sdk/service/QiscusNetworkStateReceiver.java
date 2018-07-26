@@ -22,7 +22,7 @@ import android.content.Intent;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 /**

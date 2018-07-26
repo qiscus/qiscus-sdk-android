@@ -35,7 +35,7 @@ import com.qiscus.sdk.ui.QiscusBaseChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
-import com.qiscus.sdk.util.QiscusDateUtil;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 
 import java.util.Date;
 

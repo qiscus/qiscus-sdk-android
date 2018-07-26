@@ -31,7 +31,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
-import com.qiscus.sdk.util.QiscusDateUtil;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 
 import java.util.ArrayList;
 import java.util.Date;

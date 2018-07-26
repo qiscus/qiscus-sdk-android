@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.util;
+package com.qiscus.sdk.chat.core.util;
 
 import android.text.format.DateUtils;
 
-import com.qiscus.sdk.R;
+import com.qiscus.sdk.chat.core.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

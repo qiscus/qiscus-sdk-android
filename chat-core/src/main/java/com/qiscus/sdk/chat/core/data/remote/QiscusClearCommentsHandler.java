@@ -18,13 +18,10 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.support.annotation.RestrictTo;
 
-import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -52,7 +49,7 @@ public final class QiscusClearCommentsHandler {
                     .doOnNext(roomId -> {
                         if (QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {
                             EventBus.getDefault().post(new QiscusClearCommentsEvent(roomId, clearCommentsData.timestamp));
-                            QiscusPushNotificationUtil.clearPushNotification(QiscusCore.getApps(), roomId);
+//                            QiscusPushNotificationUtil.clearPushNotification(QiscusCore.getApps(), roomId); todo
                         }
                     })
                     .subscribeOn(Schedulers.io())

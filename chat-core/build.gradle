@@ -73,12 +73,14 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     api supportLibs
+    api placesLib
     api firebaseLibs
     api qiscusUtilLibs
     api qiscusMqttLibs
     api networkLibs
-    api eventBusLib
     api rxLibs
+    api flexBoxLib
+    api eventBusLib
     api rxUrlExtractorLib
 
     testImplementation 'junit:junit:4.12'

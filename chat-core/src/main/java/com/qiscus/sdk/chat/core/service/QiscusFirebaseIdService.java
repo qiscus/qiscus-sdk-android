@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.util;
+package com.qiscus.sdk.chat.core.service;
 
-/**
- * Created on : February 06, 2018
- * Author     : zetbaitsu
- * Name       : Zetra
- * GitHub     : https://github.com/zetbaitsu
- */
-public final class QiscusNumberUtil {
-    public static int convertToInt(long number) {
-        return (int) (number % Integer.MAX_VALUE);
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.qiscus.sdk.chat.core.QiscusCore;
+
+public class QiscusFirebaseIdService extends FirebaseInstanceIdService {
+
+    @Override
+    public void onTokenRefresh() {
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        QiscusCore.setFcmToken(refreshedToken);
     }
 }

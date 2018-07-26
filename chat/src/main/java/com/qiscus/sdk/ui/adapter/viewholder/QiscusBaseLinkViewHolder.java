@@ -31,7 +31,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusLinkPreviewView;
-import com.qiscus.sdk.util.QiscusPatterns;
+import com.qiscus.sdk.chat.core.util.QiscusPatterns;
 import com.schinizer.rxunfurl.model.PreviewData;
 
 import java.util.regex.Matcher;

@@ -23,6 +23,17 @@ import android.support.annotation.NonNull;
 import com.qiscus.manggil.mention.Mentionable;
 
 public class QiscusRoomMember implements Parcelable, Mentionable {
+    public static final Creator<QiscusRoomMember> CREATOR = new Creator<QiscusRoomMember>() {
+        @Override
+        public QiscusRoomMember createFromParcel(Parcel in) {
+            return new QiscusRoomMember(in);
+        }
+
+        @Override
+        public QiscusRoomMember[] newArray(int size) {
+            return new QiscusRoomMember[size];
+        }
+    };
     private String email;
     private String username;
     private String avatar;
@@ -40,18 +51,6 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
         lastDeliveredCommentId = in.readLong();
         lastReadCommentId = in.readLong();
     }
-
-    public static final Creator<QiscusRoomMember> CREATOR = new Creator<QiscusRoomMember>() {
-        @Override
-        public QiscusRoomMember createFromParcel(Parcel in) {
-            return new QiscusRoomMember(in);
-        }
-
-        @Override
-        public QiscusRoomMember[] newArray(int size) {
-            return new QiscusRoomMember[size];
-        }
-    };
 
     public String getEmail() {
         return email;
