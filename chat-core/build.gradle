@@ -79,7 +79,6 @@ dependencies {
     api qiscusMqttLibs
     api networkLibs
     api rxLibs
-    api flexBoxLib
     api eventBusLib
     api rxUrlExtractorLib
 
