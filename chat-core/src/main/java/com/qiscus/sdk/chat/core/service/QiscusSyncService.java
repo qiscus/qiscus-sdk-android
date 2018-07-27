@@ -29,14 +29,14 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.service;
+package com.qiscus.sdk.chat.core.service;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
@@ -77,9 +77,9 @@ public class QiscusSyncService extends Service {
             EventBus.getDefault().register(this);
         }
 
-        if (Qiscus.hasSetupUser()) {
+        if (QiscusCore.hasSetupUser()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-            scheduleSync(Qiscus.getHeartBeat());
+            scheduleSync(QiscusCore.getHeartBeat());
         }
     }
 
@@ -95,12 +95,12 @@ public class QiscusSyncService extends Service {
     }
 
     private void scheduleSync(long period) {
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
 
-        scheduledSync = Qiscus.getTaskExecutor()
+        scheduledSync = QiscusCore.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
-                    if (Qiscus.isOnForeground()) {
+                    if (QiscusCore.isOnForeground()) {
                         syncComments();
                         syncEvents();
                     }
@@ -118,7 +118,7 @@ public class QiscusSyncService extends Service {
     private void syncComments() {
         QiscusApi.getInstance().sync()
                 .doOnNext(qiscusComment -> {
-                    QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(qiscusComment.getUniqueId());
+                    QiscusComment savedQiscusComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
 
                     if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
                         return;
@@ -161,7 +161,7 @@ public class QiscusSyncService extends Service {
         switch (userEvent) {
             case LOGIN:
                 QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                scheduleSync(Qiscus.getHeartBeat());
+                scheduleSync(QiscusCore.getHeartBeat());
                 break;
             case LOGOUT:
                 stopSync();

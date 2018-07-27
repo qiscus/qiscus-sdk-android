@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.service;
+package com.qiscus.sdk.chat.core.service;
 
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
@@ -29,7 +29,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
@@ -50,7 +50,7 @@ public class QiscusNetworkCheckerJobService extends JobService {
     private QiscusNetworkStateReceiver networkStateReceiver;
 
     public static int getJobId() {
-        return Qiscus.getQiscusAccount().getId() + STATIC_JOB_ID;
+        return QiscusCore.getQiscusAccount().getId() + STATIC_JOB_ID;
     }
 
     public static void scheduleJob(Context context) {
@@ -98,7 +98,7 @@ public class QiscusNetworkCheckerJobService extends JobService {
             EventBus.getDefault().register(this);
         }
 
-        if (Qiscus.hasSetupUser()) {
+        if (QiscusCore.hasSetupUser()) {
             scheduleJob(this);
         }
         networkStateReceiver = new QiscusNetworkStateReceiver();

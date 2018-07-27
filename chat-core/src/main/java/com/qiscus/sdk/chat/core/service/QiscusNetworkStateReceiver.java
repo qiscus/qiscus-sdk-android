@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.service;
+package com.qiscus.sdk.chat.core.service;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
@@ -37,7 +37,7 @@ public class QiscusNetworkStateReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         boolean isConnected = QiscusAndroidUtil.isNetworkAvailable();
         QiscusLogger.print(TAG, "isConnected : " + isConnected);
-        if (Qiscus.hasSetupUser() && Qiscus.getDataStore().getPendingComments().size() > 0) {
+        if (QiscusCore.hasSetupUser() && QiscusCore.getDataStore().getPendingComments().size() > 0) {
             QiscusAndroidUtil.runOnBackgroundThread(() -> {
                 QiscusResendCommentHelper.cancelAll();
                 QiscusResendCommentHelper.tryResendPendingComment();

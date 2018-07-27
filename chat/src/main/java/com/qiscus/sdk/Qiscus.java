@@ -29,12 +29,8 @@ import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
-import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
-import com.qiscus.sdk.service.QiscusNetworkCheckerJobService;
-import com.qiscus.sdk.service.QiscusSyncJobService;
-import com.qiscus.sdk.service.QiscusSyncService;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.vanniktech.emoji.EmojiManager;
@@ -114,44 +110,11 @@ public class Qiscus {
         QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl);
         chatConfig = new QiscusChatConfig();
         authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
-        startPusherService();
-        startNetworkCheckerService();
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
 
         Jupuk.init(application);
         EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
-    }
-
-    public static void startPusherService() {
-        checkAppIdSetup();
-        Application appInstance = QiscusCore.getApps();
-        if (BuildVersionUtil.isOreoLower()) {
-            appInstance.getApplicationContext()
-                    .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
-        } else {
-            try {
-                appInstance.getApplicationContext()
-                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
-            } catch (IllegalStateException e) {
-                //Prevent crash because trying to start service while application on background
-            }
-        }
-    }
-
-    /**
-     * start network checker job service if in oreo or higher
-     */
-    public static void startNetworkCheckerService() {
-        Application appInstance = QiscusCore.getApps();
-        if (BuildVersionUtil.isOreoOrHigher()) {
-            try {
-                appInstance.getApplicationContext()
-                        .startService(new Intent(appInstance.getApplicationContext(), QiscusNetworkCheckerJobService.class));
-            } catch (IllegalStateException e) {
-                //Prevent crash because trying to start service while application on background
-            }
-        }
     }
 
     /**
