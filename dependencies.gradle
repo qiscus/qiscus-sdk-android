@@ -63,7 +63,6 @@ ext {
 
     qiscusUtilDeps = [
             nirmana: "com.qiscus.utils:nirmana:$versions.nirmana",
-            manggil: "com.qiscus.utils:manggil:$versions.manggil",
             jupuk  : "com.qiscus.utils:jupuk:$versions.jupuk"
     ]
 
@@ -98,6 +97,8 @@ ext {
     flexBoxLib = "com.google.android:flexbox:0.3.1"
     eventBusLib = "org.greenrobot:eventbus:3.0.0"
     rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
+    qiscusManggil = "com.qiscus.utils:manggil:$versions.manggil"
+    qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:$versions.manggil-without-emoji"
 
     supportLibs = supportDeps.values()
     firebaseLibs = firebaseDeps.values()

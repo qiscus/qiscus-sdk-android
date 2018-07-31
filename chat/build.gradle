@@ -82,6 +82,7 @@ dependencies {
     api flexBoxLib
     api eventBusLib
     api rxUrlExtractorLib
+    api qiscusManggil
 
     api project(':chat-core')
 
