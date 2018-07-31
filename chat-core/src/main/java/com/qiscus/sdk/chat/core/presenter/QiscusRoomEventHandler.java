@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.presenter;
+package com.qiscus.sdk.chat.core.presenter;
 
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
@@ -39,33 +39,29 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Kelas yang handle perubahan-perubahan state comment di suatu room, dan juga typing
  */
-class QiscusRoomEventHandler {
-    private QiscusAccount account;
-    private QiscusChatRoom room;
-
-    //comment terakhir yang sudah diterima semua anggota room
-    private AtomicLong lastDeliveredCommentId;
-
-    //comment terakhir yang sudah dibaca semua anggota room
-    private AtomicLong lastReadCommentId;
-
+public class QiscusRoomEventHandler {
     //status terakhir masing-masing anggota room
     Map<String, QiscusRoomMember> memberState;
-
+    private QiscusAccount account;
+    private QiscusChatRoom room;
+    //comment terakhir yang sudah diterima semua anggota room
+    private AtomicLong lastDeliveredCommentId;
+    //comment terakhir yang sudah dibaca semua anggota room
+    private AtomicLong lastReadCommentId;
     //task untuk listen mqtt room
     private Runnable listenRoomTask;
 
     //listener untuk setiap perubahan state
     private StateListener listener;
 
-    QiscusRoomEventHandler(QiscusChatRoom qiscusChatRoom, StateListener listener) {
+    public QiscusRoomEventHandler(QiscusChatRoom qiscusChatRoom, StateListener listener) {
         this.listener = listener;
 
         //Tidak diset 0 karena kita akan mencari nilai terkecil dari semua anggota room
         lastDeliveredCommentId = new AtomicLong(0);
         lastReadCommentId = new AtomicLong(0);
 
-        account = Qiscus.getQiscusAccount();
+        account = QiscusCore.getQiscusAccount();
         setRoom(qiscusChatRoom);
 
         //Register event bus untuk dapetin event dari mqtt
@@ -78,7 +74,7 @@ class QiscusRoomEventHandler {
         QiscusAndroidUtil.runOnUIThread(listenRoomTask, 1000);
     }
 
-    void setRoom(QiscusChatRoom room) {
+    public void setRoom(QiscusChatRoom room) {
         this.room = room;
         determineMemberState();
     }
@@ -233,33 +229,33 @@ class QiscusRoomEventHandler {
      * update local DB
      */
     private void updateLocalLastDelivered() {
-        Qiscus.getDataStore().updateLastDeliveredComment(room.getId(), lastDeliveredCommentId.get());
+        QiscusCore.getDataStore().updateLastDeliveredComment(room.getId(), lastDeliveredCommentId.get());
     }
 
     /**
      * update local DB
      */
     private void updateLocalLastRead() {
-        Qiscus.getDataStore().updateLastReadComment(room.getId(), lastReadCommentId.get());
+        QiscusCore.getDataStore().updateLastReadComment(room.getId(), lastReadCommentId.get());
     }
 
     /**
      * update local DB
      */
     private void updateLocalMemberState(QiscusRoomMember roomMember) {
-        Qiscus.getDataStore().addOrUpdateRoomMember(room.getId(), roomMember, room.getDistinctId());
+        QiscusCore.getDataStore().addOrUpdateRoomMember(room.getId(), roomMember, room.getDistinctId());
     }
 
-    void transformCommentState(List<QiscusComment> comments, boolean fromLocal) {
+    public void transformCommentState(List<QiscusComment> comments, boolean fromLocal) {
         for (QiscusComment comment : comments) {
             transformCommentState(comment, fromLocal);
         }
     }
 
-    void transformCommentState(QiscusComment qiscusComment, boolean fromLocal) {
+    public void transformCommentState(QiscusComment qiscusComment, boolean fromLocal) {
         if (fromLocal && qiscusComment.getState() == QiscusComment.STATE_SENDING) {
             qiscusComment.setState(QiscusComment.STATE_PENDING);
-            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+            QiscusCore.getDataStore().addOrUpdate(qiscusComment);
         } else if (qiscusComment.getState() != QiscusComment.STATE_FAILED
                 && qiscusComment.getState() != QiscusComment.STATE_PENDING
                 && qiscusComment.getState() != QiscusComment.STATE_SENDING
@@ -273,11 +269,11 @@ class QiscusRoomEventHandler {
                 qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
             }
 
-            Qiscus.getDataStore().addOrUpdate(qiscusComment);
+            QiscusCore.getDataStore().addOrUpdate(qiscusComment);
         }
     }
 
-    void onGotComment(QiscusComment qiscusComment) {
+    public void onGotComment(QiscusComment qiscusComment) {
         if (!qiscusComment.getSender().equals(account.getEmail())) {
             //Handle room event such as invite user, kick user
             if (qiscusComment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
@@ -332,7 +328,7 @@ class QiscusRoomEventHandler {
 
             listener.onRoomMemberAdded(member);
             QiscusAndroidUtil.runOnBackgroundThread(() ->
-                    Qiscus.getDataStore().addOrUpdateRoomMember(room.getId(), member, room.getDistinctId()));
+                    QiscusCore.getDataStore().addOrUpdateRoomMember(room.getId(), member, room.getDistinctId()));
         }
     }
 
@@ -342,18 +338,18 @@ class QiscusRoomEventHandler {
 
             listener.onRoomMemberRemoved(member);
             QiscusAndroidUtil.runOnBackgroundThread(() ->
-                    Qiscus.getDataStore().deleteRoomMember(room.getId(), member.getEmail()));
+                    QiscusCore.getDataStore().deleteRoomMember(room.getId(), member.getEmail()));
         }
     }
 
-    void detach() {
+    public void detach() {
         QiscusAndroidUtil.cancelRunOnUIThread(listenRoomTask);
         QiscusPusherApi.getInstance().unListenRoom(room);
         listener = null;
         EventBus.getDefault().unregister(this);
     }
 
-    interface StateListener {
+    public interface StateListener {
         void onRoomNameChanged(String roomName);
 
         void onRoomMemberAdded(QiscusRoomMember roomMember);
