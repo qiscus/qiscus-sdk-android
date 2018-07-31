@@ -54,7 +54,7 @@ public class QiscusNetworkCheckerJobService extends JobService {
     }
 
     public static void scheduleJob(Context context) {
-        Log.d(TAG, "scheduleJob: ");
+        QiscusLogger.print(TAG, "scheduleJob: ");
         ComponentName componentName = new ComponentName(context, QiscusNetworkCheckerJobService.class);
         JobInfo jobInfo = new JobInfo.Builder(getJobId(), componentName)
                 .setRequiresCharging(true)
