@@ -19,6 +19,7 @@ package com.qiscus.sdk.chat.core.util;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.v4.util.PatternsCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -99,12 +100,12 @@ public final class QiscusTextUtil {
     }
 
     public static boolean isUrl(String s) {
-        return QiscusPatterns.AUTOLINK_WEB_URL.matcher(s).matches();
+        return PatternsCompat.AUTOLINK_WEB_URL.matcher(s).matches();
     }
 
     public static List<String> extractUrl(String text) {
         List<String> urls = new ArrayList<>();
-        Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(text);
+        Matcher matcher = PatternsCompat.AUTOLINK_WEB_URL.matcher(text);
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && text.charAt(start - 1) == '@') {

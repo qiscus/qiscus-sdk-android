@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.chat.core.util;
 
+import android.support.annotation.RestrictTo;
 import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
@@ -31,6 +32,7 @@ import retrofit2.HttpException;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public final class QiscusErrorLogger {
 
     private static final String TAG = "Qiscus";

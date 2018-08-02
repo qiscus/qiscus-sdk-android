@@ -29,7 +29,7 @@ import org.json.JSONObject;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public final class QiscusRawDataExtractor {
 
     private QiscusRawDataExtractor() {

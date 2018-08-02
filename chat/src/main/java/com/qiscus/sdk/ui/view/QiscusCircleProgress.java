@@ -31,6 +31,7 @@ import android.view.View;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusConverterUtil;
 
 public class QiscusCircleProgress extends View implements QiscusProgressView {
     private Paint textPaint;
@@ -75,8 +76,8 @@ public class QiscusCircleProgress extends View implements QiscusProgressView {
     public QiscusCircleProgress(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        defaultTextSize = QiscusAndroidUtil.sp2px(getResources(), 18);
-        minSize = (int) QiscusAndroidUtil.dp2px(getResources(), 100);
+        defaultTextSize = QiscusConverterUtil.sp2px(getResources(), 18);
+        minSize = (int) QiscusConverterUtil.dp2px(getResources(), 100);
 
         final TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.QiscusCircleProgress, defStyleAttr, 0);
         initByAttributes(attributes);

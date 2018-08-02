@@ -29,7 +29,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusPhoto;
-import com.qiscus.sdk.chat.core.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusImageUtil;
 
 import java.io.File;
 import java.util.ArrayList;

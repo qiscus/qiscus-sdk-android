@@ -1,5 +1,6 @@
 package com.qiscus.sdk.chat.core.util;
 
+import android.support.annotation.RestrictTo;
 import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
@@ -10,6 +11,7 @@ import com.qiscus.sdk.chat.core.QiscusCore;
  * Name       : Catur Adi Nugroho
  * GitHub     : https://github.com/adicatur
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public final class QiscusLogger {
 
     private static final String TAG = "Qiscus";

@@ -40,7 +40,7 @@ import com.qiscus.sdk.chat.core.presenter.QiscusRoomEventHandler;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
-import com.qiscus.sdk.chat.core.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;

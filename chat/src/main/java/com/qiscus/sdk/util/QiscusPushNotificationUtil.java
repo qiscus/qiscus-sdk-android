@@ -48,7 +48,6 @@ import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
-import com.qiscus.sdk.chat.core.util.QiscusImageUtil;
 import com.qiscus.sdk.chat.core.util.QiscusNumberUtil;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;

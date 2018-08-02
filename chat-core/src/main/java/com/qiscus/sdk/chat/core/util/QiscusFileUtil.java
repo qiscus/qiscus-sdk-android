@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 
@@ -37,7 +38,10 @@ import java.util.Date;
 import java.util.Locale;
 
 public final class QiscusFileUtil {
+
     public static final String FILES_PATH = QiscusCore.getAppsName() + File.separator + "Files";
+    public static final String IMAGE_PATH = QiscusCore.getAppsName() + File.separator +
+            QiscusCore.getAppsName() + " Images";
     private static final int EOF = -1;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
@@ -157,7 +161,7 @@ public final class QiscusFileUtil {
 
     public static String generateFilePath(String fileName, String extension) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
-                QiscusImageUtil.isImage(fileName) ? QiscusImageUtil.IMAGE_PATH : FILES_PATH);
+                isImage(fileName) ? IMAGE_PATH : FILES_PATH);
 
         if (!file.exists()) {
             file.mkdirs();
@@ -178,6 +182,17 @@ public final class QiscusFileUtil {
             }
             index++;
         }
+    }
+
+    public static boolean isImage(String fileName) {
+        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension(fileName));
+        if (type == null) {
+            return false;
+        } else if (type.contains("image")) {
+            return true;
+        }
+
+        return false;
     }
 
     public static File rename(File file, String newName) {

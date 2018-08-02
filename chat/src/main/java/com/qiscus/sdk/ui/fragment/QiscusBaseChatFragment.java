@@ -61,7 +61,6 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusCommentDraft;
@@ -70,6 +69,13 @@ import com.qiscus.sdk.chat.core.data.model.QiscusLocation;
 import com.qiscus.sdk.chat.core.data.model.QiscusPhoto;
 import com.qiscus.sdk.chat.core.data.model.QiscusReplyCommentDraft;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusNumberUtil;
+import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
+import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.presenter.QiscusChatPresenter;
 import com.qiscus.sdk.ui.QiscusAccountLinkingActivity;
 import com.qiscus.sdk.ui.QiscusPhotoViewerActivity;
@@ -85,14 +91,9 @@ import com.qiscus.sdk.ui.view.QiscusEditText;
 import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.qiscus.sdk.ui.view.QiscusRecyclerView;
 import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
-import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
-import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
-import com.qiscus.sdk.chat.core.util.QiscusImageUtil;
-import com.qiscus.sdk.chat.core.util.QiscusNumberUtil;
+import com.qiscus.sdk.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusKeyboardUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
-import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
-import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
@@ -123,7 +124,18 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final int RC_AUDIO_PERMISSION = 129;
     protected static final int RC_FILE_PERMISSION = 130;
     protected static final int RC_LOCATION_PERMISSION = 131;
-
+    protected static final String CHAT_ROOM_DATA = "chat_room_data";
+    protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
+    protected static final String EXTRA_SHARE_FILES = "extra_share_files";
+    protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
+    protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
+    protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
+    protected static final String COMMENTS_DATA = "saved_comments_data";
+    protected static final int TAKE_PICTURE_REQUEST = 1;
+    protected static final int PICK_CONTACT_REQUEST = 2;
+    protected static final int PICK_LOCATION_REQUEST = 3;
+    protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 4;
+    protected static final int SHOW_MEDIA_DETAIL = 5;
     private static final String[] PERMISSIONS = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -132,38 +144,20 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             "android.permission.ACCESS_COARSE_LOCATION",
             "android.permission.ACCESS_FINE_LOCATION",
     };
-
     private static final String AUDIO_PERMISSION = "android.permission.RECORD_AUDIO";
     private static final String[] FILE_PERMISSION = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE"
     };
-
     private static final String[] CAMERA_PERMISSION = {
             "android.permission.CAMERA",
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE",
     };
-
     private static final String[] LOCATION_PERMISSION = {
             "android.permission.ACCESS_COARSE_LOCATION",
             "android.permission.ACCESS_FINE_LOCATION"
     };
-
-    protected static final String CHAT_ROOM_DATA = "chat_room_data";
-    protected static final String EXTRA_STARTING_MESSAGE = "extra_starting_message";
-    protected static final String EXTRA_SHARE_FILES = "extra_share_files";
-    protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
-    protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
-    protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
-    protected static final String COMMENTS_DATA = "saved_comments_data";
-
-    protected static final int TAKE_PICTURE_REQUEST = 1;
-    protected static final int PICK_CONTACT_REQUEST = 2;
-    protected static final int PICK_LOCATION_REQUEST = 3;
-    protected static final int SEND_PICTURE_CONFIRMATION_REQUEST = 4;
-    protected static final int SHOW_MEDIA_DETAIL = 5;
-
     @NonNull
     protected ViewGroup rootView;
     @Nullable
@@ -371,7 +365,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 }
                 if (!message.isEmpty()) {
                     sendMessage(message);
-                    QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
+                    QiscusKeyboardUtil.hideKeyboard(getActivity(), messageEditText);
                 }
                 return true;
             }
@@ -674,7 +668,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (startingMessage != null && !startingMessage.isEmpty()) {
                 messageEditText.setText(startingMessage);
                 messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
-                QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
+                QiscusKeyboardUtil.showKeyboard(getActivity(), messageEditText);
             }
 
             if (shareFiles != null && !shareFiles.isEmpty()) {
@@ -731,7 +725,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (replyPreviewView != null) {
             replyPreviewView.bind(originComment);
             hideAttachmentPanel();
-            QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
+            QiscusKeyboardUtil.showKeyboard(getActivity(), messageEditText);
         }
     }
 
@@ -752,7 +746,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             attachmentPanel.setVisibility(View.VISIBLE);
             if (messageEditTextContainer != null) {
                 messageEditTextContainer.setVisibility(View.GONE);
-                QiscusAndroidUtil.hideKeyboard(getActivity(), messageEditText);
+                QiscusKeyboardUtil.hideKeyboard(getActivity(), messageEditText);
             }
             if (replyPreviewView != null) {
                 replyPreviewView.setVisibility(View.GONE);
@@ -967,7 +961,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             if (draftComment instanceof QiscusReplyCommentDraft && replyPreviewView != null) {
                 replyPreviewView.bind(((QiscusReplyCommentDraft) draftComment).getRepliedComment());
             }
-            QiscusAndroidUtil.showKeyboard(getActivity(), messageEditText);
+            QiscusKeyboardUtil.showKeyboard(getActivity(), messageEditText);
         }
     }
 

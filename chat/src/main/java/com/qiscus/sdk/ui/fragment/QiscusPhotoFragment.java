@@ -29,7 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.ui.view.QiscusTouchImageView;
-import com.qiscus.sdk.chat.core.util.QiscusImageUtil;
+import com.qiscus.sdk.util.QiscusImageUtil;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import java.io.File;

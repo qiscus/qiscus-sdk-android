@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.util;
+package com.qiscus.sdk.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,11 +30,11 @@ import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
-import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,11 +46,7 @@ import java.util.Locale;
 
 public final class QiscusImageUtil {
 
-    public static final String IMAGE_PATH = QiscusCore.getAppsName() + File.separator +
-            QiscusCore.getAppsName() + " Images";
-
     private QiscusImageUtil() {
-
     }
 
     public static Bitmap getScaledBitmap(Uri imageUri) {
@@ -207,18 +203,7 @@ public final class QiscusImageUtil {
     }
 
     public static boolean isImage(File file) {
-        return isImage(file.getPath());
-    }
-
-    public static boolean isImage(String fileName) {
-        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(QiscusFileUtil.getExtension(fileName));
-        if (type == null) {
-            return false;
-        } else if (type.contains("image")) {
-            return true;
-        }
-
-        return false;
+        return QiscusFileUtil.isImage(file.getPath());
     }
 
     public static void addImageToGallery(File picture) {
@@ -227,7 +212,7 @@ public final class QiscusImageUtil {
 
     public static void showImageFolderAppInGallery() {
         File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
-                QiscusImageUtil.IMAGE_PATH + File.separator +
+                QiscusFileUtil.IMAGE_PATH + File.separator +
                         QiscusCore.getApps().getString(R.string.qiscus_nomedia));
         if (nomedia.exists()) {
             nomedia.delete();
@@ -238,7 +223,7 @@ public final class QiscusImageUtil {
 
     public static void hideImageFolderAppInGallery() {
         File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
-                QiscusImageUtil.IMAGE_PATH + File.separator +
+                QiscusFileUtil.IMAGE_PATH + File.separator +
                         QiscusCore.getApps().getString(R.string.qiscus_nomedia));
 
         if (!nomedia.getParentFile().exists()) {

@@ -35,11 +35,11 @@ import com.qiscus.manggil.tokenization.interfaces.QueryTokenReceiver;
 import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.QiscusMentionSuggestionBuilder;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.util.QiscusConverterUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -163,7 +163,7 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) QiscusAndroidUtil.dp2px(getResources(), 160),
+        heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) QiscusConverterUtil.dp2px(getResources(), 160),
                 MeasureSpec.AT_MOST);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
