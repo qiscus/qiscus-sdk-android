@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 
+import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -33,6 +34,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * GitHub     : https://github.com/zetbaitsu
  */
 public final class QiscusAndroidUtil {
+
+    private static final Random random = new Random();
 
     private QiscusAndroidUtil() {
     }
@@ -69,5 +72,13 @@ public final class QiscusAndroidUtil {
                 QiscusCore.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm != null ? cm.getActiveNetworkInfo() : null;
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public static int compare(int x, int y) {
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    }
+
+    public static int compare(long x, long y) {
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 }
