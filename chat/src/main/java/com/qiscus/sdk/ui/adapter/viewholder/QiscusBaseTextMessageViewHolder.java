@@ -37,7 +37,8 @@ import com.qiscus.sdk.util.QiscusTextUtil;
  */
 public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
 
-    @NonNull protected TextView messageTextView;
+    @NonNull
+    protected TextView messageTextView;
 
     public QiscusBaseTextMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                            OnLongItemClickListener longItemClickListener) {
