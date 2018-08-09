@@ -45,8 +45,8 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
         super(itemView, itemClickListener, longItemClickListener);
         messageTextView = getMessageTextView(itemView);
         messageTextView.setMovementMethod(ClickableMovementMethod.getInstance());
-        messageTextView.setClickable(false);
-        messageTextView.setLongClickable(false);
+        messageTextView.setOnClickListener(this);
+        messageTextView.setOnLongClickListener(this);
     }
 
     @NonNull
