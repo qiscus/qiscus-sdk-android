@@ -27,8 +27,8 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.ui.QiscusChannelActivity;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.ui.QiscusChannelActivity;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
