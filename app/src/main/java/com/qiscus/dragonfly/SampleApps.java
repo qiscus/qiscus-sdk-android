@@ -20,11 +20,6 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.util.QiscusPushNotificationUtil;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 /**
  * Created on : August 18, 2016
@@ -40,20 +35,5 @@ public class SampleApps extends Application {
         Qiscus.init(this, "dragongo");
         Qiscus.setEnableLog(BuildConfig.DEBUG);
         Stetho.initializeWithDefaults(this);
-
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
-    }
-
-    @Subscribe
-    public void onReceiveComment(QiscusCommentReceivedEvent event) {
-        QiscusPushNotificationUtil.handlePushNotification(this, event.getQiscusComment());
-    }
-
-    @Override
-    public void onTerminate() {
-        EventBus.getDefault().unregister(this);
-        super.onTerminate();
     }
 }

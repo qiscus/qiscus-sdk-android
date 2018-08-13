@@ -9,6 +9,7 @@ public class QiscusCoreChatConfig {
     private boolean enableFcmPushNotification = false;
     private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
+    private PushNotificationListener pushNotificationListener;
 
     public boolean isEnableFcmPushNotification() {
         return enableFcmPushNotification;
@@ -35,6 +36,15 @@ public class QiscusCoreChatConfig {
 
     public QiscusCoreChatConfig setQiscusImageCompressionConfig(QiscusImageCompressionConfig qiscusImageCompressionConfig) {
         this.qiscusImageCompressionConfig = qiscusImageCompressionConfig;
+        return this;
+    }
+
+    public PushNotificationListener getPushNotificationListener() {
+        return pushNotificationListener;
+    }
+
+    public QiscusCoreChatConfig setPushNotificationListener(PushNotificationListener pushNotificationListener) {
+        this.pushNotificationListener = pushNotificationListener;
         return this;
     }
 }

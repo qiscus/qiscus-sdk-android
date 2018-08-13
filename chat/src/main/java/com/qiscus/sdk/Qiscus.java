@@ -25,6 +25,7 @@ import com.qiscus.jupuk.Jupuk;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
+import com.qiscus.sdk.chat.core.data.model.PushNotificationListener;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
@@ -33,6 +34,7 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
+import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.one.EmojiOneProvider;
 
@@ -115,6 +117,18 @@ public class Qiscus {
         Jupuk.init(application);
         EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
+
+        QiscusCore.getChatConfig().setPushNotificationListener(new PushNotificationListener() {
+            @Override
+            public void onHandlePushNotification(Context context, QiscusComment qiscusComment) {
+                QiscusPushNotificationUtil.handlePushNotification(context, qiscusComment);
+            }
+
+            @Override
+            public void onHandleDeletedCommentNotification(Context context, List<QiscusComment> comments, boolean hardDelete) {
+                QiscusPushNotificationUtil.handleDeletedCommentNotification(context, comments, hardDelete);
+            }
+        });
     }
 
     /**

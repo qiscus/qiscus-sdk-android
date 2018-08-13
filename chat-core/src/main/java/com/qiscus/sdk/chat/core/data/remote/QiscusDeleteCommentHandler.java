@@ -74,8 +74,13 @@ public final class QiscusDeleteCommentHandler {
                     EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
                 })
                 .toList()
-//                .doOnNext(comments -> QiscusPushNotificationUtil todo
-//                        .handleDeletedCommentNotification(QiscusCore.getApps(), comments, false))
+                .doOnNext(qiscusComments -> {
+                    if (QiscusCore.getChatConfig().getPushNotificationListener() != null) {
+                        QiscusCore.getChatConfig().getPushNotificationListener()
+                                .onHandleDeletedCommentNotification(QiscusCore.getApps(),
+                                        qiscusComments, false);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {
@@ -110,8 +115,13 @@ public final class QiscusDeleteCommentHandler {
                     EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
                 })
                 .toList()
-//                .doOnNext(comments -> QiscusPushNotificationUtil todo
-//                        .handleDeletedCommentNotification(QiscusCore.getApps(), comments, true))
+                .doOnNext(qiscusComments -> {
+                    if (QiscusCore.getChatConfig().getPushNotificationListener() != null) {
+                        QiscusCore.getChatConfig().getPushNotificationListener()
+                                .onHandleDeletedCommentNotification(QiscusCore.getApps(),
+                                        qiscusComments, true);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {
