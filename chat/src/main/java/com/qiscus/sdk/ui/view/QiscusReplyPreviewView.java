@@ -31,12 +31,12 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusReplyPanelConfig;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusSpannableBuilder;
-import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import java.io.File;
 import java.util.HashMap;

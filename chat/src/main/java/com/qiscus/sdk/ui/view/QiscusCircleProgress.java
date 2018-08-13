@@ -30,7 +30,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusConverterUtil;
 
 public class QiscusCircleProgress extends View implements QiscusProgressView {

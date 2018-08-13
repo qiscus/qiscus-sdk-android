@@ -31,7 +31,6 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.util.QiscusColorUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
 

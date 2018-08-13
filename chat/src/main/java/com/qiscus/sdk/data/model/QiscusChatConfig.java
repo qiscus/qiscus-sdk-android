@@ -40,11 +40,11 @@ import com.qiscus.sdk.chat.core.data.model.QiscusCommentSendingInterceptor;
 import com.qiscus.sdk.chat.core.data.model.QiscusImageCompressionConfig;
 import com.qiscus.sdk.chat.core.data.model.ReplyNotificationHandler;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.QiscusGroupChatActivity;
-import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
-import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;

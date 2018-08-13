@@ -23,9 +23,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
+import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
 
 /**

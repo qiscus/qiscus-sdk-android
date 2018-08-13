@@ -23,11 +23,11 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.ClickableMovementMethod;
-import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 /**
  * Created on : September 27, 2016

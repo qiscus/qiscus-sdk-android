@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.service;
+package com.qiscus.sdk.service;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;

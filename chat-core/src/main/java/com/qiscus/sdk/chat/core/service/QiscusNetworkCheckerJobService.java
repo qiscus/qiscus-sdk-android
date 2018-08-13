@@ -27,7 +27,6 @@ import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;

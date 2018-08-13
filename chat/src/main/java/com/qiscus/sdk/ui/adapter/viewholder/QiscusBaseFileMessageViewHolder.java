@@ -26,11 +26,11 @@ import android.widget.TextView;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnUploadIconClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
-import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import java.io.File;
 

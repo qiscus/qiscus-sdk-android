@@ -42,10 +42,10 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.presenter.QiscusPhotoViewerPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusPhotoPagerAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusPhotoFragment;
-import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.io.File;
