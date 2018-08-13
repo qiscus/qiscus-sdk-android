@@ -53,7 +53,7 @@ public class SampleApps extends Application {
 
     @Override
     public void onTerminate() {
-        super.onTerminate();
         EventBus.getDefault().unregister(this);
+        super.onTerminate();
     }
 }
