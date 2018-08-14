@@ -6,10 +6,12 @@ package com.qiscus.sdk.chat.core.data.model;
  **/
 public class QiscusCoreChatConfig {
 
+    private boolean enableLog = false;
     private boolean enableFcmPushNotification = false;
     private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
-    private PushNotificationListener pushNotificationListener;
+    private NotificationListener notificationListener;
+    private DeleteCommentListener deleteCommentListener;
 
     public boolean isEnableFcmPushNotification() {
         return enableFcmPushNotification;
@@ -39,12 +41,30 @@ public class QiscusCoreChatConfig {
         return this;
     }
 
-    public PushNotificationListener getPushNotificationListener() {
-        return pushNotificationListener;
+    public NotificationListener getNotificationListener() {
+        return notificationListener;
     }
 
-    public QiscusCoreChatConfig setPushNotificationListener(PushNotificationListener pushNotificationListener) {
-        this.pushNotificationListener = pushNotificationListener;
+    public QiscusCoreChatConfig setNotificationListener(NotificationListener notificationListener) {
+        this.notificationListener = notificationListener;
+        return this;
+    }
+
+    public DeleteCommentListener getDeleteCommentListener() {
+        return deleteCommentListener;
+    }
+
+    public QiscusCoreChatConfig setDeleteCommentListener(DeleteCommentListener deleteCommentListener) {
+        this.deleteCommentListener = deleteCommentListener;
+        return this;
+    }
+
+    public boolean isEnableLog() {
+        return enableLog;
+    }
+
+    public QiscusCoreChatConfig setEnableLog(boolean enableLog) {
+        this.enableLog = enableLog;
         return this;
     }
 }

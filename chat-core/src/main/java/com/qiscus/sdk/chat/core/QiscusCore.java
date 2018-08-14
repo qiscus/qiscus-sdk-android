@@ -59,7 +59,6 @@ public class QiscusCore {
     private static LocalDataManager localDataManager;
     private static long heartBeat;
     private static QiscusDataStore dataStore;
-    private static boolean enableLog;
     private static QiscusCoreChatConfig chatConfig;
     private static Handler appHandler;
     private static ScheduledThreadPoolExecutor taskExecutor;
@@ -446,25 +445,6 @@ public class QiscusCore {
                         });
             }
         }
-    }
-
-    /**
-     * Get the log qiscus
-     *
-     * @return enableLog status in boolean
-     */
-    public static boolean isEnableLog() {
-        return QiscusCore.enableLog;
-    }
-
-    /**
-     * Set the log of qiscus data. Default value is false
-     *
-     * @param enableLog boolean
-     */
-
-    public static void setEnableLog(boolean enableLog) {
-        QiscusCore.enableLog = enableLog;
     }
 
     /**

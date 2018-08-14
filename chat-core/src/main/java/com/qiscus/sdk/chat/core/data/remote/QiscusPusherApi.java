@@ -131,8 +131,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             QiscusPusherApi.getInstance().setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
         }
 
-        if (QiscusCore.getChatConfig().getPushNotificationListener() != null) {
-            QiscusCore.getChatConfig().getPushNotificationListener()
+        if (QiscusCore.getChatConfig().getNotificationListener() != null) {
+            QiscusCore.getChatConfig().getNotificationListener()
                     .onHandlePushNotification(QiscusCore.getApps(), qiscusComment);
         }
 

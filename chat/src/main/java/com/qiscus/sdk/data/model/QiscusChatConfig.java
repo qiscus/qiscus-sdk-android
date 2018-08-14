@@ -1283,4 +1283,13 @@ public class QiscusChatConfig {
         this.startReplyInterceptor = startReplyInterceptor;
         return this;
     }
+
+    public boolean isEnableLog() {
+        return QiscusCore.getChatConfig().isEnableLog();
+    }
+
+    public QiscusChatConfig setEnableLog(boolean enableLog) {
+        QiscusCore.getChatConfig().setEnableLog(enableLog);
+        return this;
+    }
 }

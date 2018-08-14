@@ -75,8 +75,8 @@ public final class QiscusDeleteCommentHandler {
                 })
                 .toList()
                 .doOnNext(qiscusComments -> {
-                    if (QiscusCore.getChatConfig().getPushNotificationListener() != null) {
-                        QiscusCore.getChatConfig().getPushNotificationListener()
+                    if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
+                        QiscusCore.getChatConfig().getDeleteCommentListener()
                                 .onHandleDeletedCommentNotification(QiscusCore.getApps(),
                                         qiscusComments, false);
                     }
@@ -116,8 +116,8 @@ public final class QiscusDeleteCommentHandler {
                 })
                 .toList()
                 .doOnNext(qiscusComments -> {
-                    if (QiscusCore.getChatConfig().getPushNotificationListener() != null) {
-                        QiscusCore.getChatConfig().getPushNotificationListener()
+                    if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
+                        QiscusCore.getChatConfig().getDeleteCommentListener()
                                 .onHandleDeletedCommentNotification(QiscusCore.getApps(),
                                         qiscusComments, true);
                     }

@@ -100,7 +100,7 @@ public enum QiscusApi {
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .addInterceptor(this::headersInterceptor)
-                .addInterceptor(makeLoggingInterceptor(QiscusCore.isEnableLog()))
+                .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
                 .build();
 
         api = new Retrofit.Builder()

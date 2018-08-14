@@ -25,7 +25,6 @@ import com.qiscus.jupuk.Jupuk;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
-import com.qiscus.sdk.chat.core.data.model.PushNotificationListener;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
@@ -118,17 +117,9 @@ public class Qiscus {
         EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
 
-        QiscusCore.getChatConfig().setPushNotificationListener(new PushNotificationListener() {
-            @Override
-            public void onHandlePushNotification(Context context, QiscusComment qiscusComment) {
-                QiscusPushNotificationUtil.handlePushNotification(context, qiscusComment);
-            }
-
-            @Override
-            public void onHandleDeletedCommentNotification(Context context, List<QiscusComment> comments, boolean hardDelete) {
-                QiscusPushNotificationUtil.handleDeletedCommentNotification(context, comments, hardDelete);
-            }
-        });
+        QiscusCore.getChatConfig()
+                .setNotificationListener(QiscusPushNotificationUtil::handlePushNotification)
+                .setDeleteCommentListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
     }
 
     /**
@@ -434,8 +425,9 @@ public class Qiscus {
      *
      * @return enableLog status in boolean
      */
+    @Deprecated
     public static boolean isEnableLog() {
-        return QiscusCore.isEnableLog();
+        return QiscusCore.getChatConfig().isEnableLog();
     }
 
     /**
@@ -443,9 +435,9 @@ public class Qiscus {
      *
      * @param enableLog boolean
      */
-
+    @Deprecated
     public static void setEnableLog(boolean enableLog) {
-        QiscusCore.setEnableLog(enableLog);
+        QiscusCore.getChatConfig().setEnableLog(enableLog);
     }
 
 
