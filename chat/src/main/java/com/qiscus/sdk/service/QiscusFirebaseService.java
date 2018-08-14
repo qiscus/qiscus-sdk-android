@@ -18,7 +18,7 @@ package com.qiscus.sdk.service;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.qiscus.sdk.util.QiscusFirebaseMessagingUtil;
+import com.qiscus.sdk.chat.core.util.QiscusFirebaseMessagingUtil;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
 
