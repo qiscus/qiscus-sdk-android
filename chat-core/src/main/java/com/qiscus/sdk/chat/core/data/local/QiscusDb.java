@@ -106,7 +106,7 @@ final class QiscusDb {
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         COLUMN_USER_EMAIL + " TEXT PRIMARY KEY," +
                         COLUMN_USER_NAME + " TEXT," +
-                        COLUMN_USER_AVATAR + " TEXT" +
+                        COLUMN_USER_AVATAR + " TEXT," +
                         COLUMN_USER_EXTRAS + " TEXT" +
                         " ); ";
 

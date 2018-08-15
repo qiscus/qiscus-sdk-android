@@ -62,9 +62,8 @@ final class QiscusApiParser {
         qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
         qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
         try {
-            qiscusAccount.setExtras(jsonAccount.get("extras").isJsonNull() ? null :
-                    new JSONObject(jsonAccount.get("extras").getAsString()));
-        } catch (JSONException ignored) {
+            qiscusAccount.setExtras(new JSONObject(jsonAccount.get("extras").getAsJsonObject().toString()));
+        } catch (Exception ignored) {
             //Do nothing
         }
         if (isSelf) {
@@ -135,8 +134,7 @@ final class QiscusApiParser {
         member.setUsername(jsonMember.get("username").getAsString());
 
         try {
-            member.setExtras(jsonMember.get("extras").isJsonNull() ? null :
-                    new JSONObject(jsonMember.get("extras").getAsString()));
+            member.setExtras(new JSONObject(jsonMember.get("extras").getAsJsonObject().toString()));
         } catch (JSONException ignored) {
             //Do nothing
         }
