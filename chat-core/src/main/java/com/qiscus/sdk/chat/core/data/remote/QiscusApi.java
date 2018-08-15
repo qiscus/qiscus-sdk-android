@@ -491,6 +491,37 @@ public enum QiscusApi {
                 .toList();
     }
 
+    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId) {
+        return getRoomMembers(roomUniqueId, 0, null, null, null);
+    }
+
+    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset, String orderKey,
+                                                             String sorting, MetaRoomMembersListener metaRoomMembersListener) {
+        return getRoomMembers(roomUniqueId, offset, orderKey, sorting, null, metaRoomMembersListener);
+    }
+
+    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset, String orderKey, String sorting,
+                                                             String userName, MetaRoomMembersListener metaRoomMembersListener) {
+        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset, orderKey, sorting, userName)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .doOnNext(jsonResults -> {
+                    JsonObject meta = jsonResults.getAsJsonObject("meta");
+                    if (metaRoomMembersListener != null) {
+                        metaRoomMembersListener.onMetaReceived(
+                                meta.get("current_offset").getAsInt(),
+                                meta.get("per_page").getAsInt(),
+                                meta.get("total").getAsInt()
+                        );
+                    }
+                })
+                .map(jsonResults -> jsonResults.getAsJsonArray("participants"))
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(QiscusApiParser::parseQiscusRoomMember)
+                .toList();
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
@@ -498,152 +529,216 @@ public enum QiscusApi {
 
         @FormUrlEncoded
         @POST("api/v2/auth/verify_identity_token")
-        Observable<JsonElement> login(@Field("identity_token") String token);
+        Observable<JsonElement> login(
+                @Field("identity_token") String token
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/login_or_register")
-        Observable<JsonElement> loginOrRegister(@Field("email") String email,
-                                                @Field("password") String password,
-                                                @Field("username") String username,
-                                                @Field("avatar_url") String avatarUrl);
+        Observable<JsonElement> loginOrRegister(
+                @Field("email") String email,
+                @Field("password") String password,
+                @Field("username") String username,
+                @Field("avatar_url") String avatarUrl
+        );
 
         @FormUrlEncoded
         @PATCH("api/v2/mobile/my_profile")
-        Observable<JsonElement> updateProfile(@Field("token") String token,
-                                              @Field("name") String name,
-                                              @Field("avatar_url") String avatarUrl);
+        Observable<JsonElement> updateProfile(
+                @Field("token") String token,
+                @Field("name") String name,
+                @Field("avatar_url") String avatarUrl
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/get_or_create_room_with_target")
-        Observable<JsonElement> createOrGetChatRoom(@Field("token") String token,
-                                                    @Field("emails[]") List<String> emails,
-                                                    @Field("distinct_id") String distinctId,
-                                                    @Field("options") String options);
+        Observable<JsonElement> createOrGetChatRoom(
+                @Field("token") String token,
+                @Field("emails[]") List<String> emails,
+                @Field("distinct_id") String distinctId,
+                @Field("options") String options
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/create_room")
-        Observable<JsonElement> createGroupChatRoom(@Field("token") String token,
-                                                    @Field("name") String name,
-                                                    @Field("participants[]") List<String> emails,
-                                                    @Field("avatar_url") String avatarUrl,
-                                                    @Field("options") String options);
+        Observable<JsonElement> createGroupChatRoom(
+                @Field("token") String token,
+                @Field("name") String name,
+                @Field("participants[]") List<String> emails,
+                @Field("avatar_url") String avatarUrl,
+                @Field("options") String options
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/get_or_create_room_with_unique_id")
-        Observable<JsonElement> createOrGetGroupChatRoom(@Field("token") String token,
-                                                         @Field("unique_id") String uniqueId,
-                                                         @Field("name") String name,
-                                                         @Field("avatar_url") String avatarUrl,
-                                                         @Field("options") String options);
+        Observable<JsonElement> createOrGetGroupChatRoom(
+                @Field("token") String token,
+                @Field("unique_id") String uniqueId,
+                @Field("name") String name,
+                @Field("avatar_url") String avatarUrl,
+                @Field("options") String options
+        );
 
         @GET("api/v2/mobile/get_room_by_id")
-        Observable<JsonElement> getChatRoom(@Query("token") String token,
-                                            @Query("id") long roomId);
+        Observable<JsonElement> getChatRoom(
+                @Query("token") String token,
+                @Query("id") long roomId
+        );
 
         @GET("api/v2/mobile/load_comments")
-        Observable<JsonElement> getComments(@Query("token") String token,
-                                            @Query("topic_id") long roomId,
-                                            @Query("last_comment_id") long lastCommentId,
-                                            @Query("after") boolean after);
+        Observable<JsonElement> getComments(
+                @Query("token") String token,
+                @Query("topic_id") long roomId,
+                @Query("last_comment_id") long lastCommentId,
+                @Query("after") boolean after
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/post_comment")
-        Observable<JsonElement> postComment(@Field("token") String token,
-                                            @Field("comment") String message,
-                                            @Field("topic_id") long roomId,
-                                            @Field("unique_temp_id") String uniqueId,
-                                            @Field("type") String type,
-                                            @Field("payload") String payload,
-                                            @Field("extras") String extras);
+        Observable<JsonElement> postComment(
+                @Field("token") String token,
+                @Field("comment") String message,
+                @Field("topic_id") long roomId,
+                @Field("unique_temp_id") String uniqueId,
+                @Field("type") String type,
+                @Field("payload") String payload,
+                @Field("extras") String extras
+        );
 
         @GET("api/v2/mobile/sync")
-        Observable<JsonElement> sync(@Query("token") String token,
-                                     @Query("last_received_comment_id") long lastCommentId);
+        Observable<JsonElement> sync(
+                @Query("token") String token,
+                @Query("last_received_comment_id") long lastCommentId
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/update_room")
-        Observable<JsonElement> updateChatRoom(@Field("token") String token,
-                                               @Field("id") long id,
-                                               @Field("room_name") String name,
-                                               @Field("avatar_url") String avatarUrl,
-                                               @Field("options") String options);
+        Observable<JsonElement> updateChatRoom(
+                @Field("token") String token,
+                @Field("id") long id,
+                @Field("room_name") String name,
+                @Field("avatar_url") String avatarUrl,
+                @Field("options") String options
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/update_comment_status")
-        Observable<JsonElement> updateCommentStatus(@Field("token") String token,
-                                                    @Field("room_id") long roomId,
-                                                    @Field("last_comment_read_id") long lastReadId,
-                                                    @Field("last_comment_received_id") long lastReceivedId);
+        Observable<JsonElement> updateCommentStatus(
+                @Field("token") String token,
+                @Field("room_id") long roomId,
+                @Field("last_comment_read_id") long lastReadId,
+                @Field("last_comment_received_id") long lastReceivedId
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/set_user_device_token")
-        Observable<JsonElement> registerFcmToken(@Field("token") String token,
-                                                 @Field("device_platform") String devicePlatform,
-                                                 @Field("device_token") String fcmToken);
+        Observable<JsonElement> registerFcmToken(
+                @Field("token") String token,
+                @Field("device_platform") String devicePlatform,
+                @Field("device_token") String fcmToken
+        );
 
         @POST("api/v2/mobile/search_messages")
-        Observable<JsonElement> searchComments(@Query("token") String token,
-                                               @Query("query") String query,
-                                               @Query("room_id") long roomId,
-                                               @Query("last_comment_id") long lastCommentId);
+        Observable<JsonElement> searchComments(
+                @Query("token") String token,
+                @Query("query") String query,
+                @Query("room_id") long roomId,
+                @Query("last_comment_id") long lastCommentId
+        );
 
         @GET("api/v2/mobile/user_rooms")
-        Observable<JsonElement> getChatRooms(@Query("token") String token,
-                                             @Query("page") int page,
-                                             @Query("limit") int limit,
-                                             @Query("show_participants") boolean showParticipants);
+        Observable<JsonElement> getChatRooms(
+                @Query("token") String token,
+                @Query("page") int page,
+                @Query("limit") int limit,
+                @Query("show_participants") boolean showParticipants
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/rooms_info")
-        Observable<JsonElement> getChatRooms(@Field("token") String token,
-                                             @Field("room_id[]") List<Long> roomIds,
-                                             @Field("room_unique_id[]") List<String> roomUniqueIds,
-                                             @Field("show_participants") boolean showParticipants);
+        Observable<JsonElement> getChatRooms(
+                @Field("token") String token,
+                @Field("room_id[]") List<Long> roomIds,
+                @Field("room_unique_id[]") List<String> roomUniqueIds,
+                @Field("show_participants") boolean showParticipants
+        );
 
         @DELETE("api/v2/mobile/clear_room_messages")
-        Observable<JsonElement> clearChatRoomMessages(@Query("token") String token,
-                                                      @Query("room_channel_ids[]") List<String> roomUniqueIds);
+        Observable<JsonElement> clearChatRoomMessages(
+                @Query("token") String token,
+                @Query("room_channel_ids[]") List<String> roomUniqueIds
+        );
 
         @DELETE("api/v2/mobile/delete_messages")
-        Observable<JsonElement> deleteComments(@Query("token") String token,
-                                               @Query("unique_ids[]") List<String> commentUniqueIds,
-                                               @Query("is_delete_for_everyone") boolean isDeleteForEveryone,
-                                               @Query("is_hard_delete") boolean isHardDelete);
+        Observable<JsonElement> deleteComments(
+                @Query("token") String token,
+                @Query("unique_ids[]") List<String> commentUniqueIds,
+                @Query("is_delete_for_everyone") boolean isDeleteForEveryone,
+                @Query("is_hard_delete") boolean isHardDelete
+        );
 
         @GET("api/v2/mobile/sync_event")
-        Observable<JsonElement> getEvents(@Query("token") String token,
-                                          @Query("start_event_id") long startEventId);
+        Observable<JsonElement> getEvents(
+                @Query("token") String token,
+                @Query("start_event_id") long startEventId
+        );
 
         @GET("api/v2/sdk/total_unread_count")
-        Observable<JsonElement> getTotalUnreadCount(@Query("token") String token);
+        Observable<JsonElement> getTotalUnreadCount(
+                @Query("token") String token
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/add_room_participants")
-        Observable<JsonElement> addRoomMember(@Field("token") String token,
-                                              @Field("room_id") long roomId,
-                                              @Field("emails[]") List<String> emails);
+        Observable<JsonElement> addRoomMember(
+                @Field("token") String token,
+                @Field("room_id") long roomId,
+                @Field("emails[]") List<String> emails
+        );
 
         @FormUrlEncoded
         @POST("api/v2/mobile/remove_room_participants")
-        Observable<JsonElement> removeRoomMember(@Field("token") String token,
-                                                 @Field("room_id") long roomId,
-                                                 @Field("emails[]") List<String> emails);
+        Observable<JsonElement> removeRoomMember(
+                @Field("token") String token,
+                @Field("room_id") long roomId,
+                @Field("emails[]") List<String> emails
+        );
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/block_user")
-        Observable<JsonElement> blockUser(@Field("token") String token,
-                                          @Field("user_email") String userEmail);
+        Observable<JsonElement> blockUser(
+                @Field("token") String token,
+                @Field("user_email") String userEmail
+        );
 
         @FormUrlEncoded
         @POST("/api/v2/mobile/unblock_user")
-        Observable<JsonElement> unblockUser(@Field("token") String token,
-                                            @Field("user_email") String userEmail);
+        Observable<JsonElement> unblockUser(
+                @Field("token") String token,
+                @Field("user_email") String userEmail
+        );
 
 
         @GET("/api/v2/mobile/get_blocked_users")
-        Observable<JsonElement> getBlockedUsers(@Query("token") String token,
-                                                @Query("page") long page,
-                                                @Query("limit") long limit);
+        Observable<JsonElement> getBlockedUsers(
+                @Query("token") String token,
+                @Query("page") long page,
+                @Query("limit") long limit
+        );
+
+        @GET("/api/v2/sdk/room_participants")
+        Observable<JsonElement> getRoomParticipants(
+                @Query("token") String token,
+                @Query("room_unique_id") String roomId,
+                @Query("offset") int offset,
+                @Query("order_by_key_name") String orderKey,
+                @Query("sorting") String sorting,
+                @Query("user_name") String userName
+        );
+    }
+
+    public interface MetaRoomMembersListener {
+        void onMetaReceived(int currentOffset, int perPage, int total);
     }
 
     public interface ProgressListener {

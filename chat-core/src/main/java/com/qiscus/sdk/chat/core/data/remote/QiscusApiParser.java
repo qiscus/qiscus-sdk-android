@@ -103,17 +103,7 @@ final class QiscusApiParser {
             if (participants.isJsonArray()) {
                 JsonArray jsonMembers = participants.getAsJsonArray();
                 for (JsonElement jsonMember : jsonMembers) {
-                    QiscusRoomMember member = new QiscusRoomMember();
-                    member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-                    member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                    member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
-                    if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
-                        member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsInt());
-                    }
-                    if (jsonMember.getAsJsonObject().has("last_comment_read_id")) {
-                        member.setLastReadCommentId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsInt());
-                    }
-                    members.add(member);
+                    members.add(parseQiscusRoomMember(jsonMember));
                 }
             }
             qiscusChatRoom.setMember(members);
@@ -130,6 +120,20 @@ final class QiscusApiParser {
         }
 
         return null;
+    }
+
+    static QiscusRoomMember parseQiscusRoomMember(JsonElement jsonMember) {
+        QiscusRoomMember member = new QiscusRoomMember();
+        member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
+        member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+        member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+        if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
+            member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsInt());
+        }
+        if (jsonMember.getAsJsonObject().has("last_comment_read_id")) {
+            member.setLastReadCommentId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsInt());
+        }
+        return member;
     }
 
     static List<QiscusChatRoom> parseQiscusChatRoomInfo(JsonElement jsonElement) {
