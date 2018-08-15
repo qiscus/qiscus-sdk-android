@@ -22,6 +22,8 @@ import android.support.annotation.NonNull;
 
 import com.qiscus.manggil.mention.Mentionable;
 
+import org.json.JSONObject;
+
 public class QiscusRoomMember implements Parcelable, Mentionable {
     public static final Creator<QiscusRoomMember> CREATOR = new Creator<QiscusRoomMember>() {
         @Override
@@ -39,6 +41,7 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
     private String avatar;
     private long lastDeliveredCommentId;
     private long lastReadCommentId;
+    private JSONObject extras;
 
     public QiscusRoomMember() {
 
@@ -50,6 +53,11 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
         avatar = in.readString();
         lastDeliveredCommentId = in.readLong();
         lastReadCommentId = in.readLong();
+        try {
+            extras = new JSONObject(in.readString());
+        } catch (Exception ignored) {
+            //Do nothing
+        }
     }
 
     public String getEmail() {
@@ -100,7 +108,16 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
                 ", avatar='" + avatar + '\'' +
                 ", lastDeliveredCommentId=" + lastDeliveredCommentId +
                 ", lastReadCommentId=" + lastReadCommentId +
+                ", extras=" + extras +
                 '}';
+    }
+
+    public JSONObject getExtras() {
+        return extras;
+    }
+
+    public void setExtras(JSONObject extras) {
+        this.extras = extras;
     }
 
     @Override
@@ -125,6 +142,10 @@ public class QiscusRoomMember implements Parcelable, Mentionable {
         dest.writeString(avatar);
         dest.writeLong(lastDeliveredCommentId);
         dest.writeLong(lastReadCommentId);
+        if (extras == null) {
+            extras = new JSONObject();
+        }
+        dest.writeString(extras.toString());
     }
 
     @NonNull

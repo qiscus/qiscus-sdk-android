@@ -36,22 +36,21 @@ import retrofit2.HttpException;
 public final class QiscusErrorLogger {
 
     private static final String TAG = "Qiscus";
-    private static boolean enableLog = QiscusCore.getChatConfig().isEnableLog();
 
     public static void print(Throwable throwable) {
-        if (enableLog) {
+        if (QiscusCore.getChatConfig().isEnableLog()) {
             Log.e(TAG, getMessage(throwable));
         }
     }
 
     public static void print(String tag, Throwable throwable) {
-        if (enableLog) {
+        if (QiscusCore.getChatConfig().isEnableLog()) {
             Log.e(tag, getMessage(throwable));
         }
     }
 
     public static void print(String tag, String errorMessage) {
-        if (enableLog) {
+        if (QiscusCore.getChatConfig().isEnableLog()) {
             Log.e(tag, errorMessage);
         }
     }

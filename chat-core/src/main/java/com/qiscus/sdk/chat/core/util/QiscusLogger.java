@@ -15,16 +15,13 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 public final class QiscusLogger {
 
     private static final String TAG = "Qiscus";
-    private static boolean enableLog = QiscusCore.getChatConfig().isEnableLog();
 
     public static void print(String message) {
-        if (enableLog) {
-            Log.i(TAG, message);
-        }
+        print(TAG, message);
     }
 
     public static void print(String tag, String message) {
-        if (enableLog) {
+        if (QiscusCore.getChatConfig().isEnableLog()) {
             Log.i(tag, message);
         }
     }

@@ -114,11 +114,11 @@ public class QiscusCore {
         appId = qiscusAppId;
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
+        chatConfig = new QiscusCoreChatConfig();
         appHandler = new Handler(QiscusCore.getApps().getApplicationContext().getMainLooper());
         taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
-        chatConfig = new QiscusCoreChatConfig();
         heartBeat = 60000;
         startPusherService();
         startNetworkCheckerService();

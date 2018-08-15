@@ -109,7 +109,7 @@ final class QiscusApiParser {
             if (participants.isJsonArray()) {
                 JsonArray jsonMembers = participants.getAsJsonArray();
                 for (JsonElement jsonMember : jsonMembers) {
-                    members.add(parseQiscusRoomMember(jsonMember));
+                    members.add(parseQiscusRoomMember(jsonMember.getAsJsonObject()));
                 }
             }
             qiscusChatRoom.setMember(members);
@@ -128,11 +128,19 @@ final class QiscusApiParser {
         return null;
     }
 
-    static QiscusRoomMember parseQiscusRoomMember(JsonElement jsonMember) {
+    static QiscusRoomMember parseQiscusRoomMember(JsonObject jsonMember) {
         QiscusRoomMember member = new QiscusRoomMember();
-        member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
-        member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-        member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+        member.setEmail(jsonMember.get("email").getAsString());
+        member.setAvatar(jsonMember.get("avatar_url").getAsString());
+        member.setUsername(jsonMember.get("username").getAsString());
+
+        try {
+            member.setExtras(jsonMember.get("extras").isJsonNull() ? null :
+                    new JSONObject(jsonMember.get("extras").getAsString()));
+        } catch (JSONException ignored) {
+            //Do nothing
+        }
+
         if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
             member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsInt());
         }

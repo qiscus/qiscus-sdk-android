@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 16;
+    static final int DATABASE_VERSION = 17;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -100,12 +100,14 @@ final class QiscusDb {
         static final String COLUMN_USER_EMAIL = "user_email";
         static final String COLUMN_USER_NAME = "user_name";
         static final String COLUMN_USER_AVATAR = "user_avatar";
+        static final String COLUMN_USER_EXTRAS = "user_extras";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         COLUMN_USER_EMAIL + " TEXT PRIMARY KEY," +
                         COLUMN_USER_NAME + " TEXT," +
                         COLUMN_USER_AVATAR + " TEXT" +
+                        COLUMN_USER_EXTRAS + " TEXT" +
                         " ); ";
 
         static ContentValues toContentValues(QiscusRoomMember qiscusRoomMember) {
@@ -113,6 +115,8 @@ final class QiscusDb {
             values.put(COLUMN_USER_EMAIL, qiscusRoomMember.getEmail());
             values.put(COLUMN_USER_NAME, qiscusRoomMember.getUsername());
             values.put(COLUMN_USER_AVATAR, qiscusRoomMember.getAvatar());
+            values.put(COLUMN_USER_EXTRAS, qiscusRoomMember.getExtras() == null ? null :
+                    qiscusRoomMember.getExtras().toString());
             return values;
         }
 
@@ -121,6 +125,12 @@ final class QiscusDb {
             qiscusRoomMember.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
             qiscusRoomMember.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_NAME)));
             qiscusRoomMember.setAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_AVATAR)));
+            try {
+                String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
+                qiscusRoomMember.setExtras(extras == null ? null : new JSONObject(extras));
+            } catch (JSONException ignored) {
+                //Do nothing
+            }
             return qiscusRoomMember;
         }
     }
