@@ -145,12 +145,20 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
-        return api.loginOrRegister(email, password, username, avatarUrl)
+        return loginOrRegister(email, password, username, avatarUrl, null);
+    }
+
+    public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl, JSONObject extras) {
+        return api.loginOrRegister(email, password, username, avatarUrl, extras == null ? null : extras.toString())
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
     public Observable<QiscusAccount> updateProfile(String username, String avatarUrl) {
-        return api.updateProfile(QiscusCore.getToken(), username, avatarUrl)
+        return updateProfile(username, avatarUrl, null);
+    }
+
+    public Observable<QiscusAccount> updateProfile(String username, String avatarUrl, JSONObject extras) {
+        return api.updateProfile(QiscusCore.getToken(), username, avatarUrl, extras == null ? null : extras.toString())
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
@@ -539,7 +547,8 @@ public enum QiscusApi {
                 @Field("email") String email,
                 @Field("password") String password,
                 @Field("username") String username,
-                @Field("avatar_url") String avatarUrl
+                @Field("avatar_url") String avatarUrl,
+                @Field("extras") String extras
         );
 
         @FormUrlEncoded
@@ -547,7 +556,8 @@ public enum QiscusApi {
         Observable<JsonElement> updateProfile(
                 @Field("token") String token,
                 @Field("name") String name,
-                @Field("avatar_url") String avatarUrl
+                @Field("avatar_url") String avatarUrl,
+                @Field("extras") String extras
         );
 
         @FormUrlEncoded

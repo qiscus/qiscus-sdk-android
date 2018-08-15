@@ -38,6 +38,7 @@ import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -358,11 +359,39 @@ public class QiscusCore {
      *
      * @param name      user name
      * @param avatarUrl user avatar url
+     * @param extras    user extras
+     * @return observable of qiscus account
+     */
+    public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl, JSONObject extras) {
+        return QiscusApi.getInstance().updateProfile(name, avatarUrl, extras)
+                .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
+    }
+
+    /**
+     * Use this method to update qiscus user data such as name and avatar
+     *
+     * @param name      user name
+     * @param avatarUrl user avatar url
      * @return observable of qiscus account
      */
     public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
-        return QiscusApi.getInstance().updateProfile(name, avatarUrl)
-                .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
+        return updateUserAsObservable(name, avatarUrl, null);
+    }
+
+    /**
+     * Use this method to update qiscus user data such as name and avatar
+     *
+     * @param name      user name
+     * @param avatarUrl user avatar url
+     * @param extras    user extras
+     * @param listener  completion listener
+     */
+    public static void updateUser(String name, String avatarUrl, JSONObject extras, SetUserListener listener) {
+        checkUserSetup();
+        updateUserAsObservable(name, avatarUrl, extras)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listener::onSuccess, listener::onError);
     }
 
     /**
@@ -373,11 +402,7 @@ public class QiscusCore {
      * @param listener  completion listener
      */
     public static void updateUser(String name, String avatarUrl, SetUserListener listener) {
-        checkUserSetup();
-        updateUserAsObservable(name, avatarUrl)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(listener::onSuccess, listener::onError);
+        updateUser(name, avatarUrl, null, listener);
     }
 
     /**
@@ -543,6 +568,7 @@ public class QiscusCore {
         private String password;
         private String username;
         private String avatarUrl;
+        private JSONObject extras;
 
         private SetUserBuilder(String email, String password) {
             this.email = email;
@@ -574,6 +600,17 @@ public class QiscusCore {
         }
 
         /**
+         * Set user extras to qiscus
+         *
+         * @param extras JSONObject
+         * @return builder
+         */
+        public SetUserBuilder withExtras(JSONObject extras) {
+            this.extras = extras;
+            return this;
+        }
+
+        /**
          * Submit to qiscus engine and save the user account
          *
          * @param listener Listener of saving user process
@@ -591,7 +628,7 @@ public class QiscusCore {
          */
         public Observable<QiscusAccount> save() {
             return QiscusApi.getInstance()
-                    .loginOrRegister(email, password, username, avatarUrl)
+                    .loginOrRegister(email, password, username, avatarUrl, extras)
                     .doOnNext(qiscusAccount -> {
                         if (QiscusCore.hasSetupUser()) {
                             QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);

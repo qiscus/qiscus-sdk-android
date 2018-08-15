@@ -19,6 +19,8 @@ package com.qiscus.sdk.chat.core.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONObject;
+
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -26,23 +28,6 @@ import android.os.Parcelable;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusAccount implements Parcelable {
-    protected int id;
-    protected String email;
-    protected String avatar;
-    protected String token;
-    protected String username;
-
-    public QiscusAccount() {
-
-    }
-
-    protected QiscusAccount(Parcel in) {
-        id = in.readInt();
-        email = in.readString();
-        avatar = in.readString();
-        token = in.readString();
-        username = in.readString();
-    }
 
     public static final Creator<QiscusAccount> CREATOR = new Creator<QiscusAccount>() {
         @Override
@@ -55,6 +40,29 @@ public class QiscusAccount implements Parcelable {
             return new QiscusAccount[size];
         }
     };
+    protected int id;
+    protected String email;
+    protected String avatar;
+    protected String token;
+    protected String username;
+    protected JSONObject extras;
+
+    public QiscusAccount() {
+
+    }
+
+    protected QiscusAccount(Parcel in) {
+        id = in.readInt();
+        email = in.readString();
+        avatar = in.readString();
+        token = in.readString();
+        username = in.readString();
+        try {
+            extras = new JSONObject(in.readString());
+        } catch (Exception ignored) {
+            //Do nothing
+        }
+    }
 
     public int getId() {
         return id;
@@ -96,6 +104,14 @@ public class QiscusAccount implements Parcelable {
         this.username = username;
     }
 
+    public JSONObject getExtras() {
+        return extras;
+    }
+
+    public void setExtras(JSONObject extras) {
+        this.extras = extras;
+    }
+
     @Override
     public int describeContents() {
         return hashCode();
@@ -108,6 +124,10 @@ public class QiscusAccount implements Parcelable {
         dest.writeString(avatar);
         dest.writeString(token);
         dest.writeString(username);
+        if (extras == null) {
+            extras = new JSONObject();
+        }
+        dest.writeString(extras.toString());
     }
 
     @Override
@@ -133,6 +153,7 @@ public class QiscusAccount implements Parcelable {
                 ", avatar='" + avatar + '\'' +
                 ", token='" + token + '\'' +
                 ", username='" + username + '\'' +
+                ", extras=" + extras +
                 '}';
     }
 }
