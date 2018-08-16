@@ -533,7 +533,7 @@ public enum QiscusApi {
     public Observable<String> getMqttBaseUrl() {
         return Observable.create(subscriber -> {
             Request request = new Request.Builder()
-                    .url("https://mqtt-lb.qiscus.com")
+                    .url(BuildConfig.BASE_URL_MQTT_LB)
                     .build();
 
             try {
