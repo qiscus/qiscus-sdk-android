@@ -37,15 +37,16 @@ import com.qiscus.sdk.ui.view.ClickableMovementMethod;
  */
 public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
 
-    @NonNull protected TextView messageTextView;
+    @NonNull
+    protected TextView messageTextView;
 
     public QiscusBaseTextMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageTextView = getMessageTextView(itemView);
         messageTextView.setMovementMethod(ClickableMovementMethod.getInstance());
-        messageTextView.setClickable(false);
-        messageTextView.setLongClickable(false);
+        messageTextView.setOnClickListener(this);
+        messageTextView.setOnLongClickListener(this);
     }
 
     @NonNull

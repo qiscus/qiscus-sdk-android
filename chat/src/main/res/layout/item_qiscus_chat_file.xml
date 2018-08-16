@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -30,7 +28,7 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <com.qiscus.sdk.ui.view.QiscusCircularImageView
         android:id="@+id/avatar"
@@ -39,7 +37,7 @@
         android:layout_alignTop="@+id/message"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/name"
@@ -59,7 +57,7 @@
         android:maxLines="1"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="12sp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/bubble"
@@ -69,7 +67,7 @@
         android:layout_marginLeft="42dp"
         android:layout_marginStart="42dp"
         android:src="@drawable/ic_qiscus_arrow_bubble_primary"
-        android:tint="@color/qiscus_left_bubble"/>
+        android:tint="@color/qiscus_left_bubble" />
 
     <RelativeLayout
         android:id="@+id/message"
@@ -100,7 +98,7 @@
                 android:layout_height="30dp"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_qiscus_file"
-                android:tint="@color/qiscus_divider"/>
+                android:tint="@color/qiscus_divider" />
 
             <TextView
                 android:id="@+id/file_name"
@@ -115,7 +113,7 @@
                 android:layout_toStartOf="@+id/iv_download"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/iv_download"
@@ -130,7 +128,7 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_qiscus_download"
                 android:tint="@color/qiscus_secondary_text"
-                android:visibility="visible"/>
+                android:visibility="visible" />
 
             <com.qiscus.sdk.ui.view.QiscusCircleProgress
                 android:id="@+id/progress"
@@ -143,7 +141,7 @@
                 android:layout_marginStart="10dp"
                 android:visibility="gone"
                 app:qcircle_finished_color="@color/qiscus_primary"
-                app:qcircle_text_size="12sp"/>
+                app:qcircle_text_size="12sp" />
 
         </RelativeLayout>
 
@@ -162,7 +160,7 @@
             android:maxLines="1"
             android:textColor="@color/qiscus_secondary_text"
             android:textSize="12sp"
-            android:visibility="visible"/>
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/time"
@@ -175,7 +173,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="2dp"
             android:textColor="@color/qiscus_secondary_text"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
     </RelativeLayout>
 
@@ -183,5 +181,5 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@+id/message"/>
+        android:layout_below="@+id/message" />
 </RelativeLayout>
