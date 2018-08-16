@@ -34,6 +34,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        buildTypes.each {
+            it.buildConfigField("String", "BASE_URL_SERVER", BASE_URL_SERVER)
+            it.buildConfigField("String", "BASE_URL_MQTT_BROKER", BASE_URL_MQTT_BROKER)
+            it.buildConfigField("String", "BASE_URL_MQTT_LB", BASE_URL_MQTT_LB)
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

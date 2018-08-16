@@ -86,7 +86,7 @@ public class QiscusCore {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, "https://api.qiscus.com/", "ssl://mqtt.qiscus.com:1885");
+        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER);
     }
 
     /**

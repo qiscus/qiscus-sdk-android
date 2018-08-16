@@ -530,6 +530,27 @@ public enum QiscusApi {
                 .toList();
     }
 
+    public Observable<String> getMqttBaseUrl() {
+        return Observable.create(subscriber -> {
+            Request request = new Request.Builder()
+                    .url("https://mqtt-lb.qiscus.com")
+                    .build();
+
+            try {
+                Response response = httpClient.newCall(request).execute();
+                JSONObject jsonResponse = new JSONObject(response.body().string());
+                String node = jsonResponse.getString("node");
+
+                subscriber.onNext(node);
+                subscriber.onCompleted();
+
+            } catch (JSONException | IOException e) {
+                QiscusErrorLogger.print("getMqttBaseUrl", e);
+                subscriber.onError(e);
+            }
+        }, Emitter.BackpressureMode.BUFFER);
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
