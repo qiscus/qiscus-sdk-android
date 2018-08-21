@@ -391,6 +391,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 .subscribeOn(Schedulers.io());
     }
 
+    public List<QiscusComment> loadLocalComments(int count) {
+        return Qiscus.getDataStore().getComments(room.getId(), count);
+    }
+
     public void loadComments(int count) {
         Observable.merge(getInitRoomData(), getLocalComments(count, true).map(comments -> Pair.create(room, comments)))
                 .filter(qiscusChatRoomListPair -> qiscusChatRoomListPair != null)

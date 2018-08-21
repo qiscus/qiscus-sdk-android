@@ -26,6 +26,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
@@ -131,6 +132,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
     protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
     protected static final String COMMENTS_DATA = "saved_comments_data";
+    protected static final String COMMENTS_LOADED_SIZE = "comments_loaded_size";
+    protected static final String COMMENTS_LAYOUT_MANAGER = "comments_layout_manager";
     protected static final int TAKE_PICTURE_REQUEST = 1;
     protected static final int PICK_CONTACT_REQUEST = 2;
     protected static final int PICK_LOCATION_REQUEST = 3;
@@ -625,13 +628,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (savedInstanceState == null) {
             qiscusChatPresenter.loadComments(20);
         } else {
-            ArrayList<QiscusComment> comments = savedInstanceState.getParcelableArrayList(COMMENTS_DATA);
-            if (comments == null) {
+            Parcelable layoutManagerState = savedInstanceState.getParcelable(COMMENTS_LAYOUT_MANAGER);
+            int commentsLoadedSize = savedInstanceState.getInt(COMMENTS_LOADED_SIZE);
+            if (commentsLoadedSize == 0 && layoutManagerState == null) {
                 qiscusChatPresenter.loadComments(20);
             } else {
-                showComments(comments);
+                showComments(qiscusChatPresenter.loadLocalComments(commentsLoadedSize));
                 chatAdapter.setQiscusChatRoom(qiscusChatRoom);
                 updateMentionSuggestionData();
+                messageRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerState);
             }
         }
 
@@ -1724,12 +1729,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
-        ArrayList<QiscusComment> comments = new ArrayList<>();
-        int size = chatAdapter.getData().size();
-        for (int i = 0; i < size; i++) {
-            comments.add((QiscusComment) chatAdapter.getData().get(i));
-        }
-        outState.putParcelableArrayList(COMMENTS_DATA, comments);
+        outState.putInt(COMMENTS_LOADED_SIZE, chatAdapter.getData().size());
+        outState.putParcelable(COMMENTS_LAYOUT_MANAGER, messageRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
