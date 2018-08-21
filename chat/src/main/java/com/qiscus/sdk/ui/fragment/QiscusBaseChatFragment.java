@@ -131,7 +131,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected static final String EXTRA_AUTO_SEND = "extra_auto_send";
     protected static final String EXTRA_FORWARD_COMMENTS = "extra_forward_comments";
     protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
-    protected static final String COMMENTS_DATA = "saved_comments_data";
     protected static final String COMMENTS_LOADED_SIZE = "comments_loaded_size";
     protected static final String COMMENTS_LAYOUT_MANAGER = "comments_layout_manager";
     protected static final int TAKE_PICTURE_REQUEST = 1;
