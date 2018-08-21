@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -29,7 +27,7 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <com.qiscus.sdk.ui.view.QiscusCircularImageView
         android:id="@+id/avatar"
@@ -38,7 +36,7 @@
         android:layout_alignTop="@+id/message"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/name"
@@ -58,7 +56,7 @@
         android:maxLines="1"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="12sp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/bubble"
@@ -68,7 +66,7 @@
         android:layout_marginLeft="42dp"
         android:layout_marginStart="42dp"
         android:src="@drawable/ic_qiscus_arrow_bubble_primary"
-        android:tint="@color/qiscus_left_bubble"/>
+        android:tint="@color/qiscus_left_bubble" />
 
     <RelativeLayout
         android:id="@+id/message"
@@ -102,7 +100,7 @@
                 android:layout_marginRight="8dp"
                 android:padding="8dp"
                 android:src="@drawable/ic_qiscus_add_contact"
-                android:tint="@color/qiscus_divider"/>
+                android:tint="@color/qiscus_divider" />
 
             <TextView
                 android:id="@+id/contact_name"
@@ -114,7 +112,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="@color/qiscus_primary_text"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/contact_id"
@@ -126,7 +124,7 @@
                 android:layout_toRightOf="@+id/ic_contact"
                 android:ellipsize="end"
                 android:textColor="@color/qiscus_secondary_text"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <TextView
@@ -140,7 +138,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="2dp"
             android:textColor="@color/qiscus_secondary_text"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
     </RelativeLayout>
 
@@ -148,5 +146,5 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@+id/message"/>
+        android:layout_below="@+id/message" />
 </RelativeLayout>

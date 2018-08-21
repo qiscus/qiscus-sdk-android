@@ -18,13 +18,13 @@ package com.qiscus.sdk.service;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 
 public class QiscusFirebaseIdService extends FirebaseInstanceIdService {
 
     @Override
     public void onTokenRefresh() {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Qiscus.setFcmToken(refreshedToken);
+        QiscusCore.setFcmToken(refreshedToken);
     }
 }

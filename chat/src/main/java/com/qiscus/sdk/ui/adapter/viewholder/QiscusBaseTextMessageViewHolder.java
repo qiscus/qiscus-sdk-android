@@ -22,12 +22,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.ClickableMovementMethod;
-import com.qiscus.sdk.util.QiscusTextUtil;
 
 /**
  * Created on : September 27, 2016
@@ -37,15 +37,16 @@ import com.qiscus.sdk.util.QiscusTextUtil;
  */
 public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
 
-    @NonNull protected TextView messageTextView;
+    @NonNull
+    protected TextView messageTextView;
 
     public QiscusBaseTextMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                            OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         messageTextView = getMessageTextView(itemView);
         messageTextView.setMovementMethod(ClickableMovementMethod.getInstance());
-        messageTextView.setClickable(false);
-        messageTextView.setLongClickable(false);
+        messageTextView.setOnClickListener(this);
+        messageTextView.setOnLongClickListener(this);
     }
 
     @NonNull

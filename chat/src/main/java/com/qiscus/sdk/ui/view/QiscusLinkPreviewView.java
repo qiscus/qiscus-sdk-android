@@ -30,8 +30,8 @@ import android.widget.TextView;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.remote.QiscusUrlScraper;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
+import com.qiscus.sdk.util.QiscusColorUtil;
 import com.schinizer.rxunfurl.model.PreviewData;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -96,7 +96,7 @@ public class QiscusLinkPreviewView extends LinearLayout {
         if (previewData == null) {
             setVisibility(GONE);
         } else {
-            image.setBackgroundColor(QiscusAndroidUtil.getRandomColor());
+            image.setBackgroundColor(QiscusColorUtil.getRandomColor());
             if (previewData.getImages().size() > 0) {
                 Nirmana.getInstance().get()
                         .load(previewData.getImages().get(0).getSource())

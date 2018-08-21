@@ -27,11 +27,11 @@ import android.view.ViewGroup;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusChatButtonView;
-import com.qiscus.sdk.util.QiscusRawDataExtractor;
 
 import org.json.JSONArray;
 import org.json.JSONException;

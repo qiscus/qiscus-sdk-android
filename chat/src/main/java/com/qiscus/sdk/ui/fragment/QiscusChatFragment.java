@@ -29,8 +29,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusChatRoom;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
 import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;

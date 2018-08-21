@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -30,7 +28,7 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
-        android:visibility="visible"/>
+        android:visibility="visible" />
 
     <ImageView
         android:id="@+id/bubble"
@@ -43,7 +41,7 @@
         android:layout_marginRight="8dp"
         android:scaleType="fitStart"
         android:src="@drawable/ic_qiscus_arrow_bubble_primary_light"
-        android:tint="@color/qiscus_primary_light"/>
+        android:tint="@color/qiscus_primary_light" />
 
     <LinearLayout
         android:id="@+id/message"
@@ -68,7 +66,7 @@
             android:layout_marginBottom="4dp"
             android:visibility="gone"
             app:qpreview_descColor="@color/qiscus_secondary_text"
-            app:qpreview_titleColor="@color/qiscus_primary_text"/>
+            app:qpreview_titleColor="@color/qiscus_primary_text" />
 
         <TextView
             android:id="@+id/contents"
@@ -78,7 +76,7 @@
             android:linksClickable="true"
             android:textColor="@color/qiscus_primary_text"
             android:textColorLink="@color/qiscus_primary_text"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,7 +91,7 @@
                 android:layout_marginLeft="48dp"
                 android:layout_marginStart="48dp"
                 android:textColor="@color/qiscus_secondary_text"
-                android:textSize="12sp"/>
+                android:textSize="12sp" />
 
             <ImageView
                 android:id="@+id/icon_read"
@@ -101,7 +99,7 @@
                 android:layout_height="16dp"
                 android:layout_gravity="bottom"
                 android:layout_marginLeft="4dp"
-                android:layout_marginStart="4dp"/>
+                android:layout_marginStart="4dp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -109,5 +107,5 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@+id/message"/>
+        android:layout_below="@+id/message" />
 </RelativeLayout>

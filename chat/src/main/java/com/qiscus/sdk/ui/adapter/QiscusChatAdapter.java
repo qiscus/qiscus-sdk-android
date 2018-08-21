@@ -20,7 +20,7 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusAccountLinkingViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusAudioViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2016 Qiscus.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,49 +17,17 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.github.dcendents.android-maven'
+apply from: '../dependencies.gradle'
+apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
 
-def versionMajor = 2
-def versionMinor = 27
-def versionPatch = 0
-
-ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'chat'
-
-    publishedGroupId = 'com.qiscus.sdk'
-    libraryName = 'chat'
-    artifact = 'chat'
-
-    libraryDescription = 'Qiscus SDK is a lightweight and powerful android chat library. Qiscus SDK will allow you to easily integrating Qiscus engine with your apps to make cool chatting application.'
-
-    siteUrl = 'https://github.com/qiscus/qiscus-sdk-android'
-    gitUrl = 'https://github.com/qiscus/qiscus-sdk-android.git'
-
-    libraryVersion = "${versionMajor}.${versionMinor}.${versionPatch}-without-emoji"
-
-    developerId = 'qiscustech'
-    developerName = 'Qiscus Tech'
-    developerEmail = 'developer@qiscus.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-
-    //library version
-    androidSupportLibVersion = "27.1.1"
-    playServicesLibVersion = "12.0.1"
-    okhttpLibVersion = '3.9.1'
-    retrofitLibVersion = '2.3.0'
-}
-
 android {
-    compileSdkVersion 27
+    compileSdkVersion compileSDKVersion
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 27
+        minSdkVersion minSDKVersion
+        targetSdkVersion targetSDKVersion
         versionCode 1
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        versionName "${chatVersionMajor}.${chatVersionMinor}.${chatVersionPatch}"
     }
     buildTypes {
         release {
@@ -98,63 +66,24 @@ buildscript {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
-
 apply from: '../buildsystem/bintrayv1.gradle'
 apply from: '../buildsystem/installv1.gradle'
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
 
-    //Android Support Libraries
-    api "com.android.support:support-v4:${androidSupportLibVersion}"
-    api "com.android.support:appcompat-v7:${androidSupportLibVersion}"
-    api "com.android.support:recyclerview-v7:${androidSupportLibVersion}"
-    api "com.android.support:design:${androidSupportLibVersion}"
-    api "com.android.support:cardview-v7:${androidSupportLibVersion}"
-    api "com.android.support:customtabs:${androidSupportLibVersion}"
-    api "com.android.support:support-v13:${androidSupportLibVersion}"
+    api supportLibs
+    api placesLib
+    api firebaseLibs
+    api qiscusUtilLibs
+    api qiscusMqttLibs
+    api networkLibs
+    api rxLibs
+    api flexBoxLib
+    api eventBusLib
+    api rxUrlExtractorLib
+    api qiscusManggilWithoutEmoji
 
+    api project(':chat-core')
 
-    //The core of Reactive Programming
-    api 'io.reactivex:rxjava:1.3.4'
-    api 'io.reactivex:rxandroid:1.2.1'
-    api 'com.trello:rxlifecycle:1.0'
-    api 'com.trello:rxlifecycle-android:1.0'
-    api 'com.trello:rxlifecycle-components:1.0'
-
-    //Network
-    api "com.squareup.okhttp3:okhttp:${okhttpLibVersion}"
-    api "com.squareup.okhttp3:logging-interceptor:${okhttpLibVersion}"
-    api "com.squareup.retrofit2:retrofit:${retrofitLibVersion}"
-    api "com.squareup.retrofit2:converter-gson:${retrofitLibVersion}"
-    api "com.squareup.retrofit2:adapter-rxjava:${retrofitLibVersion}"
-    api 'com.schinizer:rxunfurl:0.2.0'
-
-    //Mqtt
-    api 'com.qiscus.mqtt:client:1.1.1'
-    api 'com.qiscus.mqtt:android:1.1.1-q1'
-
-    //Push notification
-    api "com.google.firebase:firebase-core:${playServicesLibVersion}"
-    api "com.google.firebase:firebase-messaging:${playServicesLibVersion}"
-
-    //Image loader
-    api 'com.qiscus.utils:nirmana:1.2.0'
-
-    api 'org.greenrobot:eventbus:3.0.0'
-
-    //Custom EditText
-    api 'com.qiscus.utils:manggil:1.0.1-without-emoji'
-
-    api 'com.google.android:flexbox:0.3.1'
-
-    //File picker
-    api 'com.qiscus.utils:jupuk:1.1.0'
-
-    //Place picker
-    api "com.google.android.gms:play-services-places:${playServicesLibVersion}"
 }

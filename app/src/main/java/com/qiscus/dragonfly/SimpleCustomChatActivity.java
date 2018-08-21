@@ -23,7 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.qiscus.sdk.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.ui.QiscusBaseChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 

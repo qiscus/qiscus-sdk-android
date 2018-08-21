@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.PatternsCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -27,11 +28,10 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusLinkPreviewView;
-import com.qiscus.sdk.util.QiscusPatterns;
 import com.schinizer.rxunfurl.model.PreviewData;
 
 import java.util.regex.Matcher;
@@ -43,7 +43,8 @@ import java.util.regex.Matcher;
  * GitHub     : https://github.com/zetbaitsu
  */
 public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageViewHolder implements QiscusComment.LinkPreviewListener {
-    @NonNull protected QiscusLinkPreviewView linkPreviewView;
+    @NonNull
+    protected QiscusLinkPreviewView linkPreviewView;
 
     private QiscusComment qiscusComment;
 
@@ -74,7 +75,7 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
 
     private void setUpLinks() {
         String message = messageTextView.getText().toString();
-        Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(message);
+        Matcher matcher = PatternsCompat.AUTOLINK_WEB_URL.matcher(message);
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && message.charAt(start - 1) == '@') {
@@ -111,6 +112,23 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
         }
     }
 
+    private void clickify(int start, int end, ClickSpan.OnClickListener listener) {
+        CharSequence text = messageTextView.getText();
+        ClickSpan span = new ClickSpan(listener);
+
+        if (start == -1) {
+            return;
+        }
+
+        if (text instanceof Spannable) {
+            ((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            SpannableString s = SpannableString.valueOf(text);
+            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            messageTextView.setText(s);
+        }
+    }
+
     private static class ClickSpan extends ClickableSpan {
         private OnClickListener listener;
 
@@ -127,23 +145,6 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
 
         public interface OnClickListener {
             void onClick();
-        }
-    }
-
-    private void clickify(int start, int end, ClickSpan.OnClickListener listener) {
-        CharSequence text = messageTextView.getText();
-        ClickSpan span = new ClickSpan(listener);
-
-        if (start == -1) {
-            return;
-        }
-
-        if (text instanceof Spannable) {
-            ((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        } else {
-            SpannableString s = SpannableString.valueOf(text);
-            s.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            messageTextView.setText(s);
         }
     }
 }

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -30,7 +28,7 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/qiscus_secondary_text"
         android:textSize="14sp"
-        android:visibility="visible"/>
+        android:visibility="visible" />
 
     <ImageView
         android:id="@+id/bubble"
@@ -43,7 +41,7 @@
         android:layout_marginRight="8dp"
         android:scaleType="fitStart"
         android:src="@drawable/ic_qiscus_arrow_bubble_primary_light"
-        android:tint="@color/qiscus_primary_light"/>
+        android:tint="@color/qiscus_primary_light" />
 
     <RelativeLayout
         android:id="@+id/message"
@@ -78,7 +76,7 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_qiscus_play_audio"
                 android:tint="@color/qiscus_primary_text"
-                android:visibility="visible"/>
+                android:visibility="visible" />
 
             <com.qiscus.sdk.ui.view.QiscusCircleProgress
                 android:id="@+id/progress"
@@ -88,7 +86,7 @@
                 android:visibility="gone"
                 app:qcircle_finished_color="@color/qiscus_primary_light"
                 app:qcircle_text_size="14sp"
-                app:qcircle_unfinished_color="@color/qiscus_primary_light"/>
+                app:qcircle_unfinished_color="@color/qiscus_primary_light" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -105,7 +103,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:progressDrawable="@drawable/qiscus_audio_progress"
-                    android:thumb="@drawable/qiscus_audio_progress_thumb"/>
+                    android:thumb="@drawable/qiscus_audio_progress_thumb" />
 
                 <TextView
                     android:id="@+id/duration"
@@ -115,7 +113,7 @@
                     android:layout_marginStart="17dp"
                     android:text="@string/qiscus_audio_duration"
                     android:textColor="@color/qiscus_primary_text"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -133,7 +131,7 @@
             android:layout_toLeftOf="@+id/icon_read"
             android:layout_toStartOf="@+id/icon_read"
             android:textColor="@color/qiscus_secondary_text"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <ImageView
             android:id="@+id/icon_read"
@@ -145,12 +143,12 @@
             android:layout_gravity="bottom"
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="2dp"/>
+            android:layout_marginTop="2dp" />
     </RelativeLayout>
 
     <!-- Add this view because Xiaomi need it -->
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@+id/message"/>
+        android:layout_below="@+id/message" />
 </RelativeLayout>

@@ -1,0 +1,95 @@
+/**
+ * Copyright (c) 2016 Qiscus.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.github.dcendents.android-maven'
+apply from: '../dependencies.gradle'
+apply from: 'lib-version.gradle'
+apply from: rootProject.file('gradle/quality.gradle')
+
+android {
+    compileSdkVersion compileSDKVersion
+    defaultConfig {
+        minSdkVersion minSDKVersion
+        targetSdkVersion targetSDKVersion
+        versionCode 1
+        versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        buildTypes.each {
+            it.buildConfigField("String", "BASE_URL_SERVER", BASE_URL_SERVER)
+            it.buildConfigField("String", "BASE_URL_MQTT_BROKER", BASE_URL_MQTT_BROKER)
+            it.buildConfigField("String", "BASE_URL_MQTT_LB", BASE_URL_MQTT_LB)
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+        textReport true
+    }
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    useLibrary 'org.apache.http.legacy'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.7.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+    }
+}
+
+apply from: '../buildsystem/bintrayv1.gradle'
+apply from: '../buildsystem/installv1.gradle'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    api supportLibs
+    api placesLib
+    api firebaseLibs
+    api qiscusUtilLibs
+    api qiscusMqttLibs
+    api qiscusManggilWithoutEmoji
+    api networkLibs
+    api rxLibs
+    api eventBusLib
+    api rxUrlExtractorLib
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}

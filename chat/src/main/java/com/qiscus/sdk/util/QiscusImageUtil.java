@@ -30,11 +30,11 @@ import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
-import android.webkit.MimeTypeMap;
 
-import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.R;
+import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,11 +46,7 @@ import java.util.Locale;
 
 public final class QiscusImageUtil {
 
-    public static final String IMAGE_PATH = Qiscus.getAppsName() + File.separator +
-            Qiscus.getAppsName() + " Images";
-
     private QiscusImageUtil() {
-
     }
 
     public static Bitmap getScaledBitmap(Uri imageUri) {
@@ -74,8 +70,8 @@ public final class QiscusImageUtil {
         }
 
         //max Height and width values of the compressed image is taken as 1440x900
-        float maxHeight = Qiscus.getChatConfig().getQiscusImageCompressionConfig().getMaxHeight();
-        float maxWidth = Qiscus.getChatConfig().getQiscusImageCompressionConfig().getMaxWidth();
+        float maxHeight = QiscusCore.getChatConfig().getQiscusImageCompressionConfig().getMaxHeight();
+        float maxWidth = QiscusCore.getChatConfig().getQiscusImageCompressionConfig().getMaxWidth();
         float imgRatio = actualWidth / actualHeight;
         float maxRatio = maxWidth / maxHeight;
 
@@ -165,7 +161,7 @@ public final class QiscusImageUtil {
 
             //write the compressed bitmap at the destination specified by filename.
             QiscusImageUtil.getScaledBitmap(Uri.fromFile(imageFile)).compress(Bitmap.CompressFormat.JPEG,
-                    Qiscus.getChatConfig().getQiscusImageCompressionConfig().getQuality(), out);
+                    QiscusCore.getChatConfig().getQiscusImageCompressionConfig().getQuality(), out);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -207,18 +203,7 @@ public final class QiscusImageUtil {
     }
 
     public static boolean isImage(File file) {
-        return isImage(file.getPath());
-    }
-
-    public static boolean isImage(String fileName) {
-        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(QiscusFileUtil.getExtension(fileName));
-        if (type == null) {
-            return false;
-        } else if (type.contains("image")) {
-            return true;
-        }
-
-        return false;
+        return QiscusFileUtil.isImage(file.getPath());
     }
 
     public static void addImageToGallery(File picture) {
@@ -227,8 +212,8 @@ public final class QiscusImageUtil {
 
     public static void showImageFolderAppInGallery() {
         File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
-                QiscusImageUtil.IMAGE_PATH + File.separator +
-                        Qiscus.getApps().getString(R.string.qiscus_nomedia));
+                QiscusFileUtil.IMAGE_PATH + File.separator +
+                        QiscusCore.getApps().getString(R.string.qiscus_nomedia));
         if (nomedia.exists()) {
             nomedia.delete();
             //rescan media gallery for updating deleted .nomedia file
@@ -238,8 +223,8 @@ public final class QiscusImageUtil {
 
     public static void hideImageFolderAppInGallery() {
         File nomedia = new File(Environment.getExternalStorageDirectory().getPath(),
-                QiscusImageUtil.IMAGE_PATH + File.separator +
-                        Qiscus.getApps().getString(R.string.qiscus_nomedia));
+                QiscusFileUtil.IMAGE_PATH + File.separator +
+                        QiscusCore.getApps().getString(R.string.qiscus_nomedia));
 
         if (!nomedia.getParentFile().exists()) {
             nomedia.getParentFile().mkdirs();

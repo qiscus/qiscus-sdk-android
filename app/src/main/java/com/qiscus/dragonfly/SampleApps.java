@@ -20,6 +20,7 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 
 /**
  * Created on : August 18, 2016
@@ -32,8 +33,14 @@ public class SampleApps extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
         Qiscus.init(this, "dragongo");
-        Qiscus.setEnableLog(BuildConfig.DEBUG);
+        Qiscus.getChatConfig()
+                .setEnableLog(true)
+                .setDeleteCommentConfig(new QiscusDeleteCommentConfig()
+                        .setEnableDeleteComment(true)
+                        .setEnableHardDelete(true));
+
         Stetho.initializeWithDefaults(this);
     }
 }

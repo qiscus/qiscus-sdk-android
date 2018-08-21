@@ -21,26 +21,27 @@ import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusCacheManager;
-import com.qiscus.sdk.data.model.QiscusAccount;
-import com.qiscus.sdk.data.model.QiscusChatRoom;
-import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.model.QiscusContact;
-import com.qiscus.sdk.data.model.QiscusLocation;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
-import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.data.remote.QiscusResendCommentHelper;
-import com.qiscus.sdk.event.QiscusClearCommentsEvent;
-import com.qiscus.sdk.event.QiscusCommentDeletedEvent;
-import com.qiscus.sdk.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.event.QiscusCommentResendEvent;
-import com.qiscus.sdk.event.QiscusMqttStatusEvent;
-import com.qiscus.sdk.util.QiscusAndroidUtil;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusContact;
+import com.qiscus.sdk.chat.core.data.model.QiscusLocation;
+import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
+import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
+import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.chat.core.event.QiscusCommentResendEvent;
+import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
+import com.qiscus.sdk.chat.core.presenter.QiscusRoomEventHandler;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
-import com.qiscus.sdk.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -388,6 +389,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 })
                 .doOnNext(comments -> roomEventHandler.transformCommentState(comments, forceFailedSendingComment))
                 .subscribeOn(Schedulers.io());
+    }
+
+    public List<QiscusComment> loadLocalComments(int count) {
+        return Qiscus.getDataStore().getComments(room.getId(), count);
     }
 
     public void loadComments(int count) {
