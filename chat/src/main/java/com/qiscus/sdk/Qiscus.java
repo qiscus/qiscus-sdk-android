@@ -35,8 +35,6 @@ import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
-import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.json.JSONObject;
 
@@ -115,7 +113,6 @@ public class Qiscus {
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
 
         Jupuk.init(application);
-        EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
 
         QiscusCore.getChatConfig()

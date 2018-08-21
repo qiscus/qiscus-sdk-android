@@ -35,7 +35,6 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
-import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.Map;
 
@@ -345,7 +344,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
 
     @Override
     public void onClick(View v) {
-        if (v.equals(messageBubbleView) || v instanceof EmojiTextView) {
+        if (v.equals(messageBubbleView) || v instanceof TextView) {
             int position = getAdapterPosition();
             if (position >= 0) {
                 itemClickListener.onItemClick(v, position);
