@@ -708,6 +708,26 @@ qiscusChatRoom.getMember();
 QiscusApi.getInstance().getTotalUnreadCount();
 ```
 
+### Add Room Member
+
+```
+/**
+ * roomId (long)
+ * emails (List<String>)
+ */
+QiscusApi.getInstance().addRoomMember(roomId, emails)
+```
+
+### Remove Room Member / Leave Room
+
+```
+/**
+ * roomId (long)
+ * emails (List<String>)
+ */
+QiscusApi.getInstance().removeRoomMember(roomId, emails)
+```
+
 ## Statuses
 
 ### Publish Start Or Stop Typing
