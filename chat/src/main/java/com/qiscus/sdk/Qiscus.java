@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Handler;
 
 import com.qiscus.jupuk.Jupuk;
+import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
@@ -84,7 +85,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, "https://api.qiscus.com/", "ssl://mqtt.qiscus.com:1885");
+        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER);
     }
 
     /**
