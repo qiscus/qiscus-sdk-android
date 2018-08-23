@@ -67,11 +67,6 @@
     <string name="qiscus_group_member_typing">%s is typing…</string>
     <string name="qiscus_share_image_title">Share</string>
     <string name="qiscus_photo_viewer_title">%1$d of %2$d</string>
-    <string name="qiscus_today">Today</string>
-    <string name="qiscus_few_seconds_ago">in few seconds ago</string>
-    <string name="qiscus_date_and_time">%1$s at %2$s</string>
-    <string name="qiscus_date_format">MMMM dd, yyyy</string>
-    <string name="qiscus_hour_format">hh:mm a</string>
     <string name="qiscus_reply_to">REPLY TO %1$s</string>
     <string name="qiscus_voice_message">Voice message</string>
     <string name="qiscus_reply">Reply</string>
@@ -107,7 +102,6 @@
     <string name="qiscus_existing_contact">Existing</string>
     <string name="qiscus_location">Location</string>
     <string name="qiscus_message_too_far">Sorry, Message too far to load it!</string>
-    <string name="qiscus_nomedia" translatable="false">.nomedia</string>
     <plurals name="qiscus_delete_comments_confirmation">
         <item quantity="one">Delete message?</item>
         <item quantity="other">Delete %d messages?</item>

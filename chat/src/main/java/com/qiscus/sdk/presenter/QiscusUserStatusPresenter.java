@@ -16,8 +16,8 @@
 
 package com.qiscus.sdk.presenter;
 
-import com.qiscus.sdk.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.event.QiscusUserStatusEvent;
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

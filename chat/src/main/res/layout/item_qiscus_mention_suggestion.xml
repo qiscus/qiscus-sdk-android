@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/qiscus_white"
@@ -29,7 +27,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"/>
+        android:layout_marginRight="8dp" />
 
     <TextView
         android:id="@+id/name"
@@ -38,6 +36,6 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/qiscus_primary_text"
-        android:textSize="16sp"/>
+        android:textSize="16sp" />
 
 </LinearLayout>

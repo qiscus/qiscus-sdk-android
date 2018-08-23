@@ -20,11 +20,11 @@ import android.support.v4.util.Pair;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusComment;
-import com.qiscus.sdk.data.remote.QiscusApi;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusFileUtil;
-import com.qiscus.sdk.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import java.io.File;
 import java.util.ArrayList;

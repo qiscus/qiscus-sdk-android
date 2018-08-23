@@ -825,7 +825,7 @@ After you register the receiver, now you can subscribe to specific event you nee
 
 ### New Messages
 
-Class for this event is com.qiscus.sdk.event.QiscusCommentReceivedEvent so now we can create a method that listen with this class type.
+Class for this event is com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent so now we can create a method that listen with this class type.
 
 ```
 @Subscribe
@@ -859,7 +859,7 @@ Don't forget to unlisten it after you don't need to listen event anymore by call
 QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
 ```
 
-After you call listen room method from QiscusPusherApi now you can subscribe to room event class which is com.qiscus.sdk.event.QiscusChatRoomEvent same like at listen receive comment, the method name is up to you too.
+After you call listen room method from QiscusPusherApi now you can subscribe to room event class which is com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent same like at listen receive comment, the method name is up to you too.
 
 ```
 @Subscribe
@@ -905,7 +905,7 @@ Same as listen room event, to get user online status you need to listen it using
 QiscusPusherApi.getInstance().listenUserStatus("qiscus_user_id");
 ```
 
-Then create method that subscribe to event with com.qiscus.sdk.event.QiscusUserStatusEvent class.
+Then create method that subscribe to event with com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent class.
 
 ```
 @Subscribe

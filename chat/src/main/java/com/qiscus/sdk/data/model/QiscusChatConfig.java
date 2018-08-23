@@ -28,13 +28,23 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusCacheManager;
-import com.qiscus.sdk.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.data.model.CommentInfoHandler;
+import com.qiscus.sdk.chat.core.data.model.DateFormatter;
+import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
+import com.qiscus.sdk.chat.core.data.model.NotificationClickListener;
+import com.qiscus.sdk.chat.core.data.model.NotificationTitleHandler;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusCommentSendingInterceptor;
+import com.qiscus.sdk.chat.core.data.model.QiscusImageCompressionConfig;
+import com.qiscus.sdk.chat.core.data.model.ReplyNotificationHandler;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.QiscusGroupChatActivity;
-import com.qiscus.sdk.util.QiscusDateUtil;
-import com.qiscus.sdk.util.QiscusErrorLogger;
-import com.qiscus.sdk.util.QiscusTextUtil;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -156,11 +166,8 @@ public class QiscusChatConfig {
     private boolean enableReplyNotification = false;
     private QiscusNotificationBuilderInterceptor notificationBuilderInterceptor;
 
-    private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
-
     private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
     private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
-    private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
     private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusComment -> R.color.qiscus_secondary_text;
     private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusComment -> getReplyBarColor();
     private QiscusStartReplyInterceptor startReplyInterceptor = qiscusComment -> new QiscusReplyPanelConfig();
@@ -206,7 +213,6 @@ public class QiscusChatConfig {
 
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
-    private boolean enableFcmPushNotification = false;
     private boolean enableRequestPermission = true;
     private boolean enableCaption = true;
 
@@ -224,9 +230,19 @@ public class QiscusChatConfig {
 
     private QiscusDeleteCommentConfig deleteCommentConfig = new QiscusDeleteCommentConfig();
 
+    @ColorRes
+    public int getStatusBarColor() {
+        return statusBarColor;
+    }
+
     public QiscusChatConfig setStatusBarColor(@ColorRes int statusBarColor) {
         this.statusBarColor = statusBarColor;
         return this;
+    }
+
+    @ColorRes
+    public int getAppBarColor() {
+        return appBarColor;
     }
 
     public QiscusChatConfig setAppBarColor(@ColorRes int appBarColor) {
@@ -234,9 +250,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getAccentColor() {
+        return accentColor;
+    }
+
     public QiscusChatConfig setAccentColor(@ColorRes int accentColor) {
         this.accentColor = accentColor;
         return this;
+    }
+
+    @ColorRes
+    public int getInlineReplyColor() {
+        return inlineReplyColor;
     }
 
     public QiscusChatConfig setInlineReplyColor(@ColorRes int inlineReplyColor) {
@@ -244,9 +270,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getTitleColor() {
+        return titleColor;
+    }
+
     public QiscusChatConfig setTitleColor(@ColorRes int titleColor) {
         this.titleColor = titleColor;
         return this;
+    }
+
+    @ColorRes
+    public int getSubtitleColor() {
+        return subtitleColor;
     }
 
     public QiscusChatConfig setSubtitleColor(@ColorRes int subtitleColor) {
@@ -254,9 +290,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getRightBubbleColor() {
+        return rightBubbleColor;
+    }
+
     public QiscusChatConfig setRightBubbleColor(@ColorRes int rightBubbleColor) {
         this.rightBubbleColor = rightBubbleColor;
         return this;
+    }
+
+    @ColorRes
+    public int getLeftBubbleColor() {
+        return leftBubbleColor;
     }
 
     public QiscusChatConfig setLeftBubbleColor(@ColorRes int leftBubbleColor) {
@@ -264,9 +310,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getSystemMessageBubbleColor() {
+        return systemMessageBubbleColor;
+    }
+
     public QiscusChatConfig setSystemMessageBubbleColor(@ColorRes int systemMessageBubbleColor) {
         this.systemMessageBubbleColor = systemMessageBubbleColor;
         return this;
+    }
+
+    @ColorRes
+    public int getRightBubbleTextColor() {
+        return rightBubbleTextColor;
     }
 
     public QiscusChatConfig setRightBubbleTextColor(@ColorRes int rightBubbleTextColor) {
@@ -274,9 +330,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getLeftBubbleTextColor() {
+        return leftBubbleTextColor;
+    }
+
     public QiscusChatConfig setLeftBubbleTextColor(@ColorRes int leftBubbleTextColor) {
         this.leftBubbleTextColor = leftBubbleTextColor;
         return this;
+    }
+
+    @ColorRes
+    public int getRightBubbleTimeColor() {
+        return rightBubbleTimeColor;
     }
 
     public QiscusChatConfig setRightBubbleTimeColor(@ColorRes int rightBubbleTimeColor) {
@@ -284,9 +350,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getLeftBubbleTimeColor() {
+        return leftBubbleTimeColor;
+    }
+
     public QiscusChatConfig setLeftBubbleTimeColor(@ColorRes int leftBubbleTimeColor) {
         this.leftBubbleTimeColor = leftBubbleTimeColor;
         return this;
+    }
+
+    @ColorRes
+    public int getRightLinkTextColor() {
+        return rightLinkTextColor;
     }
 
     public QiscusChatConfig setRightLinkTextColor(@ColorRes int rightLinkTextColor) {
@@ -294,9 +370,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getLeftLinkTextColor() {
+        return leftLinkTextColor;
+    }
+
     public QiscusChatConfig setLeftLinkTextColor(@ColorRes int leftLinkTextColor) {
         this.leftLinkTextColor = leftLinkTextColor;
         return this;
+    }
+
+    @ColorRes
+    public int getSystemMessageTextColor() {
+        return systemMessageTextColor;
     }
 
     public QiscusChatConfig setSystemMessageTextColor(@ColorRes int systemMessageTextColor) {
@@ -304,9 +390,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getFailedToSendMessageColor() {
+        return failedToSendMessageColor;
+    }
+
     public QiscusChatConfig setFailedToSendMessageColor(@ColorRes int failedToSendMessageColor) {
         this.failedToSendMessageColor = failedToSendMessageColor;
         return this;
+    }
+
+    @ColorRes
+    public int getReadIconColor() {
+        return readIconColor;
     }
 
     public QiscusChatConfig setReadIconColor(@ColorRes int readIconColor) {
@@ -314,9 +410,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getDateColor() {
+        return dateColor;
+    }
+
     public QiscusChatConfig setDateColor(@ColorRes int dateColor) {
         this.dateColor = dateColor;
         return this;
+    }
+
+    @ColorRes
+    public int getSenderNameColor() {
+        return senderNameColor;
     }
 
     public QiscusChatConfig setSenderNameColor(@ColorRes int senderNameColor) {
@@ -324,9 +430,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getSelectedBubbleBackgroundColor() {
+        return selectedBubbleBackgroundColor;
+    }
+
     public QiscusChatConfig setSelectedBubbleBackgroundColor(@ColorRes int selectedBubbleBackgroundColor) {
         this.selectedBubbleBackgroundColor = selectedBubbleBackgroundColor;
         return this;
+    }
+
+    @ColorRes
+    public int getRightProgressFinishedColor() {
+        return rightProgressFinishedColor;
     }
 
     public QiscusChatConfig setRightProgressFinishedColor(@ColorRes int rightProgressFinishedColor) {
@@ -334,9 +450,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getLeftProgressFinishedColor() {
+        return leftProgressFinishedColor;
+    }
+
     public QiscusChatConfig setLeftProgressFinishedColor(@ColorRes int leftProgressFinishedColor) {
         this.leftProgressFinishedColor = leftProgressFinishedColor;
         return this;
+    }
+
+    @ColorRes
+    public int getAccountLinkingTextColor() {
+        return accountLinkingTextColor;
     }
 
     public QiscusChatConfig setAccountLinkingTextColor(@ColorRes int accountLinkingTextColor) {
@@ -344,9 +470,18 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getAccountLinkingBackground() {
+        return accountLinkingBackground;
+    }
+
     public QiscusChatConfig setAccountLinkingBackground(@ColorRes int accountLinkingBackground) {
         this.accountLinkingBackground = accountLinkingBackground;
         return this;
+    }
+
+    public String getAccountLinkingText() {
+        return accountLinkingText;
     }
 
     public QiscusChatConfig setAccountLinkingText(String accountLinkingText) {
@@ -354,9 +489,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getButtonBubbleTextColor() {
+        return buttonBubbleTextColor;
+    }
+
     public QiscusChatConfig setButtonBubbleTextColor(@ColorRes int buttonBubbleTextColor) {
         this.buttonBubbleTextColor = buttonBubbleTextColor;
         return this;
+    }
+
+    @ColorRes
+    public int getButtonBubbleBackBackground() {
+        return buttonBubbleBackBackground;
     }
 
     public QiscusChatConfig setButtonBubbleBackBackground(@ColorRes int buttonBubbleBackBackground) {
@@ -364,9 +509,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public DateFormatter getDateFormat() {
+        return dateFormat;
+    }
+
     public QiscusChatConfig setDateFormat(DateFormatter dateFormat) {
         this.dateFormat = dateFormat;
         return this;
+    }
+
+    public DateFormatter getTimeFormat() {
+        return timeFormat;
     }
 
     public QiscusChatConfig setTimeFormat(DateFormatter timeFormat) {
@@ -374,9 +527,18 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getEmptyRoomTitle() {
+        return emptyRoomTitle;
+    }
+
     public QiscusChatConfig setEmptyRoomTitle(String emptyRoomTitle) {
         this.emptyRoomTitle = emptyRoomTitle;
         return this;
+    }
+
+    @ColorRes
+    public int getEmptyRoomTitleColor() {
+        return emptyRoomTitleColor;
     }
 
     public QiscusChatConfig setEmptyRoomTitleColor(@ColorRes int emptyRoomTitleColor) {
@@ -384,9 +546,18 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getEmptyRoomSubtitle() {
+        return emptyRoomSubtitle;
+    }
+
     public QiscusChatConfig setEmptyRoomSubtitle(String emptyRoomSubtitle) {
         this.emptyRoomSubtitle = emptyRoomSubtitle;
         return this;
+    }
+
+    @ColorRes
+    public int getEmptyRoomSubtitleColor() {
+        return emptyRoomSubtitleColor;
     }
 
     public QiscusChatConfig setEmptyRoomSubtitleColor(@ColorRes int emptyRoomSubtitleColor) {
@@ -394,9 +565,18 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @DrawableRes
+    public int getEmptyRoomImageResource() {
+        return emptyRoomImageResource;
+    }
+
     public QiscusChatConfig setEmptyRoomImageResource(@DrawableRes int emptyRoomImageResource) {
         this.emptyRoomImageResource = emptyRoomImageResource;
         return this;
+    }
+
+    public String getMessageFieldHint() {
+        return messageFieldHint;
     }
 
     public QiscusChatConfig setMessageFieldHint(String messageFieldHint) {
@@ -404,9 +584,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getMessageFieldHintColor() {
+        return messageFieldHintColor;
+    }
+
     public QiscusChatConfig setMessageFieldHintColor(@ColorRes int messageFieldHintColor) {
         this.messageFieldHintColor = messageFieldHintColor;
         return this;
+    }
+
+    @ColorRes
+    public int getMessageFieldTextColor() {
+        return messageFieldTextColor;
     }
 
     public QiscusChatConfig setMessageFieldTextColor(@ColorRes int messageFieldTextColor) {
@@ -414,9 +604,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @DrawableRes
+    public int getAddPictureIcon() {
+        return addPictureIcon;
+    }
+
     public QiscusChatConfig setAddPictureIcon(@DrawableRes int addPictureIcon) {
         this.addPictureIcon = addPictureIcon;
         return this;
+    }
+
+    @ColorRes
+    public int getAddPictureBackgroundColor() {
+        return addPictureBackgroundColor;
     }
 
     public QiscusChatConfig setAddPictureBackgroundColor(@ColorRes int addPictureBackgroundColor) {
@@ -424,9 +624,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getAddPictureText() {
+        return addPictureText;
+    }
+
     public QiscusChatConfig setAddPictureText(String addPictureText) {
         this.addPictureText = addPictureText;
         return this;
+    }
+
+    public boolean isEnableAddPicture() {
+        return enableAddPicture;
     }
 
     public QiscusChatConfig setEnableAddPicture(boolean enableAddPicture) {
@@ -434,9 +642,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @DrawableRes
+    public int getTakePictureIcon() {
+        return takePictureIcon;
+    }
+
     public QiscusChatConfig setTakePictureIcon(@DrawableRes int takePictureIcon) {
         this.takePictureIcon = takePictureIcon;
         return this;
+    }
+
+    @ColorRes
+    public int getTakePictureBackgroundColor() {
+        return takePictureBackgroundColor;
     }
 
     public QiscusChatConfig setTakePictureBackgroundColor(@ColorRes int takePictureBackgroundColor) {
@@ -444,9 +662,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getTakePictureText() {
+        return takePictureText;
+    }
+
     public QiscusChatConfig setTakePictureText(String takePictureText) {
         this.takePictureText = takePictureText;
         return this;
+    }
+
+    public boolean isEnableTakePicture() {
+        return enableTakePicture;
     }
 
     public QiscusChatConfig setEnableTakePicture(boolean enableTakePicture) {
@@ -454,9 +680,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @DrawableRes
+    public int getAddFileIcon() {
+        return addFileIcon;
+    }
+
     public QiscusChatConfig setAddFileIcon(@DrawableRes int addFileIcon) {
         this.addFileIcon = addFileIcon;
         return this;
+    }
+
+    @ColorRes
+    public int getAddFileBackgroundColor() {
+        return addFileBackgroundColor;
     }
 
     public QiscusChatConfig setAddFileBackgroundColor(@ColorRes int addFileBackgroundColor) {
@@ -464,9 +700,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getAddFileText() {
+        return addFileText;
+    }
+
     public QiscusChatConfig setAddFileText(String addFileText) {
         this.addFileText = addFileText;
         return this;
+    }
+
+    public boolean isEnableAddFile() {
+        return enableAddFile;
     }
 
     public QiscusChatConfig setEnableAddFile(boolean enableAddFile) {
@@ -474,9 +718,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @DrawableRes
+    public int getRecordAudioIcon() {
+        return recordAudioIcon;
+    }
+
     public QiscusChatConfig setRecordAudioIcon(@DrawableRes int recordAudioIcon) {
         this.recordAudioIcon = recordAudioIcon;
         return this;
+    }
+
+    @ColorRes
+    public int getRecordBackgroundColor() {
+        return recordBackgroundColor;
     }
 
     public QiscusChatConfig setRecordBackgroundColor(@ColorRes int recordBackgroundColor) {
@@ -484,9 +738,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getRecordText() {
+        return recordText;
+    }
+
     public QiscusChatConfig setRecordText(String recordText) {
         this.recordText = recordText;
         return this;
+    }
+
+    public boolean isEnableRecordAudio() {
+        return enableRecordAudio;
     }
 
     public QiscusChatConfig setEnableRecordAudio(boolean enableRecordAudio) {
@@ -494,9 +756,39 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @DrawableRes
+    public int getStopRecordIcon() {
+        return stopRecordIcon;
+    }
+
+    public QiscusChatConfig setStopRecordIcon(@DrawableRes int stopRecordIcon) {
+        this.stopRecordIcon = stopRecordIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getCancelRecordIcon() {
+        return cancelRecordIcon;
+    }
+
+    public QiscusChatConfig setCancelRecordIcon(@DrawableRes int cancelRecordIcon) {
+        this.cancelRecordIcon = cancelRecordIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getAddContactIcon() {
+        return addContactIcon;
+    }
+
     public QiscusChatConfig setAddContactIcon(@DrawableRes int addContactIcon) {
         this.addContactIcon = addContactIcon;
         return this;
+    }
+
+    @ColorRes
+    public int getAddContactBackgroundColor() {
+        return addContactBackgroundColor;
     }
 
     public QiscusChatConfig setAddContactBackgroundColor(@ColorRes int addContactBackgroundColor) {
@@ -504,9 +796,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getAddContactText() {
+        return addContactText;
+    }
+
     public QiscusChatConfig setAddContactText(String addContactText) {
         this.addContactText = addContactText;
         return this;
+    }
+
+    public boolean isEnableAddContact() {
+        return enableAddContact;
     }
 
     public QiscusChatConfig setEnableAddContact(boolean enableAddContact) {
@@ -514,9 +814,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @DrawableRes
+    public int getAddLocationIcon() {
+        return addLocationIcon;
+    }
+
     public QiscusChatConfig setAddLocationIcon(@DrawableRes int addLocationIcon) {
         this.addLocationIcon = addLocationIcon;
         return this;
+    }
+
+    @ColorRes
+    public int getAddLocationBackgroundColor() {
+        return addLocationBackgroundColor;
     }
 
     public QiscusChatConfig setAddLocationBackgroundColor(@ColorRes int addLocationBackgroundColor) {
@@ -524,14 +834,145 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public String getAddLocationText() {
+        return addLocationText;
+    }
+
     public QiscusChatConfig setAddLocationText(String addLocationText) {
         this.addLocationText = addLocationText;
         return this;
     }
 
+    public boolean isEnableAddLocation() {
+        return enableAddLocation;
+    }
+
     public QiscusChatConfig setEnableAddLocation(boolean enableAddLocation) {
         this.enableAddLocation = enableAddLocation;
         return this;
+    }
+
+    @DrawableRes
+    public int getSendButtonIcon() {
+        return sendButtonIcon;
+    }
+
+    public QiscusChatConfig setSendButtonIcon(@DrawableRes int sendButtonIcon) {
+        this.sendButtonIcon = sendButtonIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getShowAttachmentPanelIcon() {
+        return showAttachmentPanelIcon;
+    }
+
+    public QiscusChatConfig setShowAttachmentPanelIcon(@DrawableRes int showAttachmentPanelIcon) {
+        this.showAttachmentPanelIcon = showAttachmentPanelIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getHideAttachmentPanelIcon() {
+        return hideAttachmentPanelIcon;
+    }
+
+    public QiscusChatConfig setHideAttachmentPanelIcon(@DrawableRes int hideAttachmentPanelIcon) {
+        this.hideAttachmentPanelIcon = hideAttachmentPanelIcon;
+        return this;
+    }
+
+    @ColorRes
+    public int getHideAttachmentPanelBackgroundColor() {
+        return hideAttachmentPanelBackgroundColor;
+    }
+
+    public QiscusChatConfig setHideAttachmentPanelBackgroundColor(@ColorRes int hideAttachmentPanelBackgroundColor) {
+        this.hideAttachmentPanelBackgroundColor = hideAttachmentPanelBackgroundColor;
+        return this;
+    }
+
+    @DrawableRes
+    public int getPlayAudioIcon() {
+        return playAudioIcon;
+    }
+
+    public QiscusChatConfig setPlayAudioIcon(@DrawableRes int playAudioIcon) {
+        this.playAudioIcon = playAudioIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getPauseAudioIcon() {
+        return pauseAudioIcon;
+    }
+
+    public QiscusChatConfig setPauseAudioIcon(@DrawableRes int pauseAudioIcon) {
+        this.pauseAudioIcon = pauseAudioIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getShowEmojiIcon() {
+        return showEmojiIcon;
+    }
+
+    public QiscusChatConfig setShowEmojiIcon(@DrawableRes int showEmojiIcon) {
+        this.showEmojiIcon = showEmojiIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getShowKeyboardIcon() {
+        return showKeyboardIcon;
+    }
+
+    public QiscusChatConfig setShowKeyboardIcon(@DrawableRes int showKeyboardIcon) {
+        this.showKeyboardIcon = showKeyboardIcon;
+        return this;
+    }
+
+    @ColorRes
+    public int[] getSwipeRefreshColorScheme() {
+        return swipeRefreshColorScheme;
+    }
+
+    public QiscusChatConfig setSwipeRefreshColorScheme(@ColorRes int... colorResIds) {
+        swipeRefreshColorScheme = colorResIds;
+        return this;
+    }
+
+    @DrawableRes
+    public int getNotificationSmallIcon() {
+        return notificationSmallIcon;
+    }
+
+    public QiscusChatConfig setNotificationSmallIcon(@DrawableRes int notificationSmallIcon) {
+        this.notificationSmallIcon = notificationSmallIcon;
+        return this;
+    }
+
+    @DrawableRes
+    public int getNotificationBigIcon() {
+        return notificationBigIcon;
+    }
+
+    public QiscusChatConfig setNotificationBigIcon(@DrawableRes int notificationBigIcon) {
+        this.notificationBigIcon = notificationBigIcon;
+        return this;
+    }
+
+    public boolean isEnableAvatarAsNotificationIcon() {
+        return enableAvatarAsNotificationIcon;
+    }
+
+    public QiscusChatConfig setEnableAvatarAsNotificationIcon(boolean enableAvatarAsNotificationIcon) {
+        this.enableAvatarAsNotificationIcon = enableAvatarAsNotificationIcon;
+        return this;
+    }
+
+    public boolean isEnableReplyNotification() {
+        return enableReplyNotification;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -540,74 +981,8 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusChatConfig setStopRecordIcon(@DrawableRes int stopRecordIcon) {
-        this.stopRecordIcon = stopRecordIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setCancelRecordIcon(@DrawableRes int cancelRecordIcon) {
-        this.cancelRecordIcon = cancelRecordIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setSendButtonIcon(@DrawableRes int sendButtonIcon) {
-        this.sendButtonIcon = sendButtonIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setShowAttachmentPanelIcon(@DrawableRes int showAttachmentPanelIcon) {
-        this.showAttachmentPanelIcon = showAttachmentPanelIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setHideAttachmentPanelIcon(@DrawableRes int hideAttachmentPanelIcon) {
-        this.hideAttachmentPanelIcon = hideAttachmentPanelIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setHideAttachmentPanelBackgroundColor(@ColorRes int hideAttachmentPanelBackgroundColor) {
-        this.hideAttachmentPanelBackgroundColor = hideAttachmentPanelBackgroundColor;
-        return this;
-    }
-
-    public QiscusChatConfig setPlayAudioIcon(@DrawableRes int playAudioIcon) {
-        this.playAudioIcon = playAudioIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setPauseAudioIcon(@DrawableRes int pauseAudioIcon) {
-        this.pauseAudioIcon = pauseAudioIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setShowEmojiIcon(@DrawableRes int showEmojiIcon) {
-        this.showEmojiIcon = showEmojiIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setShowKeyboardIcon(@DrawableRes int showKeyboardIcon) {
-        this.showKeyboardIcon = showKeyboardIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setSwipeRefreshColorScheme(@ColorRes int... colorResIds) {
-        swipeRefreshColorScheme = colorResIds;
-        return this;
-    }
-
-    public QiscusChatConfig setNotificationSmallIcon(@DrawableRes int notificationSmallIcon) {
-        this.notificationSmallIcon = notificationSmallIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setNotificationBigIcon(@DrawableRes int notificationBigIcon) {
-        this.notificationBigIcon = notificationBigIcon;
-        return this;
-    }
-
-    public QiscusChatConfig setEnableAvatarAsNotificationIcon(boolean enableAvatarAsNotificationIcon) {
-        this.enableAvatarAsNotificationIcon = enableAvatarAsNotificationIcon;
-        return this;
+    public QiscusNotificationBuilderInterceptor getNotificationBuilderInterceptor() {
+        return notificationBuilderInterceptor;
     }
 
     public QiscusChatConfig setNotificationBuilderInterceptor(QiscusNotificationBuilderInterceptor notificationBuilderInterceptor) {
@@ -615,9 +990,8 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusChatConfig setReplyNotificationHandler(ReplyNotificationHandler replyNotificationHandler) {
-        this.replyNotificationHandler = replyNotificationHandler;
-        return this;
+    public NotificationTitleHandler getNotificationTitleHandler() {
+        return notificationTitleHandler;
     }
 
     public QiscusChatConfig setNotificationTitleHandler(NotificationTitleHandler notificationTitleHandler) {
@@ -625,9 +999,26 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public NotificationClickListener getNotificationClickListener() {
+        return notificationClickListener;
+    }
+
     public QiscusChatConfig setNotificationClickListener(NotificationClickListener notificationClickListener) {
         this.notificationClickListener = notificationClickListener;
         return this;
+    }
+
+    public ReplyNotificationHandler getReplyNotificationHandler() {
+        return replyNotificationHandler;
+    }
+
+    public QiscusChatConfig setReplyNotificationHandler(ReplyNotificationHandler replyNotificationHandler) {
+        this.replyNotificationHandler = replyNotificationHandler;
+        return this;
+    }
+
+    public boolean isEnablePushNotification() {
+        return enablePushNotification;
     }
 
     public QiscusChatConfig setEnablePushNotification(boolean enablePushNotification) {
@@ -635,14 +1026,26 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public boolean isOnlyEnablePushNotificationOutsideChatRoom() {
+        return onlyEnablePushNotificationOutsideChatRoom;
+    }
+
     public QiscusChatConfig setOnlyEnablePushNotificationOutsideChatRoom(boolean onlyEnablePushNotificationOutsideChatRoom) {
         this.onlyEnablePushNotificationOutsideChatRoom = onlyEnablePushNotificationOutsideChatRoom;
         return this;
     }
 
+    public boolean isEnableFcmPushNotification() {
+        return QiscusCore.getChatConfig().isEnableFcmPushNotification();
+    }
+
     public QiscusChatConfig setEnableFcmPushNotification(boolean enableFcmPushNotification) {
-        this.enableFcmPushNotification = enableFcmPushNotification;
+        QiscusCore.getChatConfig().setEnableFcmPushNotification(enableFcmPushNotification);
         return this;
+    }
+
+    public Drawable getChatRoomBackground() {
+        return chatRoomBackground;
     }
 
     public QiscusChatConfig setChatRoomBackground(Drawable chatRoomBackground) {
@@ -650,9 +1053,27 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusImageCompressionConfig getQiscusImageCompressionConfig() {
+        return QiscusCore.getChatConfig().getQiscusImageCompressionConfig();
+    }
+
     public QiscusChatConfig setQiscusImageCompressionConfig(QiscusImageCompressionConfig qiscusImageCompressionConfig) {
-        this.qiscusImageCompressionConfig = qiscusImageCompressionConfig;
+        QiscusCore.getChatConfig().setQiscusImageCompressionConfig(qiscusImageCompressionConfig);
         return this;
+    }
+
+    public boolean isEnableRequestPermission() {
+        return enableRequestPermission;
+    }
+
+    public QiscusChatConfig setEnableRequestPermission(boolean enableRequestPermission) {
+        this.enableRequestPermission = enableRequestPermission;
+        return this;
+    }
+
+    @ColorRes
+    public int getReplyBarColor() {
+        return replyBarColor;
     }
 
     public QiscusChatConfig setReplyBarColor(@ColorRes int replyBarColor) {
@@ -660,9 +1081,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getReplySenderColor() {
+        return replySenderColor;
+    }
+
     public QiscusChatConfig setReplySenderColor(@ColorRes int replySenderColor) {
         this.replySenderColor = replySenderColor;
         return this;
+    }
+
+    @ColorRes
+    public int getReplyMessageColor() {
+        return replyMessageColor;
     }
 
     public QiscusChatConfig setReplyMessageColor(@ColorRes int replyMessageColor) {
@@ -670,9 +1101,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getCardTitleColor() {
+        return cardTitleColor;
+    }
+
     public QiscusChatConfig setCardTitleColor(@ColorRes int cardTitleColor) {
         this.cardTitleColor = cardTitleColor;
         return this;
+    }
+
+    @ColorRes
+    public int getCardDescriptionColor() {
+        return cardDescriptionColor;
     }
 
     public QiscusChatConfig setCardDescriptionColor(@ColorRes int cardDescriptionColor) {
@@ -680,9 +1121,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getCardButtonTextColor() {
+        return cardButtonTextColor;
+    }
+
     public QiscusChatConfig setCardButtonTextColor(@ColorRes int cardButtonTextColor) {
         this.cardButtonTextColor = cardButtonTextColor;
         return this;
+    }
+
+    @ColorRes
+    public int getCardButtonBackground() {
+        return cardButtonBackground;
     }
 
     public QiscusChatConfig setCardButtonBackground(@ColorRes int cardButtonBackground) {
@@ -690,9 +1141,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public ForwardCommentHandler getForwardCommentHandler() {
+        return forwardCommentHandler;
+    }
+
     public QiscusChatConfig setForwardCommentHandler(ForwardCommentHandler forwardCommentHandler) {
         this.forwardCommentHandler = forwardCommentHandler;
         return this;
+    }
+
+    public boolean isEnableForwardComment() {
+        return enableForwardComment;
     }
 
     public QiscusChatConfig setEnableForwardComment(boolean enableForwardComment) {
@@ -700,9 +1159,17 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public CommentInfoHandler getCommentInfoHandler() {
+        return commentInfoHandler;
+    }
+
     public QiscusChatConfig setCommentInfoHandler(CommentInfoHandler commentInfoHandler) {
         this.commentInfoHandler = commentInfoHandler;
         return this;
+    }
+
+    public boolean isEnableCommentInfo() {
+        return enableCommentInfo;
     }
 
     public QiscusChatConfig setEnableCommentInfo(boolean enableCommentInfo) {
@@ -710,14 +1177,26 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public boolean isEnableShareMedia() {
+        return enableShareMedia;
+    }
+
     public QiscusChatConfig setEnableShareMedia(boolean enableShareMedia) {
         this.enableShareMedia = enableShareMedia;
         return this;
     }
 
+    public QiscusMentionConfig getMentionConfig() {
+        return mentionConfig;
+    }
+
     public QiscusChatConfig setMentionConfig(QiscusMentionConfig mentionConfig) {
         this.mentionConfig = mentionConfig;
         return this;
+    }
+
+    public QiscusRoomSenderNameInterceptor getRoomSenderNameInterceptor() {
+        return qiscusRoomSenderNameInterceptor;
     }
 
     public QiscusChatConfig setRoomSenderNameInterceptor(QiscusRoomSenderNameInterceptor
@@ -726,10 +1205,18 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusRoomSenderNameColorInterceptor getRoomSenderNameColorInterceptor() {
+        return qiscusRoomSenderNameColorInterceptor;
+    }
+
     public QiscusChatConfig setRoomSenderNameColorInterceptor(QiscusRoomSenderNameColorInterceptor
                                                                       qiscusRoomSenderNameColorInterceptor) {
         this.qiscusRoomSenderNameColorInterceptor = qiscusRoomSenderNameColorInterceptor;
         return this;
+    }
+
+    public QiscusRoomReplyBarColorInterceptor getRoomReplyBarColorInterceptor() {
+        return qiscusRoomReplyBarColorInterceptor;
     }
 
     public QiscusChatConfig setRoomReplyBarColorInterceptor(QiscusRoomReplyBarColorInterceptor
@@ -738,20 +1225,28 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
+        return QiscusCore.getChatConfig().getCommentSendingInterceptor();
+    }
+
     public QiscusChatConfig setCommentSendingInterceptor(QiscusCommentSendingInterceptor
                                                                  qiscusCommentSendingInterceptor) {
-        this.qiscusCommentSendingInterceptor = qiscusCommentSendingInterceptor;
+        QiscusCore.getChatConfig().setCommentSendingInterceptor(qiscusCommentSendingInterceptor);
         return this;
     }
 
-    public QiscusChatConfig setEnableRequestPermission(boolean enableRequestPermission) {
-        this.enableRequestPermission = enableRequestPermission;
-        return this;
+    public boolean isEnableCaption() {
+        return enableCaption;
     }
 
     public QiscusChatConfig setEnableCaption(boolean enableCaption) {
         this.enableCaption = enableCaption;
         return this;
+    }
+
+    @ColorRes
+    public int getDialogPermissionPositiveButtonTextColor() {
+        return dialogPermissionPositiveButtonTextColor;
     }
 
     public QiscusChatConfig setDialogPermissionPositiveButtonTextColor
@@ -760,10 +1255,19 @@ public class QiscusChatConfig {
         return this;
     }
 
+    @ColorRes
+    public int getDialogPermissionNegativeButtonTextColor() {
+        return dialogPermissionNegativeButtonTextColor;
+    }
+
     public QiscusChatConfig setDialogPermissionNegativeButtonTextColor
             (@ColorRes int dialogPermissionNegativeButtonTextColor) {
         this.dialogPermissionNegativeButtonTextColor = dialogPermissionNegativeButtonTextColor;
         return this;
+    }
+
+    public QiscusDeleteCommentConfig getDeleteCommentConfig() {
+        return deleteCommentConfig;
     }
 
     public QiscusChatConfig setDeleteCommentConfig(QiscusDeleteCommentConfig deleteCommentConfig) {
@@ -771,510 +1275,21 @@ public class QiscusChatConfig {
         return this;
     }
 
+    public QiscusStartReplyInterceptor getStartReplyInterceptor() {
+        return startReplyInterceptor;
+    }
+
     public QiscusChatConfig setStartReplyInterceptor(QiscusStartReplyInterceptor startReplyInterceptor) {
         this.startReplyInterceptor = startReplyInterceptor;
         return this;
     }
 
-    @ColorRes
-    public int getStatusBarColor() {
-        return statusBarColor;
+    public boolean isEnableLog() {
+        return QiscusCore.getChatConfig().isEnableLog();
     }
 
-    @ColorRes
-    public int getAppBarColor() {
-        return appBarColor;
-    }
-
-    @ColorRes
-    public int getAccentColor() {
-        return accentColor;
-    }
-
-    @ColorRes
-    public int getInlineReplyColor() {
-        return inlineReplyColor;
-    }
-
-    @ColorRes
-    public int getTitleColor() {
-        return titleColor;
-    }
-
-    @ColorRes
-    public int getSubtitleColor() {
-        return subtitleColor;
-    }
-
-    @ColorRes
-    public int getRightBubbleColor() {
-        return rightBubbleColor;
-    }
-
-    @ColorRes
-    public int getLeftBubbleColor() {
-        return leftBubbleColor;
-    }
-
-    @ColorRes
-    public int getSystemMessageBubbleColor() {
-        return systemMessageBubbleColor;
-    }
-
-    @ColorRes
-    public int getRightBubbleTextColor() {
-        return rightBubbleTextColor;
-    }
-
-    @ColorRes
-    public int getLeftBubbleTextColor() {
-        return leftBubbleTextColor;
-    }
-
-    @ColorRes
-    public int getRightBubbleTimeColor() {
-        return rightBubbleTimeColor;
-    }
-
-    @ColorRes
-    public int getLeftBubbleTimeColor() {
-        return leftBubbleTimeColor;
-    }
-
-    @ColorRes
-    public int getRightLinkTextColor() {
-        return rightLinkTextColor;
-    }
-
-    @ColorRes
-    public int getLeftLinkTextColor() {
-        return leftLinkTextColor;
-    }
-
-    @ColorRes
-    public int getSystemMessageTextColor() {
-        return systemMessageTextColor;
-    }
-
-    @ColorRes
-    public int getFailedToSendMessageColor() {
-        return failedToSendMessageColor;
-    }
-
-    @ColorRes
-    public int getReadIconColor() {
-        return readIconColor;
-    }
-
-    @ColorRes
-    public int getDateColor() {
-        return dateColor;
-    }
-
-    @ColorRes
-    public int getSenderNameColor() {
-        return senderNameColor;
-    }
-
-    @ColorRes
-    public int getSelectedBubbleBackgroundColor() {
-        return selectedBubbleBackgroundColor;
-    }
-
-    @ColorRes
-    public int getRightProgressFinishedColor() {
-        return rightProgressFinishedColor;
-    }
-
-    @ColorRes
-    public int getLeftProgressFinishedColor() {
-        return leftProgressFinishedColor;
-    }
-
-    @ColorRes
-    public int getAccountLinkingTextColor() {
-        return accountLinkingTextColor;
-    }
-
-    @ColorRes
-    public int getAccountLinkingBackground() {
-        return accountLinkingBackground;
-    }
-
-    public String getAccountLinkingText() {
-        return accountLinkingText;
-    }
-
-    @ColorRes
-    public int getButtonBubbleTextColor() {
-        return buttonBubbleTextColor;
-    }
-
-    @ColorRes
-    public int getButtonBubbleBackBackground() {
-        return buttonBubbleBackBackground;
-    }
-
-    public DateFormatter getDateFormat() {
-        return dateFormat;
-    }
-
-    public DateFormatter getTimeFormat() {
-        return timeFormat;
-    }
-
-    public String getEmptyRoomTitle() {
-        return emptyRoomTitle;
-    }
-
-    @ColorRes
-    public int getEmptyRoomTitleColor() {
-        return emptyRoomTitleColor;
-    }
-
-    public String getEmptyRoomSubtitle() {
-        return emptyRoomSubtitle;
-    }
-
-    @ColorRes
-    public int getEmptyRoomSubtitleColor() {
-        return emptyRoomSubtitleColor;
-    }
-
-    @DrawableRes
-    public int getEmptyRoomImageResource() {
-        return emptyRoomImageResource;
-    }
-
-    public String getMessageFieldHint() {
-        return messageFieldHint;
-    }
-
-    @ColorRes
-    public int getMessageFieldHintColor() {
-        return messageFieldHintColor;
-    }
-
-    @ColorRes
-    public int getMessageFieldTextColor() {
-        return messageFieldTextColor;
-    }
-
-    @DrawableRes
-    public int getAddPictureIcon() {
-        return addPictureIcon;
-    }
-
-    @ColorRes
-    public int getAddPictureBackgroundColor() {
-        return addPictureBackgroundColor;
-    }
-
-    public String getAddPictureText() {
-        return addPictureText;
-    }
-
-    public boolean isEnableAddPicture() {
-        return enableAddPicture;
-    }
-
-    @DrawableRes
-    public int getTakePictureIcon() {
-        return takePictureIcon;
-    }
-
-    @ColorRes
-    public int getTakePictureBackgroundColor() {
-        return takePictureBackgroundColor;
-    }
-
-    public String getTakePictureText() {
-        return takePictureText;
-    }
-
-    public boolean isEnableTakePicture() {
-        return enableTakePicture;
-    }
-
-    @DrawableRes
-    public int getAddFileIcon() {
-        return addFileIcon;
-    }
-
-    @ColorRes
-    public int getAddFileBackgroundColor() {
-        return addFileBackgroundColor;
-    }
-
-    public String getAddFileText() {
-        return addFileText;
-    }
-
-    public boolean isEnableAddFile() {
-        return enableAddFile;
-    }
-
-    @DrawableRes
-    public int getRecordAudioIcon() {
-        return recordAudioIcon;
-    }
-
-    @ColorRes
-    public int getRecordBackgroundColor() {
-        return recordBackgroundColor;
-    }
-
-    public String getRecordText() {
-        return recordText;
-    }
-
-    public boolean isEnableRecordAudio() {
-        return enableRecordAudio;
-    }
-
-    @DrawableRes
-    public int getStopRecordIcon() {
-        return stopRecordIcon;
-    }
-
-    @DrawableRes
-    public int getCancelRecordIcon() {
-        return cancelRecordIcon;
-    }
-
-    @DrawableRes
-    public int getAddContactIcon() {
-        return addContactIcon;
-    }
-
-    @ColorRes
-    public int getAddContactBackgroundColor() {
-        return addContactBackgroundColor;
-    }
-
-    public String getAddContactText() {
-        return addContactText;
-    }
-
-    public boolean isEnableAddContact() {
-        return enableAddContact;
-    }
-
-    @DrawableRes
-    public int getAddLocationIcon() {
-        return addLocationIcon;
-    }
-
-    @ColorRes
-    public int getAddLocationBackgroundColor() {
-        return addLocationBackgroundColor;
-    }
-
-    public String getAddLocationText() {
-        return addLocationText;
-    }
-
-    public boolean isEnableAddLocation() {
-        return enableAddLocation;
-    }
-
-    @DrawableRes
-    public int getSendButtonIcon() {
-        return sendButtonIcon;
-    }
-
-    @DrawableRes
-    public int getShowAttachmentPanelIcon() {
-        return showAttachmentPanelIcon;
-    }
-
-    @DrawableRes
-    public int getHideAttachmentPanelIcon() {
-        return hideAttachmentPanelIcon;
-    }
-
-    @ColorRes
-    public int getHideAttachmentPanelBackgroundColor() {
-        return hideAttachmentPanelBackgroundColor;
-    }
-
-    @DrawableRes
-    public int getPlayAudioIcon() {
-        return playAudioIcon;
-    }
-
-    @DrawableRes
-    public int getPauseAudioIcon() {
-        return pauseAudioIcon;
-    }
-
-    @DrawableRes
-    public int getShowEmojiIcon() {
-        return showEmojiIcon;
-    }
-
-    @DrawableRes
-    public int getShowKeyboardIcon() {
-        return showKeyboardIcon;
-    }
-
-    @ColorRes
-    public int[] getSwipeRefreshColorScheme() {
-        return swipeRefreshColorScheme;
-    }
-
-    @DrawableRes
-    public int getNotificationSmallIcon() {
-        return notificationSmallIcon;
-    }
-
-    @DrawableRes
-    public int getNotificationBigIcon() {
-        return notificationBigIcon;
-    }
-
-    public boolean isEnableAvatarAsNotificationIcon() {
-        return enableAvatarAsNotificationIcon;
-    }
-
-    public boolean isEnableReplyNotification() {
-        return enableReplyNotification;
-    }
-
-    public QiscusNotificationBuilderInterceptor getNotificationBuilderInterceptor() {
-        return notificationBuilderInterceptor;
-    }
-
-    public NotificationTitleHandler getNotificationTitleHandler() {
-        return notificationTitleHandler;
-    }
-
-    public NotificationClickListener getNotificationClickListener() {
-        return notificationClickListener;
-    }
-
-    public ReplyNotificationHandler getReplyNotificationHandler() {
-        return replyNotificationHandler;
-    }
-
-    public boolean isEnablePushNotification() {
-        return enablePushNotification;
-    }
-
-    public boolean isOnlyEnablePushNotificationOutsideChatRoom() {
-        return onlyEnablePushNotificationOutsideChatRoom;
-    }
-
-    public boolean isEnableFcmPushNotification() {
-        return enableFcmPushNotification;
-    }
-
-    public Drawable getChatRoomBackground() {
-        return chatRoomBackground;
-    }
-
-    public QiscusImageCompressionConfig getQiscusImageCompressionConfig() {
-        return qiscusImageCompressionConfig;
-    }
-
-    public boolean isEnableRequestPermission() {
-        return enableRequestPermission;
-    }
-
-    @ColorRes
-    public int getReplyBarColor() {
-        return replyBarColor;
-    }
-
-    @ColorRes
-    public int getReplySenderColor() {
-        return replySenderColor;
-    }
-
-    @ColorRes
-    public int getReplyMessageColor() {
-        return replyMessageColor;
-    }
-
-    @ColorRes
-    public int getCardTitleColor() {
-        return cardTitleColor;
-    }
-
-    @ColorRes
-    public int getCardDescriptionColor() {
-        return cardDescriptionColor;
-    }
-
-    @ColorRes
-    public int getCardButtonTextColor() {
-        return cardButtonTextColor;
-    }
-
-    @ColorRes
-    public int getCardButtonBackground() {
-        return cardButtonBackground;
-    }
-
-    public ForwardCommentHandler getForwardCommentHandler() {
-        return forwardCommentHandler;
-    }
-
-    public boolean isEnableForwardComment() {
-        return enableForwardComment;
-    }
-
-    public CommentInfoHandler getCommentInfoHandler() {
-        return commentInfoHandler;
-    }
-
-    public boolean isEnableCommentInfo() {
-        return enableCommentInfo;
-    }
-
-    public boolean isEnableShareMedia() {
-        return enableShareMedia;
-    }
-
-    public QiscusMentionConfig getMentionConfig() {
-        return mentionConfig;
-    }
-
-    public QiscusRoomSenderNameInterceptor getRoomSenderNameInterceptor() {
-        return qiscusRoomSenderNameInterceptor;
-    }
-
-    public QiscusRoomSenderNameColorInterceptor getRoomSenderNameColorInterceptor() {
-        return qiscusRoomSenderNameColorInterceptor;
-    }
-
-    public QiscusRoomReplyBarColorInterceptor getRoomReplyBarColorInterceptor() {
-        return qiscusRoomReplyBarColorInterceptor;
-    }
-
-    public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
-        return qiscusCommentSendingInterceptor;
-    }
-
-    public boolean isEnableCaption() {
-        return enableCaption;
-    }
-
-    @ColorRes
-    public int getDialogPermissionPositiveButtonTextColor() {
-        return dialogPermissionPositiveButtonTextColor;
-    }
-
-    @ColorRes
-    public int getDialogPermissionNegativeButtonTextColor() {
-        return dialogPermissionNegativeButtonTextColor;
-    }
-
-    public QiscusDeleteCommentConfig getDeleteCommentConfig() {
-        return deleteCommentConfig;
-    }
-
-    public QiscusStartReplyInterceptor getStartReplyInterceptor() {
-        return startReplyInterceptor;
+    public QiscusChatConfig setEnableLog(boolean enableLog) {
+        QiscusCore.getChatConfig().setEnableLog(enableLog);
+        return this;
     }
 }

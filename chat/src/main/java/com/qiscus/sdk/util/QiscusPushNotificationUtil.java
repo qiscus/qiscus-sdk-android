@@ -40,13 +40,18 @@ import com.bumptech.glide.request.transition.Transition;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.local.QiscusCacheManager;
-import com.qiscus.sdk.data.model.QiscusChatRoom;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusPushNotificationMessage;
+import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusNumberUtil;
+import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
-import com.qiscus.sdk.data.model.QiscusPushNotificationMessage;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
-import com.qiscus.sdk.data.remote.QiscusApi;
 import com.qiscus.sdk.service.QiscusPushNotificationClickReceiver;
 
 import org.json.JSONArray;
@@ -61,7 +66,7 @@ import java.util.Map;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static com.qiscus.sdk.util.BuildVersionUtil.isNougatOrHigher;
+import static com.qiscus.sdk.chat.core.util.BuildVersionUtil.isNougatOrHigher;
 
 /**
  * Created on : June 15, 2017

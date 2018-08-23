@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<ImageView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/image"
     android:layout_width="64dp"
     android:layout_height="64dp"
@@ -25,4 +23,4 @@
     android:layout_marginRight="1dp"
     android:layout_marginTop="2dp"
     android:padding="1dp"
-    android:scaleType="centerCrop"/>
+    android:scaleType="centerCrop" />

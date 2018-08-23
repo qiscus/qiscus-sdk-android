@@ -32,7 +32,7 @@ import com.qiscus.manggil.suggestions.interfaces.Suggestible;
 import com.qiscus.manggil.suggestions.interfaces.SuggestionsListBuilder;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
 import java.util.ArrayList;
 import java.util.List;

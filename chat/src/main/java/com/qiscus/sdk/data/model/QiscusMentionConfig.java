@@ -21,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
 
 /**
  * Created on : September 12, 2017

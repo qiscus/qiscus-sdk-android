@@ -22,8 +22,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusChatRoom;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 

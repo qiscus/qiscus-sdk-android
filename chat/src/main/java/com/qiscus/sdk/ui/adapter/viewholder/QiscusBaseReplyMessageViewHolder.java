@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.PatternsCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -35,15 +36,14 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.data.model.QiscusAccount;
-import com.qiscus.sdk.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.adapter.ReplyItemClickListener;
 import com.qiscus.sdk.util.QiscusImageUtil;
-import com.qiscus.sdk.util.QiscusPatterns;
-import com.qiscus.sdk.util.QiscusTextUtil;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -276,7 +276,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
 
     private void setUpLinks() {
         String message = messageTextView.getText().toString();
-        Matcher matcher = QiscusPatterns.AUTOLINK_WEB_URL.matcher(message);
+        Matcher matcher = PatternsCompat.AUTOLINK_WEB_URL.matcher(message);
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && message.charAt(start - 1) == '@') {
