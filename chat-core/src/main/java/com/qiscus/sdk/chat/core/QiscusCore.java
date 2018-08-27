@@ -125,7 +125,8 @@ public class QiscusCore {
      * @param enableMqttLB  Qiscus using own MQTT Load Balancer for get mqtt server url
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl, boolean enableMqttLB) {
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
+                                            String mqttBrokerUrl, boolean enableMqttLB) {
         appInstance = application;
         appId = qiscusAppId;
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;

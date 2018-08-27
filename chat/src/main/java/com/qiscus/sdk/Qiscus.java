@@ -123,7 +123,8 @@ public class Qiscus {
      * @param enableMqttLB  | Qiscus using own MQTT Load Balancer for get mqtt server url
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl, boolean enableMqttLB) {
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
+                                            String mqttBrokerUrl, boolean enableMqttLB) {
         QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB);
         chatConfig = new QiscusChatConfig();
         authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
