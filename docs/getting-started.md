@@ -24,7 +24,7 @@ dependencies {
 To start building app using Qiscus  Chat SDK you need a key called APP ID. This APP ID acts as identifier of your Application so that Qiscus can connect user to other users on the sample APP ID. You can get your APP ID [here](https://www.qiscus.com/dashboard/register).
 You can find your APP ID on your Qiscus app dashboard. Here you can see the picture as a reference.
 
-![App ID Location](https://cdn.rawgit.com/qiscus/qiscus-sdk-web/feature/docs/docs/images/app-id.png "Your APP ID location")
+![App ID Location](https://cdn.rawgit.com/qiscus/qiscus-sdk-android/raw/master/screenshot/app-id.png "Your APP ID location")
 
 > *All users within the same APP ID are able to communicate with each other, across all platforms. This means users using iOS, Android, Web clients, etc. can all chat with one another. However, users in different Qiscus applications cannot talk to each other.*
 
@@ -239,8 +239,12 @@ QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom(roomID),
 
 ### Participant Management
 
-In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi).
+In some cases, you may need to add additional participants into your room chat or even removing any participant. This two methods you can use to managing participant.
 
+```
+QiscusApi.getInstance().addRoomMember(roomId, emails)
+QiscusApi.getInstance().removeRoomMember(roomId, emails)
+```
 
 ## Enable Push Notification
 
