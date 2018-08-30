@@ -678,7 +678,7 @@ Update room in local database.
 Qiscus.*getDataStore*().addOrUpdate(qiscusChatRoom);
 ```
 
-### Get List of Participant in A room
+### Get List of Participant in a Room
 
 Get participant from local database.
 
@@ -707,6 +707,30 @@ qiscusChatRoom.getMember();
  
 QiscusApi.getInstance().getTotalUnreadCount();
 ```
+
+### Add Participant in a Room
+
+ ```
+ /**
+ * Add participant in a room
+ * 
+ * roomId (long)
+ * ids (List<String>) list of userIds e.g. list of email (
+ */
+QiscusApi.getInstance().addRoomMember(roomId, ids)
+```
+
+### Remove Participant in a Room
+```
+/**
+ * Remove participant in a room
+ * 
+ * roomId (long)
+ * ids (List<String>) list of userIds e.g. list of email (
+ */
+QiscusApi.getInstance().removeRoomMember(roomId, ids)
+```
+
 
 ## Statuses
 
