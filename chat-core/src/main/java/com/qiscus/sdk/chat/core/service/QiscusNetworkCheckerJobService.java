@@ -48,14 +48,10 @@ public class QiscusNetworkCheckerJobService extends JobService {
     private static final int STATIC_JOB_ID = 200;
     private QiscusNetworkStateReceiver networkStateReceiver;
 
-    public static int getJobId() {
-        return QiscusCore.getQiscusAccount().getId() + STATIC_JOB_ID;
-    }
-
     public static void scheduleJob(Context context) {
         QiscusLogger.print(TAG, "scheduleJob: ");
         ComponentName componentName = new ComponentName(context, QiscusNetworkCheckerJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(getJobId(), componentName)
+        JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
                 .setRequiresCharging(true)
                 .setMinimumLatency(5 * 1000)
                 .setOverrideDeadline(2000)

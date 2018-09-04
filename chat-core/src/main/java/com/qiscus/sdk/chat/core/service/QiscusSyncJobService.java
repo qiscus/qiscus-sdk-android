@@ -40,6 +40,8 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.concurrent.TimeUnit;
+
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -55,16 +57,13 @@ public class QiscusSyncJobService extends JobService {
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();
     private static final int STATIC_JOB_ID = 100;
 
-    public static int getJobId() {
-        return QiscusCore.getQiscusAccount().getId() + STATIC_JOB_ID;
-    }
-
     public static void syncJob(Context context) {
         QiscusLogger.print(TAG, "syncJob...");
 
         ComponentName componentName = new ComponentName(context, QiscusSyncJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(getJobId(), componentName)
+        JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
                 .setMinimumLatency(QiscusCore.getHeartBeat())
+                .setOverrideDeadline(TimeUnit.SECONDS.toMillis(10))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
