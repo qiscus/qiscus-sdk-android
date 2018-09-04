@@ -6,3 +6,6 @@
 /build
 /captures
 core/build
+.project
+.classpath
+org.eclipse.buildship.core.prefs
