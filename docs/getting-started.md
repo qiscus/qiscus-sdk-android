@@ -15,7 +15,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 
 ```groovy
 dependencies {
-    implementation 'com.qiscus.sdk:chat:2.28.0'
+    implementation 'com.qiscus.sdk:chat:2.28.1'
 }
 ```
 
@@ -239,7 +239,15 @@ QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom(roomID),
 
 ### Participant Management
 
-In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK only allow you to manage your users server to server. You cannot do it on your client app side. Hence, we recommend to invite and remove user out of specific room through our [**SERVER API**](https://www.qiscus.com/docs/restapi) for simplicity and security reason. You can learn how to use Server API [here](https://www.qiscus.com/docs/restapi).
+In some cases, you may need to add additional participants into your room chat or even removing any participant. Currently, Qiscus Chat SDK allow you or even removing any participant. This two methods you can use to managing participant.
+
+ ```java
+QiscusApi.getInstance().addRoomMember(roomId, emails)
+```
+
+```java
+QiscusApi.getInstance().removeRoomMember(roomId, emails)
+```
 
 
 ## Enable Push Notification

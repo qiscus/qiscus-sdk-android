@@ -299,7 +299,7 @@ public final class QiscusImageUtil {
             if (i > 0) {
                 file = file.substring(0, i);
             }
-            return blurryImageUrl + file + ".jpg";
+            return blurryImageUrl + file + ".png";
         }
         return imageUrl;
     }

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.support.annotation.RestrictTo;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
@@ -63,6 +64,7 @@ public class QiscusCore {
     private static QiscusCoreChatConfig chatConfig;
     private static Handler appHandler;
     private static ScheduledThreadPoolExecutor taskExecutor;
+    private static boolean enableMqttLB = true;
 
     private QiscusCore() {
     }
@@ -86,7 +88,7 @@ public class QiscusCore {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER);
+        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER, true);
     }
 
     /**
@@ -110,16 +112,35 @@ public class QiscusCore {
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
+        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false);
+    }
+
+    /**
+     * This method @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+     *
+     * @param application   Application instance
+     * @param qiscusAppId   Your Qiscus App Id
+     * @param serverBaseUrl Your qiscus chat engine base url
+     * @param mqttBrokerUrl Your Mqtt Broker url
+     * @param enableMqttLB  Qiscus using own MQTT Load Balancer for get mqtt server url
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
+                                            String mqttBrokerUrl, boolean enableMqttLB) {
         appInstance = application;
         appId = qiscusAppId;
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
-        QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
+
         chatConfig = new QiscusCoreChatConfig();
         appHandler = new Handler(QiscusCore.getApps().getApplicationContext().getMainLooper());
         taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
         heartBeat = 60000;
+
+        QiscusCore.enableMqttLB = enableMqttLB;
+        QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
+
         startPusherService();
         startNetworkCheckerService();
         QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
@@ -147,14 +168,8 @@ public class QiscusCore {
      * start network checker job service if in oreo or higher
      */
     public static void startNetworkCheckerService() {
-        Application appInstance = QiscusCore.getApps();
         if (BuildVersionUtil.isOreoOrHigher()) {
-            try {
-                appInstance.getApplicationContext()
-                        .startService(new Intent(appInstance.getApplicationContext(), QiscusNetworkCheckerJobService.class));
-            } catch (IllegalStateException e) {
-                //Prevent crash because trying to start service while application on background
-            }
+            QiscusNetworkCheckerJobService.scheduleJob(getApps());
         }
     }
 
@@ -200,13 +215,43 @@ public class QiscusCore {
     }
 
     /**
+     * isEnableMqttLB
+     * Checker for enable or disable own MQTT Load Balancer
+     *
+     * @return boolean
+     */
+    public static boolean isEnableMqttLB() {
+        checkAppIdSetup();
+        return enableMqttLB;
+    }
+
+    /**
      * Accessor to get current mqtt broker url
      *
      * @return Current mqtt broker url
      */
     public static String getMqttBrokerUrl() {
         checkAppIdSetup();
-        return mqttBrokerUrl;
+        return isEnableMqttLB() ? localDataManager.getMqttBrokerUrl() : mqttBrokerUrl;
+    }
+
+    /**
+     * this method is used if isEnableMqttLB() == true
+     *
+     * @param mqttBaseUrl
+     */
+    public static void setCacheMqttBrokerUrl(String mqttBaseUrl, boolean everConnected) {
+        localDataManager.setMqttBrokerUrl(mqttBaseUrl);
+        localDataManager.setWillGetNewNodeMqttBrokerUrl(everConnected);
+    }
+
+    /**
+     * this is mechanism used by MQTT LB
+     *
+     * @return boolean
+     */
+    public static boolean willGetNewNodeMqttBrokerUrl() {
+        return localDataManager.willGetNewNodeMqttBrokerUrl();
     }
 
     /**
@@ -214,6 +259,7 @@ public class QiscusCore {
      *
      * @return current localDataManager
      */
+    @Deprecated
     public static LocalDataManager getLocalDataManager() {
         checkAppIdSetup();
         return localDataManager;
@@ -555,6 +601,37 @@ public class QiscusCore {
 
         private void setFcmToken(String fcmToken) {
             sharedPreferences.edit().putString("fcm_token", fcmToken).apply();
+        }
+
+        /**
+         * this is used if enableMqttLB = true
+         *
+         * @return mqttBrokerUrl
+         */
+        private String getMqttBrokerUrl() {
+            return sharedPreferences.getString("mqtt_broker_url", null);
+        }
+
+        /**
+         * this is used if enableMqttLB = true
+         *
+         * @param mqttBrokerUrl
+         */
+        private void setMqttBrokerUrl(String mqttBrokerUrl) {
+            sharedPreferences.edit().putString("mqtt_broker_url", mqttBrokerUrl).apply();
+        }
+
+        /**
+         * Mechanism for MQTT LB
+         *
+         * @return boolean
+         */
+        private boolean willGetNewNodeMqttBrokerUrl() {
+            return sharedPreferences.getBoolean("mqtt_will_get_new", true);
+        }
+
+        private void setWillGetNewNodeMqttBrokerUrl(boolean will) {
+            sharedPreferences.edit().putBoolean("mqtt_will_get_new", will).apply();
         }
 
         private void clearData() {

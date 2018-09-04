@@ -20,6 +20,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.annotation.RestrictTo;
 
 import com.qiscus.jupuk.Jupuk;
 import com.qiscus.sdk.chat.core.BuildConfig;
@@ -83,7 +84,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER);
+        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER, true);
     }
 
     /**
@@ -107,7 +108,22 @@ public class Qiscus {
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
-        QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl);
+        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false);
+    }
+
+    /**
+     * This method @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+     *
+     * @param application   Application instance
+     * @param qiscusAppId   Your Qiscus App Id
+     * @param serverBaseUrl Your qiscus chat engine base url
+     * @param mqttBrokerUrl Your Mqtt Broker url
+     * @param enableMqttLB  | Qiscus using own MQTT Load Balancer for get mqtt server url
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
+                                            String mqttBrokerUrl, boolean enableMqttLB) {
+        QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB);
         chatConfig = new QiscusChatConfig();
         authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);

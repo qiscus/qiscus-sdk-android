@@ -79,7 +79,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     private String clientId;
-    private String serverUri;
     private MqttAndroidClient mqttAndroidClient;
     private QiscusAccount qiscusAccount;
     private Runnable fallBackListenRoom;
@@ -105,7 +104,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
         clientId = QiscusCore.getApps().getPackageName() + "-";
         clientId += Settings.Secure.getString(QiscusCore.getApps().getContentResolver(), Settings.Secure.ANDROID_ID);
-        serverUri = QiscusCore.getMqttBrokerUrl();
 
         buildClient();
 
@@ -273,9 +271,36 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     private void buildClient() {
         mqttAndroidClient = null;
-        mqttAndroidClient = new MqttAndroidClient(QiscusCore.getApps().getApplicationContext(), serverUri, clientId);
+        mqttAndroidClient = new MqttAndroidClient(QiscusCore.getApps().getApplicationContext(),
+                QiscusCore.getMqttBrokerUrl(), clientId);
         mqttAndroidClient.setCallback(this);
         mqttAndroidClient.setTraceEnabled(false);
+    }
+
+    /**
+     * If isEnableMqttLB = true, MQTT broker url is from own MQTT_LB and save to shared pref
+     */
+    private void getMqttBrokerUrlFromLB() {
+        QiscusLogger.print("isEnableMqttLB : " + QiscusCore.isEnableMqttLB());
+
+        boolean isValid = QiscusCore.isEnableMqttLB() &&
+                QiscusCore.willGetNewNodeMqttBrokerUrl() &&
+                QiscusAndroidUtil.isNetworkAvailable();
+
+        if (isValid) {
+            QiscusApi.getInstance()
+                    .getMqttBaseUrl()
+                    .map(s -> String.format("ssl://%s:1885", s))
+                    .doOnNext(node -> QiscusCore.setCacheMqttBrokerUrl(node, false))
+                    .map(node -> QiscusCore.getMqttBrokerUrl())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(mqttBaseUrl -> {
+                                QiscusLogger.print("New MQTT Broker URL = " + mqttBaseUrl);
+                                buildClient();
+                            },
+                            QiscusErrorLogger::print);
+        }
     }
 
     public void connect() {
@@ -304,6 +329,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void restartConnection() {
+        getMqttBrokerUrlFromLB();
+
         QiscusLogger.print("QiscusPusherApi", "Restart connection...");
         try {
             connecting = false;
@@ -506,6 +533,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     @Override
     public void connectionLost(Throwable cause) {
         if (reconnectCounter == 0) {
+            getMqttBrokerUrlFromLB();
             EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         }
         reconnectCounter++;
@@ -591,6 +619,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void connectComplete(boolean reconnect, String serverUri) {
+        // if connected, update flag to true
+        QiscusCore.setCacheMqttBrokerUrl(QiscusCore.getMqttBrokerUrl(), true);
+
         QiscusLogger.print(TAG, "Connected...");
         EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
         try {
@@ -622,6 +653,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     @Override
     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
         if (reconnectCounter == 0) {
+            getMqttBrokerUrlFromLB();
             EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         }
         reconnectCounter++;
