@@ -201,8 +201,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public List<QiscusChatRoom> getChatRooms(int limit) {
-        String query = "SELECT * FROM "
+        String roomTableName = QiscusDb.RoomTable.TABLE_NAME;
+        String commentTableName = QiscusDb.CommentTable.TABLE_NAME;
+        String query = "SELECT "+ roomTableName + ".*" +" FROM "
                 + QiscusDb.RoomTable.TABLE_NAME
+                + " LEFT JOIN "+ commentTableName
+                + " ON " + roomTableName + "." + QiscusDb.RoomTable.COLUMN_ID
+                + " = " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_ROOM_ID
+                + " AND " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_DELETED + " != 1"
+                + " AND " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " != 1"
+                + " GROUP BY " + roomTableName + "." + QiscusDb.RoomTable.COLUMN_ID
+                + " ORDER BY " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_TIME
+                + " DESC "
                 + " LIMIT " + limit;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
@@ -217,7 +227,6 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusChatRooms.add(qiscusChatRoom);
         }
         cursor.close();
-        sortRooms(qiscusChatRooms);
         return qiscusChatRooms;
     }
 
