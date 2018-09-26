@@ -203,9 +203,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public List<QiscusChatRoom> getChatRooms(int limit) {
         String roomTableName = QiscusDb.RoomTable.TABLE_NAME;
         String commentTableName = QiscusDb.CommentTable.TABLE_NAME;
-        String query = "SELECT "+ roomTableName + ".*" +" FROM "
+        String query = "SELECT " + roomTableName + ".*" + " FROM "
                 + QiscusDb.RoomTable.TABLE_NAME
-                + " LEFT JOIN "+ commentTableName
+                + " LEFT JOIN " + commentTableName
                 + " ON " + roomTableName + "." + QiscusDb.RoomTable.COLUMN_ID
                 + " = " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_ROOM_ID
                 + " AND " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_DELETED + " != 1"
