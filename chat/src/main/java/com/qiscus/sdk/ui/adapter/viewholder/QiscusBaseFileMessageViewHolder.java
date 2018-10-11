@@ -43,10 +43,14 @@ import java.io.File;
 public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
         implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
 
-    @NonNull protected TextView fileNameView;
-    @Nullable protected TextView fileTypeView;
-    @Nullable protected QiscusProgressView progressView;
-    @Nullable protected ImageView downloadIconView;
+    @NonNull
+    protected TextView fileNameView;
+    @Nullable
+    protected TextView fileTypeView;
+    @Nullable
+    protected QiscusProgressView progressView;
+    @Nullable
+    protected ImageView downloadIconView;
 
     protected int rightProgressFinishedColor;
     protected int leftProgressFinishedColor;

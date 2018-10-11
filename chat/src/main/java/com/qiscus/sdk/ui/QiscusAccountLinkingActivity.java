@@ -108,6 +108,28 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
         webView.setWebChromeClient(new QiscusChromeClient());
     }
 
+    private void showSuccessDialog() {
+        success = false; // To prevent showing multiple dialog
+        new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setMessage(successMessage)
+                .setPositiveButton(getString(R.string.qiscus_ok), (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .create()
+                .show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private class QiscusChromeClient extends WebChromeClient {
 
         @Override
@@ -136,28 +158,6 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
                 success = true;
             }
             return super.shouldOverrideUrlLoading(view, request);
-        }
-    }
-
-    private void showSuccessDialog() {
-        success = false; // To prevent showing multiple dialog
-        new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setMessage(successMessage)
-                .setPositiveButton(getString(R.string.qiscus_ok), (dialog, which) -> {
-                    dialog.dismiss();
-                    finish();
-                })
-                .create()
-                .show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
         }
     }
 }

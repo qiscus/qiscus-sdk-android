@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -46,14 +44,14 @@
                 android:maxLines="1"
                 android:text="Custom Toolbar"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/qiscus_primary_text"/>
+                android:textColor="@color/qiscus_primary_text" />
 
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:src="@mipmap/ic_launcher"/>
+                android:src="@mipmap/ic_launcher" />
 
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
@@ -61,5 +59,5 @@
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 </RelativeLayout>

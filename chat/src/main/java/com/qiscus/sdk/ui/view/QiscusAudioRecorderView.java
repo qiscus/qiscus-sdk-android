@@ -40,13 +40,25 @@ import java.io.IOException;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusAudioRecorderView extends LinearLayout {
+    protected long startTime;
     private ImageView buttonStopRecord;
     private ImageView buttonCancelRecord;
     private TextView textViewDuration;
     private QiscusAudioRecorder recorder;
-    protected long startTime;
     private Handler handler;
     private RecordListener listener;
+    private Runnable timer = new Runnable() {
+        @Override
+        public void run() {
+            long currentTime = System.currentTimeMillis();
+            long seconds = (currentTime - startTime) / 1000;
+            String formattedDuration = DateUtils.formatElapsedTime(seconds);
+            textViewDuration.setText(formattedDuration);
+            if (isRecording()) {
+                handler.postDelayed(this, 1000L);
+            }
+        }
+    };
 
     public QiscusAudioRecorderView(Context context) {
         super(context);
@@ -139,19 +151,6 @@ public class QiscusAudioRecorderView extends LinearLayout {
     public void setButtonCancelRecord(@DrawableRes int icon) {
         buttonCancelRecord.setImageResource(icon);
     }
-
-    private Runnable timer = new Runnable() {
-        @Override
-        public void run() {
-            long currentTime = System.currentTimeMillis();
-            long seconds = (currentTime - startTime) / 1000;
-            String formattedDuration = DateUtils.formatElapsedTime(seconds);
-            textViewDuration.setText(formattedDuration);
-            if (isRecording()) {
-                handler.postDelayed(this, 1000L);
-            }
-        }
-    };
 
     public interface RecordListener {
         void onStartRecord();

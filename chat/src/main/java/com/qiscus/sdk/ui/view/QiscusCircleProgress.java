@@ -33,25 +33,6 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.util.QiscusConverterUtil;
 
 public class QiscusCircleProgress extends View implements QiscusProgressView {
-    private Paint textPaint;
-    private RectF rectF = new RectF();
-
-    private float textSize;
-    private int textColor;
-    private int progress = 0;
-    private int max;
-    private int finishedColor;
-    private int unfinishedColor;
-    private String prefixText = "";
-    private String suffixText = "%";
-
-    private final int defaultFinishedColor = Color.rgb(66, 145, 241);
-    private final int defaultUnfinishedColor = Color.rgb(204, 204, 204);
-    private final int defaultTextColor = Color.WHITE;
-    private final int defaultMax = 100;
-    private final float defaultTextSize;
-    private final int minSize;
-
     private static final String INSTANCE_STATE = "saved_instance";
     private static final String INSTANCE_TEXT_COLOR = "text_color";
     private static final String INSTANCE_TEXT_SIZE = "text_size";
@@ -61,7 +42,22 @@ public class QiscusCircleProgress extends View implements QiscusProgressView {
     private static final String INSTANCE_PROGRESS = "progress";
     private static final String INSTANCE_SUFFIX = "suffix";
     private static final String INSTANCE_PREFIX = "prefix";
-
+    private final int defaultFinishedColor = Color.rgb(66, 145, 241);
+    private final int defaultUnfinishedColor = Color.rgb(204, 204, 204);
+    private final int defaultTextColor = Color.WHITE;
+    private final int defaultMax = 100;
+    private final float defaultTextSize;
+    private final int minSize;
+    private Paint textPaint;
+    private RectF rectF = new RectF();
+    private float textSize;
+    private int textColor;
+    private int progress = 0;
+    private int max;
+    private int finishedColor;
+    private int unfinishedColor;
+    private String prefixText = "";
+    private String suffixText = "%";
     private Paint paint = new Paint();
 
     public QiscusCircleProgress(Context context) {
