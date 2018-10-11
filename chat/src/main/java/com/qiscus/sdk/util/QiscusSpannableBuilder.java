@@ -37,9 +37,12 @@ import java.util.Map;
 public class QiscusSpannableBuilder {
     private String message;
     private Map<String, QiscusRoomMember> members;
-    @ColorInt private int mentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
-    @ColorInt private int mentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
-    @ColorInt private int mentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
+    @ColorInt
+    private int mentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
+    @ColorInt
+    private int mentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
+    @ColorInt
+    private int mentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
     private MentionClickHandler mentionClickListener;
 
     public QiscusSpannableBuilder(String message, Map<String, QiscusRoomMember> members) {
