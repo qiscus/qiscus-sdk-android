@@ -35,6 +35,7 @@ public class SampleApps extends Application {
         super.onCreate();
 
         Qiscus.init(this, "dragongo");
+
         Qiscus.getChatConfig()
                 .setEnableLog(true)
                 .setDeleteCommentConfig(new QiscusDeleteCommentConfig()
