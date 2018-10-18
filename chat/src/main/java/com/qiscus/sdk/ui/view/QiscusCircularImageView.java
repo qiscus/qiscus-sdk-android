@@ -295,6 +295,11 @@ public class QiscusCircularImageView extends AppCompatImageView {
     }
 
     @Override
+    public ColorFilter getColorFilter() {
+        return colorFilter;
+    }
+
+    @Override
     public void setColorFilter(ColorFilter cf) {
         if (cf == colorFilter) {
             return;
@@ -303,11 +308,6 @@ public class QiscusCircularImageView extends AppCompatImageView {
         colorFilter = cf;
         applyColorFilter();
         invalidate();
-    }
-
-    @Override
-    public ColorFilter getColorFilter() {
-        return colorFilter;
     }
 
     private void applyColorFilter() {

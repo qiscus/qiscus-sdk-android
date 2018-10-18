@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,10 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/qiscus_light_grey"/>
-    <corners android:topLeftRadius="0dp" android:topRightRadius="0dp"
-             android:bottomLeftRadius="16dp" android:bottomRightRadius="16dp"/>
+    <solid android:color="@color/qiscus_light_grey" />
+    <corners
+        android:bottomLeftRadius="16dp"
+        android:bottomRightRadius="16dp"
+        android:topLeftRadius="0dp"
+        android:topRightRadius="0dp" />
 </shape>

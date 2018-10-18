@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +14,10 @@
   ~ limitations under the License.
   -->
 
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/action_add_images"
-        android:title="@string/qiscus_add_images"/>
+        android:title="@string/qiscus_add_images" />
 
 </menu>

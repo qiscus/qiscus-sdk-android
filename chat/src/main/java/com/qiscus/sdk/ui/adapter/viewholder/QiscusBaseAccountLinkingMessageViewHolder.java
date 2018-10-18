@@ -41,7 +41,8 @@ import org.json.JSONObject;
  */
 public abstract class QiscusBaseAccountLinkingMessageViewHolder extends QiscusBaseTextMessageViewHolder {
 
-    @NonNull protected TextView accountLinkingView;
+    @NonNull
+    protected TextView accountLinkingView;
 
     protected int accountLinkingTextColor;
     protected Drawable accountLinkingBackgroundDrawable;

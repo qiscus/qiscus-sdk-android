@@ -31,8 +31,10 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  * GitHub     : https://github.com/zetbaitsu
  */
 public abstract class QiscusBaseContactViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
-    @NonNull protected TextView contactNameView;
-    @NonNull protected TextView contactIdView;
+    @NonNull
+    protected TextView contactNameView;
+    @NonNull
+    protected TextView contactIdView;
 
     public QiscusBaseContactViewHolder(View itemView, OnItemClickListener itemClickListener,
                                        OnLongItemClickListener longItemClickListener) {
