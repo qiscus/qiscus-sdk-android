@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/qiscus_white"
@@ -26,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:alpha="0.5"
-        android:background="@color/qiscus_light_grey"/>
+        android:background="@color/qiscus_light_grey" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,7 +41,7 @@
                 android:id="@+id/button_cancel_record"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/ic_qiscus_cancel_record"/>
+                android:src="@drawable/ic_qiscus_cancel_record" />
         </FrameLayout>
 
         <TextView
@@ -52,7 +50,7 @@
             android:layout_height="wrap_content"
             android:text="@string/qiscus_audio_duration"
             android:textColor="@color/qiscus_primary_text"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <FrameLayout
             android:layout_width="0dp"
@@ -64,7 +62,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="end"
-                android:src="@drawable/ic_qiscus_send_on"/>
+                android:src="@drawable/ic_qiscus_send_on" />
         </FrameLayout>
     </LinearLayout>
 

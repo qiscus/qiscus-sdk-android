@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
@@ -46,7 +44,7 @@
                     android:layout_width="224dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_qiscus_chat_empty"/>
+                    android:src="@drawable/ic_qiscus_chat_empty" />
 
                 <TextView
                     android:id="@+id/empty_chat_title"
@@ -57,7 +55,7 @@
                     android:text="@string/qiscus_welcome"
                     android:textColor="@color/qiscus_divider"
                     android:textSize="24sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/empty_chat_desc"
@@ -65,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="@string/qiscus_desc_empty_chat"
-                    android:textColor="@color/qiscus_divider"/>
+                    android:textColor="@color/qiscus_divider" />
             </LinearLayout>
 
             <android.support.v4.widget.SwipeRefreshLayout
@@ -76,7 +74,7 @@
                 <com.qiscus.sdk.ui.view.QiscusRecyclerView
                     android:id="@+id/list_message"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
             </android.support.v4.widget.SwipeRefreshLayout>
 
             <TextView
@@ -91,34 +89,34 @@
                 android:text="@string/qiscus_new_message"
                 android:textColor="@color/qiscus_white"
                 android:textSize="14sp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/button_go_bottom"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="end|bottom"
-                android:layout_marginBottom="12dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/qiscus_circle_divider"
                 android:elevation="1dp"
                 android:padding="2dp"
                 android:src="@drawable/ic_qiscus_action_bottom"
                 android:tint="@color/qiscus_secondary_text"
-                android:visibility="gone"/>
+                android:visibility="gone" />
         </FrameLayout>
 
         <com.qiscus.sdk.ui.view.QiscusMentionSuggestionView
             android:id="@+id/mention_suggestion"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <com.qiscus.sdk.ui.view.QiscusReplyPreviewView
             android:id="@+id/reply_preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/box"
@@ -131,7 +129,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1.6dp"
                 android:alpha="0.5"
-                android:background="@color/qiscus_light_grey"/>
+                android:background="@color/qiscus_light_grey" />
 
             <LinearLayout
                 android:id="@+id/field_message_container"
@@ -153,7 +151,6 @@
                     android:maxLines="4"
                     android:nextFocusRight="@+id/button_send"
                     android:padding="8dp"
-                    android:textColorHint="@color/qiscus_secondary_text"
                     android:textColor="@color/qiscus_primary_text"
                     android:textSize="16sp" />
 
@@ -163,7 +160,7 @@
                     android:layout_height="46dp"
                     android:layout_gravity="bottom"
                     android:padding="8dp"
-                    android:src="@drawable/ic_qiscus_attach"/>
+                    android:src="@drawable/ic_qiscus_attach" />
 
             </LinearLayout>
 
@@ -172,8 +169,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:paddingBottom="4dp"
                 android:paddingTop="12dp"
+                android:paddingBottom="4dp"
                 android:visibility="gone"
                 app:alignContent="stretch"
                 app:alignItems="stretch"
@@ -192,13 +189,13 @@
                         android:id="@+id/button_pick_picture"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:background="@drawable/qiscus_camera_button_bg"
                         android:padding="12dp"
-                        android:src="@drawable/ic_qiscus_pick_picture"/>
+                        android:src="@drawable/ic_qiscus_pick_picture" />
 
                     <TextView
                         android:id="@+id/button_pick_picture_text"
@@ -207,7 +204,7 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/qiscus_camera"
                         android:textColor="@color/qiscus_secondary_text"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -223,13 +220,13 @@
                         android:id="@+id/button_add_image"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:background="@drawable/qiscus_gallery_button_bg"
                         android:padding="12dp"
-                        android:src="@drawable/ic_qiscus_add_image"/>
+                        android:src="@drawable/ic_qiscus_add_image" />
 
                     <TextView
                         android:id="@+id/button_add_image_text"
@@ -238,7 +235,7 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/qiscus_gallery"
                         android:textColor="@color/qiscus_secondary_text"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -254,13 +251,13 @@
                         android:id="@+id/button_add_file"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:background="@drawable/qiscus_file_button_bg"
                         android:padding="12dp"
-                        android:src="@drawable/ic_qiscus_add_file"/>
+                        android:src="@drawable/ic_qiscus_add_file" />
 
                     <TextView
                         android:id="@+id/button_add_file_text"
@@ -269,7 +266,7 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/qiscus_file"
                         android:textColor="@color/qiscus_secondary_text"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -285,13 +282,13 @@
                         android:id="@+id/button_add_audio"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:background="@drawable/qiscus_record_button_bg"
                         android:padding="12dp"
-                        android:src="@drawable/ic_qiscus_add_audio"/>
+                        android:src="@drawable/ic_qiscus_add_audio" />
 
                     <TextView
                         android:id="@+id/button_add_audio_text"
@@ -300,7 +297,7 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/qiscus_record"
                         android:textColor="@color/qiscus_secondary_text"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -316,13 +313,13 @@
                         android:id="@+id/button_add_location"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:background="@drawable/qiscus_location_button_bg"
                         android:padding="12dp"
-                        android:src="@drawable/ic_qiscus_location"/>
+                        android:src="@drawable/ic_qiscus_location" />
 
                     <TextView
                         android:id="@+id/button_add_location_text"
@@ -331,7 +328,7 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/qiscus_location"
                         android:textColor="@color/qiscus_secondary_text"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -347,13 +344,13 @@
                         android:id="@+id/button_add_contact"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:background="@drawable/qiscus_contact_button_bg"
                         android:padding="12dp"
-                        android:src="@drawable/ic_qiscus_add_contact"/>
+                        android:src="@drawable/ic_qiscus_add_contact" />
 
                     <TextView
                         android:id="@+id/button_add_contact_text"
@@ -362,7 +359,7 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/qiscus_contact"
                         android:textColor="@color/qiscus_secondary_text"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -376,13 +373,13 @@
                         android:id="@+id/button_keyboard"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:background="@drawable/qiscus_keyboard_button_bg"
                         android:padding="12dp"
-                        android:src="@drawable/ic_qiscus_back_to_keyboard"/>
+                        android:src="@drawable/ic_qiscus_back_to_keyboard" />
 
                 </LinearLayout>
 
@@ -394,7 +391,7 @@
             android:id="@+id/record_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -405,7 +402,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="-7dp"
         android:indeterminate="true"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 
 </RelativeLayout>

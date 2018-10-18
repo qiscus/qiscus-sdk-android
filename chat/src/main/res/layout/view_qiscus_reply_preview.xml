@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -28,28 +26,28 @@
         android:id="@+id/bar"
         android:layout_width="4dp"
         android:layout_height="match_parent"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="2dp"
-        android:background="@color/qiscus_primary"/>
+        android:layout_marginBottom="2dp"
+        android:background="@color/qiscus_primary" />
 
     <ImageView
         android:id="@+id/origin_image"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="4dp"
         android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
         android:scaleType="centerCrop"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -57,13 +55,13 @@
             android:id="@+id/origin_sender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
             android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/qiscus_primary"
             android:textSize="14sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -79,19 +77,19 @@
                 android:layout_marginRight="1dp"
                 android:src="@drawable/ic_qiscus_file"
                 android:tint="@color/qiscus_secondary_text"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/origin_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginLeft="1dp"
                 android:layout_marginStart="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginBottom="4dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:textColor="@color/qiscus_secondary_text"
-                android:textSize="12sp"/>
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -100,11 +98,11 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_qiscus_action_close"
-        android:tint="@color/qiscus_secondary_text"/>
+        android:tint="@color/qiscus_secondary_text" />
 </LinearLayout>

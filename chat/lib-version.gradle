@@ -31,7 +31,7 @@ ext {
     siteUrl = 'https://github.com/qiscus/qiscus-sdk-android'
     gitUrl = 'https://github.com/qiscus/qiscus-sdk-android.git'
 
-    libraryVersion = "${chatVersionMajor}.${chatVersionMinor}.${chatVersionPatch}"
+    libraryVersion = "${chatVersionMajor}.${chatVersionMinor}.${chatVersionPatch}-without-emoji"
 
     developerId = 'qiscustech'
     developerName = 'Qiscus Tech'

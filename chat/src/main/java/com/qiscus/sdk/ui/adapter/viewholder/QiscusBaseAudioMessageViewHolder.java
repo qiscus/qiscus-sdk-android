@@ -39,10 +39,14 @@ import com.qiscus.sdk.ui.view.QiscusProgressView;
 public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
         implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener, QiscusComment.PlayingAudioListener {
 
-    @NonNull protected ImageView playButton;
-    @NonNull protected AppCompatSeekBar seekBar;
-    @NonNull protected TextView durationView;
-    @Nullable protected QiscusProgressView progressView;
+    @NonNull
+    protected ImageView playButton;
+    @NonNull
+    protected AppCompatSeekBar seekBar;
+    @NonNull
+    protected TextView durationView;
+    @Nullable
+    protected QiscusProgressView progressView;
 
     protected int playIcon;
     protected int pauseIcon;

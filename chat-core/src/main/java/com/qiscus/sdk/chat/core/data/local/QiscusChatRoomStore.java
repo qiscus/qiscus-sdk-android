@@ -48,7 +48,11 @@ public interface QiscusChatRoomStore {
 
     List<QiscusChatRoom> getChatRooms(int limit);
 
+    List<QiscusChatRoom> getChatRooms(int limit, int offset);
+
     Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit);
+
+    Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit, int offset);
 
     List<QiscusChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds);
 

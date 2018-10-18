@@ -45,14 +45,11 @@ import org.json.JSONObject;
  */
 public class QiscusCarouselViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
 
-    private ViewGroup cardsContainer;
-
     protected int titleTextColor;
     protected int descriptionTextColor;
-
     protected int buttonsTextColor;
     protected int buttonsBackgroundColor;
-
+    private ViewGroup cardsContainer;
     private QiscusCarouselItemView.CarouselItemClickListener carouselItemClickListener;
     private QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener;
 

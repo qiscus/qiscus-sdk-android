@@ -47,16 +47,8 @@ public final class QiscusPermissionsUtil {
 
     }
 
-    public interface PermissionCallbacks extends ActivityCompat.OnRequestPermissionsResultCallback {
-
-        void onPermissionsGranted(int requestCode, List<String> perms);
-
-        void onPermissionsDenied(int requestCode, List<String> perms);
-
-    }
-
     public static boolean hasPermissions(Context context, String... perms) {
-        // Always return true for SDK < M, let the system deal with the permissions 
+        // Always return true for SDK < M, let the system deal with the permissions
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "hasPermissions: API version < M, returning true by default");
             return true;
@@ -185,10 +177,10 @@ public final class QiscusPermissionsUtil {
 
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor
                         (ContextCompat.getColor(Qiscus.getApps(),
-                        Qiscus.getChatConfig().getDialogPermissionPositiveButtonTextColor()));
+                                Qiscus.getChatConfig().getDialogPermissionPositiveButtonTextColor()));
                 dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor
                         (ContextCompat.getColor(Qiscus.getApps(),
-                        Qiscus.getChatConfig().getDialogPermissionNegativeButtonTextColor()));
+                                Qiscus.getChatConfig().getDialogPermissionNegativeButtonTextColor()));
 
                 return true;
             }
@@ -285,5 +277,13 @@ public final class QiscusPermissionsUtil {
         if (!(object instanceof PermissionCallbacks)) {
             throw new IllegalArgumentException("Caller must implement PermissionCallbacks.");
         }
+    }
+
+    public interface PermissionCallbacks extends ActivityCompat.OnRequestPermissionsResultCallback {
+
+        void onPermissionsGranted(int requestCode, List<String> perms);
+
+        void onPermissionsDenied(int requestCode, List<String> perms);
+
     }
 }

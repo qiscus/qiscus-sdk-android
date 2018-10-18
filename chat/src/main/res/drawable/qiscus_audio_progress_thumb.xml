@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016 Qiscus.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +15,9 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-       android:shape="oval">
+    android:shape="oval">
     <size
         android:width="12dp"
-        android:height="12dp"/>
-    <solid android:color="#000"/>
+        android:height="12dp" />
+    <solid android:color="#000" />
 </shape>

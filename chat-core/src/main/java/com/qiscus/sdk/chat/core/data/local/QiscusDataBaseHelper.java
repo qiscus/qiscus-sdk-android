@@ -201,9 +201,25 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public List<QiscusChatRoom> getChatRooms(int limit) {
-        String query = "SELECT * FROM "
+        return getChatRooms(limit, -1);
+    }
+
+    @Override
+    public List<QiscusChatRoom> getChatRooms(int limit, int offset) {
+        String roomTableName = QiscusDb.RoomTable.TABLE_NAME;
+        String commentTableName = QiscusDb.CommentTable.TABLE_NAME;
+        String query = "SELECT " + roomTableName + ".*" + " FROM "
                 + QiscusDb.RoomTable.TABLE_NAME
-                + " LIMIT " + limit;
+                + " LEFT JOIN " + commentTableName
+                + " ON " + roomTableName + "." + QiscusDb.RoomTable.COLUMN_ID
+                + " = " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_ROOM_ID
+                + " AND " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_DELETED + " != 1"
+                + " AND " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " != 1"
+                + " GROUP BY " + roomTableName + "." + QiscusDb.RoomTable.COLUMN_ID
+                + " ORDER BY " + commentTableName + "." + QiscusDb.CommentTable.COLUMN_TIME
+                + " DESC "
+                + " LIMIT " + limit
+                + " OFFSET " + offset;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
         List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
@@ -217,14 +233,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusChatRooms.add(qiscusChatRoom);
         }
         cursor.close();
-        sortRooms(qiscusChatRooms);
         return qiscusChatRooms;
     }
 
     @Override
     public Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit) {
+        return getObservableChatRooms(limit, -1);
+    }
+
+    @Override
+    public Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit, int offset) {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getChatRooms(limit));
+            subscriber.onNext(getChatRooms(limit, offset));
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }

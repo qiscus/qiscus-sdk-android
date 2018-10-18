@@ -79,46 +79,32 @@ public class QiscusTouchImageView extends AppCompatImageView {
     // saved prior to the screen rotating.
     //
     private Matrix matrix, prevMatrix;
-
-    private enum State {
-        NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM
-    }
-
     private State state;
-
     private float minScale;
     private float maxScale;
     private float superMinScale;
     private float superMaxScale;
     private float[] m;
-
     private Context context;
     private Fling fling;
-
     private ScaleType mScaleType;
-
     private boolean imageRenderedAtLeastOnce;
     private boolean onDrawReady;
-
     private ZoomVariables delayedZoomVariables;
-
     //
     // Size of view and previous view size (ie before rotation)
     //
     private int viewWidth, viewHeight, prevViewWidth, prevViewHeight;
-
     //
     // Size of image when it is stretched to fit view. Before and After
     // rotation.
     //
     private float matchViewWidth, matchViewHeight, prevMatchViewWidth, prevMatchViewHeight;
-
     private ScaleGestureDetector mScaleDetector;
     private GestureDetector mGestureDetector;
     private GestureDetector.OnDoubleTapListener doubleTapListener = null;
     private OnTouchListener userTouchListener = null;
     private OnTouchImageViewListener touchImageViewListener = null;
-
     public QiscusTouchImageView(Context context) {
         super(context);
         sharedConstructing(context);
@@ -199,6 +185,11 @@ public class QiscusTouchImageView extends AppCompatImageView {
     }
 
     @Override
+    public ScaleType getScaleType() {
+        return mScaleType;
+    }
+
+    @Override
     public void setScaleType(ScaleType type) {
         if (type == ScaleType.FIT_START || type == ScaleType.FIT_END) {
             throw new UnsupportedOperationException(
@@ -219,11 +210,6 @@ public class QiscusTouchImageView extends AppCompatImageView {
                 setZoom(this);
             }
         }
-    }
-
-    @Override
-    public ScaleType getScaleType() {
-        return mScaleType;
     }
 
     /**
@@ -351,16 +337,6 @@ public class QiscusTouchImageView extends AppCompatImageView {
     }
 
     /**
-     * Get the current zoom. This is the zoom relative to the initial scale, not
-     * the original resource.
-     *
-     * @return current zoom multiplier.
-     */
-    public float getCurrentZoom() {
-        return normalizedScale;
-    }
-
-    /**
      * Set the min zoom multiplier. Default value: 1.
      *
      * @param min min zoom multiplier.
@@ -368,6 +344,16 @@ public class QiscusTouchImageView extends AppCompatImageView {
     public void setMinZoom(float min) {
         minScale = min;
         superMinScale = SUPER_MIN_MULTIPLIER * minScale;
+    }
+
+    /**
+     * Get the current zoom. This is the zoom relative to the initial scale, not
+     * the original resource.
+     *
+     * @return current zoom multiplier.
+     */
+    public float getCurrentZoom() {
+        return normalizedScale;
     }
 
     /**
@@ -806,6 +792,106 @@ public class QiscusTouchImageView extends AppCompatImageView {
         return true;
     }
 
+    private void scaleImage(double deltaScale, float focusX, float focusY,
+                            boolean stretchImageToSuper) {
+
+        float lowerScale, upperScale;
+        if (stretchImageToSuper) {
+            lowerScale = superMinScale;
+            upperScale = superMaxScale;
+
+        } else {
+            lowerScale = minScale;
+            upperScale = maxScale;
+        }
+
+        float origScale = normalizedScale;
+        normalizedScale *= deltaScale;
+        if (normalizedScale > upperScale) {
+            normalizedScale = upperScale;
+            deltaScale = upperScale / origScale;
+        } else if (normalizedScale < lowerScale) {
+            normalizedScale = lowerScale;
+            deltaScale = lowerScale / origScale;
+        }
+
+        matrix.postScale((float) deltaScale, (float) deltaScale, focusX, focusY);
+        fixScaleTrans();
+    }
+
+    /**
+     * This function will transform the coordinates in the touch event to the
+     * coordinate system of the drawable that the imageview contain
+     *
+     * @param x            x-coordinate of touch event
+     * @param y            y-coordinate of touch event
+     * @param clipToBitmap Touch event may occur within view, but outside image content.
+     *                     True, to clip return value to the bounds of the bitmap size.
+     * @return Coordinates of the point touched, in the coordinate system of the
+     * original drawable.
+     */
+    private PointF transformCoordTouchToBitmap(float x, float y,
+                                               boolean clipToBitmap) {
+        matrix.getValues(m);
+        float origW = getDrawable().getIntrinsicWidth();
+        float origH = getDrawable().getIntrinsicHeight();
+        float transX = m[Matrix.MTRANS_X];
+        float transY = m[Matrix.MTRANS_Y];
+        float finalX = ((x - transX) * origW) / getImageWidth();
+        float finalY = ((y - transY) * origH) / getImageHeight();
+
+        if (clipToBitmap) {
+            finalX = Math.min(Math.max(finalX, 0), origW);
+            finalY = Math.min(Math.max(finalY, 0), origH);
+        }
+
+        return new PointF(finalX, finalY);
+    }
+
+    /**
+     * Inverse of transformCoordTouchToBitmap. This function will transform the
+     * coordinates in the drawable's coordinate system to the view's coordinate
+     * system.
+     *
+     * @param bx x-coordinate in original bitmap coordinate system
+     * @param by y-coordinate in original bitmap coordinate system
+     * @return Coordinates of the point in the view's coordinate system.
+     */
+    private PointF transformCoordBitmapToTouch(float bx, float by) {
+        matrix.getValues(m);
+        float origW = getDrawable().getIntrinsicWidth();
+        float origH = getDrawable().getIntrinsicHeight();
+        float px = bx / origW;
+        float py = by / origH;
+        float finalX = m[Matrix.MTRANS_X] + getImageWidth() * px;
+        float finalY = m[Matrix.MTRANS_Y] + getImageHeight() * py;
+        return new PointF(finalX, finalY);
+    }
+
+    @TargetApi(VERSION_CODES.JELLY_BEAN)
+    private void compatPostOnAnimation(Runnable runnable) {
+        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+            postOnAnimation(runnable);
+        } else {
+            postDelayed(runnable, 1000 / 60);
+        }
+    }
+
+    private void printMatrixInfo() {
+        float[] n = new float[9];
+        matrix.getValues(n);
+        QiscusLogger.print("TouchImageView", DEBUG + "Scale: " + n[Matrix.MSCALE_X] + " TransX: "
+                + n[Matrix.MTRANS_X] + " TransY: " + n[Matrix.MTRANS_Y]);
+    }
+
+    private enum State {
+        NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM
+    }
+
+    public interface OnTouchImageViewListener {
+        void onMove();
+    }
+
     /**
      * Gesture Listener detects a single click or long click and passes that on
      * to the view's listener.
@@ -862,10 +948,6 @@ public class QiscusTouchImageView extends AppCompatImageView {
         public boolean onDoubleTapEvent(MotionEvent e) {
             return doubleTapListener != null && doubleTapListener.onDoubleTapEvent(e);
         }
-    }
-
-    public interface OnTouchImageViewListener {
-        void onMove();
     }
 
     /**
@@ -988,33 +1070,6 @@ public class QiscusTouchImageView extends AppCompatImageView {
         }
     }
 
-    private void scaleImage(double deltaScale, float focusX, float focusY,
-                            boolean stretchImageToSuper) {
-
-        float lowerScale, upperScale;
-        if (stretchImageToSuper) {
-            lowerScale = superMinScale;
-            upperScale = superMaxScale;
-
-        } else {
-            lowerScale = minScale;
-            upperScale = maxScale;
-        }
-
-        float origScale = normalizedScale;
-        normalizedScale *= deltaScale;
-        if (normalizedScale > upperScale) {
-            normalizedScale = upperScale;
-            deltaScale = upperScale / origScale;
-        } else if (normalizedScale < lowerScale) {
-            normalizedScale = lowerScale;
-            deltaScale = lowerScale / origScale;
-        }
-
-        matrix.postScale((float) deltaScale, (float) deltaScale, focusX, focusY);
-        fixScaleTrans();
-    }
-
     /**
      * DoubleTapZoom calls a series of runnables which apply an animated zoom
      * in/out graphic to the image.
@@ -1023,8 +1078,8 @@ public class QiscusTouchImageView extends AppCompatImageView {
      */
     private class DoubleTapZoom implements Runnable {
 
-        private long startTime;
         private static final float ZOOM_TIME = 500;
+        private long startTime;
         private float startZoom, targetZoom;
         private float bitmapX, bitmapY;
         private boolean stretchImageToSuper;
@@ -1120,55 +1175,6 @@ public class QiscusTouchImageView extends AppCompatImageView {
             double zoom = startZoom + t * (targetZoom - startZoom);
             return zoom / normalizedScale;
         }
-    }
-
-    /**
-     * This function will transform the coordinates in the touch event to the
-     * coordinate system of the drawable that the imageview contain
-     *
-     * @param x            x-coordinate of touch event
-     * @param y            y-coordinate of touch event
-     * @param clipToBitmap Touch event may occur within view, but outside image content.
-     *                     True, to clip return value to the bounds of the bitmap size.
-     * @return Coordinates of the point touched, in the coordinate system of the
-     * original drawable.
-     */
-    private PointF transformCoordTouchToBitmap(float x, float y,
-                                               boolean clipToBitmap) {
-        matrix.getValues(m);
-        float origW = getDrawable().getIntrinsicWidth();
-        float origH = getDrawable().getIntrinsicHeight();
-        float transX = m[Matrix.MTRANS_X];
-        float transY = m[Matrix.MTRANS_Y];
-        float finalX = ((x - transX) * origW) / getImageWidth();
-        float finalY = ((y - transY) * origH) / getImageHeight();
-
-        if (clipToBitmap) {
-            finalX = Math.min(Math.max(finalX, 0), origW);
-            finalY = Math.min(Math.max(finalY, 0), origH);
-        }
-
-        return new PointF(finalX, finalY);
-    }
-
-    /**
-     * Inverse of transformCoordTouchToBitmap. This function will transform the
-     * coordinates in the drawable's coordinate system to the view's coordinate
-     * system.
-     *
-     * @param bx x-coordinate in original bitmap coordinate system
-     * @param by y-coordinate in original bitmap coordinate system
-     * @return Coordinates of the point in the view's coordinate system.
-     */
-    private PointF transformCoordBitmapToTouch(float bx, float by) {
-        matrix.getValues(m);
-        float origW = getDrawable().getIntrinsicWidth();
-        float origH = getDrawable().getIntrinsicHeight();
-        float px = bx / origW;
-        float py = by / origH;
-        float finalX = m[Matrix.MTRANS_X] + getImageWidth() * px;
-        float finalY = m[Matrix.MTRANS_Y] + getImageHeight() * py;
-        return new PointF(finalX, finalY);
     }
 
     /**
@@ -1318,15 +1324,6 @@ public class QiscusTouchImageView extends AppCompatImageView {
         }
     }
 
-    @TargetApi(VERSION_CODES.JELLY_BEAN)
-    private void compatPostOnAnimation(Runnable runnable) {
-        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-            postOnAnimation(runnable);
-        } else {
-            postDelayed(runnable, 1000 / 60);
-        }
-    }
-
     private class ZoomVariables {
         public float scale;
         public float focusX;
@@ -1340,12 +1337,5 @@ public class QiscusTouchImageView extends AppCompatImageView {
             this.focusY = focusY;
             this.scaleType = scaleType;
         }
-    }
-
-    private void printMatrixInfo() {
-        float[] n = new float[9];
-        matrix.getValues(n);
-        QiscusLogger.print("TouchImageView", DEBUG + "Scale: " + n[Matrix.MSCALE_X] + " TransX: "
-                + n[Matrix.MTRANS_X] + " TransY: " + n[Matrix.MTRANS_Y]);
     }
 }

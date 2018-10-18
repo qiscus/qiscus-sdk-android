@@ -37,9 +37,17 @@ public class QiscusImageCompressionConfig {
         this.quality = quality;
     }
 
+    public float getMaxHeight() {
+        return maxHeight;
+    }
+
     public QiscusImageCompressionConfig setMaxHeight(float maxHeight) {
         this.maxHeight = maxHeight;
         return this;
+    }
+
+    public float getMaxWidth() {
+        return maxWidth;
     }
 
     public QiscusImageCompressionConfig setMaxWidth(float maxWidth) {
@@ -47,20 +55,12 @@ public class QiscusImageCompressionConfig {
         return this;
     }
 
+    public int getQuality() {
+        return quality;
+    }
+
     public QiscusImageCompressionConfig setQuality(int quality) {
         this.quality = quality;
         return this;
-    }
-
-    public float getMaxHeight() {
-        return maxHeight;
-    }
-
-    public float getMaxWidth() {
-        return maxWidth;
-    }
-
-    public int getQuality() {
-        return quality;
     }
 }

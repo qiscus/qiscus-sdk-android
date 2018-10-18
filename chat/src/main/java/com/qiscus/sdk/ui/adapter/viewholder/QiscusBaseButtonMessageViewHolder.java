@@ -48,7 +48,8 @@ import java.util.List;
  */
 public abstract class QiscusBaseButtonMessageViewHolder extends QiscusBaseTextMessageViewHolder {
 
-    @NonNull protected ViewGroup buttonsContainer;
+    @NonNull
+    protected ViewGroup buttonsContainer;
 
     protected int buttonsTextColor;
     protected Drawable buttonsBackgroundDrawable;
