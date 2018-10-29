@@ -643,10 +643,23 @@ Get room list from local database.
 /**
  * Get room list
  *
- * count (integer) the maximum size of list room
+ * limit (integer) the maximum size of list room
+ * offset (integer)
  */
  
-Qiscus.getDataStore().getChatRooms(count);
+Qiscus.getDataStore().getChatRooms(limit, offset);
+
+//or only using limit
+
+Qiscus.getDataStore().getChatRooms(limit);
+
+/**
+ * or you want return observable
+ */
+ 
+Qiscus.getDataStore().getObservableChatRooms(limit, offset);
+
+Qiscus.getDataStore().getObservableChatRooms(limit);
 ```
 
 ### Update Room
