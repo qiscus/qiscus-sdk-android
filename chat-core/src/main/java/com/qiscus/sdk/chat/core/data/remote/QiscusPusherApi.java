@@ -518,6 +518,18 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 }, QiscusErrorLogger::print);
     }
 
+    public void setEvent() {
+
+    }
+
+    public void listenEvent() {
+
+    }
+
+    public void unlistenEvent() {
+
+    }
+
     private void checkAndConnect() {
         try {
             if (!mqttAndroidClient.isConnected()) {
