@@ -537,7 +537,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             mqttAndroidClient.publish("r/" + roomId + "/" + roomId + "/e", message);
         } catch (MqttException | NullPointerException | IllegalArgumentException | JSONException e) {
             //Do nothing
-            e.printStackTrace();
         }
     }
 
