@@ -16,6 +16,8 @@
 
 package com.qiscus.sdk.chat.core.event;
 
+import org.json.JSONObject;
+
 /**
  * Created on : October 31, 2016
  * Author     : zetbaitsu
@@ -29,6 +31,7 @@ public class QiscusChatRoomEvent {
     private boolean typing;
     private String user;
     private Event event;
+    private JSONObject eventData;
 
     public long getRoomId() {
         return roomId;
@@ -84,6 +87,15 @@ public class QiscusChatRoomEvent {
         return this;
     }
 
+    public JSONObject getEventData() {
+        return eventData;
+    }
+
+    public QiscusChatRoomEvent setEventData(JSONObject data) {
+        this.eventData = data;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "QiscusChatRoomEvent{" +
@@ -93,10 +105,11 @@ public class QiscusChatRoomEvent {
                 ", typing=" + typing +
                 ", user='" + user + '\'' +
                 ", event=" + event +
+                ", eventData=" + eventData +
                 '}';
     }
 
     public enum Event {
-        TYPING, DELIVERED, READ
+        TYPING, DELIVERED, READ, CUSTOM
     }
 }

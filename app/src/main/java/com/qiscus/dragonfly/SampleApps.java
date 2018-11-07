@@ -45,5 +45,7 @@ public class SampleApps extends Application {
                         .setEnableHardDelete(true));
 
         Stetho.initializeWithDefaults(this);
+
+
     }
 }

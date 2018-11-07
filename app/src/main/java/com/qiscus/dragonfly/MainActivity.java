@@ -27,8 +27,12 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.ui.QiscusChannelActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -37,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mLoginButton;
     private ProgressDialog mProgressDialog;
     private TextView mVersion;
+    private boolean publishCustomEvent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,5 +211,17 @@ public class MainActivity extends AppCompatActivity {
         Qiscus.getChatConfig()
                 .setSendButtonIcon(R.drawable.ic_qiscus_send_on)
                 .setShowAttachmentPanelIcon(R.drawable.ic_qiscus_send_off);
+    }
+
+    public void publishEvent(View view) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("msg", "Listening Music...");
+            data.put("active", !publishCustomEvent);
+
+            QiscusPusherApi.getInstance().setEvent(1353686, data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
