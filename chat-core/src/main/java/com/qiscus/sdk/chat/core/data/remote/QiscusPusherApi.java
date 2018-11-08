@@ -662,7 +662,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             JSONObject eventPayload = parseEventData(message);
             try {
                 if (eventPayload != null &&
-                        eventPayload.getString("sender").equals(qiscusAccount.getEmail())) {
+                        !eventPayload.getString("sender").equals(qiscusAccount.getEmail())) {
                     QiscusChatRoomEvent event = new QiscusChatRoomEvent()
                             .setRoomId(Long.parseLong(data[1]))
                             .setUser(eventPayload.getString("sender"))
