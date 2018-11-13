@@ -505,7 +505,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public void setUserRead(long roomId, long commentId) {
         Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
                 .filter(room -> room != null)
-                .filter(room -> !room.isChannel())
                 .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
