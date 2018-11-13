@@ -73,6 +73,14 @@
             android:onClick="openChannel"
             android:text="Open Channel" />
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="publishEvent"
+            android:text="Publish Listen Music"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 
     <TextView

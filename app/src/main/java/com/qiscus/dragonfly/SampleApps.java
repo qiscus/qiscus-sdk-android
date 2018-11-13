@@ -22,6 +22,8 @@ import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 
+import static com.qiscus.dragonfly.BuildConfig.QISCUS_SDK_APP_ID;
+
 /**
  * Created on : August 18, 2016
  * Author     : zetbaitsu
@@ -34,7 +36,7 @@ public class SampleApps extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Qiscus.init(this, "dragongo");
+        Qiscus.init(this, QISCUS_SDK_APP_ID);
 
         Qiscus.getChatConfig()
                 .setEnableLog(true)

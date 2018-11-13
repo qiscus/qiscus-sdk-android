@@ -83,11 +83,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private QiscusAccount qiscusAccount;
     private Runnable fallBackListenRoom;
     private Runnable fallBackListenUserStatus;
+    private Runnable fallbackListenEvent;
     private ScheduledFuture<?> scheduledConnect;
     private ScheduledFuture<?> scheduledListenComment;
     private ScheduledFuture<?> scheduledListenNotification;
     private ScheduledFuture<?> scheduledListenRoom;
     private ScheduledFuture<?> scheduledListenUserStatus;
+    private ScheduledFuture<?> scheduledListenEvent;
     private boolean connecting;
     private Runnable fallbackConnect = this::connect;
     private Runnable fallBackListenComment = this::listenComment;
@@ -366,6 +368,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         if (scheduledListenUserStatus != null) {
             scheduledListenUserStatus.cancel(true);
         }
+        if (scheduledListenEvent != null) {
+            scheduledListenEvent.cancel(true);
+            scheduledListenEvent = null;
+        }
     }
 
     public void disconnect() {
@@ -499,7 +505,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public void setUserRead(long roomId, long commentId) {
         Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
                 .filter(room -> room != null)
-                .filter(room -> !room.isChannel())
                 .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -516,6 +521,48 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {
                 }, QiscusErrorLogger::print);
+    }
+
+    public void setEvent(long roomId, JSONObject data) {
+        checkAndConnect();
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("sender", qiscusAccount.getEmail());
+            payload.put("data", data);
+
+            MqttMessage message = new MqttMessage();
+            message.setPayload((payload.toString().getBytes()));
+
+            mqttAndroidClient.publish("r/" + roomId + "/" + roomId + "/e", message);
+        } catch (MqttException | NullPointerException | IllegalArgumentException | JSONException e) {
+            //Do nothing
+        }
+    }
+
+    public void listenEvent(long roomId) {
+        QiscusLogger.print(TAG, "Listening event...");
+        fallbackListenEvent = () -> listenEvent(roomId);
+        try {
+            mqttAndroidClient.subscribe("r/" + roomId + "/" + roomId + "/e", 2);
+        } catch (MqttException e) {
+            //Do nothing
+        } catch (NullPointerException | IllegalArgumentException e) {
+            connect();
+            scheduledListenEvent = QiscusAndroidUtil.runOnBackgroundThread(fallbackListenEvent, RETRY_PERIOD);
+        }
+    }
+
+    public void unlistenEvent(long roomId) {
+        try {
+            mqttAndroidClient.unsubscribe("r/" + roomId + "/" + roomId + "/e");
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+            //Do nothing
+        }
+        if (scheduledListenEvent != null) {
+            scheduledListenEvent.cancel(true);
+            scheduledListenEvent = null;
+        }
+        fallbackListenEvent = null;
     }
 
     private void checkAndConnect() {
@@ -609,7 +656,32 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                         calendar.getTime());
                 EventBus.getDefault().post(event);
             }
+        } else if (topic.startsWith("r/") && topic.endsWith("/e")) {
+            String[] data = topic.split("/");
+            JSONObject eventPayload = parseEventData(message);
+            try {
+                if (eventPayload != null &&
+                        !eventPayload.getString("sender").equals(qiscusAccount.getEmail())) {
+                    QiscusChatRoomEvent event = new QiscusChatRoomEvent()
+                            .setRoomId(Long.parseLong(data[1]))
+                            .setUser(eventPayload.getString("sender"))
+                            .setEvent(QiscusChatRoomEvent.Event.CUSTOM)
+                            .setEventData(eventPayload.getJSONObject("data"));
+                    EventBus.getDefault().post(event);
+                }
+            } catch (JSONException e) {
+                QiscusErrorLogger.print(e);
+            }
         }
+    }
+
+    private JSONObject parseEventData(String message) {
+        try {
+            return new JSONObject(message);
+        } catch (JSONException e) {
+            QiscusErrorLogger.print(e);
+        }
+        return null;
     }
 
     @Override

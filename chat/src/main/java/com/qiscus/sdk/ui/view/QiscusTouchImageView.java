@@ -105,6 +105,7 @@ public class QiscusTouchImageView extends AppCompatImageView {
     private GestureDetector.OnDoubleTapListener doubleTapListener = null;
     private OnTouchListener userTouchListener = null;
     private OnTouchImageViewListener touchImageViewListener = null;
+
     public QiscusTouchImageView(Context context) {
         super(context);
         sharedConstructing(context);

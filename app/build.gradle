@@ -34,6 +34,10 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        buildTypes.each {
+            it.buildConfigField("String", "QISCUS_SDK_APP_ID", QISCUS_SDK_APP_ID)
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

@@ -396,7 +396,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void loadComments(int count) {
-        Observable.merge(getInitRoomData(), getLocalComments(count, true).map(comments -> Pair.create(room, comments)))
+        Observable.merge(getInitRoomData(), getLocalComments(count, true)
+                .map(comments -> Pair.create(room, comments)))
                 .filter(qiscusChatRoomListPair -> qiscusChatRoomListPair != null)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
