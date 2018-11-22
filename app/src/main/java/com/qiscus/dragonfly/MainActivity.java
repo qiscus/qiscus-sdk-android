@@ -27,10 +27,10 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.ui.QiscusChannelActivity;
 
 import org.greenrobot.eventbus.EventBus;
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void onRoomChanged(QiscusChatRoomEvent event) {
-        Toast.makeText(this, event.toString(), Toast.LENGTH_SHORT).show();
+        QiscusLogger.print(event.toString());
     }
 
 }

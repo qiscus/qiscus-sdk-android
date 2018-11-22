@@ -945,7 +945,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         super.onResume();
         onClearNotification();
         QiscusCacheManager.getInstance().setLastChatActivity(true, qiscusChatRoom.getId());
-        notifyLatestRead();
         showCommentDraft();
     }
 
@@ -1393,6 +1392,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 emptyChatHolder.setVisibility(View.GONE);
             }
         }
+        notifyLatestRead();
     }
 
     @Override
