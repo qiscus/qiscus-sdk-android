@@ -1875,6 +1875,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     }
 
+    @Deprecated
     public void deleteCommentsForMe(List<QiscusComment> selectedComments) {
         qiscusChatPresenter.deleteCommentsForMe(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
     }
