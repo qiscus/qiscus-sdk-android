@@ -797,6 +797,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         });
     }
 
+    @Deprecated
     public void deleteCommentsForMe(List<QiscusComment> comments, boolean hardDelete) {
         deleteComments(comments, false, hardDelete);
     }
