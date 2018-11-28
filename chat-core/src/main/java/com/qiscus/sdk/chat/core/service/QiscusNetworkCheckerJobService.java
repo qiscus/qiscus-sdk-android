@@ -28,7 +28,6 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 

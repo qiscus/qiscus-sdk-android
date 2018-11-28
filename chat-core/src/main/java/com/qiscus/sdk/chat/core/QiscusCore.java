@@ -544,7 +544,9 @@ public class QiscusCore {
     public static void clearUser() {
         if (BuildVersionUtil.isOreoOrHigher()) {
             JobScheduler jobScheduler = (JobScheduler) appInstance.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            if (jobScheduler != null) jobScheduler.cancelAll();
+            if (jobScheduler != null) {
+                jobScheduler.cancelAll();
+            }
         }
         localDataManager.clearData();
         dataStore.clear();
