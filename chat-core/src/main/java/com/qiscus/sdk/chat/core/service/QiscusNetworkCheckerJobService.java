@@ -35,6 +35,8 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.concurrent.TimeUnit;
+
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 
 /**
@@ -52,9 +54,8 @@ public class QiscusNetworkCheckerJobService extends JobService {
         QiscusLogger.print(TAG, "scheduleJob: ");
         ComponentName componentName = new ComponentName(context, QiscusNetworkCheckerJobService.class);
         JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
-                .setRequiresCharging(true)
-                .setMinimumLatency(5 * 1000)
-                .setOverrideDeadline(2000)
+                .setMinimumLatency(TimeUnit.SECONDS.toMillis(5))
+                .setOverrideDeadline(TimeUnit.SECONDS.toMillis(10))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
@@ -69,18 +70,12 @@ public class QiscusNetworkCheckerJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         QiscusLogger.print(TAG, "onStartJob: ");
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(CONNECTIVITY_ACTION);
-        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        registerReceiver(networkStateReceiver, intentFilter);
         return true; //tell to the system to keep this job
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
         QiscusLogger.print(TAG, "onStopJob: ");
-        unregisterReceiver(networkStateReceiver);
         return true;  //the system not drop this job
     }
 
@@ -93,18 +88,20 @@ public class QiscusNetworkCheckerJobService extends JobService {
             EventBus.getDefault().register(this);
         }
 
-        if (QiscusCore.hasSetupUser()) {
-            scheduleJob(this);
-        }
         networkStateReceiver = new QiscusNetworkStateReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(CONNECTIVITY_ACTION);
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(networkStateReceiver, intentFilter);
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        unregisterReceiver(networkStateReceiver);
         QiscusLogger.print(TAG, "onDestroy");
         EventBus.getDefault().unregister(this);
-        stopJob();
+        super.onDestroy();
     }
 
     @Override
@@ -130,7 +127,7 @@ public class QiscusNetworkCheckerJobService extends JobService {
         QiscusLogger.print(TAG, "stopJob");
         JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
-            jobScheduler.cancelAll();
+            jobScheduler.cancel(STATIC_JOB_ID);
         }
     }
 }

@@ -17,6 +17,7 @@
 package com.qiscus.sdk.chat.core;
 
 import android.app.Application;
+import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -541,6 +542,10 @@ public class QiscusCore {
      * Clear all current user qiscus data, you can call this method when user logout for example.
      */
     public static void clearUser() {
+        if (BuildVersionUtil.isOreoOrHigher()) {
+            JobScheduler jobScheduler = (JobScheduler) appInstance.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            if (jobScheduler != null) jobScheduler.cancelAll();
+        }
         localDataManager.clearData();
         dataStore.clear();
         QiscusCacheManager.getInstance().clearData();

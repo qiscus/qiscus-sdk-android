@@ -149,7 +149,7 @@ public class QiscusSyncJobService extends JobService {
     private void stopSync() {
         JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
-            jobScheduler.cancelAll();
+            jobScheduler.cancel(STATIC_JOB_ID);
         }
     }
 
@@ -170,7 +170,6 @@ public class QiscusSyncJobService extends JobService {
     public void onDestroy() {
         QiscusLogger.print(TAG, "Destroying...");
         EventBus.getDefault().unregister(this);
-        stopSync();
         super.onDestroy();
     }
 
