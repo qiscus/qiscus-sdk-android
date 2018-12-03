@@ -19,11 +19,11 @@ apply plugin: 'me.tatarka.retrolambda'
 apply from: rootProject.file('gradle/quality.gradle')
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.qiscus.dragonfly"
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -60,10 +60,13 @@ android {
 
 buildscript {
     repositories {
+        google()
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
+        classpath 'com.google.gms:google-services:4.2.0'
     }
 }
 
