@@ -20,31 +20,33 @@
 
 
 repositories {
+    google()
     mavenCentral()
     maven { url "https://jitpack.io" }
-    google()
 }
 
 ext {
 
     minSDKVersion = 16
-    targetSDKVersion = 27
-    compileSDKVersion = 27
+    targetSDKVersion = 28
+    compileSDKVersion = 28
 
     versions = [
-            support        : "27.1.1",
-            playService    : "12.0.1",
-            okHttp         : "3.9.1",
-            retrofit       : "2.3.0",
+            support          : "28.0.0",
+            playService      : "16.0.0",
+            firebaseCore     : "16.0.5",
+            firebaseMessaging: "17.3.4",
+            okHttp           : "3.9.1",
+            retrofit         : "2.3.0",
 
-            nirmana        : "1.2.0",
-            manggil        : "1.0.1",
-            jupuk          : "1.1.1",
+            nirmana          : "1.2.1",
+            manggil          : "1.0.1",
+            jupuk            : "1.1.2",
 
-            rxJava         : "1.3.4",
-            rxAndroid      : "1.2.1",
+            rxJava           : "1.3.4",
+            rxAndroid        : "1.2.1",
 
-            trelloLifecycle: "1.0"
+            trelloLifecycle  : "1.0"
     ]
 
     supportDeps = [
@@ -58,8 +60,8 @@ ext {
     ]
 
     firebaseDeps = [
-            core     : "com.google.firebase:firebase-core:${versions.playService}",
-            messaging: "com.google.firebase:firebase-messaging:${versions.playService}"
+            core     : "com.google.firebase:firebase-core:$versions.firebaseCore",
+            messaging: "com.google.firebase:firebase-messaging:$versions.firebaseMessaging"
     ]
 
     qiscusUtilDeps = [

@@ -62,9 +62,9 @@ android {
 
 buildscript {
     repositories {
+        google()
         mavenCentral()
         jcenter()
-        google()
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
