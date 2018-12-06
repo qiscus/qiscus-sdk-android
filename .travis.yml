@@ -28,4 +28,4 @@ before_install:
   - yes | sdkmanager "platforms;android-28"
 
 script:
-  - ./gradlew check -PdisablePreDex --continue --stacktrace
+  - ./gradlew checkstyle -PdisablePreDex --continue --stacktrace
