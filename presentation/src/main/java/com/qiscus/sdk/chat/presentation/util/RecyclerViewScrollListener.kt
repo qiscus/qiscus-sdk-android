@@ -11,7 +11,7 @@ class RecyclerViewScrollListener(private val linearLayoutManager: LinearLayoutMa
     private var onMiddle: Boolean = false
 
 
-    override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
 
         if (linearLayoutManager.findFirstVisibleItemPosition() <= 0 && !onTop) {

@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
     private fun authenticate() {
         val authenticate = useCaseFactory.authenticateWithKey()
 
-        authenticate.execute(AuthenticateWithKey.Params("zetra255@gmail.com", "12345678", "Zetra"),
+        authenticate.execute(AuthenticateWithKey.Params("zetra25@gmail.com", "12345678", "Zetra"),
                 Action {
                     Log.d("ZETRA", "Login with: $it")
                     loginButton.text = "Logout"

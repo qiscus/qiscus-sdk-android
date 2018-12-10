@@ -51,28 +51,28 @@ open class MessageAdapter : SortedAdapter<MessageViewModel, RecyclerView.ViewHol
         return delegatesManager.getItemViewType(data, position)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
-        return delegatesManager.onCreateViewHolder(parent!!, viewType)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return delegatesManager.onCreateViewHolder(parent, viewType)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
-        delegatesManager.onBindViewHolder(data, position, holder!!)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        delegatesManager.onBindViewHolder(data, position, holder)
     }
 
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder?) {
-        delegatesManager.onViewRecycled(holder!!)
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        delegatesManager.onViewRecycled(holder)
     }
 
-    override fun onFailedToRecycleView(holder: RecyclerView.ViewHolder?): Boolean {
-        return delegatesManager.onFailedToRecycleView(holder!!)
+    override fun onFailedToRecycleView(holder: RecyclerView.ViewHolder): Boolean {
+        return delegatesManager.onFailedToRecycleView(holder)
     }
 
-    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder?) {
-        delegatesManager.onViewAttachedToWindow(holder!!)
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        delegatesManager.onViewAttachedToWindow(holder)
     }
 
-    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder?) {
-        delegatesManager.onViewDetachedFromWindow(holder!!)
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        delegatesManager.onViewDetachedFromWindow(holder)
     }
 
     fun getSelectedMessages(): List<MessageViewModel> {

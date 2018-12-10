@@ -16,8 +16,8 @@
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        jcenter()
         maven { url "https://dl.bintray.com/qiscustech/maven" }
     }
 }
@@ -25,28 +25,31 @@ allprojects {
 ext {
     //Android
     androidMinSdkVersion = 16
-    androidTargetSdkVersion = 27
-    androidCompileSdkVersion = 27
+    androidTargetSdkVersion = 28
+    androidCompileSdkVersion = 28
 
     //Libraries
-    kotlinVersion = '1.2.21'
+    kotlinVersion = '1.3.10'
 
-    supportLibraryVersion = '27.0.2'
-    androidAnnotationsVersion = '27.0.2'
+    supportLibraryVersion = '28.0.0'
+    androidAnnotationsVersion = '28.0.0'
 
-    rxKotlinVersion = '2.1.0'
+    /**
+     * Please change using kotlin coroutines
+     */
+    rxKotlinVersion = '2.3.0'
     rxAndroidVersion = '2.0.1'
 
-    gsonVersion = '2.8.1'
+    gsonVersion = '2.8.5'
 
-    okHttpVersion = '3.9.1'
-    retrofitVersion = '2.3.0'
+    okHttpVersion = '3.12.0'
+    retrofitVersion = '2.5.0'
     rxunfurlVersion = '0.3.0'
 
     mqttVersion = '1.1.1'
     mqttAndroidVersion = '1.1.1-q'
 
-    glideVersion = '4.0.0'
+    glideVersion = '4.8.0'
 
     manggilVersion = '1.0.1'
 
@@ -68,7 +71,7 @@ ext {
 
     domainDependencies = [
             rxKotlin: "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
-            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}"
+            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
     ]
 
     domainTestDependencies = [
@@ -79,7 +82,7 @@ ext {
 
     dataDependencies = [
             rxKotlin: "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
-            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}"
+            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
     ]
 
     dataTestDependencies = [
@@ -90,7 +93,7 @@ ext {
 
     remoteDependencies = [
             rxKotlin         : "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
-            kotlin           : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
+            kotlin           : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}",
             gson             : "com.google.code.gson:gson:${gsonVersion}",
             okHttp           : "com.squareup.okhttp3:okhttp:${okHttpVersion}",
             okHttpLogger     : "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
@@ -108,7 +111,7 @@ ext {
 
     localDependencies = [
             rxKotlin: "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
-            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
+            kotlin  : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}",
             gson    : "com.google.code.gson:gson:${gsonVersion}"
     ]
 
@@ -122,7 +125,7 @@ ext {
 
     pusherDependencies = [
             rxKotlin   : "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
-            kotlin     : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
+            kotlin     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}",
             gson       : "com.google.code.gson:gson:${gsonVersion}",
             mqtt       : "com.qiscus.mqtt:client:${mqttVersion}",
             mqttAndroid: "com.qiscus.mqtt:android:${mqttAndroidVersion}"
@@ -139,7 +142,7 @@ ext {
     coreDependencies = [
             androidSupportV4: "com.android.support:support-v4:${supportLibraryVersion}",
             rxKotlin        : "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
-            kotlin          : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
+            kotlin          : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}",
             rxAndroid       : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
     ]
 
@@ -154,7 +157,7 @@ ext {
     presentationDependencies = [
             rxKotlin           : "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
             rxAndroid          : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
-            kotlin             : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
+            kotlin             : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}",
             androidAnnotations : "com.android.support:support-annotations:${supportLibraryVersion}",
             glide              : "com.github.bumptech.glide:glide:${glideVersion}",
             androidSupportV4   : "com.android.support:support-v4:${supportLibraryVersion}",
@@ -185,7 +188,7 @@ ext {
             rxKotlin           : "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
             rxAndroid          : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
             glide              : "com.github.bumptech.glide:glide:${glideVersion}",
-            kotlin             : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
+            kotlin             : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}",
             androidAnnotations : "com.android.support:support-annotations:${supportLibraryVersion}",
             androidSupportV4   : "com.android.support:support-v4:${supportLibraryVersion}",
             androidSupportV13  : "com.android.support:support-v13:${supportLibraryVersion}",

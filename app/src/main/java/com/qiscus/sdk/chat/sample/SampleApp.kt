@@ -32,7 +32,7 @@ import com.vanniktech.emoji.one.EmojiOneProvider
 class SampleApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        Qiscus.init(this, "dragongo")
+        Qiscus.init(this, "sdksample")
         Stetho.initializeWithDefaults(this)
         Jupuk.init(this)
         EmojiManager.install(EmojiOneProvider())

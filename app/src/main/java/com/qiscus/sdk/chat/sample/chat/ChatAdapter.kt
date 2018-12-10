@@ -49,12 +49,12 @@ class ChatAdapter(private val context: Context) : RecyclerView.Adapter<ChatAdapt
         return data.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): VH {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return VH(LayoutInflater.from(context).inflate(R.layout.item_chat, parent, false))
     }
 
-    override fun onBindViewHolder(holder: VH?, position: Int) {
-        holder!!.bind(data[position])
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        holder.bind(data[position])
     }
 
     class VH(view: View) : RecyclerView.ViewHolder(view) {
