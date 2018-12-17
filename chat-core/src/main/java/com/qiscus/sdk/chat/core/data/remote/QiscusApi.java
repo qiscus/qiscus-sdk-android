@@ -778,8 +778,10 @@ public enum QiscusApi {
 
     private static class CountingFileRequestBody extends RequestBody {
         private static final int SEGMENT_SIZE = 2048;
+        private static final int IGNORE_FIRST_NUMBER_OF_WRITE_TO_CALL = 0;
         private final File file;
         private final ProgressListener progressListener;
+        private int numWriteToCall = -1;
 
         private CountingFileRequestBody(File file, ProgressListener progressListener) {
             this.file = file;
@@ -798,6 +800,8 @@ public enum QiscusApi {
 
         @Override
         public void writeTo(@NonNull BufferedSink sink) throws IOException {
+            numWriteToCall++;
+
             Source source = null;
             try {
                 source = Okio.source(file);
@@ -807,13 +811,21 @@ public enum QiscusApi {
                 while ((read = source.read(sink.buffer(), SEGMENT_SIZE)) != -1) {
                     total += read;
                     sink.flush();
-                    progressListener.onProgress(total);
+
+                    /**
+                     * When we use HttpLoggingInterceptor,
+                     * we have issue with progress update not valid.
+                     * So we must check, first call is to HttpLoggingInterceptor
+                     * second call is to request
+                     */
+                    if (numWriteToCall > IGNORE_FIRST_NUMBER_OF_WRITE_TO_CALL) {
+                        progressListener.onProgress(total);
+                    }
 
                 }
             } finally {
                 Util.closeQuietly(source);
             }
         }
-
     }
 }
