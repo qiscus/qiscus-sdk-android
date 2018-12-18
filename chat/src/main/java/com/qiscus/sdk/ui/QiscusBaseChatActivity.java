@@ -248,13 +248,10 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             }
 
             if (chatConfig.getDeleteCommentConfig().isEnableDeleteComment()) {
-                actionMode.getMenu()
-                        .findItem(R.id.action_delete)
-                        .setVisible(deleteable(selectedComments));
+                actionMode.getMenu().findItem(R.id.action_delete)
+                        .setVisible(allMyComments(selectedComments) && deleteable(selectedComments));
             } else {
-                actionMode.getMenu()
-                        .findItem(R.id.action_delete)
-                        .setVisible(false);
+                actionMode.getMenu().findItem(R.id.action_delete).setVisible(false);
             }
         }
     }
@@ -291,6 +288,11 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         return true;
     }
 
+    private QiscusBaseChatFragment getChatFragment() {
+        return (QiscusBaseChatFragment) getSupportFragmentManager()
+                .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+    }
+
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.qiscus_comment_action, menu);
@@ -308,8 +310,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
-                .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+        QiscusBaseChatFragment fragment = getChatFragment();
         if (fragment == null) {
             mode.finish();
             return false;
@@ -433,14 +434,6 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
                 .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
                         selectedComments.size(), selectedComments.size()))
-                .setPositiveButton(R.string.qiscus_delete_for_me, (dialog, which) -> {
-                    QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
-                            .findFragmentByTag(QiscusBaseChatFragment.class.getName());
-                    if (fragment != null) {
-                        fragment.deleteCommentsForMe(selectedComments);
-                    }
-                    dialog.dismiss();
-                })
                 .setNegativeButton(R.string.qiscus_cancel, (dialog, which) -> dialog.dismiss())
                 .setCancelable(true);
 
@@ -460,7 +453,6 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
         alertDialog.setOnShowListener(dialog -> {
             QiscusDeleteCommentConfig deleteConfig = chatConfig.getDeleteCommentConfig();
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(deleteConfig.getDeleteForMeButtonColor());
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(deleteConfig.getCancelButtonColor());
             if (ableToDeleteForEveryone) {
                 alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(deleteConfig.getDeleteForEveryoneButtonColor());

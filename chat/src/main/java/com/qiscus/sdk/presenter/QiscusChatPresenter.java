@@ -797,15 +797,15 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         });
     }
 
-    @Deprecated
-    public void deleteCommentsForMe(List<QiscusComment> comments, boolean hardDelete) {
-        deleteComments(comments, false, hardDelete);
-    }
-
     public void deleteCommentsForEveryone(List<QiscusComment> comments, boolean hardDelete) {
         deleteComments(comments, true, hardDelete);
     }
 
+    /**
+     * @param comments
+     * @param forEveryone | parameter ini akan selalu true, karena deleteForMe sudah deprecated
+     * @param hardDelete
+     */
     private void deleteComments(List<QiscusComment> comments, boolean forEveryone, boolean hardDelete) {
         view.showDeleteLoading();
         Observable.from(comments)

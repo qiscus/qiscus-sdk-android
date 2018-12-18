@@ -22,11 +22,11 @@ public final class BuildVersionUtil {
     }
 
     public static boolean isOreoLower() {
-        return Build.VERSION.SDK_INT < 26;
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O;
     }
 
     public static boolean isOreoOrHigher() {
-        return Build.VERSION.SDK_INT >= 26;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }
 
     public static boolean isNougatOrHigher() {

@@ -281,7 +281,6 @@ public final class QiscusPushNotificationUtil {
                 .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
                 .setLargeIcon(largeIcon)
                 .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
-                .setGroupSummary(true)
                 .setGroup("CHAT_NOTIF_" + comment.getRoomId())
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
