@@ -185,22 +185,23 @@ public final class QiscusResendCommentHelper {
         QiscusCore.getDataStore().addOrUpdate(qiscusComment);
     }
 
+    private static boolean mustFailed(Throwable throwable, QiscusComment qiscusComment) {
+        //Error response from server
+        //Means something wrong with server, e.g user is not member of these room anymore
+        return ((throwable instanceof HttpException && ((HttpException) throwable).code() >= 400) ||
+                //if throwable from JSONException, e.g response from server not json as expected
+                (throwable instanceof JSONException) ||
+                // if attachment type
+                qiscusComment.isAttachment());
+    }
+
     private static void commentFail(Throwable throwable, QiscusComment qiscusComment) {
         pendingTask.remove(qiscusComment.getUniqueId());
         if (!QiscusCore.getDataStore().isContains(qiscusComment)) { //Have been deleted
             return;
         }
         int state = QiscusComment.STATE_PENDING;
-        if (throwable instanceof HttpException) { //Error response from server
-            //Means something wrong with server, e.g user is not member of these room anymore
-            HttpException httpException = (HttpException) throwable;
-            if (httpException.code() >= 400) {
-                qiscusComment.setDownloading(false);
-                state = QiscusComment.STATE_FAILED;
-                processingComment.remove(qiscusComment.getUniqueId());
-            }
-        } else if (throwable instanceof JSONException) {
-            //error if response not valid json
+        if (mustFailed(throwable, qiscusComment)) {
             qiscusComment.setDownloading(false);
             state = QiscusComment.STATE_FAILED;
             processingComment.remove(qiscusComment.getUniqueId());
