@@ -309,7 +309,7 @@ public enum QiscusApi {
                     long fileLength = responseBody.contentLength();
 
                     inputStream = responseBody.byteStream();
-                    byte[] buffer = new byte[512000];
+                    byte[] buffer = new byte[4096];
                     long total = 0;
                     int count;
                     while ((count = inputStream.read(buffer)) != -1) {
