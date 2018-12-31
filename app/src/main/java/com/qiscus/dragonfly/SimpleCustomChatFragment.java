@@ -24,11 +24,17 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created on : October 27, 2016
@@ -67,7 +73,7 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     @Override
     protected void onCreateChatComponents(Bundle savedInstanceState) {
         super.onCreateChatComponents(savedInstanceState);
-        lockChatAfter(2000);
+        lockChatAfter(10000);
     }
 
     private void lockChatAfter(int duration) {
@@ -81,7 +87,7 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     private void openLockedChat() {
         mInputPanel.setVisibility(View.VISIBLE);
         mLockedView.setVisibility(View.GONE);
-        lockChatAfter(2000);
+        lockChatAfter(10000);
         sendLockedMessage(false);
     }
 
@@ -106,5 +112,19 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     @Override
     protected void onCustomCommentClick(QiscusComment qiscusComment) {
         Toast.makeText(getActivity(), qiscusComment.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void actionClearComments() {
+        ArrayList<Long> roomIds = new ArrayList<>();
+        roomIds.add(qiscusChatRoom.getId());
+        QiscusApi.getInstance()
+                .clearCommentsByRoomIds(roomIds)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aVoid -> {
+                    chatAdapter.clear();
+                    chatAdapter.notifyDataSetChanged();
+
+                }, e -> Toast.makeText(getActivity(), "Cant clear comments", Toast.LENGTH_SHORT).show());
     }
 }

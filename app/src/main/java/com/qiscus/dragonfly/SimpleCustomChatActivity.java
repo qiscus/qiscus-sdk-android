@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -62,15 +64,6 @@ public class SimpleCustomChatActivity extends QiscusBaseChatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
         return SimpleCustomChatFragment.newInstance(qiscusChatRoom);
     }
@@ -89,5 +82,34 @@ public class SimpleCustomChatActivity extends QiscusBaseChatActivity {
     @Override
     public void onUserTyping(String user, boolean typing) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.custom_chat_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        } else if (item.getItemId() == R.id.menu_clear) {
+            actionClearMenu();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    private void actionClearMenu() {
+        SimpleCustomChatFragment customChatFragment = (SimpleCustomChatFragment)
+                getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (customChatFragment != null) {
+            customChatFragment.actionClearComments();
+        }
     }
 }
