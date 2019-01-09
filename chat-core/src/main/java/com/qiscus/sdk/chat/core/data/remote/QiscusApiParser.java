@@ -21,7 +21,6 @@ import android.support.v4.util.Pair;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
@@ -34,6 +33,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -118,7 +118,6 @@ final class QiscusApiParser {
 
             if (comments.size() > 0) {
                 QiscusComment latestComment = parseQiscusComment(comments.get(0), qiscusChatRoom.getId());
-                determineCommentState(latestComment, members);
                 qiscusChatRoom.setLastComment(latestComment);
             }
             return qiscusChatRoom;
@@ -151,7 +150,8 @@ final class QiscusApiParser {
     static List<QiscusChatRoom> parseQiscusChatRoomInfo(JsonElement jsonElement) {
         List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
         if (jsonElement != null) {
-            JsonArray jsonRoomInfo = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("rooms_info").getAsJsonArray();
+            JsonArray jsonRoomInfo = jsonElement.getAsJsonObject()
+                    .get("results").getAsJsonObject().get("rooms_info").getAsJsonArray();
             for (JsonElement item : jsonRoomInfo) {
                 JsonObject jsonChatRoom = item.getAsJsonObject();
                 QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
@@ -203,9 +203,6 @@ final class QiscusApiParser {
                 qiscusChatRoom.setMember(members);
 
                 QiscusComment latestComment = parseQiscusComment(jsonChatRoom.get("last_comment"), qiscusChatRoom.getId());
-                if (qiscusChatRoom.getMember() != null) {
-                    determineCommentState(latestComment, qiscusChatRoom.getMember());
-                }
                 qiscusChatRoom.setLastComment(latestComment);
 
                 qiscusChatRooms.add(qiscusChatRoom);
@@ -241,7 +238,8 @@ final class QiscusApiParser {
         qiscusComment.setSender(jsonComment.get("username").getAsString());
         qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
         qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
-        qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+//        qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+        determineCommentState(qiscusComment, jsonComment.get("status").getAsString());
 
         //timestamp is in nano seconds format, convert it to milliseconds by divide it
         long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
@@ -294,47 +292,40 @@ final class QiscusApiParser {
         return qiscusComment;
     }
 
-    private static Pair<Long, Long> getPairedLastState(List<QiscusRoomMember> members) {
-        long lastDelivered = Long.MAX_VALUE;
-        long lastRead = Long.MAX_VALUE;
-        QiscusAccount account = QiscusCore.getQiscusAccount();
-        for (QiscusRoomMember member : members) {
-            if (!member.getEmail().equals(account.getEmail())) {
-                if (member.getLastDeliveredCommentId() < lastDelivered) {
-                    lastDelivered = member.getLastDeliveredCommentId();
-                }
-
-                if (member.getLastReadCommentId() < lastRead) {
-                    lastRead = member.getLastReadCommentId();
-                    if (lastRead > lastDelivered) {
-                        lastDelivered = lastRead;
-                    }
-                }
+    private static void determineCommentState(QiscusComment qiscusComment, String status) {
+        qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+        if (status != null && !status.isEmpty()) {
+            switch (status) {
+                case "sent":
+                    qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+                    break;
+                case "delivered":
+                    qiscusComment.setState(QiscusComment.STATE_DELIVERED);
+                    break;
+                case "read":
+                    qiscusComment.setState(QiscusComment.STATE_READ);
+                    break;
             }
         }
-
-        if (lastDelivered == Long.MAX_VALUE) {
-            lastDelivered = 0;
-        }
-
-        if (lastRead == Long.MAX_VALUE) {
-            lastRead = 0;
-        }
-
-        return Pair.create(lastDelivered, lastRead);
     }
 
-    private static void determineCommentState(QiscusComment comment, List<QiscusRoomMember> members) {
-        if (members == null || members.isEmpty()) {
-            return;
-        }
-        Pair<Long, Long> lastMemberState = getPairedLastState(members);
-        if (comment.getId() > lastMemberState.first) {
-            comment.setState(QiscusComment.STATE_ON_QISCUS);
-        } else if (comment.getId() > lastMemberState.second) {
-            comment.setState(QiscusComment.STATE_DELIVERED);
-        } else {
-            comment.setState(QiscusComment.STATE_READ);
-        }
+    public static HashMap<String, List<QiscusRoomMember>> parseQiscusCommentInfo(JsonObject jsonResults) {
+        HashMap<String, List<QiscusRoomMember>> commentInfo = new HashMap<>();
+        List<QiscusRoomMember> listDeliveredTo = new ArrayList<>();
+        List<QiscusRoomMember> listPending = new ArrayList<>();
+        List<QiscusRoomMember> listReadBy = new ArrayList<>();
+
+        JsonArray arrDeliveredTo = jsonResults.getAsJsonArray("delivered_to");
+        JsonArray arrPending = jsonResults.getAsJsonArray("pending");
+        JsonArray arrReadBy = jsonResults.getAsJsonArray("read_by");
+
+
+        // TODO: 03/01/19 ini dimapping sini
+
+        commentInfo.put("delivered_to", listDeliveredTo);
+        commentInfo.put("pending", listPending);
+        commentInfo.put("read_by", listReadBy);
+
+        return commentInfo;
     }
 }

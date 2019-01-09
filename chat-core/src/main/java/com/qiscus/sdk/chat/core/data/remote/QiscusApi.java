@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -551,6 +552,13 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
+    public Observable<HashMap<String, List<QiscusRoomMember>>> getCommentInfo(long commentId) {
+        return api.getCommentReceipt(QiscusCore.getToken(), commentId)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(QiscusApiParser::parseQiscusCommentInfo);
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
@@ -765,6 +773,12 @@ public enum QiscusApi {
                 @Query("order_by_key_name") String orderKey,
                 @Query("sorting") String sorting,
                 @Query("user_name") String userName
+        );
+
+        @GET("/api/v2/sdk/comment_receipt")
+        Observable<JsonElement> getCommentReceipt(
+                @Query("token") String token,
+                @Query("comment_id") long commentId
         );
     }
 
