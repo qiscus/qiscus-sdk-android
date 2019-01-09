@@ -63,7 +63,7 @@ public class QiscusSyncJobService extends JobService {
         ComponentName componentName = new ComponentName(context, QiscusSyncJobService.class);
         JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
                 .setMinimumLatency(QiscusCore.getHeartBeat())
-                .setOverrideDeadline(TimeUnit.SECONDS.toMillis(10))
+                .setOverrideDeadline(TimeUnit.MINUTES.toMillis(1))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
