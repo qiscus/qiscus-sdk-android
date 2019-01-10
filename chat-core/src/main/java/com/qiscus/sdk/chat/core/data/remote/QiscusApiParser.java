@@ -129,11 +129,15 @@ final class QiscusApiParser {
     static QiscusRoomMember parseQiscusRoomMember(JsonObject jsonMember) {
         QiscusRoomMember member = new QiscusRoomMember();
         member.setEmail(jsonMember.get("email").getAsString());
-        member.setAvatar(jsonMember.get("avatar_url").getAsString());
         member.setUsername(jsonMember.get("username").getAsString());
+        if (jsonMember.has("avatar_url")) {
+            member.setAvatar(jsonMember.get("avatar_url").getAsString());
+        }
 
         try {
-            member.setExtras(new JSONObject(jsonMember.get("extras").getAsJsonObject().toString()));
+            if (jsonMember.has("extras")) {
+                member.setExtras(new JSONObject(jsonMember.get("extras").getAsJsonObject().toString()));
+            }
         } catch (JSONException ignored) {
             //Do nothing
         }
@@ -238,7 +242,6 @@ final class QiscusApiParser {
         qiscusComment.setSender(jsonComment.get("username").getAsString());
         qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
         qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
-//        qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
         determineCommentState(qiscusComment, jsonComment.get("status").getAsString());
 
         //timestamp is in nano seconds format, convert it to milliseconds by divide it
@@ -319,13 +322,23 @@ final class QiscusApiParser {
         JsonArray arrPending = jsonResults.getAsJsonArray("pending");
         JsonArray arrReadBy = jsonResults.getAsJsonArray("read_by");
 
-
-        // TODO: 03/01/19 ini dimapping sini
+        parseMemberAndAddToList(listDeliveredTo, arrDeliveredTo);
+        parseMemberAndAddToList(listDeliveredTo, arrPending);
+        parseMemberAndAddToList(listDeliveredTo, arrReadBy);
 
         commentInfo.put("delivered_to", listDeliveredTo);
-        commentInfo.put("pending", listPending);
+        commentInfo.put("sent", listPending); // karena pending yang dimaksud sudah masuk server qiscus
         commentInfo.put("read_by", listReadBy);
 
         return commentInfo;
+    }
+
+    private static void parseMemberAndAddToList(List<QiscusRoomMember> memberList, JsonArray arr) {
+        if (arr == null) {
+            return;
+        }
+        for (JsonElement el : arr) {
+            memberList.add(parseQiscusRoomMember(el.getAsJsonObject().getAsJsonObject("user")));
+        }
     }
 }

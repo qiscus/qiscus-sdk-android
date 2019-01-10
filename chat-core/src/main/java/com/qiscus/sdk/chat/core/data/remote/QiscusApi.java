@@ -404,9 +404,9 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusComment>> deleteComments(List<String> commentUniqueIds,
-                                                          boolean isDeleteForEveryone,
                                                           boolean isHardDelete) {
-        return api.deleteComments(QiscusCore.getToken(), commentUniqueIds, isDeleteForEveryone, isHardDelete)
+        // isDeleteForEveryone => akan selalu true, karena deleteForMe deprecated
+        return api.deleteComments(QiscusCore.getToken(), commentUniqueIds, true, isHardDelete)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
