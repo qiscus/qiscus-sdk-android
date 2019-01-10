@@ -111,7 +111,7 @@ When your backend returns a JWT after receiving Nonce from your client app, the 
 ```
 **Signature :**
 
-JWT need to be signed using Qiscus Secret Key, the one you get in [dashboard](https://www.qiscus.com/dashboard/login).The signature is used to verify that the sender of the JWT is who it says it is. To create the signature part you have to take the encoded Jose header , the encoded JWT Claim Set, a Qiscus Secret Key, the algorithm specified in the header, and sign that. 
+JWT need to be signed using Qiscus Secret Key, the one you get in [dashboard](https://www.qiscus.com/dashboard/login). The signature is used to verify that the sender of the JWT is who it says it is. To create the signature part you have to take the encoded Jose header, the encoded JWT Claim Set, a Qiscus Secret Key, the algorithm specified in the header, and sign that. 
 
 The signature is computed using the following pseudo code :
 
