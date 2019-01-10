@@ -109,6 +109,71 @@ When your backend returns a JWT after receiving Nonce from your client app, the 
   "avatar_url": "" // optional, string url of user avatar
 }
 ```
+**Signature :**
+
+JWT need to be signed using Qiscus Secret Key, the one you get in [dashboard](https://www.qiscus.com/dashboard/login).The signature is used to verify that the sender of the JWT is who it says it is. To create the signature part you have to take the encoded Jose header , the encoded JWT Claim Set, a Qiscus Secret Key, the algorithm specified in the header, and sign that. 
+
+The signature is computed using the following pseudo code :
+
+```
+data = base64urlEncode( Jose Header ) + “.” + base64urlEncode( JWT Claim Set )
+hashedData = hash( data, secret )
+signature = base64urlEncode( hashedData )
+```
+
+Here's example using PHP (You can use any other language or platform), the signature will be created in the following:
+
+```
+ public function generateIdentityToken($nonce, $user_id, $user_name = "", $avatar_url = "")
+ {
+// Using HMAC (HS256) signing method
+    $signer = new Sha256();
+
+    $now = time();
+
+    $token = (new Builder())
+      // Set header
+      // Header "alg" has been set to HS256 by library
+      // Header "typ" has been set to "JWT" by library
+      ->setHeader("ver", "v2")
+
+      // Set the payload
+      // Configures the issuer (iss claim). It is a qiscus app id, can be obtain from dashboard
+      ->setIssuer($this->qiscus_sdk_app_id)
+
+      // Configures payload, "prn" is a client provider's internal ID for the authenticating user. Don't copy to header
+      ->set("prn", $user_id, false)
+
+      // Configures the time that the token was issue (iat claim)
+      ->setIssuedAt($now)
+
+      // Configures the time that the token can be used (nbf claim)
+      ->setNotBefore($now)
+
+      // Token expiration set to 2 minutes only (exp claim)
+      ->setExpiration($now + 120)
+
+      // nce claim, is a nonce from client
+      ->set("nce", $nonce, false)
+
+      // String - Optional - Name of user.
+      ->set("name", $user_name, false)
+
+      // String - Optional - Avatar url of user.
+      ->set("avatar_url", $avatar_url, false)
+
+      // **Signing**
+      // creates a signature using qiscus sdk secret as key
+      ->sign($signer, $this->qiscus_sdk_secret)
+
+      // Retrieves the generated token
+      ->getToken();
+
+    // var_dump($token->verify($signer, $this->qiscus_sdk_secret));
+
+    return (string) $token;
+}
+```
 
 ## UI Customization
 
