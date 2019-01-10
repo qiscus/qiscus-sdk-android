@@ -673,6 +673,7 @@ public enum QiscusApi {
                 @Field("device_token") String fcmToken
         );
 
+        @Deprecated
         @POST("api/v2/mobile/search_messages")
         Observable<JsonElement> searchComments(
                 @Query("token") String token,
