@@ -366,14 +366,8 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<List<QiscusComment>> searchComments(String query, long roomId, long lastCommentId) {
-        return api.searchComments(QiscusCore.getToken(), query, roomId, lastCommentId)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
-                        .getAsJsonObject().get("comments").getAsJsonArray()))
-                .map(jsonElement -> {
-                    JsonObject jsonComment = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
-                })
-                .toList();
+        return Observable.error(new RuntimeException("Please use local data search!, we are currently working on search"));
+
     }
 
     public Observable<Void> clearCommentsByRoomIds(List<Long> roomIds) {
