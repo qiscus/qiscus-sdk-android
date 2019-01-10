@@ -359,10 +359,12 @@ public enum QiscusApi {
                 .map(jsonElement -> null);
     }
 
+    @Deprecated
     public Observable<List<QiscusComment>> searchComments(String query, long lastCommentId) {
         return searchComments(query, 0, lastCommentId);
     }
 
+    @Deprecated
     public Observable<List<QiscusComment>> searchComments(String query, long roomId, long lastCommentId) {
         return api.searchComments(QiscusCore.getToken(), query, roomId, lastCommentId)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")

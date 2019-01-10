@@ -1,8 +1,193 @@
-# Android SDK API Reference
+# Qiscus Chat SDK Core Android (1.1.7) 🎨 🐙 
 
-## Init
+> *This SDK is using MVP (Model-View-Presenter) Architecture, available version for now is **1.1.7**.
 
-### Using App ID
+## Introduction
+
+### Installation
+
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url  "https://dl.bintray.com/qiscustech/maven" }
+    }
+}
+
+dependencies {
+    ...
+    implementation 'com.qiscus.sdk:chat-core:1.1.7'
+}
+```
+
+### Package & Class Structure
+
+```
+// com.qiscus.sdk.chat.core
+
+├── QiscusActivityCallback.java
+├── QiscusCore.java
+├── data
+│   ├── local
+│   │   ├── QiscusCacheManager.java
+│   │   ├── QiscusChatRoomStore.java
+│   │   ├── QiscusCommentStore.java
+│   │   ├── QiscusDataBaseHelper.java
+│   │   ├── QiscusDataStore.java
+│   │   ├── QiscusDb.java
+│   │   ├── QiscusDbOpenHelper.java
+│   │   ├── QiscusEventCache.java
+│   │   ├── QiscusFileStore.java
+│   │   └── QiscusRoomMemberStore.java
+│   ├── model
+│   │   ├── CommentInfoHandler.java
+│   │   ├── DateFormatter.java
+│   │   ├── DeleteCommentListener.java
+│   │   ├── ForwardCommentHandler.java
+│   │   ├── MentionClickHandler.java
+│   │   ├── NotificationClickListener.java
+│   │   ├── NotificationListener.java
+│   │   ├── NotificationTitleHandler.java
+│   │   ├── QiscusAccount.java
+│   │   ├── QiscusChatRoom.java
+│   │   ├── QiscusComment.java
+│   │   ├── QiscusCommentDraft.java
+│   │   ├── QiscusCommentSendingInterceptor.java
+│   │   ├── QiscusContact.java
+│   │   ├── QiscusCoreChatConfig.java
+│   │   ├── QiscusImageCompressionConfig.java
+│   │   ├── QiscusLocation.java
+│   │   ├── QiscusNonce.java
+│   │   ├── QiscusPhoto.java
+│   │   ├── QiscusPushNotificationMessage.java
+│   │   ├── QiscusReplyCommentDraft.java
+│   │   ├── QiscusRoomMember.java
+│   │   └── ReplyNotificationHandler.java
+│   └── remote
+│       ├── QiscusApi.java
+│       ├── QiscusApiParser.java
+│       ├── QiscusClearCommentsHandler.java
+│       ├── QiscusDeleteCommentHandler.java
+│       ├── QiscusPusherApi.java
+│       ├── QiscusResendCommentHelper.java
+│       └── QiscusUrlScraper.java
+├── event
+│   ├── QiscusChatRoomEvent.java
+│   ├── QiscusClearCommentsEvent.java
+│   ├── QiscusCommentDeletedEvent.java
+│   ├── QiscusCommentReceivedEvent.java
+│   ├── QiscusCommentResendEvent.java
+│   ├── QiscusCommentSentEvent.java
+│   ├── QiscusMqttStatusEvent.java
+│   ├── QiscusSyncEvent.java
+│   ├── QiscusUserEvent.java
+│   └── QiscusUserStatusEvent.java
+├── presenter
+│   ├── QiscusChatRoomEventHandler.java
+│   └── QiscusRoomEventHandler.java
+├── service
+│   ├── QiscusNetworkCheckerJobService.java
+│   ├── QiscusNetworkStateReceiver.java
+│   ├── QiscusStartServiceReceiver.java
+│   ├── QiscusSyncJobService.java
+│   └── QiscusSyncService.java
+└── util
+    ├── BuildVersionUtil.java
+    ├── QiscusAndroidUtil.java
+    ├── QiscusDateUtil.java
+    ├── QiscusErrorLogger.java
+    ├── QiscusFileUtil.java
+    ├── QiscusFirebaseMessagingUtil.java
+    ├── QiscusLogger.java
+    ├── QiscusNumberUtil.java
+    ├── QiscusPushNotificationUtil.java
+    ├── QiscusRawDataExtractor.java
+    ├── QiscusRxExecutor.java
+    └── QiscusTextUtil.java
+
+
+```
+
+### Rx Java Intro
+
+> *Most of API from Qiscus is using RxJava, but no worry, is easy to use RxJava method. You just need to call subscribe() after you calling the method. The main advantage of using RxJava is easy to create asynchronous method, just need add subscribeOn() where thread will be used to run the task and observeOn() where thread will be used to deliver result. To learn more about RxJava you can visit https://github.com/ReactiveX/RxJava/wiki . This example how to use RxJava method from QiscusApi.*
+
+> *There is a method to request nonce like this:*
+
+```java
+QiscusApi.getInstance().requestNonce();
+```
+
+> *So to execute it you can call it like this:*
+
+```java
+QiscusApi.getInstance().requestNonce()
+        .subscribeOn(Schedulers.io()) // need to run this task on IO thread
+        .observeOn(AndroidSchedulers.mainThread()) // deliver result on main thread or UI thread
+        .subscribe(qiscusNonce -> {
+            // on success        
+        }, throwable -> {
+            // on error        
+        });
+```
+
+> *But if you want to use QiscusRxExecutor, that will be like this:*
+
+```java
+QiscusRxExecutor.*execute*(QiscusApi.*getInstance*().requestNonce(), new QiscusRxExecutor.Listener<QiscusNonce>() {
+    @Override
+    public void onSuccess(QiscusNonce qiscusNonce) {
+        // on success    
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+        // on error    
+    }
+});
+```
+
+## API Functions
+
+### List of Main Class
+
+* **com.qiscus.sdk.chat.core.QiscusCore**
+
+> *This class is the main class of the QiscusCore library, all other components will be created and executed when the QiscusCore SDK library is initiated. *
+
+> *To initiate the library, it should be done using this class, by calling the **init()** method. Initiation of libraries should only be done once throughout the life cycle of the application. *
+
+> *Therefore do the library initiation process in the Application class exactly when the **onCreate() **method is called. *
+
+> *In this class there are also some helper method that facilitate the process of making chat room, user setup, chat page configuration, and so forth.*
+
+* **com.qiscus.sdk.chat.core.data.remote.QiscusApi**
+
+> *This is the class responsible for interacting with the Qiscus server. *
+
+> *Using this class we can access data stored on Qiscus servers, such as taking a list of user-owned chat rooms, sending messages, retrieving certain chat room data and so on. *
+
+> *All methods that exist in this class will call the server, so that when there is no internet connection can be a failure. Then all methods in this class also do not give side effect to the data residing in local device, for example when calling method **getChatRoom() **then result will be directly returned without save it to database which is in local device, so when we try to access data in local , the chat room has not been saved. There is another class that will be responsible for managing data locally. Also note that all methods in this class will return the **rx.Observable object (RxJava)**, this is to facilitate multithreading handling. For developers who are uncomfortable with  RxJava, we provide helper class that can execute the method by using **com.qiscus.util.QiscusRxExecutor**.*
+
+* **com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi**
+
+> *If QiscusApi class using http request to interact with Qiscus server. Then this QiscusPusherApi class using mqtt to interact with the Qiscus mqtt broker. *
+
+> *This class can be used to get events related to a chat room such as when a user is typing, when the message we send is received by the other person or when he read it, and to know the status of the user is online or not. *
+
+> *The events that occur will be sent using EventBus, you can check existing event class list on package **com.qiscus.sdk.event**.*
+
+* **com.qiscus.sdk.chat.core.data.local.QiscusDataStore**
+
+> *Unlike the two classes above that always require internet connection to be used, QiscusDataStore class does not require internet connection because this class is responsible for managing data in local device. *
+
+> *Please note that data stored on local devices can not be guaranteed to be the most recent and complete data such as data that exist on the server. *
+
+> *However, the use of local data is to improve UX applications,  such as speed up the process of opening a chat page, when the activity chat run we can display a list of messages that are in the local first before then updated with the latest data from the server. Local data is also used for the process of resending the pending message, if we send a message when the internet connection condition is not good, by insert the message data into the local database will make it possible for Qiscus to retry the sending again at a later time when the connection has been start to stabilize again.*
+
+### Setup
+
+* init with *app_id*
 
 ```java
 /**
@@ -12,10 +197,10 @@
  * appId (string)
  */
  
-Qiscus.init(application, appId);
+QiscusCore.init(*application*, *appId*);
 ```
 
-### Using custom server
+* init custom server
 
 ```java
 /**
@@ -27,24 +212,22 @@ Qiscus.init(application, appId);
  * mqttBrokerUrl (string)
  */
  
- Qiscus.init(application, appId, serverBaseUrl, mqttBrokerUrl);
+ QiscusCore.initCustomServer(*application, appId, serverBaseUrl, mqttBrokerUrl*);
 ```
 
-Please call that function in your Application subclass, example.
+* get *app_id*
 
 ```java
-public class MyApplication extends Application {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Qiscus.init(this, "your_app_id_here");
-    }
-}
+/**
+ * Get app_id
+ */
+ 
+QiscusCore.getAppId()
 ```
 
-## Authentication
+### User
 
-### Using `UserID` and `UserKey`
+* Auth using *user_id *and *user_key*
 
 ```java
 /**
@@ -54,11 +237,13 @@ public class MyApplication extends Application {
  * userKey (string)
  * username (string) 
  * avatarURL (string, optional)
+ * extras (JSONObject, optional)
  */
 
-Qiscus.setUser(userId , userKey)
-      .withUsername(userName)
-      .withAvatarUrl(avatarUrl)
+QiscusCore.setUser(*userId* , *userKey*)
+      .withUsername(*username*)
+      .withAvatarUrl(*avatarUrl*)
+      .withExtras(*extras*)
       .save(new Qiscus.SetUserListener() {
           @Override
           public void onSuccess(QiscusAccount qiscusAccount) {
@@ -70,9 +255,23 @@ Qiscus.setUser(userId , userKey)
       });
 ```
 
-### Using JWT
+* Auth using *JWT*
 
-Client side need call this function.
+> *Server Authentication is another option, which allow you to authenticate using Json Web Token [(JWT)](https://jwt.io/). Json web token contains your app account details which typically consists of a single string which contains information of two parts, Jose header and JWT claims set.*
+
+
+The steps to authenticate with JWT goes like this:
+
+1. The Client App request a *nonce* from Qiscus SDK server
+2. Qiscus SDK Server will send *nonce* to Client App
+3. Client App send user credentials and *nonce* that is obtained from Qiscus SDK Server to Client app Backend
+4. The Client App backend will send the *token* to client app
+5. The Client App send that *token* to Qiscus Chat SDK
+6. Qiscus Chat SDK send Qiscus Account to Client App
+
+![](../screenshot/jwt.png?raw=true)
+
+> *You need to request Nonce from Qiscus Chat SDK Server. Nonce (Number Used Once) is a unique, randomly generated string used to identify a single request. Please be noted that a Nonce will expire in 10 minutes. So you need to implement your code to request JWT from your backend right after you got the returned Nonce. Here is how to authenticate to Qiscus Chat SDK using JWT :*
 
 ```java
 /**
@@ -84,7 +283,7 @@ Client side need call this function.
  QiscusApi.getInstance().requestNonce();
 ```
 
-You need to get Identity Token from you custom JWT API by using the nonce. Login or register with Identity Token. 
+> *You will request Nonce from Qiscus SDK server and a Nonce will be returned. If it is success, you can request JWT from your backend by sending Nonce you got from Qiscus SDK Server. When you got the JWT Token, you can pass that JWT to QiscusCore.setUser()** method to allow Qiscus to authenticate your user and return user account, as shown in the code below :*
 
 ```java
 /**
@@ -92,7 +291,7 @@ You need to get Identity Token from you custom JWT API by using the nonce. Login
  * you must to set JWT to Qiscus
  */
  
- Qiscus.setUser('yourjwttokenfromyourserverhere', new Qiscus.SetUserListener() {
+ QiscusCore.setUser(*'yourjwttokenfromyourserverhere'*, new QiscusCore.SetUserListener() {
         @Override
         public void onSuccess(QiscusAccount qiscusAccount) {
             //do anything if success
@@ -105,9 +304,7 @@ You need to get Identity Token from you custom JWT API by using the nonce. Login
     });
 ```
 
-## User
-
-### Update user profile and profile image
+* Updating *user *(profile and avatar)
 
 ```java
 /**
@@ -117,7 +314,7 @@ You need to get Identity Token from you custom JWT API by using the nonce. Login
  * avatarUrl (string)
  */
 
-Qiscus.updateUser(userName, avatarUrl, new Qiscus.SetUserListener() {
+QiscusCore.updateUser(*username*, *avatarUrl*, new QiscusCore.SetUserListener() {
         @Override
         public void onSuccess(QiscusAccount qiscusAccount) {
            //do anything after it successfully updated
@@ -128,168 +325,97 @@ Qiscus.updateUser(userName, avatarUrl, new Qiscus.SetUserListener() {
            //do anything if error occurs                 
         }
     });
+
+/**
+ * Update User Profile with extras
+ *
+ * userName (string)
+ * avatarUrl (string)
+ * extras (JSONObject)
+ */
+ 
+QiscusCore.updateUser(*username*, *avatarUrl*, *extras*, new QiscusCore.SetUserListener() {
+            @Override
+            public void onSuccess(QiscusAccount qiscusAccount) {
+                //do anything after it successfully updated
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                //do anything if error occurs
+            }
+        });
 ```
 
-### Login Status
-
-```java
-Qiscus.hasSetupUser(); // return true or false
-```
-
-### Logout
-
-```java
-Qiscus.clearUser();
-```
-
-### Block User
-
-```java
-QiscusApi.getInstance().blockUser(userEmail);
-```
-
-### Unblock User
-
-```java
-QiscusApi.getInstance().unblockUser(userEMail);
-```
-
-## Message
-
-Create message objects with various type of payloads.
-
-### Text Message Object
+* Check is *user* logged in
 
 ```java
 /**
-  * Text Message
-  *
-  * content (string) 
-  * roomId (integer)
-  * topicId (integer)
-  */
- QiscusComment.generateMessage(content, roomId, topicId);
+ * Check is User logged in
+ */
+ 
+QiscusCore.hasSetupUser(); //boolean
 ```
 
-### File Attachment Object
+* Block *user*
 
 ```java
 /**
-  * File Attachment Message
-  *
-  * fileUrl (string) 
-  * caption (string)
-  * roomId (integer)
-  * topicId (integer)
-  */
- QiscusComment.generateFileAttachmentMessage(fileUrl, caption, roomId, topicId)
+ * Block User
+ */
+ 
+QiscusApi.getInstance().blockUser(*userEmail*)
 ```
 
-### Contact Message Object
+* Unblock *user*
 
 ```java
 /**
-   * create QiscusContact object for Contact Message
-   *
-   * name (string) : Jarjit Singh
-   * value (string) : +628681234567
-   * type (string) : phone
-   */
-  new QiscusContact(name, value, type);
-  
-  /**
-   * Contact Message
-   *
-   * qiscusContact (QiscusContact)
-   * roomId (integer)
-   * topicId (integer)
-   */
- QiscusComment.generateContactMessage(qiscusContact, roomId, topicId);
+ * Unblock User
+ */
+ 
+QiscusApi.getInstance().unBlockUser(*userEmail*)
 ```
 
-### Location Message Object
+* Get list blocked *user*
+
+```java
+// get all blocked users without pagination
+QiscusApi.getInstance().getBlockedUsers()
+
+/**
+ * get all blocked users with pagination
+ * page (long)
+ * limit (long)
+ */
+QiscusApi.getInstance().getBlockedUsers(page, limit)
+```
+
+* Logout *user*
 
 ```java
 /**
-   * create QiscusLocation object for Location Message
-   * 
-   * name (string)
-   * address (string)
-   * latitude (double)
-   * longitude (double)
-   */
-  QiscusLocation qiscusLocation = new QiscusLocation();
-  qiscusLocation.setName(name);
-  qiscusLocation.setAddress(address);
-  qiscusLocation.setLatitude(latitude);
-  qiscusLocation.setLongitude(longitude);
-  
-   
-  /**
-   * Location Message
-   *
-   * qiscusLocation (QiscusLocation)
-   * roomId (integer)
-   * topicId (integer)
-   */
-  QiscusComment.generateLocationMessage(qiscusLocation, roomId, topicId);
+ * Clear User session
+ */
+ 
+QiscusCore.clearUser();
 ```
 
-### Reply Message Object
+### Comment
+
+* Send *comment*
+
+> *Before you send QiscusComment object, you must create the object first using provided methods in QiscusCore with parameters of specified type. Then, you can pass QiscusComment object to QiscusApi.getInstance().postComment() like below :*
 
 ```java
-/**
-   * Reply Message
-   * 
-   * content (string)
-   * roomId (integer)
-   * topicId (integer)
-   * qiscusComment (QiscusComment) repliedComment object
-   */
-  QiscusComment.generateReplyMessage(content, roomId, topicId, qiscusComment);
-```
 
-### Post Back Message Object
-
-```java
-/**
-   * Post Back Message
-   *
-   * content (string)
-   * payload (string|json) 
-   * roomId (integer)
-   * topicId (integer)
-   */
-  QiscusComment.generatePostBackMessage(content, payload, roomId, topicId);
-```
-
-### Custom Message Object
-
-```java
-/**
-   * Custom Message
-   *
-   * text (string)
-   * type (string)
-   * content (JSONObject)
-   * roomId (integer)
-   * topicId (integer)
-   */   
-  QiscusComment.generateCustomMessage(text, type, content, roomId, topicId);
-```
-
-### Send Message
-
-After create QiscusComment object, you can send message using this function.
-
-```java
 public void postComment(QiscusComment qiscusComment) {
     QiscusApi.getInstance().postComment(qiscusComment)
-            .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment)) //update comment to local database
+            .doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(qiscusComment)) //update comment to local database
             .doOnNext(this::updateStateOnQiscus)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(commentSend -> {
+            .subscribe(commentSent -> {
                 // success
             }, throwable -> {
                 // error
@@ -298,105 +424,215 @@ public void postComment(QiscusComment qiscusComment) {
     
 private void updateStateOnQiscus(QiscusComment comment) {
     comment.setState(QiscusComment.STATE_ON_QISCUS);
-    QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getId(), comment.getUniqueId());
+    QiscusComment savedQiscusComment = QiscusCore.getDataStore().getComment(comment.getId(), comment.getUniqueId());
     if (savedQiscusComment != null && savedQiscusComment.getState() > comment.getState()) {
         comment.setState(savedQiscusComment.getState());
     }
 
     //update comment to local database
-    Qiscus.getDataStore().addOrUpdate(comment);
+    QiscusCore.getDataStore().addOrUpdate(comment);
 }
 ```
 
-### Load Messages
+    * *TEXT*
 
-Load messages from server.
+```java
+/**inter
+  * Text Message
+  *
+  * roomId (long)
+  * content (string) 
+  */
+QiscusComment.generateMessage(roomId, content)
+```
+
+    * *FILE*
+
+```java
+/**
+  * File Attachment Message
+  *
+  * roomId (long)
+  * fileUrl (string)
+  * caption (string)
+  * name (string)
+  */
+ QiscusComment.generateFileAttachmentMessage(roomId, fileUrl, caption, name);
+```
+
+    * *REPLY*
+
+```java
+/**
+ * Reply Message
+ * 
+ * roomId (long)
+ * content (string)
+ * repliedComment (QiscusComment)
+ */
+QiscusComment.generateReplyMessage(roomId, content, repliedComment);
+```
+
+    * *CONTACT*
+
+```java
+/**
+ * create QiscusContact object for Contact Message
+ *
+ * name (string) : Jarjit Singh
+ * value (string) : +628681234567
+ * type (string) : phone
+ */
+new QiscusContact(name, value, type);
+  
+ /**
+  * Contact Message
+  *
+  * roomId (long)
+  * contact (QiscusContact)
+  */
+QiscusComment.generateContactMessage(roomId, contact);
+```
+
+    * *LOCATION*
+
+```java
+/**
+  * create QiscusLocation object for Location Message
+  * 
+  * name (string)
+  * address (string)
+  * latitude (double)
+  * longitude (double)
+  */
+QiscusLocation qiscusLocation = new QiscusLocation();
+qiscusLocation.setName(name);
+qiscusLocation.setAddress(address);
+qiscusLocation.setLatitude(latitude);
+qiscusLocation.setLongitude(longitude);
+  
+
+ /**
+  * Location Message
+  *
+  * roomId (long)
+  * location (QiscusLocation)
+  */
+QiscusComment.generateLocationMessage(roomId, location);
+```
+
+    * *POSTBACK*
+
+```java
+/**
+ * Post Back Message
+ * 
+ * roomId (long)
+ * content (string)
+ * payload (string)
+ */
+QiscusComment.generatePostBackMessage(roomId, content, payload);
+```
+
+    * *CUSTOM*
+
+```java
+/**
+ * Custom Message
+ *
+ * roomId (long)
+ * text (string)
+ * type (string) | define your own type
+ * content (JSONObject)
+ */
+QiscusComment.generateCustomMessage(roomId, text, type, content);
+```
+
+* Load *comments* (with *limit* and *offset*)
+    * From Server
 
 ```java
 /**
  * Get comments
  *
- * roomId  (integer)
- * topicId (integer)
- * lastCommentId (integer) set it to 0 if want to load from latest comments
+ * roomId  (long)
+ * lastCommentId (long)
  * 
  * will return 20 comments
  */
  
-QiscusApi.getInstance().getComments(roomId, topicId, lastCommentId);
+QiscusApi.getInstance().getComments(roomId, lastCommentId)
 ```
 
-Load messages from local database.
+    * From Local
 
 ```java
 /**
  * Get comments
  *
- * topicId (integer)
- * count (integer) maximum comments need to return
+ * roomId (long)
+ * limit (int) maximum comments need to return
  */
  
- Qiscus.getDataStore().getComments(topicId, count);
+ QiscusCore.getDataStore().getComments(roomId, limit);
 ```
 
-### Load More
-
-Load more message from server.
+* Load *comments *after 
+    * From Server
 
 ```java
 /**
  * Get comments
  *
- * roomId  (integer)
- * topicId (integer)
- * lastCommentId (integer) set it to 0 if want to load from latest comments
+ * roomId  (long)
+ * lastCommentId (long)
  * 
  * will return 20 comments
  */
  
-QiscusApi.getInstance().getComments(roomId, topicId, lastCommentId);
+QiscusApi.getInstance().getCommentsAfter(long roomId, long lastCommentId);
 ```
 
-Load more message from local database.
+    * From Local
 
 ```java
 /**
  * Get comments
  *
  * qiscusComment (QiscusComment)
- * topicId (integer)
- * count (integer) maximum comments need to return
+ * roomId (long)
+ * limit (integer) maximum comments need to return
  */
  
-Qiscus.getDataStore().getOlderCommentsThan(qiscusComment, topicId, count);
+QiscusCore.getDataStore().getOlderCommentsThan(qiscusComment, roomId, limit);
 ```
 
-### Download Media
+* Download media (the *path *and % of process)
 
 ```java
 /**
  * Download file
  *
- * topicId (integer) needed for identification saving the file
- * fileUrl (string)
+ * file (string)
  * fileName (string) save file as with this name
+ * totalDownloaded (long)
  */
-QiscusApi.getInstance().downloadFile(topicId, fileUrl, fileName, percentage -> {
-      // here you can get the progress percentage      
+QiscusApi.getInstance().downloadFile(url, fileName, totalDownloaded -> {
+      // here you can get the progress total file downloaded      
 });
 ```
 
-Snippet code above only download the file without saving information to local database. To save data to local database look at the code below.
+> *That code only download the file without saving information to local database. To save data to local database look at the code below:*
 
 ```java
 public void downloadFile(QiscusComment qiscusComment) {
     QiscusApi.*getInstance*()
-        .downloadFile(qiscusComment.getTopicId(), qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(), percentage -> {
-            // here you can get the progress percentage 
+        .downloadFile(qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(), total -> {
+            // here you can get the progress total downloaded 
         })
         .doOnNext(file -> {
             // here we update the local path of file
-            Qiscus.*getDataStore*()
+            QiscusCore.*getDataStore*()
                     .addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(), file.getAbsolutePath());
         })
         .subscribeOn(Schedulers.*io*())
@@ -409,82 +645,63 @@ public void downloadFile(QiscusComment qiscusComment) {
 }
 ```
 
-So if we need to get the local file of a comment, you can call this function.
+> *So if we need to get the local file of a comment, you can call this:*
 
 ```java
 /**
  * Get local file of comment
  *
- * commentId (integer)
+ * commentId (long)
  */
-Qiscus.*getDataStore*().getLocalPath(commentId);
+QiscusCore.*getDataStore*().getLocalPath(commentId);
 ```
 
-### Search Message
-
-In all chat rooms.
-
-```java
-/**
- * Search comments from backend
- *
- * query (string)
- * lastCommentId (integer)
- */
-QiscusApi.getInstance().searchComments(query, lastCommentId);
-```
+* Keyword search *comments*
+    * In all *chatrooms*
+        * From Local
 
 ```java
 /**
  * Search comments from local data
  *
  * query (string)
+ * roomId (long)
  * limit (integer)
  * offset (integer)
  */
- Qiscus.getDataStore().searchComments(query, limit, offset);
+ QiscusCore.getDataStore().searchComments(query, roomId, limit, offset);
 ```
 
-In specific chat room.
+    * In speficified *chatrooms*
+
+        * From Local
 
 ```java
 /**
  * Search comments
  *
  * query (string)
- * roomId (integer)
- * lastCommentId (integer)
- */
-QiscusApi.getInstance().searchComments(query, roomId, lastCommentId);
-```
-
-```java
-/**
- * Search comments
- *
- * query (string)
- * roomId (integer)
+ * roomId (long)
  * limit (integer)
  * offset (integer)
  */
-Qiscus.getDataStore().searchComments(query, roomId, limit, offset);
+QiscusCore.getDataStore().searchComments(query, roomId, limit, offset);
 ```
 
-### Delete Message
+* Delete *comment*
 
 ```java
 /**
- * Delete message
+ * Delete comments
  *
  * commentUniqueIds (String) 
- * isDeleteForEveryone (boolean) 
  * isHardDelete (boolean) 
- */
- 
- QiscusApi.getInstance().deleteComments(commentUniqueIds, isDeleteForEveryone, isHardDelete)
+ */ 
+QiscusApi.getInstance().deleteComments(commentUniqueIds, isHardDelete);
 ```
 
-### Clear Messages
+* Clear all *comments*
+    * From Server
 
 ```java
 /**
@@ -500,9 +717,46 @@ Qiscus.getDataStore().searchComments(query, roomId, limit, offset);
  QiscusApi.getInstance().clearCommentsByRoomUniqueIds(roomUniqueIds)
 ```
 
-## Room
+    * From Local
 
-### Create 1-on-1 Chat Room
+```java
+/**
+  * Local
+  */  
+
+QiscusCore.getDataStore().deleteCommentsByRoomId(roomId)
+  
+//or
+  
+QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, timestampOffset)
+```
+
+* Working with extras
+
+> *You can add **JSON** into **extras **property inside **QiscusComment** object*
+
+```java
+// generate TEXT comment
+QiscusComment qiscusComment = QiscusComment.generateMessage("This is message", 123, 123);
+
+// set extras like below :
+String stringJson = "{\"key\" : \"value\", \"key2\" : \"value2\"}";
+qiscusComment.setExtras(new JSONObject(stringJson));
+
+//using Comment Interceptor
+QiscusCore.getChatConfig().setCommentSendingInterceptor(qiscusComment -> {
+                    qiscusComment.setExtras(new JSONObject(stringJson));
+                    return qiscusComment;
+                });
+```
+
+### Chatroom
+
+> *In Qiscus SDK, we provide 3 type of chatrooms :*
+
+> ***SINGLE, GROUP, CHANNEL***
+
+* Create *chatroom *1-on-1
 
 ```java
 /**
@@ -516,7 +770,7 @@ Qiscus.getDataStore().searchComments(query, roomId, limit, offset);
 QiscusApi.getInstance().getChatRoom(userId, distinctId, options);
 ```
 
-### Create Group Room
+* Create *group chatroom *
 
 ```java
 /**
@@ -528,42 +782,40 @@ QiscusApi.getInstance().getChatRoom(userId, distinctId, options);
  * options (JSONObject|nullable) you can define JSON to save something in chatroom
  */
  
-QiscusApi.getInstance().createGroupChatRoom(*name, ids, avatarUrl, options*);
+QiscusApi.getInstance().createGroupChatRoom(name, ids, avatarUrl, options);
 ```
 
-After success creating chatroom, you must save chatroom to local data like this.
+> *After success creating chatroom, you must save chatroom to local data like this :*
 
 ```java
-Qiscus.getDataStore().addOrUpdate(*chatRoom*);
+QiscusCore.getDataStore().addOrUpdate(*chatRoom*);
 ```
 
-### Get Chat Room By ID
-
-Get chat room from server.
-
-```java
-/**
- * Get chat room by id
- *
- * roomId (integer)
- */
-QiscusApi.getInstance().getChatRoom(*roomId*);
-```
-
-Get chat room from local database.
+* Get *chatroom *by *id*
+    * From Server
 
 ```java
 /**
  * Get chat room by id
  *
- * roomId (integer|string)
+ * roomId (long)
  */
-Qiscus.getDataStore().getChatRoom(*roomId*);
+QiscusApi.getInstance().getChatRoom(roomId);
 ```
 
-### Get Chat Room By Channel
+    * From Local
 
-Get chat room from server.
+```java
+/**
+ * Get chat room by id
+ *
+ * roomId (long)
+ */
+QiscusCore.getDataStore().getChatRoom(roomId);
+```
+
+* Get *chatroom *by *channel*
+    * From Server
 
 ```java
 /**
@@ -574,10 +826,10 @@ Get chat room from server.
  * avatarUrl (string)
  * options (JSONObject)
  */
-QiscusApi.getInstance().getGroupChatRoom(uniqueId, name, avatarUrl, options);
+QiscusApi.*getInstance*().getGroupChatRoom(uniqueId, name, avatarUrl, options);
 ```
 
-Get chat room from local database.
+    * From Local
 
 ```java
 /**
@@ -585,12 +837,11 @@ Get chat room from local database.
  *
  * uniqueId (string) the channel
  */
-Qiscus.getDataStore().getChatRoomWithUniqueId(uniqueId);
+QiscusCore.*getDataStore*().getChatRoomWithUniqueId(uniqueId);
 ```
 
-### Get Chat Room Opponent By User ID
-
-Get chat room opponent from server.
+* Get *chatroom *opponent by *user_id*
+    * From Server
 
 ```java
 /**
@@ -601,10 +852,10 @@ Get chat room opponent from server.
  * options (JSONObject)
  */
  
-QiscusApi.getInstance().getChatRoom(withEmail, distinctId, options);
+QiscusApi.*getInstance*().getChatRoom(withEmail, distinctId, options);
 ```
 
-Get chat room opponent from local database.
+    * From Local
 
 ```java
 /**
@@ -614,16 +865,61 @@ Get chat room opponent from local database.
  * distinctId (string) if you need a difference room
  */
 
-Qiscus.getDataStore().getChatRoom(email);
+QiscusCore.*getDataStore*().getChatRoom(email);
 
 //or
 
-Qiscus.getDataStore().getChatRoom(email, distinctId);
+QiscusCore.*getDataStore*().getChatRoom(email, distinctId);
 ```
 
-### Get Room List
+> *So if you want to save the chatroom from server after create or get chatroom from server, the code will be like this*
 
-Get room list from server.
+```java
+QiscusApi.*getInstance*().getChatRoom(withEmail*,** *distinctId, options)
+        .doOnNext(chatRoom -> QiscusCore.*getDataStore*().addOrUpdate(chatRoom))
+        .subscribeOn(Schedulers.*io*())
+        .observeOn(AndroidSchedulers.*mainThread*())
+        .subscribe(chatRoom -> {
+           //success         
+        }, throwable -> {
+            //error        
+        });
+```
+
+* Get *chatroom *info 
+
+> *If you need some chatrooms using **array****** of ids**, you can use this method*
+
+    * From Server
+
+```java
+/**
+ * Get rooms info
+ *
+ * roomIds List<Long>
+ * uniqueIds (List<String>)
+ * showMembers (boolean) if set to false, then the variable member in QiscusChatRoom will be null
+ */
+ 
+QiscusApi.getInstance().getChatRooms(roomIds, uniqueIds, showMembers);
+```
+
+    * From Local
+
+```java
+/**
+ * roomIds List<Long>
+ * uniqueIds (List<String>)
+ */
+ 
+QiscusCore.getDataStore().getChatRooms(roomIds, uniqueIds);
+```
+
+* Get *chatroom *list
+
+> *If you need to get **all chatrooms in the user**, you can use this method*
+
+    * From Server
 
 ```java
 /**
@@ -634,10 +930,10 @@ Get room list from server.
  * showMembers (boolean) if set to false, then the variable member in QiscusChatRoom will be null
  */
  
- QiscusApi.getInstance().getChatRooms(page, limit, showMembers);
+QiscusApi.getInstance().getChatRooms(page, limit, showMembers);
 ```
 
-Get room list from local database.
+    * From Local
 
 ```java
 /**
@@ -647,39 +943,56 @@ Get room list from local database.
  * offset (integer)
  */
  
-Qiscus.getDataStore().getChatRooms(limit, offset);
+QiscusCore.getDataStore().getChatRooms(limit, offset);
 
 //or only using limit
 
-Qiscus.getDataStore().getChatRooms(limit);
+QiscusCore.getDataStore().getChatRooms(limit);
 
 /**
  * or you want return observable
  */
  
-Qiscus.getDataStore().getObservableChatRooms(limit, offset);
+QiscusCore.getDataStore().getObservableChatRooms(limit, offset);
 
-Qiscus.getDataStore().getObservableChatRooms(limit);
+QiscusCore.getDataStore().getObservableChatRooms(limit);
 ```
 
-### Update Room
+> *If we need to cached rooms from server to local, so the code will be like this:*
 
-Update room in server.
+```java
+QiscusApi.getInstance().getChatRooms(page, limit, showMembers)
+    .doOnNext(chatRooms -> {
+        for (QiscusChatRoom chatRoom : chatRooms) {
+            QiscusCore.getDataStore().addOrUpdate(chatRoom);
+        }
+    })
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(chatRooms -> {
+        //success
+    }, throwable -> {
+        //error
+    });
+```
+
+* Update *chatroom *(include options)
+    * From Server
 
 ```java
 /**
  * Update room
  *
- * roomId (integer)
+ * roomId (long)
  * name (string)
  * avatarUrl (string)
  * options (JSONObject)
  */
  
-QiscusApi.getInstance().updateChatRoom(roomId, name, avatarUrl, options);
+QiscusApi.*getInstance*().updateChatRoom(roomId, name, avatarUrl, options);
 ```
 
-Update room in local database.
+    * From Local
 
 ```java
 /**
@@ -688,30 +1001,107 @@ Update room in local database.
  * qiscusChatRoom (QiscusChatRoom)
  */
  
-Qiscus.*getDataStore*().addOrUpdate(qiscusChatRoom);
+Qiscus.getDataStore().addOrUpdate(qiscusChatRoom);
 ```
 
-### Get List of Participant in a Room
-
-Get participant from local database.
+* Get *chatroom's participants*
+    * From Server
 
 ```java
 /**
- * Search comments
+ * roomUniqueId (String)
  *
- * roomId (integer)
+ * default limit is 100
  */
+QiscusApi.getInstance().getRoomMembers(roomUniqueId);
+
+/**
+ * roomUniqueId String
+ * offset intger
+ * orderKey String | valid value **name**, **joined_at** or **email**, default to order by name
+ * sorting String  | **asc** or **desc**, default to asc
+ * metaRoomMembersListener MetaRoomMembersListener
+ */
+QiscusApi.getInstance().getRoomMembers(roomUniqueId, offset, orderKey, sorting, metaRoomMembersListener);
  
-Qiscus.*getDataStore*().getRoomMembers(*roomId*);
+ /**
+ * roomUniqueId String
+ * offset intger
+ * orderKey String | valid value **name**, **joined_at** or **email**, default to order by name
+ * sorting String  | **asc** or **desc**, default to asc
+ * userName String | if you want to get participants based on **userName** filter
+ * metaRoomMembersListener MetaRoomMembersListener
+ */
+ QiscusApi.getInstance().getRoomMembers(roomUniqueId, offset, orderKey, sorting, userName, metaRoomMembersListener);
+  
+  // example :
+ QiscusApi.getInstance().getRoomMembers("roomuniqueid", 0, null, null, (currentOffset, perPage, total) -> {
+                    /**
+                     * TODO : you can get currentOffset, perPage, and total here
+                     * currentOffset -> current offset the data
+                     * perPage -> limit data = 100
+                     * total -> total data
+                     */
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(qiscusRoomMembers -> {
+                    // TODO : now you can qiscusRoomMembers here
+                }, throwable -> {
+                    // TODO :show error here
+                });
 ```
 
-Get participant from QiscusChatRoom object.
+    * From Local
 
 ```java
+/**
+ * roomId (long)
+ */
+ 
+Qiscus.getDataStore().getRoomMembers(roomId);
+
+// from QiscusChatroom object
 qiscusChatRoom.getMember();
 ```
 
-### Get Total Unread Count
+* Add *chatroom's participant*
+
+```java
+/**
+ * roomId (long)
+ * emails (List<String>)
+ */
+QiscusApi.getInstance().addRoomMember(roomId, emails);
+```
+
+> *After success add room member, you must to update chatroom object to local data like this*
+
+```java
+QiscusApi.getInstance().addRoomMember(roomId, emails);
+        .doOnNext(chatRoom -> Qiscus.getDataStore().addOrUpdate(chatRoom))
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(chatRoom -> {
+           //success
+        }, throwable -> {
+            //error        
+        });
+```
+
+* Remove *chatroom's participant*
+
+```java
+/**
+ * roomId (long)
+ * emails (List<String>)
+ */
+QiscusApi.getInstance().removeRoomMember(roomId, emails)
+
+// after success, you must update room to local data like above in QiscusApi.getInstance().addRoomMember()
+```
+
+* Get total unread count
 
 ```java
 /**
@@ -721,39 +1111,13 @@ qiscusChatRoom.getMember();
 QiscusApi.getInstance().getTotalUnreadCount();
 ```
 
-### Add Participant in a Room
+### Statuses
 
- ```java
- /**
- * Add participant in a room
- * 
- * roomId (long)
- * ids (List<String>) list of userIds e.g. list of email (
- */
-QiscusApi.getInstance().addRoomMember(roomId, ids)
-```
-
-### Remove Participant in a Room
+* Publish start and stop *typing*
 
 ```java
 /**
- * Remove participant in a room
- * 
  * roomId (long)
- * ids (List<String>) list of userIds e.g. list of email (
- */
-QiscusApi.getInstance().removeRoomMember(roomId, ids)
-```
-
-
-## Statuses
-
-### Publish Start Or Stop Typing
-
-```java
-/**
- * roomId (integer)
- * topicId (integer)
  * typing (boolean)
  *
  * typing :
@@ -761,60 +1125,45 @@ QiscusApi.getInstance().removeRoomMember(roomId, ids)
  *      false | for stop typing
  */
  
-QiscusPusherApi.getInstance().setUserTyping(roomId, topicId, typing);
+QiscusPusherApi.getInstance().setUserTyping(roomId, typing);
 ```
 
-### Update Message Status
+* Update *comment status*
 
 ```java
 /**
- * roomId (integer)
- * topicId (integer)
- * commentId (integer)
- * commentUniqueId (string|nullable)
+ * roomId (long)
+ * commentId (long)
  */
  
-QiscusPusherApi.getInstance().setUserRead(roomId, topicId, commentId, commentUniqueId);
+QiscusPusherApi.getInstance().setUserRead(roomId, commentId);
 ```
 
-### View Who Has Received And Read Message
-
-To get information who has read a message, we can get all room members of that chat room. In QiscusRoomMember class there is variable called lastReadCommentId. From this variable we can compare it to the id of the comment, if the lastReadCommentId from QiscusRoomMember class is larger than id of comment or lastReadCommentId equal with comment id, thats mean this QiscusRoomMember has read that comment. This is sample code to get who has read a comment.
+* Viewing who has read a *comment*
 
 ```java
-// First get all members from this chat room
-List<QiscusRoomMember> members = Qiscus.*getDataStore*().getRoomMembers(comment.getRoomId());
+/**
+ * commentId (long)
+ */
 
-// List will save the member who has read the message
-List<QiscusRoomMember> memberHasRead = new ArrayList<>();
-
-// Get current user
-QiscusAccount account = Qiscus.getQiscusAccount();
-for (QiscusRoomMember member : members) {
-    if (!member.getEmail().equals(account.getEmail())) { // not current user
-        // if last read comment id is more than or equal with comment id, it means user has read
-        if (member.getLastReadCommentId() >= comment.getId()) {
-            memberHasRead.add(member);
-        }
-    }
-}
+QiscusApi.getInstance().getCommentInfo(commentId);
 ```
 
-## Event Handler
+### Event Handler
 
-Qiscus SDK is using EventBus for broadcasting event to entire application. You can learn more about EventBus on this website http://greenrobot.org/eventbus/. What you need to do is registering the object which will receive event from EventBus. You can call it like this.
+> *Qiscus SDK is using EventBus for broadcasting event to entire application. You can learn more about EventBus on this website http://greenrobot.org/eventbus/. What you need to do is registering the object which will receive event from EventBus. You can call it like this:*
 
 ```java
-EventBus.getDefault().register(this);
+EventBus.*getDefault*().register(this);
 ```
 
-And don't forget to unregister the receiver after you don't need to listen event anymore by calling this method.
+> *And don't forget to unregister the receiver after you don't need to listen event anymore by calling this method:*
 
 ```java
-EventBus.getDefault().unregister(this);
+EventBus.*getDefault*().unregister(this);
 ```
 
-This is example how to register an activity for receiving event from EventBus.
+> *This is example how to register an activity for receiving event from EventBus:*
 
 ```java
 public class MyActivity extends AppCompatActivity {
@@ -839,11 +1188,11 @@ public class MyActivity extends AppCompatActivity {
 }
 ```
 
-After you register the receiver, now you can subscribe to specific event you need to know. What you need to do is you must create a method with org.greenrobot.eventbus.Subscribe annotation, the method name is up to you, but the parameter in your method must be equal with the event class which you want to listen.
+> *After you register the receiver, now you can subscribe to specific event you need to know. What you need to do is you must create a method with **org.greenrobot.eventbus.Subscribe** annotation, the method name is up to you, but the parameter in your method must be equal with the event class which you want to listen.*
 
-### New Messages
+* On receive *comment*
 
-Class for this event is com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent so now we can create a method that listen with this class type.
+> *Class for this event is **com.qiscus.sdk.event.QiscusCommentReceivedEvent** so now we can create a method that listen with this class type.*
 
 ```java
 @Subscribe
@@ -852,7 +1201,7 @@ public void onReceiveComment(QiscusCommentReceivedEvent event) {
 }
 ```
 
-The method name is up to you, you also can make the method like below. And this is valid too.
+> *The method name is up to you, you also can make the method like below. And this is valid too.*
 
 ```java
 @Subscribe
@@ -861,23 +1210,53 @@ public void onGotQiscusMessage(QiscusCommentReceivedEvent event) {
 }
 ```
 
-Please note QiscusCommentReceivedEvent not guarantee the event only published once per unique comment. So there are will be the same QiscusCommentReceivedEvent published, so you need to handle it.
+> *So now the activity class will be like this below:*
 
-### Typing
+```java
+public class MyActivity extends AppCompatActivity {
 
-Different from listening receive comment, listening to user typing doesn't automatically started. So you must trigger Qiscus mqtt first to listen an event on specific room id. We make it like that for performance reason, listening event to so many room at the same time is not good, so we highly recommend to you just listen room event only to active room page. To listening room event you can call method from QiscusPusherApi class like this.
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);        
+        setContentView(R.layout.activity_my);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.*getDefault*().register(this); // register to EventBus
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.*getDefault*().unregister(this); // unregister from EventBus
+    }
+    
+    @Subscribe
+    public void onReceiveComment(QiscusCommentReceivedEvent event) {
+        event.getQiscusComment(); // to get the comment
+    }
+}
+```
+
+> *Plesae note: **QiscusCommentReceivedEvent** not guarantee the event only published once per unique comment. So there are will be the same **QiscusCommentReceivedEvent** published, so you need to handle it.*
+
+* On *user typing*
+
+> *Different from listening receive comment, listening to user typing doesn't automatically started. So you must trigger Qiscus mqtt first to listen an event on specific room id. We make it like that for performance reason, listening event to so many room at the same time is not good, so we highly recommend to you just listen room event only to active room page. To listening room event you can call method from **QiscusPusherApi** class like this:*
 
 ```java
 QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
 ```
 
-Don't forget to unlisten it after you don't need to listen event anymore by calling this method.
+> *Don't forget to unlisten it after you don't need to listen event anymore by calling this method:*
 
 ```java
 QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
 ```
 
-After you call listen room method from QiscusPusherApi now you can subscribe to room event class which is com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent same like at listen receive comment, the method name is up to you too.
+> *After you call listen room method from **QiscusPusherApi** now you can subscribe to room event class which is **com.qiscus.sdk.event.QiscusChatRoomEvent** same like at listen receive comment, the method name is up to you too.*
 
 ```java
 @Subscribe
@@ -890,7 +1269,9 @@ public void onReceiveRoomEvent(QiscusChatRoomEvent roomEvent) {
 }
 ```
 
-### Message Status Change
+* On *comment *status change
+
+> *This is same like above we need to listen to room event. So the code will be like this:*
 
 ```java
 @Subscribe
@@ -921,15 +1302,38 @@ public void onReceiveRoomEvent(QiscusChatRoomEvent roomEvent) {
 }
 ```
 
-### Participants Online Status
+* on *sync* event
 
-Same as listen room event, to get user online status you need to listen it using QiscusPusherApi first.
+```java
+@Subscribe
+public void onSyncEvent(QiscusSyncEvent event) {
+    // TODO : you can get the event here
+    boolean isStarted = event == QiscusSyncEvent.STARTED;
+    boolean isFailed = event == QiscusSyncEvent.FAILED;
+    boolean isCompleted = event == QiscusSyncEvent.COMPLETED;
+}
+```
+
+* on *MQTT* event
+
+```java
+@Subscribe
+public void onMqttEvent(QiscusMqttStatusEvent event) {
+    // TODO : you can get the event here
+    boolean isConnected = event == QiscusMqttStatusEvent.CONNECTED;
+    boolean isDisconnected = event == QiscusMqttStatusEvent.DISCONNECTED; 
+}
+```
+
+* Listen *participants *online statuses
+
+> *Same as listen room event, to get user online status you need to listen it using **QiscusPusherApi** first.*
 
 ```java
 QiscusPusherApi.getInstance().listenUserStatus("qiscus_user_id");
 ```
 
-Then create method that subscribe to event with com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent class.
+> *Then create method that subscribe to event with **com.qiscus.sdk.event.QiscusUserStatusEvent** class*
 
 ```java
 @Subscribe
@@ -940,15 +1344,98 @@ public void onUserStatusChanged(QiscusUserStatusEvent event) {
 }
 ```
 
-Don't forget to unlisten it after you don't need to listen event anymore by calling this method.
+> *Don't forget to unlisten it after you don't need to listen event anymore by calling this method:*
 
 ```java
 QiscusPusherApi.getInstance().unListenUserStatus("qiscus_user_id");
 ```
 
-### Custom Event
+> *So now the MyActivity class after that all will be like this:*
 
-You can publish and listen custom event using Qiscus, to get started using this feature you can look example below
+```java
+public class MyActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);        
+        setContentView(R.layout.activity_my);
+
+        // listen room event
+        QiscusPusherApi.*getInstance*().listenRoom(qiscusChatRoom);
+
+        // listen user status
+        QiscusPusherApi.getInstance().listenUserStatus("qiscus_user_id");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.*getDefault*().register(this); // register to EventBus
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.*getDefault*().unregister(this); // unregister from EventBus
+    }
+
+    @Subscribe
+    public void onReceiveComment(QiscusCommentReceivedEvent event) {
+        event.getQiscusComment(); // to get the comment    
+    }
+    
+    @Subscribe
+    public void onReceiveRoomEvent(QiscusChatRoomEvent roomEvent) {
+        switch (roomEvent.getEvent()) {
+            case *TYPING*:
+                roomEvent.getRoomId(); // this is the room id                
+                roomEvent.getUser(); // this is the qiscus user id                
+                roomEvent.isTyping(); // true if the user is typing                
+                break;
+            case *DELIVERED*:
+                roomEvent.getRoomId(); // this is the room id                
+                roomEvent.getUser(); // this is the qiscus user id                
+                roomEvent.getCommentId(); // the comment id was delivered                
+                break;
+            case *READ*:
+                roomEvent.getRoomId(); // this is the room id                
+                roomEvent.getUser(); // this is the qiscus user id                
+                roomEvent.getCommentId(); // the comment id was read               
+                break;
+            case CUSTOM:
+                //here, you can listen custom event
+                roomEvent.getRoomId(); // this is the room id
+                roomEvent.getUser(); // this is the qiscus user id
+                roomEvent.getEventData(); //event data (JSON)
+                break;
+        }
+    }
+
+    @Subscribe
+    public void onUserStatusChanged(QiscusUserStatusEvent event) {
+        event.getUser(); // this is the qiscus user id    
+        event.isOnline(); // true if user is online    
+        event.getLastActive(); // Date of last active user
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // stop listening room event
+        QiscusPusherApi.*getInstance*().unListenRoom(qiscusChatRoom);
+
+        // stop listening user status
+        QiscusPusherApi.getInstance().unListenUserStatus("qiscus_user_id");
+    }
+}
+```
+
+> *For all event Class that available on Qiscus you can check **com.qiscus.sdk.event** package https://github.com/qiscus/qiscus-sdk-android/tree/master/chat/src/main/java/com/qiscus/sdk/event*
+
+* Custom Event
+
+> *You can publish and listen custom event using Qiscus, to get started using this feature you can look example below*
 
 ```java
 // publish 
@@ -961,86 +1448,211 @@ QiscusPusherApi.getInstance().listenEvent(roomId);
 QiscusPusherApi.getInstance().unlistenEvent(roomId);
 ```
 
-## Notification
-
-By default push notification already enabled, without to do nothing anymore. But you can still change the configuration to meet your need.
-
-### Enable or Disable Notification
+> *To retrieve Event Data, you can use EventBus by using **@Subscribe** annotation like below*
 
 ```java
-Qiscus.getChatConfig().setEnablePushNotification(true); //default is true
-```
-
-By default too, notifications will appear either when opening a chat page or not. You can change it to just show notification only when user is not open that chat room page.
-
-```java
-Qiscus.getChatConfig().setOnlyEnablePushNotificationOutsideChatRoom(true); // default is false
-```
-
-### FCM Support
-
-Default notification is by mqtt event, we strongly recommend you to use Firebase Cloud Messaging (FCM) too to improve the reliability. First step is to enable FCM configuration.
-
-```java
-Qiscus.getChatConfig().setEnableFcmPushNotification(true); // default is false
-```
-
-After that on your FirebaseInstanceIdService subclass please notify Qiscus the fcm token.
-
-```java
-public class MyFirebaseIdService extends FirebaseInstanceIdService {
-    @Override
-    public void onTokenRefresh() {
-        super.onTokenRefresh();
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        
-        // Register token to qiscus        
-        Qiscus.setFcmToken(refreshedToken);
-        
-        // Below is your own apps specific code        
-        // e.g register the token to your backend        
-        sendTokenToMyBackend(refreshedToken);
+@Subscribe
+public void onReceiveRoomEvent(QiscusChatRoomEvent roomEvent) {
+    switch (roomEvent.getEvent()) {
+        case CUSTOM:
+            //here, you can listen custom event
+            roomEvent.getRoomId(); // this is the room id
+            roomEvent.getUser(); // this is the sender's qiscus user id
+            roomEvent.getEventData(); //event data (JSON)
+        break;
     }
 }
 ```
 
-Then whenever FCM receive a message pass it to Qiscus, so Qiscus can handle that message.
+### Notification
+
+> *Qiscus SDK has 2 source for notification, using **MQTT** and **FCM** . Default notification is from **MQTT**, you must implement **setNotificationListener() **in **chatConfig** like below :*
+
+
+
+* Default
 
 ```java
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        if (QiscusFirebaseService.handleMessageReceived(remoteMessage)) { // For qiscus            
+QiscusCore.getChatConfig().setNotificationListener((context, qiscusComment) -> {
+*    // TODO: Handle Notification here*
+    **showNotification**(context, qiscusComment);
+});
+
+/**
+ * 
+ * ***showNotification****() is your method for show push notification,**
+ * when you call **notify **method in **NotificationManagerCompat** you must run on **UI Thread
+** */
+
+*private void showNotification(Context context, QiscusComment qiscusComment) {
+
+        //check if qiscusComment object already in local database
+        if (QiscusCore.getDataStore().isContains(qiscusComment)) {
             return;
         }
 
-        // Your FCM PN here    
+        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+        
+        String notificationChannelId = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.notification.channel";
+        if (BuildVersionUtil.isOreoOrHigher()) {
+            NotificationChannel notificationChannel =
+                    new NotificationChannel(notificationChannelId, "Chat", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+
+        PendingIntent pendingIntent;
+        Intent openIntent = new Intent(context, **NotificationClickReceiver.class**);
+        openIntent.putExtra("data", qiscusComment);
+        pendingIntent = PendingIntent.getBroadcast(context, QiscusNumberUtil.convertToInt(qiscusComment.getRoomId()),
+                openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelId);
+        notificationBuilder.setContentTitle(qiscusComment.getSender())
+                .setContentIntent(pendingIntent)
+                .setContentText(qiscusComment.getMessage())
+                .setTicker(qiscusComment.getMessage())
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setColor(ContextCompat.getColor(context, R.color.colorAccent))
+                .setGroupSummary(true)
+                .setGroup("CHAT_NOTIF_" + qiscusComment.getRoomId())
+                .setAutoCancel(true)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+
+        QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
+                .notify(QiscusNumberUtil.convertToInt(qiscusComment.getRoomId()), notificationBuilder.build()));
     }
-}
-```
+/**
+ * you must create **NotificationClickReceiver **class like below
+ */
+ public class NotificationClickReceiver extends BroadcastReceiver {
 
-### Custom Notification
-
-If you need a custom notification you can create a NotificationBuilderInterceptor
-
-```java
-class MyNotificationBuilder implements QiscusNotificationBuilderInterceptor {
     @Override
-    public boolean intercept(NotificationCompat.Builder notificationBuilder, QiscusComment qiscusComment) {
-        //Here you can create your own notification        
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationChannelId);        
-        builder.setContentText(qiscusComment.getMessage());
-        NotificationManagerCompat.from(context).notify(id, builder.build());
+    public void onReceive(Context context, Intent intent) {
+        // get qiscusComment object
+        QiscusComment qiscusComment = intent.getParcelableExtra("data");
 
-        return false; // return false to canceling qiscus showing notification    
+        // get qiscusChatRoom from API
+        QiscusApi.getInstance()
+                .getChatRoom(qiscusComment.getRoomId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(qiscusChatRoom -> QiscusCore.getDataStore().addOrUpdate(qiscusChatRoom))
+                .map(qiscusChatRoom -> getChatRoomActivity(context, qiscusChatRoom))
+                .subscribe(newIntent -> start(context, newIntent), throwable ->
+                        Toast.makeText(context, throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private Intent getChatRoomActivity(Context context, QiscusChatRoom qiscusChatRoom) {
+        return qiscusChatRoom.isGroup() ? GroupChatRoomActivity.generateIntent(context, qiscusChatRoom) :
+                ChatRoomActivity.generateIntent(context, qiscusChatRoom);
+    }
+
+    private void start(Context context, Intent newIntent) {
+        context.startActivity(newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+    }
+}
+ 
+
+/**
+ * add to your manifest
+ */
+ <receiver
+    android:name=".service.NotificationClickReceiver"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="com.qiscus.OPEN_COMMENT_PN" />
+    </intent-filter>
+  </receiver>
+    *
+/**
+ * or you can use **PushNotificationUtil** class inside chat module here : link
+ * and you can use like this 
+ * QiscusCore.getChatConfig().setNotificationListener(**QiscusPushNotificationUtil::handlePushNotification**)
+ *
+ */*
+```
+
+* FCM (Firebase Cloud Messaging) Support
+
+> *To enable FCM for your Application, you need to enable FCM like below :*
+
+```java
+QiscusCore.getChatConfig().setEnableFcmPushNotification(true); // default is **false**
+```
+
+> *After enable FCM in **ChatConfig, **you please notify Qiscus about FCM Token like below :*
+
+```java
+public class **AppFirebaseInstanceIdService** extends FirebaseInstanceIdService {
+
+    @Override
+    public void onTokenRefresh() {
+        super.onTokenRefresh();
+        
+        // Notify Qiscus about FCM token
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        QiscusCore.setFcmToken(refreshedToken);
+        
+        //TODO : Application part here, maybe you need to send FCM token to your Backend
     }
 }
 ```
 
-Then register the interceptor to Qiscus
+> *Add the service to your Manifest :*
+
+```xml
+<service android:name=".service.**AppFirebaseInstanceIdService**">
+    <intent-filter>
+        <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+    </intent-filter>
+</service>
+```
+
+> *Handle incoming **qiscusComment** object like below :*
 
 ```java
-Qiscus.getChatConfig().setNotificationBuilderInterceptor(new MyNotificationBuilder());
+public class **AppFirebaseMessagingService** extends FirebaseMessagingService {
+
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+
+        // Qiscus will handle incoming message
+        if (QiscusFirebaseMessagingUtil.handleMessageReceived(remoteMessage)) {
+            return;
+        }
+
+        // TODO : here is hanlder for your application
+        
+    }
+}
+```
+
+> *Add to Manifest :*
+
+```xml
+<service android:name=".service.**AppFirebaseMessagingService**">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+```
+
+> *Add FCM Secret key to your [Qiscus Dashboard Settings](https://www.qiscus.com/dashboard)*
+
+### Debugger
+
+* Enable *debug*
+
+```java
+/**
+ * *enableLog boolean*
+ */
+ 
+QiscusCore.getChatConfig().setEnableLog(*enableLog*);
 ```
 
 
