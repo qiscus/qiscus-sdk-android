@@ -700,13 +700,21 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 } else if (forwardComment.getType() == QiscusComment.Type.LOCATION) {
                     qiscusComment = QiscusComment.generateLocationMessage(room.getId(), forwardComment.getLocation());
                 } else if (forwardComment.getType() == QiscusComment.Type.IMAGE) {
-                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),forwardComment.getAttachmentUri().toString(),forwardComment.getCaption(),forwardComment.getAttachmentName());
+                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),
+                            forwardComment.getAttachmentUri().toString(), forwardComment.getCaption(),
+                            forwardComment.getAttachmentName());
                 } else if (forwardComment.getType() == QiscusComment.Type.AUDIO) {
-                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),forwardComment.getAttachmentUri().toString(),forwardComment.getCaption(),forwardComment.getAttachmentName());
+                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(), forwardComment.getAttachmentUri().toString(),
+                            forwardComment.getCaption(),
+                            forwardComment.getAttachmentName());
                 } else if (forwardComment.getType() == QiscusComment.Type.FILE) {
-                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),forwardComment.getAttachmentUri().toString(),forwardComment.getCaption(),forwardComment.getAttachmentName());
+                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(), forwardComment.getAttachmentUri().toString(),
+                            forwardComment.getCaption(),
+                            forwardComment.getAttachmentName());
                 } else if (forwardComment.getType() == QiscusComment.Type.VIDEO) {
-                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(),forwardComment.getAttachmentUri().toString(),forwardComment.getCaption(),forwardComment.getAttachmentName());
+                    qiscusComment = QiscusComment.generateFileAttachmentMessage(room.getId(), forwardComment.getAttachmentUri().toString(),
+                            forwardComment.getCaption(),
+                            forwardComment.getAttachmentName());
                 } else {
                     qiscusComment = QiscusComment.generateMessage(room.getId(), forwardComment.getMessage());
                 }
