@@ -47,6 +47,7 @@
                 android:textColor="@color/qiscus_primary_text" />
 
             <ImageView
+                android:visibility="gone"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="16dp"

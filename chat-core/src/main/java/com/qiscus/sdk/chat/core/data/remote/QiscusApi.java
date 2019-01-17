@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -358,19 +359,15 @@ public enum QiscusApi {
                 .map(jsonElement -> null);
     }
 
+    @Deprecated
     public Observable<List<QiscusComment>> searchComments(String query, long lastCommentId) {
         return searchComments(query, 0, lastCommentId);
     }
 
+    @Deprecated
     public Observable<List<QiscusComment>> searchComments(String query, long roomId, long lastCommentId) {
-        return api.searchComments(QiscusCore.getToken(), query, roomId, lastCommentId)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
-                        .getAsJsonObject().get("comments").getAsJsonArray()))
-                .map(jsonElement -> {
-                    JsonObject jsonComment = jsonElement.getAsJsonObject();
-                    return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
-                })
-                .toList();
+        return Observable.error(new RuntimeException("Please use local data search!, we are currently working on search"));
+
     }
 
     public Observable<Void> clearCommentsByRoomIds(List<Long> roomIds) {
@@ -403,9 +400,9 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusComment>> deleteComments(List<String> commentUniqueIds,
-                                                          boolean isDeleteForEveryone,
                                                           boolean isHardDelete) {
-        return api.deleteComments(QiscusCore.getToken(), commentUniqueIds, isDeleteForEveryone, isHardDelete)
+        // isDeleteForEveryone => akan selalu true, karena deleteForMe deprecated
+        return api.deleteComments(QiscusCore.getToken(), commentUniqueIds, true, isHardDelete)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
@@ -551,6 +548,13 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
+    public Observable<HashMap<String, List<QiscusRoomMember>>> getCommentInfo(long commentId) {
+        return api.getCommentReceipt(QiscusCore.getToken(), commentId)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(QiscusApiParser::parseQiscusCommentInfo);
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
@@ -669,6 +673,7 @@ public enum QiscusApi {
                 @Field("device_token") String fcmToken
         );
 
+        @Deprecated
         @POST("api/v2/mobile/search_messages")
         Observable<JsonElement> searchComments(
                 @Query("token") String token,
@@ -765,6 +770,12 @@ public enum QiscusApi {
                 @Query("order_by_key_name") String orderKey,
                 @Query("sorting") String sorting,
                 @Query("user_name") String userName
+        );
+
+        @GET("/api/v2/sdk/comment_receipt")
+        Observable<JsonElement> getCommentReceipt(
+                @Query("token") String token,
+                @Query("comment_id") long commentId
         );
     }
 
