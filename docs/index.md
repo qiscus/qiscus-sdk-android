@@ -235,7 +235,7 @@ Email addresses are a bad choice for user IDs because users may change their ema
 
 Server Authentication is another option, which allow you to authenticate using JSON Web Tokens [(JWT)](https://jwt.io/). JSON Web Tokens contains your app account details which typically consists of a single string which contains information of two parts, JOSE Header, JWT Claims Set.
 
-<p align="center"><br/><img src="[https://d3p8ijl4igpb16.cloudfront.net/docs/assets/docs-screenshot-android/docs_ss_jwt_authentication.png](https://s3-ap-southeast-1.amazonaws.com/qiscus-sdk/docs/assets/docs-screenshot-android/docs_ss_jwt_authentication.png)" width="100%" /><br/></p>
+<p align="center"><br/><img src="https://d3p8ijl4igpb16.cloudfront.net/docs/assets/docs-screenshot-android/docs_ss_jwt_authentication.png" width="100%" /><br/></p>
 
 The steps to authenticate with JWT goes like this:
 
@@ -768,7 +768,7 @@ QiscusApi.getInstance().getTotalUnreadCount()
 
 ## Message
 
-This section consist of Message Qiscus Chat SDK behaviour. In Message you can add metadata called **extras. ****extras** is automatically synchronized by each participant in the Chat Room. Qiscus Chat SDK has 3 statues, Sent, Delivered, and Read for a message. Once message is sent, the OnReceiveMessage event handler will be called, you can refer to [event handler section](#event-handler)
+This section consist of Message Qiscus Chat SDK behaviour. In Message you can add metadata called **extras**. **extras** is automatically synchronized by each participant in the Chat Room. Qiscus Chat SDK has 3 statues, Sent, Delivered, and Read for a message. Once message is sent, the OnReceiveMessage event handler will be called, you can refer to [event handler section](#event-handler)
 
 ### Send Message 
 
@@ -790,7 +790,7 @@ Where:
 
 * `roomId`:  Chat Room Identity (Id), you can get this Id in `QiscusChatRoom` object 
 * `text`: message text that you send to other participant
-* `type`: message type, that you can define freely, there are predefined rich messages **type, **for example: ***text, file_attachment, account_linking, buttons, button_postback_response, replay, system_event, card, custom, location, contact_person, carousel. ***These type have taken, if you use it you may face your structured data will not work, these type for bot API, hence you need define other type name.
+* `type`: message type, that you can define freely, there are predefined rich messages **type**, **for example: text, file_attachment, account_linking, buttons, button_postback_response, replay, system_event, card, custom, location, contact_person, carousel**. These type have taken, if you use it you may face your structured data will not work, these type for bot API, hence you need define other type name.
 * `content`: Payload for defining the structured message data, for example you want to create your own **file** message, you can fill the `content` using this example JSON :
 
 ```
@@ -848,7 +848,7 @@ QiscusApi.getInstance().postComment(qiscusComment)
 
 ### Update Messsage Read Status
 
-You can set your message status into **read**, the ideal case of this is to notify other participant that a message has **read.  **
+You can set your message status into **read**, the ideal case of this is to notify other participant that a message has **read.**
 You need to pass `roomId ` and `commentId`. When you have **10 messages**, and the latest message Id, let say is **10**, once you set **read** message status with the latest message, in this case is **10, **your previous messages will update into **read** as well. You can update message read status by calling `setUserRead` method, for example:
 
 ```
