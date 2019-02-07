@@ -482,7 +482,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload(online ? "1".getBytes() : "0".getBytes());
-            message.setQos(2);
+            message.setQos(0);
             message.setRetained(true);
             mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message);
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {

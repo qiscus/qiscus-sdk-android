@@ -485,12 +485,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 
-        if (cursor.moveToNext()) {
-            QiscusRoomMember qiscusRoomMember = QiscusDb.MemberTable.getMember(cursor);
+        try {
+            if (cursor != null && cursor.moveToNext()) {
+                QiscusRoomMember qiscusRoomMember = QiscusDb.MemberTable.getMember(cursor);
+                cursor.close();
+                return qiscusRoomMember;
+            } else {
+                cursor.close();
+                return null;
+            }
+        } catch (Exception e) {
             cursor.close();
-            return qiscusRoomMember;
-        } else {
-            cursor.close();
+            QiscusErrorLogger.print(e);
             return null;
         }
     }
