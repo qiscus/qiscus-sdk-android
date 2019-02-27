@@ -37,24 +37,26 @@ import rx.Observable;
 
 public class QiscusDataBaseHelper implements QiscusDataStore {
 
-    protected final SQLiteDatabase sqLiteDatabase;
+    protected final SQLiteDatabase sqLiteReadDatabase;
+    protected final SQLiteDatabase sqLiteWriteDatabase;
 
     public QiscusDataBaseHelper() {
         QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(QiscusCore.getApps());
-        sqLiteDatabase = qiscusDbOpenHelper.getReadableDatabase();
+        sqLiteReadDatabase = qiscusDbOpenHelper.getReadableDatabase();
+        sqLiteWriteDatabase = qiscusDbOpenHelper.getWritableDatabase();
     }
 
     @Override
     public void add(QiscusChatRoom qiscusChatRoom) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.RoomTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.RoomTable.TABLE_NAME, null,
                     QiscusDb.RoomTable.toContentValues(qiscusChatRoom), SQLiteDatabase.CONFLICT_ABORT);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
 
         if (qiscusChatRoom.getMember() != null) {
@@ -75,7 +77,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
                 + QiscusDb.RoomTable.COLUMN_ID + " = " + qiscusChatRoom.getId();
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
         cursor.close();
         return contains;
@@ -85,14 +87,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void update(QiscusChatRoom qiscusChatRoom) {
         String where = QiscusDb.RoomTable.COLUMN_ID + " = " + qiscusChatRoom.getId();
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.update(QiscusDb.RoomTable.TABLE_NAME, QiscusDb.RoomTable.toContentValues(qiscusChatRoom), where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.update(QiscusDb.RoomTable.TABLE_NAME, QiscusDb.RoomTable.toContentValues(qiscusChatRoom), where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
 
         if (qiscusChatRoom.getMember() != null && !qiscusChatRoom.getMember().isEmpty()) {
@@ -123,7 +125,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
                 + QiscusDb.RoomTable.COLUMN_ID + " = " + id;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
 
         if (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
@@ -158,7 +160,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL
                 + " = " + DatabaseUtils.sqlEscapeString(email);
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
 
         while (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = getChatRoom(QiscusDb.RoomMemberTable.getRoomId(cursor));
@@ -182,7 +184,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
                 + QiscusDb.RoomTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(uniqueId);
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
 
         if (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
@@ -221,7 +223,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " LIMIT " + limit
                 + " OFFSET " + offset;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
@@ -275,7 +277,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             }
         }
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query.toString(), null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query.toString(), null);
         while (cursor.moveToNext()) {
             QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qiscusChatRoom.setMember(getRoomMembers(qiscusChatRoom.getId()));
@@ -294,29 +296,29 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void deleteChatRoom(long roomId) {
         String where = QiscusDb.RoomTable.COLUMN_ID + " = " + roomId;
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
     @Override
     public void addRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
         distinctId = distinctId == null ? "default" : distinctId;
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.RoomMemberTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.RoomMemberTable.TABLE_NAME, null,
                     QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember), SQLiteDatabase.CONFLICT_ABORT);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
         addOrUpdate(qiscusRoomMember);
     }
@@ -329,7 +331,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL
                 + " = " + DatabaseUtils.sqlEscapeString(email);
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
         cursor.close();
         return contains;
@@ -341,15 +343,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
                 + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(qiscusRoomMember.getEmail());
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.update(QiscusDb.RoomMemberTable.TABLE_NAME,
+            sqLiteWriteDatabase.update(QiscusDb.RoomMemberTable.TABLE_NAME,
                     QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember), where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
 
         addOrUpdate(qiscusRoomMember);
@@ -357,15 +359,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void addOrUpdateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.RoomMemberTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.RoomMemberTable.TABLE_NAME, null,
                     QiscusDb.RoomMemberTable.toContentValues(roomId, distinctId, qiscusRoomMember), SQLiteDatabase.CONFLICT_REPLACE);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
 
         addOrUpdate(qiscusRoomMember);
@@ -377,7 +379,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.RoomMemberTable.TABLE_NAME + " WHERE "
                 + QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusRoomMember> members = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusRoomMember member = getMember(QiscusDb.RoomMemberTable.getUserEmail(cursor));
@@ -396,14 +398,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId
                 + " AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(email);
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -411,28 +413,28 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void deleteRoomMembers(long roomId) {
         String where = QiscusDb.RoomMemberTable.COLUMN_ROOM_ID + " = " + roomId;
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
     @Override
     public void add(QiscusRoomMember qiscusRoomMember) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.MemberTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.MemberTable.TABLE_NAME, null,
                     QiscusDb.MemberTable.toContentValues(qiscusRoomMember), SQLiteDatabase.CONFLICT_ABORT);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -442,7 +444,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.MemberTable.TABLE_NAME + " WHERE "
                 + QiscusDb.MemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(qiscusRoomMember.getEmail());
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
         cursor.close();
         return contains;
@@ -452,28 +454,28 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void update(QiscusRoomMember qiscusRoomMember) {
         String where = QiscusDb.MemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(qiscusRoomMember.getEmail());
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.update(QiscusDb.MemberTable.TABLE_NAME, QiscusDb.MemberTable.toContentValues(qiscusRoomMember), where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.update(QiscusDb.MemberTable.TABLE_NAME, QiscusDb.MemberTable.toContentValues(qiscusRoomMember), where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
     @Override
     public void addOrUpdate(QiscusRoomMember qiscusRoomMember) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.MemberTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.MemberTable.TABLE_NAME, null,
                     QiscusDb.MemberTable.toContentValues(qiscusRoomMember), SQLiteDatabase.CONFLICT_REPLACE);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -483,7 +485,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.MemberTable.TABLE_NAME + " WHERE "
                 + QiscusDb.MemberTable.COLUMN_USER_EMAIL + " = " + DatabaseUtils.sqlEscapeString(email);
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
 
         try {
             if (cursor != null && cursor.moveToNext()) {
@@ -503,29 +505,29 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void add(QiscusComment qiscusComment) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
                     QiscusDb.CommentTable.toContentValues(qiscusComment), SQLiteDatabase.CONFLICT_ABORT);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
     @Override
     public void saveLocalPath(long roomId, long commentId, String localPath) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.FilesTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.FilesTable.TABLE_NAME, null,
                     QiscusDb.FilesTable.toContentValues(roomId, commentId, localPath), SQLiteDatabase.CONFLICT_ABORT);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -535,7 +537,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusComment.getUniqueId());
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
         cursor.close();
         return contains;
@@ -547,7 +549,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
                 + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
         cursor.close();
         return contains;
@@ -557,14 +559,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void update(QiscusComment qiscusComment) {
         String where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusComment.getUniqueId());
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -572,43 +574,43 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void updateLocalPath(long roomId, long commentId, String localPath) {
         String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId;
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.update(QiscusDb.FilesTable.TABLE_NAME,
+            sqLiteWriteDatabase.update(QiscusDb.FilesTable.TABLE_NAME,
                     QiscusDb.FilesTable.toContentValues(roomId, commentId, localPath), where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
     @Override
     public void addOrUpdate(QiscusComment qiscusComment) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
                     QiscusDb.CommentTable.toContentValues(qiscusComment), SQLiteDatabase.CONFLICT_REPLACE);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
     @Override
     public void addOrUpdateLocalPath(long roomId, long commentId, String localPath) {
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.insertWithOnConflict(QiscusDb.FilesTable.TABLE_NAME, null,
+            sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.FilesTable.TABLE_NAME, null,
                     QiscusDb.FilesTable.toContentValues(roomId, commentId, localPath), SQLiteDatabase.CONFLICT_REPLACE);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -616,14 +618,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void delete(QiscusComment qiscusComment) {
         String where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusComment.getUniqueId());
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
         deleteLocalPath(qiscusComment.getId());
     }
@@ -641,14 +643,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         }
 
         String where = QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId;
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
 
         return true;
@@ -669,14 +671,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String where = QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
                 + QiscusDb.CommentTable.COLUMN_TIME + " <= " + timestampOffset;
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
 
         return true;
@@ -691,14 +693,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " AND " + QiscusDb.CommentTable.COLUMN_ID + " != -1"
                 + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QiscusComment.STATE_DELIVERED;
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.execSQL(sql);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.execSQL(sql);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -711,14 +713,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " AND " + QiscusDb.CommentTable.COLUMN_ID + " != -1"
                 + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QiscusComment.STATE_READ;
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteDatabase.execSQL(sql);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.execSQL(sql);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -728,7 +730,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.FilesTable.TABLE_NAME + " WHERE "
                 + QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         if (cursor.moveToNext()) {
             File file = new File(QiscusDb.FilesTable.parseCursor(cursor));
             cursor.close();
@@ -749,15 +751,15 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             file.delete();
         }
 
-        sqLiteDatabase.beginTransaction();
+        sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
             String where = QiscusDb.FilesTable.COLUMN_COMMENT_ID + " = " + commentId;
-            sqLiteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, where, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteWriteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, where, null);
+            sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
@@ -767,7 +769,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(uniqueId);
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         if (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
             QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
@@ -788,7 +790,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " = " + id;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         if (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
             QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
@@ -810,7 +812,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_COMMENT_BEFORE_ID + " = " + beforeId;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         if (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
             QiscusRoomMember qiscusRoomMember = getMember(qiscusComment.getSenderEmail());
@@ -834,7 +836,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -858,7 +860,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + limit;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -882,7 +884,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -923,7 +925,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + limit;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment comment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -961,7 +963,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment comment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -993,7 +995,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + " LIMIT " + 1;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1016,7 +1018,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1040,7 +1042,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1064,7 +1066,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         QiscusComment qiscusComment = null;
         while (cursor.moveToNext()) {
             qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1085,7 +1087,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_PENDING
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " ASC";
 
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1118,7 +1120,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + " LIMIT " + limit + " OFFSET " + offset;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(sql, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1142,7 +1144,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC "
                 + " LIMIT " + limit + " OFFSET " + offset;
 
-        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        Cursor cursor = sqLiteReadDatabase.rawQuery(sql, null);
         List<QiscusComment> qiscusComments = new ArrayList<>();
         while (cursor.moveToNext()) {
             QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
@@ -1159,18 +1161,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void clear() {
-        sqLiteDatabase.beginTransaction();
+        sqLiteReadDatabase.beginTransaction();
         try {
-            sqLiteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, null, null);
-            sqLiteDatabase.delete(QiscusDb.MemberTable.TABLE_NAME, null, null);
-            sqLiteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, null, null);
-            sqLiteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, null, null);
-            sqLiteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
-            sqLiteDatabase.setTransactionSuccessful();
+            sqLiteReadDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, null, null);
+            sqLiteReadDatabase.delete(QiscusDb.MemberTable.TABLE_NAME, null, null);
+            sqLiteReadDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, null, null);
+            sqLiteReadDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, null, null);
+            sqLiteReadDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
+            sqLiteReadDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteDatabase.endTransaction();
+            sqLiteWriteDatabase.endTransaction();
         }
     }
 
