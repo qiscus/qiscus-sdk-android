@@ -456,7 +456,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteWriteDatabase.update(QiscusDb.MemberTable.TABLE_NAME, QiscusDb.MemberTable.toContentValues(qiscusRoomMember), where, null);
+            sqLiteWriteDatabase.update(QiscusDb.MemberTable.TABLE_NAME,
+                    QiscusDb.MemberTable.toContentValues(qiscusRoomMember), where, null);
             sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
