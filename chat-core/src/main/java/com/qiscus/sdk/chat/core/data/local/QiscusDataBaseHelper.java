@@ -1173,7 +1173,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
         } finally {
-            sqLiteWriteDatabase.endTransaction();
+            sqLiteReadDatabase.endTransaction();
         }
     }
 
