@@ -22,7 +22,7 @@ public final class QiscusLogger {
 
     public static void print(String tag, String message) {
         if (QiscusCore.getChatConfig().isEnableLog()) {
-            Log.i(tag, message);
+            Log.d(tag, message);
         }
     }
 }
