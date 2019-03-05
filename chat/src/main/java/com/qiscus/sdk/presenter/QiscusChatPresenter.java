@@ -21,6 +21,7 @@ import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
@@ -364,13 +365,21 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
                     Qiscus.getDataStore().addOrUpdate(roomData.first);
                 })
+                .doOnNext(roomData -> {
+                    for (QiscusComment qiscusComment : roomData.second) {
+                        Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .onErrorReturn(throwable -> null);
     }
 
     private Observable<List<QiscusComment>> getCommentsFromNetwork(long lastCommentId) {
         return QiscusApi.getInstance().getComments(room.getId(), lastCommentId)
-                .doOnNext(qiscusComment -> qiscusComment.setRoomId(room.getId()))
+                .doOnNext(qiscusComment -> {
+                    QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+                    qiscusComment.setRoomId(room.getId());
+                })
                 .toSortedList(commentComparator)
                 .subscribeOn(Schedulers.io());
     }
