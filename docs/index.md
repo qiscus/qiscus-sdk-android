@@ -112,7 +112,7 @@ QiscusCore.setUser(*userId* , *userKey*)
       .withUsername(*username*)
       .withAvatarUrl(*avatarUrl*)
       .withExtras(*extras*)
-      .save(new Qiscus.SetUserListener() {
+      .save(new QiscusCore.SetUserListener() {
           @Override
           public void onSuccess(QiscusAccount qiscusAccount) {
               //on success
@@ -205,7 +205,7 @@ QiscusCore.setUser(*userId* , *userKey*)
       .withUsername(*username*)
       .withAvatarUrl(*avatarUrl*)
       .withExtras(*extras*)
-      .save(new Qiscus.SetUserListener() {
+      .save(new QiscusCore.SetUserListener() {
           @Override
           public void onSuccess(QiscusAccount qiscusAccount) {
               //on success
@@ -317,7 +317,7 @@ QiscusApi.getInstance()
 Once you get a Nonce, you can request JWT from your backend by sending Nonce you got from Qiscus Server. When you got the JWT Token, you can pass that JWT to `setUser()` method to allow Qiscus to authenticate your user and return Qiscus Account, as shown in the code below:
 
 ```
-Qiscus.setUser('your jwt token', new Qiscus.SetUserListener() {
+QiscusCore.setUser('your jwt token', new QiscusCore.SetUserListener() {
         @Override
         public void onSuccess(QiscusAccount qiscusAccount) {
             //do anything if success
@@ -663,7 +663,7 @@ qiscusChatRoom.getMember();
 Retrieving local data you need `roomId`, for example:
 
 ```
-Qiscus.getDataStore().getRoomMembers(roomId);
+QiscusCore.getDataStore().getRoomMembers(roomId);
 ```
 
 Retrieving from Qiscus Server, you need `roomUniqueId`, you get default 100 participants, for example:
@@ -722,7 +722,7 @@ After success adding participant in Chat Room participant, you can to update Cha
 
 ```
 QiscusApi.getInstance().addRoomMember(roomId, userId)
-        .doOnNext(chatRoom -> Qiscus.getDataStore().addOrUpdate(chatRoom))
+        .doOnNext(chatRoom -> QiscusCore.getDataStore().addOrUpdate(chatRoom))
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(chatRoom -> {
@@ -744,7 +744,7 @@ After success removing a participant in Chat Room, you can update Chat Room obje
 
 ```
 QiscusApi.getInstance().removeRoomMember(roomId, userId)
-        .doOnNext(chatRoom -> Qiscus.getDataStore().addOrUpdate(chatRoom))
+        .doOnNext(chatRoom -> QiscusCore.getDataStore().addOrUpdate(chatRoom))
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(chatRoom -> {
@@ -1145,7 +1145,7 @@ Firstly you need passing `roomId` which ChatRoom you want to set, and the struct
 {
   "sender": "John Doe",
   "event": "writing document...",
-  **"active": "true"**
+  "active": "true"
 }
 ```
 
@@ -1161,7 +1161,7 @@ If you need to stop telling other participant that event is ended, you can send 
 {
   "sender": "John Doe",
   "event": "writing document...",
-  **"active": "false"**
+  "active": "false"
 }
 ```
 
