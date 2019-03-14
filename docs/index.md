@@ -21,7 +21,7 @@ Qiscus Chat SDK provides features such as:
 * Enable Push notification
 * Export and import messages from your App
 
-### How QIscus works
+### How Qiscus works
 
 We recommend that you understand the concept before proceeding with the rest
 
