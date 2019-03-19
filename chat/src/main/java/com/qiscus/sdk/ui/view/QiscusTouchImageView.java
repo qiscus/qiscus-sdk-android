@@ -937,6 +937,11 @@ public class QiscusTouchImageView extends AppCompatImageView {
                 consumed = doubleTapListener.onDoubleTap(e);
             }
             if (state == State.NONE) {
+                final Drawable drawable = getDrawable();
+                if (drawable == null) {
+                    return false;
+                }
+
                 float targetZoom = (normalizedScale == minScale) ? maxScale : minScale;
                 DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, e.getX(), e.getY(), false);
                 compatPostOnAnimation(doubleTap);
