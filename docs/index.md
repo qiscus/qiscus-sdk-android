@@ -21,7 +21,7 @@ Qiscus Chat SDK provides features such as:
 * Enable Push notification
 * Export and import messages from your App
 
-### How QIscus works
+### How Qiscus works
 
 We recommend that you understand the concept before proceeding with the rest
 
@@ -52,7 +52,7 @@ In order to help you to get to know with our chat SDK, we have provided a sample
 git clone https://bitbucket.org/qiscus/qiscus-sdk-core-android-sample.git
 ```
 
-This sample use **sample APP ID**, means, you will share data with others, in case you want to try by your own you can change the APP ID into your own APP ID, you can find your APP ID in your dashboard. [dashboard link] (https://dashboard.qiscus.com/dashboard/login)
+This sample use **sample APP ID**, means, you will share data with others, in case you want to try by your own you can change the APP ID into your own APP ID, you can find your APP ID in your dashboard. [dashboard link](https://dashboard.qiscus.com/dashboard/login)
 
 ## Getting Started
 
@@ -80,7 +80,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 ```
 dependencies {
     ...
-    implementation 'com.qiscus.sdk:chat-core:1.2.4'
+    implementation 'com.qiscus.sdk:chat-core:1.2.5'
 }
 ```
 
@@ -108,11 +108,11 @@ public class SampleApp extends Application {
 To use Qiscus Chat SDK features a user firstly need to authenticate to Qiscus Server, for further detail you might figure out [Authentication section link](#authentication). This authentication is done by calling `setUser()` function. This function will retrieve or create user credential based on the unique **User Id, **for example:
 
 ```
-QiscusCore.setUser(*userId* , *userKey*)
-      .withUsername(*username*)
-      .withAvatarUrl(*avatarUrl*)
-      .withExtras(*extras*)
-      .save(new Qiscus.SetUserListener() {
+QiscusCore.setUser(userId, userKey)
+      .withUsername(username)
+      .withAvatarUrl(avatarUrl)
+      .withExtras(extras)
+      .save(new QiscusCore.SetUserListener() {
           @Override
           public void onSuccess(QiscusAccount qiscusAccount) {
               //on success
@@ -125,12 +125,12 @@ QiscusCore.setUser(*userId* , *userKey*)
 
 ### Step 5 : Create 1-On-1 Chat Room
 
-There are three Chat Room types, 1-on-1, group, and channel, for further detail you can see [Chat Room type](#chat-room-type) for this section let's use 1-on-1. We assume that you already know a targeted user you want to chat with. To start a conversation with your targeted user, it can be done with **getChatRoom**** **method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is successfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener . 
+There are three Chat Room types, 1-on-1, group, and channel, for further detail you can see [Chat Room type](#chat-room-type) for this section let's use 1-on-1. We assume that you already know a targeted user you want to chat with. To start a conversation with your targeted user, it can be done with **getChatRoom** method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is successfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener. 
 
 ```
 QiscusApi.getInstance().getChatRoom(userId, distinctId, options)
-        .subscribeOn(Schedulers.io()) // need to run this task on IO thread
-        .observeOn(AndroidSchedulers.mainThread()) // deliver result on main thread or UI thread
+        .subscribeOn(Schedulers.io()) //need to run this task on IO thread
+        .observeOn(AndroidSchedulers.mainThread()) //deliver result on main thread or UI thread
         .subscribe(qiscusChatRoom -> {
             // on success        
         }, throwable -> {
@@ -138,14 +138,14 @@ QiscusApi.getInstance().getChatRoom(userId, distinctId, options)
         });
 ```
 
-> **Note:  **Make sure that your targeted user has been registered in Qiscus Chat SDK 
+> **Note:  ** Make sure that your targeted user has been registered in Qiscus Chat SDK 
 
 ### Step 6 : Send Message
 
 You can send any type of data through Qiscus Chat SDK, in this section let's send a “Hi” **message**, 
-with type value is **text. **For further detail about message you can find at [Message section](#message)
+with type value is **text** .For further detail about message you can find at [Message section](#message)
 
-* Generate `QiscusComment`** **object, **text** type :
+* Generate `QiscusComment` **object**, **text** type :
 
 ```
 QiscusComment qiscuscomment = QiscusComment.generateMessage(roomId, text)
@@ -175,13 +175,13 @@ To use Qiscus Chat SDK features, authentication to Qiscus Server is needed, your
 You need to initiate your APP ID for your chat App before carry out to Authentication. This initialization only need to be done once in the app lifecycle. Initialization can be implemented in the initial startup. Here is how you can do that:
 
 ```
-QiscusCore.init(*application*, *appId*);
+QiscusCore.init(application, appId);
 ```
 
 If you have your own server **(on Premise) **you can change the URL, here's the example 
 
 ```
-QiscusCore.initCustomServer(*application, appId, serverBaseUrl, mqttBrokerUrl*);
+QiscusCore.initCustomServer(application, appId, serverBaseUrl, mqttBrokerUrl);
 ```
 
 For further detail on premise information you can contact us mailto:contact.us@qiscus.com
@@ -201,11 +201,11 @@ There are 2 type of authentications that you can choose to use: Client Authentic
 This authentication is done by calling `setUser()` function. This function will retrieve or create user credential based on the unique user Id. Here is example:
 
 ```
-QiscusCore.setUser(*userId* , *userKey*)
-      .withUsername(*username*)
-      .withAvatarUrl(*avatarUrl*)
-      .withExtras(*extras*)
-      .save(new Qiscus.SetUserListener() {
+QiscusCore.setUser(userId , userKey)
+      .withUsername(username)
+      .withAvatarUrl(avatarUrl)
+      .withExtras(extras)
+      .save(new QiscusCore.SetUserListener() {
           @Override
           public void onSuccess(QiscusAccount qiscusAccount) {
               //on success
@@ -291,7 +291,10 @@ HMACSHA256(
   Qiscus Secret Key)
 ```
 
-To make this easier, we provide sample backends in PHP [[PHP sample identity token](https://bitbucket.org/qiscus/qiscus-sdk-php/src/ff4f04a59100/?at=master)] You can use any other language or platform
+To make this easier, we provide sample backends in [PHP](https://bitbucket.org/qiscus/qiscus-sdk-jwt-sample/src/master/). You can use any other language or platform.
+
+> Note :
+JWT Sample backend in PHP can be found by clicking this [link](https://bitbucket.org/qiscus/qiscus-sdk-jwt-sample/src/master/)
 
 * Step 2 : Start to get a **Nonce **
 
@@ -314,7 +317,7 @@ QiscusApi.getInstance()
 Once you get a Nonce, you can request JWT from your backend by sending Nonce you got from Qiscus Server. When you got the JWT Token, you can pass that JWT to `setUser()` method to allow Qiscus to authenticate your user and return Qiscus Account, as shown in the code below:
 
 ```
-Qiscus.setUser('your jwt token', new Qiscus.SetUserListener() {
+QiscusCore.setUser('your jwt token', new QiscusCore.SetUserListener() {
         @Override
         public void onSuccess(QiscusAccount qiscusAccount) {
             //do anything if success
@@ -431,7 +434,7 @@ This section contains user Qiscus Chat SDK behaviour, you can do **update user p
 You can update user's data, for example
 
 ```
-QiscusCore.updateUser(*username*, *avatarUrl*, *extras*, new QiscusCore.SetUserListener() {
+QiscusCore.updateUser(username, avatarUrl, extras, new QiscusCore.SetUserListener() {
             @Override
             public void onSuccess(QiscusAccount qiscusAccount) {
                 //do anything after it successfully updated
@@ -516,10 +519,10 @@ Where:
 if you want to save the Chat Room into local data after creating or getting Chat Room from Qiscus server, here's the code:
 
 ```
-QiscusApi.*getInstance*().getChatRoom(userId*,** *distinctId, options)
-        .doOnNext(chatRoom -> QiscusCore.*getDataStore*().addOrUpdate(chatRoom))
-        .subscribeOn(Schedulers.*io*())
-        .observeOn(AndroidSchedulers.*mainThread*())
+QiscusApi.getInstance().getChatRoom(userId, distinctId, options)
+        .doOnNext(chatRoom -> QiscusCore.getDataStore().addOrUpdate(chatRoom))
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(chatRoom -> {
            // on success         
         }, throwable -> {
@@ -548,7 +551,7 @@ Where:
 After success creating a Chat Room, you can save Chat Room to local data like this :
 
 ```
-QiscusCore.getDataStore().addOrUpdate(*chatRoom*);
+QiscusCore.getDataStore().addOrUpdate(chatRoom);
 ```
 
 ### Create Or Get Channel With Metadata
@@ -558,13 +561,13 @@ The ideal creating Channel Chat Room is for use cases that requires a lot of num
 When first call (room is not exist), if requester did not send `avatar_ur`l and/or room `name` it will use default value. But, after the second call (room is exist) and user (requester) send `avatar_url` and/or room `name`, it will be updated to that value.
 
 ```
-QiscusApi.*getInstance*().getGroupChatRoom(uniqueId, name, avatarUrl, options);
+QiscusApi.getInstance().getGroupChatRoom(uniqueId, name, avatarUrl, options);
 ```
 
 You can get Channel Chat Room from your local data, for example: 
 
 ```
-QiscusCore.*getDataStore*().getChatRoomWithUniqueId(uniqueId);
+QiscusCore.getDataStore().getChatRoomWithUniqueId(uniqueId);
 ```
 
 ### Get Chat Room By Id (Enter Existing Chat Room)
@@ -580,13 +583,13 @@ QiscusApi.getInstance().getChatRoomComments(roomId);
 You can get a Chat Room by `userId`. This only works 1-on-1 Chat Room.
 
 ```
-QiscusApi.*getInstance*().getChatRoom(userId, distinctId, options);
+QiscusApi.getInstance().getChatRoom(userId, distinctId, options);
 ```
 
 You can get a Chat Room from your local data, for example:
 
 ```
-QiscusCore.*getDataStore*().getChatRoom(userId);
+QiscusCore.getDataStore().getChatRoom(userId);
 ```
 
 ### Get Chat Rooms Information
@@ -644,7 +647,7 @@ QiscusApi.getInstance().getChatRooms(page, limit, showMembers)
 You can update your Chat Room metadata, you need `roomId`, your Chat Room `name`, your Chat Room `avatar Url`, and `options`, for example:
 
 ```
-QiscusApi.*getInstance*().updateChatRoom(roomId, name, avatarUrl, options);
+QiscusApi.getInstance().updateChatRoom(roomId, name, avatarUrl, options);
 ```
 
 ### Get Participant List In Chat Room
@@ -660,7 +663,7 @@ qiscusChatRoom.getMember();
 Retrieving local data you need `roomId`, for example:
 
 ```
-Qiscus.getDataStore().getRoomMembers(roomId);
+QiscusCore.getDataStore().getRoomMembers(roomId);
 ```
 
 Retrieving from Qiscus Server, you need `roomUniqueId`, you get default 100 participants, for example:
@@ -719,7 +722,7 @@ After success adding participant in Chat Room participant, you can to update Cha
 
 ```
 QiscusApi.getInstance().addRoomMember(roomId, userId)
-        .doOnNext(chatRoom -> Qiscus.getDataStore().addOrUpdate(chatRoom))
+        .doOnNext(chatRoom -> QiscusCore.getDataStore().addOrUpdate(chatRoom))
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(chatRoom -> {
@@ -741,7 +744,7 @@ After success removing a participant in Chat Room, you can update Chat Room obje
 
 ```
 QiscusApi.getInstance().removeRoomMember(roomId, userId)
-        .doOnNext(chatRoom -> Qiscus.getDataStore().addOrUpdate(chatRoom))
+        .doOnNext(chatRoom -> QiscusCore.getDataStore().addOrUpdate(chatRoom))
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(chatRoom -> {
@@ -921,17 +924,17 @@ That code only download the file without saving information to local data. To sa
 
 ```
 public void downloadFile(QiscusComment qiscusComment) {
-    QiscusApi.*getInstance*()
+    QiscusApi.getInstance()
         .downloadFile(qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(), total -> {
             // here you can get the progress total downloaded 
         })
         .doOnNext(file -> {
             // here we update the local path of file
-            QiscusCore.*getDataStore*()
+            QiscusCore.getDataStore()
                     .addOrUpdateLocalPath(qiscusComment.getTopicId(), qiscusComment.getId(), file.getAbsolutePath());
         })
-        .subscribeOn(Schedulers.*io*())
-        .observeOn(AndroidSchedulers.*mainThread*())
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(file -> {
             //on success            
         }, throwable -> {
@@ -979,18 +982,18 @@ ProGuard is the most popular optimizer for Java bytecode. It makes your Java and
 
 ## Event Handler
 
-Qiscus Chat SDK provides a simple way to let applications publish and listen some real time event. You can publish **typing, read, user status, custom event **and you can handle freely in event handler. This lets you inform users that another participant is actively engaged in communicating with them.
+Qiscus Chat SDK provides a simple way to let applications publish and listen some real time event. You can publish **typing, read, user status, custom event** and you can handle freely in event handler. This lets you inform users that another participant is actively engaged in communicating with them.
 
 Qiscus Chat SDK is using EventBus for broadcasting event to entire application. You can learn more about EventBus on this website http://greenrobot.org/eventbus/. What you need to do is registering the object which will receive event from EventBus. You can call it like this:
 
 ```
-EventBus.*getDefault*().register(this);
+EventBus.getDefault().register(this);
 ```
 
 You need unregister the receiver after you don't need to listen event anymore by calling this method:
 
 ```
-EventBus.*getDefault*().unregister(this);
+EventBus.getDefault().unregister(this);
 ```
 
 This is example how to register an activity for receiving event from EventBus: 
@@ -1007,13 +1010,13 @@ public class MyActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        EventBus.*getDefault*().register(this); // register to EventBus
+        EventBus.getDefault().register(this); // register to EventBus
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        EventBus.*getDefault*().unregister(this); // unregister from EventBus
+        EventBus.getDefault().unregister(this); // unregister from EventBus
     }
 }
 ```
@@ -1054,13 +1057,13 @@ public class MyActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        EventBus.*getDefault*().register(this); // register to EventBus
+        EventBus.getDefault().register(this); // register to EventBus
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        EventBus.*getDefault*().unregister(this); // unregister from EventBus
+        EventBus.getDefault().unregister(this); // unregister from EventBus
     }
     
     @Subscribe
@@ -1099,7 +1102,7 @@ After you call listen room method from **QiscusPusherApi** now you can subscribe
 ```
 @Subscribe
 public void onReceiveRoomEvent(QiscusChatRoomEvent roomEvent) {
-    if (roomEvent.getEvent() == QiscusChatRoomEvent.Event.*TYPING*) {
+    if (roomEvent.getEvent() == QiscusChatRoomEvent.Event.TYPING) {
         roomEvent.getRoomId(); // this is the room id        
         roomEvent.getUser(); // this is the qiscus user id        
         roomEvent.isTyping(); // true if the user is typing    
@@ -1142,7 +1145,7 @@ Firstly you need passing `roomId` which ChatRoom you want to set, and the struct
 {
   "sender": "John Doe",
   "event": "writing document...",
-  **"active": "true"**
+  "active": "true"
 }
 ```
 
@@ -1158,7 +1161,7 @@ If you need to stop telling other participant that event is ended, you can send 
 {
   "sender": "John Doe",
   "event": "writing document...",
-  **"active": "false"**
+  "active": "false"
 }
 ```
 
@@ -1234,7 +1237,7 @@ public class MyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my);
 
         // listen room event
-        QiscusPusherApi.*getInstance*().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
 
         // listen user status
         QiscusPusherApi.getInstance().listenUserStatus("userId");
@@ -1243,13 +1246,13 @@ public class MyActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        EventBus.*getDefault*().register(this); // register to EventBus
+        EventBus.getDefault().register(this); // register to EventBus
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        EventBus.*getDefault*().unregister(this); // unregister from EventBus
+        EventBus.getDefault().unregister(this); // unregister from EventBus
     }
 
     @Subscribe
@@ -1260,17 +1263,17 @@ public class MyActivity extends AppCompatActivity {
     @Subscribe
     public void onReceiveRoomEvent(QiscusChatRoomEvent roomEvent) {
         switch (roomEvent.getEvent()) {
-            case *TYPING*:
+            case TYPING:
                 roomEvent.getRoomId(); // this is the room id                
                 roomEvent.getUser(); // this is the qiscus user id                
                 roomEvent.isTyping(); // true if the user is typing                
                 break;
-            case *DELIVERED*:
+            case DELIVERED:
                 roomEvent.getRoomId(); // this is the room id                
                 roomEvent.getUser(); // this is the qiscus user id                
                 roomEvent.getCommentId(); // the comment id was delivered                
                 break;
-            case *READ*:
+            case READ:
                 roomEvent.getRoomId(); // this is the room id                
                 roomEvent.getUser(); // this is the qiscus user id                
                 roomEvent.getCommentId(); // the comment id was read               
@@ -1296,7 +1299,7 @@ public class MyActivity extends AppCompatActivity {
         super.onDestroy();
 
         // stop listening room event
-        QiscusPusherApi.*getInstance*().unListenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
 
         // stop listening user status
         QiscusPusherApi.getInstance().unListenUserStatus("qiscus_user_id");
@@ -1316,7 +1319,7 @@ Do the following steps to setup push notifications:
 4. Register your FCM token in the Qiscus Chat SDK   
 5. Handling incoming Message from Push Notification
 
-### STEP 1: Setup Firebase To Your Android App
+### Step 1: Setup Firebase To Your Android App
 
 If you already have setup firebase in your Android App, you can skip this step and go to next step **Generate FCM Secret key**. Otherwise you can setup firebase to your Android App by following this steps https://firebase.google.com/docs/cloud-messaging/android/client.
 
@@ -1338,7 +1341,7 @@ You can get FCM Secret Key by following these steps:
 
 <p align="center"><br/><img src="https://s3-ap-southeast-1.amazonaws.com/qiscus-sdk/docs/assets/docs-screenshot-android/docs_ss_server_key_docs.png" width="100%" /><br/></p>
 
-### STEP 3: Setup FCM Server Key In The Qiscus Dashboard
+### Step 3: Setup FCM Server Key In The Qiscus Dashboard
 
 You can set FCM Secret Key by following these steps:
 
@@ -1354,7 +1357,7 @@ You can set FCM Secret Key by following these steps:
 
 <p align="center"><br/><img src="https://s3-ap-southeast-1.amazonaws.com/qiscus-sdk/docs/assets/docs-screenshot-android/docs_ss_qiscus_chat_dashboard_save_changes_docs.png" width="100%" /><br/></p>
 
-### STEP 4: Register Your FCM Token In The Qiscus Chat SDK
+### Step 4: Register Your FCM Token In The Qiscus Chat SDK
 
 *  Firstly, you need to enable FCM for your Application, you need to enable FCM, for example: 
 
@@ -1365,7 +1368,7 @@ QiscusCore.getChatConfig().setEnableFcmPushNotification(true); // default is **f
 * Enable FCM in **ChatConfig, **you need register FCM token to notify Qiscus Chat SDK, for example:  
 
 ```
-public class **AppFirebaseInstanceIdService** extends FirebaseInstanceIdService {
+public class AppFirebaseInstanceIdService extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
         super.onTokenRefresh();
@@ -1382,7 +1385,7 @@ public class **AppFirebaseInstanceIdService** extends FirebaseInstanceIdService 
 * Add the service to your Manifest, for example: 
 
 ```
-<service android:name=".service.**AppFirebaseInstanceIdService**">
+<service android:name=".service.AppFirebaseInstanceIdService">
     <intent-filter>
         <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
     </intent-filter>
@@ -1392,19 +1395,19 @@ public class **AppFirebaseInstanceIdService** extends FirebaseInstanceIdService 
 * Add the service.AppFirebaseMessagingService in Manifest as well, for example: 
 
 ```
-<service android:name=".service.**AppFirebaseMessagingService**">
+<service android:name=".service.AppFirebaseMessagingService">
     <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
     </intent-filter>
 </service>
 ```
 
-### STEP 5: Handle Incoming Message From Push Notification
+### Step 5: Handle Incoming Message From Push Notification
 
 After registering your FCM token, you will get data from FCM Qiscus Chat SDK, you can handle by  using `handleMessageReceived()` method, for example: 
 
 ```
-public class **AppFirebaseMessagingService** extends FirebaseMessagingService {
+public class AppFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -1427,7 +1430,7 @@ You can see the change log by clicking this [link](https://github.com/qiscus/qis
 
 ## On Premise 
 
-Qiscus Chat SDK is available to be deployed on premise option. For further information you might contact  at [contact.us@qiscus.com](mailto:contact.us@qiscus.com.)
+Qiscus Chat SDK is available to be deployed on premise option. For further information you might contact at [contact.us@qiscus.com](mailto:contact.us@qiscus.com.)
 
 ## Support  
 
@@ -1435,7 +1438,7 @@ If you are facing any issue in the Qiscus Chat SDK then you can contact us and s
 Firstly, you can enable the **debugger **to get the logs, we recommend to use these debugger only in development environment. You can enable or disable the **debugger **using `setEnableLog` method for example: 
 
 ```
-QiscusCore.getChatConfig().setEnableLog(*enableLog*);
+QiscusCore.getChatConfig().setEnableLog(enableLog);
 ```
 
 Then, you can sent the inquiries in our support platform https://support.qiscus.com/hc/en-us/requests/new with information that you have.
