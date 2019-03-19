@@ -153,8 +153,12 @@ public class QiscusCore {
         checkAppIdSetup();
         Application appInstance = QiscusCore.getApps();
         if (BuildVersionUtil.isOreoLower()) {
-            appInstance.getApplicationContext()
-                    .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
+            try {
+                appInstance.getApplicationContext()
+                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
+            } catch (IllegalStateException e) {
+                //Prevent crash because trying to start service while application on background
+            }
         } else {
             try {
                 appInstance.getApplicationContext()
