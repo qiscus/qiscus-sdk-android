@@ -277,17 +277,41 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
     private void initPhotos() {
         List<QiscusPhotoFragment> fragments = new ArrayList<>();
-        for (int i = 0; i < qiscusPhotos.size(); i++) {
-            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(i);
-            fragments.add(QiscusPhotoFragment.newInstance(qiscusPhoto.second));
-            if (position == -1 && qiscusPhoto.first.equals(qiscusComment)) {
-                position = i;
+
+        if (qiscusPhotos.size() == 0) {
+            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            ongoingDownload = qiscusPhoto.first;
+            ongoingDownload.setDownloadingListener((qiscusComment, downloading) -> {
+                if (qiscusComment.equals(ongoingDownload) && !downloading) {
+                    mediaUpdated = true;
+                    progressDialog.dismiss();
+                    ongoingDownload.setDownloadingListener(null);
+                    ongoingDownload.setProgressListener(null);
+                }
+            });
+            ongoingDownload.setProgressListener((qiscusComment, percentage) -> {
+                if (qiscusComment.equals(ongoingDownload)) {
+                    progressDialog.setProgress(percentage);
+                }
+            });
+            progressDialog.show();
+            progressDialog.setProgress(0);
+            presenter.downloadFile(ongoingDownload);
+        } else {
+            for (int i = 0; i < qiscusPhotos.size(); i++) {
+                Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(i);
+                fragments.add(QiscusPhotoFragment.newInstance(qiscusPhoto.second));
+                if (position == -1 && qiscusPhoto.first.equals(qiscusComment)) {
+                    position = i;
+                }
             }
         }
+
         adapter = new QiscusPhotoPagerAdapter(getSupportFragmentManager(), fragments);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(position);
         bindInfo();
+
     }
 
     @Override

@@ -21,6 +21,7 @@ import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
@@ -51,6 +52,13 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        QiscusLogger.print("Opening database.. ");
+        db.enableWriteAheadLogging();
     }
 
     @Override
