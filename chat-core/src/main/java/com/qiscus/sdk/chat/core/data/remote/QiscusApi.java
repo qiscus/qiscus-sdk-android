@@ -555,6 +555,22 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusCommentInfo);
     }
 
+    public Observable<List<QiscusAccount>> getUsers(String query) {
+        return getUsers(0, 100, query);
+    }
+
+    public Observable<List<QiscusAccount>> getUsers(long page, long limit,
+                                                       String query) {
+        return api.getUserList(QiscusCore.getToken(), page, limit, "username asc", query)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.getAsJsonArray("users"))
+                .flatMap(Observable::from)
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .toList();
+    }
+
     private interface Api {
 
         @POST("api/v2/auth/nonce")
@@ -776,6 +792,15 @@ public enum QiscusApi {
         Observable<JsonElement> getCommentReceipt(
                 @Query("token") String token,
                 @Query("comment_id") long commentId
+        );
+
+        @GET("/api/v2/mobile/get_user_list")
+        Observable<JsonElement> getUserList(
+                @Query("token") String token,
+                @Query("page") long page,
+                @Query("limit") long limit,
+                @Query("order_query") String orderQuery,
+                @Query("query") String query
         );
     }
 

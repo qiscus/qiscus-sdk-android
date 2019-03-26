@@ -330,11 +330,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if (!typing) {
-                    typing = true;
-                    notifyServerTyping(true);
-                }
-                QiscusAndroidUtil.cancelRunOnUIThread(stopTypingNotifyTask);
+                typing = true;
+                notifyServerTyping(true);
             }
 
             @Override
@@ -345,7 +342,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             @Override
             public void afterTextChanged(Editable s) {
                 onMessageEditTextChanged(s);
-                QiscusAndroidUtil.runOnUIThread(stopTypingNotifyTask, 800);
             }
         });
 
