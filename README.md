@@ -95,8 +95,11 @@ QiscusCore.setUser(userId, userKey)
 Where:
 
 **userId** (string, unique): A user identifier that will be used to identify a user and used whenever another user need to chat with this user. It can be anything, whether is is user's email, your user database index, etc. As long as it is unique and a string.
+
 **userKey** (string): userKey for authentication purpose, so even if a stranger knows your user Id, he cannot access the user data.
+
 **username** (string): Username for display name inside Chat Room purposes.
+
 **avatarURL** (string, optional): to display user's avatar, fallback to default avatar if not provided.
 
 You can learn from the figure below to understand what really happened when calling `setUser()` function:
@@ -153,7 +156,9 @@ QiscusApi.getInstance().getChatRoom(userId, distinctId, options)
 Where:
 
 **userId**: A User identifier that will be used to identify a user and used whenever another user needs to chat with this user. It can be anything, whether is user's email, your user database index, etc. As long as it is unique and a string.
+
 **distinctId**: (deprecated) you can fill “ ” (empty string).
+
 **options**: metadata that can be as additional information to Chat Room, which consists key-value, for example, key: background, and value: red.
 
 ### Group Chat Room
