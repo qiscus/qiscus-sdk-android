@@ -331,7 +331,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void restartConnection() {
-        if (mqttAndroidClient.isConnected()) return;
+        if (mqttAndroidClient != null && mqttAndroidClient.isConnected()) {
+            return;
+        }
+
         getMqttBrokerUrlFromLB();
 
         QiscusLogger.print("QiscusPusherApi", "Restart connection...");
