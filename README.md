@@ -26,7 +26,7 @@ Qiscus Chat SDK provides many features such as:
 We have provided a sample app to help you get to know with our chat SDK. This sample app is built with full functionalities so that you can figure out the flow and main activities using Qiscus Chat SDK. Now you can freely customize your own UI. You can also build your own app on top of our sample app. For further details you can download this sample.
 
 ```
-git clone https://github.com/qiscus/qiscus-chat-sdk-js-sample.git
+git clone https://github.com/qiscus/qiscus-sdk-android.git
 ```
 This sample app uses sample APP ID, which means, by using this sample app, you will share the data with others. In case you want to try by your own, you can change the APP ID into your own APP ID. You can find your APP ID in your dashboard. Click [here](https://dashboard.qiscus.com/dashboard/login) to access your dashboard
 
