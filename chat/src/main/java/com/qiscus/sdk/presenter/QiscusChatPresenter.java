@@ -230,30 +230,37 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         File finalCompressedFile = compressedFile;
         Subscription subscription = QiscusApi.getInstance()
-                .uploadFile(compressedFile, percentage -> qiscusComment.setProgress((int) percentage))
+                .uploadFile(compressedFile, percentage -> {
+                    qiscusComment.setProgress((int) percentage);
+                })
+                .subscribeOn(Schedulers.io())
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
                     qiscusComment.updateAttachmentUrl(uri.toString());
+                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
                     return QiscusApi.getInstance().postComment(qiscusComment);
                 })
                 .doOnNext(commentSend -> {
+                    Qiscus.getDataStore().addOrUpdate(commentSend);
                     Qiscus.getDataStore()
-                            .addOrUpdateLocalPath(commentSend.getRoomId(), commentSend.getId(), finalCompressedFile.getAbsolutePath());
-                    qiscusComment.setDownloading(false);
+                            .addOrUpdateLocalPath(commentSend.getRoomId(),
+                                    commentSend.getId(), finalCompressedFile.getAbsolutePath());
+                    commentSend.setDownloading(false);
                     commentSuccess(commentSend);
                 })
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .compose(bindToLifecycle())
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
                 .subscribe(commentSend -> {
-                    if (commentSend.getRoomId() == room.getId()) {
+
+                    if (room != null && commentSend.getRoomId() == room.getId()) {
                         view.onSuccessSendComment(commentSend);
                     }
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
-                    if (qiscusComment.getRoomId() == room.getId()) {
+                    if (room != null && qiscusComment.getRoomId() == room.getId()) {
                         view.onFailedSendComment(qiscusComment);
                     }
                 });
