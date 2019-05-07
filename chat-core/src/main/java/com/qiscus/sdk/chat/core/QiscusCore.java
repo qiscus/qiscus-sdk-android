@@ -158,6 +158,10 @@ public class QiscusCore {
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
+                QiscusErrorLogger.print(e);
+            } catch (RuntimeException e) {
+                //Prevent crash because trying to start service while application on background
+                QiscusErrorLogger.print(e);
             }
         } else {
             try {
@@ -165,6 +169,10 @@ public class QiscusCore {
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
+                QiscusErrorLogger.print(e);
+            } catch (RuntimeException e) {
+                //Prevent crash because trying to start service while application on background
+                QiscusErrorLogger.print(e);
             }
         }
     }
