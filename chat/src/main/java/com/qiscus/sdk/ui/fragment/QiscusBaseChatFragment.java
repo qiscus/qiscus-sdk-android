@@ -1219,6 +1219,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 try {
                     photoFile = QiscusImageUtil.createImageFile();
                 } catch (IOException ex) {
+                    QiscusErrorLogger.print(ex);
                     showError(getString(R.string.qiscus_chat_error_failed_write));
                 }
 
