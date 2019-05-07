@@ -125,19 +125,31 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.RoomTable.TABLE_NAME + " WHERE "
                 + QiscusDb.RoomTable.COLUMN_ID + " = " + id;
 
-        Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
 
-        if (cursor.moveToNext()) {
-            QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
-            qiscusChatRoom.setMember(getRoomMembers(id));
-            QiscusComment latestComment = getLatestComment(id);
-            if (latestComment != null) {
-                qiscusChatRoom.setLastComment(latestComment);
+        Cursor cursor = null;
+        try {
+            cursor = sqLiteReadDatabase.rawQuery(query, null);
+            if (cursor.moveToNext()) {
+                QiscusChatRoom qiscusChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
+                qiscusChatRoom.setMember(getRoomMembers(id));
+                QiscusComment latestComment = getLatestComment(id);
+                if (latestComment != null) {
+                    qiscusChatRoom.setLastComment(latestComment);
+                }
+                cursor.close();
+                return qiscusChatRoom;
+            } else {
+                cursor.close();
+                return null;
             }
+
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
             cursor.close();
-            return qiscusChatRoom;
-        } else {
-            cursor.close();
+            return null;
+        } finally {
+            if (cursor != null)
+                cursor.close();
             return null;
         }
     }
