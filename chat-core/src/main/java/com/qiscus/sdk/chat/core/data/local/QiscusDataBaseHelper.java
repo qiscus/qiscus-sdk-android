@@ -145,11 +145,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
-            cursor.close();
-            return null;
-        } finally {
-            if (cursor != null)
+            if (cursor != null) {
                 cursor.close();
+            }
             return null;
         }
     }
