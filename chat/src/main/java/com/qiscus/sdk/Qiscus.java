@@ -86,7 +86,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER, true);
+        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
 
     /**
@@ -110,7 +110,11 @@ public class Qiscus {
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
-        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false);
+        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, null);
+    }
+
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl, String baseURLLB) {
+        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, true, baseURLLB);
     }
 
     /**
@@ -124,8 +128,8 @@ public class Qiscus {
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
-                                            String mqttBrokerUrl, boolean enableMqttLB) {
-        QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB);
+                                            String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
+        QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
         chatConfig = new QiscusChatConfig();
         authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);

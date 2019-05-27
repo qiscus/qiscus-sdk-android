@@ -530,7 +530,7 @@ public enum QiscusApi {
     public Observable<String> getMqttBaseUrl() {
         return Observable.create(subscriber -> {
             Request request = new Request.Builder()
-                    .url(BuildConfig.BASE_URL_MQTT_LB)
+                    .url(QiscusCore.getBaseURLLB())
                     .build();
 
             try {
@@ -560,7 +560,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusAccount>> getUsers(long page, long limit,
-                                                       String query) {
+                                                    String query) {
         return api.getUserList(QiscusCore.getToken(), page, limit, "username asc", query)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
