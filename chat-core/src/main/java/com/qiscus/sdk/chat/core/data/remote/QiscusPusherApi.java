@@ -307,6 +307,18 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    private void eventReport(String module_name, String event, String message) {
+        if (QiscusCore.hasSetupUser() == true) {
+            QiscusApi.getInstance()
+                    .eventReport(module_name, event, message)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aVoid -> {
+
+                    }, QiscusErrorLogger::print);
+        }
+    }
+
     public void connect() {
         if (QiscusCore.hasSetupUser() && !connecting && QiscusAndroidUtil.isNetworkAvailable()) {
             QiscusLogger.print(TAG, "Connecting...");
@@ -320,9 +332,20 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     .getBytes(), 2, true);
             try {
                 mqttAndroidClient.connect(mqttConnectOptions, null, this);
+                eventReport("MQTT", "CONNECTING", "Connecting...");
             } catch (MqttException | IllegalStateException e) {
                 //Do nothing
+                if (e != null) {
+                    eventReport("MQTT", "CONNECTING", e.getMessage());
+                } else {
+                    eventReport("MQTT", "CONNECTING", "Failure to connecting");
+                }
             } catch (NullPointerException | IllegalArgumentException e) {
+                if (e != null) {
+                    eventReport("MQTT", "CONNECTING", e.getMessage());
+                } else {
+                    eventReport("MQTT", "CONNECTING", "Failure to connecting");
+                }
                 restartConnection();
             }
         }
@@ -344,8 +367,24 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             connecting = false;
             mqttAndroidClient.disconnect();
             mqttAndroidClient.close();
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    eventReport("MQTT", "RESTART_CONNECTION", "Restart connection...");
+                }
+            }, 1000);
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
+            if (e != null) {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        eventReport("MQTT", "RESTART_CONNECTION", e.getMessage());
+                    }
+                }, 1000);
+            }
         }
 
         clearTasks();
@@ -387,8 +426,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             connecting = false;
             mqttAndroidClient.disconnect();
             mqttAndroidClient.close();
+            eventReport("MQTT", "DISCONNECT", "Disconnect");
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
+            if (e != null) {
+                eventReport("MQTT", "DISCONNECT", e.getMessage());
+            }
         }
         clearTasks();
         stopUserStatus();
@@ -407,9 +450,14 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             QiscusLogger.print(TAG, "Listening comment...");
             try {
                 mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
+                eventReport("MQTT", "LISTEN_COMMENT", qiscusAccount.getToken() + "/c");
             } catch (MqttException e) {
                 //Do nothing
             } catch (NullPointerException | IllegalArgumentException e) {
+                if (e != null) {
+                    eventReport("MQTT", "LISTEN_COMMENT", "Failure listen comment, try again in "
+                            + RETRY_PERIOD + " ms" + ", withError = " + e.getMessage());
+                }
                 QiscusErrorLogger.print(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
                 connect();
                 scheduledListenComment = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenComment, RETRY_PERIOD);
@@ -430,9 +478,26 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             QiscusLogger.print(TAG, "Listening notification...");
             try {
                 mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/n", 2);
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        eventReport("MQTT", "LISTEN_NOTIFICATION", qiscusAccount.getToken() + "/n");
+                    }
+                }, 1000);
             } catch (MqttException e) {
                 //Do nothing
             } catch (NullPointerException | IllegalArgumentException e) {
+                if (e != null) {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            eventReport("MQTT", "LISTEN_NOTIFICATION", "Failure listen notification, try again in "
+                                    + RETRY_PERIOD + " ms" + ", withError = " + e.getMessage());
+                        }
+                    }, 1000);
+                }
                 QiscusErrorLogger.print(TAG, "Failure listen notification, try again in " + RETRY_PERIOD + " ms");
                 connect();
                 scheduledListenNotification = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenNotification, RETRY_PERIOD);
@@ -467,12 +532,36 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
                     mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
                     mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
+
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            eventReport("MQTT", "LISTEN_ROOM", "r/" + roomId + "/+/+/t/d/r");
+                        }
+                    }, 1000);
                 } else {
                     mqttAndroidClient.subscribe(QiscusCore.getAppId() + "/" + qiscusChatRoom.getUniqueId() + "/c", 2);
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            eventReport("MQTT", "LISTEN_ROOM", QiscusCore.getAppId() + "/" + qiscusChatRoom.getUniqueId() + "/c");
+                        }
+                    }, 1000);
                 }
             } catch (MqttException e) {
                 //Do nothing
             } catch (NullPointerException | IllegalArgumentException e) {
+                if (e != null) {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            eventReport("MQTT", "LISTEN_ROOM", e.getMessage());
+                        }
+                    }, 1000);
+                }
                 QiscusErrorLogger.print(TAG, "Failure listen room, try again in " + RETRY_PERIOD + " ms");
                 connect();
                 scheduledListenRoom = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenRoom, RETRY_PERIOD);
@@ -630,6 +719,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
         EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         reconnectCounter++;
+        if (cause != null) {
+            eventReport("MQTT", "CONNECTION_LOST", cause.toString());
+        } else {
+            eventReport("MQTT", "CONNECTION_LOST", "Lost connection, will try reconnect in " + RETRY_PERIOD * 1 + " ms");
+        }
+
         QiscusErrorLogger.print(TAG, "Lost connection, will try reconnect in " + RETRY_PERIOD * 1 + " ms");
         connecting = false;
         scheduledConnect = QiscusAndroidUtil.runOnBackgroundThread(fallbackConnect, RETRY_PERIOD * 1);
@@ -741,6 +836,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         QiscusCore.setCacheMqttBrokerUrl(QiscusCore.getMqttBrokerUrl(), true);
 
         QiscusLogger.print(TAG, "Connected..." + QiscusCore.getMqttBrokerUrl());
+        eventReport("MQTT", "CONNECTED", "connectComplete... " + QiscusCore.getMqttBrokerUrl());
         EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
         try {
             connecting = false;
@@ -775,6 +871,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
 
         EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
+        if (exception != null) {
+            eventReport("MQTT", "FAILURE_TO_CONNECT", exception.getCause().getMessage());
+        } else {
+            eventReport("MQTT", "FAILURE_TO_CONNECT", "Failure to connect, try again in " + RETRY_PERIOD * 1 + " ms");
+        }
         reconnectCounter++;
         QiscusErrorLogger.print(TAG, "Failure to connect, try again in " + RETRY_PERIOD * 1 + " ms");
         connecting = false;

@@ -155,7 +155,7 @@ public class QiscusSyncJobService extends JobService {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().connect());
                 syncJob(this);
                 break;
             case LOGOUT:

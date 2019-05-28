@@ -571,7 +571,21 @@ public enum QiscusApi {
                 .toList();
     }
 
+    public Observable<Void> eventReport(String module_name, String event, String message) {
+        return api.eventReport(QiscusCore.getToken(), module_name, event, message)
+                .map(jsonElement -> null);
+    }
+
     private interface Api {
+
+        @FormUrlEncoded
+        @POST("api/v2/mobile/event_report")
+        Observable<JsonElement> eventReport(
+                @Field("token") String token,
+                @Field("module_name") String module_name,
+                @Field("event") String event,
+                @Field("message") String message
+        );
 
         @POST("api/v2/auth/nonce")
         Observable<JsonElement> requestNonce();
