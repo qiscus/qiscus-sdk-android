@@ -536,10 +536,6 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     @Subscribe
     public void onMqttEvent(QiscusMqttStatusEvent event) {
-        if (event == QiscusMqttStatusEvent.DISCONNECTED) {
-            loadComments(20);
-        }
-
         view.onRealtimeStatusChanged(event == QiscusMqttStatusEvent.CONNECTED);
     }
 
