@@ -90,7 +90,8 @@ public class QiscusCore {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
+        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
+                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
 
     /**
@@ -113,7 +114,8 @@ public class QiscusCore {
      * @param serverBaseUrl Your qiscus chat engine base url
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
-    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl, String baseURLLB) {
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
+                                            String mqttBrokerUrl, String baseURLLB) {
         if (baseURLLB == null) {
             initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, baseURLLB);
         } else {

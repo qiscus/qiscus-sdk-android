@@ -308,10 +308,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    private void eventReport(String module_name, String event, String message) {
-        if (QiscusCore.hasSetupUser() == true) {
+    private void eventReport(String moduleName, String event, String message) {
+        if (QiscusCore.hasSetupUser()) {
             QiscusApi.getInstance()
-                    .eventReport(module_name, event, message)
+                    .eventReport(moduleName, event, message)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(aVoid -> {

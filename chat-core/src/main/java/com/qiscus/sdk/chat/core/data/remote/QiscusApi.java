@@ -571,8 +571,8 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<Void> eventReport(String module_name, String event, String message) {
-        return api.eventReport(QiscusCore.getToken(), module_name, event, message)
+    public Observable<Void> eventReport(String moduleName, String event, String message) {
+        return api.eventReport(QiscusCore.getToken(), moduleName, event, message)
                 .map(jsonElement -> null);
     }
 
@@ -582,7 +582,7 @@ public enum QiscusApi {
         @POST("api/v2/mobile/event_report")
         Observable<JsonElement> eventReport(
                 @Field("token") String token,
-                @Field("module_name") String module_name,
+                @Field("module_name") String moduleName,
                 @Field("event") String event,
                 @Field("message") String message
         );
