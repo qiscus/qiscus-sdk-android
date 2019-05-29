@@ -148,7 +148,6 @@ public class QiscusCore {
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
         QiscusCore.baseURLLB = baseURLLB;
         localDataManager.setURLLB(baseURLLB);
-
         startPusherService();
         startNetworkCheckerService();
         QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
