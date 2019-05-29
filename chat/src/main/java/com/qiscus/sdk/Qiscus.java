@@ -113,9 +113,12 @@ public class Qiscus {
         initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, null);
     }
 
-    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl, String baseURLLB) {
-        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, true, baseURLLB);
-    }
+    /**
+     * will have onNext Release
+     */
+//    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl, String baseURLLB) {
+//        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, true, baseURLLB);
+//    }
 
     /**
      * This method @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
