@@ -14,7 +14,7 @@ If you want to use Core SDK only, change gradle file to like below :
 
 ```groovy
 dependencies {
-    implementation 'com.qiscus.sdk:chat-core:1.2.9'
+    implementation 'com.qiscus.sdk:chat-core:1.2.10'
 }
 ```
 
