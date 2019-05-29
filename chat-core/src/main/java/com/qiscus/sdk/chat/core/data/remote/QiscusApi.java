@@ -530,7 +530,7 @@ public enum QiscusApi {
     public Observable<String> getMqttBaseUrl() {
         return Observable.create(subscriber -> {
             Request request = new Request.Builder()
-                    .url(BuildConfig.BASE_URL_MQTT_LB)
+                    .url(QiscusCore.getBaseURLLB())
                     .build();
 
             try {
@@ -560,7 +560,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusAccount>> getUsers(long page, long limit,
-                                                       String query) {
+                                                    String query) {
         return api.getUserList(QiscusCore.getToken(), page, limit, "username asc", query)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -571,7 +571,21 @@ public enum QiscusApi {
                 .toList();
     }
 
+    public Observable<Void> eventReport(String moduleName, String event, String message) {
+        return api.eventReport(QiscusCore.getToken(), moduleName, event, message)
+                .map(jsonElement -> null);
+    }
+
     private interface Api {
+
+        @FormUrlEncoded
+        @POST("api/v2/mobile/event_report")
+        Observable<JsonElement> eventReport(
+                @Field("token") String token,
+                @Field("module_name") String moduleName,
+                @Field("event") String event,
+                @Field("message") String message
+        );
 
         @POST("api/v2/auth/nonce")
         Observable<JsonElement> requestNonce();

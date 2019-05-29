@@ -59,6 +59,7 @@ public class QiscusCore {
     private static String appId;
     private static String appServer;
     private static String mqttBrokerUrl;
+    private static String baseURLLB;
     private static LocalDataManager localDataManager;
     private static long heartBeat;
     private static QiscusDataStore dataStore;
@@ -89,7 +90,8 @@ public class QiscusCore {
      * @param qiscusAppId Your qiscus application Id
      */
     public static void init(Application application, String qiscusAppId) {
-        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER, BuildConfig.BASE_URL_MQTT_BROKER, true);
+        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
+                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
 
     /**
@@ -112,8 +114,13 @@ public class QiscusCore {
      * @param serverBaseUrl Your qiscus chat engine base url
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
-    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl, String mqttBrokerUrl) {
-        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false);
+    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
+                                            String mqttBrokerUrl, String baseURLLB) {
+        if (baseURLLB == null) {
+            initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, baseURLLB);
+        } else {
+            initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, true, baseURLLB);
+        }
     }
 
     /**
@@ -127,7 +134,7 @@ public class QiscusCore {
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
-                                            String mqttBrokerUrl, boolean enableMqttLB) {
+                                            String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
         appInstance = application;
         appId = qiscusAppId;
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
@@ -141,7 +148,8 @@ public class QiscusCore {
 
         QiscusCore.enableMqttLB = enableMqttLB;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
-
+        QiscusCore.baseURLLB = baseURLLB;
+        localDataManager.setURLLB(baseURLLB);
         startPusherService();
         startNetworkCheckerService();
         QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
@@ -245,7 +253,27 @@ public class QiscusCore {
      */
     public static String getMqttBrokerUrl() {
         checkAppIdSetup();
+
+        if (localDataManager.getMqttBrokerUrl() == null) {
+            localDataManager.setMqttBrokerUrl(mqttBrokerUrl);
+        }
+
         return isEnableMqttLB() ? localDataManager.getMqttBrokerUrl() : mqttBrokerUrl;
+    }
+
+    /**
+     * Accessor to get current mqtt broker url
+     *
+     * @return Current mqtt broker url
+     */
+    public static String getBaseURLLB() {
+        checkAppIdSetup();
+
+        if (localDataManager.getURLLB() == null) {
+            localDataManager.setURLLB(baseURLLB);
+        }
+
+        return isEnableMqttLB() ? localDataManager.getURLLB() : baseURLLB;
     }
 
     /**
@@ -638,6 +666,24 @@ public class QiscusCore {
          */
         private void setMqttBrokerUrl(String mqttBrokerUrl) {
             sharedPreferences.edit().putString("mqtt_broker_url", mqttBrokerUrl).apply();
+        }
+
+        /**
+         * this is used if enableMqttLB = true
+         *
+         * @return UrlLB
+         */
+        private String getURLLB() {
+            return sharedPreferences.getString("lb_url", null);
+        }
+
+        /**
+         * this is used if enableMqttLB = true
+         *
+         * @param urlLb
+         */
+        private void setURLLB(String urlLb) {
+            sharedPreferences.edit().putString("lb_url", urlLb).apply();
         }
 
         /**

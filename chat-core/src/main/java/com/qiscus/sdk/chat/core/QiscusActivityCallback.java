@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 
 import java.util.concurrent.ScheduledFuture;
@@ -40,6 +41,9 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        if (!QiscusPusherApi.getInstance().isConnected() && QiscusCore.hasSetupUser()) {
+            QiscusPusherApi.getInstance().restartConnection();
+        }
     }
 
     @Override
