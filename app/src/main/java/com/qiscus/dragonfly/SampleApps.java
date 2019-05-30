@@ -36,8 +36,7 @@ public class SampleApps extends Application {
     public void onCreate() {
         super.onCreate();
 
-        //Qiscus.init(this, QISCUS_SDK_APP_ID);
-        Qiscus.initWithCustomServer(this,"dinosauru-nqmxcraaqm1","https://qiscus-lb.stage.halodoc.com","ssl://qiscus-mqtt.stage.halodoc.com:1885",false,null);
+        Qiscus.init(this, QISCUS_SDK_APP_ID);
 
         Qiscus.getChatConfig()
                 .setEnableLog(true)
