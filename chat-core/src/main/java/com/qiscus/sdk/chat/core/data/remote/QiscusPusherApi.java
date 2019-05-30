@@ -843,10 +843,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
         EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
         if (exception != null) {
-            eventReport("MQTT", "FAILURE_TO_CONNECT", exception.getCause().toString());
+            eventReport("MQTT", "FAILURE_TO_CONNECT", exception.toString());
         } else {
             eventReport("MQTT", "FAILURE_TO_CONNECT", "Failure to connect, try again in " + RETRY_PERIOD * 1 + " ms");
         }
+
         reconnectCounter++;
         QiscusErrorLogger.print(TAG, "Failure to connect, try again in " + RETRY_PERIOD * 1 + " ms");
         connecting = false;
