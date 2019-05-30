@@ -48,6 +48,8 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
                 }
             } catch (IllegalArgumentException e) {
                 // ignore
+            } catch (RuntimeException e) {
+                //ignore
             }
         });
     }
