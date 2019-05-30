@@ -63,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
     public void loginOrLogout(View view) {
         if (Qiscus.hasSetupUser()) {
             Qiscus.clearUser();
-            finish();
-            startActivity(new Intent(MainActivity.this, SplashActivity.class));
             mLoginButton.setText("Login");
         } else {
             showLoading();
@@ -92,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(intent -> {
-//                    revertCustomChatConfig();
+                    revertCustomChatConfig();
                     startActivity(intent);
                     dismissLoading();
                 }, throwable -> {
