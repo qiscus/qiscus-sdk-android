@@ -47,6 +47,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
@@ -272,9 +273,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     private void buildClient() {
+        Long epochTimeLong = System.currentTimeMillis() / 1000;
+        String epochTime = epochTimeLong.toString();
+
         mqttAndroidClient = null;
         mqttAndroidClient = new MqttAndroidClient(QiscusCore.getApps().getApplicationContext(),
-                QiscusCore.getMqttBrokerUrl(), clientId);
+                QiscusCore.getMqttBrokerUrl(), clientId + epochTime, new MemoryPersistence());
         mqttAndroidClient.setCallback(this);
         mqttAndroidClient.setTraceEnabled(false);
     }
@@ -607,16 +611,26 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     private void setUserStatus(boolean online) {
-        checkAndConnect();
         try {
-            MqttMessage message = new MqttMessage();
-            message.setPayload(online ? "1".getBytes() : "0".getBytes());
-            message.setQos(1);
-            message.setRetained(true);
-            mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message);
-        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
-            //Do nothing
+            if (!mqttAndroidClient.isConnected() && connecting != true) {
+                connect();
+            } else {
+                try {
+                    MqttMessage message = new MqttMessage();
+                    message.setPayload(online ? "1".getBytes() : "0".getBytes());
+                    message.setQos(1);
+                    message.setRetained(true);
+                    mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message);
+                } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+                    //Do nothing
+                }
+            }
+        } catch (NullPointerException e) {
+            connect();
+        } catch (Exception ignored) {
+            //ignored
         }
+
     }
 
     public void setUserTyping(long roomId, boolean typing) {
@@ -828,7 +842,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-
     }
 
     @Override
@@ -860,7 +873,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     scheduledConnect = null;
                 }
                 scheduleUserStatus();
-            } catch (NullPointerException | IllegalArgumentException ignored) {
+            } catch (NullPointerException e) {
+                //ignored
+            } catch (IllegalArgumentException ignored) {
                 //Do nothing
                 if (ignored != null) {
                     try {
