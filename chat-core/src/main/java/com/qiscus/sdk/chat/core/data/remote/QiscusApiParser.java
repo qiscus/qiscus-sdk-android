@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.core.data.remote;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

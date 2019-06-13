@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.core.util;
 
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;

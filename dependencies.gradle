@@ -27,7 +27,7 @@ repositories {
 
 ext {
 
-    minSDKVersion = 16
+    minSDKVersion = 19
     targetSDKVersion = 28
     compileSDKVersion = 28
 
@@ -46,7 +46,8 @@ ext {
             rxJava           : "1.3.4",
             rxAndroid        : "1.2.1",
 
-            trelloLifecycle  : "1.0"
+            trelloLifecycle  : "1.0",
+            places           : "1.0.3"
     ]
 
     supportDeps = [
@@ -96,7 +97,9 @@ ext {
             trelloLifecycleComponents: "com.trello:rxlifecycle-components:${versions.trelloLifecycle}"
     ]
 
-    placesLib = "com.google.android.gms:play-services-places:${versions.playService}"
+//    placesLib = "com.google.android.gms:play-services-places:${versions.playService}"
+    placePickerLib = "com.github.rtchagas:pingplacepicker:1.0.3"
+    placeLib = "com.google.android.libraries.places:places:1.1.0"
     flexBoxLib = "com.google.android:flexbox:0.3.1"
     eventBusLib = "org.greenrobot:eventbus:3.0.0"
     rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"

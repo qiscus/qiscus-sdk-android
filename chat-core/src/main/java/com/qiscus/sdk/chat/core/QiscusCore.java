@@ -22,7 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;

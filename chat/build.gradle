@@ -28,6 +28,8 @@ android {
         targetSdkVersion targetSDKVersion
         versionCode 1
         versionName "${chatVersionMajor}.${chatVersionMinor}.${chatVersionPatch}"
+        multiDexEnabled true
+
     }
     buildTypes {
         release {
@@ -75,7 +77,8 @@ dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
 
     api supportLibs
-    api placesLib
+    api placePickerLib
+    api placeLib
     api firebaseLibs
     api qiscusUtilLibs
     api qiscusMqttLibs
@@ -85,6 +88,7 @@ dependencies {
     api eventBusLib
     api rxUrlExtractorLib
     api qiscusManggil
+    api 'com.android.support:multidex:1.0.3'
 
     api project(':chat-core')
 

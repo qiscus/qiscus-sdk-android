@@ -40,6 +40,7 @@ public class SampleApps extends Application {
 
         Qiscus.getChatConfig()
                 .setEnableLog(true)
+                .setEnableAddLocation(true)
                 .setDeleteCommentConfig(new QiscusDeleteCommentConfig()
                         .setEnableDeleteComment(true)
                         .setEnableHardDelete(true));
