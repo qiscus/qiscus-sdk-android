@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
@@ -28,7 +27,6 @@ android {
         targetSdkVersion targetSDKVersion
         versionCode 1
         versionName "${chatVersionMajor}.${chatVersionMinor}.${chatVersionPatch}"
-        multiDexEnabled true
 
     }
     buildTypes {
@@ -88,7 +86,6 @@ dependencies {
     api eventBusLib
     api rxUrlExtractorLib
     api qiscusManggil
-    api 'com.android.support:multidex:1.0.3'
 
     api project(':chat-core')
 

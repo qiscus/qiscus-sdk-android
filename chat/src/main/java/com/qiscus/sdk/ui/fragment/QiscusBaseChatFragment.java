@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +39,7 @@ import androidx.core.content.FileProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -52,11 +54,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-//import com.google.android.gms.common.GooglePlayServicesRepairableException;
-//import com.google.android.gms.location.places.Place;
-//import com.google.android.gms.location.places.ui.PlacePicker;
-//import com.google.android.gms.common.GooglePlayServicesRepairableException;
-//import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.libraries.places.api.model.Place;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
@@ -1328,24 +1325,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     .setGeolocationApiKey("");
             try {
                 startActivityForResult(builder.build(getActivity()), PICK_LOCATION_REQUEST);
-            } catch ( GooglePlayServicesNotAvailableException e) {
+            } catch (GooglePlayServicesNotAvailableException e) {
                 e.printStackTrace();
             }
             hideAttachmentPanel();
         } else {
             requestAddLocationPermission();
         }
-
-        /*
-        PingPlacePicker.IntentBuilder builder = new PingPlacePicker.IntentBuilder();
-            builder.setAndroidApiKey("")
-                    .setGeolocationApiKey("");
-            try {
-                startActivityForResult(builder.build(getActivity()), PICK_LOCATION_REQUEST);
-            } catch ( GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
-            }
-         */
     }
 
     protected void toggleEmoji() {
