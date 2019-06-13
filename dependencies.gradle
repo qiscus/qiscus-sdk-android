@@ -47,7 +47,9 @@ ext {
             rxAndroid        : "1.2.1",
 
             trelloLifecycle  : "1.0",
-            places           : "1.0.3"
+
+            places           : "1.0.3",
+            placePicker      : "1.0.5rc"
     ]
 
     supportDeps = [
@@ -97,9 +99,8 @@ ext {
             trelloLifecycleComponents: "com.trello:rxlifecycle-components:${versions.trelloLifecycle}"
     ]
 
-//    placesLib = "com.google.android.gms:play-services-places:${versions.playService}"
-    placePickerLib = "com.github.rtchagas:pingplacepicker:1.0.3"
-    placeLib = "com.google.android.libraries.places:places:1.1.0"
+    placePickerLib = "com.github.adicatur:pingplacepicker:$versions.placePicker"
+    placeLib = "com.google.android.libraries.places:places:$versions.places"
     flexBoxLib = "com.google.android:flexbox:0.3.1"
     eventBusLib = "org.greenrobot:eventbus:3.0.0"
     rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"

@@ -23,7 +23,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value=""/>
+            android:value="@string/qiscus_key_google_apis_android"/>
     </application>
 
 </manifest>

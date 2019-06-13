@@ -1321,8 +1321,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected void addLocation() {
         if (QiscusPermissionsUtil.hasPermissions(getActivity(), LOCATION_PERMISSION)) {
             PingPlacePicker.IntentBuilder builder = new PingPlacePicker.IntentBuilder();
-            builder.setAndroidApiKey("")
-                    .setGeolocationApiKey("");
+            builder.setAndroidApiKey(getString(R.string.qiscus_key_google_apis_android))
+                    .setGeolocationApiKey(getString(R.string.qiscus_key_google_apis_geolocation));
             try {
                 startActivityForResult(builder.build(getActivity()), PICK_LOCATION_REQUEST);
             } catch (GooglePlayServicesNotAvailableException e) {
