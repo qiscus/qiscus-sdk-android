@@ -27,7 +27,7 @@ repositories {
 
 ext {
 
-    minSDKVersion = 19
+    minSDKVersion = 16
     targetSDKVersion = 28
     compileSDKVersion = 28
 
