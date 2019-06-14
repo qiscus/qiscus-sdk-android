@@ -48,8 +48,8 @@ ext {
 
             trelloLifecycle  : "1.0",
 
-            places           : "1.0.3",
-            placePicker      : "1.0.5rc"
+            places           : "1.1.0",
+            placePicker      : "v1.0.5a"
     ]
 
     supportDeps = [
