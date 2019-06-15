@@ -20,7 +20,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 
 import com.qiscus.jupuk.Jupuk;
 import com.qiscus.sdk.chat.core.BuildConfig;

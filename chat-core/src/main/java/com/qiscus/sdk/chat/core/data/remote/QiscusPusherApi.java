@@ -17,8 +17,8 @@
 package com.qiscus.sdk.chat.core.data.remote;
 
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

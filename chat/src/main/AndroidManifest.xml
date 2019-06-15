@@ -64,7 +64,7 @@
         </receiver>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.qiscus.sdk.provider"
             android:exported="false"
             android:grantUriPermissions="true">

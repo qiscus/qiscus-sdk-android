@@ -18,7 +18,7 @@ package com.qiscus.sdk.chat.core.data.local;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;

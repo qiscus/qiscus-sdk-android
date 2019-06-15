@@ -16,8 +16,8 @@
 
 package com.qiscus.sdk.data.model;
 
-import android.support.annotation.ColorInt;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.ColorInt;
+import androidx.core.content.ContextCompat;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;

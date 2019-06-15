@@ -17,8 +17,8 @@
 package com.qiscus.sdk.chat.core.util;
 
 import android.content.Context;
-import android.support.annotation.RestrictTo;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.annotation.RestrictTo;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 

@@ -17,10 +17,10 @@
 package com.qiscus.sdk.ui.adapter.viewholder;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.util.PatternsCompat;
+import androidx.annotation.NonNull;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+import androidx.core.util.PatternsCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
