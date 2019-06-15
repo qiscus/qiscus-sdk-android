@@ -16,5 +16,7 @@
 
 <resources>
     <string name="app_name" translatable="false">DragonFly</string>
-    <string name="qiscus_version">Qiscus SDK version</string>
+    <string name="qiscus_version" translatable="false">Qiscus SDK version</string>
+    <string name="qiscus_key_google_apis_geolocation" translatable="false">Add here an Android restricted key</string>
+    <string name="qiscus_key_google_apis_android" translatable="false">Add here an Geolocation API only restricted key</string>
 </resources>

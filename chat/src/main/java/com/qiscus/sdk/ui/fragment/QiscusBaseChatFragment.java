@@ -29,15 +29,17 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -52,9 +54,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.libraries.places.api.model.Place;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
 import com.qiscus.manggil.ui.MentionsEditText;
@@ -95,6 +95,7 @@ import com.qiscus.sdk.ui.view.QiscusReplyPreviewView;
 import com.qiscus.sdk.util.QiscusImageUtil;
 import com.qiscus.sdk.util.QiscusKeyboardUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
+import com.rtchagas.pingplacepicker.PingPlacePicker;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import org.json.JSONException;
@@ -1283,10 +1284,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     protected void addLocation() {
         if (QiscusPermissionsUtil.hasPermissions(getActivity(), LOCATION_PERMISSION)) {
-            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            PingPlacePicker.IntentBuilder builder = new PingPlacePicker.IntentBuilder();
+            builder.setAndroidApiKey(getString(R.string.qiscus_key_google_apis_android))
+                    .setGeolocationApiKey(getString(R.string.qiscus_key_google_apis_geolocation));
             try {
                 startActivityForResult(builder.build(getActivity()), PICK_LOCATION_REQUEST);
-            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            } catch (GooglePlayServicesNotAvailableException e) {
                 e.printStackTrace();
             }
             hideAttachmentPanel();
@@ -1640,7 +1643,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 cursor.close();
             }
         } else if (requestCode == PICK_LOCATION_REQUEST && resultCode == Activity.RESULT_OK) {
-            Place place = PlacePicker.getPlace(getActivity(), data);
+            Place place = PingPlacePicker.Companion.getPlace(data);
             QiscusLocation location = new QiscusLocation();
             location.setName(place.getName().toString());
             location.setAddress(place.getAddress().toString());

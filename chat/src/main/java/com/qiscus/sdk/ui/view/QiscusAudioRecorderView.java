@@ -20,7 +20,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.widget.ImageView;

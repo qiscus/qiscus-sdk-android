@@ -19,7 +19,7 @@ package com.qiscus.dragonfly;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.widget.TextView;
 
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
