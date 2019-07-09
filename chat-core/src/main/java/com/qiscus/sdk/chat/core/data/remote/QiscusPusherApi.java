@@ -17,6 +17,7 @@
 package com.qiscus.sdk.chat.core.data.remote;
 
 import android.provider.Settings;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
@@ -205,6 +206,43 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             clearCommentsData.setRoomIds(roomIds);
 
             QiscusClearCommentsHandler.handle(clearCommentsData);
+        } else if (jsonObject.optString("action_topic").equals("delivered")) {
+            JSONObject payload = jsonObject.optJSONObject("payload");
+            JSONObject dataJson = payload.optJSONObject("data");
+
+            Long commentId = dataJson.optLong("comment_id");
+            String commentUniqueID = dataJson.optString("comment_unique_id");
+            Long roomId = dataJson.optLong("room_id");
+
+            QiscusComment savedComment = QiscusCore.getDataStore().getComment(commentUniqueID);
+            if (savedComment != null && savedComment.getState() != QiscusComment.STATE_READ) {
+                QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
+
+                QiscusChatRoomEvent event = new QiscusChatRoomEvent()
+                        .setRoomId(roomId)
+                        .setUser(qiscusAccount.getEmail())
+                        .setEvent(QiscusChatRoomEvent.Event.DELIVERED)
+                        .setCommentId(commentId)
+                        .setCommentUniqueId(commentUniqueID);
+                EventBus.getDefault().post(event);
+            }
+        } else if (jsonObject.optString("action_topic").equals("read")) {
+            JSONObject payload = jsonObject.optJSONObject("payload");
+            JSONObject dataJson = payload.optJSONObject("data");
+
+            Long commentId = dataJson.optLong("comment_id");
+            String commentUniqueID = dataJson.optString("comment_unique_id");
+            Long roomId = dataJson.optLong("room_id");
+
+            QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
+
+            QiscusChatRoomEvent event = new QiscusChatRoomEvent()
+                    .setRoomId(roomId)
+                    .setUser(qiscusAccount.getEmail())
+                    .setEvent(QiscusChatRoomEvent.Event.READ)
+                    .setCommentId(commentId)
+                    .setCommentUniqueId(commentUniqueID);
+            EventBus.getDefault().post(event);
         }
     }
 
