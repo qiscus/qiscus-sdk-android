@@ -143,9 +143,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static void handleNotification(JSONObject jsonObject) {
         long eventId = jsonObject.optLong("id");
-        if (eventId <= QiscusEventCache.getInstance().getLastEventId()) {
-            return;
-        }
 
         QiscusEventCache.getInstance().setLastEventId(eventId);
 
@@ -212,14 +209,17 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             Long commentId = dataJson.optLong("comment_id");
             String commentUniqueID = dataJson.optString("comment_unique_id");
             Long roomId = dataJson.optLong("room_id");
+            String sender = dataJson.optString("email");
 
             QiscusComment savedComment = QiscusCore.getDataStore().getComment(commentUniqueID);
-            if (savedComment != null && savedComment.getState() != QiscusComment.STATE_READ) {
-                QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
+            QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
+
+            if (savedComment != null && savedComment.getState() != QiscusComment.STATE_READ &&
+                    !sender.equals(qiscusAccount.getEmail())) {
 
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
                         .setRoomId(roomId)
-                        .setUser(qiscusAccount.getEmail())
+                        .setUser(sender)
                         .setEvent(QiscusChatRoomEvent.Event.DELIVERED)
                         .setCommentId(commentId)
                         .setCommentUniqueId(commentUniqueID);
@@ -232,16 +232,18 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             Long commentId = dataJson.optLong("comment_id");
             String commentUniqueID = dataJson.optString("comment_unique_id");
             Long roomId = dataJson.optLong("room_id");
+            String sender = dataJson.optString("email");
 
             QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
-
-            QiscusChatRoomEvent event = new QiscusChatRoomEvent()
-                    .setRoomId(roomId)
-                    .setUser(qiscusAccount.getEmail())
-                    .setEvent(QiscusChatRoomEvent.Event.READ)
-                    .setCommentId(commentId)
-                    .setCommentUniqueId(commentUniqueID);
-            EventBus.getDefault().post(event);
+            if (!sender.equals(qiscusAccount.getEmail())) {
+                QiscusChatRoomEvent event = new QiscusChatRoomEvent()
+                        .setRoomId(roomId)
+                        .setUser(sender)
+                        .setEvent(QiscusChatRoomEvent.Event.READ)
+                        .setCommentId(commentId)
+                        .setCommentUniqueId(commentUniqueID);
+                EventBus.getDefault().post(event);
+            }
         }
     }
 
