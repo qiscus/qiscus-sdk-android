@@ -18,12 +18,12 @@ package com.qiscus.sdk.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 
@@ -32,13 +32,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 /**
  * Created on : April 10, 2018
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusChannelActivity extends QiscusGroupChatActivity {
+public class QiscusChannelActivity extends QiscusGroupChatActivity implements QiscusApi.MetaRoomMembersListener {
     protected String subtitle;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
@@ -71,10 +75,13 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity {
         return intent;
     }
 
+
     @Override
     protected void generateSubtitle() {
-        subtitle = getResources().getQuantityString(R.plurals.qiscus_channel_participant_count_subtitle,
-                qiscusChatRoom.getMemberCount(), qiscusChatRoom.getMemberCount());
+        QiscusApi.getInstance().getRoomMembers(qiscusChatRoom.getUniqueId(), this)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
     @Override
@@ -115,5 +122,11 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity {
         });
 
         alertDialog.show();
+    }
+
+    @Override
+    public void onMetaReceived(int currentOffset, int perPage, int total) {
+        subtitle = getResources().getQuantityString(R.plurals.qiscus_channel_participant_count_subtitle,
+                total, total);
     }
 }
