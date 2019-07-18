@@ -24,6 +24,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+
 import androidx.annotation.RequiresApi;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
@@ -83,7 +84,6 @@ public class QiscusSyncJobService extends JobService {
         }
 
         if (QiscusCore.hasSetupUser()) {
-            QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             syncJob(this);
         }
 
