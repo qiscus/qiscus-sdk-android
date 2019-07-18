@@ -144,7 +144,7 @@ public class QiscusCore {
         taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
-        heartBeat = 60000;
+        heartBeat = 5000;
 
         QiscusCore.enableMqttLB = enableMqttLB;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;

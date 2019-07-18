@@ -18,6 +18,7 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.net.Uri;
 import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
@@ -496,8 +497,9 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId) {
-        return getRoomMembers(roomUniqueId, 0, null, null, null);
+    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId,
+                                                             MetaRoomMembersListener metaRoomMembersListener) {
+        return getRoomMembers(roomUniqueId, 0, null, null, metaRoomMembersListener);
     }
 
     public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset, String orderKey,

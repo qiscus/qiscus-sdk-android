@@ -78,7 +78,6 @@ public class QiscusSyncService extends Service {
         }
 
         if (QiscusCore.hasSetupUser()) {
-            QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync(QiscusCore.getHeartBeat());
         }
     }
