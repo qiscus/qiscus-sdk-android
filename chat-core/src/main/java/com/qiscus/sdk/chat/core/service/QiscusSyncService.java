@@ -97,6 +97,8 @@ public class QiscusSyncService extends Service {
         qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
 
+        if (QiscusPusherApi.getInstance().isConnected()) return;
+
         scheduledSync = QiscusCore.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
                     if (QiscusCore.isOnForeground()) {
@@ -121,11 +123,6 @@ public class QiscusSyncService extends Service {
 
                     if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
                         return;
-                    }
-
-                    if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
-                        QiscusPusherApi.getInstance()
-                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
                     }
 
                     if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
