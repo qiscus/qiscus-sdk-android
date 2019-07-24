@@ -97,11 +97,9 @@ public class QiscusSyncService extends Service {
         qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
 
-        if (QiscusPusherApi.getInstance().isConnected()) return;
-
         scheduledSync = QiscusCore.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
-                    if (QiscusCore.isOnForeground()) {
+                    if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
                         syncComments();
                         syncEvents();
                     }
