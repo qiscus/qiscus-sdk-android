@@ -111,17 +111,6 @@ public class QiscusSyncJobService extends JobService {
 
     private void syncComments() {
         QiscusApi.getInstance().sync()
-                .doOnNext(qiscusComment -> {
-                    QiscusComment savedQiscusComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-
-                    if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
-                        return;
-                    }
-
-                    if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
-                        qiscusComment.setState(savedQiscusComment.getState());
-                    }
-                })
                 .doOnSubscribe(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
                     QiscusLogger.print("Sync started...");
