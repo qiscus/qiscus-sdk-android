@@ -111,22 +111,6 @@ public class QiscusSyncJobService extends JobService {
 
     private void syncComments() {
         QiscusApi.getInstance().sync()
-                .doOnNext(qiscusComment -> {
-                    QiscusComment savedQiscusComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-
-                    if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
-                        return;
-                    }
-
-                    if (!qiscusComment.isMyComment()) {
-                        QiscusPusherApi.getInstance()
-                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-                    }
-
-                    if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
-                        qiscusComment.setState(savedQiscusComment.getState());
-                    }
-                })
                 .doOnSubscribe(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
                     QiscusLogger.print("Sync started...");
@@ -175,7 +159,7 @@ public class QiscusSyncJobService extends JobService {
     public boolean onStartJob(JobParameters params) {
         QiscusLogger.print(TAG, "Job started...");
 
-        if (QiscusCore.hasSetupUser()) {
+        if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
             syncJob(this);

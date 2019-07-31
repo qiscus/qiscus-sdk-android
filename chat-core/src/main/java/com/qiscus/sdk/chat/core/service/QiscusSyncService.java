@@ -99,7 +99,7 @@ public class QiscusSyncService extends Service {
 
         scheduledSync = QiscusCore.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
-                    if (QiscusCore.isOnForeground()) {
+                    if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
                         syncComments();
                         syncEvents();
                     }
@@ -116,22 +116,6 @@ public class QiscusSyncService extends Service {
 
     private void syncComments() {
         QiscusApi.getInstance().sync()
-                .doOnNext(qiscusComment -> {
-                    QiscusComment savedQiscusComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-
-                    if (savedQiscusComment != null && savedQiscusComment.isDeleted()) {
-                        return;
-                    }
-
-                    if (!qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
-                        QiscusPusherApi.getInstance()
-                                .setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
-                    }
-
-                    if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
-                        qiscusComment.setState(savedQiscusComment.getState());
-                    }
-                })
                 .doOnSubscribe(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
                     QiscusLogger.print("Sync started...");

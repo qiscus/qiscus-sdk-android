@@ -78,7 +78,6 @@ apply from: '../buildsystem/installv1.gradle'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api supportLibs
     api firebaseLibs
     api qiscusUtilLibs
     api qiscusMqttLibs

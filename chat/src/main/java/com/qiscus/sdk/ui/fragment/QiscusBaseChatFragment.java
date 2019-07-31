@@ -907,6 +907,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         onClearNotification();
         QiscusCacheManager.getInstance().setLastChatActivity(true, qiscusChatRoom.getId());
         showCommentDraft();
+        notifyLatestRead();
     }
 
     private void showCommentDraft() {
