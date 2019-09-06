@@ -107,7 +107,7 @@ public class QiscusSyncService extends Service {
     }
 
     private void syncEvents() {
-        QiscusApi.getInstance().getEvents(QiscusEventCache.getInstance().getLastEventId())
+        QiscusApi.getInstance().synchronizeEvent(QiscusEventCache.getInstance().getLastEventId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(events -> {

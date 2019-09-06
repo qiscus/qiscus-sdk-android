@@ -129,7 +129,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
 
         if (!qiscusComment.isMyComment()) {
-            QiscusPusherApi.getInstance().setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
+            QiscusPusherApi.getInstance().markAsDelivered(qiscusComment.getRoomId(), qiscusComment.getId());
         }
 
         if (QiscusCore.getChatConfig().getNotificationListener() != null) {
@@ -648,6 +648,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    @Deprecated
     public void setUserRead(long roomId, long commentId) {
         Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
                 .filter(room -> room != null)
@@ -658,7 +659,29 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 }, QiscusErrorLogger::print);
     }
 
+    @Deprecated
     public void setUserDelivery(long roomId, long commentId) {
+        Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
+                .filter(room -> !room.isChannel())
+                .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aVoid -> {
+                }, QiscusErrorLogger::print);
+    }
+
+    public void markAsRead(long roomId, long commentId) {
+        Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
+                .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aVoid -> {
+                }, QiscusErrorLogger::print);
+    }
+
+    public void markAsDelivered(long roomId, long commentId) {
         Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
                 .filter(room -> room != null)
                 .filter(room -> !room.isChannel())
