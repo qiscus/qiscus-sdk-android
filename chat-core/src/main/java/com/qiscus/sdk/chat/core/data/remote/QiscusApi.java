@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -119,16 +120,34 @@ public enum QiscusApi {
     }
 
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
-        Request req = chain.request().newBuilder()
-                .addHeader("QISCUS_SDK_APP_ID", QiscusCore.getAppId())
-                .addHeader("QISCUS_SDK_TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "")
-                .addHeader("QISCUS_SDK_USER_EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "")
-                .addHeader("QISCUS_SDK_VERSION", "ANDROID_" + BuildConfig.VERSION_NAME)
-                .addHeader("QISCUS_SDK_PLATFORM", "ANDROID")
-                .addHeader("QISCUS_SDK_DEVICE_BRAND", Build.MANUFACTURER)
-                .addHeader("QISCUS_SDK_DEVICE_MODEL", Build.MODEL)
-                .addHeader("QISCUS_SDK_DEVICE_OS_VERSION", BuildVersionUtil.OS_VERSION_NAME)
-                .build();
+        Request.Builder builder = chain.request().newBuilder();
+        JSONObject jsonCustomHeader = QiscusCore.getCustomHeader();
+
+        Iterator<String> keys = jsonCustomHeader.keys();
+
+        while (keys.hasNext()) {
+            String key = keys.next();
+            try {
+                Object customHeader = jsonCustomHeader.get(key);
+                if (customHeader != null) {
+                    builder.addHeader(key, customHeader.toString());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        builder.addHeader("QISCUS_SDK_APP_ID", QiscusCore.getAppId());
+        builder.addHeader("QISCUS_SDK_TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
+        builder.addHeader("QISCUS_SDK_USER_EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
+        builder.addHeader("QISCUS_SDK_VERSION", "ANDROID_" + BuildConfig.VERSION_NAME);
+        builder.addHeader("QISCUS_SDK_PLATFORM", "ANDROID");
+        builder.addHeader("QISCUS_SDK_DEVICE_BRAND", Build.MANUFACTURER);
+        builder.addHeader("QISCUS_SDK_DEVICE_MODEL", Build.MODEL);
+        builder.addHeader("QISCUS_SDK_DEVICE_OS_VERSION", BuildVersionUtil.OS_VERSION_NAME);
+
+        Request req = builder.build();
+
         return chain.proceed(req);
     }
 
