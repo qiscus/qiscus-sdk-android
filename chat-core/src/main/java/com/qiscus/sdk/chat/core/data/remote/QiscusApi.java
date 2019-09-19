@@ -123,6 +123,15 @@ public enum QiscusApi {
         Request.Builder builder = chain.request().newBuilder();
         JSONObject jsonCustomHeader = QiscusCore.getCustomHeader();
 
+        builder.addHeader("QISCUS-SDK-APP-ID", QiscusCore.getAppId());
+        builder.addHeader("QISCUS-SDK-TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
+        builder.addHeader("QISCUS-SDK-USER-EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
+        builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" + BuildConfig.VERSION_NAME);
+        builder.addHeader("QISCUS-SDK-PLATFORM", "ANDROID");
+        builder.addHeader("QISCUS-SDK-DEVICE-BRAND", Build.MANUFACTURER);
+        builder.addHeader("QISCUS-SDK-DEVICE-MODEL", Build.MODEL);
+        builder.addHeader("QISCUS-SDK-DEVICE-OS-VERSION", BuildVersionUtil.OS_VERSION_NAME);
+
         if (jsonCustomHeader != null) {
             Iterator<String> keys = jsonCustomHeader.keys();
 
@@ -138,16 +147,6 @@ public enum QiscusApi {
                 }
             }
         }
-
-        builder.addHeader("QISCUS-SDK-APP-ID", QiscusCore.getAppId());
-        builder.addHeader("QISCUS-SDK-TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
-        builder.addHeader("QISCUS-SDK-USER-EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
-        builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" + BuildConfig.VERSION_NAME);
-        builder.addHeader("QISCUS-SDK-PLATFORM", "ANDROID");
-        builder.addHeader("QISCUS-SDK-DEVICE-BRAND", Build.MANUFACTURER);
-        builder.addHeader("QISCUS-SDK-DEVICE-MODEL", Build.MODEL);
-        builder.addHeader("QISCUS-SDK-DEVICE-OS-VERSION", BuildVersionUtil.OS_VERSION_NAME);
-
         Request req = builder.build();
 
         return chain.proceed(req);
