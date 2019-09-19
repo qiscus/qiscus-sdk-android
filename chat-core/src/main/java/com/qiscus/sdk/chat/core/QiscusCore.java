@@ -68,6 +68,7 @@ public class QiscusCore {
     private static Handler appHandler;
     private static ScheduledThreadPoolExecutor taskExecutor;
     private static boolean enableMqttLB = true;
+    private static JSONObject customHeader;
 
     private QiscusCore() {
     }
@@ -581,6 +582,19 @@ public class QiscusCore {
     public static Handler getAppsHandler() {
         checkAppIdSetup();
         return appHandler;
+    }
+
+    /**
+     * Use this method to set custom header
+     *
+     * @param customHeader      custom header
+     */
+    public static void setCustomHeader(JSONObject customHeader) {
+        QiscusCore.customHeader = customHeader;
+    }
+
+    public static JSONObject getCustomHeader() {
+        return customHeader;
     }
 
     /**
