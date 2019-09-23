@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -119,16 +120,35 @@ public enum QiscusApi {
     }
 
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
-        Request req = chain.request().newBuilder()
-                .addHeader("QISCUS_SDK_APP_ID", QiscusCore.getAppId())
-                .addHeader("QISCUS_SDK_TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "")
-                .addHeader("QISCUS_SDK_USER_EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "")
-                .addHeader("QISCUS_SDK_VERSION", "ANDROID_" + BuildConfig.VERSION_NAME)
-                .addHeader("QISCUS_SDK_PLATFORM", "ANDROID")
-                .addHeader("QISCUS_SDK_DEVICE_BRAND", Build.MANUFACTURER)
-                .addHeader("QISCUS_SDK_DEVICE_MODEL", Build.MODEL)
-                .addHeader("QISCUS_SDK_DEVICE_OS_VERSION", BuildVersionUtil.OS_VERSION_NAME)
-                .build();
+        Request.Builder builder = chain.request().newBuilder();
+        JSONObject jsonCustomHeader = QiscusCore.getCustomHeader();
+
+        builder.addHeader("QISCUS-SDK-APP-ID", QiscusCore.getAppId());
+        builder.addHeader("QISCUS-SDK-TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
+        builder.addHeader("QISCUS-SDK-USER-EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
+        builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" + BuildConfig.VERSION_NAME);
+        builder.addHeader("QISCUS-SDK-PLATFORM", "ANDROID");
+        builder.addHeader("QISCUS-SDK-DEVICE-BRAND", Build.MANUFACTURER);
+        builder.addHeader("QISCUS-SDK-DEVICE-MODEL", Build.MODEL);
+        builder.addHeader("QISCUS-SDK-DEVICE-OS-VERSION", BuildVersionUtil.OS_VERSION_NAME);
+
+        if (jsonCustomHeader != null) {
+            Iterator<String> keys = jsonCustomHeader.keys();
+
+            while (keys.hasNext()) {
+                String key = keys.next();
+                try {
+                    Object customHeader = jsonCustomHeader.get(key);
+                    if (customHeader != null) {
+                        builder.addHeader(key, customHeader.toString());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        Request req = builder.build();
+
         return chain.proceed(req);
     }
 
@@ -173,6 +193,11 @@ public enum QiscusApi {
     public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
         return api.createGroupChatRoom(QiscusCore.getToken(), name, emails, avatarUrl, options == null ? null : options.toString())
                 .map(QiscusApiParser::parseQiscusChatRoom);
+    }
+
+    public Observable<QiscusAccount> getUserData() {
+        return api.getUserData(QiscusCore.getToken())
+                .map(QiscusApiParser::parseQiscusAccount);
     }
 
     public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {
@@ -589,11 +614,11 @@ public enum QiscusApi {
                 @Field("message") String message
         );
 
-        @POST("api/v2/auth/nonce")
+        @POST("api/v2/mobile/auth/nonce")
         Observable<JsonElement> requestNonce();
 
         @FormUrlEncoded
-        @POST("api/v2/auth/verify_identity_token")
+        @POST("api/v2/mobile/auth/verify_identity_token")
         Observable<JsonElement> login(
                 @Field("identity_token") String token
         );
@@ -751,7 +776,7 @@ public enum QiscusApi {
                 @Query("start_event_id") long startEventId
         );
 
-        @GET("api/v2/sdk/total_unread_count")
+        @GET("api/v2/mobile/total_unread_count")
         Observable<JsonElement> getTotalUnreadCount(
                 @Query("token") String token
         );
@@ -794,7 +819,7 @@ public enum QiscusApi {
                 @Query("limit") long limit
         );
 
-        @GET("/api/v2/sdk/room_participants")
+        @GET("/api/v2/mobile/room_participants")
         Observable<JsonElement> getRoomParticipants(
                 @Query("token") String token,
                 @Query("room_unique_id") String roomId,
@@ -804,7 +829,7 @@ public enum QiscusApi {
                 @Query("user_name") String userName
         );
 
-        @GET("/api/v2/sdk/comment_receipt")
+        @GET("/api/v2/mobile/comment_receipt")
         Observable<JsonElement> getCommentReceipt(
                 @Query("token") String token,
                 @Query("comment_id") long commentId
@@ -818,6 +843,12 @@ public enum QiscusApi {
                 @Query("order_query") String orderQuery,
                 @Query("query") String query
         );
+
+        @GET("api/v2/mobile/my_profile")
+        Observable<JsonElement> getUserData(
+                @Query("token") String token
+        );
+
     }
 
     public interface MetaRoomMembersListener {
