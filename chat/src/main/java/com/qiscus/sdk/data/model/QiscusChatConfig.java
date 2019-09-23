@@ -1288,8 +1288,14 @@ public class QiscusChatConfig {
         return QiscusCore.getChatConfig().isEnableLog();
     }
 
+    @Deprecated
     public QiscusChatConfig setEnableLog(boolean enableLog) {
         QiscusCore.getChatConfig().setEnableLog(enableLog);
+        return this;
+    }
+
+    public QiscusChatConfig enableDebugMode(boolean enableDebugMode) {
+        QiscusCore.getChatConfig().setEnableLog(enableDebugMode);
         return this;
     }
 }

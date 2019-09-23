@@ -39,7 +39,7 @@ public class SampleApps extends MultiDexApplication {
         Qiscus.init(this, QISCUS_SDK_APP_ID);
 
         Qiscus.getChatConfig()
-                .setEnableLog(true)
+                .enableDebugMode(true)
                 .setEnableAddLocation(false)
                 .setDeleteCommentConfig(new QiscusDeleteCommentConfig()
                         .setEnableDeleteComment(true)

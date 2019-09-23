@@ -68,12 +68,12 @@ public class QiscusChatRoomEventHandler {
     }
 
     private void listenChatRoomEvent() {
-        QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().subscribeChatRoom(qiscusChatRoom);
     }
 
     public void detach() {
         QiscusAndroidUtil.cancelRunOnUIThread(listenChatRoomTask);
-        QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().unsubsribeChatRoom(qiscusChatRoom);
         EventBus.getDefault().unregister(this);
     }
 
