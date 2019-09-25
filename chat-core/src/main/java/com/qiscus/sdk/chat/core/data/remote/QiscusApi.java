@@ -351,10 +351,10 @@ public enum QiscusApi {
                 .doOnNext(comment -> EventBus.getDefault().post(new QiscusCommentSentEvent(comment)));
     }
 
-    public Observable<QiscusComment> sendMessage(long roomId, QiscusComment message) {
+    public Observable<QiscusComment> sendMessage(QiscusComment message) {
         QiscusCore.getChatConfig().getCommentSendingInterceptor().sendComment(message);
         return api.postComment(QiscusCore.getToken(), message.getMessage(),
-                roomId, message.getUniqueId(), message.getRawType(),
+                message.getRoomId(), message.getUniqueId(), message.getRawType(),
                 message.getExtraPayload(), message.getExtras() == null ? null :
                         message.getExtras().toString())
                 .map(jsonElement -> {
@@ -372,7 +372,7 @@ public enum QiscusApi {
                 .doOnNext(comment -> EventBus.getDefault().post(new QiscusCommentSentEvent(comment)));
     }
 
-    public Observable<QiscusComment> sendFileMessage(long roomId, QiscusComment message, File file, ProgressListener progressUploadListener) {
+    public Observable<QiscusComment> sendFileMessage(QiscusComment message, File file, ProgressListener progressUploadListener) {
         return Observable.create(subscriber -> {
             long fileLength = file.length();
 
@@ -397,7 +397,7 @@ public enum QiscusApi {
                 message.updateAttachmentUrl(Uri.parse(result).toString());
                 QiscusCore.getDataStore().addOrUpdate(message);
 
-                QiscusApi.getInstance().sendMessage(message.getRoomId(), message)
+                QiscusApi.getInstance().sendMessage(message)
                         .doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(message))
                         .doOnError(throwable -> {
                             subscriber.onError(throwable);
@@ -793,10 +793,17 @@ public enum QiscusApi {
                 .flatMap(jsonElement -> getChatRoom(roomId));
     }
 
+    @Deprecated
     public Observable<QiscusChatRoom> removeRoomMember(long roomId, List<String> userIds) {
         return api.removeRoomMember(QiscusCore.getToken(), roomId, userIds)
                 .flatMap(jsonElement -> getChatRoom(roomId));
     }
+
+    public Observable<QiscusChatRoom> removeParticipants(long roomId, List<String> userIds) {
+        return api.removeRoomMember(QiscusCore.getToken(), roomId, userIds)
+                .flatMap(jsonElement -> getChatRoom(roomId));
+    }
+
 
     public Observable<QiscusAccount> blockUser(String userId) {
         return api.blockUser(QiscusCore.getToken(), userId)
@@ -918,13 +925,6 @@ public enum QiscusApi {
                 subscriber.onError(e);
             }
         }, Emitter.BackpressureMode.BUFFER);
-    }
-
-    public Observable<HashMap<String, List<QiscusRoomMember>>> getCommentInfo(long commentId) {
-        return api.getCommentReceipt(QiscusCore.getToken(), commentId)
-                .map(JsonElement::getAsJsonObject)
-                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
-                .map(QiscusApiParser::parseQiscusCommentInfo);
     }
 
     public Observable<List<QiscusAccount>> getUsers(String searchUsername) {

@@ -96,7 +96,7 @@ public final class QiscusResendCommentHelper {
 
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment.getRoomId(), qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnNext(QiscusResendCommentHelper::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
@@ -136,7 +136,7 @@ public final class QiscusResendCommentHelper {
                 .upload(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .flatMap(uri -> {
                     qiscusComment.updateAttachmentUrl(uri.toString());
-                    return QiscusApi.getInstance().sendMessage(qiscusComment.getRoomId(), qiscusComment);
+                    return QiscusApi.getInstance().sendMessage(qiscusComment);
                 })
                 .doOnNext(commentSend -> {
                     QiscusCore.getDataStore()
@@ -159,7 +159,7 @@ public final class QiscusResendCommentHelper {
         qiscusComment.setProgress(100);
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment.getRoomId(), qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnNext(commentSend -> {
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);

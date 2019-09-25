@@ -230,7 +230,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         File finalCompressedFile = compressedFile;
 
-        Subscription subscription = QiscusApi.getInstance().sendFileMessage(room.getId(),
+        Subscription subscription = QiscusApi.getInstance().sendFileMessage(
                 qiscusComment,finalCompressedFile,percentage -> {
                     qiscusComment.setProgress((int) percentage);
                 }).doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
