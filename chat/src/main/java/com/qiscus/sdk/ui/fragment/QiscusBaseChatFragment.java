@@ -970,7 +970,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
         if (qiscusComment != null) {
             QiscusPusherApi.getInstance()
-                    .setUserRead(qiscusChatRoom.getId(), qiscusComment.getId());
+                    .markAsRead(qiscusChatRoom.getId(), qiscusComment.getId());
         }
     }
 

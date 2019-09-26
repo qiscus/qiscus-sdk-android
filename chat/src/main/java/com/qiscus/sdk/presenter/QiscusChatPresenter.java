@@ -144,7 +144,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void sendComment(QiscusComment qiscusComment) {
         view.onSendingComment(qiscusComment);
-        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(this::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
@@ -600,7 +600,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             QiscusAndroidUtil.runOnBackgroundThread(() -> {
                 if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())
                         && QiscusCacheManager.getInstance().getLastChatActivity().first) {
-                    QiscusPusherApi.getInstance().setUserRead(room.getId(), qiscusComment.getId());
+                    QiscusPusherApi.getInstance().markAsRead(room.getId(), qiscusComment.getId());
                 }
             });
             view.onNewComment(qiscusComment);
