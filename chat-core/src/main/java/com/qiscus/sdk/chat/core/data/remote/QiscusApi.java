@@ -221,13 +221,13 @@ public enum QiscusApi {
     @Deprecated
     public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, JSONObject options) {
         return api.createOrGetChatRoom(QiscusCore.getToken(), Collections.singletonList(withEmail), distinctId,
-                options == null ? null : options.toString())
+                options == null ? null : options.toString(),null)
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> chatUser(String userId, JSONObject extras) {
+    public Observable<QiscusChatRoom> chatUser(String userId, String avatarUrl, JSONObject extras) {
         return api.createOrGetChatRoom(QiscusCore.getToken(), Collections.singletonList(userId), null,
-                extras == null ? null : extras.toString())
+                extras == null ? null : extras.toString(), avatarUrl)
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
@@ -322,7 +322,7 @@ public enum QiscusApi {
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
-    public Observable<QiscusComment> getCommentsAfter(long roomId, int limit, long messageId) {
+    public Observable<QiscusComment> getNextMessagesById(long roomId, int limit, long messageId) {
         return api.getComments(QiscusCore.getToken(), roomId, messageId, true, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
@@ -871,8 +871,8 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomId, int offset, String sorting, MetaRoomMembersListener metaRoomMembersListener) {
-        return api.getRoomParticipants(QiscusCore.getToken(), roomId, offset, null, sorting, null)
+    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset, String sorting, MetaRoomMembersListener metaRoomMembersListener) {
+        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset, null, sorting, null)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
@@ -892,8 +892,8 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomId, int offset, String sorting) {
-        return api.getRoomParticipants(QiscusCore.getToken(), roomId, offset, null, sorting, null)
+    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset, String sorting) {
+        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset, null, sorting, null)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
@@ -1011,7 +1011,8 @@ public enum QiscusApi {
                 @Field("token") String token,
                 @Field("emails[]") List<String> emails,
                 @Field("distinct_id") String distinctId,
-                @Field("options") String options
+                @Field("options") String options,
+                @Field("avatar_url") String avatarUrl
         );
 
         @FormUrlEncoded
@@ -1197,7 +1198,7 @@ public enum QiscusApi {
         @GET("/api/v2/mobile/room_participants")
         Observable<JsonElement> getRoomParticipants(
                 @Query("token") String token,
-                @Query("room_unique_id") String roomId,
+                @Query("room_unique_id") String roomUniqId,
                 @Query("offset") int offset,
                 @Query("order_by_key_name") String orderKey,
                 @Query("sorting") String sorting,

@@ -493,7 +493,21 @@ public class QiscusCore {
      * @param token    the jwt token
      * @param listener completion listener
      */
+    @Deprecated
     public static void setUser(String token, SetUserListener listener) {
+        setUserWithIdentityToken(token)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listener::onSuccess, listener::onError);
+    }
+
+    /**
+     * Use this method to set qiscus user with jwt token from your apps backend
+     *
+     * @param token    the jwt token
+     * @param listener completion listener
+     */
+    public static void setUserWithIdentityToken(String token, SetUserListener listener) {
         setUserWithIdentityToken(token)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

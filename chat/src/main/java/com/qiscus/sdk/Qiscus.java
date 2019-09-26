@@ -85,8 +85,32 @@ public class Qiscus {
      * @param application Application instance
      * @param qiscusAppId Your qiscus application Id
      */
+    @Deprecated
     public static void init(Application application, String qiscusAppId) {
         initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
+                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
+    }
+
+    /**
+     * The first method you need to be invoke to using qiscus sdk. Call this method from your Application
+     * class. You can not using another qiscus feature if you not invoke this method first. Here sample
+     * to call this method:
+     * <pre>
+     * {@code
+     * public class SampleApps extends Application {
+     *  public void onCreate() {
+     *      super.onCreate();
+     *      Qiscus.init(this, "yourQiscusAppId");
+     *  }
+     * }
+     * }
+     * </pre>
+     *
+     * @param application Application instance
+     * @param AppID Your qiscus application Id
+     */
+    public static void setup(Application application, String AppID) {
+        initWithCustomServer(application, AppID, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
 
@@ -110,9 +134,21 @@ public class Qiscus {
      * @param serverBaseUrl Your qiscus chat engine base url
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
+    @Deprecated
     public static void initWithCustomServer(Application application, String qiscusAppId,
                                             String serverBaseUrl, String mqttBrokerUrl) {
         initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, null);
+    }
+
+
+    public static void setupWithCustomServer(Application application, String AppID,
+                                            String baseUrl, String brokerUrl,String brokerUrlLb) {
+        initWithCustomServer(application, AppID, baseUrl, brokerUrl, true, brokerUrlLb);
+    }
+
+    public static void setupWithCustomServer(Application application, String AppID,
+                                             String baseUrl, String brokerUrl) {
+        initWithCustomServer(application, AppID, baseUrl, brokerUrl, false, null);
     }
 
     /**
@@ -464,6 +500,10 @@ public class Qiscus {
      */
     @Deprecated
     public static void setEnableLog(boolean enableLog) {
+        QiscusCore.getChatConfig().setEnableLog(enableLog);
+    }
+
+    public static void enableDebugMode(boolean enableLog) {
         QiscusCore.getChatConfig().setEnableLog(enableLog);
     }
 

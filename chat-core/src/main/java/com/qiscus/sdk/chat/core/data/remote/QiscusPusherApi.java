@@ -371,6 +371,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             mqttConnectOptions.setWill("u/" + qiscusAccount.getEmail()
                     + "/s", ("0:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis())
                     .getBytes(), 2, true);
+            EventBus.getDefault().post(QiscusMqttStatusEvent.RECONNETING);
             try {
                 mqttAndroidClient.connect(mqttConnectOptions, null, this);
                 QiscusLogger.print(TAG, "Connecting...");
