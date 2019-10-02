@@ -299,6 +299,11 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
+    public Observable<List<QiscusChatRoom>> getChatRooms(List<Long> roomIds, int page, boolean showRemoved, boolean showParticipant) {
+        return api.getChatRooms(QiscusCore.getToken(), roomIds, null, showParticipant, showRemoved)
+                .map(QiscusApiParser::parseQiscusChatRoomInfo);
+    }
+
     @Deprecated
     public Observable<QiscusComment> getComments(long roomId, long lastCommentId) {
         return api.getComments(QiscusCore.getToken(), roomId, lastCommentId, false, 20)
