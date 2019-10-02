@@ -221,7 +221,7 @@ public enum QiscusApi {
     @Deprecated
     public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, JSONObject options) {
         return api.createOrGetChatRoom(QiscusCore.getToken(), Collections.singletonList(withEmail), distinctId,
-                options == null ? null : options.toString(),null)
+                options == null ? null : options.toString(), null)
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
@@ -283,7 +283,8 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<List<QiscusChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved, boolean showEmpty, int page, int limit) {
+    public Observable<List<QiscusChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved,
+                                                            boolean showEmpty, int page, int limit) {
         return api.getChatRooms(QiscusCore.getToken(), page, limit, showParticipant, showEmpty, showRemoved)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
@@ -294,7 +295,8 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<List<QiscusChatRoom>> getChatRooms(List<Long> roomIds, List<String> uniqueIds, int page, boolean showRemoved, boolean showParticipant) {
+    public Observable<List<QiscusChatRoom>> getChatRooms(List<Long> roomIds, List<String> uniqueIds, int page,
+                                                         boolean showRemoved, boolean showParticipant) {
         return api.getChatRooms(QiscusCore.getToken(), roomIds, uniqueIds, showParticipant, showRemoved)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
@@ -876,8 +878,10 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset, String sorting, MetaRoomMembersListener metaRoomMembersListener) {
-        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset, null, sorting, null)
+    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset,
+                                                              String sorting, MetaRoomMembersListener metaRoomMembersListener) {
+        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset,
+                null, sorting, null)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
