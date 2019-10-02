@@ -80,7 +80,7 @@ Secondly, you need to add SDK dependencies inside your app .gradle. Then, you ne
 ```
 dependencies {
     ...
-    implementation 'com.qiscus.sdk:chat-core:1.2.15'
+    implementation 'com.qiscus.sdk:chat-core:3.0.0-alpha.1'
 }
 ```
 
