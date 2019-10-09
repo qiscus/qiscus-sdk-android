@@ -575,13 +575,6 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<HashMap<String, List<QiscusRoomMember>>> getCommentInfo(long commentId) {
-        return api.getCommentReceipt(QiscusCore.getToken(), commentId)
-                .map(JsonElement::getAsJsonObject)
-                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
-                .map(QiscusApiParser::parseQiscusCommentInfo);
-    }
-
     public Observable<List<QiscusAccount>> getUsers(String query) {
         return getUsers(0, 100, query);
     }
@@ -730,15 +723,6 @@ public enum QiscusApi {
                 @Field("device_token") String fcmToken
         );
 
-        @Deprecated
-        @POST("api/v2/mobile/search_messages")
-        Observable<JsonElement> searchComments(
-                @Query("token") String token,
-                @Query("query") String query,
-                @Query("room_id") long roomId,
-                @Query("last_comment_id") long lastCommentId
-        );
-
         @GET("api/v2/mobile/user_rooms")
         Observable<JsonElement> getChatRooms(
                 @Query("token") String token,
@@ -827,12 +811,6 @@ public enum QiscusApi {
                 @Query("order_by_key_name") String orderKey,
                 @Query("sorting") String sorting,
                 @Query("user_name") String userName
-        );
-
-        @GET("/api/v2/mobile/comment_receipt")
-        Observable<JsonElement> getCommentReceipt(
-                @Query("token") String token,
-                @Query("comment_id") long commentId
         );
 
         @GET("/api/v2/mobile/get_user_list")
