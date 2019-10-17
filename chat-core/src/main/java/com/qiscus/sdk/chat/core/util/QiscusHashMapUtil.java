@@ -1,17 +1,10 @@
 package com.qiscus.sdk.chat.core.util;
 
-import android.util.Log;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 

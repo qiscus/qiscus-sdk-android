@@ -56,9 +56,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -78,8 +76,6 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
@@ -326,7 +322,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusChatRoom>> getChatRoomsWithUniqueIds(List<String> uniqueIds,
-                                                         boolean showRemoved, boolean showParticipant) {
+                                                                      boolean showRemoved, boolean showParticipant) {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 null, uniqueIds, showParticipant, showRemoved))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
