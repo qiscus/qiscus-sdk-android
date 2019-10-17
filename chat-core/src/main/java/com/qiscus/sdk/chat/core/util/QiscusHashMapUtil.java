@@ -167,8 +167,15 @@ public class QiscusHashMapUtil {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("token", QiscusCore.getToken());
-        hashMap.put("room_id", roomIds);
-        hashMap.put("room_unique_id", roomUniqueIds);
+
+        if (roomIds != null) {
+            hashMap.put("room_id", roomIds);
+        }
+
+        if (roomUniqueIds != null) {
+            hashMap.put("room_unique_id", roomUniqueIds);
+        }
+
         hashMap.put("show_participants", showParticipants);
         hashMap.put("show_removed", showRemoved);
 
