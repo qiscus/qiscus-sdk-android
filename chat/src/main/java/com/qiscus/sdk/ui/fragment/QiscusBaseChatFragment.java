@@ -1877,7 +1877,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     public void deleteCommentsForEveryone(List<QiscusComment> selectedComments) {
-        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
+        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments);
     }
 
     @Override
