@@ -645,17 +645,6 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<List<QiscusComment>> searchComments(String query, long lastCommentId) {
-        return searchComments(query, 0, lastCommentId);
-    }
-
-    @Deprecated
-    public Observable<List<QiscusComment>> searchComments(String query, long roomId, long lastCommentId) {
-        return Observable.error(new RuntimeException("Please use local data search!, we are currently working on search"));
-
-    }
-
-    @Deprecated
     public Observable<Void> clearCommentsByRoomIds(List<Long> roomIds) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
@@ -1116,15 +1105,6 @@ public enum QiscusApi {
                 @Body HashMap<String, Object> data
         );
 
-        @Deprecated
-        @POST("api/v2/mobile/search_messages")
-        Observable<JsonElement> searchComments(
-                @Query("token") String token,
-                @Query("query") String query,
-                @Query("room_id") long roomId,
-                @Query("last_comment_id") long lastCommentId
-        );
-
         @GET("api/v2/mobile/user_rooms")
         Observable<JsonElement> getChatRooms(
                 @Query("token") String token,
@@ -1203,12 +1183,6 @@ public enum QiscusApi {
                 @Query("room_unique_id") String roomUniqId,
                 @Query("offset") int offset,
                 @Query("sorting") String sorting
-        );
-
-        @GET("/api/v2/mobile/comment_receipt")
-        Observable<JsonElement> getCommentReceipt(
-                @Query("token") String token,
-                @Query("comment_id") long commentId
         );
 
         @GET("/api/v2/mobile/get_user_list")
