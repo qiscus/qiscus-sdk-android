@@ -306,7 +306,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved,
-                                                            boolean showEmpty, @Nullable int page, int limit) {
+                                                            boolean showEmpty, int page, int limit) {
         return api.getChatRooms(QiscusCore.getToken(), page, limit, showParticipant, showEmpty, showRemoved)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
