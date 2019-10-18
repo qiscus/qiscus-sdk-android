@@ -346,7 +346,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
-        return QiscusApi.getInstance().getChatRoomComments(room.getId())
+        return QiscusApi.getInstance().getChatRoomWithMessages(room.getId())
                 .doOnError(throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
@@ -373,7 +373,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private Observable<List<QiscusComment>> getCommentsFromNetwork(long lastCommentId) {
-        return QiscusApi.getInstance().getComments(room.getId(), lastCommentId)
+        return QiscusApi.getInstance().getPreviousMessagesById(room.getId(), 20, lastCommentId)
                 .doOnNext(qiscusComment -> {
                     QiscusCore.getDataStore().addOrUpdate(qiscusComment);
                     qiscusComment.setRoomId(room.getId());
@@ -531,7 +531,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void loadCommentsAfter(QiscusComment comment) {
-        QiscusApi.getInstance().getCommentsAfter(room.getId(), comment.getId())
+        QiscusApi.getInstance().getNextMessagesById(room.getId(), 20, comment.getId())
                 .doOnNext(qiscusComment -> qiscusComment.setRoomId(room.getId()))
                 .toSortedList(commentComparator)
                 .doOnNext(Collections::reverse)
@@ -745,20 +745,19 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         EventBus.getDefault().unregister(this);
     }
 
-    public void deleteCommentsForEveryone(List<QiscusComment> comments, boolean hardDelete) {
-        deleteComments(comments, hardDelete);
+    public void deleteCommentsForEveryone(List<QiscusComment> comments) {
+        deleteComments(comments);
     }
 
     /**
      * @param comments
-     * @param hardDelete
      */
-    private void deleteComments(List<QiscusComment> comments, boolean hardDelete) {
+    private void deleteComments(List<QiscusComment> comments) {
         view.showDeleteLoading();
         Observable.from(comments)
                 .map(QiscusComment::getUniqueId)
                 .toList()
-                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteComments(uniqueIds, hardDelete))
+                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteMessages(uniqueIds))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())

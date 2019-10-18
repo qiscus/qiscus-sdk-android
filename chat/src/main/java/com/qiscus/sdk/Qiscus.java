@@ -504,7 +504,7 @@ public class Qiscus {
     }
 
     public static void enableDebugMode(boolean enableLog) {
-        QiscusCore.getChatConfig().setEnableLog(enableLog);
+        QiscusCore.getChatConfig().enableDebugMode(enableLog);
     }
 
 
@@ -629,7 +629,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(email, distinctId, options)
+                    .chatUser(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -772,7 +772,7 @@ public class Qiscus {
          */
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
-                    .getChatRoom(email, distinctId, options)
+                    .chatUser(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
@@ -916,7 +916,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(email, distinctId, options)
+                    .chatUser(email, distinctId, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFiles,
@@ -992,7 +992,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .createGroupChatRoom(name, new ArrayList<>(emails), avatarUrl, options)
+                    .createGroupChat(name, new ArrayList<>(emails), avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -1059,7 +1059,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getGroupChatRoom(uniqueId, name, avatarUrl, options)
+                    .createChannel(uniqueId, name, avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }

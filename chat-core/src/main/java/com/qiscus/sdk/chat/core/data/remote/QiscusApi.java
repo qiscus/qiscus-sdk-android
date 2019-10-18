@@ -746,7 +746,6 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusComment>> deleteMessages(List<String> messageUniqueIds) {
-        // isDeleteForEveryone => akan selalu true, karena deleteForMe deprecated
         return api.deleteComments(QiscusCore.getToken(), messageUniqueIds, true, true)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
@@ -873,13 +872,7 @@ public enum QiscusApi {
     @Deprecated
     public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId,
                                                              MetaRoomMembersListener metaRoomMembersListener) {
-        return getRoomMembers(roomUniqueId, 0, null, null, metaRoomMembersListener);
-    }
-
-    @Deprecated
-    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset, String orderKey,
-                                                             String sorting, MetaRoomMembersListener metaRoomMembersListener) {
-        return getRoomMembers(roomUniqueId, offset, sorting, metaRoomMembersListener);
+        return getRoomMembers(roomUniqueId, 0,  null, metaRoomMembersListener);
     }
 
     @Deprecated
