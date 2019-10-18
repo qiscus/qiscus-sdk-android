@@ -142,7 +142,7 @@ public class Qiscus {
 
 
     public static void setupWithCustomServer(Application application, String AppID,
-                                            String baseUrl, String brokerUrl,String brokerUrlLb) {
+                                            String baseUrl, String brokerUrl, String brokerUrlLb) {
         initWithCustomServer(application, AppID, baseUrl, brokerUrl, true, brokerUrlLb);
     }
 
@@ -205,7 +205,7 @@ public class Qiscus {
      * @return observable of qiscus account
      */
     public static Observable<QiscusAccount> setUserAsObservable(String token) {
-        return QiscusCore.setUserAsObservable(token);
+        return QiscusCore.setUserWithIdentityToken(token);
     }
 
     /**
@@ -215,7 +215,7 @@ public class Qiscus {
      * @param listener completion listener
      */
     public static void setUser(String token, QiscusCore.SetUserListener listener) {
-        QiscusCore.setUser(token, listener);
+        QiscusCore.setUserWithIdentityToken(token, listener);
     }
 
     /**
@@ -440,7 +440,7 @@ public class Qiscus {
      * @param heartBeat Heartbeat duration in milliseconds
      */
     public static void setHeartBeat(long heartBeat) {
-        QiscusCore.setHeartBeat(heartBeat);
+        QiscusCore.setSyncInterval(heartBeat);
     }
 
     /**
@@ -456,7 +456,7 @@ public class Qiscus {
      * @param fcmToken the token
      */
     public static void setFcmToken(String fcmToken) {
-        QiscusCore.setFcmToken(fcmToken);
+        QiscusCore.registerDeviceToken(fcmToken);
     }
 
     public static String getProviderAuthorities() {
@@ -629,7 +629,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .chatUser(email, distinctId, options)
+                    .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -772,7 +772,7 @@ public class Qiscus {
          */
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
-                    .chatUser(email, distinctId, options)
+                    .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
@@ -916,7 +916,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
-                    .chatUser(email, distinctId, options)
+                    .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFiles,
