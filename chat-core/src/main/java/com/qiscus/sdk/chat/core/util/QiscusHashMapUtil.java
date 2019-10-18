@@ -24,7 +24,7 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> login(String token) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", token);
+        hashMap.put("identity_token", token);
 
         return hashMap;
     }
@@ -62,14 +62,12 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> getChatRoom(Object withEmail, String distinctId, String options, String avatarUrl) {
+    public static HashMap<String, Object> getChatRoom(Object withEmail, String options) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("token", QiscusCore.getToken());
         hashMap.put("emails", withEmail);
-        hashMap.put("distinct_id", distinctId);
         hashMap.put("options", options);
-        hashMap.put("avatar_url", avatarUrl);
 
         return hashMap;
     }
@@ -134,7 +132,7 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> updateCommentStatus(String roomId, String lastReadId, String lastReceivedId) {
+    public static HashMap<String, Object>   updateCommentStatus(String roomId, String lastReadId, String lastReceivedId) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("token", QiscusCore.getToken());
