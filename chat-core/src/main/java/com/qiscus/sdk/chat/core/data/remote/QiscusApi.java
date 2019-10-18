@@ -962,8 +962,7 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<List<QiscusAccount>> getUsers(long page, long limit,
-                                                    String query) {
+    public Observable<List<QiscusAccount>> getUsers(long page, long limit, String query) {
         return api.getUserList(QiscusCore.getToken(), page, limit, "username asc", query)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -974,8 +973,7 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusAccount>> getUsers(String searchUsername, long page,
-                                                    long limit) {
+    public Observable<List<QiscusAccount>> getUsers(String searchUsername, long page, long limit) {
         return api.getUserList(QiscusCore.getToken(), page, limit, "username asc", searchUsername)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
