@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.google.gson.JsonElement;
@@ -226,15 +227,15 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<QiscusChatRoom> getChatRoom(String withEmail, String distinctId, JSONObject options) {
-        return api.createOrGetChatRoom(QiscusHashMapUtil.getChatRoom(Collections.singletonList(withEmail), distinctId,
-                options == null ? null : options.toString(), null))
+    public Observable<QiscusChatRoom> getChatRoom(String withEmail, JSONObject options) {
+        return api.createOrGetChatRoom(QiscusHashMapUtil.getChatRoom(Collections.singletonList(withEmail),
+                options == null ? null : options.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> chatUser(String userId, String avatarUrl, JSONObject extras) {
-        return api.createOrGetChatRoom(QiscusHashMapUtil.getChatRoom(Collections.singletonList(userId), null,
-                extras == null ? null : extras.toString(), avatarUrl))
+    public Observable<QiscusChatRoom> chatUser(String userId, JSONObject extras) {
+        return api.createOrGetChatRoom(QiscusHashMapUtil.getChatRoom(Collections.singletonList(userId),
+                extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 

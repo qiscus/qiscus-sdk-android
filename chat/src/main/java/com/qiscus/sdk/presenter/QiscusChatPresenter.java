@@ -231,7 +231,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         File finalCompressedFile = compressedFile;
 
         Subscription subscription = QiscusApi.getInstance().sendFileMessage(
-                qiscusComment,finalCompressedFile,percentage -> {
+                qiscusComment, finalCompressedFile, percentage -> {
                     qiscusComment.setProgress((int) percentage);
                 }).doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(this::commentSuccess)
@@ -277,11 +277,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         qiscusComment.setDownloading(true);
         qiscusComment.setProgress(0);
         Subscription subscription = QiscusApi.getInstance()
-                .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
+                .upload(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
                     qiscusComment.updateAttachmentUrl(uri.toString());
-                    return QiscusApi.getInstance().postComment(qiscusComment);
+                    return QiscusApi.getInstance().sendMessage(qiscusComment);
                 })
                 .doOnNext(commentSend -> {
                     Qiscus.getDataStore()
@@ -310,7 +310,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void forwardFile(QiscusComment qiscusComment) {
         qiscusComment.setProgress(100);
-        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(commentSend -> {
                     qiscusComment.setDownloading(false);
