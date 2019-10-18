@@ -24,7 +24,7 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> login(String token) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", token);
+        hashMap.put("identity_token", token);
 
         return hashMap;
     }
