@@ -598,17 +598,17 @@ public class QiscusCore {
         return appHandler;
     }
 
+    public static JSONObject getCustomHeader() {
+        return customHeader;
+    }
+
     /**
      * Use this method to set custom header
      *
-     * @param customHeader      custom header
+     * @param customHeader custom header
      */
     public static void setCustomHeader(JSONObject customHeader) {
         QiscusCore.customHeader = customHeader;
-    }
-
-    public static JSONObject getCustomHeader() {
-        return customHeader;
     }
 
     /**

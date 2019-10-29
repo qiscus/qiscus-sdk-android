@@ -273,15 +273,15 @@ public enum QiscusApi {
     @Deprecated
     public Observable<QiscusChatRoom> getChatRoom(long roomId) {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
-                Collections.singletonList(roomId), new ArrayList<>(), true, false))
+                Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
                 .flatMap(Observable::from)
                 .take(1);
     }
 
-    private Observable<QiscusChatRoom> getChatRoomInfo(long roomId) {
+    public Observable<QiscusChatRoom> getChatRoomInfo(long roomId) {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
-                Collections.singletonList(roomId), new ArrayList<>(), true, false))
+                Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
                 .flatMap(Observable::from)
                 .take(1);
@@ -872,7 +872,7 @@ public enum QiscusApi {
     @Deprecated
     public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId,
                                                              MetaRoomMembersListener metaRoomMembersListener) {
-        return getRoomMembers(roomUniqueId, 0,  null, metaRoomMembersListener);
+        return getRoomMembers(roomUniqueId, 0, null, metaRoomMembersListener);
     }
 
     @Deprecated

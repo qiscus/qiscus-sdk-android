@@ -29,7 +29,6 @@ import androidx.annotation.RequiresApi;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
@@ -159,8 +158,10 @@ public class QiscusSyncJobService extends JobService {
     public boolean onStartJob(JobParameters params) {
         QiscusLogger.print(TAG, "Job started...");
 
-        if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
-            QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+        if (QiscusCore.hasSetupUser()) {
+            if (!QiscusPusherApi.getInstance().isConnected()) {
+                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+            }
             scheduleSync();
             syncJob(this);
         }
