@@ -118,7 +118,7 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
         ArrayList<Long> roomIds = new ArrayList<>();
         roomIds.add(qiscusChatRoom.getId());
         QiscusApi.getInstance()
-                .clearCommentsByRoomIds(roomIds)
+                .clearMessagesByChatRoomIds(roomIds)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aVoid -> {

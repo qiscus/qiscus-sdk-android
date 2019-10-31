@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+
 import androidx.annotation.RestrictTo;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -90,8 +91,32 @@ public class QiscusCore {
      * @param application Application instance
      * @param qiscusAppId Your qiscus application Id
      */
+    @Deprecated
     public static void init(Application application, String qiscusAppId) {
         initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
+                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
+    }
+
+    /**
+     * The first method you need to be invoke to using qiscus sdk. Call this method from your Application
+     * class. You can not using another qiscus feature if you not invoke this method first. Here sample
+     * to call this method:
+     * <pre>
+     * {@code
+     * public class SampleApps extends Application {
+     *  public void onCreate() {
+     *      super.onCreate();
+     *      QiscusCore.init(this, "yourQiscusAppId");
+     *  }
+     * }
+     * }
+     * </pre>
+     *
+     * @param application Application instance
+     * @param appID       Your qiscus application Id
+     */
+    public static void initWithAppId(Application application, String appID) {
+        initWithCustomServer(application, appID, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
 
@@ -110,17 +135,17 @@ public class QiscusCore {
      * }
      * </pre>
      *
-     * @param application   Application instance
-     * @param qiscusAppId   Your Qiscus App Id
-     * @param serverBaseUrl Your qiscus chat engine base url
-     * @param mqttBrokerUrl Your Mqtt Broker url
+     * @param application Application instance
+     * @param appId       Your Qiscus App Id
+     * @param baseUrl     Your qiscus chat engine base url
+     * @param brokerUrl   Your Mqtt Broker url
      */
-    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
-                                            String mqttBrokerUrl, String baseURLLB) {
-        if (baseURLLB == null) {
-            initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, baseURLLB);
+    public static void initWithCustomServer(Application application, String appId, String baseUrl,
+                                            String brokerUrl, String brokerLBUrl) {
+        if (brokerLBUrl == null) {
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl);
         } else {
-            initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, true, baseURLLB);
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl);
         }
     }
 
@@ -362,9 +387,20 @@ public class QiscusCore {
      *
      * @param heartBeat Heartbeat duration in milliseconds
      */
+    @Deprecated
     public static void setHeartBeat(long heartBeat) {
         checkAppIdSetup();
         QiscusCore.heartBeat = heartBeat;
+    }
+
+    /**
+     * Set the syncInterval of qiscus synchronization chat data. Default value is 500ms
+     *
+     * @param interval Heartbeat duration in milliseconds
+     */
+    public static void setSyncInterval(long interval) {
+        checkAppIdSetup();
+        QiscusCore.heartBeat = interval;
     }
 
     /**
@@ -414,6 +450,7 @@ public class QiscusCore {
      * @param token the jwt token
      * @return observable of qiscus account
      */
+    @Deprecated
     public static Observable<QiscusAccount> setUserAsObservable(String token) {
         return QiscusApi.getInstance()
                 .login(token)
@@ -432,11 +469,46 @@ public class QiscusCore {
     /**
      * Use this method to set qiscus user with jwt token from your apps backend
      *
+     * @param token the jwt token
+     * @return observable of qiscus account
+     */
+    public static Observable<QiscusAccount> setUserWithIdentityToken(String token) {
+        return QiscusApi.getInstance()
+                .setUserWithIdentityToken(token)
+                .doOnNext(qiscusAccount -> {
+                    if (QiscusCore.hasSetupUser()) {
+                        QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                        configureFcmToken();
+                    } else {
+                        QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                        configureFcmToken();
+                        EventBus.getDefault().post(QiscusUserEvent.LOGIN);
+                    }
+                });
+    }
+
+    /**
+     * Use this method to set qiscus user with jwt token from your apps backend
+     *
      * @param token    the jwt token
      * @param listener completion listener
      */
+    @Deprecated
     public static void setUser(String token, SetUserListener listener) {
-        setUserAsObservable(token)
+        setUserWithIdentityToken(token)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listener::onSuccess, listener::onError);
+    }
+
+    /**
+     * Use this method to set qiscus user with jwt token from your apps backend
+     *
+     * @param token    the jwt token
+     * @param listener completion listener
+     */
+    public static void setUserWithIdentityToken(String token, SetUserListener listener) {
+        setUserWithIdentityToken(token)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listener::onSuccess, listener::onError);
@@ -451,7 +523,20 @@ public class QiscusCore {
      * @return observable of qiscus account
      */
     public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl, JSONObject extras) {
-        return QiscusApi.getInstance().updateProfile(name, avatarUrl, extras)
+        return QiscusApi.getInstance().updateUser(name, avatarUrl, extras)
+                .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
+    }
+
+    /**
+     * Use this method to update qiscus user data such as name and avatar
+     *
+     * @param name      user name
+     * @param avatarURL user avatar url
+     * @param extras    user extras
+     * @return observable of qiscus account
+     */
+    public static Observable<QiscusAccount> updateUser(String name, String avatarURL, JSONObject extras) {
+        return QiscusApi.getInstance().updateUser(name, avatarURL, extras)
                 .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
     }
 
@@ -476,7 +561,7 @@ public class QiscusCore {
      */
     public static void updateUser(String name, String avatarUrl, JSONObject extras, SetUserListener listener) {
         checkUserSetup();
-        updateUserAsObservable(name, avatarUrl, extras)
+        updateUser(name, avatarUrl, extras)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listener::onSuccess, listener::onError);
@@ -513,17 +598,17 @@ public class QiscusCore {
         return appHandler;
     }
 
+    public static JSONObject getCustomHeader() {
+        return customHeader;
+    }
+
     /**
      * Use this method to set custom header
      *
-     * @param customHeader      custom header
+     * @param customHeader custom header
      */
     public static void setCustomHeader(JSONObject customHeader) {
         QiscusCore.customHeader = customHeader;
-    }
-
-    public static JSONObject getCustomHeader() {
-        return customHeader;
     }
 
     /**
@@ -538,6 +623,7 @@ public class QiscusCore {
      *
      * @param fcmToken the token
      */
+    @Deprecated
     public static void setFcmToken(String fcmToken) {
         if (hasSetupUser() && getChatConfig().isEnableFcmPushNotification()) {
             QiscusApi.getInstance().registerFcmToken(fcmToken)
@@ -550,11 +636,45 @@ public class QiscusCore {
         localDataManager.setFcmToken(fcmToken);
     }
 
+    /**
+     * Set the FCM token to configure push notification with firebase cloud messaging
+     *
+     * @param token the token (fcmToken)
+     */
+    public static void registerDeviceToken(String token) {
+        if (hasSetupUser() && getChatConfig().isEnableFcmPushNotification()) {
+            QiscusApi.getInstance().registerDeviceToken(token)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aVoid -> {
+                    }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
+        }
+
+        localDataManager.setFcmToken(token);
+    }
+
+    /**
+     * Remove the FCM token
+     *
+     * @param token the token (fcmToken)
+     */
+    public static void removeDeviceToken(String token) {
+        if (hasSetupUser()) {
+            QiscusApi.getInstance().removeDeviceToken(token)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aVoid -> {
+                    }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
+        }
+
+        localDataManager.setFcmToken(null);
+    }
+
     private static void configureFcmToken() {
         if (hasSetupUser() && getChatConfig().isEnableFcmPushNotification()) {
             String fcmToken = getFcmToken();
             if (fcmToken != null) {
-                setFcmToken(fcmToken);
+                registerDeviceToken(fcmToken);
             } else {
                 Observable.just(null)
                         .doOnNext(o -> {
@@ -784,7 +904,7 @@ public class QiscusCore {
          */
         public Observable<QiscusAccount> save() {
             return QiscusApi.getInstance()
-                    .loginOrRegister(email, password, username, avatarUrl, extras)
+                    .setUser(email, password, username, avatarUrl, extras)
                     .doOnNext(qiscusAccount -> {
                         if (QiscusCore.hasSetupUser()) {
                             QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
