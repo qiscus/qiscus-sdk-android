@@ -192,7 +192,7 @@ public class QiscusChatConfig {
                     });
 
     private ReplyNotificationHandler replyNotificationHandler =
-            (context, qiscusComment) -> QiscusApi.getInstance().postComment(qiscusComment)
+            (context, qiscusComment) -> QiscusApi.getInstance().sendMessage(qiscusComment)
                     .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                     .doOnNext(comment -> {
                         comment.setState(QiscusComment.STATE_ON_QISCUS);
@@ -1288,8 +1288,14 @@ public class QiscusChatConfig {
         return QiscusCore.getChatConfig().isEnableLog();
     }
 
+    @Deprecated
     public QiscusChatConfig setEnableLog(boolean enableLog) {
         QiscusCore.getChatConfig().setEnableLog(enableLog);
+        return this;
+    }
+
+    public QiscusChatConfig enableDebugMode(boolean enableDebugMode) {
+        QiscusCore.getChatConfig().enableDebugMode(enableDebugMode);
         return this;
     }
 }

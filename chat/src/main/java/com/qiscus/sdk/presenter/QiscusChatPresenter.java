@@ -144,7 +144,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void sendComment(QiscusComment qiscusComment) {
         view.onSendingComment(qiscusComment);
-        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(this::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
@@ -229,41 +229,32 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         view.onSendingComment(qiscusComment);
 
         File finalCompressedFile = compressedFile;
-        Subscription subscription = QiscusApi.getInstance()
-                .uploadFile(compressedFile, percentage -> {
-                    qiscusComment.setProgress((int) percentage);
-                })
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                .flatMap(uri -> {
-                    qiscusComment.updateAttachmentUrl(uri.toString());
-                    Qiscus.getDataStore().addOrUpdate(qiscusComment);
-                    return QiscusApi.getInstance().postComment(qiscusComment);
-                })
-                .doOnNext(commentSend -> {
-                    Qiscus.getDataStore().addOrUpdate(commentSend);
-                    Qiscus.getDataStore()
-                            .addOrUpdateLocalPath(commentSend.getRoomId(),
-                                    commentSend.getId(), finalCompressedFile.getAbsolutePath());
-                    commentSend.setDownloading(false);
-                    commentSuccess(commentSend);
-                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .compose(bindToLifecycle())
-                .doOnError(throwable -> commentFail(throwable, qiscusComment))
-                .subscribe(commentSend -> {
 
-                    if (room != null && commentSend.getRoomId() == room.getId()) {
+        Subscription subscription = QiscusApi.getInstance().sendFileMessage(
+                qiscusComment, finalCompressedFile, percentage -> {
+                    qiscusComment.setProgress((int) percentage);
+                }).doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                .doOnNext(this::commentSuccess)
+                .doOnError(throwable -> commentFail(throwable, qiscusComment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getRoomId() == room.getId()) {
+                        commentSend.setDownloading(false);
                         view.onSuccessSendComment(commentSend);
+                        QiscusCore.getDataStore()
+                                .addOrUpdateLocalPath(commentSend.getRoomId(),
+                                        commentSend.getId(), finalCompressedFile.getAbsolutePath());
                     }
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
-                    if (room != null && qiscusComment.getRoomId() == room.getId()) {
+                    if (qiscusComment.getRoomId() == room.getId()) {
                         view.onFailedSendComment(qiscusComment);
                     }
                 });
+
 
         pendingTask.put(qiscusComment, subscription);
     }
@@ -286,11 +277,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         qiscusComment.setDownloading(true);
         qiscusComment.setProgress(0);
         Subscription subscription = QiscusApi.getInstance()
-                .uploadFile(file, percentage -> qiscusComment.setProgress((int) percentage))
+                .upload(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .flatMap(uri -> {
                     qiscusComment.updateAttachmentUrl(uri.toString());
-                    return QiscusApi.getInstance().postComment(qiscusComment);
+                    return QiscusApi.getInstance().sendMessage(qiscusComment);
                 })
                 .doOnNext(commentSend -> {
                     Qiscus.getDataStore()
@@ -319,7 +310,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void forwardFile(QiscusComment qiscusComment) {
         qiscusComment.setProgress(100);
-        Subscription subscription = QiscusApi.getInstance().postComment(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
                 .doOnNext(commentSend -> {
                     qiscusComment.setDownloading(false);
@@ -355,7 +346,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
-        return QiscusApi.getInstance().getChatRoomComments(room.getId())
+        return QiscusApi.getInstance().getChatRoomWithMessages(room.getId())
                 .doOnError(throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
@@ -382,7 +373,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private Observable<List<QiscusComment>> getCommentsFromNetwork(long lastCommentId) {
-        return QiscusApi.getInstance().getComments(room.getId(), lastCommentId)
+        return QiscusApi.getInstance().getPreviousMessagesById(room.getId(), 20, lastCommentId)
                 .doOnNext(qiscusComment -> {
                     QiscusCore.getDataStore().addOrUpdate(qiscusComment);
                     qiscusComment.setRoomId(room.getId());
@@ -540,7 +531,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void loadCommentsAfter(QiscusComment comment) {
-        QiscusApi.getInstance().getCommentsAfter(room.getId(), comment.getId())
+        QiscusApi.getInstance().getNextMessagesById(room.getId(), 20, comment.getId())
                 .doOnNext(qiscusComment -> qiscusComment.setRoomId(room.getId()))
                 .toSortedList(commentComparator)
                 .doOnNext(Collections::reverse)
@@ -609,7 +600,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             QiscusAndroidUtil.runOnBackgroundThread(() -> {
                 if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())
                         && QiscusCacheManager.getInstance().getLastChatActivity().first) {
-                    QiscusPusherApi.getInstance().setUserRead(room.getId(), qiscusComment.getId());
+                    QiscusPusherApi.getInstance().markAsRead(room.getId(), qiscusComment.getId());
                 }
             });
             view.onNewComment(qiscusComment);
@@ -754,20 +745,19 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         EventBus.getDefault().unregister(this);
     }
 
-    public void deleteCommentsForEveryone(List<QiscusComment> comments, boolean hardDelete) {
-        deleteComments(comments, hardDelete);
+    public void deleteCommentsForEveryone(List<QiscusComment> comments) {
+        deleteComments(comments);
     }
 
     /**
      * @param comments
-     * @param hardDelete
      */
-    private void deleteComments(List<QiscusComment> comments, boolean hardDelete) {
+    private void deleteComments(List<QiscusComment> comments) {
         view.showDeleteLoading();
         Observable.from(comments)
                 .map(QiscusComment::getUniqueId)
                 .toList()
-                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteComments(uniqueIds, hardDelete))
+                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteMessages(uniqueIds))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())

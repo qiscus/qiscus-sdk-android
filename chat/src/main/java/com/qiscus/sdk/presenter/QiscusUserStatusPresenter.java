@@ -46,7 +46,7 @@ public class QiscusUserStatusPresenter extends QiscusPresenter<QiscusUserStatusP
     public void listenUser(String user) {
         if (!users.contains(user)) {
             users.add(user);
-            QiscusPusherApi.getInstance().listenUserStatus(user);
+            QiscusPusherApi.getInstance().subscribeUserOnlinePresence(user);
         }
     }
 
@@ -61,7 +61,7 @@ public class QiscusUserStatusPresenter extends QiscusPresenter<QiscusUserStatusP
     public void detachView() {
         super.detachView();
         for (String user : users) {
-            QiscusPusherApi.getInstance().unListenUserStatus(user);
+            QiscusPusherApi.getInstance().unsubscribeUserOnlinePresence(user);
         }
         EventBus.getDefault().unregister(this);
     }

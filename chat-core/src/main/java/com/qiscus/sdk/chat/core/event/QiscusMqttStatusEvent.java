@@ -23,5 +23,5 @@ package com.qiscus.sdk.chat.core.event;
  * GitHub     : https://github.com/zetbaitsu
  */
 public enum QiscusMqttStatusEvent {
-    CONNECTED, DISCONNECTED
+    CONNECTED, DISCONNECTED, RECONNETING
 }
