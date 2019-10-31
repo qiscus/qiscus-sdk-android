@@ -18,6 +18,9 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.provider.Settings;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -60,8 +63,6 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -71,6 +72,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     INSTANCE;
     private static final String TAG = QiscusPusherApi.class.getSimpleName();
     private static final long RETRY_PERIOD = 4000;
+    private static final long CONNECTED_SYNC_INTERVAL = 30000;
+    private static final long DISCONNECTED_SYNC_INTERVAL = 5000;
 
     private static Gson gson;
     private static long reconnectCounter;
@@ -124,12 +127,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     private static void handleComment(QiscusComment qiscusComment) {
         QiscusComment savedComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
+        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
         if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
             return;
         }
 
         if (!qiscusComment.isMyComment()) {
-            QiscusPusherApi.getInstance().setUserDelivery(qiscusComment.getRoomId(), qiscusComment.getId());
+            QiscusPusherApi.getInstance().markAsDelivered(qiscusComment.getRoomId(), qiscusComment.getId());
         }
 
         if (QiscusCore.getChatConfig().getNotificationListener() != null) {
@@ -371,6 +375,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             mqttConnectOptions.setWill("u/" + qiscusAccount.getEmail()
                     + "/s", ("0:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis())
                     .getBytes(), 2, true);
+            EventBus.getDefault().post(QiscusMqttStatusEvent.RECONNETING);
             try {
                 mqttAndroidClient.connect(mqttConnectOptions, null, this);
                 QiscusLogger.print(TAG, "Connecting...");
@@ -471,7 +476,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void disconnect() {
         QiscusLogger.print(TAG, "Disconnecting...");
-        setUserStatus(false);
+        QiscusCore.setSyncInterval(DISCONNECTED_SYNC_INTERVAL);
+        publishOnlinePresence(false);
         try {
             connecting = false;
             mqttAndroidClient.disconnect();
@@ -533,6 +539,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    @Deprecated
     public void listenRoom(QiscusChatRoom qiscusChatRoom) {
         QiscusLogger.print(TAG, "Listening room...");
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
@@ -571,6 +578,45 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    public void subscribeChatRoom(QiscusChatRoom qiscusChatRoom) {
+        QiscusLogger.print(TAG, "Listening room...");
+        fallBackListenRoom = () -> subscribeChatRoom(qiscusChatRoom);
+        try {
+            long roomId = qiscusChatRoom.getId();
+            if (!qiscusChatRoom.isChannel()) {
+                mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
+                mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
+                mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
+
+                QiscusAndroidUtil.runOnBackgroundThread(() -> eventReport("MQTT", "LISTEN_ROOM",
+                        "r/" + roomId + "/+/+/t/d/r"), 1000);
+            } else {
+                mqttAndroidClient.subscribe(QiscusCore.getAppId() + "/" + qiscusChatRoom.getUniqueId() + "/c", 2);
+                QiscusAndroidUtil.runOnBackgroundThread(() -> eventReport("MQTT",
+                        "LISTEN_ROOM", QiscusCore.getAppId()
+                                + "/" + qiscusChatRoom.getUniqueId() + "/c"), 1000);
+            }
+        } catch (MqttException e) {
+            //Do nothing
+        } catch (NullPointerException | IllegalArgumentException e) {
+            if (e != null) {
+                QiscusAndroidUtil.runOnBackgroundThread(() -> {
+                    try {
+                        eventReport("MQTT", "LISTEN_ROOM", e.toString());
+                    } catch (NullPointerException d) {
+                        //ignored
+                    } catch (Exception d) {
+                        //ignored
+                    }
+                }, 1000);
+            }
+            QiscusErrorLogger.print(TAG, "Failure listen room, try again in " + RETRY_PERIOD + " ms");
+            connect();
+            scheduledListenRoom = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenRoom, RETRY_PERIOD);
+        }
+    }
+
+    @Deprecated
     public void unListenRoom(QiscusChatRoom qiscusChatRoom) {
         try {
             long roomId = qiscusChatRoom.getId();
@@ -588,6 +634,25 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         fallBackListenRoom = null;
     }
 
+
+    public void unsubsribeChatRoom(QiscusChatRoom qiscusChatRoom) {
+        try {
+            long roomId = qiscusChatRoom.getId();
+            mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/t");
+            mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/d");
+            mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/r");
+            mqttAndroidClient.unsubscribe(QiscusCore.getAppId() + "/" + qiscusChatRoom.getUniqueId() + "/c");
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+            //Do nothing
+        }
+        if (scheduledListenRoom != null) {
+            scheduledListenRoom.cancel(true);
+            scheduledListenRoom = null;
+        }
+        fallBackListenRoom = null;
+    }
+
+    @Deprecated
     public void listenUserStatus(String user) {
         fallBackListenUserStatus = () -> listenUserStatus(user);
         try {
@@ -600,6 +665,19 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    public void subscribeUserOnlinePresence(String userId) {
+        fallBackListenUserStatus = () -> subscribeUserOnlinePresence(userId);
+        try {
+            mqttAndroidClient.subscribe("u/" + userId + "/s", 2);
+        } catch (MqttException e) {
+            //Do nothing
+        } catch (NullPointerException | IllegalArgumentException e) {
+            connect();
+            scheduledListenUserStatus = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenUserStatus, RETRY_PERIOD);
+        }
+    }
+
+    @Deprecated
     public void unListenUserStatus(String user) {
         try {
             mqttAndroidClient.unsubscribe("u/" + user + "/s");
@@ -613,6 +691,20 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         fallBackListenUserStatus = null;
     }
 
+    public void unsubscribeUserOnlinePresence(String userId) {
+        try {
+            mqttAndroidClient.unsubscribe("u/" + userId + "/s");
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+            //Do nothing
+        }
+        if (scheduledListenUserStatus != null) {
+            scheduledListenUserStatus.cancel(true);
+            scheduledListenUserStatus = null;
+        }
+        fallBackListenUserStatus = null;
+    }
+
+    @Deprecated
     private void setUserStatus(boolean online) {
         try {
             if (!isConnected() && connecting != true) {
@@ -636,6 +728,30 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     }
 
+    public void publishOnlinePresence(boolean isOnline) {
+        try {
+            if (!isConnected() && connecting != true) {
+                connect();
+            } else {
+                try {
+                    MqttMessage message = new MqttMessage();
+                    message.setPayload(isOnline ? "1".getBytes() : "0".getBytes());
+                    message.setQos(1);
+                    message.setRetained(true);
+                    mqttAndroidClient.publish("u/" + qiscusAccount.getEmail() + "/s", message);
+                } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+                    //Do nothing
+                }
+            }
+        } catch (NullPointerException e) {
+            connect();
+        } catch (Exception ignored) {
+            //ignored
+        }
+
+    }
+
+    @Deprecated
     public void setUserTyping(long roomId, boolean typing) {
         checkAndConnect();
         try {
@@ -648,6 +764,19 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    public void publishTyping(long roomId, boolean isTyping) {
+        checkAndConnect();
+        try {
+            MqttMessage message = new MqttMessage();
+            message.setPayload((isTyping ? "1" : "0").getBytes());
+            mqttAndroidClient.publish("r/" + roomId + "/" + roomId + "/"
+                    + qiscusAccount.getEmail() + "/t", message);
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+            //Do nothing
+        }
+    }
+
+    @Deprecated
     public void setUserRead(long roomId, long commentId) {
         Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
                 .filter(room -> room != null)
@@ -658,6 +787,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 }, QiscusErrorLogger::print);
     }
 
+    @Deprecated
     public void setUserDelivery(long roomId, long commentId) {
         Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
                 .filter(room -> room != null)
@@ -669,6 +799,28 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 }, QiscusErrorLogger::print);
     }
 
+    public void markAsRead(long roomId, long commentId) {
+        Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
+                .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, commentId, 0))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aVoid -> {
+                }, QiscusErrorLogger::print);
+    }
+
+    public void markAsDelivered(long roomId, long commentId) {
+        Observable.fromCallable(() -> QiscusCore.getDataStore().getChatRoom(roomId))
+                .filter(room -> room != null)
+                .filter(room -> !room.isChannel())
+                .flatMap(room -> QiscusApi.getInstance().updateCommentStatus(roomId, 0, commentId))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aVoid -> {
+                }, QiscusErrorLogger::print);
+    }
+
+    @Deprecated
     public void setEvent(long roomId, JSONObject data) {
         checkAndConnect();
         try {
@@ -685,6 +837,23 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    public void publishCustomEvent(long roomId, JSONObject data) {
+        checkAndConnect();
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("sender", qiscusAccount.getEmail());
+            payload.put("data", data);
+
+            MqttMessage message = new MqttMessage();
+            message.setPayload((payload.toString().getBytes()));
+
+            mqttAndroidClient.publish("r/" + roomId + "/" + roomId + "/e", message);
+        } catch (MqttException | NullPointerException | IllegalArgumentException | JSONException e) {
+            //Do nothing
+        }
+    }
+
+    @Deprecated
     public void listenEvent(long roomId) {
         QiscusLogger.print(TAG, "Listening event...");
         fallbackListenEvent = () -> listenEvent(roomId);
@@ -698,7 +867,34 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
+    public void subsribeCustomEvent(long roomId) {
+        QiscusLogger.print(TAG, "Listening event...");
+        fallbackListenEvent = () -> subsribeCustomEvent(roomId);
+        try {
+            mqttAndroidClient.subscribe("r/" + roomId + "/" + roomId + "/e", 2);
+        } catch (MqttException e) {
+            //Do nothing
+        } catch (NullPointerException | IllegalArgumentException e) {
+            connect();
+            scheduledListenEvent = QiscusAndroidUtil.runOnBackgroundThread(fallbackListenEvent, RETRY_PERIOD);
+        }
+    }
+
+    @Deprecated
     public void unlistenEvent(long roomId) {
+        try {
+            mqttAndroidClient.unsubscribe("r/" + roomId + "/" + roomId + "/e");
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+            //Do nothing
+        }
+        if (scheduledListenEvent != null) {
+            scheduledListenEvent.cancel(true);
+            scheduledListenEvent = null;
+        }
+        fallbackListenEvent = null;
+    }
+
+    public void unsubsribeCustomEvent(long roomId) {
         try {
             mqttAndroidClient.unsubscribe("r/" + roomId + "/" + roomId + "/e");
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
@@ -852,10 +1048,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     @Override
     public void connectComplete(boolean reconnect, String serverUri) {
         if (!isConnected()) {
+            QiscusCore.setSyncInterval(DISCONNECTED_SYNC_INTERVAL);
             connecting = false;
             reconnectCounter = 0;
             connect();
         } else {
+            QiscusCore.setSyncInterval(CONNECTED_SYNC_INTERVAL);
             // if connected, update flag to true
             QiscusCore.setCacheMqttBrokerUrl(QiscusCore.getMqttBrokerUrl(), true);
 
@@ -898,11 +1096,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void onSuccess(IMqttToken asyncActionToken) {
-
+        QiscusCore.setSyncInterval(CONNECTED_SYNC_INTERVAL);
     }
 
     @Override
     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+        QiscusCore.setSyncInterval(DISCONNECTED_SYNC_INTERVAL);
         if (reconnectCounter == 0) {
             getMqttBrokerUrlFromLB();
         }
@@ -946,10 +1145,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                         if (isConnected()) {
                             if (QiscusCore.isOnForeground()) {
                                 setOfflineCounter = 0;
-                                setUserStatus(true);
+                                publishOnlinePresence(true);
                             } else {
                                 if (setOfflineCounter <= 2) {
-                                    setUserStatus(false);
+                                    publishOnlinePresence(false);
                                     setOfflineCounter++;
                                 }
                             }

@@ -63,7 +63,13 @@ public class QiscusCoreChatConfig {
         return enableLog;
     }
 
+    @Deprecated
     public QiscusCoreChatConfig setEnableLog(boolean enableLog) {
+        this.enableLog = enableLog;
+        return this;
+    }
+
+    public QiscusCoreChatConfig enableDebugMode(boolean enableLog) {
         this.enableLog = enableLog;
         return this;
     }

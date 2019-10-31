@@ -970,7 +970,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
         if (qiscusComment != null) {
             QiscusPusherApi.getInstance()
-                    .setUserRead(qiscusChatRoom.getId(), qiscusComment.getId());
+                    .markAsRead(qiscusChatRoom.getId(), qiscusComment.getId());
         }
     }
 
@@ -1188,7 +1188,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private void notifyServerTyping(boolean typing) {
         if (!qiscusChatRoom.isChannel()) {
-            QiscusPusherApi.getInstance().setUserTyping(qiscusChatRoom.getId(), typing);
+            QiscusPusherApi.getInstance().publishTyping(qiscusChatRoom.getId(), typing);
         }
     }
 
@@ -1877,7 +1877,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     public void deleteCommentsForEveryone(List<QiscusComment> selectedComments) {
-        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments, chatConfig.getDeleteCommentConfig().isEnableHardDelete());
+        qiscusChatPresenter.deleteCommentsForEveryone(selectedComments);
     }
 
     @Override

@@ -85,8 +85,32 @@ public class Qiscus {
      * @param application Application instance
      * @param qiscusAppId Your qiscus application Id
      */
+    @Deprecated
     public static void init(Application application, String qiscusAppId) {
         initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
+                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
+    }
+
+    /**
+     * The first method you need to be invoke to using qiscus sdk. Call this method from your Application
+     * class. You can not using another qiscus feature if you not invoke this method first. Here sample
+     * to call this method:
+     * <pre>
+     * {@code
+     * public class SampleApps extends Application {
+     *  public void onCreate() {
+     *      super.onCreate();
+     *      Qiscus.init(this, "yourQiscusAppId");
+     *  }
+     * }
+     * }
+     * </pre>
+     *
+     * @param application Application instance
+     * @param AppID Your qiscus application Id
+     */
+    public static void setup(Application application, String AppID) {
+        initWithCustomServer(application, AppID, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
 
@@ -110,9 +134,21 @@ public class Qiscus {
      * @param serverBaseUrl Your qiscus chat engine base url
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
+    @Deprecated
     public static void initWithCustomServer(Application application, String qiscusAppId,
                                             String serverBaseUrl, String mqttBrokerUrl) {
         initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, null);
+    }
+
+
+    public static void setupWithCustomServer(Application application, String AppID,
+                                            String baseUrl, String brokerUrl, String brokerUrlLb) {
+        initWithCustomServer(application, AppID, baseUrl, brokerUrl, true, brokerUrlLb);
+    }
+
+    public static void setupWithCustomServer(Application application, String AppID,
+                                             String baseUrl, String brokerUrl) {
+        initWithCustomServer(application, AppID, baseUrl, brokerUrl, false, null);
     }
 
     /**
@@ -169,7 +205,7 @@ public class Qiscus {
      * @return observable of qiscus account
      */
     public static Observable<QiscusAccount> setUserAsObservable(String token) {
-        return QiscusCore.setUserAsObservable(token);
+        return QiscusCore.setUserWithIdentityToken(token);
     }
 
     /**
@@ -179,7 +215,7 @@ public class Qiscus {
      * @param listener completion listener
      */
     public static void setUser(String token, QiscusCore.SetUserListener listener) {
-        QiscusCore.setUser(token, listener);
+        QiscusCore.setUserWithIdentityToken(token, listener);
     }
 
     /**
@@ -404,7 +440,7 @@ public class Qiscus {
      * @param heartBeat Heartbeat duration in milliseconds
      */
     public static void setHeartBeat(long heartBeat) {
-        QiscusCore.setHeartBeat(heartBeat);
+        QiscusCore.setSyncInterval(heartBeat);
     }
 
     /**
@@ -420,7 +456,7 @@ public class Qiscus {
      * @param fcmToken the token
      */
     public static void setFcmToken(String fcmToken) {
-        QiscusCore.setFcmToken(fcmToken);
+        QiscusCore.registerDeviceToken(fcmToken);
     }
 
     public static String getProviderAuthorities() {
@@ -465,6 +501,10 @@ public class Qiscus {
     @Deprecated
     public static void setEnableLog(boolean enableLog) {
         QiscusCore.getChatConfig().setEnableLog(enableLog);
+    }
+
+    public static void enableDebugMode(boolean enableLog) {
+        QiscusCore.getChatConfig().enableDebugMode(enableLog);
     }
 
 
@@ -589,7 +629,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(email, distinctId, options)
+                    .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -732,7 +772,7 @@ public class Qiscus {
          */
         public Observable<Intent> build(Context context) {
             return QiscusApi.getInstance()
-                    .getChatRoom(email, distinctId, options)
+                    .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatActivity.generateIntent(context, qiscusChatRoom, message,
@@ -876,7 +916,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatFragment> build() {
             return QiscusApi.getInstance()
-                    .getChatRoom(email, distinctId, options)
+                    .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom))
                     .map(qiscusChatRoom ->
                             QiscusChatFragment.newInstance(qiscusChatRoom, message, shareFiles,
@@ -952,7 +992,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .createGroupChatRoom(name, new ArrayList<>(emails), avatarUrl, options)
+                    .createGroupChat(name, new ArrayList<>(emails), avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
@@ -1019,7 +1059,7 @@ public class Qiscus {
          */
         public Observable<QiscusChatRoom> build() {
             return QiscusApi.getInstance()
-                    .getGroupChatRoom(uniqueId, name, avatarUrl, options)
+                    .createChannel(uniqueId, name, avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
