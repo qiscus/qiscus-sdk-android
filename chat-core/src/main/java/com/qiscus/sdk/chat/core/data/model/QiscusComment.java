@@ -451,7 +451,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public boolean isAttachment() {
-        String trimmedMessage = message.trim();
+        String trimmedMessage = message.trim().replaceAll(" ", "");
         return (trimmedMessage.startsWith("[file]") && trimmedMessage.endsWith("[/file]"))
                 || (!TextUtils.isEmpty(rawType) && rawType.equals("file_attachment"));
     }
@@ -497,10 +497,21 @@ public class QiscusComment implements Parcelable {
                 return attachmentName;
             }
 
-            int fileNameEndIndex = message.lastIndexOf(" [/file]");
-            int fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
+            int fileNameEndIndex = -1;
+            int fileNameBeginIndex;
+            String fileName;
 
-            String fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
+            fileNameEndIndex = message.lastIndexOf(" [/file]");
+
+            if (fileNameEndIndex != -1) {
+                fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
+                fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
+            } else {
+                fileNameEndIndex = message.lastIndexOf("[/file]");
+                fileNameBeginIndex = message.lastIndexOf('/', fileNameEndIndex) + 1;
+                fileName = message.substring(fileNameBeginIndex, fileNameEndIndex);
+            }
+
             try {
                 fileName = fileName.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
                 fileName = fileName.replaceAll("\\+", "%2B");
