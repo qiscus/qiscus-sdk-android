@@ -127,7 +127,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     private static void handleComment(QiscusComment qiscusComment) {
         QiscusComment savedComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+
         if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
             return;
         }
