@@ -276,7 +276,7 @@ public final class QiscusFileUtil {
         if (i > 0) {
             i += 7;
             String thumbnailUrl = url.substring(0, i);
-            String fileName = url.substring(url.lastIndexOf("/") + 1);
+
             if (blur == 300) {
                 thumbnailUrl += "w_" + width + ",h_" + height + ",c_limit,e_blur:" + blur + "/";
             } else {
