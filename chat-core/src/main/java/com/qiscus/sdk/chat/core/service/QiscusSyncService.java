@@ -72,6 +72,7 @@ public class QiscusSyncService extends Service {
 
         if (QiscusCore.hasSetupUser()) {
             scheduleSync(QiscusCore.getHeartBeat());
+            scheduleConnectionCheck();
         }
     }
 
@@ -95,17 +96,37 @@ public class QiscusSyncService extends Service {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        if (QiscusCore.isOnForeground()) {
+                        if (QiscusCore.isOnForeground() && QiscusCore.hasSetupUser()) {
                             if (!QiscusPusherApi.getInstance().isConnected()) {
                                 QiscusPusherApi.getInstance().restartConnection();
                             }
                             syncComments();
                             syncEvents();
-                            scheduleSync(QiscusCore.getHeartBeat());
+                            if (QiscusPusherApi.getInstance().isConnected()) {
+                                scheduleSync(QiscusCore.getHeartBeat());
+                            }
                         }
                     });
         }
+    }
 
+    private void scheduleConnectionCheck() {
+        if (QiscusCore.hasSetupUser()) {
+            QiscusCore.getTaskExecutor()
+                    .execute(() -> {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (QiscusCore.isOnForeground() && QiscusCore.hasSetupUser()) {
+                            if (!QiscusPusherApi.getInstance().isConnected()) {
+                                scheduleSync(QiscusCore.getHeartBeat());
+                            }
+                            scheduleConnectionCheck();
+                        }
+                    });
+        }
     }
 
     private void syncEvents() {
@@ -141,6 +162,7 @@ public class QiscusSyncService extends Service {
             case LOGIN:
                 QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                 scheduleSync(QiscusCore.getHeartBeat());
+                scheduleConnectionCheck();
                 break;
             case LOGOUT:
                 break;
