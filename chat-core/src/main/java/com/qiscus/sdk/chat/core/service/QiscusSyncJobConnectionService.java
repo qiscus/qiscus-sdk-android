@@ -54,16 +54,16 @@ public class QiscusSyncJobConnectionService extends JobService {
 
     private static final String TAG = QiscusSyncJobConnectionService.class.getSimpleName();
     private static final int STATIC_JOB_ID_CONNECTION = 101;
-    private static JobInfo jobInfoConnection;
-    private static JobScheduler jobScheduler;
-    private static ComponentName componentName;
+    private JobInfo jobInfoConnection;
+    private JobScheduler jobScheduler;
+    private ComponentName componentName;
 
-    public static void syncJobConnection() {
+    public void syncJobConnection() {
         QiscusLogger.print(TAG, "syncJob...");
 
         jobInfoConnection = new JobInfo.Builder(STATIC_JOB_ID_CONNECTION, componentName)
-                .setMinimumLatency(30000)
-                .setOverrideDeadline(30000)
+                .setMinimumLatency(QiscusPusherApi.DISCONNECTED_SYNC_INTERVAL)
+                .setOverrideDeadline(QiscusPusherApi.DISCONNECTED_SYNC_INTERVAL)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
@@ -97,7 +97,7 @@ public class QiscusSyncJobConnectionService extends JobService {
 
     private void scheduleSync() {
         if (QiscusCore.isOnForeground()) {
-            if (QiscusPusherApi.getInstance().isConnected()) {
+            if (!QiscusPusherApi.getInstance().isConnected()) {
                 syncComments();
                 syncEvents();
             }

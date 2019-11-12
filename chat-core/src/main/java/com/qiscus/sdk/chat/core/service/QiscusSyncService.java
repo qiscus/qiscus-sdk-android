@@ -115,7 +115,7 @@ public class QiscusSyncService extends Service {
             QiscusCore.getTaskExecutor()
                     .execute(() -> {
                         try {
-                            Thread.sleep(5000);
+                            Thread.sleep(QiscusPusherApi.DISCONNECTED_SYNC_INTERVAL);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

@@ -72,8 +72,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     INSTANCE;
     private static final String TAG = QiscusPusherApi.class.getSimpleName();
     private static final long RETRY_PERIOD = 4000;
-    private static final long CONNECTED_SYNC_INTERVAL = 30000;
-    private static final long DISCONNECTED_SYNC_INTERVAL = 5000;
+    public static final long CONNECTED_SYNC_INTERVAL = 30000;
+    public static final long DISCONNECTED_SYNC_INTERVAL = 5000;
 
     private static Gson gson;
     private static long reconnectCounter;
