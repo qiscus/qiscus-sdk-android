@@ -54,28 +54,30 @@ public class QiscusSyncJobService extends JobService {
 
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();
     private static final int STATIC_JOB_ID = 100;
+    private static JobInfo jobInfo;
+    private static JobScheduler jobScheduler;
+    private static ComponentName componentName;
 
-    public static void syncJob(Context context) {
+    public static void syncJob() {
         QiscusLogger.print(TAG, "syncJob...");
 
-        ComponentName componentName = new ComponentName(context, QiscusSyncJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
-                .setMinimumLatency(QiscusCore.getHeartBeat())
-                .setOverrideDeadline(QiscusCore.getHeartBeat())
+        jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
+                .setMinimumLatency(5000)
+                .setOverrideDeadline(5000)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
 
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.schedule(jobInfo);
-        }
-
+        jobScheduler.schedule(jobInfo);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        componentName = new ComponentName(this, QiscusSyncJobService.class);
+
+        jobScheduler = (JobScheduler) this.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
         QiscusLogger.print(TAG, "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
@@ -83,7 +85,7 @@ public class QiscusSyncJobService extends JobService {
         }
 
         if (QiscusCore.hasSetupUser()) {
-            syncJob(this);
+            syncJob();
         }
 
     }
@@ -95,8 +97,10 @@ public class QiscusSyncJobService extends JobService {
 
     private void scheduleSync() {
         if (QiscusCore.isOnForeground()) {
-            syncComments();
-            syncEvents();
+            if (!QiscusPusherApi.getInstance().isConnected()) {
+                syncComments();
+                syncEvents();
+            }
         }
     }
 
@@ -139,7 +143,7 @@ public class QiscusSyncJobService extends JobService {
         switch (userEvent) {
             case LOGIN:
                 QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().connect());
-                syncJob(this);
+                syncJob();
                 break;
             case LOGOUT:
                 stopSync();
@@ -163,11 +167,12 @@ public class QiscusSyncJobService extends JobService {
                 QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             }
             scheduleSync();
-            syncJob(this);
+            syncJob();
         }
 
         return true;
     }
+
 
     @Override
     public boolean onStopJob(JobParameters params) {

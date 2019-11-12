@@ -221,7 +221,7 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusAccount> getUserData() {
-        return api.getUserData(QiscusCore.getToken())
+        return api.getUserData()
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
@@ -289,24 +289,24 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
-        return api.getChatRoom(QiscusCore.getToken(), roomId)
+        return api.getChatRoom(roomId)
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
 
     public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomWithMessages(long roomId) {
-        return api.getChatRoom(QiscusCore.getToken(), roomId)
+        return api.getChatRoom(roomId)
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
 
     @Deprecated
     public Observable<List<QiscusChatRoom>> getChatRooms(int page, int limit, boolean showMembers) {
-        return api.getChatRooms(QiscusCore.getToken(), page, limit, showMembers, false, false)
+        return api.getChatRooms(page, limit, showMembers, false, false)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
     public Observable<List<QiscusChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved,
                                                             boolean showEmpty, int page, int limit) {
-        return api.getChatRooms(QiscusCore.getToken(), page, limit, showParticipant, showEmpty, showRemoved)
+        return api.getChatRooms(page, limit, showParticipant, showEmpty, showRemoved)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
@@ -340,7 +340,7 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> getComments(long roomId, long lastCommentId) {
-        return api.getComments(QiscusCore.getToken(), roomId, lastCommentId, false, 20)
+        return api.getComments(roomId, lastCommentId, false, 20)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
@@ -348,21 +348,21 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> getCommentsAfter(long roomId, long lastCommentId) {
-        return api.getComments(QiscusCore.getToken(), roomId, lastCommentId, true, 20)
+        return api.getComments(roomId, lastCommentId, true, 20)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getPreviousMessagesById(long roomId, int limit, long messageId) {
-        return api.getComments(QiscusCore.getToken(), roomId, messageId, false, limit)
+        return api.getComments(roomId, messageId, false, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getNextMessagesById(long roomId, int limit, long messageId) {
-        return api.getComments(QiscusCore.getToken(), roomId, messageId, true, limit)
+        return api.getComments(roomId, messageId, true, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
@@ -411,7 +411,6 @@ public enum QiscusApi {
 
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
-                    .addFormDataPart("token", QiscusCore.getToken())
                     .addFormDataPart("file", file.getName(),
                             new CountingFileRequestBody(file, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
@@ -457,7 +456,7 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> sync(long lastCommentId) {
-        return api.sync(QiscusCore.getToken(), lastCommentId)
+        return api.sync(lastCommentId)
                 .onErrorReturn(throwable -> {
                     QiscusErrorLogger.print("Sync", throwable);
                     return null;
@@ -472,7 +471,7 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> synchronize(long lastMessageId) {
-        return api.sync(QiscusCore.getToken(), lastMessageId)
+        return api.sync(lastMessageId)
                 .onErrorReturn(throwable -> {
                     QiscusErrorLogger.print("Sync", throwable);
                     return null;
@@ -502,7 +501,6 @@ public enum QiscusApi {
 
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
-                    .addFormDataPart("token", QiscusCore.getToken())
                     .addFormDataPart("file", file.getName(),
                             new CountingFileRequestBody(file, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
@@ -534,7 +532,6 @@ public enum QiscusApi {
 
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
-                    .addFormDataPart("token", QiscusCore.getToken())
                     .addFormDataPart("file", file.getName(),
                             new CountingFileRequestBody(file, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
@@ -660,7 +657,7 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<Void> clearCommentsByRoomUniqueIds(List<String> roomUniqueIds) {
-        return api.clearChatRoomMessages(QiscusCore.getToken(), roomUniqueIds)
+        return api.clearChatRoomMessages(roomUniqueIds)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
@@ -694,7 +691,7 @@ public enum QiscusApi {
     }
 
     public Observable<Void> clearMessagesByChatRoomUniqueIds(List<String> roomUniqueIds) {
-        return api.clearChatRoomMessages(QiscusCore.getToken(), roomUniqueIds)
+        return api.clearChatRoomMessages(roomUniqueIds)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
@@ -714,7 +711,7 @@ public enum QiscusApi {
     public Observable<List<QiscusComment>> deleteComments(List<String> commentUniqueIds,
                                                           boolean isHardDelete) {
         // isDeleteForEveryone => akan selalu true, karena deleteForMe deprecated
-        return api.deleteComments(QiscusCore.getToken(), commentUniqueIds, true, isHardDelete)
+        return api.deleteComments(commentUniqueIds, true, isHardDelete)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
@@ -746,7 +743,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusComment>> deleteMessages(List<String> messageUniqueIds) {
-        return api.deleteComments(QiscusCore.getToken(), messageUniqueIds, true, true)
+        return api.deleteComments(messageUniqueIds, true, true)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
@@ -779,7 +776,7 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<List<JSONObject>> getEvents(long startEventId) {
-        return api.getEvents(QiscusCore.getToken(), startEventId)
+        return api.getEvents(startEventId)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
                 .map(jsonEvent -> {
                     try {
@@ -794,7 +791,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<JSONObject>> synchronizeEvent(long lastEventId) {
-        return api.getEvents(QiscusCore.getToken(), lastEventId)
+        return api.getEvents(lastEventId)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
                 .map(jsonEvent -> {
                     try {
@@ -809,7 +806,7 @@ public enum QiscusApi {
     }
 
     public Observable<Long> getTotalUnreadCount() {
-        return api.getTotalUnreadCount(QiscusCore.getToken())
+        return api.getTotalUnreadCount()
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
@@ -859,7 +856,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusAccount>> getBlockedUsers(long page, long limit) {
-        return api.getBlockedUsers(QiscusCore.getToken(), page, limit)
+        return api.getBlockedUsers(page, limit)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
@@ -878,7 +875,7 @@ public enum QiscusApi {
     @Deprecated
     public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset, String sorting,
                                                              MetaRoomMembersListener metaRoomMembersListener) {
-        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset, sorting)
+        return api.getRoomParticipants(roomUniqueId, offset, sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
@@ -900,7 +897,7 @@ public enum QiscusApi {
 
     public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset,
                                                               String sorting, MetaRoomMembersListener metaRoomMembersListener) {
-        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset,
+        return api.getRoomParticipants(roomUniqueId, offset,
                 sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -922,7 +919,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset, String sorting) {
-        return api.getRoomParticipants(QiscusCore.getToken(), roomUniqueId, offset, sorting)
+        return api.getRoomParticipants(roomUniqueId, offset, sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
@@ -962,7 +959,7 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<List<QiscusAccount>> getUsers(long page, long limit, String query) {
-        return api.getUserList(QiscusCore.getToken(), page, limit, "username asc", query)
+        return api.getUserList(page, limit, "username asc", query)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
@@ -973,7 +970,7 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusAccount>> getUsers(String searchUsername, long page, long limit) {
-        return api.getUserList(QiscusCore.getToken(), page, limit, "username asc", searchUsername)
+        return api.getUserList(page, limit, "username asc", searchUsername)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
@@ -1020,7 +1017,6 @@ public enum QiscusApi {
 
         @GET("api/v2/mobile/my_profile")
         Observable<JsonElement> getUserData(
-                @Query("token") String token
         );
 
         @Headers("Content-Type: application/json")
@@ -1043,13 +1039,11 @@ public enum QiscusApi {
 
         @GET("api/v2/mobile/get_room_by_id")
         Observable<JsonElement> getChatRoom(
-                @Query("token") String token,
                 @Query("id") long roomId
         );
 
         @GET("api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(
-                @Query("token") String token,
                 @Query("topic_id") long roomId,
                 @Query("last_comment_id") long lastCommentId,
                 @Query("after") boolean after,
@@ -1064,7 +1058,6 @@ public enum QiscusApi {
 
         @GET("api/v2/mobile/sync")
         Observable<JsonElement> sync(
-                @Query("token") String token,
                 @Query("last_received_comment_id") long lastCommentId
         );
 
@@ -1094,7 +1087,6 @@ public enum QiscusApi {
 
         @GET("api/v2/mobile/user_rooms")
         Observable<JsonElement> getChatRooms(
-                @Query("token") String token,
                 @Query("page") int page,
                 @Query("limit") int limit,
                 @Query("show_participants") boolean showParticipants,
@@ -1110,13 +1102,11 @@ public enum QiscusApi {
 
         @DELETE("api/v2/mobile/clear_room_messages")
         Observable<JsonElement> clearChatRoomMessages(
-                @Query("token") String token,
                 @Query("room_channel_ids[]") List<String> roomUniqueIds
         );
 
         @DELETE("api/v2/mobile/delete_messages")
         Observable<JsonElement> deleteComments(
-                @Query("token") String token,
                 @Query("unique_ids[]") List<String> commentUniqueIds,
                 @Query("is_delete_for_everyone") boolean isDeleteForEveryone,
                 @Query("is_hard_delete") boolean isHardDelete
@@ -1124,14 +1114,11 @@ public enum QiscusApi {
 
         @GET("api/v2/mobile/sync_event")
         Observable<JsonElement> getEvents(
-                @Query("token") String token,
                 @Query("start_event_id") long startEventId
         );
 
         @GET("api/v2/mobile/total_unread_count")
-        Observable<JsonElement> getTotalUnreadCount(
-                @Query("token") String token
-        );
+        Observable<JsonElement> getTotalUnreadCount();
 
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/add_room_participants")
@@ -1159,14 +1146,12 @@ public enum QiscusApi {
 
         @GET("/api/v2/mobile/get_blocked_users")
         Observable<JsonElement> getBlockedUsers(
-                @Query("token") String token,
                 @Query("page") long page,
                 @Query("limit") long limit
         );
 
         @GET("/api/v2/mobile/room_participants")
         Observable<JsonElement> getRoomParticipants(
-                @Query("token") String token,
                 @Query("room_unique_id") String roomUniqId,
                 @Query("offset") int offset,
                 @Query("sorting") String sorting
@@ -1174,7 +1159,6 @@ public enum QiscusApi {
 
         @GET("/api/v2/mobile/get_user_list")
         Observable<JsonElement> getUserList(
-                @Query("token") String token,
                 @Query("page") long page,
                 @Query("limit") long limit,
                 @Query("order_query") String orderQuery,

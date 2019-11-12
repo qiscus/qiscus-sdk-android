@@ -58,6 +58,12 @@
             android:exported="true"
             android:label="QiscusSyncJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".service.QiscusSyncJobConnectionService"
+            android:exported="true"
+            android:label="QiscusSyncJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

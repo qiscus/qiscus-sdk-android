@@ -35,6 +35,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
+import com.qiscus.sdk.chat.core.service.QiscusSyncJobConnectionService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
@@ -201,6 +202,8 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
+                appInstance.getApplicationContext()
+                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobConnectionService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
                 QiscusErrorLogger.print(e);
