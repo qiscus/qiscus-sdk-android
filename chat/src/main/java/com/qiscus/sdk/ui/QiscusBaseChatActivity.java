@@ -41,7 +41,7 @@ import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
@@ -80,7 +80,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected List<QiscusComment> forwardCommentsData;
     protected QiscusComment scrollToComment;
 
-    private Map<String, QiscusRoomMember> roomMembers;
+    private Map<String, QParticipant> roomMembers;
     private ActionMode actionMode;
     private QiscusUserStatusPresenter userStatusPresenter;
 
@@ -182,9 +182,9 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     }
 
     protected void binRoomData() {
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equals(Qiscus.getQiscusAccount().getId())) {
-                userStatusPresenter.listenUser(member.getEmail());
+        for (QParticipant member : qiscusChatRoom.getMember()) {
+            if (!member.getId().equals(Qiscus.getQiscusAccount().getId())) {
+                userStatusPresenter.listenUser(member.getId());
             }
         }
     }
@@ -345,8 +345,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected void copyComments(List<QiscusComment> selectedComments) {
         if (roomMembers == null) {
             roomMembers = new HashMap<>();
-            for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-                roomMembers.put(member.getEmail(), member);
+            for (QParticipant member : qiscusChatRoom.getMember()) {
+                roomMembers.put(member.getId(), member);
             }
         }
         QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();

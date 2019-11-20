@@ -109,7 +109,7 @@ To use Qiscus Chat SDK features a user firstly need to authenticate to Qiscus Se
 
 ```
 QiscusCore.setUser(userId, userKey)
-      .withUsername(username)
+      .withUsername(name)
       .withAvatarUrl(avatarUrl)
       .withExtras(extras)
       .save(new QiscusCore.SetUserListener() {
@@ -202,7 +202,7 @@ This authentication is done by calling `setUser()` function. This function will 
 
 ```
 QiscusCore.setUser(userId , userKey)
-      .withUsername(username)
+      .withUsername(name)
       .withAvatarUrl(avatarUrl)
       .withExtras(extras)
       .save(new QiscusCore.SetUserListener() {
@@ -220,7 +220,7 @@ Where:
 
 * `userId` (string, unique): A User identifier that will be used to identify a user and used whenever another user need to chat with this user. It can be anything, whether is is user's email, your user database index, etc. HiAs long as it is unique and a string.
 * `userKey` (string): userKey for authentication purpose, so even if a stranger knows your user Id, he cannot access the user data.
-* `username` (string): Username for display name inside Chat Room purposes.
+* `name` (string): Username for display name inside Chat Room purposes.
 * `avatarURL` (string, optional): to display user's avatar, fallback to default avatar if not provided.
 * `extras`** **(JSON, optional): to give additional information (metadata) to user, which consist key-value, for example **key: position, **and** value: engineer**.** **
 
@@ -434,7 +434,7 @@ This section contains user Qiscus Chat SDK behaviour, you can do **update user p
 You can update user's data, for example
 
 ```
-QiscusCore.updateUser(username, avatarUrl, extras, new QiscusCore.SetUserListener() {
+QiscusCore.updateUser(name, avatarUrl, extras, new QiscusCore.SetUserListener() {
             @Override
             public void onSuccess(QiscusAccount qAccount) {
                 //do anything after it successfully updated
@@ -449,7 +449,7 @@ QiscusCore.updateUser(username, avatarUrl, extras, new QiscusCore.SetUserListene
 
 Where:
 
-* `username`: username of its user, for display name purpose if in 1-on-1 Chat Room
+* `name`: name of its user, for display name purpose if in 1-on-1 Chat Room
 * `avatarUrl` : Url to display user's avatar, fallback to default avatar if not provided.
 * `extras` : metadata that can be as additional information to user, which consist key-value, for example **key: position, **and** value: engineer**.** **
 
@@ -672,7 +672,7 @@ Retrieving from Qiscus Server, you need `roomUniqueId`, you get default 100 part
 QiscusApi.getInstance().getRoomMembers(roomUniqueId);
 ```
 
-You can get advance by adding some parameter, for example you can order the list based on either ascending `(asc)` or descending `(desc)`, or you can sort by `username` . 
+You can get advance by adding some parameter, for example you can order the list based on either ascending `(asc)` or descending `(desc)`, or you can sort by `name` . 
 
 ```
 QiscusApi.getInstance().getRoomMembers(roomUniqueId, offset, sorting, userName, metaRoomMembersListener);
@@ -704,7 +704,7 @@ Where:
 * `roomUniqueId`:  unique Id each of Chat Room
 * `offset`: number of offset
 * `sorting`: filtering based on ascending (**asc)** or descending (**desc)**, by default refer to **asc**
-* `username`: (**deprecated**) filtering based on participant's username
+* `name`: (**deprecated**) filtering based on participant's name
 * `metaRoomMemberListener`:  metadata from the response Qiscus Server, there are, total page, current offset and page
 
 > Note :

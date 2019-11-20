@@ -32,7 +32,7 @@ import com.qiscus.manggil.suggestions.interfaces.Suggestible;
 import com.qiscus.manggil.suggestions.interfaces.SuggestionsListBuilder;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,15 +74,15 @@ public class QiscusMentionSuggestionBuilder implements SuggestionsListBuilder {
         TextView textView = view.findViewById(R.id.name);
         textView.setText(suggestion.getSuggestiblePrimaryText());
 
-        if (suggestion instanceof QiscusRoomMember) {
+        if (suggestion instanceof QParticipant) {
             ImageView imageView = view.findViewById(R.id.avatar);
-            QiscusRoomMember member = (QiscusRoomMember) suggestion;
+            QParticipant member = (QParticipant) suggestion;
             Nirmana.getInstance().get()
                     .setDefaultRequestOptions(new RequestOptions()
                             .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
                             .placeholder(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
                             .dontAnimate())
-                    .load(member.getAvatar())
+                    .load(member.getAvatarUrl())
                     .into(imageView);
         }
 

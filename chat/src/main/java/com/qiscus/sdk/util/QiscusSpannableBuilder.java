@@ -23,7 +23,7 @@ import android.text.Spannable;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class QiscusSpannableBuilder {
     private String message;
-    private Map<String, QiscusRoomMember> members;
+    private Map<String, QParticipant> members;
     @ColorInt
     private int mentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
     @ColorInt
@@ -45,7 +45,7 @@ public class QiscusSpannableBuilder {
     private int mentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
     private MentionClickHandler mentionClickListener;
 
-    public QiscusSpannableBuilder(String message, Map<String, QiscusRoomMember> members) {
+    public QiscusSpannableBuilder(String message, Map<String, QParticipant> members) {
         this.message = message;
         this.members = members;
     }

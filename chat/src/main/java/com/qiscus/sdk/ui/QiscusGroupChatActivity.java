@@ -22,9 +22,9 @@ import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
 import java.io.File;
 import java.io.Serializable;
@@ -87,10 +87,10 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     protected void generateSubtitle() {
         subtitle = "";
         int count = 0;
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getId())) {
+        for (QParticipant member : qiscusChatRoom.getMember()) {
+            if (!member.getId().equalsIgnoreCase(Qiscus.getQiscusAccount().getId())) {
                 count++;
-                subtitle += member.getUsername().split(" ")[0];
+                subtitle += member.getName().split(" ")[0];
                 if (count < qiscusChatRoom.getMember().size() - 1) {
                     subtitle += ", ";
                 }
@@ -112,12 +112,12 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     public void onUserTyping(String user, boolean typing) {
         if (typing) {
             Observable.from(qiscusChatRoom.getMember())
-                    .filter(qiscusRoomMember -> qiscusRoomMember.getEmail().equals(user))
+                    .filter(qiscusRoomMember -> qiscusRoomMember.getId().equals(user))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(bindToLifecycle())
                     .subscribe(qiscusRoomMember -> tvSubtitle.setText(getString(R.string.qiscus_group_member_typing,
-                            qiscusRoomMember.getUsername())), throwable -> {
+                            qiscusRoomMember.getName())), throwable -> {
                     });
         } else {
             tvSubtitle.setText(subtitle);

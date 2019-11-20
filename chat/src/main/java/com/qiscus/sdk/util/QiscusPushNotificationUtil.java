@@ -41,10 +41,10 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusPushNotificationMessage;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -142,12 +142,12 @@ public final class QiscusPushNotificationUtil {
         }
 
         QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
-        Map<String, QiscusRoomMember> members = new HashMap<>();
+        Map<String, QParticipant> members = new HashMap<>();
         if (mentionConfig.isEnableMention()) {
             QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(comment.getRoomId());
             if (room != null) {
-                for (QiscusRoomMember member : room.getMember()) {
-                    members.put(member.getEmail(), member);
+                for (QParticipant member : room.getMember()) {
+                    members.put(member.getId(), member);
                 }
             }
         }

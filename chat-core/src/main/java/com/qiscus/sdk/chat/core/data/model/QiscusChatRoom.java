@@ -51,7 +51,7 @@ public class QiscusChatRoom implements Parcelable {
     protected boolean group;
     protected boolean channel;
     protected String avatarUrl;
-    protected List<QiscusRoomMember> member;
+    protected List<QParticipant> member;
     protected int unreadCount;
     protected QiscusComment lastComment;
     protected int memberCount;
@@ -73,7 +73,7 @@ public class QiscusChatRoom implements Parcelable {
         group = in.readByte() != 0;
         channel = in.readByte() != 0;
         avatarUrl = in.readString();
-        member = in.createTypedArrayList(QiscusRoomMember.CREATOR);
+        member = in.createTypedArrayList(QParticipant.CREATOR);
         unreadCount = in.readInt();
         lastComment = in.readParcelable(QiscusComment.class.getClassLoader());
         memberCount = in.readInt();
@@ -143,11 +143,11 @@ public class QiscusChatRoom implements Parcelable {
         this.avatarUrl = avatarUrl;
     }
 
-    public List<QiscusRoomMember> getMember() {
+    public List<QParticipant> getMember() {
         return member;
     }
 
-    public void setMember(List<QiscusRoomMember> member) {
+    public void setMember(List<QParticipant> member) {
         this.member = member;
     }
 

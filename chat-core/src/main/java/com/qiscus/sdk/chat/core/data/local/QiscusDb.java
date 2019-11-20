@@ -19,9 +19,9 @@ package com.qiscus.sdk.chat.core.data.local;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,28 +110,28 @@ final class QiscusDb {
                         COLUMN_USER_EXTRAS + " TEXT" +
                         " ); ";
 
-        static ContentValues toContentValues(QiscusRoomMember qiscusRoomMember) {
+        static ContentValues toContentValues(QParticipant QParticipant) {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_USER_EMAIL, qiscusRoomMember.getEmail());
-            values.put(COLUMN_USER_NAME, qiscusRoomMember.getUsername());
-            values.put(COLUMN_USER_AVATAR, qiscusRoomMember.getAvatar());
-            values.put(COLUMN_USER_EXTRAS, qiscusRoomMember.getExtras() == null ? null :
-                    qiscusRoomMember.getExtras().toString());
+            values.put(COLUMN_USER_EMAIL, QParticipant.getId());
+            values.put(COLUMN_USER_NAME, QParticipant.getName());
+            values.put(COLUMN_USER_AVATAR, QParticipant.getAvatarUrl());
+            values.put(COLUMN_USER_EXTRAS, QParticipant.getExtras() == null ? null :
+                    QParticipant.getExtras().toString());
             return values;
         }
 
-        static QiscusRoomMember getMember(Cursor cursor) {
-            QiscusRoomMember qiscusRoomMember = new QiscusRoomMember();
-            qiscusRoomMember.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
-            qiscusRoomMember.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_NAME)));
-            qiscusRoomMember.setAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_AVATAR)));
+        static QParticipant getMember(Cursor cursor) {
+            QParticipant QParticipant = new QParticipant();
+            QParticipant.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
+            QParticipant.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_NAME)));
+            QParticipant.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_AVATAR)));
             try {
                 String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
-                qiscusRoomMember.setExtras(extras == null ? null : new JSONObject(extras));
+                QParticipant.setExtras(extras == null ? null : new JSONObject(extras));
             } catch (JSONException ignored) {
                 //Do nothing
             }
-            return qiscusRoomMember;
+            return QParticipant;
         }
     }
 
@@ -153,17 +153,17 @@ final class QiscusDb {
                         "PRIMARY KEY (" + COLUMN_ROOM_ID + ", " + COLUMN_USER_EMAIL + ")" +
                         " ); ";
 
-        static ContentValues toContentValues(long roomId, QiscusRoomMember roomMember) {
+        static ContentValues toContentValues(long roomId, QParticipant roomMember) {
             return toContentValues(roomId, "default", roomMember);
         }
 
-        static ContentValues toContentValues(long roomId, String distinctId, QiscusRoomMember roomMember) {
+        static ContentValues toContentValues(long roomId, String distinctId, QParticipant roomMember) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_ROOM_ID, roomId);
             values.put(COLUMN_DISTINCT_ID, distinctId);
-            values.put(COLUMN_USER_EMAIL, roomMember.getEmail());
-            values.put(COLUMN_LAST_DELIVERED, roomMember.getLastDeliveredCommentId());
-            values.put(COLUMN_LAST_READ, roomMember.getLastReadCommentId());
+            values.put(COLUMN_USER_EMAIL, roomMember.getId());
+            values.put(COLUMN_LAST_DELIVERED, roomMember.getLastMessageDeliveredId());
+            values.put(COLUMN_LAST_READ, roomMember.getLastMessageReadId());
             return values;
         }
 

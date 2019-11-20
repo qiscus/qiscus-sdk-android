@@ -86,13 +86,13 @@ QiscusCore.getAppId()
  *
  * userId  (string|email|unique)
  * userKey (string)
- * username (string) 
+ * name (string) 
  * avatarURL (string, optional)
  * extras (JSONObject, optional)
  */
 
 QiscusCore.setUser(*userId* , *userKey*)
-      .withUsername(*username*)
+      .withUsername(*name*)
       .withAvatarUrl(*avatarUrl*)
       .withExtras(*extras*)
       .save(new Qiscus.SetUserListener() {
@@ -165,7 +165,7 @@ The steps to authenticate with JWT goes like this:
  * avatarUrl (string)
  */
 
-QiscusCore.updateUser(*username*, *avatarUrl*, new QiscusCore.SetUserListener() {
+QiscusCore.updateUser(*name*, *avatarUrl*, new QiscusCore.SetUserListener() {
         @Override
         public void onSuccess(QiscusAccount qAccount) {
            //do anything after it successfully updated
@@ -185,7 +185,7 @@ QiscusCore.updateUser(*username*, *avatarUrl*, new QiscusCore.SetUserListener() 
  * extras (JSONObject)
  */
  
-QiscusCore.updateUser(*username*, *avatarUrl*, *extras*, new QiscusCore.SetUserListener() {
+QiscusCore.updateUser(*name*, *avatarUrl*, *extras*, new QiscusCore.SetUserListener() {
             @Override
             public void onSuccess(QiscusAccount qAccount) {
                 //do anything after it successfully updated

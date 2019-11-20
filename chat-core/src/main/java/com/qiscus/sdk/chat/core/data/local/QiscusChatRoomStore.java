@@ -16,8 +16,8 @@
 
 package com.qiscus.sdk.chat.core.data.local;
 
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
 import java.util.List;
 
@@ -58,15 +58,15 @@ public interface QiscusChatRoomStore {
 
     void deleteChatRoom(long roomId);
 
-    void addRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void addRoomMember(long roomId, QParticipant QParticipant, String distinctId);
 
     boolean isContainsRoomMember(long roomId, String email);
 
-    void updateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void updateRoomMember(long roomId, QParticipant QParticipant, String distinctId);
 
-    void addOrUpdateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void addOrUpdateRoomMember(long roomId, QParticipant QParticipant, String distinctId);
 
-    List<QiscusRoomMember> getRoomMembers(long roomId);
+    List<QParticipant> getRoomMembers(long roomId);
 
     void deleteRoomMember(long roomId, String email);
 

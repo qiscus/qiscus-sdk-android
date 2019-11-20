@@ -28,10 +28,10 @@ import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentSentEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
@@ -721,10 +721,10 @@ public enum QiscusApi {
                 .toList()
                 .doOnNext(comments -> {
                     QAccount account = QiscusCore.getQiscusAccount();
-                    QiscusRoomMember actor = new QiscusRoomMember();
-                    actor.setEmail(account.getId());
-                    actor.setUsername(account.getName());
-                    actor.setAvatar(account.getAvatarUrl());
+                    QParticipant actor = new QParticipant();
+                    actor.setId(account.getId());
+                    actor.setName(account.getName());
+                    actor.setAvatarUrl(account.getAvatarUrl());
 
                     List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
                     for (QiscusComment comment : comments) {
@@ -753,10 +753,10 @@ public enum QiscusApi {
                 .toList()
                 .doOnNext(comments -> {
                     QAccount account = QiscusCore.getQiscusAccount();
-                    QiscusRoomMember actor = new QiscusRoomMember();
-                    actor.setEmail(account.getId());
-                    actor.setUsername(account.getName());
-                    actor.setAvatar(account.getAvatarUrl());
+                    QParticipant actor = new QParticipant();
+                    actor.setId(account.getId());
+                    actor.setName(account.getName());
+                    actor.setAvatarUrl(account.getAvatarUrl());
 
                     List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
                     for (QiscusComment comment : comments) {
@@ -867,14 +867,14 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId,
-                                                             MetaRoomMembersListener metaRoomMembersListener) {
+    public Observable<List<QParticipant>> getRoomMembers(String roomUniqueId,
+                                                         MetaRoomMembersListener metaRoomMembersListener) {
         return getRoomMembers(roomUniqueId, 0, null, metaRoomMembersListener);
     }
 
     @Deprecated
-    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset, String sorting,
-                                                             MetaRoomMembersListener metaRoomMembersListener) {
+    public Observable<List<QParticipant>> getRoomMembers(String roomUniqueId, int offset, String sorting,
+                                                         MetaRoomMembersListener metaRoomMembersListener) {
         return api.getRoomParticipants(roomUniqueId, offset, sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -895,8 +895,8 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset,
-                                                              String sorting, MetaRoomMembersListener metaRoomMembersListener) {
+    public Observable<List<QParticipant>> getParticipants(String roomUniqueId, int offset,
+                                                          String sorting, MetaRoomMembersListener metaRoomMembersListener) {
         return api.getRoomParticipants(roomUniqueId, offset,
                 sorting)
                 .map(JsonElement::getAsJsonObject)
@@ -918,7 +918,7 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset, String sorting) {
+    public Observable<List<QParticipant>> getParticipants(String roomUniqueId, int offset, String sorting) {
         return api.getRoomParticipants(roomUniqueId, offset, sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))

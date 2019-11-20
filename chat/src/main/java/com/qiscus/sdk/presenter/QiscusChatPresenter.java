@@ -24,11 +24,11 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusContact;
 import com.qiscus.sdk.chat.core.data.model.QiscusLocation;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
@@ -513,9 +513,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             if (comment.getType() == QiscusComment.Type.REPLY) {
                 QiscusComment repliedComment = comment.getReplyTo();
                 if (repliedComment != null) {
-                    for (QiscusRoomMember qiscusRoomMember : room.getMember()) {
-                        if (repliedComment.getSenderEmail().equals(qiscusRoomMember.getEmail())) {
-                            repliedComment.setSender(qiscusRoomMember.getUsername());
+                    for (QParticipant QParticipant : room.getMember()) {
+                        if (repliedComment.getSenderEmail().equals(QParticipant.getId())) {
+                            repliedComment.setSender(QParticipant.getName());
                             comment.setReplyTo(repliedComment);
                             break;
                         }
@@ -785,7 +785,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Override
-    public void onChatRoomMemberAdded(QiscusRoomMember member) {
+    public void onChatRoomMemberAdded(QParticipant member) {
         if (!room.getMember().contains(member)) {
             room.getMember().add(member);
             QiscusAndroidUtil.runOnUIThread(() -> {
@@ -797,7 +797,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Override
-    public void onChatRoomMemberRemoved(QiscusRoomMember member) {
+    public void onChatRoomMemberRemoved(QParticipant member) {
         int x = room.getMember().indexOf(member);
         if (x >= 0) {
             room.getMember().remove(x);

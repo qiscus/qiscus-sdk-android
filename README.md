@@ -79,7 +79,7 @@ To use Qiscus Chat SDK features, a user need to authenticate to Qiscus Server, f
 
 ```java
 QiscusCore.setUser(userId, userKey)
-      .withUsername(username)
+      .withUsername(name)
       .withAvatarUrl(avatarUrl)
       .withExtras(extras)
       .save(new QiscusCore.SetUserListener() {
@@ -98,7 +98,7 @@ Where:
 
 **userKey** (string): userKey for authentication purpose, so even if a stranger knows your user Id, he cannot access the user data.
 
-**username** (string): Username for display name inside Chat Room purposes.
+**name** (string): Username for display name inside Chat Room purposes.
 
 **avatarURL** (string, optional): to display user's avatar, fallback to default avatar if not provided.
 

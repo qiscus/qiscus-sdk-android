@@ -19,9 +19,9 @@ package com.qiscus.sdk.chat.core.data.remote;
 import androidx.annotation.RestrictTo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
@@ -139,15 +139,15 @@ public final class QiscusDeleteCommentHandler {
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static class DeletedCommentsData {
-        private QiscusRoomMember actor;
+        private QParticipant actor;
         private boolean hardDelete;
         private List<DeletedComment> deletedComments;
 
-        public QiscusRoomMember getActor() {
+        public QParticipant getActor() {
             return actor;
         }
 
-        public void setActor(QiscusRoomMember actor) {
+        public void setActor(QParticipant actor) {
             this.actor = actor;
         }
 

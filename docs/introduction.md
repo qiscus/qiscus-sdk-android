@@ -124,7 +124,7 @@ You will get the response as follow:
             "id":452773,
             "name":"sample",
             "updated_at":"2017-12-05T08:07:58.405896Z",
-            "username":"sample"
+            "name":"sample"
          }
       ]
    },

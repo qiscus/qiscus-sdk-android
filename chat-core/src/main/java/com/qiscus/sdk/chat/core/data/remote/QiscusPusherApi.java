@@ -27,9 +27,9 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
@@ -154,9 +154,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             JSONObject payload = jsonObject.optJSONObject("payload");
 
             JSONObject actorJson = payload.optJSONObject("actor");
-            QiscusRoomMember actor = new QiscusRoomMember();
-            actor.setEmail(actorJson.optString("email"));
-            actor.setUsername(actorJson.optString("name"));
+            QParticipant actor = new QParticipant();
+            actor.setId(actorJson.optString("email"));
+            actor.setName(actorJson.optString("name"));
 
             List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
             JSONObject dataJson = payload.optJSONObject("data");
@@ -185,9 +185,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             JSONObject payload = jsonObject.optJSONObject("payload");
 
             JSONObject actorJson = payload.optJSONObject("actor");
-            QiscusRoomMember actor = new QiscusRoomMember();
-            actor.setEmail(actorJson.optString("email"));
-            actor.setUsername(actorJson.optString("name"));
+            QParticipant actor = new QParticipant();
+            actor.setId(actorJson.optString("email"));
+            actor.setName(actorJson.optString("name"));
 
             List<Long> roomIds = new ArrayList<>();
             JSONObject dataJson = payload.optJSONObject("data");

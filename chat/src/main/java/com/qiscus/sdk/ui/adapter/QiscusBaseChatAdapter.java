@@ -25,9 +25,9 @@ import android.view.ViewGroup;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
@@ -64,7 +64,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected boolean groupChat;
     protected boolean channelRoom;
 
-    private Map<String, QiscusRoomMember> members;
+    private Map<String, QParticipant> members;
 
     public QiscusBaseChatAdapter(Context context, boolean groupChat) {
         this(context, groupChat, false);
@@ -154,8 +154,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     private void updateMember() {
         members.clear();
-        for (QiscusRoomMember roomMember : qiscusChatRoom.getMember()) {
-            members.put(roomMember.getEmail(), roomMember);
+        for (QParticipant roomMember : qiscusChatRoom.getMember()) {
+            members.put(roomMember.getId(), roomMember);
         }
     }
 

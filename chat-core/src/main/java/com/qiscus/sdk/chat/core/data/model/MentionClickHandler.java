@@ -23,5 +23,5 @@ package com.qiscus.sdk.chat.core.data.model;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface MentionClickHandler {
-    void onMentionClick(QiscusRoomMember member);
+    void onMentionClick(QParticipant member);
 }

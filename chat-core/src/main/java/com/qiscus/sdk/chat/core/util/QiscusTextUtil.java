@@ -31,7 +31,7 @@ import android.view.View;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public final class QiscusTextUtil {
 
     public static Spannable createQiscusSpannableText(
             String message,
-            Map<String, QiscusRoomMember> members,
+            Map<String, QParticipant> members,
             @ColorInt int mentionAllColor, @ColorInt int mentionOtherColor,
             @ColorInt int mentionMeColor, MentionClickHandler mentionClickListener) {
 
@@ -150,9 +150,9 @@ public final class QiscusTextUtil {
 
             if (ongoing && message.charAt(i) == ']') {
                 String mentionedUserId = message.substring(startPosition + 2, i);
-                QiscusRoomMember mentionedUser = members.get(mentionedUserId);
+                QParticipant mentionedUser = members.get(mentionedUserId);
                 if (mentionedUser != null) {
-                    SpannableString mention = new SpannableString("@" + mentionedUser.getUsername());
+                    SpannableString mention = new SpannableString("@" + mentionedUser.getName());
                     mention.setSpan(new ClickableSpan() {
                         @Override
                         public void onClick(View widget) {

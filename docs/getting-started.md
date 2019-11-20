@@ -78,7 +78,7 @@ Here are the explanation for the parameters on user setup:
 
 * ***userId*** (string, unique): A User identifier that will be used to identify a user and used whenever another user need to chat with this user. It can be anything, wheter is is user's email, your user database index, etc. As long as it is unique and a string.
 * ***userKey*** (string): userKey is used as for authentication purpose, so even if a stranger knows your userId, he cannot access the user data.
-* ***username*** (string): Username is used as a display name inside chat room.
+* ***name*** (string): Username is used as a display name inside chat room.
 * ***avatarURL*** (string, optional): used to display user's avatar, fallback to default avatar if not provided.
 
 You can learn from the figure below to understand what really happened when calling `setUser()` function:

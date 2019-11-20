@@ -19,7 +19,7 @@ package com.qiscus.sdk.chat.core.data.remote;
 import androidx.annotation.RestrictTo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusPushNotificationUtil;
@@ -45,7 +45,7 @@ public final class QiscusClearCommentsHandler {
     }
 
     public static void handle(ClearCommentsData clearCommentsData) {
-        if (clearCommentsData.getActor().getEmail().equals(QiscusCore.getQiscusAccount().getId())) {
+        if (clearCommentsData.getActor().getId().equals(QiscusCore.getQiscusAccount().getId())) {
             Observable.from(clearCommentsData.getRoomIds())
                     .doOnNext(roomId -> {
                         if (QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {
@@ -63,7 +63,7 @@ public final class QiscusClearCommentsHandler {
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static class ClearCommentsData {
         private long timestamp;
-        private QiscusRoomMember actor;
+        private QParticipant actor;
         private List<Long> roomIds;
 
         public long getTimestamp() {
@@ -74,11 +74,11 @@ public final class QiscusClearCommentsHandler {
             this.timestamp = timestamp;
         }
 
-        public QiscusRoomMember getActor() {
+        public QParticipant getActor() {
             return actor;
         }
 
-        public void setActor(QiscusRoomMember actor) {
+        public void setActor(QParticipant actor) {
             this.actor = actor;
         }
 

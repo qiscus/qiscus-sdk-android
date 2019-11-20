@@ -36,7 +36,7 @@ import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.QiscusMentionSuggestionBuilder;
 import com.qiscus.sdk.util.QiscusConverterUtil;
@@ -57,7 +57,7 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
     private MentionsEditText editText;
     private ListView listView;
 
-    private List<QiscusRoomMember> members;
+    private List<QParticipant> members;
     private SuggestionsAdapter adapter;
 
     private QAccount qAccount = Qiscus.getQiscusAccount();
@@ -81,7 +81,7 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
         setupEditText();
     }
 
-    public void setRoomMembers(List<QiscusRoomMember> members) {
+    public void setRoomMembers(List<QParticipant> members) {
         this.members = members;
     }
 
@@ -116,7 +116,7 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
     @Override
     public List<String> onQueryReceived(@NonNull QueryToken queryToken) {
         List<String> buckets = Collections.singletonList(BUCKET);
-        List<QiscusRoomMember> suggestions = getSuggestions(queryToken);
+        List<QParticipant> suggestions = getSuggestions(queryToken);
         final SuggestionsResult result = new SuggestionsResult(queryToken, suggestions);
         listView.post(() -> {
             if (adapter != null) {
@@ -126,16 +126,16 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
         return buckets;
     }
 
-    private List<QiscusRoomMember> getSuggestions(QueryToken queryToken) {
-        ArrayList<QiscusRoomMember> suggestions = new ArrayList<>();
+    private List<QParticipant> getSuggestions(QueryToken queryToken) {
+        ArrayList<QParticipant> suggestions = new ArrayList<>();
         String namePrefix = queryToken.getKeywords().toLowerCase();
         if (members != null) {
-            for (QiscusRoomMember suggestion : members) {
-                if (qAccount.getId().equals(suggestion.getEmail())) {
+            for (QParticipant suggestion : members) {
+                if (qAccount.getId().equals(suggestion.getId())) {
                     continue;
                 }
 
-                if (suggestion.getUsername().toLowerCase().startsWith(namePrefix)) {
+                if (suggestion.getName().toLowerCase().startsWith(namePrefix)) {
                     suggestions.add(suggestion);
                 }
             }

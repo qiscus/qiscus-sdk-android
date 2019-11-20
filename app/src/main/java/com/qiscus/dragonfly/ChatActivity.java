@@ -29,8 +29,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.QiscusBaseChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -108,14 +108,14 @@ public class ChatActivity extends QiscusBaseChatActivity {
     }
 
     protected void showRoomImage() {
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equalsIgnoreCase(qAccount.getId())) {
+        for (QParticipant member : qiscusChatRoom.getMember()) {
+            if (!member.getId().equalsIgnoreCase(qAccount.getId())) {
                 Nirmana.getInstance().get()
                         .setDefaultRequestOptions(new RequestOptions()
                                 .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
                                 .placeholder(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)
                                 .dontAnimate())
-                        .load(member.getAvatar())
+                        .load(member.getAvatarUrl())
                         .into(ivAvatar);
                 break;
             }

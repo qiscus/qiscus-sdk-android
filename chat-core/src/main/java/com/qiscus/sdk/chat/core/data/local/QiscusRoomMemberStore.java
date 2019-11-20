@@ -16,17 +16,17 @@
 
 package com.qiscus.sdk.chat.core.data.local;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 
 public interface QiscusRoomMemberStore {
 
-    void add(QiscusRoomMember qiscusRoomMember);
+    void add(QParticipant QParticipant);
 
-    boolean isContains(QiscusRoomMember qiscusRoomMember);
+    boolean isContains(QParticipant QParticipant);
 
-    void update(QiscusRoomMember qiscusRoomMember);
+    void update(QParticipant QParticipant);
 
-    void addOrUpdate(QiscusRoomMember qiscusRoomMember);
+    void addOrUpdate(QParticipant QParticipant);
 
-    QiscusRoomMember getMember(String email);
+    QParticipant getMember(String email);
 }

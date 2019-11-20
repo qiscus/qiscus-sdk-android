@@ -31,7 +31,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.data.model.QiscusReplyPanelConfig;
@@ -60,7 +60,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private ImageView closeView;
     private QiscusComment originComment;
 
-    private Map<String, QiscusRoomMember> members = new HashMap<>();
+    private Map<String, QParticipant> members = new HashMap<>();
 
     public QiscusReplyPreviewView(Context context) {
         super(context);
@@ -92,10 +92,10 @@ public class QiscusReplyPreviewView extends LinearLayout {
         closeView.setOnClickListener(v -> close());
     }
 
-    public void updateMember(List<QiscusRoomMember> roomMembers) {
+    public void updateMember(List<QParticipant> roomMembers) {
         members.clear();
-        for (QiscusRoomMember roomMember : roomMembers) {
-            members.put(roomMember.getEmail(), roomMember);
+        for (QParticipant roomMember : roomMembers) {
+            members.put(roomMember.getId(), roomMember);
         }
     }
 
