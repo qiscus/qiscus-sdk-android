@@ -20,7 +20,7 @@ import androidx.annotation.RestrictTo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
@@ -129,11 +129,11 @@ public final class QiscusDeleteCommentHandler {
     }
 
     private static void setRoomData(QiscusComment qiscusComment) {
-        QiscusChatRoom chatRoom = QiscusCore.getDataStore().getChatRoom(qiscusComment.getRoomId());
+        QChatRoom chatRoom = QiscusCore.getDataStore().getChatRoom(qiscusComment.getRoomId());
         if (chatRoom != null) {
             qiscusComment.setRoomName(chatRoom.getName());
             qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
-            qiscusComment.setGroupMessage(chatRoom.isGroup());
+            qiscusComment.setGroupMessage(chatRoom.getType().equals("group"));
         }
     }
 

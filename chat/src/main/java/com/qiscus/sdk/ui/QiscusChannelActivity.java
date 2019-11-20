@@ -21,7 +21,7 @@ import android.content.Intent;
 import android.view.View;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
@@ -45,28 +45,28 @@ import rx.schedulers.Schedulers;
 public class QiscusChannelActivity extends QiscusGroupChatActivity implements QiscusApi.MetaRoomMembersListener {
     protected String subtitle;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
-        return generateIntent(context, qiscusChatRoom, null, null,
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom) {
+        return generateIntent(context, qChatRoom, null, null,
                 false, null, null);
     }
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom,
                                         String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {
 
-        if (!qiscusChatRoom.isGroup()) {
-            return QiscusChatActivity.generateIntent(context, qiscusChatRoom, startingMessage,
+        if (qChatRoom.getType().equals("single")) {
+            return QiscusChatActivity.generateIntent(context, qChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
         }
 
-        if (!qiscusChatRoom.isChannel()) {
-            return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom, startingMessage,
+        if (!qChatRoom.getType().equals("channel")) {
+            return QiscusGroupChatActivity.generateIntent(context, qChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
         }
 
         Intent intent = new Intent(context, QiscusChannelActivity.class);
-        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
+        intent.putExtra(CHAT_ROOM_DATA, qChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILES, (Serializable) shareFiles);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
@@ -78,7 +78,7 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
 
     @Override
     protected void generateSubtitle() {
-        QiscusApi.getInstance().getParticipants(qiscusChatRoom.getUniqueId(), 0, null, this)
+        QiscusApi.getInstance().getParticipants(qChatRoom.getUniqueId(), 0, null, this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
@@ -86,7 +86,7 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
 
     @Override
     protected void binRoomData() {
-        tvTitle.setText(qiscusChatRoom.getName());
+        tvTitle.setText(qChatRoom.getName());
         generateSubtitle();
         tvSubtitle.setText(subtitle);
         tvSubtitle.setVisibility(View.VISIBLE);

@@ -28,7 +28,7 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
@@ -395,7 +395,7 @@ public class Qiscus {
     /**
      * Use this method to create new group chat.
      *
-     * @param email Email or username of group chat member.
+     * @param email Email or username of group chat participants.
      * @return Group Chat room builder
      */
     public static GroupChatBuilder buildGroupChatRoom(String name, String email) {
@@ -406,7 +406,7 @@ public class Qiscus {
     /**
      * Use this method to create new group chat.
      *
-     * @param emails Emails or username of group chat member.
+     * @param emails Emails or username of group chat participants.
      * @return Group Chat room builder
      */
     public static GroupChatBuilder buildGroupChatRoom(String name, List<String> emails) {
@@ -512,9 +512,9 @@ public class Qiscus {
         /**
          * Called if building chat room succeed
          *
-         * @param qiscusChatRoom Built chat room
+         * @param qChatRoom Built chat room
          */
-        void onSuccess(QiscusChatRoom qiscusChatRoom);
+        void onSuccess(QChatRoom qChatRoom);
 
         /**
          * Called if error happened while building chat room. e.g network error
@@ -601,7 +601,7 @@ public class Qiscus {
         }
 
         /**
-         * If you need to save options or extra data to this room
+         * If you need to save extras or extra data to this room
          *
          * @param options The data need to save
          * @return builder
@@ -627,7 +627,7 @@ public class Qiscus {
          *
          * @return Observable chat room
          */
-        public Observable<QiscusChatRoom> build() {
+        public Observable<QChatRoom> build() {
             return QiscusApi.getInstance()
                     .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
@@ -686,7 +686,7 @@ public class Qiscus {
         }
 
         /**
-         * If you need to save options or extra data to this room
+         * If you need to save extras or extra data to this room
          *
          * @param options The data need to save
          * @return builder
@@ -832,7 +832,7 @@ public class Qiscus {
         }
 
         /**
-         * If you need to save options or extra data to this room
+         * If you need to save extras or extra data to this room
          *
          * @param options The data need to save
          * @return builder
@@ -944,7 +944,7 @@ public class Qiscus {
         /**
          * Adding initial group chat members
          *
-         * @param email qiscus member
+         * @param email qiscus participants
          * @return builder
          */
         public GroupChatBuilder addEmail(String email) {
@@ -964,7 +964,7 @@ public class Qiscus {
         }
 
         /**
-         * If you need to save options or extra data to this room
+         * If you need to save extras or extra data to this room
          *
          * @param options The data need to save
          * @return builder
@@ -990,7 +990,7 @@ public class Qiscus {
          *
          * @return Observable chat room
          */
-        public Observable<QiscusChatRoom> build() {
+        public Observable<QChatRoom> build() {
             return QiscusApi.getInstance()
                     .createGroupChat(name, new ArrayList<>(emails), avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
@@ -1031,7 +1031,7 @@ public class Qiscus {
         }
 
         /**
-         * If you need to save options or extra data to this room
+         * If you need to save extras or extra data to this room
          *
          * @param options The data need to save
          * @return builder
@@ -1057,7 +1057,7 @@ public class Qiscus {
          *
          * @return Observable chat room
          */
-        public Observable<QiscusChatRoom> build() {
+        public Observable<QChatRoom> build() {
             return QiscusApi.getInstance()
                     .createChannel(uniqueId, name, avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));

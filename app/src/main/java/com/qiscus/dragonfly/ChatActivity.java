@@ -30,7 +30,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.QiscusBaseChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -53,9 +53,9 @@ public class ChatActivity extends QiscusBaseChatActivity {
 
     private QAccount qAccount;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom) {
         Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
+        intent.putExtra(CHAT_ROOM_DATA, qChatRoom);
         return intent;
     }
 
@@ -84,7 +84,7 @@ public class ChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return QiscusChatFragment.newInstance(qiscusChatRoom);
+        return QiscusChatFragment.newInstance(qChatRoom);
     }
 
     @Override
@@ -103,12 +103,12 @@ public class ChatActivity extends QiscusBaseChatActivity {
     @Override
     protected void binRoomData() {
         super.binRoomData();
-        tvTitle.setText(qiscusChatRoom.getName());
+        tvTitle.setText(qChatRoom.getName());
         showRoomImage();
     }
 
     protected void showRoomImage() {
-        for (QParticipant member : qiscusChatRoom.getMember()) {
+        for (QParticipant member : qChatRoom.getParticipants()) {
             if (!member.getId().equalsIgnoreCase(qAccount.getId())) {
                 Nirmana.getInstance().get()
                         .setDefaultRequestOptions(new RequestOptions()

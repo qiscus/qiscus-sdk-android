@@ -34,7 +34,7 @@ To authenticate to SDK server, app needs to have user credential locally stored 
 When you want to disconnect from SDK server, terminating authentication will be done by clearing the stored credential.
 Qiscus SDK authentication can be done separately with your main app authentication, especially if your main app has functionality before the messaging features. 
 There are 2 type of authentication that you can opt to use: Client Authentication and Server Authentication.
-Here some comparison to help you decide between the two options:
+Here some comparison to help you decide between the two extras:
 
 * Client Authentication can be done simply by providing userID and userKey through your client app. On the other hand, Server Authentication, the credential information is provided by your Server App. In this case, you need o prepare your own Backend. 
 * The Client Authentication is easier to implement but Server Authentication is more secure.
@@ -145,8 +145,8 @@ Qiscus.buildGroupChatRoom("GroupName", Arrays.asList("user1@gmail.com", "user2@g
       .withAvatar("http://avatar.url.com/group.jpg")
       .build(new Qiscus.ChatBuilderListener() {
           @Override
-          public void onSuccess(QiscusChatRoom qiscusChatRoom) {
-              startActivity(QiscusGroupChatActivity.generateIntent(MainActivity.this, qiscusChatRoom));
+          public void onSuccess(QiscusChatRoom qChatRoom) {
+              startActivity(QiscusGroupChatActivity.generateIntent(MainActivity.this, qChatRoom));
           }
           
           @Override
@@ -165,8 +165,8 @@ Qiscus.buildGroupChatRoomWith("ChannelName")
       .withAvatar("http://avatar.url.com/channel.jpg")
       .build(new Qiscus.ChatBuilderListener() {
           @Override
-          public void onSuccess(QiscusChatRoom qiscusChatRoom) {
-              startActivity(QiscusChannelActivity.generateIntent(MainActivity.this, qiscusChatRoom));
+          public void onSuccess(QiscusChatRoom qChatRoom) {
+              startActivity(QiscusChannelActivity.generateIntent(MainActivity.this, qChatRoom));
           }
 
           @Override
@@ -210,12 +210,12 @@ After executing the code above, here is what you will get in return :
  protected String name;
  protected String subtitle = "";
  protected int lastTopicId;
- protected JSONObject options;
+ protected JSONObject extras;
  protected boolean group;
  protected String avatarUrl;
- protected List<QiscusRoomMember> member;
+ protected List<QiscusRoomMember> participants;
  protected int unreadCount;
- protected QiscusComment lastComment;
+ protected QiscusComment lastMessage;
 ```
 ### Enter to Existing Room
 
@@ -225,9 +225,9 @@ After successfully getting your room list, you may want to enter an existing roo
 QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom(roomID),
                     new QiscusRxExecutor.Listener<QiscusChatRoom>() {
                         @Override
-                        public void onSuccess(QiscusChatRoom qiscusChatRoom) {
+                        public void onSuccess(QiscusChatRoom qChatRoom) {
                             context.startActivity(QiscusGroupChatActivity.
-                                    generateIntent(context, qiscusChatRoom));
+                                    generateIntent(context, qChatRoom));
                         }
                         @Override
                         public void onError(Throwable throwable) {

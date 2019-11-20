@@ -19,8 +19,8 @@ package com.qiscus.sdk.chat.core.data.local;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 import org.json.JSONException;
@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 17;
+    static final int DATABASE_VERSION = 18;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -38,11 +38,10 @@ final class QiscusDb {
         static final String COLUMN_DISTINCT_ID = "distinct_id";
         static final String COLUMN_UNIQUE_ID = "unique_id";
         static final String COLUMN_NAME = "name";
-        static final String COLUMN_IS_GROUP = "is_group";
-        static final String COLUMN_OPTIONS = "options";
+        static final String COLUMN_TYPE = "type";
+        static final String COLUMN_OPTIONS = "extras";
         static final String COLUMN_AVATAR_URL = "avatar_url";
         static final String COLUMN_UNREAD_COUNT = "unread_count";
-        static final String COLUMN_IS_CHANNEL = "is_channel";
         static final String COLUMN_MEMBER_COUNT = "member_count";
 
         static final String CREATE =
@@ -51,47 +50,45 @@ final class QiscusDb {
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
                         COLUMN_UNIQUE_ID + " TEXT," +
                         COLUMN_NAME + " TEXT," +
-                        COLUMN_IS_GROUP + " INTEGER DEFAULT 0," +
                         COLUMN_OPTIONS + " TEXT," +
                         COLUMN_AVATAR_URL + " TEXT," +
                         COLUMN_UNREAD_COUNT + " INTEGER DEFAULT 0," +
-                        COLUMN_IS_CHANNEL + " INTEGER DEFAULT 0," +
+                        COLUMN_TYPE + " TEXT," +
                         COLUMN_MEMBER_COUNT + " INTEGER DEFAULT 0" +
                         " ); ";
 
-        static ContentValues toContentValues(QiscusChatRoom qiscusChatRoom) {
+        static ContentValues toContentValues(QChatRoom qChatRoom) {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_ID, qiscusChatRoom.getId());
-            values.put(COLUMN_DISTINCT_ID, qiscusChatRoom.getDistinctId());
-            values.put(COLUMN_UNIQUE_ID, qiscusChatRoom.getUniqueId());
-            values.put(COLUMN_NAME, qiscusChatRoom.getName());
-            values.put(COLUMN_IS_GROUP, qiscusChatRoom.isGroup() ? 1 : 0);
-            values.put(COLUMN_OPTIONS, qiscusChatRoom.getOptions() == null ? null : qiscusChatRoom.getOptions().toString());
-            values.put(COLUMN_AVATAR_URL, qiscusChatRoom.getAvatarUrl());
-            values.put(COLUMN_UNREAD_COUNT, qiscusChatRoom.getUnreadCount());
-            values.put(COLUMN_IS_CHANNEL, qiscusChatRoom.isChannel());
-            values.put(COLUMN_MEMBER_COUNT, qiscusChatRoom.getMemberCount());
+            values.put(COLUMN_ID, qChatRoom.getId());
+            values.put(COLUMN_DISTINCT_ID, qChatRoom.getDistinctId());
+            values.put(COLUMN_UNIQUE_ID, qChatRoom.getUniqueId());
+            values.put(COLUMN_NAME, qChatRoom.getName());
+            values.put(COLUMN_OPTIONS, qChatRoom.getExtras() == null ? null : qChatRoom.getExtras().toString());
+            values.put(COLUMN_AVATAR_URL, qChatRoom.getAvatarUrl());
+            values.put(COLUMN_UNREAD_COUNT, qChatRoom.getUnreadCount());
+            values.put(COLUMN_TYPE, qChatRoom.getType());
+            values.put(COLUMN_MEMBER_COUNT, qChatRoom.getTotalParticipants());
             return values;
         }
 
-        static QiscusChatRoom parseCursor(Cursor cursor) {
-            QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
-            qiscusChatRoom.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-            qiscusChatRoom.setDistinctId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DISTINCT_ID)));
-            qiscusChatRoom.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
-            qiscusChatRoom.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
-            qiscusChatRoom.setGroup(cursor.getShort(cursor.getColumnIndexOrThrow(COLUMN_IS_GROUP)) == 1);
+        static QChatRoom parseCursor(Cursor cursor) {
+            QChatRoom qChatRoom = new QChatRoom();
+            qChatRoom.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qChatRoom.setDistinctId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DISTINCT_ID)));
+            qChatRoom.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
+            qChatRoom.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
+            qChatRoom.setType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             try {
                 String options = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OPTIONS));
-                qiscusChatRoom.setOptions(options == null ? null : new JSONObject(options));
+                qChatRoom.setExtras(options == null ? null : new JSONObject(options));
             } catch (JSONException ignored) {
                 //Do nothing
             }
-            qiscusChatRoom.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AVATAR_URL)));
-            qiscusChatRoom.setUnreadCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_UNREAD_COUNT)));
-            qiscusChatRoom.setChannel(cursor.getShort(cursor.getColumnIndexOrThrow(COLUMN_IS_CHANNEL)) == 1);
-            qiscusChatRoom.setMemberCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MEMBER_COUNT)));
-            return qiscusChatRoom;
+            qChatRoom.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AVATAR_URL)));
+            qChatRoom.setUnreadCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_UNREAD_COUNT)));
+            qChatRoom.setType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
+            qChatRoom.setTotalParticipants(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MEMBER_COUNT)));
+            return qChatRoom;
         }
     }
 

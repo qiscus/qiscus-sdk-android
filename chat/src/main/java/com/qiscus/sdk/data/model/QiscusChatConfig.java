@@ -178,7 +178,7 @@ public class QiscusChatConfig {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .map(qiscusChatRoom -> {
-                        if (qiscusChatRoom.isGroup()) {
+                        if (qiscusChatRoom.getType().equals("group")) {
                             return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom);
                         }
                         return QiscusChatActivity.generateIntent(context, qiscusChatRoom);

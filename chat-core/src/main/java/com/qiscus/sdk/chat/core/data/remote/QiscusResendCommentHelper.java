@@ -187,7 +187,7 @@ public final class QiscusResendCommentHelper {
 
     private static boolean mustFailed(Throwable throwable, QiscusComment qiscusComment) {
         //Error response from server
-        //Means something wrong with server, e.g user is not member of these room anymore
+        //Means something wrong with server, e.g user is not participants of these room anymore
         return ((throwable instanceof HttpException && ((HttpException) throwable).code() >= 400) ||
                 //if throwable from JSONException, e.g response from server not json as expected
                 (throwable instanceof JSONException) ||

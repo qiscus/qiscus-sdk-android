@@ -98,7 +98,7 @@ public final class QiscusImageUtil {
         //inJustDecodeBounds set to false to load the actual bitmap
         options.inJustDecodeBounds = false;
 
-        //this options allow android to claim the bitmap memory if it runs low on memory
+        //this extras allow android to claim the bitmap memory if it runs low on memory
         options.inPurgeable = true;
         options.inInputShareable = true;
         options.inTempStorage = new byte[16 * 1024];

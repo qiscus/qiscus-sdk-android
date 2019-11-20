@@ -25,7 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.ui.QiscusBaseChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 
@@ -40,9 +40,9 @@ import java.util.Date;
 public class SimpleCustomChatActivity extends QiscusBaseChatActivity {
     private TextView mTitle;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom) {
         Intent intent = new Intent(context, SimpleCustomChatActivity.class);
-        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
+        intent.putExtra(CHAT_ROOM_DATA, qChatRoom);
         return intent;
     }
 
@@ -65,13 +65,13 @@ public class SimpleCustomChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return SimpleCustomChatFragment.newInstance(qiscusChatRoom);
+        return SimpleCustomChatFragment.newInstance(qChatRoom);
     }
 
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
         super.onViewReady(savedInstanceState);
-        mTitle.setText(qiscusChatRoom.getName());
+        mTitle.setText(qChatRoom.getName());
     }
 
     @Override

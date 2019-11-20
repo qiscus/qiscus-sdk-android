@@ -128,10 +128,10 @@ QiscusCore.setUser(userId, userKey)
 There are three Chat Room types, 1-on-1, group, and channel, for further detail you can see [Chat Room type](#chat-room-type) for this section let's use 1-on-1. We assume that you already know a targeted user you want to chat with. To start a conversation with your targeted user, it can be done with **getChatRoom** method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is successfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener. 
 
 ```
-QiscusApi.getInstance().getChatRoom(userId, distinctId, options)
+QiscusApi.getInstance().getChatRoom(userId, distinctId, extras)
         .subscribeOn(Schedulers.io()) //need to run this task on IO thread
         .observeOn(AndroidSchedulers.mainThread()) //deliver result on main thread or UI thread
-        .subscribe(qiscusChatRoom -> {
+        .subscribe(qChatRoom -> {
             // on success        
         }, throwable -> {
             // on error        
@@ -157,7 +157,7 @@ QiscusComment qiscuscomment = QiscusComment.generateMessage(roomId, text)
 QiscusApi.getInstance().postComment(qiscusComment)
         .subscribeOn(Schedulers.io()) // need to run this task on IO thread
         .observeOn(AndroidSchedulers.mainThread()) // deliver result on main thread or UI thread
-        .subscribe(qiscusChatRoom -> {
+        .subscribe(qChatRoom -> {
             // on success        
         }, throwable -> {
             // on error        
@@ -496,30 +496,30 @@ QiscusApi.getInstance().getBlockedUsers(page, limit)
 
 ## Chat Room
 
-This section consist Chat Room Qiscus Chat SDK behaviour In Chat Room you can add additional information called **options. options** is automatically synchronized by each participant in the conversation. It is important that the amount of data stored in **options** is kept to a minimum to ensure the quickest synchronization possible. You can use **options **tag a room for changing background colour purposes, or you can add a latitude or longitude.
+This section consist Chat Room Qiscus Chat SDK behaviour In Chat Room you can add additional information called **extras. extras** is automatically synchronized by each participant in the conversation. It is important that the amount of data stored in **extras** is kept to a minimum to ensure the quickest synchronization possible. You can use **extras **tag a room for changing background colour purposes, or you can add a latitude or longitude.
 
 
 > Note
-options consist string key-value pairs
+extras consist string key-value pairs
 
 ### Create 1-On-1 Chat Room With Metadata
 
 The ideal creating 1-on-1 Chat Room is for use cases that require 2 users, for further information you can see this [Chat Room-1-on-1](#1-on-1-chat-room). After success creating a 1-on-1 Chat room, room name is another userId.
 
 ```
-QiscusApi.getInstance().getChatRoom(userId, distinctId, options);
+QiscusApi.getInstance().getChatRoom(userId, distinctId, extras);
 ```
 
 Where:
 
 * `userId`:  A User identifier that will be used to identify a user and used whenever another user need to chat with this user. It can be anything, whether is is user's email, your user database index, etc. As long as it is unique and a string.
 * `distinctId`: **(deprecated) **you can fill **“ ” (empty string).**
-* `options:` metadata that can be as additional information to Chat Room, which consist key-value, for example **key: background, **and** value: red. **
+* `extras:` metadata that can be as additional information to Chat Room, which consist key-value, for example **key: background, **and** value: red. **
 
 if you want to save the Chat Room into local data after creating or getting Chat Room from Qiscus server, here's the code:
 
 ```
-QiscusApi.getInstance().getChatRoom(userId, distinctId, options)
+QiscusApi.getInstance().getChatRoom(userId, distinctId, extras)
         .doOnNext(chatRoom -> QiscusCore.getDataStore().addOrUpdate(chatRoom))
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
@@ -538,7 +538,7 @@ We recommend after creating or getting a Chat Room, you need to update to your l
 When you want your many users to chat together in a 1-on-1 Chat Room, you need to create Group Chat Room. Basically Group Chat Room has the same concept as 1-on-1 Chat Room, but the different is that Group Chat Room will target array of user Id in a single method. 
 
 ```
-QiscusApi.getInstance().createGroupChatRoom(name, userIds, avatarUrl, options);
+QiscusApi.getInstance().createGroupChatRoom(name, userIds, avatarUrl, extras);
 ```
 
 Where: 
@@ -546,7 +546,7 @@ Where:
 * `name`: Group name
 * `userIds`: List of `user Id`
 * `avatarUrl`: avatar url for group Chat Room
-* `options`:  metadata that can be as additional information to Chat Room, which consist key-value, for example **key: background, **and** value: red. **
+* `extras`:  metadata that can be as additional information to Chat Room, which consist key-value, for example **key: background, **and** value: red. **
 
 After success creating a Chat Room, you can save Chat Room to local data like this :
 
@@ -561,7 +561,7 @@ The ideal creating Channel Chat Room is for use cases that requires a lot of num
 When first call (room is not exist), if requester did not send `avatar_ur`l and/or room `name` it will use default value. But, after the second call (room is exist) and user (requester) send `avatar_url` and/or room `name`, it will be updated to that value.
 
 ```
-QiscusApi.getInstance().getGroupChatRoom(uniqueId, name, avatarUrl, options);
+QiscusApi.getInstance().getGroupChatRoom(uniqueId, name, avatarUrl, extras);
 ```
 
 You can get Channel Chat Room from your local data, for example: 
@@ -583,7 +583,7 @@ QiscusApi.getInstance().getChatRoomComments(roomId);
 You can get a Chat Room by `userId`. This only works 1-on-1 Chat Room.
 
 ```
-QiscusApi.getInstance().getChatRoom(userId, distinctId, options);
+QiscusApi.getInstance().getChatRoom(userId, distinctId, extras);
 ```
 
 You can get a Chat Room from your local data, for example:
@@ -644,10 +644,10 @@ QiscusApi.getInstance().getChatRooms(page, limit, showMembers)
 
 ### Update Chat Room
 
-You can update your Chat Room metadata, you need `roomId`, your Chat Room `name`, your Chat Room `avatar Url`, and `options`, for example:
+You can update your Chat Room metadata, you need `roomId`, your Chat Room `name`, your Chat Room `avatar Url`, and `extras`, for example:
 
 ```
-QiscusApi.getInstance().updateChatRoom(roomId, name, avatarUrl, options);
+QiscusApi.getInstance().updateChatRoom(roomId, name, avatarUrl, extras);
 ```
 
 ### Get Participant List In Chat Room
@@ -657,7 +657,7 @@ You can get participant list in Chat Room, you can get from `QiscusChatRoom` obj
 This example code you can retrieve from object `QiscusChatRoom`:
 
 ```
-qiscusChatRoom.getMember();
+qChatRoom.getMember();
 ```
 
 Retrieving local data you need `roomId`, for example:
@@ -1085,16 +1085,16 @@ QiscusPusherApi.getInstance().setUserTyping(roomId, typing);
 
 ### On User Typing (With Information On Which Chat Room)
 
-Different from listening `onReceiveComment` event, listening to user typing doesn't automatically started. You need to listen an event on specific room id. We make it like that for performance reason, listening event too many rooms at the same time is not good, we highly recommend to you just listen room event only to active room page. To listening room event you can call method from **QiscusPusherApi** class. You need to pass `qiscusChatRoom` object to define which room you need to listen, for example:
+Different from listening `onReceiveComment` event, listening to user typing doesn't automatically started. You need to listen an event on specific room id. We make it like that for performance reason, listening event too many rooms at the same time is not good, we highly recommend to you just listen room event only to active room page. To listening room event you can call method from **QiscusPusherApi** class. You need to pass `qChatRoom` object to define which room you need to listen, for example:
 
 ```
-QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+QiscusPusherApi.getInstance().listenRoom(qChatRoom);
 ```
 
 Once you don't need to listen this event, you need to unlisten an by calling this method `unlistenRoom`, for example: 
 
 ```
-QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
+QiscusPusherApi.getInstance().unListenRoom(qChatRoom);
 ```
 
 After you call listen room method from **QiscusPusherApi** now you can subscribe to Chat Room event class which is **com.qiscus.sdk.event.QiscusChatRoomEvent** same like listen `OnReceiveComment`, for example:
@@ -1237,7 +1237,7 @@ public class MyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my);
 
         // listen room event
-        QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().listenRoom(qChatRoom);
 
         // listen user status
         QiscusPusherApi.getInstance().listenUserStatus("userId");
@@ -1299,7 +1299,7 @@ public class MyActivity extends AppCompatActivity {
         super.onDestroy();
 
         // stop listening room event
-        QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().unListenRoom(qChatRoom);
 
         // stop listening user status
         QiscusPusherApi.getInstance().unListenUserStatus("qiscus_user_id");

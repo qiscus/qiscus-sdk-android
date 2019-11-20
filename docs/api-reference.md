@@ -615,10 +615,10 @@ QiscusCore.getChatConfig().setCommentSendingInterceptor(qiscusComment -> {
  *
  * userId (string|email|unique) email or something unique
  * distinctId (string|nullable) deprecated
- * options (JSONObject|nullable) you can define JSON to save something in chatroom
+ * extras (JSONObject|nullable) you can define JSON to save something in chatroom
  */
  
-QiscusApi.getInstance().getChatRoom(userId, distinctId, options);
+QiscusApi.getInstance().getChatRoom(userId, distinctId, extras);
 ```
 
 * Create *group chatroom *
@@ -630,10 +630,10 @@ QiscusApi.getInstance().getChatRoom(userId, distinctId, options);
  * name (string) group name
  * ids (List<String>) list of userIds e.g. list of email
  * avatarUrl (string) url of group avatar
- * options (JSONObject|nullable) you can define JSON to save something in chatroom
+ * extras (JSONObject|nullable) you can define JSON to save something in chatroom
  */
  
-QiscusApi.getInstance().createGroupChatRoom(name, ids, avatarUrl, options);
+QiscusApi.getInstance().createGroupChatRoom(name, ids, avatarUrl, extras);
 ```
 
 > *After success creating chatroom, you must save chatroom to local data like this :*
@@ -675,9 +675,9 @@ QiscusCore.getDataStore().getChatRoom(roomId);
  * uniqueId (string) the channel
  * name (string)
  * avatarUrl (string)
- * options (JSONObject)
+ * extras (JSONObject)
  */
-QiscusApi.*getInstance*().getGroupChatRoom(uniqueId, name, avatarUrl, options);
+QiscusApi.*getInstance*().getGroupChatRoom(uniqueId, name, avatarUrl, extras);
 ```
 
     * From Local
@@ -700,10 +700,10 @@ QiscusCore.*getDataStore*().getChatRoomWithUniqueId(uniqueId);
  *
  * withEmail (string) the opponent id
  * distinctId (string) if you need a difference room
- * options (JSONObject)
+ * extras (JSONObject)
  */
  
-QiscusApi.*getInstance*().getChatRoom(withEmail, distinctId, options);
+QiscusApi.*getInstance*().getChatRoom(withEmail, distinctId, extras);
 ```
 
     * From Local
@@ -726,7 +726,7 @@ QiscusCore.*getDataStore*().getChatRoom(email, distinctId);
 > *So if you want to save the chatroom from server after create or get chatroom from server, the code will be like this*
 
 ```java
-QiscusApi.*getInstance*().getChatRoom(withEmail*,** *distinctId, options)
+QiscusApi.*getInstance*().getChatRoom(withEmail*,** *distinctId, extras)
         .doOnNext(chatRoom -> QiscusCore.*getDataStore*().addOrUpdate(chatRoom))
         .subscribeOn(Schedulers.*io*())
         .observeOn(AndroidSchedulers.*mainThread*())
@@ -749,7 +749,7 @@ QiscusApi.*getInstance*().getChatRoom(withEmail*,** *distinctId, options)
  *
  * roomIds List<Long>
  * uniqueIds (List<String>)
- * showMembers (boolean) if set to false, then the variable member in QiscusChatRoom will be null
+ * showMembers (boolean) if set to false, then the variable participants in QiscusChatRoom will be null
  */
  
 QiscusApi.getInstance().getChatRooms(roomIds, uniqueIds, showMembers);
@@ -778,7 +778,7 @@ QiscusCore.getDataStore().getChatRooms(roomIds, uniqueIds);
  *
  * page (integer) start from 1
  * limit (integer) the maximum size of list room
- * showMembers (boolean) if set to false, then the variable member in QiscusChatRoom will be null
+ * showMembers (boolean) if set to false, then the variable participants in QiscusChatRoom will be null
  */
  
 QiscusApi.getInstance().getChatRooms(page, limit, showMembers);
@@ -827,7 +827,7 @@ QiscusApi.getInstance().getChatRooms(page, limit, showMembers)
     });
 ```
 
-* Update *chatroom *(include options)
+* Update *chatroom *(include extras)
     * From Server
 
 ```java
@@ -837,10 +837,10 @@ QiscusApi.getInstance().getChatRooms(page, limit, showMembers)
  * roomId (long)
  * name (string)
  * avatarUrl (string)
- * options (JSONObject)
+ * extras (JSONObject)
  */
  
-QiscusApi.*getInstance*().updateChatRoom(roomId, name, avatarUrl, options);
+QiscusApi.*getInstance*().updateChatRoom(roomId, name, avatarUrl, extras);
 ```
 
     * From Local
@@ -849,10 +849,10 @@ QiscusApi.*getInstance*().updateChatRoom(roomId, name, avatarUrl, options);
 /**
  * Update room
  *
- * qiscusChatRoom (QiscusChatRoom)
+ * qChatRoom (QiscusChatRoom)
  */
  
-Qiscus.getDataStore().addOrUpdate(qiscusChatRoom);
+Qiscus.getDataStore().addOrUpdate(qChatRoom);
 ```
 
 * Get *chatroom's participants*
@@ -913,7 +913,7 @@ QiscusApi.getInstance().getRoomMembers(roomUniqueId, offset, orderKey, sorting, 
 Qiscus.getDataStore().getRoomMembers(roomId);
 
 // from QiscusChatroom object
-qiscusChatRoom.getMember();
+qChatRoom.getMember();
 ```
 
 * Add *chatroom's participant*
@@ -926,7 +926,7 @@ qiscusChatRoom.getMember();
 QiscusApi.getInstance().addRoomMember(roomId, emails);
 ```
 
-> *After success add room member, you must to update chatroom object to local data like this*
+> *After success add room participants, you must to update chatroom object to local data like this*
 
 ```java
 QiscusApi.getInstance().addRoomMember(roomId, emails);
@@ -1098,13 +1098,13 @@ public class MyActivity extends AppCompatActivity {
 > *Different from listening receive comment, listening to user typing doesn't automatically started. So you must trigger Qiscus mqtt first to listen an event on specific room id. We make it like that for performance reason, listening event to so many room at the same time is not good, so we highly recommend to you just listen room event only to active room page. To listening room event you can call method from **QiscusPusherApi** class like this:*
 
 ```java
-QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+QiscusPusherApi.getInstance().listenRoom(qChatRoom);
 ```
 
 > *Don't forget to unlisten it after you don't need to listen event anymore by calling this method:*
 
 ```java
-QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
+QiscusPusherApi.getInstance().unListenRoom(qChatRoom);
 ```
 
 > *After you call listen room method from **QiscusPusherApi** now you can subscribe to room event class which is **com.qiscus.sdk.event.QiscusChatRoomEvent** same like at listen receive comment, the method name is up to you too.*
@@ -1212,7 +1212,7 @@ public class MyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my);
 
         // listen room event
-        QiscusPusherApi.*getInstance*().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.*getInstance*().listenRoom(qChatRoom);
 
         // listen user status
         QiscusPusherApi.getInstance().listenUserStatus("qiscus_user_id");
@@ -1274,7 +1274,7 @@ public class MyActivity extends AppCompatActivity {
         super.onDestroy();
 
         // stop listening room event
-        QiscusPusherApi.*getInstance*().unListenRoom(qiscusChatRoom);
+        QiscusPusherApi.*getInstance*().unListenRoom(qChatRoom);
 
         // stop listening user status
         QiscusPusherApi.getInstance().unListenUserStatus("qiscus_user_id");
@@ -1385,20 +1385,20 @@ QiscusCore.getChatConfig().setNotificationListener((context, qiscusComment) -> {
         // get qiscusComment object
         QiscusComment qiscusComment = intent.getParcelableExtra("data");
 
-        // get qiscusChatRoom from API
+        // get qChatRoom from API
         QiscusApi.getInstance()
                 .getChatRoom(qiscusComment.getRoomId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(qiscusChatRoom -> QiscusCore.getDataStore().addOrUpdate(qiscusChatRoom))
-                .map(qiscusChatRoom -> getChatRoomActivity(context, qiscusChatRoom))
+                .doOnNext(qChatRoom -> QiscusCore.getDataStore().addOrUpdate(qChatRoom))
+                .map(qChatRoom -> getChatRoomActivity(context, qChatRoom))
                 .subscribe(newIntent -> start(context, newIntent), throwable ->
                         Toast.makeText(context, throwable.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private Intent getChatRoomActivity(Context context, QiscusChatRoom qiscusChatRoom) {
-        return qiscusChatRoom.isGroup() ? GroupChatRoomActivity.generateIntent(context, qiscusChatRoom) :
-                ChatRoomActivity.generateIntent(context, qiscusChatRoom);
+    private Intent getChatRoomActivity(Context context, QiscusChatRoom qChatRoom) {
+        return qChatRoom.isGroup() ? GroupChatRoomActivity.generateIntent(context, qChatRoom) :
+                ChatRoomActivity.generateIntent(context, qChatRoom);
     }
 
     private void start(Context context, Intent newIntent) {

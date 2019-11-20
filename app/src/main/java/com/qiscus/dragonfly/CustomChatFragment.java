@@ -30,7 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
@@ -48,10 +48,10 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
     private ImageView mAttachButton;
     private LinearLayout mAddPanel;
 
-    public static CustomChatFragment newInstance(QiscusChatRoom qiscusChatRoom) {
+    public static CustomChatFragment newInstance(QChatRoom qChatRoom) {
         CustomChatFragment fragment = new CustomChatFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+        bundle.putParcelable(CHAT_ROOM_DATA, qChatRoom);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -303,7 +303,7 @@ public class CustomChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
-        return new QiscusChatAdapter(getActivity(), qiscusChatRoom.isGroup());
+        return new QiscusChatAdapter(getActivity(), qChatRoom.getType().equals("group"));
     }
 
     @Override

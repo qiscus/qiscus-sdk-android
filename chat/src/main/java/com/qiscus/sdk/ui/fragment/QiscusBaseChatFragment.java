@@ -62,7 +62,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusCommentDraft;
 import com.qiscus.sdk.chat.core.data.model.QiscusContact;
@@ -252,7 +252,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected View goToBottomButton;
 
     protected QiscusChatConfig chatConfig;
-    protected QiscusChatRoom qiscusChatRoom;
+    protected QChatRoom qChatRoom;
     protected String startingMessage;
     protected List<File> shareFiles;
     protected boolean autoSendExtra;
@@ -620,7 +620,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             notifyServerTyping(false);
         };
 
-        qiscusChatPresenter = new QiscusChatPresenter(this, qiscusChatRoom);
+        qiscusChatPresenter = new QiscusChatPresenter(this, qChatRoom);
         if (savedInstanceState == null) {
             qiscusChatPresenter.loadComments(20);
         } else {
@@ -630,7 +630,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 qiscusChatPresenter.loadComments(20);
             } else {
                 showComments(qiscusChatPresenter.loadLocalComments(commentsLoadedSize));
-                chatAdapter.setQiscusChatRoom(qiscusChatRoom);
+                chatAdapter.setqChatRoom(qChatRoom);
                 updateMentionSuggestionData();
                 messageRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerState);
             }
@@ -679,7 +679,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                         qiscusPhotos.add(new QiscusPhoto(shareFile));
                     }
                     startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                            qiscusChatRoom, qiscusPhotos),
+                            qChatRoom, qiscusPhotos),
                             SEND_PICTURE_CONFIRMATION_REQUEST);
                 } else {
                     QiscusAndroidUtil.runOnUIThread(() -> sendFiles(shareFiles), 800);
@@ -697,7 +697,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
                     qiscusPhotos.add(new QiscusPhoto(QiscusFileUtil.rename(imageFile, imageName)));
                     startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                            qiscusChatRoom, qiscusPhotos),
+                            qChatRoom, qiscusPhotos),
                             SEND_PICTURE_CONFIRMATION_REQUEST);
                 } catch (IOException e) {
                     showError(getString(R.string.qiscus_error_gif));
@@ -717,7 +717,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void setupMentionEditText() {
-        if (messageEditText instanceof MentionsEditText && mentionSuggestionView != null && qiscusChatRoom.isGroup()) {
+        if (messageEditText instanceof MentionsEditText && mentionSuggestionView != null && qChatRoom.getType().equals("group")) {
             mentionSuggestionView.bind((MentionsEditText) messageEditText);
         }
     }
@@ -760,12 +760,12 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void resolveChatRoom(Bundle savedInstanceState) {
-        qiscusChatRoom = getArguments().getParcelable(CHAT_ROOM_DATA);
-        if (qiscusChatRoom == null && savedInstanceState != null) {
-            qiscusChatRoom = savedInstanceState.getParcelable(CHAT_ROOM_DATA);
+        qChatRoom = getArguments().getParcelable(CHAT_ROOM_DATA);
+        if (qChatRoom == null && savedInstanceState != null) {
+            qChatRoom = savedInstanceState.getParcelable(CHAT_ROOM_DATA);
         }
 
-        if (qiscusChatRoom == null) {
+        if (qChatRoom == null) {
             getActivity().finish();
             return;
         }
@@ -931,8 +931,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void onClearNotification() {
-        NotificationManagerCompat.from(getActivity()).cancel(QiscusNumberUtil.convertToInt(qiscusChatRoom.getId()));
-        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusChatRoom.getId());
+        NotificationManagerCompat.from(getActivity()).cancel(QiscusNumberUtil.convertToInt(qChatRoom.getId()));
+        QiscusCacheManager.getInstance().clearMessageNotifItems(qChatRoom.getId());
     }
 
     protected abstract T onCreateChatAdapter();
@@ -941,7 +941,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     public void onResume() {
         super.onResume();
         onClearNotification();
-        QiscusCacheManager.getInstance().setLastChatActivity(true, qiscusChatRoom.getId());
+        QiscusCacheManager.getInstance().setLastChatActivity(true, qChatRoom.getId());
         showCommentDraft();
         notifyLatestRead();
     }
@@ -950,11 +950,11 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         if (QiscusTextUtil.isNotBlank(startingMessage) && !autoSendExtra) {
             return;
         }
-        QiscusCommentDraft draftComment = QiscusCacheManager.getInstance().getDraftComment(qiscusChatRoom.getId());
+        QiscusCommentDraft draftComment = QiscusCacheManager.getInstance().getDraftComment(qChatRoom.getId());
         if (draftComment != null) {
             if (messageEditText instanceof MentionsEditText) {
                 ((MentionsEditText) messageEditText).setMentionsTextEncoded(draftComment.getMessage(),
-                        qiscusChatRoom.getMember());
+                        qChatRoom.getParticipants());
             } else {
                 messageEditText.setText(draftComment.getMessage());
             }
@@ -970,14 +970,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         QiscusComment qiscusComment = chatAdapter.getLatestSentComment();
         if (qiscusComment != null) {
             QiscusPusherApi.getInstance()
-                    .markAsRead(qiscusChatRoom.getId(), qiscusComment.getId());
+                    .markAsRead(qChatRoom.getId(), qiscusComment.getId());
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        QiscusCacheManager.getInstance().setLastChatActivity(false, qiscusChatRoom.getId());
+        QiscusCacheManager.getInstance().setLastChatActivity(false, qChatRoom.getId());
         saveCommentDraft();
     }
 
@@ -991,15 +991,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 QiscusComment repliedComment = replyPreviewView.getOriginComment();
                 if (repliedComment != null) {
                     QiscusCacheManager.getInstance()
-                            .setDraftComment(qiscusChatRoom.getId(),
+                            .setDraftComment(qChatRoom.getId(),
                                     new QiscusReplyCommentDraft(message, repliedComment));
                     return;
                 }
             }
             QiscusCacheManager.getInstance()
-                    .setDraftComment(qiscusChatRoom.getId(), new QiscusCommentDraft(message));
+                    .setDraftComment(qChatRoom.getId(), new QiscusCommentDraft(message));
         } else {
-            QiscusCacheManager.getInstance().clearDraftComment(qiscusChatRoom.getId());
+            QiscusCacheManager.getInstance().clearDraftComment(qChatRoom.getId());
         }
     }
 
@@ -1187,8 +1187,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     private void notifyServerTyping(boolean typing) {
-        if (!qiscusChatRoom.isChannel()) {
-            QiscusPusherApi.getInstance().publishTyping(qiscusChatRoom.getId(), typing);
+        if (!qChatRoom.getType().equals("channel")) {
+            QiscusPusherApi.getInstance().publishTyping(qChatRoom.getId(), typing);
         }
     }
 
@@ -1350,32 +1350,32 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void updateMentionSuggestionData() {
-        if (mentionSuggestionView != null && qiscusChatRoom.isGroup()
+        if (mentionSuggestionView != null && qChatRoom.getType().equals("group")
                 && Qiscus.getChatConfig().getMentionConfig().isEnableMention()) {
-            mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
+            mentionSuggestionView.setRoomMembers(qChatRoom.getParticipants());
         }
         if (replyPreviewView != null) {
-            replyPreviewView.updateMember(qiscusChatRoom.getMember());
+            replyPreviewView.updateMember(qChatRoom.getParticipants());
         }
     }
 
     @Override
-    public void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments) {
-        this.qiscusChatRoom = qiscusChatRoom;
+    public void initRoomData(QChatRoom qChatRoom, List<QiscusComment> comments) {
+        this.qChatRoom = qChatRoom;
         if (roomChangedListener != null) {
-            roomChangedListener.onRoomUpdated(qiscusChatRoom);
+            roomChangedListener.onRoomUpdated(qChatRoom);
         }
-        chatAdapter.setQiscusChatRoom(qiscusChatRoom);
+        chatAdapter.setqChatRoom(qChatRoom);
         updateMentionSuggestionData();
         showComments(comments);
         resolveScrollToComment();
     }
 
     @Override
-    public void onRoomChanged(QiscusChatRoom qiscusChatRoom) {
-        this.qiscusChatRoom = qiscusChatRoom;
+    public void onRoomChanged(QChatRoom qChatRoom) {
+        this.qChatRoom = qChatRoom;
         if (roomChangedListener != null) {
-            roomChangedListener.onRoomUpdated(qiscusChatRoom);
+            roomChangedListener.onRoomUpdated(qChatRoom);
         }
     }
 
@@ -1624,7 +1624,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                     qiscusPhotos.add(new QiscusPhoto(new File(path)));
                 }
                 startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                        qiscusChatRoom, qiscusPhotos),
+                        qChatRoom, qiscusPhotos),
                         SEND_PICTURE_CONFIRMATION_REQUEST);
             }
         } else if (requestCode == JupukConst.REQUEST_CODE_DOC && resultCode == Activity.RESULT_OK) {
@@ -1642,7 +1642,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 List<QiscusPhoto> qiscusPhotos = new ArrayList<>();
                 qiscusPhotos.add(new QiscusPhoto(imageFile));
                 startActivityForResult(QiscusSendPhotoConfirmationActivity.generateIntent(getActivity(),
-                        qiscusChatRoom, qiscusPhotos),
+                        qChatRoom, qiscusPhotos),
                         SEND_PICTURE_CONFIRMATION_REQUEST);
             } catch (Exception e) {
                 showError(getString(R.string.qiscus_chat_error_failed_read_picture));
@@ -1728,7 +1728,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+        outState.putParcelable(CHAT_ROOM_DATA, qChatRoom);
         outState.putInt(COMMENTS_LOADED_SIZE, chatAdapter.getData().size());
         outState.putParcelable(COMMENTS_LAYOUT_MANAGER, messageRecyclerView.getLayoutManager().onSaveInstanceState());
     }
@@ -1890,6 +1890,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     public interface RoomChangedListener {
-        void onRoomUpdated(QiscusChatRoom qiscusChatRoom);
+        void onRoomUpdated(QChatRoom qChatRoom);
     }
 }

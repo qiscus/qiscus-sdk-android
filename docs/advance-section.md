@@ -226,7 +226,7 @@ public class SampleApps extends Application {
     }
 
     /**
-     * Call QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom); to get room event from anywhere at your application
+     * Call QiscusPusherApi.getInstance().listenRoom(qChatRoom); to get room event from anywhere at your application
      */
      @Subscribe 
      public void onGetNewQiscusRoomEvent(QiscusChatRoomEvent event) {

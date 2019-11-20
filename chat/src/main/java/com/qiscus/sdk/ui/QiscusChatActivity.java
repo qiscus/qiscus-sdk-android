@@ -30,7 +30,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -51,22 +51,22 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     protected QAccount qAccount;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
-        return generateIntent(context, qiscusChatRoom, null, null,
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom) {
+        return generateIntent(context, qChatRoom, null, null,
                 false, null, null);
     }
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom,
                                         String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {
-        if (qiscusChatRoom.isGroup()) {
-            return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom, startingMessage,
+        if (qChatRoom.getType().equals("group")) {
+            return QiscusGroupChatActivity.generateIntent(context, qChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
         }
 
         Intent intent = new Intent(context, QiscusChatActivity.class);
-        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
+        intent.putExtra(CHAT_ROOM_DATA, qChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILES, (Serializable) shareFiles);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
@@ -114,7 +114,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     @Override
     protected void binRoomData() {
         super.binRoomData();
-        tvTitle.setText(qiscusChatRoom.getName());
+        tvTitle.setText(qChatRoom.getName());
         showRoomImage();
     }
 
@@ -126,13 +126,13 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
         Nirmana.getInstance().get()
                 .setDefaultRequestOptions(requestOptions)
-                .load(qiscusChatRoom.getAvatarUrl())
+                .load(qChatRoom.getAvatarUrl())
                 .into(ivAvatar);
     }
 
     @Override
     protected QiscusBaseChatFragment onCreateChatFragment() {
-        return QiscusChatFragment.newInstance(qiscusChatRoom, startingMessage, shareFiles,
+        return QiscusChatFragment.newInstance(qChatRoom, startingMessage, shareFiles,
                 autoSendExtra, forwardCommentsData, scrollToComment);
     }
 

@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(qiscusChatRoom -> {
                     Log.d(MainActivity.class.getSimpleName(), "Room: " + qiscusChatRoom.toString());
                     Log.d(MainActivity.class.getSimpleName(),
-                            "Last message: " + qiscusChatRoom.getLastComment().getMessage());
+                            "Last message: " + qiscusChatRoom.getLastMessage().getMessage());
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     showError(QiscusErrorLogger.getMessage(throwable));

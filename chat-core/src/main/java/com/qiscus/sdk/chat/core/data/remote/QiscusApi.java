@@ -28,8 +28,8 @@ import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
@@ -226,52 +226,52 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<QiscusChatRoom> getChatRoom(String withEmail, JSONObject options) {
+    public Observable<QChatRoom> getChatRoom(String withEmail, JSONObject options) {
         return api.createOrGetChatRoom(QiscusHashMapUtil.getChatRoom(Collections.singletonList(withEmail),
                 options == null ? null : options.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> chatUser(String userId, JSONObject extras) {
+    public Observable<QChatRoom> chatUser(String userId, JSONObject extras) {
         return api.createOrGetChatRoom(QiscusHashMapUtil.getChatRoom(Collections.singletonList(userId),
                 extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     @Deprecated
-    public Observable<QiscusChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
+    public Observable<QChatRoom> createGroupChatRoom(String name, List<String> emails, String avatarUrl, JSONObject options) {
         return api.createGroupChatRoom(QiscusHashMapUtil.createGroupChatRoom(
                 name, emails, avatarUrl, options == null ? null : options.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> createGroupChat(String name, List<String> userIds, String avatarURL, JSONObject extras) {
+    public Observable<QChatRoom> createGroupChat(String name, List<String> userIds, String avatarURL, JSONObject extras) {
         return api.createGroupChatRoom(QiscusHashMapUtil.createGroupChatRoom(
                 name, userIds, avatarURL, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     @Deprecated
-    public Observable<QiscusChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {
+    public Observable<QChatRoom> getGroupChatRoom(String uniqueId, String name, String avatarUrl, JSONObject options) {
         return api.createOrGetGroupChatRoom(QiscusHashMapUtil.getGroupChatRoom(
                 uniqueId, name, avatarUrl, options == null ? null : options.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> createChannel(String uniqueId, String name, String avatarURL, JSONObject extras) {
+    public Observable<QChatRoom> createChannel(String uniqueId, String name, String avatarURL, JSONObject extras) {
         return api.createOrGetGroupChatRoom(QiscusHashMapUtil.getGroupChatRoom(
                 uniqueId, name, avatarURL, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
-    public Observable<QiscusChatRoom> getChannel(String uniqueId) {
+    public Observable<QChatRoom> getChannel(String uniqueId) {
         return api.createOrGetGroupChatRoom(QiscusHashMapUtil.getGroupChatRoom(
                 uniqueId, null, null, null))
                 .map(QiscusApiParser::parseQiscusChatRoom);
     }
 
     @Deprecated
-    public Observable<QiscusChatRoom> getChatRoom(long roomId) {
+    public Observable<QChatRoom> getChatRoom(long roomId) {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
@@ -279,7 +279,7 @@ public enum QiscusApi {
                 .take(1);
     }
 
-    public Observable<QiscusChatRoom> getChatRoomInfo(long roomId) {
+    public Observable<QChatRoom> getChatRoomInfo(long roomId) {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
@@ -288,30 +288,30 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
+    public Observable<Pair<QChatRoom, List<QiscusComment>>> getChatRoomComments(long roomId) {
         return api.getChatRoom(roomId)
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
 
-    public Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getChatRoomWithMessages(long roomId) {
+    public Observable<Pair<QChatRoom, List<QiscusComment>>> getChatRoomWithMessages(long roomId) {
         return api.getChatRoom(roomId)
                 .map(QiscusApiParser::parseQiscusChatRoomWithComments);
     }
 
     @Deprecated
-    public Observable<List<QiscusChatRoom>> getChatRooms(int page, int limit, boolean showMembers) {
+    public Observable<List<QChatRoom>> getChatRooms(int page, int limit, boolean showMembers) {
         return api.getChatRooms(page, limit, showMembers, false, false)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<List<QiscusChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved,
-                                                            boolean showEmpty, int page, int limit) {
+    public Observable<List<QChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved,
+                                                       boolean showEmpty, int page, int limit) {
         return api.getChatRooms(page, limit, showParticipant, showEmpty, showRemoved)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
     @Deprecated
-    public Observable<List<QiscusChatRoom>> getChatRooms(List<Long> roomIds, List<String> uniqueIds, boolean showMembers) {
+    public Observable<List<QChatRoom>> getChatRooms(List<Long> roomIds, List<String> uniqueIds, boolean showMembers) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
             listOfRoomIds.add(String.valueOf(roomId));
@@ -321,14 +321,14 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<List<QiscusChatRoom>> getChatRoomsWithUniqueIds(List<String> uniqueIds,
-                                                                      boolean showRemoved, boolean showParticipant) {
+    public Observable<List<QChatRoom>> getChatRoomsWithUniqueIds(List<String> uniqueIds,
+                                                                 boolean showRemoved, boolean showParticipant) {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 null, uniqueIds, showParticipant, showRemoved))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
-    public Observable<List<QiscusChatRoom>> getChatRooms(List<Long> roomIds, boolean showRemoved, boolean showParticipant) {
+    public Observable<List<QChatRoom>> getChatRooms(List<Long> roomIds, boolean showRemoved, boolean showParticipant) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
             listOfRoomIds.add(String.valueOf(roomId));
@@ -608,7 +608,7 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<QiscusChatRoom> updateChatRoom(long roomId, String name, String avatarURL, JSONObject extras) {
+    public Observable<QChatRoom> updateChatRoom(long roomId, String name, String avatarURL, JSONObject extras) {
         return api.updateChatRoom(QiscusHashMapUtil.updateChatRoom(
                 String.valueOf(roomId), name, avatarURL, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusChatRoom)
@@ -813,23 +813,23 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<QiscusChatRoom> addRoomMember(long roomId, List<String> emails) {
+    public Observable<QChatRoom> addRoomMember(long roomId, List<String> emails) {
         return api.addRoomMember(QiscusHashMapUtil.addRoomMember(String.valueOf(roomId), emails))
                 .flatMap(jsonElement -> getChatRoomInfo(roomId));
     }
 
-    public Observable<QiscusChatRoom> addParticipants(long roomId, List<String> userIds) {
+    public Observable<QChatRoom> addParticipants(long roomId, List<String> userIds) {
         return api.addRoomMember(QiscusHashMapUtil.addRoomMember(String.valueOf(roomId), userIds))
                 .flatMap(jsonElement -> getChatRoomInfo(roomId));
     }
 
     @Deprecated
-    public Observable<QiscusChatRoom> removeRoomMember(long roomId, List<String> userIds) {
+    public Observable<QChatRoom> removeRoomMember(long roomId, List<String> userIds) {
         return api.removeRoomMember(QiscusHashMapUtil.removeRoomMember(String.valueOf(roomId), userIds))
                 .flatMap(jsonElement -> getChatRoomInfo(roomId));
     }
 
-    public Observable<QiscusChatRoom> removeParticipants(long roomId, List<String> userIds) {
+    public Observable<QChatRoom> removeParticipants(long roomId, List<String> userIds) {
         return api.removeRoomMember(QiscusHashMapUtil.removeRoomMember(String.valueOf(roomId), userIds))
                 .flatMap(jsonElement -> getChatRoomInfo(roomId));
     }

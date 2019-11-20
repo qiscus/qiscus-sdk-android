@@ -49,7 +49,7 @@ import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusPhoto;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.ui.adapter.QiscusPhotoAdapter;
@@ -81,7 +81,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     private ViewPager viewPager;
     private QiscusMentionSuggestionView mentionSuggestionView;
-    private QiscusChatRoom qiscusChatRoom;
+    private QChatRoom qChatRoom;
     private List<QiscusPhoto> qiscusPhotos;
     private Map<String, String> captions;
     private int position = -1;
@@ -94,7 +94,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     private QiscusChatConfig chatConfig;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom room, List<QiscusPhoto> qiscusPhotos) {
+    public static Intent generateIntent(Context context, QChatRoom room, List<QiscusPhoto> qiscusPhotos) {
         Intent intent = new Intent(context, QiscusSendPhotoConfirmationActivity.class);
         intent.putExtra(EXTRA_ROOM, room);
         intent.putParcelableArrayListExtra(EXTRA_QISCUS_PHOTOS, (ArrayList<QiscusPhoto>) qiscusPhotos);
@@ -117,19 +117,19 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         toolbar.setBackgroundResource(chatConfig.getAppBarColor());
         setSupportActionBar(toolbar);
 
-        qiscusChatRoom = getIntent().getParcelableExtra(EXTRA_ROOM);
-        if (qiscusChatRoom == null) {
+        qChatRoom = getIntent().getParcelableExtra(EXTRA_ROOM);
+        if (qChatRoom == null) {
             finish();
             return;
         }
 
-        tvTitle.setText(qiscusChatRoom.getName());
+        tvTitle.setText(qChatRoom.getName());
         Nirmana.getInstance().get()
                 .setDefaultRequestOptions(new RequestOptions()
                         .error(R.drawable.ic_qiscus_avatar)
                         .placeholder(R.drawable.ic_qiscus_avatar)
                         .dontAnimate())
-                .load(qiscusChatRoom.getAvatarUrl())
+                .load(qChatRoom.getAvatarUrl())
                 .into(ivAvatar);
 
         viewPager = findViewById(R.id.view_pager);
@@ -187,9 +187,9 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         });
 
         mentionSuggestionView = findViewById(R.id.mention_suggestion);
-        if (qiscusChatRoom.isGroup() && chatConfig.getMentionConfig().isEnableMention()) {
+        if (qChatRoom.getType().equals("group") && chatConfig.getMentionConfig().isEnableMention()) {
             mentionSuggestionView.bind(messageEditText);
-            mentionSuggestionView.setRoomMembers(qiscusChatRoom.getMember());
+            mentionSuggestionView.setRoomMembers(qChatRoom.getParticipants());
         }
 
         viewPager.addOnPageChangeListener(this);
@@ -310,7 +310,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
                 if (caption == null) {
                     caption = "";
                 }
-                messageEditText.setMentionsTextEncoded(caption, qiscusChatRoom.getMember());
+                messageEditText.setMentionsTextEncoded(caption, qChatRoom.getParticipants());
                 messageEditText.post(() -> messageEditText.setSelection(messageEditText.getText().length()));
             }
         }

@@ -52,7 +52,7 @@ import java.util.List;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusMentionSuggestionView extends FrameLayout implements QueryTokenReceiver, SuggestionsVisibilityManager {
-    private static final String BUCKET = "member-memory";
+    private static final String BUCKET = "participants-memory";
 
     private MentionsEditText editText;
     private ListView listView;

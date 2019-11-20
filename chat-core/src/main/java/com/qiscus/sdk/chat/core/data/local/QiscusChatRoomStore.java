@@ -17,7 +17,7 @@
 package com.qiscus.sdk.chat.core.data.local;
 
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 
 import java.util.List;
 
@@ -30,31 +30,31 @@ import rx.Observable;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusChatRoomStore {
-    void add(QiscusChatRoom qiscusChatRoom);
+    void add(QChatRoom qChatRoom);
 
-    boolean isContains(QiscusChatRoom qiscusChatRoom);
+    boolean isContains(QChatRoom qChatRoom);
 
-    void update(QiscusChatRoom qiscusChatRoom);
+    void update(QChatRoom qChatRoom);
 
-    void addOrUpdate(QiscusChatRoom qiscusChatRoom);
+    void addOrUpdate(QChatRoom qChatRoom);
 
-    QiscusChatRoom getChatRoom(long roomId);
+    QChatRoom getChatRoom(long roomId);
 
-    QiscusChatRoom getChatRoom(String email);
+    QChatRoom getChatRoom(String email);
 
-    QiscusChatRoom getChatRoom(String email, String distinctId);
+    QChatRoom getChatRoom(String email, String distinctId);
 
-    QiscusChatRoom getChatRoomWithUniqueId(String uniqueId);
+    QChatRoom getChatRoomWithUniqueId(String uniqueId);
 
-    List<QiscusChatRoom> getChatRooms(int limit);
+    List<QChatRoom> getChatRooms(int limit);
 
-    List<QiscusChatRoom> getChatRooms(int limit, int offset);
+    List<QChatRoom> getChatRooms(int limit, int offset);
 
-    Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit);
+    Observable<List<QChatRoom>> getObservableChatRooms(int limit);
 
-    Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit, int offset);
+    Observable<List<QChatRoom>> getObservableChatRooms(int limit, int offset);
 
-    List<QiscusChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds);
+    List<QChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds);
 
     void deleteChatRoom(long roomId);
 

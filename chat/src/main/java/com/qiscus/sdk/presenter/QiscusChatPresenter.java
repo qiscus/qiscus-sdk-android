@@ -24,8 +24,8 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusContact;
 import com.qiscus.sdk.chat.core.data.model.QiscusLocation;
@@ -66,7 +66,7 @@ import rx.schedulers.Schedulers;
 
 public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.View> implements QiscusChatRoomEventHandler.StateListener {
 
-    private QiscusChatRoom room;
+    private QChatRoom room;
     private QAccount qAccount;
     private Func2<QiscusComment, QiscusComment, Integer> commentComparator = (lhs, rhs) -> rhs.getTime().compareTo(lhs.getTime());
 
@@ -74,15 +74,15 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private QiscusChatRoomEventHandler chatRoomEventHandler;
 
-    public QiscusChatPresenter(View view, QiscusChatRoom room) {
+    public QiscusChatPresenter(View view, QChatRoom room) {
         super(view);
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
         this.room = room;
-        if (this.room.getMember().isEmpty()) {
-            this.room = Qiscus.getDataStore().getChatRoom(room.getId());
-        }
+//        if (this.room.getParticipants().isEmpty()) {
+//            this.room = Qiscus.getDataStore().getChatRoom(room.getId());
+//        }
         qAccount = Qiscus.getQiscusAccount();
         pendingTask = new HashMap<>();
 
@@ -101,7 +101,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private boolean mustFailed(Throwable throwable, QiscusComment qiscusComment) {
         //Error response from server
-        //Means something wrong with server, e.g user is not member of these room anymore
+        //Means something wrong with server, e.g user is not participants of these room anymore
         return ((throwable instanceof HttpException && ((HttpException) throwable).code() >= 400) ||
                 //if throwable from JSONException, e.g response from server not json as expected
                 (throwable instanceof JSONException) ||
@@ -345,7 +345,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         view.onCommentDeleted(qiscusComment);
     }
 
-    private Observable<Pair<QiscusChatRoom, List<QiscusComment>>> getInitRoomData() {
+    private Observable<Pair<QChatRoom, List<QiscusComment>>> getInitRoomData() {
         return QiscusApi.getInstance().getChatRoomWithMessages(room.getId())
                 .doOnError(throwable -> {
                     QiscusErrorLogger.print(throwable);
@@ -513,7 +513,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
             if (comment.getType() == QiscusComment.Type.REPLY) {
                 QiscusComment repliedComment = comment.getReplyTo();
                 if (repliedComment != null) {
-                    for (QParticipant QParticipant : room.getMember()) {
+                    for (QParticipant QParticipant : room.getParticipants()) {
                         if (repliedComment.getSenderEmail().equals(QParticipant.getId())) {
                             repliedComment.setSender(QParticipant.getName());
                             comment.setReplyTo(repliedComment);
@@ -732,7 +732,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     private void clearUnreadCount() {
         room.setUnreadCount(0);
-        room.setLastComment(null);
+        room.setLastMessage(null);
         Qiscus.getDataStore().addOrUpdate(room);
     }
 
@@ -786,8 +786,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     @Override
     public void onChatRoomMemberAdded(QParticipant member) {
-        if (!room.getMember().contains(member)) {
-            room.getMember().add(member);
+        if (!room.getParticipants().contains(member)) {
+            room.getParticipants().add(member);
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
                     view.onRoomChanged(room);
@@ -798,9 +798,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
     @Override
     public void onChatRoomMemberRemoved(QParticipant member) {
-        int x = room.getMember().indexOf(member);
+        int x = room.getParticipants().indexOf(member);
         if (x >= 0) {
-            room.getMember().remove(x);
+            room.getParticipants().remove(x);
             QiscusAndroidUtil.runOnUIThread(() -> {
                 if (view != null) {
                     view.onRoomChanged(room);
@@ -842,9 +842,9 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         void showDeleteLoading();
 
-        void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments);
+        void initRoomData(QChatRoom qChatRoom, List<QiscusComment> comments);
 
-        void onRoomChanged(QiscusChatRoom qiscusChatRoom);
+        void onRoomChanged(QChatRoom qChatRoom);
 
         void showComments(List<QiscusComment> qiscusComments);
 

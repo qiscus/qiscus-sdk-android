@@ -22,7 +22,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
@@ -46,10 +46,10 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     private View mInputPanel;
     private TextView mLockedView;
 
-    public static SimpleCustomChatFragment newInstance(QiscusChatRoom qiscusChatRoom) {
+    public static SimpleCustomChatFragment newInstance(QChatRoom qChatRoom) {
         SimpleCustomChatFragment fragment = new SimpleCustomChatFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+        bundle.putParcelable(CHAT_ROOM_DATA, qChatRoom);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -100,13 +100,13 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        QiscusComment comment = QiscusComment.generateCustomMessage(qiscusChatRoom.getId(), message, "lock_message", payload);
+        QiscusComment comment = QiscusComment.generateCustomMessage(qChatRoom.getId(), message, "lock_message", payload);
         sendQiscusComment(comment);
     }
 
     @Override
     protected QiscusChatAdapter onCreateChatAdapter() {
-        return new CustomChatAdapter(getActivity(), qiscusChatRoom.isGroup());
+        return new CustomChatAdapter(getActivity(), qChatRoom.getType().equals("group"));
     }
 
     @Override
@@ -116,7 +116,7 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
 
     public void actionClearComments() {
         ArrayList<Long> roomIds = new ArrayList<>();
-        roomIds.add(qiscusChatRoom.getId());
+        roomIds.add(qChatRoom.getId());
         QiscusApi.getInstance()
                 .clearMessagesByChatRoomIds(roomIds)
                 .subscribeOn(Schedulers.io())

@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
@@ -57,7 +57,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected ReplyItemClickListener replyItemClickListener;
     protected CommentChainingListener commentChainingListener;
 
-    protected QiscusChatRoom qiscusChatRoom;
+    protected QChatRoom qChatRoom;
     protected QAccount qAccount;
     protected long lastDeliveredCommentId;
     protected long lastReadCommentId;
@@ -143,18 +143,18 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         this.channelRoom = channelRoom;
     }
 
-    public QiscusChatRoom getQiscusChatRoom() {
-        return qiscusChatRoom;
+    public QChatRoom getqChatRoom() {
+        return qChatRoom;
     }
 
-    public void setQiscusChatRoom(QiscusChatRoom qiscusChatRoom) {
-        this.qiscusChatRoom = qiscusChatRoom;
+    public void setqChatRoom(QChatRoom qChatRoom) {
+        this.qChatRoom = qChatRoom;
         updateMember();
     }
 
     private void updateMember() {
         members.clear();
-        for (QParticipant roomMember : qiscusChatRoom.getMember()) {
+        for (QParticipant roomMember : qChatRoom.getParticipants()) {
             members.put(roomMember.getId(), roomMember);
         }
     }

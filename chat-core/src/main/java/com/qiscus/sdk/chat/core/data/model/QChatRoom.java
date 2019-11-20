@@ -31,52 +31,50 @@ import java.util.List;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusChatRoom implements Parcelable {
-    public static final Creator<QiscusChatRoom> CREATOR = new Creator<QiscusChatRoom>() {
+public class QChatRoom implements Parcelable {
+    public static final Creator<QChatRoom> CREATOR = new Creator<QChatRoom>() {
         @Override
-        public QiscusChatRoom createFromParcel(Parcel in) {
-            return new QiscusChatRoom(in);
+        public QChatRoom createFromParcel(Parcel in) {
+            return new QChatRoom(in);
         }
 
         @Override
-        public QiscusChatRoom[] newArray(int size) {
-            return new QiscusChatRoom[size];
+        public QChatRoom[] newArray(int size) {
+            return new QChatRoom[size];
         }
     };
     protected long id;
     protected String distinctId;
     protected String uniqueId;
     protected String name;
-    protected JSONObject options;
-    protected boolean group;
-    protected boolean channel;
+    protected JSONObject extras;
+    protected String type;
     protected String avatarUrl;
-    protected List<QParticipant> member;
+    protected List<QParticipant> participants;
     protected int unreadCount;
-    protected QiscusComment lastComment;
-    protected int memberCount;
+    protected QiscusComment lastMessage;
+    protected int totalParticipants;
 
-    public QiscusChatRoom() {
+    public QChatRoom() {
 
     }
 
-    protected QiscusChatRoom(Parcel in) {
+    protected QChatRoom(Parcel in) {
         id = in.readLong();
         distinctId = in.readString();
         uniqueId = in.readString();
         name = in.readString();
         try {
-            options = new JSONObject(in.readString());
+            extras = new JSONObject(in.readString());
         } catch (Exception ignored) {
             //Do nothing
         }
-        group = in.readByte() != 0;
-        channel = in.readByte() != 0;
+        type       = in.readString();
         avatarUrl = in.readString();
-        member = in.createTypedArrayList(QParticipant.CREATOR);
+        participants = in.createTypedArrayList(QParticipant.CREATOR);
         unreadCount = in.readInt();
-        lastComment = in.readParcelable(QiscusComment.class.getClassLoader());
-        memberCount = in.readInt();
+        lastMessage = in.readParcelable(QiscusComment.class.getClassLoader());
+        totalParticipants = in.readInt();
     }
 
     public long getId() {
@@ -111,28 +109,20 @@ public class QiscusChatRoom implements Parcelable {
         this.name = name;
     }
 
-    public JSONObject getOptions() {
-        return options;
+    public JSONObject getExtras() {
+        return extras;
     }
 
-    public void setOptions(JSONObject options) {
-        this.options = options;
+    public void setExtras(JSONObject extras) {
+        this.extras = extras;
     }
 
-    public boolean isGroup() {
-        return group;
+    public String getType() {
+        return type;
     }
 
-    public void setGroup(boolean group) {
-        this.group = group;
-    }
-
-    public boolean isChannel() {
-        return channel;
-    }
-
-    public void setChannel(boolean channel) {
-        this.channel = channel;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getAvatarUrl() {
@@ -143,12 +133,12 @@ public class QiscusChatRoom implements Parcelable {
         this.avatarUrl = avatarUrl;
     }
 
-    public List<QParticipant> getMember() {
-        return member;
+    public List<QParticipant> getParticipants() {
+        return participants;
     }
 
-    public void setMember(List<QParticipant> member) {
-        this.member = member;
+    public void setParticipants(List<QParticipant> participants) {
+        this.participants = participants;
     }
 
     public int getUnreadCount() {
@@ -159,20 +149,20 @@ public class QiscusChatRoom implements Parcelable {
         this.unreadCount = unreadCount;
     }
 
-    public QiscusComment getLastComment() {
-        return lastComment;
+    public QiscusComment getLastMessage() {
+        return lastMessage;
     }
 
-    public void setLastComment(QiscusComment lastComment) {
-        this.lastComment = lastComment;
+    public void setLastMessage(QiscusComment lastMessage) {
+        this.lastMessage = lastMessage;
     }
 
-    public int getMemberCount() {
-        return memberCount;
+    public int getTotalParticipants() {
+        return totalParticipants;
     }
 
-    public void setMemberCount(int memberCount) {
-        this.memberCount = memberCount;
+    public void setTotalParticipants(int totalParticipants) {
+        this.totalParticipants = totalParticipants;
     }
 
     @Override
@@ -182,7 +172,7 @@ public class QiscusChatRoom implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof QiscusChatRoom && id == ((QiscusChatRoom) o).id;
+        return o instanceof QChatRoom && id == ((QChatRoom) o).id;
     }
 
     @Override
@@ -196,34 +186,32 @@ public class QiscusChatRoom implements Parcelable {
         dest.writeString(distinctId);
         dest.writeString(uniqueId);
         dest.writeString(name);
-        if (options == null) {
-            options = new JSONObject();
+        if (extras == null) {
+            extras = new JSONObject();
         }
-        dest.writeString(options.toString());
-        dest.writeByte((byte) (group ? 1 : 0));
-        dest.writeByte((byte) (channel ? 1 : 0));
+        dest.writeString(extras.toString());
+        dest.writeString(type.toString());
         dest.writeString(avatarUrl);
-        dest.writeTypedList(member);
+        dest.writeTypedList(participants);
         dest.writeInt(unreadCount);
-        dest.writeParcelable(lastComment, flags);
-        dest.writeInt(memberCount);
+        dest.writeParcelable(lastMessage, flags);
+        dest.writeInt(totalParticipants);
     }
 
     @Override
     public String toString() {
-        return "QiscusChatRoom{" +
+        return "QChatRoom{" +
                 "id=" + id +
                 ", distinctId='" + distinctId + '\'' +
                 ", uniqueId='" + uniqueId + '\'' +
                 ", name='" + name + '\'' +
-                ", options=" + options +
-                ", group=" + group +
-                ", channel=" + channel +
+                ", extras=" + extras +
+                ", type=" + type +
                 ", avatarUrl='" + avatarUrl + '\'' +
-                ", member=" + member +
+                ", participants=" + participants +
                 ", unreadCount=" + unreadCount +
-                ", lastComment=" + lastComment +
-                ", memberCount=" + memberCount +
+                ", lastMessage=" + lastMessage +
+                ", totalParticipants=" + totalParticipants +
                 '}';
     }
 }

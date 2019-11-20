@@ -22,9 +22,10 @@ import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 
 import java.io.File;
 import java.io.Serializable;
@@ -46,27 +47,27 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
 
     protected String subtitle;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
-        return generateIntent(context, qiscusChatRoom, null, null,
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom) {
+        return generateIntent(context, qChatRoom, null, null,
                 false, null, null);
     }
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
+    public static Intent generateIntent(Context context, QChatRoom qChatRoom,
                                         String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {
-        if (!qiscusChatRoom.isGroup()) {
-            return QiscusChatActivity.generateIntent(context, qiscusChatRoom, startingMessage,
+        if (!qChatRoom.getType().equals("group")) {
+            return QiscusChatActivity.generateIntent(context, qChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
         }
 
-        if (qiscusChatRoom.isChannel()) {
-            return QiscusChannelActivity.generateIntent(context, qiscusChatRoom, startingMessage,
+        if (qChatRoom.getType().equals("channel")) {
+            return QiscusChannelActivity.generateIntent(context, qChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
         }
 
         Intent intent = new Intent(context, QiscusGroupChatActivity.class);
-        intent.putExtra(CHAT_ROOM_DATA, qiscusChatRoom);
+        intent.putExtra(CHAT_ROOM_DATA, qChatRoom);
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILES, (Serializable) shareFiles);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
@@ -77,7 +78,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
 
     @Override
     protected void binRoomData() {
-        tvTitle.setText(qiscusChatRoom.getName());
+        tvTitle.setText(qChatRoom.getName());
         generateSubtitle();
         tvSubtitle.setText(subtitle);
         tvSubtitle.setVisibility(View.VISIBLE);
@@ -85,22 +86,31 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     }
 
     protected void generateSubtitle() {
-        subtitle = "";
-        int count = 0;
-        for (QParticipant member : qiscusChatRoom.getMember()) {
-            if (!member.getId().equalsIgnoreCase(Qiscus.getQiscusAccount().getId())) {
-                count++;
-                subtitle += member.getName().split(" ")[0];
-                if (count < qiscusChatRoom.getMember().size() - 1) {
-                    subtitle += ", ";
-                }
-            }
-            if (count >= 10) {
-                break;
-            }
-        }
-        subtitle += String.format(" %s", getString(R.string.qiscus_group_member_closing));
-        if (count == 0) subtitle = getString(R.string.qiscus_group_member_only_you);
+        QiscusApi.getInstance().getParticipants(qChatRoom.getUniqueId(),0,"asc")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(participants -> {
+                    qChatRoom.setParticipants(participants);
+                    subtitle = "";
+                    int count = 0;
+                    for (QParticipant member : qChatRoom.getParticipants()) {
+                        if (!member.getId().equalsIgnoreCase(Qiscus.getQiscusAccount().getId())) {
+                            count++;
+                            subtitle += member.getName().split(" ")[0];
+                            if (count < qChatRoom.getParticipants().size() - 1) {
+                                subtitle += ", ";
+                            }
+                        }
+                        if (count >= 10) {
+                            break;
+                        }
+                    }
+                    subtitle += String.format(" %s", getString(R.string.qiscus_group_member_closing));
+                    if (count == 0) subtitle = getString(R.string.qiscus_group_member_only_you);
+                }, throwable -> {
+                    throwable.printStackTrace();
+                });
+
     }
 
     @Override
@@ -111,7 +121,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     @Override
     public void onUserTyping(String user, boolean typing) {
         if (typing) {
-            Observable.from(qiscusChatRoom.getMember())
+            Observable.from(qChatRoom.getParticipants())
                     .filter(qiscusRoomMember -> qiscusRoomMember.getId().equals(user))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())

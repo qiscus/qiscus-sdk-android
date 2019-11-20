@@ -42,7 +42,7 @@ You also can access more advance and customizable features such as :
 
 ## Try Sample App
 
-To meet your expectations, we suggest you try out our sample app. The sample app is built with full functionalities so that you can figure out the flow and main activities of common chat apps.  We provide you with two options to start with the sample app: 
+To meet your expectations, we suggest you try out our sample app. The sample app is built with full functionalities so that you can figure out the flow and main activities of common chat apps.  We provide you with two extras to start with the sample app: 
 1. Try Sample App only or
 2. Try Sample App with Sample Dashboard
 

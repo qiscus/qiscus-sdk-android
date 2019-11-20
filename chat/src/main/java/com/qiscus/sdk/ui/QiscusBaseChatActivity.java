@@ -39,7 +39,7 @@ import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.CommentInfoHandler;
 import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
@@ -73,7 +73,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected static final String EXTRA_SCROLL_TO_COMMENT = "extra_scroll_to_comment";
 
     protected QiscusChatConfig chatConfig;
-    protected QiscusChatRoom qiscusChatRoom;
+    protected QChatRoom qChatRoom;
     protected String startingMessage;
     protected List<File> shareFiles;
     protected boolean autoSendExtra;
@@ -135,12 +135,12 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     }
 
     protected void resolveChatRoom(Bundle savedInstanceState) {
-        qiscusChatRoom = getIntent().getParcelableExtra(CHAT_ROOM_DATA);
-        if (qiscusChatRoom == null && savedInstanceState != null) {
-            qiscusChatRoom = savedInstanceState.getParcelable(CHAT_ROOM_DATA);
+        qChatRoom = getIntent().getParcelableExtra(CHAT_ROOM_DATA);
+        if (qChatRoom == null && savedInstanceState != null) {
+            qChatRoom = savedInstanceState.getParcelable(CHAT_ROOM_DATA);
         }
 
-        if (qiscusChatRoom == null) {
+        if (qChatRoom == null) {
             finish();
             return;
         }
@@ -182,7 +182,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     }
 
     protected void binRoomData() {
-        for (QParticipant member : qiscusChatRoom.getMember()) {
+        for (QParticipant member : qChatRoom.getParticipants()) {
             if (!member.getId().equals(Qiscus.getQiscusAccount().getId())) {
                 userStatusPresenter.listenUser(member.getId());
             }
@@ -194,12 +194,12 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
+        outState.putParcelable(CHAT_ROOM_DATA, qChatRoom);
     }
 
     @Override
-    public void onRoomUpdated(QiscusChatRoom qiscusChatRoom) {
-        this.qiscusChatRoom = qiscusChatRoom;
+    public void onRoomUpdated(QChatRoom qChatRoom) {
+        this.qChatRoom = qChatRoom;
         binRoomData();
     }
 
@@ -221,7 +221,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
 
-                if (qiscusChatRoom.isGroup() && qiscusComment.isMyComment() && !qiscusChatRoom.isChannel()) {
+                if (qChatRoom.getType().equals("group") && qiscusComment.isMyComment() && !qChatRoom.getType().equals("channel")) {
                     actionMode.getMenu().findItem(R.id.action_info)
                             .setVisible(Qiscus.getChatConfig().isEnableCommentInfo());
                 } else {
@@ -345,7 +345,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected void copyComments(List<QiscusComment> selectedComments) {
         if (roomMembers == null) {
             roomMembers = new HashMap<>();
-            for (QParticipant member : qiscusChatRoom.getMember()) {
+            for (QParticipant member : qChatRoom.getParticipants()) {
                 roomMembers.put(member.getId(), member);
             }
         }
