@@ -135,7 +135,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public static QiscusComment generateMessage(long roomId, String content) {
-        QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
+        QAccount qAccount = QiscusCore.getQiscusAccount();
         QiscusComment qiscusComment = new QiscusComment();
         qiscusComment.setId(-1);
         qiscusComment.setRoomId(roomId);
@@ -146,9 +146,9 @@ public class QiscusComment implements Parcelable {
                 Settings.Secure.ANDROID_ID));
         qiscusComment.setMessage(content);
         qiscusComment.setTime(new Date());
-        qiscusComment.setSenderEmail(qiscusAccount.getEmail());
-        qiscusComment.setSender(qiscusAccount.getUsername());
-        qiscusComment.setSenderAvatar(qiscusAccount.getAvatar());
+        qiscusComment.setSenderEmail(qAccount.getId());
+        qiscusComment.setSender(qAccount.getName());
+        qiscusComment.setSenderAvatar(qAccount.getAvatarUrl());
         qiscusComment.setState(STATE_SENDING);
 
         return qiscusComment;
@@ -413,7 +413,7 @@ public class QiscusComment implements Parcelable {
     }
 
     public boolean isMyComment() {
-        return getSenderEmail().equals(QiscusCore.getQiscusAccount().getEmail());
+        return getSenderEmail().equals(QiscusCore.getQiscusAccount().getId());
     }
 
     public QiscusComment getReplyTo() {

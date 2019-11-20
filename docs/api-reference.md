@@ -97,7 +97,7 @@ QiscusCore.setUser(*userId* , *userKey*)
       .withExtras(*extras*)
       .save(new Qiscus.SetUserListener() {
           @Override
-          public void onSuccess(QiscusAccount qiscusAccount) {
+          public void onSuccess(QiscusAccount qAccount) {
               //on success followup
           }
           @Override
@@ -144,7 +144,7 @@ The steps to authenticate with JWT goes like this:
  
  QiscusCore.setUser(*'yourjwttokenfromyourserverhere'*, new QiscusCore.SetUserListener() {
         @Override
-        public void onSuccess(QiscusAccount qiscusAccount) {
+        public void onSuccess(QiscusAccount qAccount) {
             //do anything if success
         }
 
@@ -167,7 +167,7 @@ The steps to authenticate with JWT goes like this:
 
 QiscusCore.updateUser(*username*, *avatarUrl*, new QiscusCore.SetUserListener() {
         @Override
-        public void onSuccess(QiscusAccount qiscusAccount) {
+        public void onSuccess(QiscusAccount qAccount) {
            //do anything after it successfully updated
         }
 
@@ -187,7 +187,7 @@ QiscusCore.updateUser(*username*, *avatarUrl*, new QiscusCore.SetUserListener() 
  
 QiscusCore.updateUser(*username*, *avatarUrl*, *extras*, new QiscusCore.SetUserListener() {
             @Override
-            public void onSuccess(QiscusAccount qiscusAccount) {
+            public void onSuccess(QiscusAccount qAccount) {
                 //do anything after it successfully updated
             }
 

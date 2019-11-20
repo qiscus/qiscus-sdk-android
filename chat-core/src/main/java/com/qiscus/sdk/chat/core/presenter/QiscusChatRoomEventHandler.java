@@ -1,7 +1,7 @@
 package com.qiscus.sdk.chat.core.presenter;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  **/
 public class QiscusChatRoomEventHandler {
 
-    private QiscusAccount qiscusAccount;
+    private QAccount qAccount;
     private StateListener listener;
     private QiscusChatRoom qiscusChatRoom;
     private Runnable listenChatRoomTask;
@@ -34,7 +34,7 @@ public class QiscusChatRoomEventHandler {
 
     public QiscusChatRoomEventHandler(QiscusChatRoom qiscusChatRoom, StateListener listener) {
         this.listener = listener;
-        this.qiscusAccount = QiscusCore.getQiscusAccount();
+        this.qAccount = QiscusCore.getQiscusAccount();
         setChatRoom(qiscusChatRoom);
 
         if (!EventBus.getDefault().isRegistered(this)) {
@@ -103,7 +103,7 @@ public class QiscusChatRoomEventHandler {
     }
 
     public void onGotComment(QiscusComment qiscusComment) {
-        if (!qiscusComment.getSender().equals(qiscusAccount.getEmail())) {
+        if (!qiscusComment.getSender().equals(qAccount.getId())) {
             // handle room event such s invite user, kick user
             if (qiscusComment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
                 handleChatRoomChanged(qiscusComment);

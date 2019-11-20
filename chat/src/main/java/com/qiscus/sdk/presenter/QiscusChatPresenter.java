@@ -23,7 +23,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusContact;
@@ -67,7 +67,7 @@ import rx.schedulers.Schedulers;
 public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.View> implements QiscusChatRoomEventHandler.StateListener {
 
     private QiscusChatRoom room;
-    private QiscusAccount qiscusAccount;
+    private QAccount qAccount;
     private Func2<QiscusComment, QiscusComment, Integer> commentComparator = (lhs, rhs) -> rhs.getTime().compareTo(lhs.getTime());
 
     private Map<QiscusComment, Subscription> pendingTask;
@@ -83,7 +83,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (this.room.getMember().isEmpty()) {
             this.room = Qiscus.getDataStore().getChatRoom(room.getId());
         }
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qAccount = Qiscus.getQiscusAccount();
         pendingTask = new HashMap<>();
 
         chatRoomEventHandler = new QiscusChatRoomEventHandler(this.room, this);
@@ -590,7 +590,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     private void onGotNewComment(QiscusComment qiscusComment) {
-        if (qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
+        if (qiscusComment.getSenderEmail().equalsIgnoreCase(qAccount.getId())) {
             QiscusAndroidUtil.runOnBackgroundThread(() -> commentSuccess(qiscusComment));
         } else {
             chatRoomEventHandler.onGotComment(qiscusComment);
@@ -598,7 +598,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
 
         if (qiscusComment.getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnBackgroundThread(() -> {
-                if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail())
+                if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qAccount.getId())
                         && QiscusCacheManager.getInstance().getLastChatActivity().first) {
                     QiscusPusherApi.getInstance().markAsRead(room.getId(), qiscusComment.getId());
                 }

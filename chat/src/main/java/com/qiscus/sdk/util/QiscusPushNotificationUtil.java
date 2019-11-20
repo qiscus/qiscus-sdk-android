@@ -98,7 +98,7 @@ public final class QiscusPushNotificationUtil {
         }
 
         if (Qiscus.getChatConfig().isEnablePushNotification()
-                && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+                && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getId())) {
             if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
                 if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {
                     showPushNotification(context, qiscusComment);
@@ -372,7 +372,7 @@ public final class QiscusPushNotificationUtil {
 
     private static void updateNotification(Context context, QiscusComment qiscusComment) {
         if (Qiscus.getChatConfig().isEnablePushNotification()
-                && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+                && !qiscusComment.getSenderEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getId())) {
             if (Qiscus.getChatConfig().isOnlyEnablePushNotificationOutsideChatRoom()) {
                 Pair<Boolean, Long> lastChatActivity = QiscusCacheManager.getInstance().getLastChatActivity();
                 if (!lastChatActivity.first || lastChatActivity.second != qiscusComment.getRoomId()) {

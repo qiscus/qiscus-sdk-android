@@ -61,7 +61,7 @@ import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusCommentDraft;
@@ -261,7 +261,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected QiscusChatPresenter qiscusChatPresenter;
     protected Animation animation;
     protected LinearLayoutManager chatLayoutManager;
-    private QiscusAccount qiscusAccount;
+    private QAccount qAccount;
     private boolean fieldMessageEmpty = true;
     private CommentSelectedListener commentSelectedListener;
     private RoomChangedListener roomChangedListener;
@@ -594,7 +594,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
         onClearNotification();
 
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qAccount = Qiscus.getQiscusAccount();
 
         chatAdapter = onCreateChatAdapter();
         chatAdapter.setOnItemClickListener((view, position) ->
@@ -1432,7 +1432,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     @Override
     public void onNewComment(QiscusComment qiscusComment) {
         chatAdapter.addOrUpdate(qiscusComment);
-        if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qiscusAccount.getEmail()) && shouldShowNewMessageButton()) {
+        if (!qiscusComment.getSenderEmail().equalsIgnoreCase(qAccount.getId()) && shouldShowNewMessageButton()) {
             if (newMessageButton != null && newMessageButton.getVisibility() == View.GONE) {
                 newMessageButton.setVisibility(View.VISIBLE);
                 newMessageButton.startAnimation(animation);

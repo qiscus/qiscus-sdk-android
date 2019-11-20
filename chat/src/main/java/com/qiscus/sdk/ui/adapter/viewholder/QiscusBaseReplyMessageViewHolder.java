@@ -36,7 +36,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
@@ -74,14 +74,14 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
     protected int originMessageColor;
 
     private ReplyItemClickListener replyItemClickListener;
-    private QiscusAccount qiscusAccount;
+    private QAccount qAccount;
 
     public QiscusBaseReplyMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener,
                                             ReplyItemClickListener replyItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
         this.replyItemClickListener = replyItemClickListener;
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qAccount = Qiscus.getQiscusAccount();
         originMessageView = getOriginMessageView(itemView);
         originSenderTextView = getOriginSenderTextView(itemView);
         originMessageTextView = getOriginMessageTextView(itemView);
@@ -136,7 +136,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
             }
         });
         QiscusComment originComment = qiscusComment.getReplyTo();
-        originSenderTextView.setText(originComment.getSenderEmail().equals(qiscusAccount.getEmail()) ?
+        originSenderTextView.setText(originComment.getSenderEmail().equals(qAccount.getId()) ?
                 QiscusTextUtil.getString(R.string.qiscus_you) : Qiscus.getChatConfig().getRoomSenderNameInterceptor()
                 .getSenderName(originComment));
         originSenderTextView.setTextColor(ContextCompat

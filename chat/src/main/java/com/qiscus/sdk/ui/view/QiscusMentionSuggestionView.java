@@ -35,7 +35,7 @@ import com.qiscus.manggil.tokenization.interfaces.QueryTokenReceiver;
 import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.QiscusMentionSuggestionBuilder;
@@ -60,7 +60,7 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
     private List<QiscusRoomMember> members;
     private SuggestionsAdapter adapter;
 
-    private QiscusAccount qiscusAccount = Qiscus.getQiscusAccount();
+    private QAccount qAccount = Qiscus.getQiscusAccount();
 
     public QiscusMentionSuggestionView(@NonNull Context context) {
         super(context);
@@ -131,7 +131,7 @@ public class QiscusMentionSuggestionView extends FrameLayout implements QueryTok
         String namePrefix = queryToken.getKeywords().toLowerCase();
         if (members != null) {
             for (QiscusRoomMember suggestion : members) {
-                if (qiscusAccount.getEmail().equals(suggestion.getEmail())) {
+                if (qAccount.getId().equals(suggestion.getEmail())) {
                     continue;
                 }
 

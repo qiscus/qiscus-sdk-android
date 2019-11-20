@@ -38,7 +38,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.CommentInfoHandler;
 import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
@@ -183,7 +183,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
 
     protected void binRoomData() {
         for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equals(Qiscus.getQiscusAccount().getEmail())) {
+            if (!member.getEmail().equals(Qiscus.getQiscusAccount().getId())) {
                 userStatusPresenter.listenUser(member.getEmail());
             }
         }
@@ -279,9 +279,9 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     }
 
     private boolean allMyComments(List<QiscusComment> selectedComments) {
-        QiscusAccount account = Qiscus.getQiscusAccount();
+        QAccount account = Qiscus.getQiscusAccount();
         for (QiscusComment selectedComment : selectedComments) {
-            if (!selectedComment.getSenderEmail().equals(account.getEmail())) {
+            if (!selectedComment.getSenderEmail().equals(account.getId())) {
                 return false;
             }
         }

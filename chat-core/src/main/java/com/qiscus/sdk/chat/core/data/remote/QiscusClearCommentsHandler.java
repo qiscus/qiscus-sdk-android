@@ -45,7 +45,7 @@ public final class QiscusClearCommentsHandler {
     }
 
     public static void handle(ClearCommentsData clearCommentsData) {
-        if (clearCommentsData.getActor().getEmail().equals(QiscusCore.getQiscusAccount().getEmail())) {
+        if (clearCommentsData.getActor().getEmail().equals(QiscusCore.getQiscusAccount().getId())) {
             Observable.from(clearCommentsData.getRoomIds())
                     .doOnNext(roomId -> {
                         if (QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {

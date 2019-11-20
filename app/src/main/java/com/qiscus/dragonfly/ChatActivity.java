@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
@@ -51,7 +51,7 @@ public class ChatActivity extends QiscusBaseChatActivity {
     private TextView tvSubtitle;
     private QiscusCircularImageView ivAvatar;
 
-    private QiscusAccount qiscusAccount;
+    private QAccount qAccount;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -89,7 +89,7 @@ public class ChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qAccount = Qiscus.getQiscusAccount();
         super.onViewReady(savedInstanceState);
     }
 
@@ -109,7 +109,7 @@ public class ChatActivity extends QiscusBaseChatActivity {
 
     protected void showRoomImage() {
         for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equalsIgnoreCase(qiscusAccount.getEmail())) {
+            if (!member.getEmail().equalsIgnoreCase(qAccount.getId())) {
                 Nirmana.getInstance().get()
                         .setDefaultRequestOptions(new RequestOptions()
                                 .error(com.qiscus.sdk.R.drawable.ic_qiscus_avatar)

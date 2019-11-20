@@ -30,7 +30,7 @@ import android.view.View;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
 import java.util.ArrayList;
@@ -135,7 +135,7 @@ public final class QiscusTextUtil {
             return new SpannableString("");
         }
 
-        QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
+        QAccount qAccount = QiscusCore.getQiscusAccount();
 
         SpannableStringBuilder spannable = new SpannableStringBuilder();
         int length = message.length();
@@ -165,7 +165,7 @@ public final class QiscusTextUtil {
                         public void updateDrawState(TextPaint ds) {
                             if (mentionedUserId.equals("all")) {
                                 ds.setColor(mentionAllColor);
-                            } else if (mentionedUserId.equals(qiscusAccount.getEmail())) {
+                            } else if (mentionedUserId.equals(qAccount.getId())) {
                                 ds.setColor(mentionMeColor);
                             } else {
                                 ds.setColor(mentionOtherColor);

@@ -16,14 +16,12 @@
 
 package com.qiscus.sdk.chat.core.data.remote;
 
-import android.util.Log;
-
 import androidx.core.util.Pair;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -52,26 +50,27 @@ final class QiscusApiParser {
                 result.get("nonce").getAsString());
     }
 
-    static QiscusAccount parseQiscusAccount(JsonElement jsonElement) {
+    static QAccount parseQiscusAccount(JsonElement jsonElement) {
         JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user").getAsJsonObject();
         return parseQiscusAccount(jsonAccount, true);
     }
 
-    static QiscusAccount parseQiscusAccount(JsonObject jsonAccount, Boolean isSelf) {
-        QiscusAccount qiscusAccount = new QiscusAccount();
-        qiscusAccount.setId(jsonAccount.get("id").getAsInt());
-        qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
-        qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
-        qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
+    static QAccount parseQiscusAccount(JsonObject jsonAccount, Boolean isSelf) {
+        QAccount qAccount = new QAccount();
+        qAccount.setId(jsonAccount.get("email").getAsString());
+        qAccount.setName(jsonAccount.get("username").getAsString());
+        qAccount.setAvatarUrl(jsonAccount.get("avatar_url").getAsString());
+        qAccount.setLastMessageId(jsonAccount.get("last_comment_id").getAsLong());
+        qAccount.setLastSyncEventId(jsonAccount.get("last_sync_event_id").getAsLong());
         try {
-            qiscusAccount.setExtras(new JSONObject(jsonAccount.get("extras").getAsJsonObject().toString()));
+            qAccount.setExtras(new JSONObject(jsonAccount.get("extras").getAsJsonObject().toString()));
         } catch (Exception ignored) {
             //Do nothing
         }
         if (isSelf) {
-            qiscusAccount.setToken(jsonAccount.get("token").getAsString());
+            qAccount.setToken(jsonAccount.get("token").getAsString());
         }
-        return qiscusAccount;
+        return qAccount;
     }
 
     static QiscusChatRoom parseQiscusChatRoom(JsonElement jsonElement) {

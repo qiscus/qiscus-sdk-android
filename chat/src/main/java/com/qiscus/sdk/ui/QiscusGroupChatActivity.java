@@ -88,7 +88,7 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
         subtitle = "";
         int count = 0;
         for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            if (!member.getEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getEmail())) {
+            if (!member.getEmail().equalsIgnoreCase(Qiscus.getQiscusAccount().getId())) {
                 count++;
                 subtitle += member.getUsername().split(" ")[0];
                 if (count < qiscusChatRoom.getMember().size() - 1) {

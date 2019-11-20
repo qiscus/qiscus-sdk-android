@@ -70,7 +70,7 @@ When you got the JWT Token, you can pass that JWTto` Qiscus.setUser()` method to
 ```java
 Qiscus.setUser('your jwt token', new Qiscus.SetUserListener() {
         @Override
-        public void onSuccess(QiscusAccount qiscusAccount) {
+        public void onSuccess(QiscusAccount qAccount) {
             //do anything if success
         }
 
@@ -271,7 +271,7 @@ Qiscus.setUser("user@email.com", "password")
       .save()
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
-      .subscribe(qiscusAccount -> {
+      .subscribe(qAccount -> {
           //do anything if success
       }, throwable -> {
           //do anything if error occurs

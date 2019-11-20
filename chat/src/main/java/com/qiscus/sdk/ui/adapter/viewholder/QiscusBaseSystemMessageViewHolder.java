@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
@@ -48,12 +48,12 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
     protected Drawable bubbleDrawable;
     protected int bubbleTextColor;
 
-    private QiscusAccount qiscusAccount;
+    private QAccount qAccount;
 
     public QiscusBaseSystemMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                              OnLongItemClickListener longItemClickListener) {
         super(itemView, itemClickListener, longItemClickListener);
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qAccount = Qiscus.getQiscusAccount();
     }
 
     @Override
@@ -107,7 +107,7 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
     protected void showMessage(QiscusComment qiscusComment) {
         try {
             JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
-            String message = payload.optString("subject_email").equals(qiscusAccount.getEmail()) ?
+            String message = payload.optString("subject_email").equals(qAccount.getId()) ?
                     QiscusTextUtil.getString(R.string.qiscus_you) : payload.optString("subject_username");
             switch (payload.optString("type")) {
                 case "create_room":
@@ -116,7 +116,7 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
                     break;
                 case "add_member":
                     message += " " + QiscusTextUtil.getString(R.string.qiscus_added);
-                    message += " " + (payload.optString("object_email").equals(qiscusAccount.getEmail()) ?
+                    message += " " + (payload.optString("object_email").equals(qAccount.getId()) ?
                             QiscusTextUtil.getString(R.string.qiscus_you) : payload.optString("object_username"));
                     break;
                 case "join_room":
@@ -124,7 +124,7 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
                     break;
                 case "remove_member":
                     message += " " + QiscusTextUtil.getString(R.string.qiscus_removed);
-                    message += " " + (payload.optString("object_email").equals(qiscusAccount.getEmail()) ?
+                    message += " " + (payload.optString("object_email").equals(qAccount.getId()) ?
                             QiscusTextUtil.getString(R.string.qiscus_you) : payload.optString("object_username"));
                     break;
                 case "left_room":

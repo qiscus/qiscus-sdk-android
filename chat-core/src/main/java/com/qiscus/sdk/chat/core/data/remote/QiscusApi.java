@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -128,7 +128,7 @@ public enum QiscusApi {
 
         builder.addHeader("QISCUS-SDK-APP-ID", QiscusCore.getAppId());
         builder.addHeader("QISCUS-SDK-TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
-        builder.addHeader("QISCUS-SDK-USER-EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
+        builder.addHeader("QISCUS-SDK-USER-EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getId() : "");
         builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" + BuildConfig.VERSION_NAME);
         builder.addHeader("QISCUS-SDK-PLATFORM", "ANDROID");
         builder.addHeader("QISCUS-SDK-DEVICE-BRAND", Build.MANUFACTURER);
@@ -171,56 +171,56 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<QiscusAccount> login(String token) {
+    public Observable<QAccount> login(String token) {
         return api.login(QiscusHashMapUtil.login(token)).map(QiscusApiParser::parseQiscusAccount);
     }
 
-    public Observable<QiscusAccount> setUserWithIdentityToken(String token) {
+    public Observable<QAccount> setUserWithIdentityToken(String token) {
         return api.login(QiscusHashMapUtil.login(token)).map(QiscusApiParser::parseQiscusAccount);
     }
 
     @Deprecated
-    public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
+    public Observable<QAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
         return loginOrRegister(email, password, username, avatarUrl, null);
     }
 
     @Deprecated
-    public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl, JSONObject extras) {
+    public Observable<QAccount> loginOrRegister(String email, String password, String username, String avatarUrl, JSONObject extras) {
         return api.loginOrRegister(QiscusHashMapUtil.loginOrRegister(
                 email, password, username, avatarUrl, extras == null ? null : extras.toString()
         ))
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
-    public Observable<QiscusAccount> setUser(String userId, String userKey, String username, String avatarURL, JSONObject extras) {
+    public Observable<QAccount> setUser(String userId, String userKey, String username, String avatarURL, JSONObject extras) {
         return api.loginOrRegister(QiscusHashMapUtil.loginOrRegister(
                 userId, userKey, username, avatarURL, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
     @Deprecated
-    public Observable<QiscusAccount> updateProfile(String username, String avatarUrl) {
+    public Observable<QAccount> updateProfile(String username, String avatarUrl) {
         return updateProfile(username, avatarUrl, null);
     }
 
-    public Observable<QiscusAccount> updateUser(String name, String avatarURL) {
+    public Observable<QAccount> updateUser(String name, String avatarURL) {
         return updateUser(name, avatarURL, null);
     }
 
     @Deprecated
-    public Observable<QiscusAccount> updateProfile(String username, String avatarUrl, JSONObject extras) {
+    public Observable<QAccount> updateProfile(String username, String avatarUrl, JSONObject extras) {
         return api.updateProfile(QiscusHashMapUtil.updateProfile(
                 username, avatarUrl, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
-    public Observable<QiscusAccount> updateUser(String name, String avatarURL, JSONObject extras) {
+    public Observable<QAccount> updateUser(String name, String avatarURL, JSONObject extras) {
         return api.updateProfile(QiscusHashMapUtil.updateProfile(
                 name, avatarURL, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusAccount);
     }
 
-    public Observable<QiscusAccount> getUserData() {
+    public Observable<QAccount> getUserData() {
         return api.getUserData()
                 .map(QiscusApiParser::parseQiscusAccount);
     }
@@ -720,11 +720,11 @@ public enum QiscusApi {
                 })
                 .toList()
                 .doOnNext(comments -> {
-                    QiscusAccount account = QiscusCore.getQiscusAccount();
+                    QAccount account = QiscusCore.getQiscusAccount();
                     QiscusRoomMember actor = new QiscusRoomMember();
-                    actor.setEmail(account.getEmail());
-                    actor.setUsername(account.getUsername());
-                    actor.setAvatar(account.getAvatar());
+                    actor.setEmail(account.getId());
+                    actor.setUsername(account.getName());
+                    actor.setAvatar(account.getAvatarUrl());
 
                     List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
                     for (QiscusComment comment : comments) {
@@ -752,11 +752,11 @@ public enum QiscusApi {
                 })
                 .toList()
                 .doOnNext(comments -> {
-                    QiscusAccount account = QiscusCore.getQiscusAccount();
+                    QAccount account = QiscusCore.getQiscusAccount();
                     QiscusRoomMember actor = new QiscusRoomMember();
-                    actor.setEmail(account.getEmail());
-                    actor.setUsername(account.getUsername());
-                    actor.setAvatar(account.getAvatar());
+                    actor.setEmail(account.getId());
+                    actor.setUsername(account.getName());
+                    actor.setAvatar(account.getAvatarUrl());
 
                     List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
                     for (QiscusComment comment : comments) {
@@ -835,7 +835,7 @@ public enum QiscusApi {
     }
 
 
-    public Observable<QiscusAccount> blockUser(String userId) {
+    public Observable<QAccount> blockUser(String userId) {
         return api.blockUser(QiscusHashMapUtil.blockUser(userId))
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -843,7 +843,7 @@ public enum QiscusApi {
                 .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
     }
 
-    public Observable<QiscusAccount> unblockUser(String userId) {
+    public Observable<QAccount> unblockUser(String userId) {
         return api.unblockUser(QiscusHashMapUtil.unblockUser(userId))
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -851,11 +851,11 @@ public enum QiscusApi {
                 .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
     }
 
-    public Observable<List<QiscusAccount>> getBlockedUsers() {
+    public Observable<List<QAccount>> getBlockedUsers() {
         return getBlockedUsers(0, 100);
     }
 
-    public Observable<List<QiscusAccount>> getBlockedUsers(long page, long limit) {
+    public Observable<List<QAccount>> getBlockedUsers(long page, long limit) {
         return api.getBlockedUsers(page, limit)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -953,12 +953,12 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<List<QiscusAccount>> getUsers(String searchUsername) {
+    public Observable<List<QAccount>> getUsers(String searchUsername) {
         return getUsers(searchUsername, 0, 100);
     }
 
     @Deprecated
-    public Observable<List<QiscusAccount>> getUsers(long page, long limit, String query) {
+    public Observable<List<QAccount>> getUsers(long page, long limit, String query) {
         return api.getUserList(page, limit, "username asc", query)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
@@ -969,7 +969,7 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusAccount>> getUsers(String searchUsername, long page, long limit) {
+    public Observable<List<QAccount>> getUsers(String searchUsername, long page, long limit) {
         return api.getUserList(page, limit, "username asc", searchUsername)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))

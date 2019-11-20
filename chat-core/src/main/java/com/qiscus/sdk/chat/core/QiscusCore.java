@@ -30,7 +30,7 @@ import com.google.gson.Gson;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
@@ -380,7 +380,7 @@ public class QiscusCore {
      *
      * @return Current qiscus user account
      */
-    public static QiscusAccount getQiscusAccount() {
+    public static QAccount getQiscusAccount() {
         checkUserSetup();
         return localDataManager.getAccountInfo();
     }
@@ -485,7 +485,7 @@ public class QiscusCore {
      * @return observable of qiscus account
      */
     @Deprecated
-    public static Observable<QiscusAccount> setUserAsObservable(String token) {
+    public static Observable<QAccount> setUserAsObservable(String token) {
         return QiscusApi.getInstance()
                 .login(token)
                 .doOnNext(qiscusAccount -> {
@@ -506,7 +506,7 @@ public class QiscusCore {
      * @param token the jwt token
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> setUserWithIdentityToken(String token) {
+    public static Observable<QAccount> setUserWithIdentityToken(String token) {
         return QiscusApi.getInstance()
                 .setUserWithIdentityToken(token)
                 .doOnNext(qiscusAccount -> {
@@ -556,7 +556,7 @@ public class QiscusCore {
      * @param extras    user extras
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl, JSONObject extras) {
+    public static Observable<QAccount> updateUserAsObservable(String name, String avatarUrl, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarUrl, extras)
                 .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
     }
@@ -569,7 +569,7 @@ public class QiscusCore {
      * @param extras    user extras
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> updateUser(String name, String avatarURL, JSONObject extras) {
+    public static Observable<QAccount> updateUser(String name, String avatarURL, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarURL, extras)
                 .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
     }
@@ -581,7 +581,7 @@ public class QiscusCore {
      * @param avatarUrl user avatar url
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
+    public static Observable<QAccount> updateUserAsObservable(String name, String avatarUrl) {
         return updateUserAsObservable(name, avatarUrl, null);
     }
 
@@ -766,9 +766,9 @@ public class QiscusCore {
         /**
          * Called if saving user succeed
          *
-         * @param qiscusAccount Saved qiscus account
+         * @param qAccount Saved qiscus account
          */
-        void onSuccess(QiscusAccount qiscusAccount);
+        void onSuccess(QAccount qAccount);
 
         /**
          * Called if error happened while saving qiscus user account. e.g network error
@@ -793,13 +793,13 @@ public class QiscusCore {
             return sharedPreferences.contains("cached_account");
         }
 
-        private void saveAccountInfo(QiscusAccount qiscusAccount) {
-            sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
-            setToken(qiscusAccount.getToken());
+        private void saveAccountInfo(QAccount qAccount) {
+            sharedPreferences.edit().putString("cached_account", gson.toJson(qAccount)).apply();
+            setToken(qAccount.getToken());
         }
 
-        private QiscusAccount getAccountInfo() {
-            return gson.fromJson(sharedPreferences.getString("cached_account", ""), QiscusAccount.class);
+        private QAccount getAccountInfo() {
+            return gson.fromJson(sharedPreferences.getString("cached_account", ""), QAccount.class);
         }
 
         private String getToken() {
@@ -936,7 +936,7 @@ public class QiscusCore {
          *
          * @return Observable of Qiscus account
          */
-        public Observable<QiscusAccount> save() {
+        public Observable<QAccount> save() {
             return QiscusApi.getInstance()
                     .setUser(email, password, username, avatarUrl, extras)
                     .doOnNext(qiscusAccount -> {

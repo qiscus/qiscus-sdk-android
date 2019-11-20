@@ -27,7 +27,7 @@ import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
@@ -204,7 +204,7 @@ public class Qiscus {
      * @param token the jwt token
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> setUserAsObservable(String token) {
+    public static Observable<QAccount> setUserAsObservable(String token) {
         return QiscusCore.setUserWithIdentityToken(token);
     }
 
@@ -225,7 +225,7 @@ public class Qiscus {
      * @param avatarUrl user avatar url
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
+    public static Observable<QAccount> updateUserAsObservable(String name, String avatarUrl) {
         return QiscusCore.updateUserAsObservable(name, avatarUrl);
     }
 
@@ -317,7 +317,7 @@ public class Qiscus {
      *
      * @return Current qiscus user account
      */
-    public static QiscusAccount getQiscusAccount() {
+    public static QAccount getQiscusAccount() {
         return QiscusCore.getQiscusAccount();
     }
 

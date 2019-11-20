@@ -114,7 +114,7 @@ QiscusCore.setUser(userId, userKey)
       .withExtras(extras)
       .save(new QiscusCore.SetUserListener() {
           @Override
-          public void onSuccess(QiscusAccount qiscusAccount) {
+          public void onSuccess(QiscusAccount qAccount) {
               //on success
           }
           @Override
@@ -207,7 +207,7 @@ QiscusCore.setUser(userId , userKey)
       .withExtras(extras)
       .save(new QiscusCore.SetUserListener() {
           @Override
-          public void onSuccess(QiscusAccount qiscusAccount) {
+          public void onSuccess(QiscusAccount qAccount) {
               //on success
           }
           @Override
@@ -319,7 +319,7 @@ Once you get a Nonce, you can request JWT from your backend by sending Nonce you
 ```
 QiscusCore.setUser('your jwt token', new QiscusCore.SetUserListener() {
         @Override
-        public void onSuccess(QiscusAccount qiscusAccount) {
+        public void onSuccess(QiscusAccount qAccount) {
             //do anything if success
         }
 
@@ -436,7 +436,7 @@ You can update user's data, for example
 ```
 QiscusCore.updateUser(username, avatarUrl, extras, new QiscusCore.SetUserListener() {
             @Override
-            public void onSuccess(QiscusAccount qiscusAccount) {
+            public void onSuccess(QiscusAccount qAccount) {
                 //do anything after it successfully updated
             }
 

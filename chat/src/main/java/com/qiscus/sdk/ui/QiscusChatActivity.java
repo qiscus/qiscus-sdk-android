@@ -29,7 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
@@ -49,7 +49,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
     protected TextView tvSubtitle;
     protected QiscusCircularImageView ivAvatar;
 
-    protected QiscusAccount qiscusAccount;
+    protected QAccount qAccount;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
         return generateIntent(context, qiscusChatRoom, null, null,
@@ -100,7 +100,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     @Override
     protected void onViewReady(Bundle savedInstanceState) {
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qAccount = Qiscus.getQiscusAccount();
         super.onViewReady(savedInstanceState);
     }
 

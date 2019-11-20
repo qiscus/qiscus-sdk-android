@@ -84,7 +84,7 @@ QiscusCore.setUser(userId, userKey)
       .withExtras(extras)
       .save(new QiscusCore.SetUserListener() {
           @Override
-          public void onSuccess(QiscusAccount qiscusAccount) {
+          public void onSuccess(QiscusAccount qAccount) {
               //on success
           }
           @Override
@@ -115,7 +115,7 @@ After your user account is created, sometimes you may need to update a user info
 ```java
 QiscusCore.updateUser(userName, avatarUrl, new QiscusCore.SetUserListener() {
             @Override
-            public void onSuccess(QiscusAccount qiscusAccount) {
+            public void onSuccess(QiscusAccount qAccount) {
                 //do anything after it successfully updated
             }
 
@@ -424,7 +424,7 @@ Qiscus.setUser("user@email.com", "password")
       .save()
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
-      .subscribe(qiscusAccount -> {
+      .subscribe(qAccount -> {
           //do anything if success
       }, throwable -> {
           //do anything if error occurs

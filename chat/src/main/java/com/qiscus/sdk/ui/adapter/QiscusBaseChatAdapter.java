@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
@@ -58,7 +58,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected CommentChainingListener commentChainingListener;
 
     protected QiscusChatRoom qiscusChatRoom;
-    protected QiscusAccount qiscusAccount;
+    protected QAccount qAccount;
     protected long lastDeliveredCommentId;
     protected long lastReadCommentId;
     protected boolean groupChat;
@@ -110,7 +110,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
                 return oldE.equals(newE);
             }
         });
-        qiscusAccount = Qiscus.getQiscusAccount();
+        qAccount = Qiscus.getQiscusAccount();
         members = new HashMap<>();
     }
 
@@ -167,7 +167,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         if (qiscusComment.getType() == QiscusComment.Type.CUSTOM) {
             return getItemViewTypeCustomMessage(qiscusComment, position);
         }
-        if (qiscusComment.getSenderEmail().equals(qiscusAccount.getEmail())) {
+        if (qiscusComment.getSenderEmail().equals(qAccount.getId())) {
             return getItemViewTypeMyMessage(qiscusComment, position);
         }
         return getItemViewTypeOthersMessage(qiscusComment, position);
@@ -237,7 +237,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     }
 
     protected void determineIsCommentFromMe(H holder, int position) {
-        if (!qiscusAccount.getEmail().equals(data.get(position).getSenderEmail())) {
+        if (!qAccount.getId().equals(data.get(position).getSenderEmail())) {
             holder.setMessageFromMe(false);
         } else {
             holder.setMessageFromMe(true);

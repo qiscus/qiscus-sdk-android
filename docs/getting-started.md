@@ -65,7 +65,7 @@ Qiscus.setUser(userId , userKey)
       .withAvatarUrl(avatarUrl)
       .save(new Qiscus.SetUserListener() {
           @Override
-          public void onSuccess(QiscusAccount qiscusAccount) {
+          public void onSuccess(QiscusAccount qAccount) {
               //on success followup
           }
           @Override
@@ -94,7 +94,7 @@ After your user account is created, sometimes you may need to update a user info
 ```java
 Qiscus.updateUser(userName, avatarUrl, new Qiscus.SetUserListener() {
         @Override
-        public void onSuccess(QiscusAccount qiscusAccount) {
+        public void onSuccess(QiscusAccount qAccount) {
            //do anything after it successfully updated
         }
 
