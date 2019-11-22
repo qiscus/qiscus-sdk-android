@@ -39,7 +39,7 @@ final class QiscusDb {
         static final String COLUMN_UNIQUE_ID = "unique_id";
         static final String COLUMN_NAME = "name";
         static final String COLUMN_TYPE = "type";
-        static final String COLUMN_OPTIONS = "extras";
+        static final String COLUMN_OPTIONS = "options";
         static final String COLUMN_AVATAR_URL = "avatar_url";
         static final String COLUMN_UNREAD_COUNT = "unread_count";
         static final String COLUMN_MEMBER_COUNT = "member_count";
@@ -50,10 +50,10 @@ final class QiscusDb {
                         COLUMN_DISTINCT_ID + " TEXT DEFAULT 'default'," +
                         COLUMN_UNIQUE_ID + " TEXT," +
                         COLUMN_NAME + " TEXT," +
+                        COLUMN_TYPE + " TEXT," +
                         COLUMN_OPTIONS + " TEXT," +
                         COLUMN_AVATAR_URL + " TEXT," +
                         COLUMN_UNREAD_COUNT + " INTEGER DEFAULT 0," +
-                        COLUMN_TYPE + " TEXT," +
                         COLUMN_MEMBER_COUNT + " INTEGER DEFAULT 0" +
                         " ); ";
 
@@ -63,10 +63,10 @@ final class QiscusDb {
             values.put(COLUMN_DISTINCT_ID, qChatRoom.getDistinctId());
             values.put(COLUMN_UNIQUE_ID, qChatRoom.getUniqueId());
             values.put(COLUMN_NAME, qChatRoom.getName());
+            values.put(COLUMN_TYPE, qChatRoom.getType());
             values.put(COLUMN_OPTIONS, qChatRoom.getExtras() == null ? null : qChatRoom.getExtras().toString());
             values.put(COLUMN_AVATAR_URL, qChatRoom.getAvatarUrl());
             values.put(COLUMN_UNREAD_COUNT, qChatRoom.getUnreadCount());
-            values.put(COLUMN_TYPE, qChatRoom.getType());
             values.put(COLUMN_MEMBER_COUNT, qChatRoom.getTotalParticipants());
             return values;
         }
@@ -86,7 +86,6 @@ final class QiscusDb {
             }
             qChatRoom.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AVATAR_URL)));
             qChatRoom.setUnreadCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_UNREAD_COUNT)));
-            qChatRoom.setType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             qChatRoom.setTotalParticipants(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MEMBER_COUNT)));
             return qChatRoom;
         }

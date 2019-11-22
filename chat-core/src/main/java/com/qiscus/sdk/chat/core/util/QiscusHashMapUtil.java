@@ -64,7 +64,7 @@ public class QiscusHashMapUtil {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("emails", withEmail);
-        hashMap.put("extras", options);
+        hashMap.put("options", options);
 
         return hashMap;
     }
@@ -75,7 +75,7 @@ public class QiscusHashMapUtil {
         hashMap.put("name", name);
         hashMap.put("participants", emails);
         hashMap.put("avatar_url", avatarUrl);
-        hashMap.put("extras", options);
+        hashMap.put("options", options);
 
         return hashMap;
     }
@@ -86,7 +86,7 @@ public class QiscusHashMapUtil {
         hashMap.put("unique_id", uniqueId);
         hashMap.put("name", name);
         hashMap.put("avatar_url", avatarUrl);
-        hashMap.put("extras", options);
+        hashMap.put("options", options);
 
         return hashMap;
     }
@@ -121,7 +121,7 @@ public class QiscusHashMapUtil {
         hashMap.put("id", roomId);
         hashMap.put("room_name", name);
         hashMap.put("avatar_url", avatarUrl);
-        hashMap.put("extras", options);
+        hashMap.put("options", options);
 
         return hashMap;
     }

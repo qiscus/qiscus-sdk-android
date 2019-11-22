@@ -190,7 +190,7 @@ public class QChatRoom implements Parcelable {
             extras = new JSONObject();
         }
         dest.writeString(extras.toString());
-        dest.writeString(type.toString());
+        dest.writeString(type);
         dest.writeString(avatarUrl);
         dest.writeTypedList(participants);
         dest.writeInt(unreadCount);
