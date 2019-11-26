@@ -20,7 +20,7 @@ import androidx.core.util.Pair;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
@@ -53,13 +53,13 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
         view.showLoading();
         Qiscus.getDataStore()
                 .getObservableComments(roomId)
-                .map(qiscusComments -> {
-                    List<Pair<QiscusComment, File>> qiscusPhotos = new ArrayList<>();
-                    for (QiscusComment qiscusComment : qiscusComments) {
-                        if (qiscusComment.isImage()) {
-                            File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+                .map(qiscusMessages -> {
+                    List<Pair<QMessage, File>> qiscusPhotos = new ArrayList<>();
+                    for (QMessage qiscusMessage : qiscusMessages) {
+                        if (qiscusMessage.isImage()) {
+                            File localPath = Qiscus.getDataStore().getLocalPath(qiscusMessage.getId());
                             if (localPath != null) {
-                                qiscusPhotos.add(Pair.create(qiscusComment, localPath));
+                                qiscusPhotos.add(Pair.create(qiscusMessage, localPath));
                             }
                         }
                     }
@@ -83,27 +83,27 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                 });
     }
 
-    public void downloadFile(QiscusComment qiscusComment) {
-        if (qiscusComment.isDownloading()) {
+    public void downloadFile(QMessage qiscusMessage) {
+        if (qiscusMessage.isDownloading()) {
             return;
         }
-        qiscusComment.setDownloading(true);
+        qiscusMessage.setDownloading(true);
         downloadSubscription = QiscusApi.getInstance()
-                .downloadFile(qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
-                        percentage -> qiscusComment.setProgress((int) percentage))
+                .downloadFile(qiscusMessage.getAttachmentUri().toString(), qiscusMessage.getAttachmentName(),
+                        percentage -> qiscusMessage.setProgress((int) percentage))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .doOnNext(file1 -> {
                     QiscusFileUtil.notifySystem(file1);
-                    qiscusComment.setDownloading(false);
-                    Qiscus.getDataStore().addOrUpdateLocalPath(qiscusComment.getRoomId(), qiscusComment.getId(),
+                    qiscusMessage.setDownloading(false);
+                    Qiscus.getDataStore().addOrUpdateLocalPath(qiscusMessage.getChatRoomId(), qiscusMessage.getId(),
                             file1.getAbsolutePath());
                 })
-                .subscribe(file1 -> view.onFileDownloaded(Pair.create(qiscusComment, file1)), throwable -> {
+                .subscribe(file1 -> view.onFileDownloaded(Pair.create(qiscusMessage, file1)), throwable -> {
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
-                    qiscusComment.setDownloading(false);
+                    qiscusMessage.setDownloading(false);
                     view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_download_file));
                 });
     }
@@ -115,9 +115,9 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
     }
 
     public interface View extends QiscusPresenter.View {
-        void onLoadQiscusPhotos(List<Pair<QiscusComment, File>> qiscusPhotos);
+        void onLoadQiscusPhotos(List<Pair<QMessage, File>> qiscusPhotos);
 
-        void onFileDownloaded(Pair<QiscusComment, File> qiscusPhoto);
+        void onFileDownloaded(Pair<QMessage, File> qiscusPhoto);
 
         void closePage();
     }

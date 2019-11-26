@@ -37,7 +37,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
@@ -127,15 +127,15 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        super.showMessage(qiscusComment);
+    protected void showMessage(QMessage qiscusMessage) {
+        super.showMessage(qiscusMessage);
         setUpLinks();
         originMessageView.setOnClickListener(v -> {
             if (replyItemClickListener != null) {
-                replyItemClickListener.onReplyItemClick(qiscusComment);
+                replyItemClickListener.onReplyItemClick(qiscusMessage);
             }
         });
-        QiscusComment originComment = qiscusComment.getReplyTo();
+        QMessage originComment = qiscusMessage.getReplyTo();
         originSenderTextView.setText(originComment.getSenderEmail().equals(qAccount.getId()) ?
                 QiscusTextUtil.getString(R.string.qiscus_you) : Qiscus.getChatConfig().getRoomSenderNameInterceptor()
                 .getSenderName(originComment));
@@ -259,7 +259,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
         }
     }
 
-    private void showBlurryImage(QiscusComment qiscusComment) {
+    private void showBlurryImage(QMessage qiscusMessage) {
         if (originImageView != null) {
             Nirmana.getInstance().get()
                     .setDefaultRequestOptions(new RequestOptions()
@@ -268,7 +268,7 @@ public abstract class QiscusBaseReplyMessageViewHolder extends QiscusBaseTextMes
                             .placeholder(R.drawable.qiscus_image_placeholder)
                             .error(R.drawable.qiscus_image_placeholder))
                     .asBitmap()
-                    .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                    .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusMessage.getAttachmentUri().toString()))
                     .thumbnail(0.5f)
                     .into(originImageView);
         }

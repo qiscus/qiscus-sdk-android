@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.data.model;
+package com.qiscus.sdk.chat.core.event;
+
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
- * Created on : September 06, 2017
+ * Created on : August 25, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusCommentDraft {
-    private String message;
+public class QMessageResendEvent {
+    private QMessage qiscusMessage;
 
-    public QiscusCommentDraft(String message) {
-        this.message = message;
+    public QMessageResendEvent(QMessage qiscusMessage) {
+        this.qiscusMessage = qiscusMessage;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toString() {
-        return "QiscusCommentDraft{" +
-                "message='" + message + '\'' +
-                '}';
+    public QMessage getQMessage() {
+        return qiscusMessage;
     }
 }

@@ -27,7 +27,7 @@ import android.widget.TextView;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
@@ -104,9 +104,9 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
+    protected void showMessage(QMessage qiscusMessage) {
         try {
-            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusMessage);
             String message = payload.optString("subject_email").equals(qAccount.getId()) ?
                     QiscusTextUtil.getString(R.string.qiscus_you) : payload.optString("subject_username");
             switch (payload.optString("type")) {
@@ -138,11 +138,11 @@ public abstract class QiscusBaseSystemMessageViewHolder extends QiscusBaseTextMe
                     message += " " + QiscusTextUtil.getString(R.string.qiscus_changed_room_avatar);
                     break;
                 default:
-                    message = qiscusComment.getMessage();
+                    message = qiscusMessage.getMessage();
             }
             messageTextView.setText(message);
         } catch (JSONException e) {
-            super.showMessage(qiscusComment);
+            super.showMessage(qiscusMessage);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.qiscus.sdk.data.model;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
  * @author yuana <andhikayuana@gmail.com>
@@ -8,5 +8,5 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
  */
 
 public interface QiscusRoomSenderNameInterceptor {
-    String getSenderName(QiscusComment qiscusComment);
+    String getSenderName(QMessage qiscusMessage);
 }

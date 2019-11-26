@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -80,10 +80,10 @@ public abstract class QiscusBaseAccountLinkingMessageViewHolder extends QiscusBa
     protected abstract TextView getAccountLinkingView(View itemView);
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        super.showMessage(qiscusComment);
+    protected void showMessage(QMessage qiscusMessage) {
+        super.showMessage(qiscusMessage);
         try {
-            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusMessage);
             String text = payload.getJSONObject("params").optString("button_text", accountLinkingText);
             if (text == null || text.isEmpty()) {
                 text = accountLinkingText;

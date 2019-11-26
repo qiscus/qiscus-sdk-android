@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.ui.adapter;
-
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+package com.qiscus.sdk.chat.core.data.model;
 
 /**
- * Created on : July 28, 2017
+ * Created on : September 06, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public interface CommentChainingListener {
-    void onCommentChainingBreak(QiscusComment insertedComment, QiscusComment commentBefore);
+public class QMessageDraft {
+    private String message;
+
+    public QMessageDraft(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public String toString() {
+        return "QMessageDraft{" +
+                "message='" + message + '\'' +
+                '}';
+    }
 }

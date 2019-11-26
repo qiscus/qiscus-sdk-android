@@ -27,7 +27,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 import com.qiscus.sdk.ui.view.QiscusCarouselItemView;
@@ -45,7 +45,7 @@ import java.util.Map;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends QiscusBaseMessageViewHolder<E>>
+public abstract class QiscusBaseChatAdapter<E extends QMessage, H extends QiscusBaseMessageViewHolder<E>>
         extends RecyclerView.Adapter<H> {
     protected Context context;
     protected SortedList<E> data;
@@ -55,7 +55,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected QiscusChatButtonView.ChatButtonClickListener chatButtonClickListener;
     protected QiscusCarouselItemView.CarouselItemClickListener carouselItemClickListener;
     protected ReplyItemClickListener replyItemClickListener;
-    protected CommentChainingListener commentChainingListener;
+    protected MessageChainingListener messageChainingListener;
 
     protected QChatRoom qChatRoom;
     protected QAccount qAccount;
@@ -116,13 +116,13 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     private void checkChaining(int position) {
         if (position < data.size() - 1) {
-            QiscusComment comment = data.get(position);
-            QiscusComment before = data.get(position + 1);
-            if (comment.getState() >= QiscusComment.STATE_ON_QISCUS
-                    && before.getState() >= QiscusComment.STATE_ON_QISCUS
-                    && comment.getCommentBeforeId() != before.getId()
-                    && commentChainingListener != null) {
-                commentChainingListener.onCommentChainingBreak(comment, before);
+            QMessage comment = data.get(position);
+            QMessage before = data.get(position + 1);
+            if (comment.getState() >= QMessage.STATE_ON_QISCUS
+                    && before.getState() >= QMessage.STATE_ON_QISCUS
+                    && comment.getPreviousMessageId() != before.getId()
+                    && messageChainingListener != null) {
+                messageChainingListener.onMessageChainingBreak(comment, before);
             }
         }
     }
@@ -163,35 +163,35 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
 
     @Override
     public int getItemViewType(int position) {
-        E qiscusComment = data.get(position);
-        if (qiscusComment.getType() == QiscusComment.Type.CUSTOM) {
-            return getItemViewTypeCustomMessage(qiscusComment, position);
+        E qiscusMessage = data.get(position);
+        if (qiscusMessage.getType() == QMessage.Type.CUSTOM) {
+            return getItemViewTypeCustomMessage(qiscusMessage, position);
         }
-        if (qiscusComment.getSenderEmail().equals(qAccount.getId())) {
-            return getItemViewTypeMyMessage(qiscusComment, position);
+        if (qiscusMessage.getSenderEmail().equals(qAccount.getId())) {
+            return getItemViewTypeMyMessage(qiscusMessage, position);
         }
-        return getItemViewTypeOthersMessage(qiscusComment, position);
+        return getItemViewTypeOthersMessage(qiscusMessage, position);
     }
 
-    protected abstract int getItemViewTypeCustomMessage(E qiscusComment, int position);
+    protected abstract int getItemViewTypeCustomMessage(E qiscusMessage, int position);
 
-    protected abstract int getItemViewTypeMyMessage(E qiscusComment, int position);
+    protected abstract int getItemViewTypeMyMessage(E qiscusMessage, int position);
 
-    protected abstract int getItemViewTypeOthersMessage(E qiscusComment, int position);
+    protected abstract int getItemViewTypeOthersMessage(E qiscusMessage, int position);
 
     protected int compare(E lhs, E rhs) {
         if (rhs.equals(lhs)) { //Same comments
             return 0;
         } else if (rhs.getId() == -1 && lhs.getId() == -1) { //Not completed comments
-            return rhs.getTime().compareTo(lhs.getTime());
+            return rhs.getTimestamp().compareTo(lhs.getTimestamp());
         } else if (rhs.getId() != -1 && lhs.getId() != -1) { //Completed comments
-            return rhs.getTime().compareTo(lhs.getTime());
+            return rhs.getTimestamp().compareTo(lhs.getTimestamp());
         } else if (rhs.getId() == -1) {
             return 1;
         } else if (lhs.getId() == -1) {
             return -1;
         }
-        return rhs.getTime().compareTo(lhs.getTime());
+        return rhs.getTimestamp().compareTo(lhs.getTimestamp());
     }
 
     protected View getView(ViewGroup parent, int viewType) {
@@ -217,8 +217,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     }
 
     protected void determineIsNeedToShowFirstMessageIndicator(H holder, int position) {
-        if (holder.isNeedToShowDate() || data.get(position + 1).getType() == QiscusComment.Type.CARD
-                || data.get(position + 1).getType() == QiscusComment.Type.CAROUSEL) {
+        if (holder.isNeedToShowDate() || data.get(position + 1).getType() == QMessage.Type.CARD
+                || data.get(position + 1).getType() == QMessage.Type.CAROUSEL) {
             holder.setNeedToShowFirstMessageBubbleIndicator(true);
         } else if (data.get(position).getSenderEmail().equals(data.get(position + 1).getSenderEmail())) {
             holder.setNeedToShowFirstMessageBubbleIndicator(false);
@@ -231,8 +231,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         if (position == getItemCount() - 1) {
             holder.setNeedToShowDate(true);
         } else {
-            holder.setNeedToShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTime(),
-                    data.get(position + 1).getTime()));
+            holder.setNeedToShowDate(!QiscusDateUtil.isDateEqualIgnoreTime(data.get(position).getTimestamp(),
+                    data.get(position + 1).getTimestamp()));
         }
     }
 
@@ -282,8 +282,8 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         this.replyItemClickListener = replyItemClickListener;
     }
 
-    public void setCommentChainingListener(CommentChainingListener commentChainingListener) {
-        this.commentChainingListener = commentChainingListener;
+    public void setMessageChainingListener(MessageChainingListener messageChainingListener) {
+        this.messageChainingListener = messageChainingListener;
     }
 
     public SortedList<E> getData() {
@@ -364,26 +364,26 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
             return;
         }
 
-        Date minDate = es.get(0).getTime();
-        Date maxDate = es.get(0).getTime();
+        Date minDate = es.get(0).getTimestamp();
+        Date maxDate = es.get(0).getTimestamp();
         for (E e : es) {
-            if (minDate.compareTo(e.getTime()) < 0) {
-                minDate = e.getTime();
+            if (minDate.compareTo(e.getTimestamp()) < 0) {
+                minDate = e.getTimestamp();
             }
 
-            if (maxDate.compareTo(e.getTime()) > 0) {
-                maxDate = e.getTime();
+            if (maxDate.compareTo(e.getTimestamp()) > 0) {
+                maxDate = e.getTimestamp();
             }
         }
         List<E> keep = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             //Keep not complete comment but in still range of remote comment
-            if (data.get(i).getId() == -1 && data.get(i).getTime().compareTo(minDate) >= 0) {
+            if (data.get(i).getId() == -1 && data.get(i).getTimestamp().compareTo(minDate) >= 0) {
                 keep.add(data.get(i));
             }
 
             //Keep all comment with date more than latest comment
-            if (data.get(i).getTime().compareTo(maxDate) >= 0) {
+            if (data.get(i).getTimestamp().compareTo(maxDate) >= 0) {
                 keep.add(data.get(i));
             }
         }
@@ -454,17 +454,17 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     private void updateCommentState() {
         int size = data.size();
         for (int i = 0; i < size; i++) {
-            if (data.get(i).getState() > QiscusComment.STATE_SENDING) {
+            if (data.get(i).getState() > QMessage.STATE_SENDING) {
                 if (data.get(i).getId() <= lastReadCommentId) {
-                    if (data.get(i).getState() == QiscusComment.STATE_READ) {
+                    if (data.get(i).getState() == QMessage.STATE_READ) {
                         break;
                     }
-                    data.get(i).setState(QiscusComment.STATE_READ);
+                    data.get(i).setState(QMessage.STATE_READ);
                 } else if (data.get(i).getId() <= lastDeliveredCommentId) {
-                    if (data.get(i).getState() == QiscusComment.STATE_DELIVERED) {
+                    if (data.get(i).getState() == QMessage.STATE_DELIVERED) {
                         break;
                     }
-                    data.get(i).setState(QiscusComment.STATE_DELIVERED);
+                    data.get(i).setState(QMessage.STATE_DELIVERED);
                 }
             }
         }
@@ -498,11 +498,11 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         notifyDataSetChanged();
     }
 
-    public QiscusComment getLatestSentComment() {
+    public QMessage getLatestSentComment() {
         int size = data.size();
         for (int i = 0; i < size; i++) {
-            QiscusComment comment = data.get(i);
-            if (comment.getState() >= QiscusComment.STATE_ON_QISCUS) {
+            QMessage comment = data.get(i);
+            if (comment.getState() >= QMessage.STATE_ON_QISCUS) {
                 return comment;
             }
         }
@@ -519,7 +519,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     public void clearCommentsBefore(long timestamp) {
         int size = data.size();
         for (int i = size - 1; i >= 0; i--) {
-            if (data.get(i).getTime().getTime() <= timestamp) {
+            if (data.get(i).getTimestamp().getTime() <= timestamp) {
                 data.get(i).destroy();
                 data.removeItemAt(i);
             }

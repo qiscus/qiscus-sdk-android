@@ -22,7 +22,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
@@ -35,7 +35,7 @@ import com.qiscus.sdk.ui.view.ClickableMovementMethod;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
+public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageViewHolder<QMessage> {
 
     @NonNull
     protected TextView messageTextView;
@@ -60,11 +60,11 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
+    protected void showMessage(QMessage qiscusMessage) {
         QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
         if (mentionConfig.isEnableMention()) {
             Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
-                    qiscusComment.getMessage(),
+                    qiscusMessage.getMessage(),
                     roomMembers,
                     messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
                     messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
@@ -73,7 +73,7 @@ public abstract class QiscusBaseTextMessageViewHolder extends QiscusBaseMessageV
             );
             messageTextView.setText(spannable);
         } else {
-            messageTextView.setText(qiscusComment.getMessage());
+            messageTextView.setText(qiscusMessage.getMessage());
         }
     }
 }

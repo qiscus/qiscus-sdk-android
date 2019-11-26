@@ -21,8 +21,8 @@ import androidx.annotation.RestrictTo;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.event.QMessageDeletedEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -56,29 +56,29 @@ public final class QiscusDeleteCommentHandler {
     private static void handleSoftDelete(DeletedCommentsData deletedCommentsData) {
         Observable.from(deletedCommentsData.getDeletedComments())
                 .map(deletedComment -> {
-                    QiscusComment qiscusComment = QiscusCore.getDataStore().getComment(deletedComment.getCommentUniqueId());
-                    if (qiscusComment != null) {
-                        qiscusComment.setMessage("This message has been deleted.");
-                        qiscusComment.setRawType("text");
-                        qiscusComment.setDeleted(true);
+                    QMessage qiscusMessage = QiscusCore.getDataStore().getComment(deletedComment.getCommentUniqueId());
+                    if (qiscusMessage != null) {
+                        qiscusMessage.setMessage("This message has been deleted.");
+                        qiscusMessage.setRawType("text");
+                        qiscusMessage.setDeleted(true);
 
-                        setRoomData(qiscusComment);
+                        setRoomData(qiscusMessage);
                     }
-                    return qiscusComment;
+                    return qiscusMessage;
                 })
-                .filter(qiscusComment -> qiscusComment != null)
-                .doOnNext(qiscusComment -> {
-                    QiscusCore.getDataStore().addOrUpdate(qiscusComment);
-                    QiscusCore.getDataStore().deleteLocalPath(qiscusComment.getId());
+                .filter(qiscusMessage -> qiscusMessage != null)
+                .doOnNext(qiscusMessage -> {
+                    QiscusCore.getDataStore().addOrUpdate(qiscusMessage);
+                    QiscusCore.getDataStore().deleteLocalPath(qiscusMessage.getId());
 
-                    EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
+                    EventBus.getDefault().post(new QMessageDeletedEvent(qiscusMessage));
                 })
                 .toList()
-                .doOnNext(qiscusComments -> {
-                    if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
-                        QiscusCore.getChatConfig().getDeleteCommentListener()
+                .doOnNext(qiscusMessages -> {
+                    if (QiscusCore.getChatConfig().getDeleteMessageListener() != null) {
+                        QiscusCore.getChatConfig().getDeleteMessageListener()
                                 .onHandleDeletedCommentNotification(QiscusCore.getApps(),
-                                        qiscusComments, false);
+                                        qiscusMessages, false);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -90,36 +90,36 @@ public final class QiscusDeleteCommentHandler {
     private static void handleHardDelete(DeletedCommentsData deletedCommentsData) {
         Observable.from(deletedCommentsData.getDeletedComments())
                 .map(deletedComment -> {
-                    QiscusComment qiscusComment = QiscusCore.getDataStore().getComment(deletedComment.getCommentUniqueId());
-                    if (qiscusComment != null) {
-                        qiscusComment.setMessage("This message has been deleted.");
-                        qiscusComment.setRawType("text");
-                        qiscusComment.setDeleted(true);
-                        qiscusComment.setHardDeleted(true);
-                        setRoomData(qiscusComment);
+                    QMessage qiscusMessage = QiscusCore.getDataStore().getComment(deletedComment.getCommentUniqueId());
+                    if (qiscusMessage != null) {
+                        qiscusMessage.setMessage("This message has been deleted.");
+                        qiscusMessage.setRawType("text");
+                        qiscusMessage.setDeleted(true);
+                        qiscusMessage.setHardDeleted(true);
+                        setRoomData(qiscusMessage);
                     }
 
-                    return qiscusComment;
+                    return qiscusMessage;
                 })
-                .filter(qiscusComment -> qiscusComment != null)
-                .doOnNext(qiscusComment -> {
+                .filter(qiscusMessage -> qiscusMessage != null)
+                .doOnNext(qiscusMessage -> {
                     // Update chaining id and before id
-                    QiscusComment commentAfter = QiscusCore.getDataStore().getCommentByBeforeId(qiscusComment.getId());
+                    QMessage commentAfter = QiscusCore.getDataStore().getCommentByBeforeId(qiscusMessage.getId());
                     if (commentAfter != null) {
-                        commentAfter.setCommentBeforeId(qiscusComment.getCommentBeforeId());
+                        commentAfter.setPreviousMessageId(qiscusMessage.getPreviousMessageId());
                         QiscusCore.getDataStore().addOrUpdate(commentAfter);
                     }
 
-                    QiscusCore.getDataStore().addOrUpdate(qiscusComment);
-                    QiscusCore.getDataStore().deleteLocalPath(qiscusComment.getId());
-                    EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
+                    QiscusCore.getDataStore().addOrUpdate(qiscusMessage);
+                    QiscusCore.getDataStore().deleteLocalPath(qiscusMessage.getId());
+                    EventBus.getDefault().post(new QMessageDeletedEvent(qiscusMessage, true));
                 })
                 .toList()
-                .doOnNext(qiscusComments -> {
-                    if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
-                        QiscusCore.getChatConfig().getDeleteCommentListener()
+                .doOnNext(qiscusMessages -> {
+                    if (QiscusCore.getChatConfig().getDeleteMessageListener() != null) {
+                        QiscusCore.getChatConfig().getDeleteMessageListener()
                                 .onHandleDeletedCommentNotification(QiscusCore.getApps(),
-                                        qiscusComments, true);
+                                        qiscusMessages, true);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -128,12 +128,12 @@ public final class QiscusDeleteCommentHandler {
                 }, QiscusErrorLogger::print);
     }
 
-    private static void setRoomData(QiscusComment qiscusComment) {
-        QChatRoom chatRoom = QiscusCore.getDataStore().getChatRoom(qiscusComment.getRoomId());
+    private static void setRoomData(QMessage qiscusMessage) {
+        QChatRoom chatRoom = QiscusCore.getDataStore().getChatRoom(qiscusMessage.getChatRoomId());
         if (chatRoom != null) {
-            qiscusComment.setRoomName(chatRoom.getName());
-            qiscusComment.setRoomAvatar(chatRoom.getAvatarUrl());
-            qiscusComment.setGroupMessage(chatRoom.getType().equals("group"));
+            qiscusMessage.setRoomName(chatRoom.getName());
+            qiscusMessage.setRoomAvatar(chatRoom.getAvatarUrl());
+            qiscusMessage.setGroupMessage(chatRoom.getType().equals("group"));
         }
     }
 

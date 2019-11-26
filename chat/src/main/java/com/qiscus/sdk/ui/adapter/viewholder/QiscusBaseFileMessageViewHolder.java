@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -40,8 +40,8 @@ import java.io.File;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
-        implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
+public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageViewHolder<QMessage>
+        implements QMessage.ProgressListener, QMessage.DownloadingListener {
 
     @NonNull
     protected TextView fileNameView;
@@ -55,7 +55,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     protected int rightProgressFinishedColor;
     protected int leftProgressFinishedColor;
 
-    protected QiscusComment qiscusComment;
+    protected QMessage qiscusMessage;
 
     public QiscusBaseFileMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                            OnLongItemClickListener longItemClickListener) {
@@ -72,7 +72,7 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
         downloadIconView = getDownloadIconView(itemView);
         if (downloadIconView != null) {
             downloadIconView.setOnClickListener(v -> {
-                if (uploadIconClickListener != null && qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+                if (uploadIconClickListener != null && qiscusMessage.getState() == QMessage.STATE_FAILED) {
                     uploadIconClickListener.onUploadIconClick(v, getAdapterPosition());
                 } else {
                     onClick(messageBubbleView);
@@ -101,18 +101,18 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     protected abstract ImageView getDownloadIconView(View itemView);
 
     @Override
-    public void bind(QiscusComment qiscusComment) {
-        super.bind(qiscusComment);
-        this.qiscusComment = qiscusComment;
-        qiscusComment.setProgressListener(this);
-        qiscusComment.setDownloadingListener(this);
-        setUpDownloadIcon(qiscusComment);
-        showProgressOrNot(qiscusComment);
+    public void bind(QMessage qiscusMessage) {
+        super.bind(qiscusMessage);
+        this.qiscusMessage = qiscusMessage;
+        qiscusMessage.setProgressListener(this);
+        qiscusMessage.setDownloadingListener(this);
+        setUpDownloadIcon(qiscusMessage);
+        showProgressOrNot(qiscusMessage);
     }
 
-    protected void setUpDownloadIcon(QiscusComment qiscusComment) {
+    protected void setUpDownloadIcon(QMessage qiscusMessage) {
         if (downloadIconView != null) {
-            if (qiscusComment.getState() <= QiscusComment.STATE_SENDING) {
+            if (qiscusMessage.getState() <= QMessage.STATE_SENDING) {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_upload);
             } else {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_download);
@@ -120,13 +120,13 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
         }
     }
 
-    protected void showProgressOrNot(QiscusComment qiscusComment) {
+    protected void showProgressOrNot(QMessage qiscusMessage) {
         if (progressView != null) {
-            progressView.setProgress(qiscusComment.getProgress());
+            progressView.setProgress(qiscusMessage.getProgress());
             progressView.setVisibility(
-                    qiscusComment.isDownloading()
-                            || qiscusComment.getState() == QiscusComment.STATE_PENDING
-                            || qiscusComment.getState() == QiscusComment.STATE_SENDING
+                    qiscusMessage.isDownloading()
+                            || qiscusMessage.getState() == QMessage.STATE_PENDING
+                            || qiscusMessage.getState() == QMessage.STATE_SENDING
                             ? View.VISIBLE : View.GONE
             );
         }
@@ -144,11 +144,11 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
+    protected void showMessage(QMessage qiscusMessage) {
         if (downloadIconView != null) {
-            File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+            File localPath = Qiscus.getDataStore().getLocalPath(qiscusMessage.getId());
             if (localPath == null) {
-                File file = new File(qiscusComment.getAttachmentUri().toString());
+                File file = new File(qiscusMessage.getAttachmentUri().toString());
                 if (file.exists()) {
                     localPath = file;
                 }
@@ -156,28 +156,28 @@ public abstract class QiscusBaseFileMessageViewHolder extends QiscusBaseMessageV
             downloadIconView.setVisibility(localPath == null ? View.VISIBLE : View.GONE);
         }
 
-        fileNameView.setText(qiscusComment.getAttachmentName());
+        fileNameView.setText(qiscusMessage.getAttachmentName());
 
         if (fileTypeView != null) {
-            if (qiscusComment.getExtension().isEmpty()) {
+            if (qiscusMessage.getExtension().isEmpty()) {
                 fileTypeView.setText(R.string.qiscus_unknown_type);
             } else {
                 fileTypeView.setText(QiscusTextUtil.getString(R.string.qiscus_file_type,
-                        qiscusComment.getExtension().toUpperCase()));
+                        qiscusMessage.getExtension().toUpperCase()));
             }
         }
     }
 
     @Override
-    public void onProgress(QiscusComment qiscusComment, int percentage) {
-        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
+    public void onProgress(QMessage qiscusMessage, int percentage) {
+        if (qiscusMessage.equals(this.qiscusMessage) && progressView != null) {
             progressView.setProgress(percentage);
         }
     }
 
     @Override
-    public void onDownloading(QiscusComment qiscusComment, boolean downloading) {
-        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
+    public void onDownloading(QMessage qiscusMessage, boolean downloading) {
+        if (qiscusMessage.equals(this.qiscusMessage) && progressView != null) {
             progressView.setVisibility(downloading ? View.VISIBLE : View.GONE);
         }
     }

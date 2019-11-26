@@ -30,13 +30,13 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
-import com.qiscus.sdk.chat.core.data.model.CommentInfoHandler;
+import com.qiscus.sdk.chat.core.data.model.ForwardMessageHandler;
+import com.qiscus.sdk.chat.core.data.model.MessageInfoHandler;
 import com.qiscus.sdk.chat.core.data.model.DateFormatter;
-import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
 import com.qiscus.sdk.chat.core.data.model.NotificationClickListener;
 import com.qiscus.sdk.chat.core.data.model.NotificationTitleHandler;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusCommentSendingInterceptor;
+import com.qiscus.sdk.chat.core.data.model.QMessage;;
+import com.qiscus.sdk.chat.core.data.model.QMessageSendingInterceptor;
 import com.qiscus.sdk.chat.core.data.model.QiscusImageCompressionConfig;
 import com.qiscus.sdk.chat.core.data.model.ReplyNotificationHandler;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
@@ -166,15 +166,15 @@ public class QiscusChatConfig {
     private boolean enableReplyNotification = false;
     private QiscusNotificationBuilderInterceptor notificationBuilderInterceptor;
 
-    private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
-    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
-    private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusComment -> R.color.qiscus_secondary_text;
-    private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusComment -> getReplyBarColor();
-    private QiscusStartReplyInterceptor startReplyInterceptor = qiscusComment -> new QiscusReplyPanelConfig();
+    private NotificationTitleHandler notificationTitleHandler = QMessage::getRoomName;
+    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QMessage::getSender;
+    private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusMessage -> R.color.qiscus_secondary_text;
+    private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusMessage -> getReplyBarColor();
+    private QiscusStartReplyInterceptor startReplyInterceptor = qiscusMessage -> new QiscusReplyPanelConfig();
 
     private NotificationClickListener notificationClickListener =
-            (context, qiscusComment) -> QiscusApi.getInstance()
-                    .getChatRoom(qiscusComment.getRoomId())
+            (context, qiscusMessage) -> QiscusApi.getInstance()
+                    .getChatRoom(qiscusMessage.getChatRoomId())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .map(qiscusChatRoom -> {
@@ -192,20 +192,20 @@ public class QiscusChatConfig {
                     });
 
     private ReplyNotificationHandler replyNotificationHandler =
-            (context, qiscusComment) -> QiscusApi.getInstance().sendMessage(qiscusComment)
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+            (context, qiscusMessage) -> QiscusApi.getInstance().sendMessage(qiscusMessage)
+                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusMessage))
                     .doOnNext(comment -> {
-                        comment.setState(QiscusComment.STATE_ON_QISCUS);
-                        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
-                        if (savedQiscusComment != null && savedQiscusComment.getState() > comment.getState()) {
-                            comment.setState(savedQiscusComment.getState());
+                        comment.setState(QMessage.STATE_ON_QISCUS);
+                        QMessage savedQMessage = Qiscus.getDataStore().getComment(comment.getUniqueId());
+                        if (savedQMessage != null && savedQMessage.getState() > comment.getState()) {
+                            comment.setState(savedQMessage.getState());
                         }
                         Qiscus.getDataStore().addOrUpdate(comment);
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(commentSend -> {
-                        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusComment.getRoomId());
+                        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusMessage.getChatRoomId());
                     }, throwable -> {
                         QiscusErrorLogger.print("ReplyNotification", throwable);
                         Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
@@ -218,17 +218,17 @@ public class QiscusChatConfig {
 
     private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
 
-    private ForwardCommentHandler forwardCommentHandler;
+    private ForwardMessageHandler forwardMessageHandler;
     private boolean enableForwardComment = false;
 
-    private CommentInfoHandler commentInfoHandler;
+    private MessageInfoHandler messageInfoHandler;
     private boolean enableCommentInfo = false;
 
     private boolean enableShareMedia = true;
 
     private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
 
-    private QiscusDeleteCommentConfig deleteCommentConfig = new QiscusDeleteCommentConfig();
+    private QiscusDeleteMessageConfig deleteCommentConfig = new QiscusDeleteMessageConfig();
 
     @ColorRes
     public int getStatusBarColor() {
@@ -1141,12 +1141,12 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public ForwardCommentHandler getForwardCommentHandler() {
-        return forwardCommentHandler;
+    public ForwardMessageHandler getForwardMessageHandler() {
+        return forwardMessageHandler;
     }
 
-    public QiscusChatConfig setForwardCommentHandler(ForwardCommentHandler forwardCommentHandler) {
-        this.forwardCommentHandler = forwardCommentHandler;
+    public QiscusChatConfig setForwardMessageHandler(ForwardMessageHandler forwardMessageHandler) {
+        this.forwardMessageHandler = forwardMessageHandler;
         return this;
     }
 
@@ -1159,12 +1159,12 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public CommentInfoHandler getCommentInfoHandler() {
-        return commentInfoHandler;
+    public MessageInfoHandler getMessageInfoHandler() {
+        return messageInfoHandler;
     }
 
-    public QiscusChatConfig setCommentInfoHandler(CommentInfoHandler commentInfoHandler) {
-        this.commentInfoHandler = commentInfoHandler;
+    public QiscusChatConfig setMessageInfoHandler(MessageInfoHandler messageInfoHandler) {
+        this.messageInfoHandler = messageInfoHandler;
         return this;
     }
 
@@ -1225,13 +1225,13 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
+    public QMessageSendingInterceptor getCommentSendingInterceptor() {
         return QiscusCore.getChatConfig().getCommentSendingInterceptor();
     }
 
-    public QiscusChatConfig setCommentSendingInterceptor(QiscusCommentSendingInterceptor
-                                                                 qiscusCommentSendingInterceptor) {
-        QiscusCore.getChatConfig().setCommentSendingInterceptor(qiscusCommentSendingInterceptor);
+    public QiscusChatConfig setCommentSendingInterceptor(QMessageSendingInterceptor
+                                                                 qiscusMessageSendingInterceptor) {
+        QiscusCore.getChatConfig().setCommentSendingInterceptor(qiscusMessageSendingInterceptor);
         return this;
     }
 
@@ -1266,11 +1266,11 @@ public class QiscusChatConfig {
         return this;
     }
 
-    public QiscusDeleteCommentConfig getDeleteCommentConfig() {
+    public QiscusDeleteMessageConfig getDeleteCommentConfig() {
         return deleteCommentConfig;
     }
 
-    public QiscusChatConfig setDeleteCommentConfig(QiscusDeleteCommentConfig deleteCommentConfig) {
+    public QiscusChatConfig setDeleteCommentConfig(QiscusDeleteMessageConfig deleteCommentConfig) {
         this.deleteCommentConfig = deleteCommentConfig;
         return this;
     }

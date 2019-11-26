@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.event;
+package com.qiscus.sdk.chat.core.data.model;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import java.util.List;
 
 /**
- * Created on : August 25, 2017
+ * Created on : July 11, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusCommentResendEvent {
-    private QiscusComment qiscusComment;
-
-    public QiscusCommentResendEvent(QiscusComment qiscusComment) {
-        this.qiscusComment = qiscusComment;
-    }
-
-    public QiscusComment getQiscusComment() {
-        return qiscusComment;
-    }
+public interface ForwardMessageHandler {
+    void forward(List<QMessage> messages);
 }

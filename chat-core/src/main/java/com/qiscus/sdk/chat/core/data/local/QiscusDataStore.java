@@ -22,6 +22,6 @@ package com.qiscus.sdk.chat.core.data.local;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public interface QiscusDataStore extends QiscusChatRoomStore, QiscusRoomMemberStore, QiscusCommentStore, QiscusFileStore {
+public interface QiscusDataStore extends QiscusChatRoomStore, QiscusRoomMemberStore, QMessageStore, QiscusFileStore {
     void clear();
 }

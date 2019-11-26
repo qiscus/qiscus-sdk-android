@@ -23,7 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
@@ -100,8 +100,8 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        QiscusComment comment = QiscusComment.generateCustomMessage(qChatRoom.getId(), message, "lock_message", payload);
-        sendQiscusComment(comment);
+        QMessage comment = QMessage.generateCustomMessage(qChatRoom.getId(), message, "lock_message", payload);
+        sendQMessage(comment);
     }
 
     @Override
@@ -110,8 +110,8 @@ public class SimpleCustomChatFragment extends QiscusChatFragment {
     }
 
     @Override
-    protected void onCustomCommentClick(QiscusComment qiscusComment) {
-        Toast.makeText(getActivity(), qiscusComment.getMessage(), Toast.LENGTH_SHORT).show();
+    protected void onCustomCommentClick(QMessage qiscusMessage) {
+        Toast.makeText(getActivity(), qiscusMessage.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     public void actionClearComments() {

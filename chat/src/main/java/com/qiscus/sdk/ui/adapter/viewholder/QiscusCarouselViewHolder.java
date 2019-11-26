@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -43,7 +43,7 @@ import org.json.JSONObject;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusCarouselViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
+public class QiscusCarouselViewHolder extends QiscusBaseMessageViewHolder<QMessage> {
 
     protected int titleTextColor;
     protected int descriptionTextColor;
@@ -115,9 +115,9 @@ public class QiscusCarouselViewHolder extends QiscusBaseMessageViewHolder<Qiscus
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
+    protected void showMessage(QMessage qiscusMessage) {
         try {
-            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusMessage);
             setUpCards(payload);
         } catch (JSONException | NullPointerException e) {
             e.printStackTrace();

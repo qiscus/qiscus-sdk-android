@@ -18,7 +18,7 @@ package com.qiscus.sdk.data.model;
 
 import androidx.core.app.NotificationCompat;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
  * Created on : March 24, 2017
@@ -31,8 +31,8 @@ public interface QiscusNotificationBuilderInterceptor {
      * Intercept notification builder, to customizing notification
      *
      * @param notificationBuilder The builder
-     * @param qiscusComment       comment to show
+     * @param qiscusMessage       comment to show
      * @return true to continue showing push notification, false to cancel push notification
      */
-    boolean intercept(NotificationCompat.Builder notificationBuilder, QiscusComment qiscusComment);
+    boolean intercept(NotificationCompat.Builder notificationBuilder, QMessage qiscusMessage);
 }

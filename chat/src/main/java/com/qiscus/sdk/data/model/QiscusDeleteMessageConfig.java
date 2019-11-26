@@ -28,7 +28,7 @@ import com.qiscus.sdk.R;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusDeleteCommentConfig {
+public class QiscusDeleteMessageConfig {
     private boolean enableDeleteComment = false;
     private boolean enableHardDelete = false;
 
@@ -39,7 +39,7 @@ public class QiscusDeleteCommentConfig {
         return enableDeleteComment;
     }
 
-    public QiscusDeleteCommentConfig setEnableDeleteComment(boolean enableDeleteComment) {
+    public QiscusDeleteMessageConfig setEnableDeleteComment(boolean enableDeleteComment) {
         this.enableDeleteComment = enableDeleteComment;
         return this;
     }
@@ -48,7 +48,7 @@ public class QiscusDeleteCommentConfig {
         return enableHardDelete;
     }
 
-    public QiscusDeleteCommentConfig setEnableHardDelete(boolean enableHardDelete) {
+    public QiscusDeleteMessageConfig setEnableHardDelete(boolean enableHardDelete) {
         this.enableHardDelete = enableHardDelete;
         return this;
     }
@@ -58,7 +58,7 @@ public class QiscusDeleteCommentConfig {
         return deleteForEveryoneButtonColor;
     }
 
-    public QiscusDeleteCommentConfig setDeleteForEveryoneButtonColor(@ColorInt int deleteForEveryoneButtonColor) {
+    public QiscusDeleteMessageConfig setDeleteForEveryoneButtonColor(@ColorInt int deleteForEveryoneButtonColor) {
         this.deleteForEveryoneButtonColor = deleteForEveryoneButtonColor;
         return this;
     }
@@ -68,7 +68,7 @@ public class QiscusDeleteCommentConfig {
         return cancelButtonColor;
     }
 
-    public QiscusDeleteCommentConfig setCancelButtonColor(@ColorInt int cancelButtonColor) {
+    public QiscusDeleteMessageConfig setCancelButtonColor(@ColorInt int cancelButtonColor) {
         this.cancelButtonColor = cancelButtonColor;
         return this;
     }

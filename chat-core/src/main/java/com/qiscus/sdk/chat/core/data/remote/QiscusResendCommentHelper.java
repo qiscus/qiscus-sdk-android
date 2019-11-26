@@ -17,9 +17,9 @@
 package com.qiscus.sdk.chat.core.data.remote;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
-import com.qiscus.sdk.chat.core.event.QiscusCommentResendEvent;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.event.QMessageReceivedEvent;
+import com.qiscus.sdk.chat.core.event.QMessageResendEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -53,16 +53,16 @@ public final class QiscusResendCommentHelper {
         QiscusCore.getDataStore()
                 .getObservablePendingComments()
                 .flatMap(Observable::from)
-                .doOnNext(qiscusComment -> {
-                    if (qiscusComment.isAttachment() && !pendingTask.containsKey(qiscusComment.getUniqueId())) {
-                        resendFile(qiscusComment);
+                .doOnNext(qiscusMessage -> {
+                    if (qiscusMessage.isAttachment() && !pendingTask.containsKey(qiscusMessage.getUniqueId())) {
+                        resendFile(qiscusMessage);
                     }
                 })
-                .filter(qiscusComment -> !qiscusComment.isAttachment())
+                .filter(qiscusMessage -> !qiscusMessage.isAttachment())
                 .take(1)
-                .doOnNext(qiscusComment -> {
-                    if (!pendingTask.containsKey(qiscusComment.getUniqueId())) {
-                        resendComment(qiscusComment);
+                .doOnNext(qiscusMessage -> {
+                    if (!pendingTask.containsKey(qiscusMessage.getUniqueId())) {
+                        resendComment(qiscusMessage);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -71,159 +71,159 @@ public final class QiscusResendCommentHelper {
                 }, QiscusErrorLogger::print);
     }
 
-    public static void cancelPendingComment(QiscusComment qiscusComment) {
-        Subscription subscription = pendingTask.get(qiscusComment.getUniqueId());
+    public static void cancelPendingComment(QMessage qiscusMessage) {
+        Subscription subscription = pendingTask.get(qiscusMessage.getUniqueId());
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
-        pendingTask.remove(qiscusComment.getUniqueId());
-        processingComment.remove(qiscusComment.getUniqueId());
+        pendingTask.remove(qiscusMessage.getUniqueId());
+        processingComment.remove(qiscusMessage.getUniqueId());
     }
 
-    private static void resendComment(QiscusComment qiscusComment) {
-        if (qiscusComment.isAttachment()) {
-            resendFile(qiscusComment);
+    private static void resendComment(QMessage qiscusMessage) {
+        if (qiscusMessage.isAttachment()) {
+            resendFile(qiscusMessage);
             return;
         }
 
         //Wait until this success
-        if (!processingComment.isEmpty() && !processingComment.contains(qiscusComment.getUniqueId())) {
+        if (!processingComment.isEmpty() && !processingComment.contains(qiscusMessage.getUniqueId())) {
             return;
         }
 
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
-        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+        qiscusMessage.setState(QMessage.STATE_SENDING);
+        QiscusCore.getDataStore().addOrUpdate(qiscusMessage);
 
-        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+        EventBus.getDefault().post(new QMessageResendEvent(qiscusMessage));
 
-        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusMessage)
                 .doOnNext(QiscusResendCommentHelper::commentSuccess)
-                .doOnError(throwable -> commentFail(throwable, qiscusComment))
+                .doOnError(throwable -> commentFail(throwable, qiscusMessage))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend -> {
                     tryResendPendingComment(); //Process next pending comments
-                    EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend));
+                    EventBus.getDefault().post(new QMessageReceivedEvent(commentSend));
                 }, QiscusErrorLogger::print);
 
-        pendingTask.put(qiscusComment.getUniqueId(), subscription);
-        processingComment.add(qiscusComment.getUniqueId());
+        pendingTask.put(qiscusMessage.getUniqueId(), subscription);
+        processingComment.add(qiscusMessage.getUniqueId());
     }
 
-    private static void resendFile(QiscusComment qiscusComment) {
-        qiscusComment.setState(QiscusComment.STATE_SENDING);
-        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+    private static void resendFile(QMessage qiscusMessage) {
+        qiscusMessage.setState(QMessage.STATE_SENDING);
+        QiscusCore.getDataStore().addOrUpdate(qiscusMessage);
 
-        if (qiscusComment.getAttachmentUri().toString().startsWith("http")) { //We forward file message
-            forwardFile(qiscusComment);
+        if (qiscusMessage.getAttachmentUri().toString().startsWith("http")) { //We forward file message
+            forwardFile(qiscusMessage);
             return;
         }
 
-        File file = new File(qiscusComment.getAttachmentUri().toString());
+        File file = new File(qiscusMessage.getAttachmentUri().toString());
         if (!file.exists()) { //File have been removed, so we can not upload it anymore
-            qiscusComment.setDownloading(false);
-            qiscusComment.setState(QiscusComment.STATE_FAILED);
-            QiscusCore.getDataStore().addOrUpdate(qiscusComment);
-            EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+            qiscusMessage.setDownloading(false);
+            qiscusMessage.setState(QMessage.STATE_FAILED);
+            QiscusCore.getDataStore().addOrUpdate(qiscusMessage);
+            EventBus.getDefault().post(new QMessageResendEvent(qiscusMessage));
             return;
         }
 
-        qiscusComment.setDownloading(true);
-        qiscusComment.setProgress(0);
-        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+        qiscusMessage.setDownloading(true);
+        qiscusMessage.setProgress(0);
+        EventBus.getDefault().post(new QMessageResendEvent(qiscusMessage));
 
         Subscription subscription = QiscusApi.getInstance()
-                .upload(file, percentage -> qiscusComment.setProgress((int) percentage))
+                .upload(file, percentage -> qiscusMessage.setProgress((int) percentage))
                 .flatMap(uri -> {
-                    qiscusComment.updateAttachmentUrl(uri.toString());
-                    return QiscusApi.getInstance().sendMessage(qiscusComment);
+                    qiscusMessage.updateAttachmentUrl(uri.toString());
+                    return QiscusApi.getInstance().sendMessage(qiscusMessage);
                 })
                 .doOnNext(commentSend -> {
                     QiscusCore.getDataStore()
-                            .addOrUpdateLocalPath(commentSend.getRoomId(), commentSend.getId(), file.getAbsolutePath());
-                    qiscusComment.setDownloading(false);
+                            .addOrUpdateLocalPath(commentSend.getChatRoomId(), commentSend.getId(), file.getAbsolutePath());
+                    qiscusMessage.setDownloading(false);
                     commentSuccess(commentSend);
                 })
-                .doOnError(throwable -> commentFail(throwable, qiscusComment))
+                .doOnError(throwable -> commentFail(throwable, qiscusMessage))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend ->
-                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
+                                EventBus.getDefault().post(new QMessageReceivedEvent(commentSend)),
                         QiscusErrorLogger::print);
 
-        pendingTask.put(qiscusComment.getUniqueId(), subscription);
+        pendingTask.put(qiscusMessage.getUniqueId(), subscription);
     }
 
-    private static void forwardFile(QiscusComment qiscusComment) {
-        qiscusComment.setDownloading(true);
-        qiscusComment.setProgress(100);
-        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+    private static void forwardFile(QMessage qiscusMessage) {
+        qiscusMessage.setDownloading(true);
+        qiscusMessage.setProgress(100);
+        EventBus.getDefault().post(new QMessageResendEvent(qiscusMessage));
 
-        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
+        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusMessage)
                 .doOnNext(commentSend -> {
-                    qiscusComment.setDownloading(false);
+                    qiscusMessage.setDownloading(false);
                     commentSuccess(commentSend);
                 })
-                .doOnError(throwable -> commentFail(throwable, qiscusComment))
+                .doOnError(throwable -> commentFail(throwable, qiscusMessage))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentSend ->
-                                EventBus.getDefault().post(new QiscusCommentReceivedEvent(commentSend)),
+                                EventBus.getDefault().post(new QMessageReceivedEvent(commentSend)),
                         QiscusErrorLogger::print);
 
-        pendingTask.put(qiscusComment.getUniqueId(), subscription);
+        pendingTask.put(qiscusMessage.getUniqueId(), subscription);
     }
 
-    private static void commentSuccess(QiscusComment qiscusComment) {
-        pendingTask.remove(qiscusComment.getUniqueId());
-        processingComment.remove(qiscusComment.getUniqueId());
-        qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
-        QiscusComment savedQiscusComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-        if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
-            qiscusComment.setState(savedQiscusComment.getState());
+    private static void commentSuccess(QMessage qiscusMessage) {
+        pendingTask.remove(qiscusMessage.getUniqueId());
+        processingComment.remove(qiscusMessage.getUniqueId());
+        qiscusMessage.setState(QMessage.STATE_ON_QISCUS);
+        QMessage savedQMessage = QiscusCore.getDataStore().getComment(qiscusMessage.getUniqueId());
+        if (savedQMessage != null && savedQMessage.getState() > qiscusMessage.getState()) {
+            qiscusMessage.setState(savedQMessage.getState());
         }
-        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+        QiscusCore.getDataStore().addOrUpdate(qiscusMessage);
     }
 
-    private static boolean mustFailed(Throwable throwable, QiscusComment qiscusComment) {
+    private static boolean mustFailed(Throwable throwable, QMessage qiscusMessage) {
         //Error response from server
         //Means something wrong with server, e.g user is not participants of these room anymore
         return ((throwable instanceof HttpException && ((HttpException) throwable).code() >= 400) ||
                 //if throwable from JSONException, e.g response from server not json as expected
                 (throwable instanceof JSONException) ||
                 // if attachment type
-                qiscusComment.isAttachment());
+                qiscusMessage.isAttachment());
     }
 
-    private static void commentFail(Throwable throwable, QiscusComment qiscusComment) {
-        pendingTask.remove(qiscusComment.getUniqueId());
-        if (!QiscusCore.getDataStore().isContains(qiscusComment)) { //Have been deleted
+    private static void commentFail(Throwable throwable, QMessage qiscusMessage) {
+        pendingTask.remove(qiscusMessage.getUniqueId());
+        if (!QiscusCore.getDataStore().isContains(qiscusMessage)) { //Have been deleted
             return;
         }
-        int state = QiscusComment.STATE_PENDING;
-        if (mustFailed(throwable, qiscusComment)) {
-            qiscusComment.setDownloading(false);
-            state = QiscusComment.STATE_FAILED;
-            processingComment.remove(qiscusComment.getUniqueId());
+        int state = QMessage.STATE_PENDING;
+        if (mustFailed(throwable, qiscusMessage)) {
+            qiscusMessage.setDownloading(false);
+            state = QMessage.STATE_FAILED;
+            processingComment.remove(qiscusMessage.getUniqueId());
         }
 
         //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update
-        QiscusComment savedQiscusComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-        if (savedQiscusComment != null && savedQiscusComment.getState() > QiscusComment.STATE_SENDING) {
+        QMessage savedQMessage = QiscusCore.getDataStore().getComment(qiscusMessage.getUniqueId());
+        if (savedQMessage != null && savedQMessage.getState() > QMessage.STATE_SENDING) {
             return;
         }
 
         //Simpen statenya
-        qiscusComment.setState(state);
-        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+        qiscusMessage.setState(state);
+        QiscusCore.getDataStore().addOrUpdate(qiscusMessage);
 
-        EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
+        EventBus.getDefault().post(new QMessageResendEvent(qiscusMessage));
     }
 
     public static void cancelAll() {
-        List<QiscusComment> pendingComments = QiscusCore.getDataStore().getPendingComments();
-        for (QiscusComment qiscusComment : pendingComments) {
-            Subscription subscription = pendingTask.get(qiscusComment.getUniqueId());
+        List<QMessage> pendingComments = QiscusCore.getDataStore().getPendingComments();
+        for (QMessage qiscusMessage : pendingComments) {
+            Subscription subscription = pendingTask.get(qiscusMessage.getUniqueId());
             if (subscription != null && !subscription.isUnsubscribed()) {
                 subscription.unsubscribe();
             }

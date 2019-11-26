@@ -40,8 +40,8 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.ForwardMessageHandler;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.presenter.QiscusPhotoViewerPresenter;
 import com.qiscus.sdk.ui.adapter.QiscusPhotoPagerAdapter;
@@ -76,9 +76,9 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     private Animation fadein, fadeout;
     private ProgressDialog progressDialog;
 
-    private QiscusComment qiscusComment;
+    private QMessage qiscusMessage;
     private int position = -1;
-    private List<Pair<QiscusComment, File>> qiscusPhotos;
+    private List<Pair<QMessage, File>> qiscusPhotos;
     private QiscusPhotoPagerAdapter adapter;
 
     private boolean mediaDeleted;
@@ -86,11 +86,11 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
     private QiscusPhotoViewerPresenter presenter;
 
-    private QiscusComment ongoingDownload;
+    private QMessage ongoingDownload;
 
-    public static Intent generateIntent(Context context, QiscusComment qiscusComment) {
+    public static Intent generateIntent(Context context, QMessage qiscusMessage) {
         Intent intent = new Intent(context, QiscusPhotoViewerActivity.class);
-        intent.putExtra(EXTRA_COMMENT, qiscusComment);
+        intent.putExtra(EXTRA_COMMENT, qiscusMessage);
         return intent;
     }
 
@@ -135,25 +135,25 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
         resolveData(savedInstanceState);
 
-        presenter.loadQiscusPhotos(qiscusComment.getRoomId());
+        presenter.loadQiscusPhotos(qiscusMessage.getChatRoomId());
 
         if (!Qiscus.getChatConfig().isEnableShareMedia()) {
             shareButton.setVisibility(View.GONE);
         }
 
         shareButton.setOnClickListener(v -> {
-            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(position);
             shareImage(qiscusPhoto.second);
         });
     }
 
     private void resolveData(Bundle savedInstanceState) {
-        qiscusComment = getIntent().getParcelableExtra(EXTRA_COMMENT);
-        if (qiscusComment == null && savedInstanceState != null) {
-            qiscusComment = savedInstanceState.getParcelable(EXTRA_COMMENT);
+        qiscusMessage = getIntent().getParcelableExtra(EXTRA_COMMENT);
+        if (qiscusMessage == null && savedInstanceState != null) {
+            qiscusMessage = savedInstanceState.getParcelable(EXTRA_COMMENT);
         }
 
-        if (qiscusComment == null) {
+        if (qiscusMessage == null) {
             finish();
             return;
         }
@@ -171,18 +171,18 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     public boolean onOptionsItemSelected(MenuItem item) {
         int i = item.getItemId();
         if (i == R.id.action_redownload) {
-            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(position);
             ongoingDownload = qiscusPhoto.first;
-            ongoingDownload.setDownloadingListener((qiscusComment, downloading) -> {
-                if (qiscusComment.equals(ongoingDownload) && !downloading) {
+            ongoingDownload.setDownloadingListener((qiscusMessage, downloading) -> {
+                if (qiscusMessage.equals(ongoingDownload) && !downloading) {
                     mediaUpdated = true;
                     progressDialog.dismiss();
                     ongoingDownload.setDownloadingListener(null);
                     ongoingDownload.setProgressListener(null);
                 }
             });
-            ongoingDownload.setProgressListener((qiscusComment, percentage) -> {
-                if (qiscusComment.equals(ongoingDownload)) {
+            ongoingDownload.setProgressListener((qiscusMessage, percentage) -> {
+                if (qiscusMessage.equals(ongoingDownload)) {
                     progressDialog.setProgress(percentage);
                 }
             });
@@ -190,7 +190,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
             progressDialog.setProgress(0);
             presenter.downloadFile(ongoingDownload);
         } else if (i == R.id.action_delete) {
-            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(position);
             if (qiscusPhoto.second.delete()) {
                 mediaDeleted = true;
                 if (qiscusPhotos.size() == 1) {
@@ -205,15 +205,15 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
                 showError(getString(R.string.qiscus_error_can_not_delete_file));
             }
         } else if (i == R.id.action_forward) {
-            ForwardCommentHandler forwardCommentHandler = Qiscus.getChatConfig().getForwardCommentHandler();
-            if (forwardCommentHandler == null) {
+            ForwardMessageHandler forwardMessageHandler = Qiscus.getChatConfig().getForwardMessageHandler();
+            if (forwardMessageHandler == null) {
                 throw new NullPointerException("Please set forward handler before.\n" +
-                        "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
+                        "Set it using this method Qiscus.getChatConfig().setForwardMessageHandler()");
             }
-            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
-            List<QiscusComment> comments = new ArrayList<>();
+            Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(position);
+            List<QMessage> comments = new ArrayList<>();
             comments.add(qiscusPhoto.first);
-            forwardCommentHandler.forward(comments);
+            forwardMessageHandler.forward(comments);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -233,7 +233,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(EXTRA_COMMENT, qiscusComment);
+        outState.putParcelable(EXTRA_COMMENT, qiscusMessage);
         outState.putInt(KEY_POSITION, position);
     }
 
@@ -253,15 +253,15 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     }
 
     @Override
-    public void onLoadQiscusPhotos(List<Pair<QiscusComment, File>> qiscusPhotos) {
+    public void onLoadQiscusPhotos(List<Pair<QMessage, File>> qiscusPhotos) {
         this.qiscusPhotos = qiscusPhotos;
         initPhotos();
     }
 
     @Override
-    public void onFileDownloaded(Pair<QiscusComment, File> qiscusPhoto) {
+    public void onFileDownloaded(Pair<QMessage, File> qiscusPhoto) {
         for (int i = 0; i < qiscusPhotos.size(); i++) {
-            Pair<QiscusComment, File> qiscusPhoto1 = qiscusPhotos.get(i);
+            Pair<QMessage, File> qiscusPhoto1 = qiscusPhotos.get(i);
             if (qiscusPhoto.first.equals(qiscusPhoto1.first)) {
                 adapter.getFragments().set(i, QiscusPhotoFragment.newInstance(qiscusPhoto.second));
                 adapter.notifyDataSetChanged();
@@ -279,18 +279,18 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
         List<QiscusPhotoFragment> fragments = new ArrayList<>();
 
         if (qiscusPhotos.size() == 0) {
-            Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+            Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(position);
             ongoingDownload = qiscusPhoto.first;
-            ongoingDownload.setDownloadingListener((qiscusComment, downloading) -> {
-                if (qiscusComment.equals(ongoingDownload) && !downloading) {
+            ongoingDownload.setDownloadingListener((qiscusMessage, downloading) -> {
+                if (qiscusMessage.equals(ongoingDownload) && !downloading) {
                     mediaUpdated = true;
                     progressDialog.dismiss();
                     ongoingDownload.setDownloadingListener(null);
                     ongoingDownload.setProgressListener(null);
                 }
             });
-            ongoingDownload.setProgressListener((qiscusComment, percentage) -> {
-                if (qiscusComment.equals(ongoingDownload)) {
+            ongoingDownload.setProgressListener((qiscusMessage, percentage) -> {
+                if (qiscusMessage.equals(ongoingDownload)) {
                     progressDialog.setProgress(percentage);
                 }
             });
@@ -299,9 +299,9 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
             presenter.downloadFile(ongoingDownload);
         } else {
             for (int i = 0; i < qiscusPhotos.size(); i++) {
-                Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(i);
+                Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(i);
                 fragments.add(QiscusPhotoFragment.newInstance(qiscusPhoto.second));
-                if (position == -1 && qiscusPhoto.first.equals(qiscusComment)) {
+                if (position == -1 && qiscusPhoto.first.equals(qiscusMessage)) {
                     position = i;
                 }
             }
@@ -326,9 +326,9 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
     }
 
     private void bindInfo() {
-        Pair<QiscusComment, File> qiscusPhoto = qiscusPhotos.get(position);
+        Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(position);
         senderName.setText(qiscusPhoto.first.getSender());
-        date.setText(QiscusDateUtil.toFullDateFormat(qiscusPhoto.first.getTime()));
+        date.setText(QiscusDateUtil.toFullDateFormat(qiscusPhoto.first.getTimestamp()));
         tvTitle.setText(getString(R.string.qiscus_photo_viewer_title, (position + 1), qiscusPhotos.size()));
     }
 

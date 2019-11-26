@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.data.model;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
  * Created on : March 12, 2018
@@ -25,5 +25,5 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusStartReplyInterceptor {
-    QiscusReplyPanelConfig getReplyPanelConfig(QiscusComment comment);
+    QiscusReplyPanelConfig getReplyPanelConfig(QMessage message);
 }

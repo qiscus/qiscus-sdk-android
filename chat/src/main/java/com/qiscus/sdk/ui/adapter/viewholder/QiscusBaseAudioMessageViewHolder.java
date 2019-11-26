@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusProgressView;
@@ -36,8 +36,8 @@ import com.qiscus.sdk.ui.view.QiscusProgressView;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
-        implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener, QiscusComment.PlayingAudioListener {
+public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessageViewHolder<QMessage>
+        implements QMessage.ProgressListener, QMessage.DownloadingListener, QMessage.PlayingAudioListener {
 
     @NonNull
     protected ImageView playButton;
@@ -51,7 +51,7 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
     protected int playIcon;
     protected int pauseIcon;
 
-    private QiscusComment qiscusComment;
+    private QMessage qiscusMessage;
 
     public QiscusBaseAudioMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener) {
@@ -83,27 +83,27 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
     }
 
     @Override
-    public void bind(QiscusComment qiscusComment) {
-        super.bind(qiscusComment);
-        this.qiscusComment = qiscusComment;
-        qiscusComment.setProgressListener(this);
-        qiscusComment.setDownloadingListener(this);
-        qiscusComment.setPlayingAudioListener(this);
-        setUpPlayButton(qiscusComment);
-        showProgressOrNot(qiscusComment);
+    public void bind(QMessage qiscusMessage) {
+        super.bind(qiscusMessage);
+        this.qiscusMessage = qiscusMessage;
+        qiscusMessage.setProgressListener(this);
+        qiscusMessage.setDownloadingListener(this);
+        qiscusMessage.setPlayingAudioListener(this);
+        setUpPlayButton(qiscusMessage);
+        showProgressOrNot(qiscusMessage);
     }
 
-    protected void setUpPlayButton(QiscusComment qiscusComment) {
-        playButton.setImageResource(qiscusComment.isPlayingAudio() ? pauseIcon : playIcon);
+    protected void setUpPlayButton(QMessage qiscusMessage) {
+        playButton.setImageResource(qiscusMessage.isPlayingAudio() ? pauseIcon : playIcon);
     }
 
-    protected void showProgressOrNot(QiscusComment qiscusComment) {
+    protected void showProgressOrNot(QMessage qiscusMessage) {
         if (progressView != null) {
-            progressView.setProgress(qiscusComment.getProgress());
+            progressView.setProgress(qiscusMessage.getProgress());
             progressView.setVisibility(
-                    qiscusComment.isDownloading()
-                            || qiscusComment.getState() == QiscusComment.STATE_PENDING
-                            || qiscusComment.getState() == QiscusComment.STATE_SENDING
+                    qiscusMessage.isDownloading()
+                            || qiscusMessage.getState() == QMessage.STATE_PENDING
+                            || qiscusMessage.getState() == QMessage.STATE_SENDING
                             ? View.VISIBLE : View.GONE
             );
         }
@@ -119,32 +119,32 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        playButton.setOnClickListener(v -> playAudio(qiscusComment));
-        seekBar.setMax(qiscusComment.getAudioDuration());
-        seekBar.setProgress(qiscusComment.isPlayingAudio() ? qiscusComment.getCurrentAudioPosition() : 0);
-        setTimeRemaining(qiscusComment.isPlayingAudio() ?
-                qiscusComment.getAudioDuration() - qiscusComment.getCurrentAudioPosition()
-                : qiscusComment.getAudioDuration());
+    protected void showMessage(QMessage qiscusMessage) {
+        playButton.setOnClickListener(v -> playAudio(qiscusMessage));
+        seekBar.setMax(qiscusMessage.getAudioDuration());
+        seekBar.setProgress(qiscusMessage.isPlayingAudio() ? qiscusMessage.getCurrentAudioPosition() : 0);
+        setTimeRemaining(qiscusMessage.isPlayingAudio() ?
+                qiscusMessage.getAudioDuration() - qiscusMessage.getCurrentAudioPosition()
+                : qiscusMessage.getAudioDuration());
     }
 
     @Override
-    public void onProgress(QiscusComment qiscusComment, int percentage) {
+    public void onProgress(QMessage qiscusMessage, int percentage) {
         if (progressView != null) {
             progressView.setProgress(percentage);
         }
     }
 
     @Override
-    public void onDownloading(QiscusComment qiscusComment, boolean downloading) {
+    public void onDownloading(QMessage qiscusMessage, boolean downloading) {
         if (progressView != null) {
             progressView.setVisibility(downloading ? View.VISIBLE : View.GONE);
         }
     }
 
-    protected void playAudio(QiscusComment qiscusComment) {
-        if (qiscusComment.getAudioDuration() > 0) {
-            qiscusComment.playAudio();
+    protected void playAudio(QMessage qiscusMessage) {
+        if (qiscusMessage.getAudioDuration() > 0) {
+            qiscusMessage.playAudio();
         } else {
             onClick(messageBubbleView);
         }
@@ -155,27 +155,27 @@ public abstract class QiscusBaseAudioMessageViewHolder extends QiscusBaseMessage
     }
 
     @Override
-    public void onPlayingAudio(QiscusComment qiscusComment, int currentPosition) {
-        if (qiscusComment.equals(this.qiscusComment)) {
+    public void onPlayingAudio(QMessage qiscusMessage, int currentPosition) {
+        if (qiscusMessage.equals(this.qiscusMessage)) {
             playButton.setImageResource(pauseIcon);
             seekBar.setProgress(currentPosition);
-            setTimeRemaining(qiscusComment.getAudioDuration() - currentPosition);
+            setTimeRemaining(qiscusMessage.getAudioDuration() - currentPosition);
         }
     }
 
     @Override
-    public void onPauseAudio(QiscusComment qiscusComment) {
-        if (qiscusComment.equals(this.qiscusComment)) {
+    public void onPauseAudio(QMessage qiscusMessage) {
+        if (qiscusMessage.equals(this.qiscusMessage)) {
             playButton.setImageResource(playIcon);
         }
     }
 
     @Override
-    public void onStopAudio(QiscusComment qiscusComment) {
-        if (qiscusComment.equals(this.qiscusComment)) {
+    public void onStopAudio(QMessage qiscusMessage) {
+        if (qiscusMessage.equals(this.qiscusMessage)) {
             playButton.setImageResource(playIcon);
             seekBar.setProgress(0);
-            setTimeRemaining(qiscusComment.getAudioDuration());
+            setTimeRemaining(qiscusMessage.getAudioDuration());
         }
     }
 }

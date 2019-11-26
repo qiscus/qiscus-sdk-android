@@ -29,9 +29,9 @@ import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
-import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
+import com.qiscus.sdk.chat.core.event.QMessageReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent;
@@ -121,27 +121,27 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public static void handleReceivedComment(QiscusComment qiscusComment) {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qiscusComment));
+    public static void handleReceivedComment(QMessage qiscusMessage) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qiscusMessage));
     }
 
-    private static void handleComment(QiscusComment qiscusComment) {
-        QiscusComment savedComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
+    private static void handleComment(QMessage qiscusMessage) {
+        QMessage savedComment = QiscusCore.getDataStore().getComment(qiscusMessage.getUniqueId());
 
-        if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
+        if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusMessage))) {
             return;
         }
 
-        if (!qiscusComment.isMyComment()) {
-            QiscusPusherApi.getInstance().markAsDelivered(qiscusComment.getRoomId(), qiscusComment.getId());
+        if (!qiscusMessage.isMyComment()) {
+            QiscusPusherApi.getInstance().markAsDelivered(qiscusMessage.getChatRoomId(), qiscusMessage.getId());
         }
 
         if (QiscusCore.getChatConfig().getNotificationListener() != null) {
             QiscusCore.getChatConfig().getNotificationListener()
-                    .onHandlePushNotification(QiscusCore.getApps(), qiscusComment);
+                    .onHandlePushNotification(QiscusCore.getApps(), qiscusMessage);
         }
 
-        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QiscusCommentReceivedEvent(qiscusComment)));
+        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QMessageReceivedEvent(qiscusMessage)));
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -198,14 +198,14 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 roomIds.add(clearedRoomJson.optLong("id"));
             }
 
-            QiscusClearCommentsHandler.ClearCommentsData clearCommentsData
-                    = new QiscusClearCommentsHandler.ClearCommentsData();
+            QiscusClearMessagesHandler.ClearMessagesData clearMessagesData
+                    = new QiscusClearMessagesHandler.ClearMessagesData();
             //timestamp is in nano seconds format, convert it to milliseconds by divide it
-            clearCommentsData.setTimestamp(jsonObject.optLong("timestamp") / 1000000L);
-            clearCommentsData.setActor(actor);
-            clearCommentsData.setRoomIds(roomIds);
+            clearMessagesData.setTimestamp(jsonObject.optLong("timestamp") / 1000000L);
+            clearMessagesData.setActor(actor);
+            clearMessagesData.setRoomIds(roomIds);
 
-            QiscusClearCommentsHandler.handle(clearCommentsData);
+            QiscusClearMessagesHandler.handle(clearMessagesData);
         } else if (jsonObject.optString("action_topic").equals("delivered")) {
             JSONObject payload = jsonObject.optJSONObject("payload");
             JSONObject dataJson = payload.optJSONObject("data");
@@ -215,10 +215,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             Long roomId = dataJson.optLong("room_id");
             String sender = dataJson.optString("email");
 
-            QiscusComment savedComment = QiscusCore.getDataStore().getComment(commentUniqueID);
+            QMessage savedComment = QiscusCore.getDataStore().getComment(commentUniqueID);
             QAccount qAccount = QiscusCore.getQiscusAccount();
 
-            if (savedComment != null && savedComment.getState() != QiscusComment.STATE_READ &&
+            if (savedComment != null && savedComment.getState() != QMessage.STATE_READ &&
                     !sender.equals(qAccount.getId())) {
 
                 QiscusChatRoomEvent event = new QiscusChatRoomEvent()
@@ -252,58 +252,61 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     @Nullable
-    public static QiscusComment jsonToComment(JsonObject jsonObject) {
+    public static QMessage jsonToComment(JsonObject jsonObject) {
         try {
-            QiscusComment qiscusComment = new QiscusComment();
-            qiscusComment.setId(jsonObject.get("id").getAsLong());
-            qiscusComment.setRoomId(jsonObject.get("room_id").getAsLong());
-            qiscusComment.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
-            qiscusComment.setCommentBeforeId(jsonObject.get("comment_before_id").getAsLong());
-            qiscusComment.setMessage(jsonObject.get("message").getAsString());
-            qiscusComment.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
-            qiscusComment.setSenderEmail(jsonObject.get("email").getAsString());
-            qiscusComment.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
+            QMessage qiscusMessage = new QMessage();
+            qiscusMessage.setId(jsonObject.get("id").getAsLong());
+            qiscusMessage.setChatRoomId(jsonObject.get("room_id").getAsLong());
+            qiscusMessage.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
+            qiscusMessage.setPreviousMessageId(jsonObject.get("comment_before_id").getAsLong());
+            qiscusMessage.setMessage(jsonObject.get("message").getAsString());
+            qiscusMessage.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
+            qiscusMessage.setSenderEmail(jsonObject.get("email").getAsString());
+            qiscusMessage.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
 
             //timestamp is in nano seconds format, convert it to milliseconds by divide it
             long timestamp = jsonObject.get("unix_nano_timestamp").getAsLong() / 1000000L;
-            qiscusComment.setTime(new Date(timestamp));
-            qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+            qiscusMessage.setTimestamp(new Date(timestamp));
+            qiscusMessage.setState(QMessage.STATE_ON_QISCUS);
 
             if (jsonObject.has("is_deleted")) {
-                qiscusComment.setDeleted(jsonObject.get("is_deleted").getAsBoolean());
+                qiscusMessage.setDeleted(jsonObject.get("is_deleted").getAsBoolean());
             }
 
-            qiscusComment.setRoomName(jsonObject.get("room_name").isJsonNull() ?
-                    qiscusComment.getSender() : jsonObject.get("room_name").getAsString());
+            qiscusMessage.setRoomName(jsonObject.get("room_name").isJsonNull() ?
+                    qiscusMessage.getSender() : jsonObject.get("room_name").getAsString());
             if (jsonObject.has("room_avatar")) {
-                qiscusComment.setRoomAvatar(jsonObject.get("room_avatar").getAsString());
+                qiscusMessage.setRoomAvatar(jsonObject.get("room_avatar").getAsString());
             }
 
-            qiscusComment.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
-            if (!qiscusComment.isGroupMessage()) {
-                qiscusComment.setRoomName(qiscusComment.getSender());
+            qiscusMessage.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
+            if (!qiscusMessage.isGroupMessage()) {
+                qiscusMessage.setRoomName(qiscusMessage.getSender());
             }
             if (jsonObject.has("type")) {
-                qiscusComment.setRawType(jsonObject.get("type").getAsString());
-                qiscusComment.setExtraPayload(jsonObject.get("payload").toString());
-                if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
-                        || qiscusComment.getType() == QiscusComment.Type.REPLY
-                        || qiscusComment.getType() == QiscusComment.Type.CARD) {
+                qiscusMessage.setRawType(jsonObject.get("type").getAsString());
+                if (jsonObject.has("payload") && !jsonObject.get("payload").isJsonNull()) {
+                    qiscusMessage.setPayload(new JSONObject(jsonObject.get("payload").getAsJsonObject().toString()));
+                }
+
+                if (qiscusMessage.getType() == QMessage.Type.BUTTONS
+                        || qiscusMessage.getType() == QMessage.Type.REPLY
+                        || qiscusMessage.getType() == QMessage.Type.CARD) {
                     JsonObject payload = jsonObject.get("payload").getAsJsonObject();
                     if (payload.has("text")) {
                         String text = payload.get("text").getAsString();
                         if (QiscusTextUtil.isNotBlank(text)) {
-                            qiscusComment.setMessage(text.trim());
+                            qiscusMessage.setMessage(text.trim());
                         }
                     }
                 }
             }
 
             if (jsonObject.has("extras") && !jsonObject.get("extras").isJsonNull()) {
-                qiscusComment.setExtras(new JSONObject(jsonObject.get("extras").getAsJsonObject().toString()));
+                qiscusMessage.setExtras(new JSONObject(jsonObject.get("extras").getAsJsonObject().toString()));
             }
 
-            return qiscusComment;
+            return qiscusMessage;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -311,7 +314,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     @Nullable
-    public static QiscusComment jsonToComment(String json) {
+    public static QMessage jsonToComment(String json) {
         return jsonToComment(gson.fromJson(json, JsonObject.class));
     }
 
@@ -964,11 +967,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             }
         } else if (topic.equals(qAccount.getToken() + "/c")
                 || (topic.startsWith(QiscusCore.getAppId()) && topic.endsWith("/c"))) {
-            QiscusComment qiscusComment = jsonToComment(message);
-            if (qiscusComment == null) {
+            QMessage qiscusMessage = jsonToComment(message);
+            if (qiscusMessage == null) {
                 return;
             }
-            handleReceivedComment(qiscusComment);
+            handleReceivedComment(qiscusMessage);
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qAccount.getId())) {

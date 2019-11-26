@@ -16,30 +16,32 @@
 
 package com.qiscus.sdk.chat.core.event;
 
+import com.qiscus.sdk.chat.core.data.model.QMessage;
+
 /**
- * Created on : February 14, 2018
+ * Created on : February 12, 2018
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusClearCommentsEvent {
-    private long roomId;
-    private long timestamp;
+public class QMessageDeletedEvent {
+    private QMessage qiscusMessage;
+    private boolean hardDelete;
 
-    public QiscusClearCommentsEvent(long roomId) {
-        this(roomId, System.currentTimeMillis());
+    public QMessageDeletedEvent(QMessage qiscusMessage) {
+        this.qiscusMessage = qiscusMessage;
     }
 
-    public QiscusClearCommentsEvent(long roomId, long timestamp) {
-        this.roomId = roomId;
-        this.timestamp = timestamp;
+    public QMessageDeletedEvent(QMessage qiscusMessage, boolean hardDelete) {
+        this.qiscusMessage = qiscusMessage;
+        this.hardDelete = hardDelete;
     }
 
-    public long getRoomId() {
-        return roomId;
+    public QMessage getQMessage() {
+        return qiscusMessage;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public boolean isHardDelete() {
+        return hardDelete;
     }
 }

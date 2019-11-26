@@ -19,7 +19,7 @@ package com.qiscus.dragonfly;
 import android.content.Context;
 import android.view.ViewGroup;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
 
@@ -40,16 +40,12 @@ public class CustomChatAdapter extends QiscusChatAdapter {
     }
 
     @Override
-    protected int getItemViewTypeCustomMessage(QiscusComment qiscusComment, int position) {
-        try {
-            JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
-            if (payload.optString("type").equals("lock_message")) {
-                return TYPE_LOCKED_MESSAGE;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+    protected int getItemViewTypeCustomMessage(QMessage qiscusMessage, int position) {
+        JSONObject payload = qiscusMessage.getPayload();
+        if (payload.optString("type").equals("lock_message")) {
+            return TYPE_LOCKED_MESSAGE;
         }
-        return super.getItemViewTypeCustomMessage(qiscusComment, position);
+        return super.getItemViewTypeCustomMessage(qiscusMessage, position);
     }
 
     @Override
@@ -63,7 +59,7 @@ public class CustomChatAdapter extends QiscusChatAdapter {
     }
 
     @Override
-    public QiscusBaseMessageViewHolder<QiscusComment> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public QiscusBaseMessageViewHolder<QMessage> onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_LOCKED_MESSAGE:
                 return new LockedMessageViewHolder(getView(parent, viewType), itemClickListener, longItemClickListener);

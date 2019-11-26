@@ -17,16 +17,16 @@
 package com.qiscus.sdk.chat.core.event;
 
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
-public class QiscusCommentSentEvent {
-    private QiscusComment qiscusComment;
+public class QMessageSentEvent {
+    private QMessage qiscusMessage;
 
-    public QiscusCommentSentEvent(QiscusComment qiscusComment) {
-        this.qiscusComment = qiscusComment;
+    public QMessageSentEvent(QMessage qiscusMessage) {
+        this.qiscusMessage = qiscusMessage;
     }
 
-    public QiscusComment getQiscusComment() {
-        return qiscusComment;
+    public QMessage getQiscusComment() {
+        return qiscusMessage;
     }
 }

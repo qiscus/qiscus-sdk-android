@@ -3,7 +3,7 @@ package com.qiscus.sdk.chat.core.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.BuildConfig;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -91,24 +91,24 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> postComment(QiscusComment qiscusComment) {
+    public static HashMap<String, Object> postComment(QMessage qiscusMessage) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         JsonObject jsonPayload = null;
         JsonObject jsonExtras = null;
 
-        if (qiscusComment.getExtraPayload() != null && !qiscusComment.getExtraPayload().equals("")) {
-            jsonPayload = new JsonParser().parse(qiscusComment.getExtraPayload()).getAsJsonObject();
+        if (qiscusMessage.getPayload() != null) {
+            jsonPayload = new JsonParser().parse(qiscusMessage.getPayload().toString()).getAsJsonObject();
         }
 
-        if (qiscusComment.getExtras() != null) {
-            jsonExtras = new JsonParser().parse(qiscusComment.getExtras().toString()).getAsJsonObject();
+        if (qiscusMessage.getExtras() != null) {
+            jsonExtras = new JsonParser().parse(qiscusMessage.getExtras().toString()).getAsJsonObject();
         }
 
-        hashMap.put("comment", qiscusComment.getMessage());
-        hashMap.put("topic_id", String.valueOf(qiscusComment.getRoomId()));
-        hashMap.put("unique_temp_id", qiscusComment.getUniqueId());
-        hashMap.put("type", qiscusComment.getRawType());
+        hashMap.put("comment", qiscusMessage.getMessage());
+        hashMap.put("topic_id", String.valueOf(qiscusMessage.getChatRoomId()));
+        hashMap.put("unique_temp_id", qiscusMessage.getUniqueId());
+        hashMap.put("type", qiscusMessage.getRawType());
         hashMap.put("payload", jsonPayload);
         hashMap.put("extras", jsonExtras);
 

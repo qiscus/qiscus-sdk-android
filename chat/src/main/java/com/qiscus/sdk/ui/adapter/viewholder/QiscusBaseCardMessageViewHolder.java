@@ -32,7 +32,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -120,17 +120,17 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        super.showMessage(qiscusComment);
+    protected void showMessage(QMessage qiscusMessage) {
+        super.showMessage(qiscusMessage);
         try {
-            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusMessage);
             setUpCard(payload);
         } catch (JSONException | NullPointerException e) {
             e.printStackTrace();
             cardView.setVisibility(View.GONE);
         }
 
-        if (TextUtils.isEmpty(qiscusComment.getMessage().trim())) {
+        if (TextUtils.isEmpty(qiscusMessage.getMessage().trim())) {
             messageBubbleView.setVisibility(View.GONE);
             if (firstMessageBubbleIndicatorView != null) {
                 firstMessageBubbleIndicatorView.setVisibility(View.GONE);

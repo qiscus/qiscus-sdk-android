@@ -39,7 +39,7 @@ import android.os.Bundle;
 import androidx.core.app.RemoteInput;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
 
 /**
@@ -52,17 +52,17 @@ public class QiscusPushNotificationClickReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        QiscusComment comment = intent.getParcelableExtra("data");
+        QMessage comment = intent.getParcelableExtra("data");
         Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
         if (remoteInput != null) {
             CharSequence message = remoteInput.getCharSequence(QiscusPushNotificationUtil.KEY_NOTIFICATION_REPLY);
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(
                     Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
-                notificationManager.cancel((int) comment.getRoomId());
+                notificationManager.cancel((int) comment.getChatRoomId());
             }
-            QiscusComment qiscusComment = QiscusComment.generateMessage(comment.getRoomId(), (String) message);
-            Qiscus.getChatConfig().getReplyNotificationHandler().onSend(context, qiscusComment);
+            QMessage qiscusMessage = QMessage.generateMessage(comment.getChatRoomId(), (String) message);
+            Qiscus.getChatConfig().getReplyNotificationHandler().onSend(context, qiscusMessage);
         } else {
             Qiscus.getChatConfig().getNotificationClickListener().onClick(context, comment);
         }

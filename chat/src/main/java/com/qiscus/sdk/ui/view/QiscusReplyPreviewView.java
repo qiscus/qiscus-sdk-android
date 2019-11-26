@@ -30,7 +30,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
@@ -58,7 +58,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
     private ImageView image;
     private ImageView icon;
     private ImageView closeView;
-    private QiscusComment originComment;
+    private QMessage originComment;
 
     private Map<String, QParticipant> members = new HashMap<>();
 
@@ -99,11 +99,11 @@ public class QiscusReplyPreviewView extends LinearLayout {
         }
     }
 
-    public QiscusComment getOriginComment() {
+    public QMessage getOriginComment() {
         return originComment;
     }
 
-    public void bind(QiscusComment originComment) {
+    public void bind(QMessage originComment) {
         this.originComment = originComment;
         if (originComment == null) {
             content.setText(null);
@@ -176,7 +176,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
         }
     }
 
-    private void configureColor(QiscusComment originComment) {
+    private void configureColor(QMessage originComment) {
         QiscusReplyPanelConfig config = Qiscus.getChatConfig().getStartReplyInterceptor()
                 .getReplyPanelConfig(originComment);
         setSenderColor(config.getSenderNameColor());
@@ -225,7 +225,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
                 .into(image);
     }
 
-    private void showBlurryImage(QiscusComment qiscusComment) {
+    private void showBlurryImage(QMessage qiscusMessage) {
         Nirmana.getInstance().get()
                 .setDefaultRequestOptions(new RequestOptions()
                         .centerCrop()
@@ -233,7 +233,7 @@ public class QiscusReplyPreviewView extends LinearLayout {
                         .placeholder(R.drawable.qiscus_image_placeholder)
                         .error(R.drawable.qiscus_image_placeholder))
                 .asBitmap()
-                .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusMessage.getAttachmentUri().toString()))
                 .thumbnail(0.5f)
                 .into(image);
     }

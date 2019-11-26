@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 
@@ -30,7 +30,7 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseContactViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
+public abstract class QiscusBaseContactViewHolder extends QiscusBaseMessageViewHolder<QMessage> {
     @NonNull
     protected TextView contactNameView;
     @NonNull
@@ -51,8 +51,8 @@ public abstract class QiscusBaseContactViewHolder extends QiscusBaseMessageViewH
     public abstract TextView getContactIdView(View itemView);
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        contactNameView.setText(qiscusComment.getContact().getName());
-        contactIdView.setText(qiscusComment.getContact().getValue());
+    protected void showMessage(QMessage qiscusMessage) {
+        contactNameView.setText(qiscusMessage.getContact().getName());
+        contactIdView.setText(qiscusMessage.getContact().getValue());
     }
 }

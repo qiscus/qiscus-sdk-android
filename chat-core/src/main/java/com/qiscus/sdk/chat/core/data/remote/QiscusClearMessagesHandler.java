@@ -20,7 +20,7 @@ import androidx.annotation.RestrictTo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
+import com.qiscus.sdk.chat.core.event.QiscusClearMessagesEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusPushNotificationUtil;
 
@@ -39,17 +39,17 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public final class QiscusClearCommentsHandler {
-    private QiscusClearCommentsHandler() {
+public final class QiscusClearMessagesHandler {
+    private QiscusClearMessagesHandler() {
 
     }
 
-    public static void handle(ClearCommentsData clearCommentsData) {
-        if (clearCommentsData.getActor().getId().equals(QiscusCore.getQiscusAccount().getId())) {
-            Observable.from(clearCommentsData.getRoomIds())
+    public static void handle(ClearMessagesData clearMessagesData) {
+        if (clearMessagesData.getActor().getId().equals(QiscusCore.getQiscusAccount().getId())) {
+            Observable.from(clearMessagesData.getRoomIds())
                     .doOnNext(roomId -> {
-                        if (QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {
-                            EventBus.getDefault().post(new QiscusClearCommentsEvent(roomId, clearCommentsData.timestamp));
+                        if (QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearMessagesData.timestamp)) {
+                            EventBus.getDefault().post(new QiscusClearMessagesEvent(roomId, clearMessagesData.timestamp));
                             QiscusPushNotificationUtil.clearPushNotification(QiscusCore.getApps(), roomId);
                         }
                     })
@@ -61,7 +61,7 @@ public final class QiscusClearCommentsHandler {
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public static class ClearCommentsData {
+    public static class ClearMessagesData {
         private long timestamp;
         private QParticipant actor;
         private List<Long> roomIds;

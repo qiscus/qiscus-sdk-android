@@ -28,7 +28,7 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusLinkPreviewView;
@@ -42,11 +42,11 @@ import java.util.regex.Matcher;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageViewHolder implements QiscusComment.LinkPreviewListener {
+public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageViewHolder implements QMessage.LinkPreviewListener {
     @NonNull
     protected QiscusLinkPreviewView linkPreviewView;
 
-    private QiscusComment qiscusComment;
+    private QMessage qiscusMessage;
 
     public QiscusBaseLinkViewHolder(View itemView, OnItemClickListener itemClickListener,
                                     OnLongItemClickListener longItemClickListener) {
@@ -59,17 +59,17 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
     protected abstract QiscusLinkPreviewView getLinkPreviewView(View itemView);
 
     @Override
-    public void bind(QiscusComment qiscusComment) {
-        super.bind(qiscusComment);
-        this.qiscusComment = qiscusComment;
+    public void bind(QMessage qiscusMessage) {
+        super.bind(qiscusMessage);
+        this.qiscusMessage = qiscusMessage;
         linkPreviewView.clearView();
-        qiscusComment.setLinkPreviewListener(this);
-        qiscusComment.loadLinkPreviewData();
+        qiscusMessage.setLinkPreviewListener(this);
+        qiscusMessage.loadLinkPreviewData();
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        super.showMessage(qiscusComment);
+    protected void showMessage(QMessage qiscusMessage) {
+        super.showMessage(qiscusMessage);
         setUpLinks();
     }
 
@@ -106,8 +106,8 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
     }
 
     @Override
-    public void onLinkPreviewReady(QiscusComment qiscusComment, PreviewData previewData) {
-        if (qiscusComment.equals(this.qiscusComment)) {
+    public void onLinkPreviewReady(QMessage qiscusMessage, PreviewData previewData) {
+        if (qiscusMessage.equals(this.qiscusMessage)) {
             linkPreviewView.bind(previewData);
         }
     }

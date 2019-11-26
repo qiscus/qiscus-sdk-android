@@ -22,6 +22,6 @@ package com.qiscus.sdk.chat.core.data.model;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public interface CommentInfoHandler {
-    void showInfo(QiscusComment qiscusComment);
+public interface MessageInfoHandler {
+    void showInfo(QMessage qiscusMessage);
 }

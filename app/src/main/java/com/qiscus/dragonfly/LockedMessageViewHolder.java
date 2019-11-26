@@ -22,7 +22,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
@@ -35,7 +35,7 @@ import org.json.JSONObject;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class LockedMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
+public class LockedMessageViewHolder extends QiscusBaseMessageViewHolder<QMessage> {
     private TextView textView;
 
     public LockedMessageViewHolder(View itemView, OnItemClickListener itemClickListener, OnLongItemClickListener longItemClickListener) {
@@ -86,12 +86,12 @@ public class LockedMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusC
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
+    protected void showMessage(QMessage qiscusMessage) {
         try {
-            JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
+            JSONObject payload = qiscusMessage.getPayload();
             textView.setText(payload.optJSONObject("content").optString("description"));
         } catch (Exception e) {
-            textView.setText(qiscusComment.getMessage());
+            textView.setText(qiscusMessage.getMessage());
         }
     }
 

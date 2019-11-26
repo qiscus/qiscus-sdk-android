@@ -2,7 +2,7 @@ package com.qiscus.sdk.data.model;
 
 import androidx.annotation.ColorRes;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
  * @author yuana <andhikayuana@gmail.com>
@@ -11,5 +11,5 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 public interface QiscusRoomReplyBarColorInterceptor {
     @ColorRes
-    int getColor(QiscusComment qiscusComment);
+    int getColor(QMessage qiscusMessage);
 }

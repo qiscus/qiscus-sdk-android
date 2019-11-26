@@ -31,7 +31,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
@@ -58,8 +58,8 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     public static Intent generateIntent(Context context, QChatRoom qChatRoom,
                                         String startingMessage, List<File> shareFiles,
-                                        boolean autoSendExtra, List<QiscusComment> comments,
-                                        QiscusComment scrollToComment) {
+                                        boolean autoSendExtra, List<QMessage> comments,
+                                        QMessage scrollToComment) {
         if (qChatRoom.getType().equals("group")) {
             return QiscusGroupChatActivity.generateIntent(context, qChatRoom, startingMessage,
                     shareFiles, autoSendExtra, comments, scrollToComment);
@@ -70,7 +70,7 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILES, (Serializable) shareFiles);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
-        intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
+        intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QMessage>) comments);
         intent.putExtra(EXTRA_SCROLL_TO_COMMENT, scrollToComment);
         return intent;
     }

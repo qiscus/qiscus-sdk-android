@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -78,11 +78,11 @@ public abstract class QiscusBaseButtonMessageViewHolder extends QiscusBaseTextMe
     protected abstract ViewGroup getButtonsContainer(View itemView);
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        super.showMessage(qiscusComment);
+    protected void showMessage(QMessage qiscusMessage) {
+        super.showMessage(qiscusMessage);
         buttonsContainer.removeAllViews();
         try {
-            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusMessage);
             setUpButtons(payload.getJSONArray("buttons"));
         } catch (JSONException | NullPointerException e) {
             buttonsContainer.setVisibility(View.GONE);

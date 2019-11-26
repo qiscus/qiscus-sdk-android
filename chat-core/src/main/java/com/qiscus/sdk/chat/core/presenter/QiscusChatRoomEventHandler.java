@@ -4,7 +4,7 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -102,18 +102,18 @@ public class QiscusChatRoomEventHandler {
         }
     }
 
-    public void onGotComment(QiscusComment qiscusComment) {
-        if (!qiscusComment.getSender().equals(qAccount.getId())) {
+    public void onGotComment(QMessage qiscusMessage) {
+        if (!qiscusMessage.getSender().equals(qAccount.getId())) {
             // handle room event such s invite user, kick user
-            if (qiscusComment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
-                handleChatRoomChanged(qiscusComment);
+            if (qiscusMessage.getType() == QMessage.Type.SYSTEM_EVENT) {
+                handleChatRoomChanged(qiscusMessage);
             }
         }
     }
 
-    private void handleChatRoomChanged(QiscusComment qiscusComment) {
+    private void handleChatRoomChanged(QMessage qiscusMessage) {
         try {
-            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusMessage);
             QParticipant member = new QParticipant();
             switch (payload.optString("type")) {
                 case "add_member":

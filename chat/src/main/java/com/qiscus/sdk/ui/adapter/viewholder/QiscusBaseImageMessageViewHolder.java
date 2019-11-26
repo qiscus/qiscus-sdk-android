@@ -36,7 +36,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
@@ -55,8 +55,8 @@ import java.util.regex.Matcher;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment>
-        implements QiscusComment.ProgressListener, QiscusComment.DownloadingListener {
+public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessageViewHolder<QMessage>
+        implements QMessage.ProgressListener, QMessage.DownloadingListener {
 
     @NonNull
     protected ImageView thumbnailView;
@@ -72,7 +72,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected int rightProgressFinishedColor;
     protected int leftProgressFinishedColor;
 
-    protected QiscusComment qiscusComment;
+    protected QMessage qiscusMessage;
 
     public QiscusBaseImageMessageViewHolder(View itemView, OnItemClickListener itemClickListener,
                                             OnLongItemClickListener longItemClickListener) {
@@ -96,7 +96,7 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
 
         if (downloadIconView != null) {
             downloadIconView.setOnClickListener(v -> {
-                if (uploadIconClickListener != null && qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+                if (uploadIconClickListener != null && qiscusMessage.getState() == QMessage.STATE_FAILED) {
                     uploadIconClickListener.onUploadIconClick(v, getAdapterPosition());
                 } else {
                     onClick(messageBubbleView);
@@ -128,21 +128,21 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     protected abstract ImageView getDownloadIconView(View itemView);
 
     @Override
-    public void bind(QiscusComment qiscusComment) {
-        super.bind(qiscusComment);
-        this.qiscusComment = qiscusComment;
-        qiscusComment.setProgressListener(this);
-        qiscusComment.setDownloadingListener(this);
-        setUpDownloadIcon(qiscusComment);
-        showProgressOrNot(qiscusComment);
+    public void bind(QMessage qiscusMessage) {
+        super.bind(qiscusMessage);
+        this.qiscusMessage = qiscusMessage;
+        qiscusMessage.setProgressListener(this);
+        qiscusMessage.setDownloadingListener(this);
+        setUpDownloadIcon(qiscusMessage);
+        showProgressOrNot(qiscusMessage);
         if (captionView != null) {
             setUpLinks();
         }
     }
 
-    protected void setUpDownloadIcon(QiscusComment qiscusComment) {
+    protected void setUpDownloadIcon(QMessage qiscusMessage) {
         if (downloadIconView != null) {
-            if (qiscusComment.getState() <= QiscusComment.STATE_SENDING) {
+            if (qiscusMessage.getState() <= QMessage.STATE_SENDING) {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_upload);
             } else {
                 downloadIconView.setImageResource(R.drawable.ic_qiscus_download);
@@ -150,13 +150,13 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         }
     }
 
-    protected void showProgressOrNot(QiscusComment qiscusComment) {
+    protected void showProgressOrNot(QMessage qiscusMessage) {
         if (progressView != null) {
-            progressView.setProgress(qiscusComment.getProgress());
+            progressView.setProgress(qiscusMessage.getProgress());
             progressView.setVisibility(
-                    qiscusComment.isDownloading()
-                            || qiscusComment.getState() == QiscusComment.STATE_PENDING
-                            || qiscusComment.getState() == QiscusComment.STATE_SENDING
+                    qiscusMessage.isDownloading()
+                            || qiscusMessage.getState() == QMessage.STATE_PENDING
+                            || qiscusMessage.getState() == QMessage.STATE_SENDING
                             ? View.VISIBLE : View.GONE
             );
         }
@@ -178,18 +178,18 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
-        showImage(qiscusComment);
-        showCaption(qiscusComment);
+    protected void showMessage(QMessage qiscusMessage) {
+        showImage(qiscusMessage);
+        showCaption(qiscusMessage);
     }
 
-    protected void showCaption(QiscusComment qiscusComment) {
+    protected void showCaption(QMessage qiscusMessage) {
         if (captionView != null) {
-            captionView.setVisibility(TextUtils.isEmpty(qiscusComment.getCaption()) ? View.GONE : View.VISIBLE);
+            captionView.setVisibility(TextUtils.isEmpty(qiscusMessage.getCaption()) ? View.GONE : View.VISIBLE);
             QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
             if (mentionConfig.isEnableMention()) {
                 Spannable spannable = QiscusTextUtil.createQiscusSpannableText(
-                        qiscusComment.getCaption(),
+                        qiscusMessage.getCaption(),
                         roomMembers,
                         messageFromMe ? mentionConfig.getRightMentionAllColor() : mentionConfig.getLeftMentionAllColor(),
                         messageFromMe ? mentionConfig.getRightMentionOtherColor() : mentionConfig.getLeftMentionOtherColor(),
@@ -198,24 +198,24 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                 );
                 captionView.setText(spannable);
             } else {
-                captionView.setText(qiscusComment.getCaption());
+                captionView.setText(qiscusMessage.getCaption());
             }
         }
     }
 
-    protected void showImage(QiscusComment qiscusComment) {
-        if (qiscusComment.getAttachmentUri().toString().startsWith("http")) { //We have sent it
-            showSentImage(qiscusComment);
+    protected void showImage(QMessage qiscusMessage) {
+        if (qiscusMessage.getAttachmentUri().toString().startsWith("http")) { //We have sent it
+            showSentImage(qiscusMessage);
         } else { //Still uploading the image
-            showSendingImage(qiscusComment);
+            showSendingImage(qiscusMessage);
         }
     }
 
-    protected void showSentImage(QiscusComment qiscusComment) {
-        File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+    protected void showSentImage(QMessage qiscusMessage) {
+        File localPath = Qiscus.getDataStore().getLocalPath(qiscusMessage.getId());
         if (localPath == null) { //If the image not yet downloaded
             showDownloadIcon(true);
-            showBlurryImage(qiscusComment);
+            showBlurryImage(qiscusMessage);
         } else {
             showDownloadIcon(false);
             showLocalFileImage(localPath);
@@ -233,9 +233,9 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
                 .into(thumbnailView);
     }
 
-    protected void showSendingImage(QiscusComment qiscusComment) {
+    protected void showSendingImage(QMessage qiscusMessage) {
         showDownloadIcon(true);
-        File localPath = new File(qiscusComment.getAttachmentUri().toString());
+        File localPath = new File(qiscusMessage.getAttachmentUri().toString());
         if (localPath.exists()) { //If the image still exist
             showLocalFileImage(localPath);
         } else { //If the image file have been removed
@@ -246,14 +246,14 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
         }
     }
 
-    protected void showBlurryImage(QiscusComment qiscusComment) {
+    protected void showBlurryImage(QMessage qiscusMessage) {
         Nirmana.getInstance().get()
                 .setDefaultRequestOptions(new RequestOptions()
                         .dontAnimate()
                         .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                         .placeholder(R.drawable.qiscus_image_placeholder)
                         .error(R.drawable.qiscus_image_placeholder))
-                .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusComment.getAttachmentUri().toString()))
+                .load(QiscusImageUtil.generateBlurryThumbnailUrl(qiscusMessage.getAttachmentUri().toString()))
                 .into(thumbnailView);
     }
 
@@ -264,15 +264,15 @@ public abstract class QiscusBaseImageMessageViewHolder extends QiscusBaseMessage
     }
 
     @Override
-    public void onProgress(QiscusComment qiscusComment, int percentage) {
-        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
+    public void onProgress(QMessage qiscusMessage, int percentage) {
+        if (qiscusMessage.equals(this.qiscusMessage) && progressView != null) {
             progressView.setProgress(percentage);
         }
     }
 
     @Override
-    public void onDownloading(QiscusComment qiscusComment, boolean downloading) {
-        if (qiscusComment.equals(this.qiscusComment) && progressView != null) {
+    public void onDownloading(QMessage qiscusMessage, boolean downloading) {
+        if (qiscusMessage.equals(this.qiscusMessage) && progressView != null) {
             progressView.setVisibility(downloading ? View.VISIBLE : View.GONE);
         }
     }

@@ -22,9 +22,9 @@ import android.view.View;
 
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
-import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
+import com.qiscus.sdk.data.model.QiscusDeleteMessageConfig;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
 
 import java.io.File;
@@ -52,8 +52,8 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
 
     public static Intent generateIntent(Context context, QChatRoom qChatRoom,
                                         String startingMessage, List<File> shareFiles,
-                                        boolean autoSendExtra, List<QiscusComment> comments,
-                                        QiscusComment scrollToComment) {
+                                        boolean autoSendExtra, List<QMessage> comments,
+                                        QMessage scrollToComment) {
 
         if (qChatRoom.getType().equals("single")) {
             return QiscusChatActivity.generateIntent(context, qChatRoom, startingMessage,
@@ -70,7 +70,7 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
         intent.putExtra(EXTRA_STARTING_MESSAGE, startingMessage);
         intent.putExtra(EXTRA_SHARING_FILES, (Serializable) shareFiles);
         intent.putExtra(EXTRA_AUTO_SEND, autoSendExtra);
-        intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QiscusComment>) comments);
+        intent.putParcelableArrayListExtra(EXTRA_FORWARD_COMMENTS, (ArrayList<QMessage>) comments);
         intent.putExtra(EXTRA_SCROLL_TO_COMMENT, scrollToComment);
         return intent;
     }
@@ -97,7 +97,7 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
      * Only can hard delete for every one
      */
     @Override
-    protected void deleteComments(List<QiscusComment> selectedComments) {
+    protected void deleteComments(List<QMessage> selectedComments) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
                 .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
                         selectedComments.size(), selectedComments.size()))
@@ -116,7 +116,7 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
         AlertDialog alertDialog = alertDialogBuilder.create();
 
         alertDialog.setOnShowListener(dialog -> {
-            QiscusDeleteCommentConfig deleteConfig = chatConfig.getDeleteCommentConfig();
+            QiscusDeleteMessageConfig deleteConfig = chatConfig.getDeleteCommentConfig();
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(deleteConfig.getCancelButtonColor());
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(deleteConfig.getDeleteForEveryoneButtonColor());
         });

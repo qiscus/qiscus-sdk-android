@@ -52,7 +52,7 @@ public class QChatRoom implements Parcelable {
     protected String avatarUrl;
     protected List<QParticipant> participants;
     protected int unreadCount;
-    protected QiscusComment lastMessage;
+    protected QMessage lastMessage;
     protected int totalParticipants;
 
     public QChatRoom() {
@@ -73,7 +73,7 @@ public class QChatRoom implements Parcelable {
         avatarUrl = in.readString();
         participants = in.createTypedArrayList(QParticipant.CREATOR);
         unreadCount = in.readInt();
-        lastMessage = in.readParcelable(QiscusComment.class.getClassLoader());
+        lastMessage = in.readParcelable(QMessage.class.getClassLoader());
         totalParticipants = in.readInt();
     }
 
@@ -149,11 +149,11 @@ public class QChatRoom implements Parcelable {
         this.unreadCount = unreadCount;
     }
 
-    public QiscusComment getLastMessage() {
+    public QMessage getLastMessage() {
         return lastMessage;
     }
 
-    public void setLastMessage(QiscusComment lastMessage) {
+    public void setLastMessage(QMessage lastMessage) {
         this.lastMessage = lastMessage;
     }
 

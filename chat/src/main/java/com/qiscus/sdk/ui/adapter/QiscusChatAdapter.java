@@ -20,7 +20,7 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusAccountLinkingViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusAudioViewHolder;
 import com.qiscus.sdk.ui.adapter.viewholder.QiscusBaseMessageViewHolder;
@@ -43,7 +43,7 @@ import com.qiscus.sdk.ui.adapter.viewholder.QiscusVideoViewHolder;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, QiscusBaseMessageViewHolder<QiscusComment>> {
+public class QiscusChatAdapter extends QiscusBaseChatAdapter<QMessage, QiscusBaseMessageViewHolder<QMessage>> {
     private static final int TYPE_MESSAGE_ME = 1;
     private static final int TYPE_MESSAGE_OTHER = 2;
     private static final int TYPE_IMAGE_ME = 3;
@@ -80,25 +80,25 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     }
 
     @Override
-    protected Class<QiscusComment> getItemClass() {
-        return QiscusComment.class;
+    protected Class<QMessage> getItemClass() {
+        return QMessage.class;
     }
 
     @Override
-    protected int getItemViewTypeCustomMessage(QiscusComment qiscusComment, int position) {
-        if (qiscusComment.getSenderEmail().equals(qAccount.getId())) {
-            return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+    protected int getItemViewTypeCustomMessage(QMessage qiscusMessage, int position) {
+        if (qiscusMessage.getSenderEmail().equals(qAccount.getId())) {
+            return qiscusMessage.getMessage().contains(System.getProperty("line.separator"))
                     ? TYPE_MESSAGE_MULTI_LINE_ME : TYPE_MESSAGE_ME;
         }
-        return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+        return qiscusMessage.getMessage().contains(System.getProperty("line.separator"))
                 ? TYPE_MESSAGE_MULTI_LINE_OTHER : TYPE_MESSAGE_OTHER;
     }
 
     @Override
-    protected int getItemViewTypeMyMessage(QiscusComment qiscusComment, int position) {
-        switch (qiscusComment.getType()) {
+    protected int getItemViewTypeMyMessage(QMessage qiscusMessage, int position) {
+        switch (qiscusMessage.getType()) {
             case TEXT:
-                return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+                return qiscusMessage.getMessage().contains(System.getProperty("line.separator"))
                         ? TYPE_MESSAGE_MULTI_LINE_ME : TYPE_MESSAGE_ME;
             case LINK:
                 return TYPE_LINK_ME;
@@ -132,10 +132,10 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     }
 
     @Override
-    protected int getItemViewTypeOthersMessage(QiscusComment qiscusComment, int position) {
-        switch (qiscusComment.getType()) {
+    protected int getItemViewTypeOthersMessage(QMessage qiscusMessage, int position) {
+        switch (qiscusMessage.getType()) {
             case TEXT:
-                return qiscusComment.getMessage().contains(System.getProperty("line.separator"))
+                return qiscusMessage.getMessage().contains(System.getProperty("line.separator"))
                         ? TYPE_MESSAGE_MULTI_LINE_OTHER : TYPE_MESSAGE_OTHER;
             case LINK:
                 return TYPE_LINK_OTHER;
@@ -229,7 +229,7 @@ public class QiscusChatAdapter extends QiscusBaseChatAdapter<QiscusComment, Qisc
     }
 
     @Override
-    public QiscusBaseMessageViewHolder<QiscusComment> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public QiscusBaseMessageViewHolder<QMessage> onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_MESSAGE_ME:
             case TYPE_MESSAGE_OTHER:

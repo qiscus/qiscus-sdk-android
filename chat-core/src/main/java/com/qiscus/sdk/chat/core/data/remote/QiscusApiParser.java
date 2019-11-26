@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -126,7 +126,7 @@ final class QiscusApiParser {
                     .getAsJsonObject().get("comments").getAsJsonArray();
 
             if (comments.size() > 0) {
-                QiscusComment latestComment = parseQiscusComment(comments.get(0), qChatRoom.getId());
+                QMessage latestComment = parseQMessage(comments.get(0), qChatRoom.getId());
                 qChatRoom.setLastMessage(latestComment);
             }
             return qChatRoom;
@@ -223,7 +223,7 @@ final class QiscusApiParser {
                 }
                 qChatRoom.setParticipants(members);
 
-                QiscusComment latestComment = parseQiscusComment(jsonChatRoom.get("last_comment"), qChatRoom.getId());
+                QMessage latestComment = parseQMessage(jsonChatRoom.get("last_comment"), qChatRoom.getId());
                 qChatRoom.setLastMessage(latestComment);
 
                 qChatRooms.add(qChatRoom);
@@ -233,69 +233,75 @@ final class QiscusApiParser {
         return qChatRooms;
     }
 
-    static Pair<QChatRoom, List<QiscusComment>> parseQiscusChatRoomWithComments(JsonElement jsonElement) {
+    static Pair<QChatRoom, List<QMessage>> parseQiscusChatRoomWithComments(JsonElement jsonElement) {
         if (jsonElement != null) {
             QChatRoom qChatRoom = parseQiscusChatRoom(jsonElement);
 
             JsonArray comments = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("comments").getAsJsonArray();
-            List<QiscusComment> qiscusComments = new ArrayList<>();
+            List<QMessage> qiscusMessages = new ArrayList<>();
             for (JsonElement jsonComment : comments) {
-                qiscusComments.add(parseQiscusComment(jsonComment, qChatRoom.getId()));
+                qiscusMessages.add(parseQMessage(jsonComment, qChatRoom.getId()));
             }
 
-            return Pair.create(qChatRoom, qiscusComments);
+            return Pair.create(qChatRoom, qiscusMessages);
         }
 
         return null;
     }
 
-    static QiscusComment parseQiscusComment(JsonElement jsonElement, long roomId) {
-        QiscusComment qiscusComment = new QiscusComment();
+    static QMessage parseQMessage(JsonElement jsonElement, long roomId) {
+        QMessage qiscusMessage = new QMessage();
         JsonObject jsonComment = jsonElement.getAsJsonObject();
-        qiscusComment.setRoomId(roomId);
-        qiscusComment.setId(jsonComment.get("id").getAsLong());
-        qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsLong());
-        qiscusComment.setMessage(jsonComment.get("message").getAsString());
-        qiscusComment.setSender(jsonComment.get("username").getAsString());
-        qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
-        qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
-        determineCommentState(qiscusComment, jsonComment.get("status").getAsString());
+        qiscusMessage.setChatRoomId(roomId);
+        qiscusMessage.setId(jsonComment.get("id").getAsLong());
+        qiscusMessage.setPreviousMessageId(jsonComment.get("comment_before_id").getAsLong());
+        qiscusMessage.setMessage(jsonComment.get("message").getAsString());
+        qiscusMessage.setSender(jsonComment.get("username").getAsString());
+        qiscusMessage.setSenderEmail(jsonComment.get("email").getAsString());
+        qiscusMessage.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
+        determineCommentState(qiscusMessage, jsonComment.get("status").getAsString());
 
         //timestamp is in nano seconds format, convert it to milliseconds by divide it
         long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
-        qiscusComment.setTime(new Date(timestamp));
+        qiscusMessage.setTimestamp(new Date(timestamp));
 
         if (jsonComment.has("is_deleted")) {
-            qiscusComment.setDeleted(jsonComment.get("is_deleted").getAsBoolean());
+            qiscusMessage.setDeleted(jsonComment.get("is_deleted").getAsBoolean());
         }
 
         if (jsonComment.has("room_name")) {
-            qiscusComment.setRoomName(jsonComment.get("room_name").getAsString());
+            qiscusMessage.setRoomName(jsonComment.get("room_name").getAsString());
         }
 
         if (jsonComment.has("room_type")) {
-            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
+            qiscusMessage.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
         }
 
         if (jsonComment.has("unique_id")) {
-            qiscusComment.setUniqueId(jsonComment.get("unique_id").getAsString());
+            qiscusMessage.setUniqueId(jsonComment.get("unique_id").getAsString());
         } else if (jsonComment.has("unique_temp_id")) {
-            qiscusComment.setUniqueId(jsonComment.get("unique_temp_id").getAsString());
+            qiscusMessage.setUniqueId(jsonComment.get("unique_temp_id").getAsString());
         } else {
-            qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
+            qiscusMessage.setUniqueId(String.valueOf(qiscusMessage.getId()));
         }
 
         if (jsonComment.has("type")) {
-            qiscusComment.setRawType(jsonComment.get("type").getAsString());
-            qiscusComment.setExtraPayload(jsonComment.get("payload").toString());
-            if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
-                    || qiscusComment.getType() == QiscusComment.Type.REPLY
-                    || qiscusComment.getType() == QiscusComment.Type.CARD) {
+            qiscusMessage.setRawType(jsonComment.get("type").getAsString());
+            if (jsonComment.has("payload") && !jsonComment.get("payload").isJsonNull()) {
+                try {
+                    qiscusMessage.setPayload(new JSONObject(jsonComment.get("payload").getAsJsonObject().toString()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (qiscusMessage.getType() == QMessage.Type.BUTTONS
+                    || qiscusMessage.getType() == QMessage.Type.REPLY
+                    || qiscusMessage.getType() == QMessage.Type.CARD) {
                 JsonObject payload = jsonComment.get("payload").getAsJsonObject();
                 if (payload.has("text")) {
                     String text = payload.get("text").getAsString();
                     if (QiscusTextUtil.isNotBlank(text)) {
-                        qiscusComment.setMessage(text.trim());
+                        qiscusMessage.setMessage(text.trim());
                     }
                 }
             }
@@ -303,33 +309,33 @@ final class QiscusApiParser {
 
         if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
             try {
-                qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+                qiscusMessage.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        return qiscusComment;
+        return qiscusMessage;
     }
 
-    private static void determineCommentState(QiscusComment qiscusComment, String status) {
-        qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+    private static void determineCommentState(QMessage qiscusMessage, String status) {
+        qiscusMessage.setState(QMessage.STATE_ON_QISCUS);
         if (status != null && !status.isEmpty()) {
             switch (status) {
                 case "sent":
-                    qiscusComment.setState(QiscusComment.STATE_ON_QISCUS);
+                    qiscusMessage.setState(QMessage.STATE_ON_QISCUS);
                     break;
                 case "delivered":
-                    qiscusComment.setState(QiscusComment.STATE_DELIVERED);
+                    qiscusMessage.setState(QMessage.STATE_DELIVERED);
                     break;
                 case "read":
-                    qiscusComment.setState(QiscusComment.STATE_READ);
+                    qiscusMessage.setState(QMessage.STATE_READ);
                     break;
             }
         }
     }
 
-    public static HashMap<String, List<QParticipant>> parseQiscusCommentInfo(JsonObject jsonResults) {
+    public static HashMap<String, List<QParticipant>> parseQMessageInfo(JsonObject jsonResults) {
         HashMap<String, List<QParticipant>> commentInfo = new HashMap<>();
         List<QParticipant> listDeliveredTo = new ArrayList<>();
         List<QParticipant> listPending = new ArrayList<>();

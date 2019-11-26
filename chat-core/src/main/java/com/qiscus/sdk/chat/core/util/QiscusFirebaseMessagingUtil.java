@@ -2,7 +2,7 @@ package com.qiscus.sdk.chat.core.util;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 
 import org.json.JSONObject;
@@ -44,11 +44,11 @@ public final class QiscusFirebaseMessagingUtil {
     }
 
     private static void handlePostCommentEvent(RemoteMessage remoteMessage) {
-        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
-        if (qiscusComment == null) {
+        QMessage qiscusMessage = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
+        if (qiscusMessage == null) {
             return;
         }
-        QiscusPusherApi.handleReceivedComment(qiscusComment);
+        QiscusPusherApi.handleReceivedComment(qiscusMessage);
     }
 
     private static void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {

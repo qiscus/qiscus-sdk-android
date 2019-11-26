@@ -20,7 +20,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
+import com.qiscus.sdk.data.model.QiscusDeleteMessageConfig;
 
 import static com.qiscus.dragonfly.BuildConfig.QISCUS_SDK_APP_ID;
 
@@ -41,7 +41,7 @@ public class SampleApps extends MultiDexApplication {
         Qiscus.getChatConfig()
                 .enableDebugMode(true)
                 .setEnableAddLocation(false)
-                .setDeleteCommentConfig(new QiscusDeleteCommentConfig()
+                .setDeleteCommentConfig(new QiscusDeleteMessageConfig()
                         .setEnableDeleteComment(true)
                         .setEnableHardDelete(true));
 

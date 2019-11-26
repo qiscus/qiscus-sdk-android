@@ -36,14 +36,14 @@ import android.widget.Toast;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.CommentInfoHandler;
-import com.qiscus.sdk.chat.core.data.model.ForwardCommentHandler;
+import com.qiscus.sdk.chat.core.data.model.MessageInfoHandler;
+import com.qiscus.sdk.chat.core.data.model.ForwardMessageHandler;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
-import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
+import com.qiscus.sdk.data.model.QiscusDeleteMessageConfig;
 import com.qiscus.sdk.data.model.QiscusMentionConfig;
 import com.qiscus.sdk.presenter.QiscusUserStatusPresenter;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -77,8 +77,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     protected String startingMessage;
     protected List<File> shareFiles;
     protected boolean autoSendExtra;
-    protected List<QiscusComment> forwardCommentsData;
-    protected QiscusComment scrollToComment;
+    protected List<QMessage> forwardCommentsData;
+    protected QMessage scrollToComment;
 
     private Map<String, QParticipant> roomMembers;
     private ActionMode actionMode;
@@ -204,7 +204,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
     }
 
     @Override
-    public void onCommentSelected(List<QiscusComment> selectedComments) {
+    public void onCommentSelected(List<QMessage> selectedComments) {
         boolean hasCheckedItems = selectedComments.size() > 0;
         if (hasCheckedItems && actionMode == null) {
             actionMode = startSupportActionMode(this);
@@ -216,19 +216,19 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             actionMode.setTitle(getString(R.string.qiscus_selected_comment, selectedComments.size()));
             actionMode.getMenu().findItem(R.id.action_forward)
                     .setVisible(Qiscus.getChatConfig().isEnableForwardComment());
-            if (selectedComments.size() == 1 && selectedComments.get(0).getState() >= QiscusComment.STATE_ON_QISCUS) {
-                QiscusComment qiscusComment = selectedComments.get(0);
+            if (selectedComments.size() == 1 && selectedComments.get(0).getState() >= QMessage.STATE_ON_QISCUS) {
+                QMessage qiscusMessage = selectedComments.get(0);
 
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(true);
 
-                if (qChatRoom.getType().equals("group") && qiscusComment.isMyComment() && !qChatRoom.getType().equals("channel")) {
+                if (qChatRoom.getType().equals("group") && qiscusMessage.isMyComment() && !qChatRoom.getType().equals("channel")) {
                     actionMode.getMenu().findItem(R.id.action_info)
                             .setVisible(Qiscus.getChatConfig().isEnableCommentInfo());
                 } else {
                     actionMode.getMenu().findItem(R.id.action_info).setVisible(false);
                 }
 
-                File localPath = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+                File localPath = Qiscus.getDataStore().getLocalPath(qiscusMessage.getId());
                 if (localPath != null) {
                     actionMode.getMenu().findItem(R.id.action_share)
                             .setVisible(Qiscus.getChatConfig().isEnableShareMedia());
@@ -256,21 +256,21 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         }
     }
 
-    private boolean onlyTextOrLinkType(List<QiscusComment> selectedComments) {
-        for (QiscusComment selectedComment : selectedComments) {
-            if (selectedComment.getType() != QiscusComment.Type.TEXT
-                    && selectedComment.getType() != QiscusComment.Type.LINK
-                    && selectedComment.getType() != QiscusComment.Type.REPLY
-                    && selectedComment.getType() != QiscusComment.Type.CONTACT
-                    && selectedComment.getType() != QiscusComment.Type.LOCATION) {
+    private boolean onlyTextOrLinkType(List<QMessage> selectedComments) {
+        for (QMessage selectedComment : selectedComments) {
+            if (selectedComment.getType() != QMessage.Type.TEXT
+                    && selectedComment.getType() != QMessage.Type.LINK
+                    && selectedComment.getType() != QMessage.Type.REPLY
+                    && selectedComment.getType() != QMessage.Type.CONTACT
+                    && selectedComment.getType() != QMessage.Type.LOCATION) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean deleteable(List<QiscusComment> selectedComments) {
-        for (QiscusComment selectedComment : selectedComments) {
+    private boolean deleteable(List<QMessage> selectedComments) {
+        for (QMessage selectedComment : selectedComments) {
             if (selectedComment.isDeleted()) {
                 return false;
             }
@@ -278,9 +278,9 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         return true;
     }
 
-    private boolean allMyComments(List<QiscusComment> selectedComments) {
+    private boolean allMyComments(List<QMessage> selectedComments) {
         QAccount account = Qiscus.getQiscusAccount();
-        for (QiscusComment selectedComment : selectedComments) {
+        for (QMessage selectedComment : selectedComments) {
             if (!selectedComment.getSenderEmail().equals(account.getId())) {
                 return false;
             }
@@ -320,7 +320,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         return false;
     }
 
-    protected void onSelectedCommentsAction(ActionMode mode, MenuItem item, List<QiscusComment> selectedComments) {
+    protected void onSelectedCommentsAction(ActionMode mode, MenuItem item, List<QMessage> selectedComments) {
         int i = item.getItemId();
         if (i == R.id.action_copy) {
             copyComments(selectedComments);
@@ -342,7 +342,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         mode.finish();
     }
 
-    protected void copyComments(List<QiscusComment> selectedComments) {
+    protected void copyComments(List<QMessage> selectedComments) {
         if (roomMembers == null) {
             roomMembers = new HashMap<>();
             for (QParticipant member : qChatRoom.getParticipants()) {
@@ -352,29 +352,29 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
         String textCopied;
         if (selectedComments.size() == 1) {
-            QiscusComment qiscusComment = selectedComments.get(0);
+            QMessage qiscusMessage = selectedComments.get(0);
             if (mentionConfig.isEnableMention()) {
-                textCopied = (qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
-                        new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
+                textCopied = (qiscusMessage.isAttachment() ? qiscusMessage.getAttachmentName() :
+                        new QiscusSpannableBuilder(qiscusMessage.getMessage(), roomMembers)
                                 .build().toString());
             } else {
-                textCopied = qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() : qiscusComment.getMessage();
+                textCopied = qiscusMessage.isAttachment() ? qiscusMessage.getAttachmentName() : qiscusMessage.getMessage();
             }
         } else {
             StringBuilder text = new StringBuilder();
             if (mentionConfig.isEnableMention()) {
-                for (QiscusComment qiscusComment : selectedComments) {
-                    text.append(qiscusComment.getSender()).append(": ");
-                    text.append(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
-                            new QiscusSpannableBuilder(qiscusComment.getMessage(), roomMembers)
+                for (QMessage qiscusMessage : selectedComments) {
+                    text.append(qiscusMessage.getSender()).append(": ");
+                    text.append(qiscusMessage.isAttachment() ? qiscusMessage.getAttachmentName() :
+                            new QiscusSpannableBuilder(qiscusMessage.getMessage(), roomMembers)
                                     .build().toString());
                     text.append('\n');
                 }
             } else {
-                for (QiscusComment qiscusComment : selectedComments) {
-                    text.append(qiscusComment.getSender()).append(": ");
-                    text.append(qiscusComment.isAttachment() ? qiscusComment.getAttachmentName() :
-                            qiscusComment.getMessage());
+                for (QMessage qiscusMessage : selectedComments) {
+                    text.append(qiscusMessage.getSender()).append(": ");
+                    text.append(qiscusMessage.isAttachment() ? qiscusMessage.getAttachmentName() :
+                            qiscusMessage.getMessage());
                     text.append('\n');
                 }
             }
@@ -389,9 +389,9 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         Toast.makeText(this, getString(R.string.qiscus_copied_message, selectedComments.size()), Toast.LENGTH_SHORT).show();
     }
 
-    protected void shareComment(QiscusComment qiscusComment) {
-        String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusComment.getExtension());
-        File file = Qiscus.getDataStore().getLocalPath(qiscusComment.getId());
+    protected void shareComment(QMessage qiscusMessage) {
+        String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(qiscusMessage.getExtension());
+        File file = Qiscus.getDataStore().getLocalPath(qiscusMessage.getId());
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType(mime);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -404,33 +404,33 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         startActivity(Intent.createChooser(intent, getString(R.string.qiscus_share_image_title)));
     }
 
-    protected void replyComment(QiscusComment qiscusComment) {
+    protected void replyComment(QMessage qiscusMessage) {
         QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
                 .findFragmentByTag(QiscusBaseChatFragment.class.getName());
         if (fragment != null) {
-            fragment.replyComment(qiscusComment);
+            fragment.replyComment(qiscusMessage);
         }
     }
 
-    protected void forwardComments(List<QiscusComment> selectedComments) {
-        ForwardCommentHandler forwardCommentHandler = Qiscus.getChatConfig().getForwardCommentHandler();
-        if (forwardCommentHandler == null) {
+    protected void forwardComments(List<QMessage> selectedComments) {
+        ForwardMessageHandler forwardMessageHandler = Qiscus.getChatConfig().getForwardMessageHandler();
+        if (forwardMessageHandler == null) {
             throw new NullPointerException("Please set forward handler before.\n" +
-                    "Set it using this method Qiscus.getChatConfig().setForwardCommentHandler()");
+                    "Set it using this method Qiscus.getChatConfig().setForwardMessageHandler()");
         }
-        forwardCommentHandler.forward(selectedComments);
+        forwardMessageHandler.forward(selectedComments);
     }
 
-    protected void showCommentInfo(QiscusComment qiscusComment) {
-        CommentInfoHandler commentInfoHandler = Qiscus.getChatConfig().getCommentInfoHandler();
-        if (commentInfoHandler == null) {
+    protected void showCommentInfo(QMessage qiscusMessage) {
+        MessageInfoHandler messageInfoHandler = Qiscus.getChatConfig().getMessageInfoHandler();
+        if (messageInfoHandler == null) {
             throw new NullPointerException("Please set comment info handler before.\n" +
-                    "Set it using this method Qiscus.getChatConfig().setCommentInfoHandler()");
+                    "Set it using this method Qiscus.getChatConfig().setMessageInfoHandler()");
         }
-        commentInfoHandler.showInfo(qiscusComment);
+        messageInfoHandler.showInfo(qiscusMessage);
     }
 
-    protected void deleteComments(List<QiscusComment> selectedComments) {
+    protected void deleteComments(List<QMessage> selectedComments) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
                 .setMessage(getResources().getQuantityString(R.plurals.qiscus_delete_comments_confirmation,
                         selectedComments.size(), selectedComments.size()))
@@ -452,7 +452,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
         AlertDialog alertDialog = alertDialogBuilder.create();
 
         alertDialog.setOnShowListener(dialog -> {
-            QiscusDeleteCommentConfig deleteConfig = chatConfig.getDeleteCommentConfig();
+            QiscusDeleteMessageConfig deleteConfig = chatConfig.getDeleteCommentConfig();
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(deleteConfig.getCancelButtonColor());
             if (ableToDeleteForEveryone) {
                 alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(deleteConfig.getDeleteForEveryoneButtonColor());

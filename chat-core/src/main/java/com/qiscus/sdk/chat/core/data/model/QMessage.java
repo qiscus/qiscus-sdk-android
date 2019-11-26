@@ -52,33 +52,33 @@ import rx.schedulers.Schedulers;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusComment implements Parcelable {
+public class QMessage implements Parcelable {
     public static final int STATE_FAILED = -1;
     public static final int STATE_PENDING = 0;
     public static final int STATE_SENDING = 1;
     public static final int STATE_ON_QISCUS = 2;
     public static final int STATE_DELIVERED = 3;
     public static final int STATE_READ = 4;
-    public static final Creator<QiscusComment> CREATOR = new Creator<QiscusComment>() {
+    public static final Creator<QMessage> CREATOR = new Creator<QMessage>() {
         @Override
-        public QiscusComment createFromParcel(Parcel in) {
-            return new QiscusComment(in);
+        public QMessage createFromParcel(Parcel in) {
+            return new QMessage(in);
         }
 
         @Override
-        public QiscusComment[] newArray(int size) {
-            return new QiscusComment[size];
+        public QMessage[] newArray(int size) {
+            return new QMessage[size];
         }
     };
     protected long id;
-    protected long roomId;
+    protected long chatRoomId;
     protected String uniqueId;
-    protected long commentBeforeId;
+    protected long previousMessageId;
     protected String message;
     protected String sender;
     protected String senderEmail;
     protected String senderAvatar;
-    protected Date time;
+    protected Date timestamp;
     protected int state;
     protected boolean deleted;
     protected boolean hardDeleted;
@@ -98,65 +98,66 @@ public class QiscusComment implements Parcelable {
     private QiscusContact contact;
     private QiscusLocation location;
     private String rawType;
-    private String extraPayload;
+    private JSONObject payload;
     private JSONObject extras;
     private MediaObserver observer;
     private MediaPlayer player;
-    private QiscusComment replyTo;
+    private QMessage replyTo;
     private String caption;
     private String attachmentName;
 
-    public QiscusComment() {
+    public QMessage() {
 
     }
 
-    protected QiscusComment(Parcel in) {
+    protected QMessage(Parcel in) {
         id = in.readLong();
-        roomId = in.readLong();
+        chatRoomId = in.readLong();
         uniqueId = in.readString();
-        commentBeforeId = in.readLong();
+        previousMessageId = in.readLong();
         message = in.readString();
         sender = in.readString();
         senderEmail = in.readString();
         senderAvatar = in.readString();
-        time = new Date(in.readLong());
+        timestamp = new Date(in.readLong());
         state = in.readInt();
         deleted = in.readByte() != 0;
         hardDeleted = in.readByte() != 0;
         selected = in.readByte() != 0;
         rawType = in.readString();
-        extraPayload = in.readString();
-        replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
+
+        replyTo = in.readParcelable(QMessage.class.getClassLoader());
         try {
             extras = new JSONObject(in.readString());
+            payload = new JSONObject(in.readString());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static QiscusComment generateMessage(long roomId, String content) {
+    public static QMessage generateMessage(long roomId, String content) {
         QAccount qAccount = QiscusCore.getQiscusAccount();
-        QiscusComment qiscusComment = new QiscusComment();
-        qiscusComment.setId(-1);
-        qiscusComment.setRoomId(roomId);
-        qiscusComment.setUniqueId("android_"
+        QMessage qiscusMessage = new QMessage();
+        qiscusMessage.setId(-1);
+        qiscusMessage.setChatRoomId(roomId);
+        qiscusMessage.setUniqueId("android_"
                 + System.currentTimeMillis()
                 + QiscusTextUtil.getRandomString(8)
                 + Settings.Secure.getString(QiscusCore.getApps().getContentResolver(),
                 Settings.Secure.ANDROID_ID));
-        qiscusComment.setMessage(content);
-        qiscusComment.setTime(new Date());
-        qiscusComment.setSenderEmail(qAccount.getId());
-        qiscusComment.setSender(qAccount.getName());
-        qiscusComment.setSenderAvatar(qAccount.getAvatarUrl());
-        qiscusComment.setState(STATE_SENDING);
+        qiscusMessage.setMessage(content);
+        qiscusMessage.setTimestamp(new Date());
+        qiscusMessage.setSenderEmail(qAccount.getId());
+        qiscusMessage.setSender(qAccount.getName());
+        qiscusMessage.setSenderAvatar(qAccount.getAvatarUrl());
+        qiscusMessage.setState(STATE_SENDING);
 
-        return qiscusComment;
+        return qiscusMessage;
     }
 
-    public static QiscusComment generateFileAttachmentMessage(long roomId, String fileUrl, String caption, String name) {
-        QiscusComment qiscusComment = generateMessage(roomId, String.format("[file] %s [/file]", fileUrl));
-        qiscusComment.setRawType("file_attachment");
+    public static QMessage generateFileAttachmentMessage(long roomId, String fileUrl, String caption, String name) {
+        QMessage qiscusMessage = generateMessage(roomId, String.format("[file] %s [/file]", fileUrl));
+        qiscusMessage.setRawType("file_attachment");
         JSONObject json = new JSONObject();
         try {
             json.put("url", fileUrl)
@@ -165,51 +166,51 @@ public class QiscusComment implements Parcelable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusComment.setExtraPayload(json.toString());
-        return qiscusComment;
+        qiscusMessage.setPayload(json);
+        return qiscusMessage;
     }
 
-    public static QiscusComment generateReplyMessage(long roomId, String content, QiscusComment repliedComment) {
-        QiscusComment qiscusComment = generateMessage(roomId, content);
-        qiscusComment.setRawType("reply");
-        qiscusComment.setReplyTo(repliedComment);
+    public static QMessage generateReplyMessage(long roomId, String content, QMessage repliedComment) {
+        QMessage qiscusMessage = generateMessage(roomId, content);
+        qiscusMessage.setRawType("reply");
+        qiscusMessage.setReplyTo(repliedComment);
         JSONObject json = new JSONObject();
         try {
-            json.put("text", qiscusComment.getMessage())
+            json.put("text", qiscusMessage.getMessage())
                     .put("replied_comment_id", repliedComment.getId())
                     .put("replied_comment_message", repliedComment.getMessage())
                     .put("replied_comment_sender_username", repliedComment.getSender())
                     .put("replied_comment_sender_email", repliedComment.getSenderEmail())
                     .put("replied_comment_type", repliedComment.getRawType())
-                    .put("replied_comment_payload", repliedComment.getExtraPayload());
+                    .put("replied_comment_payload", repliedComment.getPayload().toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusComment.setExtraPayload(json.toString());
+        qiscusMessage.setPayload(json);
 
-        return qiscusComment;
+        return qiscusMessage;
     }
 
-    public static QiscusComment generateContactMessage(long roomId, QiscusContact contact) {
-        QiscusComment qiscusComment = generateMessage(roomId, contact.getName() + "\n" + contact.getValue());
-        qiscusComment.setRawType("contact_person");
-        qiscusComment.setContact(contact);
+    public static QMessage generateContactMessage(long roomId, QiscusContact contact) {
+        QMessage qiscusMessage = generateMessage(roomId, contact.getName() + "\n" + contact.getValue());
+        qiscusMessage.setRawType("contact_person");
+        qiscusMessage.setContact(contact);
         JSONObject json = new JSONObject();
         try {
             json.put("name", contact.getName()).put("value", contact.getValue());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusComment.setExtraPayload(json.toString());
+        qiscusMessage.setPayload(json);
 
-        return qiscusComment;
+        return qiscusMessage;
     }
 
-    public static QiscusComment generateLocationMessage(long roomId, QiscusLocation location) {
-        QiscusComment qiscusComment = generateMessage(roomId, location.getName() + " - " + location.getAddress()
+    public static QMessage generateLocationMessage(long roomId, QiscusLocation location) {
+        QMessage qiscusMessage = generateMessage(roomId, location.getName() + " - " + location.getAddress()
                 + "\n" + location.getMapUrl());
-        qiscusComment.setRawType("location");
-        qiscusComment.setLocation(location);
+        qiscusMessage.setRawType("location");
+        qiscusMessage.setLocation(location);
         JSONObject json = new JSONObject();
         try {
             json.put("name", location.getName()).put("address", location.getAddress())
@@ -218,16 +219,16 @@ public class QiscusComment implements Parcelable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusComment.setExtraPayload(json.toString());
+        qiscusMessage.setPayload(json);
 
-        return qiscusComment;
+        return qiscusMessage;
     }
 
-    public static QiscusComment generatePostBackMessage(long roomId, String content, String payload) {
-        QiscusComment qiscusComment = generateMessage(roomId, content);
-        qiscusComment.setRawType("button_postback_response");
-        qiscusComment.setExtraPayload(payload);
-        return qiscusComment;
+    public static QMessage generatePostBackMessage(long roomId, String content, JSONObject payload) {
+        QMessage qiscusMessage = generateMessage(roomId, content);
+        qiscusMessage.setRawType("button_postback_response");
+        qiscusMessage.setPayload(payload);
+        return qiscusMessage;
     }
 
     /**
@@ -237,19 +238,19 @@ public class QiscusComment implements Parcelable {
      * @param type    your custom type
      * @param content your custom payload
      * @param roomId  room id for these comment
-     * @return QiscusComment
+     * @return QMessage
      */
-    public static QiscusComment generateCustomMessage(long roomId, String text, String type, JSONObject content) {
-        QiscusComment qiscusComment = generateMessage(roomId, text);
-        qiscusComment.setRawType("custom");
+    public static QMessage generateCustomMessage(long roomId, String text, String type, JSONObject content) {
+        QMessage qiscusMessage = generateMessage(roomId, text);
+        qiscusMessage.setRawType("custom");
         JSONObject json = new JSONObject();
         try {
             json.put("type", type).put("content", content);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusComment.setExtraPayload(json.toString());
-        return qiscusComment;
+        qiscusMessage.setPayload(json);
+        return qiscusMessage;
     }
 
     public long getId() {
@@ -260,12 +261,12 @@ public class QiscusComment implements Parcelable {
         this.id = id;
     }
 
-    public long getRoomId() {
-        return roomId;
+    public long getChatRoomId() {
+        return chatRoomId;
     }
 
-    public void setRoomId(long roomId) {
-        this.roomId = roomId;
+    public void setChatRoomId(long chatRoomId) {
+        this.chatRoomId = chatRoomId;
     }
 
     public String getUniqueId() {
@@ -276,12 +277,12 @@ public class QiscusComment implements Parcelable {
         this.uniqueId = uniqueId;
     }
 
-    public long getCommentBeforeId() {
-        return commentBeforeId;
+    public long getPreviousMessageId() {
+        return previousMessageId;
     }
 
-    public void setCommentBeforeId(long commentBeforeId) {
-        this.commentBeforeId = commentBeforeId;
+    public void setPreviousMessageId(long commentBeforeId) {
+        this.previousMessageId = commentBeforeId;
     }
 
     public String getMessage() {
@@ -316,12 +317,12 @@ public class QiscusComment implements Parcelable {
         this.senderAvatar = senderAvatar;
     }
 
-    public Date getTime() {
-        return time;
+    public Date getTimestamp() {
+        return timestamp;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public int getState() {
@@ -396,12 +397,12 @@ public class QiscusComment implements Parcelable {
         this.rawType = rawType;
     }
 
-    public String getExtraPayload() {
-        return extraPayload;
+    public JSONObject getPayload() {
+        return payload;
     }
 
-    public void setExtraPayload(String extraPayload) {
-        this.extraPayload = extraPayload;
+    public void setPayload(JSONObject payload) {
+        this.payload = payload;
     }
 
     public JSONObject getExtras() {
@@ -416,18 +417,18 @@ public class QiscusComment implements Parcelable {
         return getSenderEmail().equals(QiscusCore.getQiscusAccount().getId());
     }
 
-    public QiscusComment getReplyTo() {
+    public QMessage getReplyTo() {
         if (replyTo == null && getType() == Type.REPLY) {
             try {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(this);
-                replyTo = new QiscusComment();
+                replyTo = new QMessage();
                 replyTo.id = payload.getInt("replied_comment_id");
                 replyTo.uniqueId = replyTo.id + "";
                 replyTo.message = payload.getString("replied_comment_message");
                 replyTo.sender = payload.getString("replied_comment_sender_username");
                 replyTo.senderEmail = payload.getString("replied_comment_sender_email");
                 replyTo.rawType = payload.optString("replied_comment_type");
-                replyTo.extraPayload = payload.optString("replied_comment_payload");
+                replyTo.payload = payload.getJSONObject("replied_comment_payload");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -435,16 +436,16 @@ public class QiscusComment implements Parcelable {
         return replyTo;
     }
 
-    public void setReplyTo(QiscusComment replyTo) {
+    public void setReplyTo(QMessage replyTo) {
         this.replyTo = replyTo;
     }
 
     public void updateAttachmentUrl(String url) {
         setMessage(String.format("[file] %s [/file]", url));
         try {
-            JSONObject json = new JSONObject(getExtraPayload());
+            JSONObject json = getPayload();
             json.put("url", url);
-            setExtraPayload(json.toString());
+            setPayload(json);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -823,12 +824,12 @@ public class QiscusComment implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof QiscusComment) {
-            QiscusComment qiscusComment = (QiscusComment) o;
+        if (o instanceof QMessage) {
+            QMessage qiscusMessage = (QMessage) o;
             if (id == -1) {
-                return qiscusComment.uniqueId.equals(uniqueId);
+                return qiscusMessage.uniqueId.equals(uniqueId);
             } else {
-                return qiscusComment.id == id || qiscusComment.uniqueId.equals(uniqueId);
+                return qiscusMessage.id == id || qiscusMessage.uniqueId.equals(uniqueId);
             }
         }
         return false;
@@ -841,16 +842,16 @@ public class QiscusComment implements Parcelable {
 
     @Override
     public String toString() {
-        return "QiscusComment{" +
+        return "QMessage{" +
                 "id=" + id +
-                ", roomId=" + roomId +
+                ", chatRoomId=" + chatRoomId +
                 ", uniqueId='" + uniqueId + '\'' +
-                ", commentBeforeId=" + commentBeforeId +
+                ", previousMessageId=" + previousMessageId +
                 ", message='" + message + '\'' +
                 ", sender='" + sender + '\'' +
                 ", senderEmail='" + senderEmail + '\'' +
                 ", senderAvatar='" + senderAvatar + '\'' +
-                ", time=" + time +
+                ", timestamp=" + timestamp +
                 ", state=" + state +
                 ", deleted=" + deleted +
                 ", hardDeleted=" + hardDeleted +
@@ -865,23 +866,22 @@ public class QiscusComment implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeLong(roomId);
+        dest.writeLong(chatRoomId);
         dest.writeString(uniqueId);
-        dest.writeLong(commentBeforeId);
+        dest.writeLong(previousMessageId);
         dest.writeString(message);
         dest.writeString(sender);
         dest.writeString(senderEmail);
         dest.writeString(senderAvatar);
-        if (time == null) {
-            time = new Date();
+        if (timestamp == null) {
+            timestamp = new Date();
         }
-        dest.writeLong(time.getTime());
+        dest.writeLong(timestamp.getTime());
         dest.writeInt(state);
         dest.writeByte((byte) (deleted ? 1 : 0));
         dest.writeByte((byte) (hardDeleted ? 1 : 0));
         dest.writeByte((byte) (selected ? 1 : 0));
         dest.writeString(rawType);
-        dest.writeString(extraPayload);
         dest.writeParcelable(replyTo, flags);
         if (extras == null) {
             try {
@@ -891,25 +891,34 @@ public class QiscusComment implements Parcelable {
             }
         }
         dest.writeString(extras.toString());
+
+        if (payload == null) {
+            try {
+                payload = new JSONObject("{}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        dest.writeString(payload.toString());
     }
 
-    public boolean areContentsTheSame(QiscusComment qiscusComment) {
-        return id == qiscusComment.id
-                && uniqueId.equals(qiscusComment.uniqueId)
-                && roomId == qiscusComment.roomId
-                && commentBeforeId == qiscusComment.commentBeforeId
-                && message.equals(qiscusComment.message)
-                && sender.equals(qiscusComment.sender)
-                && senderEmail.equals(qiscusComment.senderEmail)
-                && senderAvatar.equals(qiscusComment.senderAvatar)
-                && time.equals(qiscusComment.time)
-                && state == qiscusComment.state
-                && deleted == qiscusComment.deleted
-                && hardDeleted == qiscusComment.hardDeleted
-                && selected == qiscusComment.selected
-                && highlighted == qiscusComment.highlighted
-                && downloading == qiscusComment.downloading
-                && progress == qiscusComment.progress;
+    public boolean areContentsTheSame(QMessage qiscusMessage) {
+        return id == qiscusMessage.id
+                && uniqueId.equals(qiscusMessage.uniqueId)
+                && chatRoomId == qiscusMessage.chatRoomId
+                && previousMessageId == qiscusMessage.previousMessageId
+                && message.equals(qiscusMessage.message)
+                && sender.equals(qiscusMessage.sender)
+                && senderEmail.equals(qiscusMessage.senderEmail)
+                && senderAvatar.equals(qiscusMessage.senderAvatar)
+                && timestamp.equals(qiscusMessage.timestamp)
+                && state == qiscusMessage.state
+                && deleted == qiscusMessage.deleted
+                && hardDeleted == qiscusMessage.hardDeleted
+                && selected == qiscusMessage.selected
+                && highlighted == qiscusMessage.highlighted
+                && downloading == qiscusMessage.downloading
+                && progress == qiscusMessage.progress;
     }
 
     public enum Type {
@@ -918,23 +927,23 @@ public class QiscusComment implements Parcelable {
     }
 
     public interface ProgressListener {
-        void onProgress(QiscusComment qiscusComment, int percentage);
+        void onProgress(QMessage qiscusMessage, int percentage);
     }
 
     public interface DownloadingListener {
-        void onDownloading(QiscusComment qiscusComment, boolean downloading);
+        void onDownloading(QMessage qiscusMessage, boolean downloading);
     }
 
     public interface PlayingAudioListener {
-        void onPlayingAudio(QiscusComment qiscusComment, int currentPosition);
+        void onPlayingAudio(QMessage qiscusMessage, int currentPosition);
 
-        void onPauseAudio(QiscusComment qiscusComment);
+        void onPauseAudio(QMessage qiscusMessage);
 
-        void onStopAudio(QiscusComment qiscusComment);
+        void onStopAudio(QMessage qiscusMessage);
     }
 
     public interface LinkPreviewListener {
-        void onLinkPreviewReady(QiscusComment qiscusComment, PreviewData previewData);
+        void onLinkPreviewReady(QMessage qiscusMessage, PreviewData previewData);
     }
 
     private class MediaObserver implements Runnable {
@@ -953,7 +962,7 @@ public class QiscusComment implements Parcelable {
             while (!stopPlay.get()) {
                 QiscusAndroidUtil.runOnUIThread(() -> {
                     if (playingAudioListener != null) {
-                        playingAudioListener.onPlayingAudio(QiscusComment.this, player.getCurrentPosition());
+                        playingAudioListener.onPlayingAudio(QMessage.this, player.getCurrentPosition());
                     }
                 });
                 try {

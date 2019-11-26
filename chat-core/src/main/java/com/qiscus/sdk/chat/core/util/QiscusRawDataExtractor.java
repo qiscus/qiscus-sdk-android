@@ -18,7 +18,7 @@ package com.qiscus.sdk.chat.core.util;
 
 import androidx.annotation.RestrictTo;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +35,7 @@ public final class QiscusRawDataExtractor {
     private QiscusRawDataExtractor() {
     }
 
-    public static JSONObject getPayload(QiscusComment qiscusComment) throws JSONException {
-        return new JSONObject(qiscusComment.getExtraPayload());
+    public static JSONObject getPayload(QMessage qiscusMessage) throws JSONException {
+        return qiscusMessage.getPayload();
     }
 }

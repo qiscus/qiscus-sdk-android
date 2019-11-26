@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.data.model;
+package com.qiscus.sdk.chat.core.event;
 
-import java.util.List;
 
-/**
- * Created on : July 11, 2017
- * Author     : zetbaitsu
- * Name       : Zetra
- * GitHub     : https://github.com/zetbaitsu
- */
-public interface ForwardCommentHandler {
-    void forward(List<QiscusComment> comments);
+import com.qiscus.sdk.chat.core.data.model.QMessage;
+
+public class QMessageReceivedEvent {
+    private QMessage qiscusMessage;
+
+    public QMessageReceivedEvent(QMessage qiscusMessage) {
+        this.qiscusMessage = qiscusMessage;
+    }
+
+    public QMessage getQMessage() {
+        return qiscusMessage;
+    }
 }

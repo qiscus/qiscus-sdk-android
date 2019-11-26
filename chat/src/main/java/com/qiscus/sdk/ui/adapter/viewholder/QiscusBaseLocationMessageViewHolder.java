@@ -26,7 +26,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 
@@ -36,7 +36,7 @@ import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMessageViewHolder<QiscusComment> {
+public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMessageViewHolder<QMessage> {
 
     @NonNull
     protected ImageView mapImageView;
@@ -79,16 +79,16 @@ public abstract class QiscusBaseLocationMessageViewHolder extends QiscusBaseMess
     }
 
     @Override
-    protected void showMessage(QiscusComment qiscusComment) {
+    protected void showMessage(QMessage qiscusMessage) {
         Nirmana.getInstance().get()
                 .setDefaultRequestOptions(new RequestOptions()
                         .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                         .error(R.drawable.ic_qiscus_placehalder_map)
                         .placeholder(R.drawable.ic_qiscus_placehalder_map)
                         .dontAnimate())
-                .load(qiscusComment.getLocation().getThumbnailUrl())
+                .load(qiscusMessage.getLocation().getThumbnailUrl())
                 .into(mapImageView);
-        locationNameView.setText(qiscusComment.getLocation().getName());
-        locationAddressView.setText(qiscusComment.getLocation().getAddress());
+        locationNameView.setText(qiscusMessage.getLocation().getName());
+        locationAddressView.setText(qiscusMessage.getLocation().getAddress());
     }
 }

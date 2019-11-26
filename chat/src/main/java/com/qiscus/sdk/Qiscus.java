@@ -29,7 +29,7 @@ import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
@@ -182,7 +182,7 @@ public class Qiscus {
 
         QiscusCore.getChatConfig()
                 .setNotificationListener(QiscusPushNotificationUtil::handlePushNotification)
-                .setDeleteCommentListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
+                .setDeleteMessageListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
     }
 
     /**
@@ -641,8 +641,8 @@ public class Qiscus {
         private String message;
         private List<File> shareFiles;
         private boolean autoSendExtra;
-        private List<QiscusComment> comments;
-        private QiscusComment scrollToComment;
+        private List<QMessage> comments;
+        private QMessage scrollToComment;
 
         private ChatActivityBuilder(String email) {
             this.email = email;
@@ -735,7 +735,7 @@ public class Qiscus {
          * @param comments The list of comment
          * @return builder
          */
-        public ChatActivityBuilder withForwardComments(List<QiscusComment> comments) {
+        public ChatActivityBuilder withForwardComments(List<QMessage> comments) {
             this.comments = comments;
             return this;
         }
@@ -747,7 +747,7 @@ public class Qiscus {
          * @param comment The comment
          * @return builder
          */
-        public ChatActivityBuilder withScrollToComment(QiscusComment comment) {
+        public ChatActivityBuilder withScrollToComment(QMessage comment) {
             this.scrollToComment = comment;
             return this;
         }
@@ -787,8 +787,8 @@ public class Qiscus {
         private String message;
         private List<File> shareFiles;
         private boolean autoSendExtra;
-        private List<QiscusComment> comments;
-        private QiscusComment scrollToComment;
+        private List<QMessage> comments;
+        private QMessage scrollToComment;
 
         private ChatFragmentBuilder(String email) {
             this.email = email;
@@ -881,7 +881,7 @@ public class Qiscus {
          * @param comments The list of comment
          * @return builder
          */
-        public ChatFragmentBuilder withForwardComments(List<QiscusComment> comments) {
+        public ChatFragmentBuilder withForwardComments(List<QMessage> comments) {
             this.comments = comments;
             return this;
         }
@@ -893,7 +893,7 @@ public class Qiscus {
          * @param comment The comment
          * @return builder
          */
-        public ChatFragmentBuilder withScrollToComment(QiscusComment comment) {
+        public ChatFragmentBuilder withScrollToComment(QMessage comment) {
             this.scrollToComment = comment;
             return this;
         }

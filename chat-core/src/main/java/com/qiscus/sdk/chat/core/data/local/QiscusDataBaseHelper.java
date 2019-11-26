@@ -24,7 +24,7 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
 import java.io.File;
@@ -65,7 +65,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             }
         }
 
-        QiscusComment comment = qChatRoom.getLastMessage();
+        QMessage comment = qChatRoom.getLastMessage();
         if (comment != null && comment.getId() > 0) {
             addOrUpdate(comment);
         }
@@ -104,7 +104,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             }
         }
 
-        QiscusComment comment = qChatRoom.getLastMessage();
+        QMessage comment = qChatRoom.getLastMessage();
         if (comment != null && comment.getId() > 0) {
             addOrUpdate(comment);
         }
@@ -132,7 +132,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             if (cursor.moveToNext()) {
                 QChatRoom qChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
                 qChatRoom.setParticipants(getRoomMembers(id));
-                QiscusComment latestComment = getLatestComment(id);
+                QMessage latestComment = getLatestComment(id);
                 if (latestComment != null) {
                     qChatRoom.setLastMessage(latestComment);
                 }
@@ -200,7 +200,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         if (cursor.moveToNext()) {
             QChatRoom qChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qChatRoom.setParticipants(getRoomMembers(qChatRoom.getId()));
-            QiscusComment latestComment = getLatestComment(qChatRoom.getId());
+            QMessage latestComment = getLatestComment(qChatRoom.getId());
             if (latestComment != null) {
                 qChatRoom.setLastMessage(latestComment);
             }
@@ -239,7 +239,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         while (cursor.moveToNext()) {
             QChatRoom qChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qChatRoom.setParticipants(getRoomMembers(qChatRoom.getId()));
-            QiscusComment latestComment = getLatestComment(qChatRoom.getId());
+            QMessage latestComment = getLatestComment(qChatRoom.getId());
             if (latestComment != null) {
                 qChatRoom.setLastMessage(latestComment);
             }
@@ -292,7 +292,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         while (cursor.moveToNext()) {
             QChatRoom qChatRoom = QiscusDb.RoomTable.parseCursor(cursor);
             qChatRoom.setParticipants(getRoomMembers(qChatRoom.getId()));
-            QiscusComment latestComment = getLatestComment(qChatRoom.getId());
+            QMessage latestComment = getLatestComment(qChatRoom.getId());
             if (latestComment != null) {
                 qChatRoom.setLastMessage(latestComment);
             }
@@ -516,11 +516,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void add(QiscusComment qiscusComment) {
+    public void add(QMessage qiscusMessage) {
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
             sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
-                    QiscusDb.CommentTable.toContentValues(qiscusComment), SQLiteDatabase.CONFLICT_ABORT);
+                    QiscusDb.CommentTable.toContentValues(qiscusMessage), SQLiteDatabase.CONFLICT_ABORT);
             sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
@@ -544,10 +544,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public boolean isContains(QiscusComment qiscusComment) {
+    public boolean isContains(QMessage qiscusMessage) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusComment.getUniqueId());
+                + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusMessage.getUniqueId());
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         boolean contains = cursor.getCount() > 0;
@@ -568,12 +568,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void update(QiscusComment qiscusComment) {
-        String where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusComment.getUniqueId());
+    public void update(QMessage qiscusMessage) {
+        String where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusMessage.getUniqueId());
 
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
-            sqLiteWriteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusComment), where, null);
+            sqLiteWriteDatabase.update(QiscusDb.CommentTable.TABLE_NAME, QiscusDb.CommentTable.toContentValues(qiscusMessage), where, null);
             sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
@@ -599,11 +599,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void addOrUpdate(QiscusComment qiscusComment) {
+    public void addOrUpdate(QMessage qiscusMessage) {
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
             sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
-                    QiscusDb.CommentTable.toContentValues(qiscusComment), SQLiteDatabase.CONFLICT_REPLACE);
+                    QiscusDb.CommentTable.toContentValues(qiscusMessage), SQLiteDatabase.CONFLICT_REPLACE);
             sqLiteWriteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             QiscusErrorLogger.print(e);
@@ -627,8 +627,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public void delete(QiscusComment qiscusComment) {
-        String where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusComment.getUniqueId());
+    public void delete(QMessage qiscusMessage) {
+        String where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(qiscusMessage.getUniqueId());
 
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
@@ -639,18 +639,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         } finally {
             sqLiteWriteDatabase.endTransaction();
         }
-        deleteLocalPath(qiscusComment.getId());
+        deleteLocalPath(qiscusMessage.getId());
     }
 
     @Override
     public boolean deleteCommentsByRoomId(long roomId) {
-        List<QiscusComment> comments = getComments(roomId);
+        List<QMessage> comments = getComments(roomId);
 
         if (comments.isEmpty()) {
             return false;
         }
 
-        for (QiscusComment comment : comments) {
+        for (QMessage comment : comments) {
             deleteLocalPath(comment.getId());
         }
 
@@ -670,13 +670,13 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public boolean deleteCommentsByRoomId(long roomId, long timestampOffset) {
-        List<QiscusComment> comments = getComments(roomId, timestampOffset);
+        List<QMessage> comments = getComments(roomId, timestampOffset);
 
         if (comments.isEmpty()) {
             return false;
         }
 
-        for (QiscusComment comment : comments) {
+        for (QMessage comment : comments) {
             deleteLocalPath(comment.getId());
         }
 
@@ -699,11 +699,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public void updateLastDeliveredComment(long roomId, long commentId) {
         String sql = "UPDATE " + QiscusDb.CommentTable.TABLE_NAME
-                + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_DELIVERED
+                + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QMessage.STATE_DELIVERED
                 + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
                 + " AND " + QiscusDb.CommentTable.COLUMN_ID + " <= " + commentId
                 + " AND " + QiscusDb.CommentTable.COLUMN_ID + " != -1"
-                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QiscusComment.STATE_DELIVERED;
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QMessage.STATE_DELIVERED;
 
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
@@ -719,11 +719,11 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     @Override
     public void updateLastReadComment(long roomId, long commentId) {
         String sql = "UPDATE " + QiscusDb.CommentTable.TABLE_NAME
-                + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_READ
+                + " SET " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QMessage.STATE_READ
                 + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
                 + " AND " + QiscusDb.CommentTable.COLUMN_ID + " <= " + commentId
                 + " AND " + QiscusDb.CommentTable.COLUMN_ID + " != -1"
-                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QiscusComment.STATE_READ;
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " < " + QMessage.STATE_READ;
 
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
@@ -776,42 +776,42 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getComment(String uniqueId) {
+    public QMessage getComment(String uniqueId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " = " + DatabaseUtils.sqlEscapeString(uniqueId);
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         if (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             cursor.close();
-            return qiscusComment;
+            return qiscusMessage;
         } else {
             cursor.close();
             return null;
         }
     }
 
-    private QiscusComment getComment(long id) {
+    private QMessage getComment(long id) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " = " + id;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         if (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             cursor.close();
-            return qiscusComment;
+            return qiscusMessage;
         } else {
             cursor.close();
             return null;
@@ -819,21 +819,21 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public QiscusComment getCommentByBeforeId(long beforeId) {
+    public QMessage getCommentByBeforeId(long beforeId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_COMMENT_BEFORE_ID + " = " + beforeId;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         if (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             cursor.close();
-            return qiscusComment;
+            return qiscusMessage;
         } else {
             cursor.close();
             return null;
@@ -841,7 +841,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getComments(long roomId) {
+    public List<QMessage> getComments(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
@@ -849,22 +849,22 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(qiscusComment);
+            qiscusMessages.add(qiscusMessage);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
-    public List<QiscusComment> getComments(long roomId, int limit) {
+    public List<QMessage> getComments(long roomId, int limit) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
@@ -873,22 +873,22 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " LIMIT " + limit;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(qiscusComment);
+            qiscusMessages.add(qiscusMessage);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
-    public List<QiscusComment> getComments(long roomId, long timestampOffset) {
+    public List<QMessage> getComments(long roomId, long timestampOffset) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
@@ -897,22 +897,22 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(qiscusComment);
+            qiscusMessages.add(qiscusMessage);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableComments(final long roomId) {
+    public Observable<List<QMessage>> getObservableComments(final long roomId) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(roomId));
             subscriber.onCompleted();
@@ -920,7 +920,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableComments(final long roomId, final int limit) {
+    public Observable<List<QMessage>> getObservableComments(final long roomId, final int limit) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(roomId, limit));
             subscriber.onCompleted();
@@ -928,41 +928,41 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit) {
+    public List<QMessage> getOlderCommentsThan(QMessage qiscusMessage, long roomId, int limit) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
-                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + qiscusComment.getTime().getTime() + " AND "
+                + QiscusDb.CommentTable.COLUMN_TIME + " <= " + qiscusMessage.getTimestamp().getTime() + " AND "
                 + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + limit;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment comment = QiscusDb.CommentTable.parseCursor(cursor);
+            QMessage comment = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(comment.getSenderEmail());
             if (QParticipant != null) {
                 comment.setSender(QParticipant.getName());
                 comment.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(comment);
+            qiscusMessages.add(comment);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit) {
+    public Observable<List<QMessage>> getObservableOlderCommentsThan(QMessage qiscusMessage, long roomId, int limit) {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getOlderCommentsThan(qiscusComment, roomId, limit));
+            subscriber.onNext(getOlderCommentsThan(qiscusMessage, roomId, limit));
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }
 
     @Override
-    public List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, long roomId) {
-        QiscusComment savedComment = getComment(qiscusComment.getId());
+    public List<QMessage> getCommentsAfter(QMessage qiscusMessage, long roomId) {
+        QMessage savedComment = getComment(qiscusMessage.getId());
         if (savedComment == null) {
             return new ArrayList<>();
         }
@@ -970,36 +970,36 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND ("
-                + QiscusDb.CommentTable.COLUMN_TIME + " >= " + savedComment.getTime().getTime() + " OR "
+                + QiscusDb.CommentTable.COLUMN_TIME + " >= " + savedComment.getTimestamp().getTime() + " OR "
                 + QiscusDb.CommentTable.COLUMN_ID + " = -1) " + " AND "
                 + QiscusDb.CommentTable.COLUMN_HARD_DELETED + " = " + 0
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC";
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment comment = QiscusDb.CommentTable.parseCursor(cursor);
+            QMessage comment = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(comment.getSenderEmail());
             if (QParticipant != null) {
                 comment.setSender(QParticipant.getName());
                 comment.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(comment);
+            qiscusMessages.add(comment);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, long roomId) {
+    public Observable<List<QMessage>> getObservableCommentsAfter(QMessage qiscusMessage, long roomId) {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getCommentsAfter(qiscusComment, roomId));
+            subscriber.onNext(getCommentsAfter(qiscusMessage, roomId));
             subscriber.onCompleted();
         }, Emitter.BackpressureMode.BUFFER);
     }
 
     @Override
-    public QiscusComment getLatestComment() {
+    public QMessage getLatestComment() {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 " + " AND "
@@ -1008,21 +1008,21 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " LIMIT " + 1;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        QiscusComment qiscusComment = null;
+        QMessage qiscusMessage = null;
         while (cursor.moveToNext()) {
-            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
         cursor.close();
-        return qiscusComment;
+        return qiscusMessage;
     }
 
     @Override
-    public QiscusComment getLatestComment(long roomId) {
+    public QMessage getLatestComment(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME
                 + " WHERE " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
@@ -1031,91 +1031,91 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " LIMIT " + 1;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        QiscusComment qiscusComment = null;
+        QMessage qiscusMessage = null;
         while (cursor.moveToNext()) {
-            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
         cursor.close();
-        return qiscusComment;
+        return qiscusMessage;
     }
 
     @Override
-    public QiscusComment getLatestDeliveredComment(long roomId) {
+    public QMessage getLatestDeliveredComment(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
                 + " AND " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
-                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_DELIVERED
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QMessage.STATE_DELIVERED
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        QiscusComment qiscusComment = null;
+        QMessage qiscusMessage = null;
         while (cursor.moveToNext()) {
-            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
         cursor.close();
-        return qiscusComment;
+        return qiscusMessage;
     }
 
     @Override
-    public QiscusComment getLatestReadComment(long roomId) {
+    public QMessage getLatestReadComment(long roomId) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " != -1 "
                 + " AND " + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId
-                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_READ
+                + " AND " + QiscusDb.CommentTable.COLUMN_STATE + " = " + QMessage.STATE_READ
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " DESC"
                 + " LIMIT " + 1;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        QiscusComment qiscusComment = null;
+        QMessage qiscusMessage = null;
         while (cursor.moveToNext()) {
-            qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
         cursor.close();
-        return qiscusComment;
+        return qiscusMessage;
     }
 
     @Override
-    public List<QiscusComment> getPendingComments() {
+    public List<QMessage> getPendingComments() {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
-                + QiscusDb.CommentTable.COLUMN_STATE + " = " + QiscusComment.STATE_PENDING
+                + QiscusDb.CommentTable.COLUMN_STATE + " = " + QMessage.STATE_PENDING
                 + " ORDER BY " + QiscusDb.CommentTable.COLUMN_TIME + " ASC";
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(qiscusComment);
+            qiscusMessages.add(qiscusMessage);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
-    public Observable<List<QiscusComment>> getObservablePendingComments() {
+    public Observable<List<QMessage>> getObservablePendingComments() {
         return Observable.create(subscriber -> {
             subscriber.onNext(getPendingComments());
             subscriber.onCompleted();
@@ -1123,7 +1123,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     @Override
-    public List<QiscusComment> searchComments(String query, long roomId, int limit, int offset) {
+    public List<QMessage> searchComments(String query, long roomId, int limit, int offset) {
         String sql = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " = " + roomId + " AND "
@@ -1133,22 +1133,22 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " LIMIT " + limit + " OFFSET " + offset;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(sql, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(qiscusComment);
+            qiscusMessages.add(qiscusMessage);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
-    public List<QiscusComment> searchComments(String query, int limit, int offset) {
+    public List<QMessage> searchComments(String query, int limit, int offset) {
         String sql = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_MESSAGE + " LIKE '%" + query + "%' " + " AND "
@@ -1157,18 +1157,18 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + " LIMIT " + limit + " OFFSET " + offset;
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(sql, null);
-        List<QiscusComment> qiscusComments = new ArrayList<>();
+        List<QMessage> qiscusMessages = new ArrayList<>();
         while (cursor.moveToNext()) {
-            QiscusComment qiscusComment = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant QParticipant = getMember(qiscusComment.getSenderEmail());
+            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+            QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusComment.setSender(QParticipant.getName());
-                qiscusComment.setSenderAvatar(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(QParticipant.getName());
+                qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
-            qiscusComments.add(qiscusComment);
+            qiscusMessages.add(qiscusMessage);
         }
         cursor.close();
-        return qiscusComments;
+        return qiscusMessages;
     }
 
     @Override
@@ -1191,7 +1191,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     private void sortRooms(List<QChatRoom> qChatRooms) {
         Collections.sort(qChatRooms, (room1, room2) -> {
             if (room1.getLastMessage() != null && room2.getLastMessage() != null) {
-                return room2.getLastMessage().getTime().compareTo(room1.getLastMessage().getTime());
+                return room2.getLastMessage().getTimestamp().compareTo(room1.getLastMessage().getTimestamp());
             } else if (room1.getLastMessage() == null && room2.getLastMessage() != null) {
                 return 1;
             } else if (room1.getLastMessage() != null && room2.getLastMessage() == null) {

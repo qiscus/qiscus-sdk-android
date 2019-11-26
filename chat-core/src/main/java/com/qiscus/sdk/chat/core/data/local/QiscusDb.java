@@ -21,7 +21,7 @@ import android.database.Cursor;
 
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -217,50 +217,56 @@ final class QiscusDb {
                         COLUMN_EXTRAS + " TEXT " +
                         " ); ";
 
-        static ContentValues toContentValues(QiscusComment qiscusComment) {
+        static ContentValues toContentValues(QMessage qiscusMessage) {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_ID, qiscusComment.getId());
-            values.put(COLUMN_ROOM_ID, qiscusComment.getRoomId());
-            values.put(COLUMN_UNIQUE_ID, qiscusComment.getUniqueId());
-            values.put(COLUMN_COMMENT_BEFORE_ID, qiscusComment.getCommentBeforeId());
-            values.put(COLUMN_MESSAGE, qiscusComment.getMessage());
-            values.put(COLUMN_SENDER, qiscusComment.getSender());
-            values.put(COLUMN_SENDER_EMAIL, qiscusComment.getSenderEmail());
-            values.put(COLUMN_SENDER_AVATAR, qiscusComment.getSenderAvatar());
-            values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
-            values.put(COLUMN_STATE, qiscusComment.getState());
-            values.put(COLUMN_DELETED, qiscusComment.isDeleted() ? 1 : 0);
-            values.put(COLUMN_HARD_DELETED, qiscusComment.isHardDeleted() ? 1 : 0);
-            values.put(COLUMN_TYPE, qiscusComment.getRawType());
-            values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
-            values.put(COLUMN_EXTRAS, qiscusComment.getExtras() == null ? null :
-                    qiscusComment.getExtras().toString());
+            values.put(COLUMN_ID, qiscusMessage.getId());
+            values.put(COLUMN_ROOM_ID, qiscusMessage.getChatRoomId());
+            values.put(COLUMN_UNIQUE_ID, qiscusMessage.getUniqueId());
+            values.put(COLUMN_COMMENT_BEFORE_ID, qiscusMessage.getPreviousMessageId());
+            values.put(COLUMN_MESSAGE, qiscusMessage.getMessage());
+            values.put(COLUMN_SENDER, qiscusMessage.getSender());
+            values.put(COLUMN_SENDER_EMAIL, qiscusMessage.getSenderEmail());
+            values.put(COLUMN_SENDER_AVATAR, qiscusMessage.getSenderAvatar());
+            values.put(COLUMN_TIME, qiscusMessage.getTimestamp().getTime());
+            values.put(COLUMN_STATE, qiscusMessage.getState());
+            values.put(COLUMN_DELETED, qiscusMessage.isDeleted() ? 1 : 0);
+            values.put(COLUMN_HARD_DELETED, qiscusMessage.isHardDeleted() ? 1 : 0);
+            values.put(COLUMN_TYPE, qiscusMessage.getRawType());
+            values.put(COLUMN_PAYLOAD, qiscusMessage.getPayload() == null ? null :
+                    qiscusMessage.getPayload().toString());
+            values.put(COLUMN_EXTRAS, qiscusMessage.getExtras() == null ? null :
+                    qiscusMessage.getExtras().toString());
             return values;
         }
 
-        static QiscusComment parseCursor(Cursor cursor) {
-            QiscusComment qiscusComment = new QiscusComment();
-            qiscusComment.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-            qiscusComment.setRoomId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
-            qiscusComment.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
-            qiscusComment.setCommentBeforeId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
-            qiscusComment.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
-            qiscusComment.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
-            qiscusComment.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
-            qiscusComment.setSenderAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
-            qiscusComment.setTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
-            qiscusComment.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
-            qiscusComment.setDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETED)) == 1);
-            qiscusComment.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
-            qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
-            qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
+        static QMessage parseCursor(Cursor cursor) {
+            QMessage qiscusMessage = new QMessage();
+            qiscusMessage.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            qiscusMessage.setChatRoomId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ROOM_ID)));
+            qiscusMessage.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
+            qiscusMessage.setPreviousMessageId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
+            qiscusMessage.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
+            qiscusMessage.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
+            qiscusMessage.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
+            qiscusMessage.setSenderAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
+            qiscusMessage.setTimestamp(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
+            qiscusMessage.setState(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
+            qiscusMessage.setDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETED)) == 1);
+            qiscusMessage.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
+            qiscusMessage.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             try {
-                String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
-                qiscusComment.setExtras(extras == null ? null : new JSONObject(extras));
+                String payload = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD));
+                qiscusMessage.setPayload(payload == null ? null : new JSONObject(payload));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return qiscusComment;
+            try {
+                String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
+                qiscusMessage.setExtras(extras == null ? null : new JSONObject(extras));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return qiscusMessage;
         }
     }
 

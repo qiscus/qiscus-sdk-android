@@ -32,7 +32,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.vanniktech.emoji.EmojiTextView;
@@ -45,7 +45,7 @@ import java.util.Map;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> extends RecyclerView.ViewHolder implements
+public abstract class QiscusBaseMessageViewHolder<E extends QMessage> extends RecyclerView.ViewHolder implements
         View.OnClickListener, View.OnLongClickListener {
 
     @Nullable
@@ -178,26 +178,26 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         this.roomMembers = roomMembers;
     }
 
-    public void bind(E qiscusComment) {
+    public void bind(E qiscusMessage) {
         setUpColor();
 
-        showDateOrNot(qiscusComment);
-        showTime(qiscusComment);
-        showIconReadOrNot(qiscusComment);
+        showDateOrNot(qiscusMessage);
+        showTime(qiscusMessage);
+        showIconReadOrNot(qiscusMessage);
 
         if (firstMessageBubbleIndicatorView != null) {
             firstMessageBubbleIndicatorView.setVisibility(needToShowFirstMessageBubbleIndicator ? View.VISIBLE : View.GONE);
         }
 
-        showSenderAvatar(qiscusComment);
-        showSenderName(qiscusComment);
+        showSenderAvatar(qiscusMessage);
+        showSenderName(qiscusMessage);
 
-        showMessage(qiscusComment);
+        showMessage(qiscusMessage);
 
-        onCommentSelected(qiscusComment);
+        onCommentSelected(qiscusMessage);
     }
 
-    private void showSenderName(E qiscusComment) {
+    private void showSenderName(E qiscusMessage) {
         if (senderNameView != null && !messageFromMe && groupChat) {
             if (needToShowFirstMessageBubbleIndicator) {
                 senderNameView.setVisibility(View.VISIBLE);
@@ -205,11 +205,11 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
                         .getColor(Qiscus.getApps(), Qiscus
                                 .getChatConfig()
                                 .getRoomSenderNameColorInterceptor()
-                                .getColor(qiscusComment)));
+                                .getColor(qiscusMessage)));
                 senderNameView.setText(String.format("~ %s", Qiscus
                         .getChatConfig()
                         .getRoomSenderNameInterceptor()
-                        .getSenderName(qiscusComment)));
+                        .getSenderName(qiscusMessage)));
             } else {
                 senderNameView.setVisibility(View.GONE);
             }
@@ -217,7 +217,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         }
     }
 
-    private void showSenderAvatar(E qiscusComment) {
+    private void showSenderAvatar(E qiscusMessage) {
         if (avatarView != null && !messageFromMe) {
             if (needToShowFirstMessageBubbleIndicator) {
                 avatarView.setVisibility(View.VISIBLE);
@@ -226,7 +226,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
                                 .dontAnimate()
                                 .placeholder(R.drawable.ic_qiscus_avatar)
                                 .error(R.drawable.ic_qiscus_avatar))
-                        .load(qiscusComment.getSenderAvatar())
+                        .load(qiscusMessage.getSenderAvatar())
                         .into(avatarView);
             } else {
                 avatarView.setVisibility(View.GONE);
@@ -234,7 +234,7 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         }
     }
 
-    protected abstract void showMessage(E qiscusComment);
+    protected abstract void showMessage(E qiscusMessage);
 
     protected void setUpColor() {
         if (messageFromMe) {
@@ -261,44 +261,44 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         }
     }
 
-    protected void showTime(QiscusComment qiscusComment) {
+    protected void showTime(QMessage qiscusMessage) {
         if (timeView != null) {
-            if (qiscusComment.getState() == QiscusComment.STATE_FAILED) {
+            if (qiscusMessage.getState() == QMessage.STATE_FAILED) {
                 timeView.setText(R.string.qiscus_sending_failed);
                 timeView.setTextColor(failedToSendMessageColor);
             } else {
-                timeView.setText(Qiscus.getChatConfig().getTimeFormat().format(qiscusComment.getTime()));
+                timeView.setText(Qiscus.getChatConfig().getTimeFormat().format(qiscusMessage.getTimestamp()));
                 timeView.setTextColor(messageFromMe ? rightBubbleTimeColor : leftBubbleTimeColor);
             }
         }
     }
 
-    protected void showIconReadOrNot(QiscusComment qiscusComment) {
+    protected void showIconReadOrNot(QMessage qiscusMessage) {
         if (channelRoom) {
-            showIconReadOrNotForChannelRoom(qiscusComment);
+            showIconReadOrNotForChannelRoom(qiscusMessage);
             return;
         }
 
         if (messageStateIndicatorView != null) {
-            switch (qiscusComment.getState()) {
-                case QiscusComment.STATE_PENDING:
-                case QiscusComment.STATE_SENDING:
+            switch (qiscusMessage.getState()) {
+                case QMessage.STATE_PENDING:
+                case QMessage.STATE_SENDING:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_info_time);
                     break;
-                case QiscusComment.STATE_ON_QISCUS:
+                case QMessage.STATE_ON_QISCUS:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending);
                     break;
-                case QiscusComment.STATE_DELIVERED:
+                case QMessage.STATE_DELIVERED:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_read);
                     break;
-                case QiscusComment.STATE_READ:
+                case QMessage.STATE_READ:
                     messageStateIndicatorView.setColorFilter(readIconColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_read);
                     break;
-                case QiscusComment.STATE_FAILED:
+                case QMessage.STATE_FAILED:
                     messageStateIndicatorView.setColorFilter(failedToSendMessageColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending_failed);
                     break;
@@ -306,21 +306,21 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         }
     }
 
-    protected void showIconReadOrNotForChannelRoom(QiscusComment qiscusComment) {
+    protected void showIconReadOrNotForChannelRoom(QMessage qiscusMessage) {
         if (messageStateIndicatorView != null) {
-            switch (qiscusComment.getState()) {
-                case QiscusComment.STATE_PENDING:
-                case QiscusComment.STATE_SENDING:
+            switch (qiscusMessage.getState()) {
+                case QMessage.STATE_PENDING:
+                case QMessage.STATE_SENDING:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_info_time);
                     break;
-                case QiscusComment.STATE_ON_QISCUS:
-                case QiscusComment.STATE_DELIVERED:
-                case QiscusComment.STATE_READ:
+                case QMessage.STATE_ON_QISCUS:
+                case QMessage.STATE_DELIVERED:
+                case QMessage.STATE_READ:
                     messageStateIndicatorView.setColorFilter(rightBubbleTimeColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending);
                     break;
-                case QiscusComment.STATE_FAILED:
+                case QMessage.STATE_FAILED:
                     messageStateIndicatorView.setColorFilter(failedToSendMessageColor);
                     messageStateIndicatorView.setImageResource(R.drawable.ic_qiscus_sending_failed);
                     break;
@@ -328,10 +328,10 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         }
     }
 
-    protected void showDateOrNot(QiscusComment qiscusComment) {
+    protected void showDateOrNot(QMessage qiscusMessage) {
         if (dateView != null) {
             if (needToShowDate) {
-                dateView.setText(Qiscus.getChatConfig().getDateFormat().format(qiscusComment.getTime()));
+                dateView.setText(Qiscus.getChatConfig().getDateFormat().format(qiscusMessage.getTimestamp()));
                 dateView.setVisibility(View.VISIBLE);
             } else {
                 dateView.setVisibility(View.GONE);
@@ -339,8 +339,8 @@ public abstract class QiscusBaseMessageViewHolder<E extends QiscusComment> exten
         }
     }
 
-    protected void onCommentSelected(E qiscusComment) {
-        itemView.setBackground(qiscusComment.isSelected() || qiscusComment.isHighlighted() ? selectionBackground : null);
+    protected void onCommentSelected(E qiscusMessage) {
+        itemView.setBackground(qiscusMessage.isSelected() || qiscusMessage.isHighlighted() ? selectionBackground : null);
     }
 
     @Override

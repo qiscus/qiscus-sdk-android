@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.ui.adapter;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
  * Created on : June 05, 2017
@@ -25,5 +25,5 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface ReplyItemClickListener {
-    void onReplyItemClick(QiscusComment comment);
+    void onReplyItemClick(QMessage message);
 }

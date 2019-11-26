@@ -25,5 +25,5 @@ import android.content.Context;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface NotificationClickListener {
-    void onClick(Context context, QiscusComment qiscusComment);
+    void onClick(Context context, QMessage qiscusMessage);
 }

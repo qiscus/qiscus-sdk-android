@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.event;
+package com.qiscus.sdk.ui.adapter;
 
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-
-public class QiscusCommentReceivedEvent {
-    private QiscusComment qiscusComment;
-
-    public QiscusCommentReceivedEvent(QiscusComment qiscusComment) {
-        this.qiscusComment = qiscusComment;
-    }
-
-    public QiscusComment getQiscusComment() {
-        return qiscusComment;
-    }
+/**
+ * Created on : July 28, 2017
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
+ */
+public interface MessageChainingListener {
+    void onMessageChainingBreak(QMessage insertedComment, QMessage messageBefore);
 }
