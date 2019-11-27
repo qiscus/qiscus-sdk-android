@@ -25,6 +25,7 @@ import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -71,6 +72,24 @@ final class QiscusApiParser {
             qAccount.setToken(jsonAccount.get("token").getAsString());
         }
         return qAccount;
+    }
+
+    static QUser parseQUser(JsonElement jsonElement) {
+        JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user").getAsJsonObject();
+        return parseQUser(jsonAccount);
+    }
+
+    static QUser parseQUser(JsonObject jsonAccount) {
+        QUser qUser = new QUser();
+        qUser.setId(jsonAccount.get("email").getAsString());
+        qUser.setName(jsonAccount.get("username").getAsString());
+        qUser.setAvatarUrl(jsonAccount.get("avatar_url").getAsString());
+        try {
+            qUser.setExtras(new JSONObject(jsonAccount.get("extras").getAsJsonObject().toString()));
+        } catch (Exception ignored) {
+            //Do nothing
+        }
+        return qUser;
     }
 
     static QChatRoom parseQiscusChatRoom(JsonElement jsonElement) {
@@ -256,7 +275,19 @@ final class QiscusApiParser {
         qiscusMessage.setId(jsonComment.get("id").getAsLong());
         qiscusMessage.setPreviousMessageId(jsonComment.get("comment_before_id").getAsLong());
         qiscusMessage.setMessage(jsonComment.get("message").getAsString());
-        qiscusMessage.setSender(jsonComment.get("username").getAsString());
+
+        QUser qUser = new QUser();
+        qUser.setAvatarUrl(jsonComment.get("user_avatar_url").getAsString());
+        qUser.setName(jsonComment.get("username").getAsString());
+        qUser.setId(jsonComment.get("email").getAsString());
+        if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+            try {
+                qUser.setExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        qiscusMessage.setSender(qUser);
         qiscusMessage.setSenderEmail(jsonComment.get("email").getAsString());
         qiscusMessage.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
         determineCommentState(qiscusMessage, jsonComment.get("status").getAsString());

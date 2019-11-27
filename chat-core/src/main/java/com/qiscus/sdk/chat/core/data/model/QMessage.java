@@ -75,7 +75,7 @@ public class QMessage implements Parcelable {
     protected String uniqueId;
     protected long previousMessageId;
     protected String message;
-    protected String sender;
+    protected QUser sender;
     protected String senderEmail;
     protected String senderAvatar;
     protected Date timestamp;
@@ -116,7 +116,7 @@ public class QMessage implements Parcelable {
         uniqueId = in.readString();
         previousMessageId = in.readLong();
         message = in.readString();
-        sender = in.readString();
+        sender = in.readParcelable(QUser.class.getClassLoader());
         senderEmail = in.readString();
         senderAvatar = in.readString();
         timestamp = new Date(in.readLong());
@@ -137,6 +137,12 @@ public class QMessage implements Parcelable {
 
     public static QMessage generateMessage(long roomId, String content) {
         QAccount qAccount = QiscusCore.getQiscusAccount();
+        QUser qUser = new QUser();
+        qUser.avatarUrl = qAccount.avatarUrl;
+        qUser.id        = qAccount.id;
+        qUser.extras    = qAccount.extras;
+        qUser.name      = qAccount.name;
+
         QMessage qiscusMessage = new QMessage();
         qiscusMessage.setId(-1);
         qiscusMessage.setChatRoomId(roomId);
@@ -148,7 +154,7 @@ public class QMessage implements Parcelable {
         qiscusMessage.setMessage(content);
         qiscusMessage.setTimestamp(new Date());
         qiscusMessage.setSenderEmail(qAccount.getId());
-        qiscusMessage.setSender(qAccount.getName());
+        qiscusMessage.setSender(qUser);
         qiscusMessage.setSenderAvatar(qAccount.getAvatarUrl());
         qiscusMessage.setState(STATE_SENDING);
 
@@ -293,11 +299,11 @@ public class QMessage implements Parcelable {
         this.message = message;
     }
 
-    public String getSender() {
+    public QUser getSender() {
         return sender;
     }
 
-    public void setSender(String sender) {
+    public void setSender(QUser sender) {
         this.sender = sender;
     }
 
@@ -425,7 +431,12 @@ public class QMessage implements Parcelable {
                 replyTo.id = payload.getInt("replied_comment_id");
                 replyTo.uniqueId = replyTo.id + "";
                 replyTo.message = payload.getString("replied_comment_message");
-                replyTo.sender = payload.getString("replied_comment_sender_username");
+
+                QUser qUser = new QUser();
+                qUser.setName(payload.getString("replied_comment_sender_username"));
+                qUser.setId(payload.getString("replied_comment_sender_email"));
+
+                replyTo.sender = qUser;
                 replyTo.senderEmail = payload.getString("replied_comment_sender_email");
                 replyTo.rawType = payload.optString("replied_comment_type");
                 replyTo.payload = payload.getJSONObject("replied_comment_payload");
@@ -870,7 +881,7 @@ public class QMessage implements Parcelable {
         dest.writeString(uniqueId);
         dest.writeLong(previousMessageId);
         dest.writeString(message);
-        dest.writeString(sender);
+        dest.writeParcelable(sender, flags);
         dest.writeString(senderEmail);
         dest.writeString(senderAvatar);
         if (timestamp == null) {

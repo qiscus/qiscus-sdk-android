@@ -22,6 +22,7 @@ import android.database.Cursor;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -224,7 +225,7 @@ final class QiscusDb {
             values.put(COLUMN_UNIQUE_ID, qiscusMessage.getUniqueId());
             values.put(COLUMN_COMMENT_BEFORE_ID, qiscusMessage.getPreviousMessageId());
             values.put(COLUMN_MESSAGE, qiscusMessage.getMessage());
-            values.put(COLUMN_SENDER, qiscusMessage.getSender());
+            values.put(COLUMN_SENDER, qiscusMessage.getSender().getName());
             values.put(COLUMN_SENDER_EMAIL, qiscusMessage.getSenderEmail());
             values.put(COLUMN_SENDER_AVATAR, qiscusMessage.getSenderAvatar());
             values.put(COLUMN_TIME, qiscusMessage.getTimestamp().getTime());
@@ -246,7 +247,17 @@ final class QiscusDb {
             qiscusMessage.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UNIQUE_ID)));
             qiscusMessage.setPreviousMessageId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID)));
             qiscusMessage.setMessage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE)));
-            qiscusMessage.setSender(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
+
+            QUser qUser = new QUser();
+            qUser.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER)));
+            qUser.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
+            try {
+                String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
+                qUser.setExtras(extras == null ? null : new JSONObject(extras));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            qUser.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
             qiscusMessage.setSenderEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
             qiscusMessage.setSenderAvatar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
             qiscusMessage.setTimestamp(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));

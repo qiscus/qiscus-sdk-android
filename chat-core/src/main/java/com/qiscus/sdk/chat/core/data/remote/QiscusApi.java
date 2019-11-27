@@ -31,6 +31,7 @@ import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.event.QMessageSentEvent;
 import com.qiscus.sdk.chat.core.event.QiscusClearMessagesEvent;
@@ -835,34 +836,34 @@ public enum QiscusApi {
     }
 
 
-    public Observable<QAccount> blockUser(String userId) {
+    public Observable<QUser> blockUser(String userId) {
         return api.blockUser(QiscusHashMapUtil.blockUser(userId))
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonObject("user"))
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
+                .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount));
     }
 
-    public Observable<QAccount> unblockUser(String userId) {
+    public Observable<QUser> unblockUser(String userId) {
         return api.unblockUser(QiscusHashMapUtil.unblockUser(userId))
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonObject("user"))
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
+                .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount));
     }
 
-    public Observable<List<QAccount>> getBlockedUsers() {
+    public Observable<List<QUser>> getBlockedUsers() {
         return getBlockedUsers(0, 100);
     }
 
-    public Observable<List<QAccount>> getBlockedUsers(long page, long limit) {
+    public Observable<List<QUser>> getBlockedUsers(long page, long limit) {
         return api.getBlockedUsers(page, limit)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount))
                 .toList();
     }
 
@@ -953,30 +954,30 @@ public enum QiscusApi {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    public Observable<List<QAccount>> getUsers(String searchUsername) {
+    public Observable<List<QUser>> getUsers(String searchUsername) {
         return getUsers(searchUsername, 0, 100);
     }
 
     @Deprecated
-    public Observable<List<QAccount>> getUsers(long page, long limit, String query) {
+    public Observable<List<QUser>> getUsers(long page, long limit, String query) {
         return api.getUserList(page, limit, "username asc", query)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount))
                 .toList();
     }
 
-    public Observable<List<QAccount>> getUsers(String searchUsername, long page, long limit) {
+    public Observable<List<QUser>> getUsers(String searchUsername, long page, long limit) {
         return api.getUserList(page, limit, "username asc", searchUsername)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount))
                 .toList();
     }
 

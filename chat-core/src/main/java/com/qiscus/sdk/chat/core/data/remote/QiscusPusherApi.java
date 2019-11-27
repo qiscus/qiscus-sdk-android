@@ -30,6 +30,7 @@ import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.event.QMessageReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
@@ -260,7 +261,20 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             qiscusMessage.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
             qiscusMessage.setPreviousMessageId(jsonObject.get("comment_before_id").getAsLong());
             qiscusMessage.setMessage(jsonObject.get("message").getAsString());
-            qiscusMessage.setSender(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
+
+            QUser qUser = new QUser();
+            qUser.setAvatarUrl(jsonObject.get("user_avatar").getAsString());
+            qUser.setName(jsonObject.get("username").isJsonNull() ? null : jsonObject.get("username").getAsString());
+            qUser.setId(jsonObject.get("email").getAsString());
+            if (jsonObject.has("user_extras") && !jsonObject.get("user_extras").isJsonNull()) {
+                try {
+                    qUser.setExtras(new JSONObject(jsonObject.get("user_extras").getAsJsonObject().toString()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            qiscusMessage.setSender(qUser);
+
             qiscusMessage.setSenderEmail(jsonObject.get("email").getAsString());
             qiscusMessage.setSenderAvatar(jsonObject.get("user_avatar").getAsString());
 
@@ -274,14 +288,14 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             }
 
             qiscusMessage.setRoomName(jsonObject.get("room_name").isJsonNull() ?
-                    qiscusMessage.getSender() : jsonObject.get("room_name").getAsString());
+                    qiscusMessage.getSender().getName() : jsonObject.get("room_name").getAsString());
             if (jsonObject.has("room_avatar")) {
                 qiscusMessage.setRoomAvatar(jsonObject.get("room_avatar").getAsString());
             }
 
             qiscusMessage.setGroupMessage(!"single".equals(jsonObject.get("chat_type").getAsString()));
             if (!qiscusMessage.isGroupMessage()) {
-                qiscusMessage.setRoomName(qiscusMessage.getSender());
+                qiscusMessage.setRoomName(qiscusMessage.getSender().getName());
             }
             if (jsonObject.has("type")) {
                 qiscusMessage.setRawType(jsonObject.get("type").getAsString());

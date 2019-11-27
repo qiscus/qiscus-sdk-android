@@ -327,7 +327,7 @@ public class QiscusPhotoViewerActivity extends RxAppCompatActivity implements Qi
 
     private void bindInfo() {
         Pair<QMessage, File> qiscusPhoto = qiscusPhotos.get(position);
-        senderName.setText(qiscusPhoto.first.getSender());
+        senderName.setText(qiscusPhoto.first.getSender().getName());
         date.setText(QiscusDateUtil.toFullDateFormat(qiscusPhoto.first.getTimestamp()));
         tvTitle.setText(getString(R.string.qiscus_photo_viewer_title, (position + 1), qiscusPhotos.size()));
     }

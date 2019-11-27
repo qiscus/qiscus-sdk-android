@@ -136,7 +136,7 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void showPushNotification(Context context, QMessage comment) {
-        String messageText = comment.isGroupMessage() ? comment.getSender().split(" ")[0] + ": " : "";
+        String messageText = comment.isGroupMessage() ? comment.getSender().getName().split(" ")[0] + ": " : "";
         if (comment.getType() == QMessage.Type.SYSTEM_EVENT) {
             messageText = "";
         }

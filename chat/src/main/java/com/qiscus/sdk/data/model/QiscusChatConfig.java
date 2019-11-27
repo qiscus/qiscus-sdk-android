@@ -167,7 +167,7 @@ public class QiscusChatConfig {
     private QiscusNotificationBuilderInterceptor notificationBuilderInterceptor;
 
     private NotificationTitleHandler notificationTitleHandler = QMessage::getRoomName;
-    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QMessage::getSender;
+    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = qiscusMessage -> qiscusMessage.getSender().getName();
     private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusMessage -> R.color.qiscus_secondary_text;
     private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusMessage -> getReplyBarColor();
     private QiscusStartReplyInterceptor startReplyInterceptor = qiscusMessage -> new QiscusReplyPanelConfig();

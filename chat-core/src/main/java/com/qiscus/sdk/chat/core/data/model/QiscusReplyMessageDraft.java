@@ -62,7 +62,12 @@ public class QiscusReplyMessageDraft extends QMessageDraft {
             replyTo.setId(payload.getLong("replied_comment_id"));
             replyTo.setUniqueId(replyTo.getId() + "");
             replyTo.setMessage(payload.getString("replied_comment_message"));
-            replyTo.setSender(payload.getString("replied_comment_sender_username"));
+
+            QUser qUser = new QUser();
+            qUser.setName(payload.getString("replied_comment_sender_username"));
+            qUser.setId(payload.getString("replied_comment_sender_email"));
+
+            replyTo.setSender(qUser);
             replyTo.setSenderEmail(payload.getString("replied_comment_sender_email"));
             replyTo.setRawType(payload.optString("replied_comment_type"));
             replyTo.setPayload(payload.getJSONObject("replied_comment_payload"));

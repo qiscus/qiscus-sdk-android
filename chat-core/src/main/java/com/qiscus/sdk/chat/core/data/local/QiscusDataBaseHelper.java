@@ -25,6 +25,7 @@ import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
 import java.io.File;
@@ -786,7 +787,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             cursor.close();
@@ -807,7 +813,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             cursor.close();
@@ -829,7 +840,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             cursor.close();
@@ -854,7 +870,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(qiscusMessage);
@@ -878,7 +899,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(qiscusMessage);
@@ -902,7 +928,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(qiscusMessage);
@@ -943,7 +974,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage comment = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(comment.getSenderEmail());
             if (QParticipant != null) {
-                comment.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                comment.setSender(qUser);
                 comment.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(comment);
@@ -981,7 +1017,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage comment = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(comment.getSenderEmail());
             if (QParticipant != null) {
-                comment.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                comment.setSender(qUser);
                 comment.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(comment);
@@ -1013,7 +1054,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
@@ -1036,7 +1082,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
@@ -1060,7 +1111,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
@@ -1084,7 +1140,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
         }
@@ -1105,7 +1166,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(qiscusMessage);
@@ -1138,7 +1204,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(qiscusMessage);
@@ -1162,7 +1233,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
             QParticipant QParticipant = getMember(qiscusMessage.getSenderEmail());
             if (QParticipant != null) {
-                qiscusMessage.setSender(QParticipant.getName());
+                QUser qUser = new QUser();
+                qUser.setId(QParticipant.getId());
+                qUser.setName(QParticipant.getName());
+                qUser.setExtras(QParticipant.getExtras());
+                qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                qiscusMessage.setSender(qUser);
                 qiscusMessage.setSenderAvatar(QParticipant.getAvatarUrl());
             }
             qiscusMessages.add(qiscusMessage);

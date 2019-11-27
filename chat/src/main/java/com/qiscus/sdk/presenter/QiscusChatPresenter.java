@@ -27,6 +27,7 @@ import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.data.model.QiscusContact;
 import com.qiscus.sdk.chat.core.data.model.QiscusLocation;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
@@ -515,7 +516,12 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 if (repliedComment != null) {
                     for (QParticipant QParticipant : room.getParticipants()) {
                         if (repliedComment.getSenderEmail().equals(QParticipant.getId())) {
-                            repliedComment.setSender(QParticipant.getName());
+                            QUser qUser = new QUser();
+                            qUser.setId(QParticipant.getId());
+                            qUser.setName(QParticipant.getName());
+                            qUser.setExtras(QParticipant.getExtras());
+                            qUser.setAvatarUrl(QParticipant.getAvatarUrl());
+                            repliedComment.setSender(qUser);
                             comment.setReplyTo(repliedComment);
                             break;
                         }
