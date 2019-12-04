@@ -601,7 +601,7 @@ public class QiscusCore {
     /**
      * Use this method to set custom header
      *
-     * @param customHeader      custom header
+     * @param customHeader custom header
      */
     public static void setCustomHeader(JSONObject customHeader) {
         QiscusCore.customHeader = customHeader;

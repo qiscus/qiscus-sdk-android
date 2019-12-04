@@ -2,6 +2,7 @@ package com.qiscus.sdk.chat.core.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
@@ -132,7 +133,7 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object>   updateCommentStatus(String roomId, String lastReadId, String lastReceivedId) {
+    public static HashMap<String, Object> updateCommentStatus(String roomId, String lastReadId, String lastReceivedId) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("token", QiscusCore.getToken());
@@ -149,7 +150,7 @@ public class QiscusHashMapUtil {
         hashMap.put("token", QiscusCore.getToken());
         hashMap.put("device_platform", "android");
         hashMap.put("device_token", fcmToken);
-
+        hashMap.put("is_development", BuildConfig.DEBUG);
         return hashMap;
     }
 
