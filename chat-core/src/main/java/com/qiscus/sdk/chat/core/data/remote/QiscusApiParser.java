@@ -99,14 +99,14 @@ final class QiscusApiParser {
             qChatRoom.setId(jsonChatRoom.get("id").getAsLong());
             String type = "single";
             type = jsonChatRoom.get("chat_type").getAsString();
-            if (type.equals("group")){
+            if (type.equals("group")) {
                 qChatRoom.setType("group");
                 if (jsonChatRoom.has("is_public_channel")) {
-                    if (jsonChatRoom.get("is_public_channel").getAsBoolean() == true){
+                    if (jsonChatRoom.get("is_public_channel").getAsBoolean() == true) {
                         qChatRoom.setType("channel");
                     }
                 }
-            }else{
+            } else {
                 qChatRoom.setType("single");
             }
 
@@ -192,14 +192,14 @@ final class QiscusApiParser {
 
                 String type = "single";
                 type = jsonChatRoom.get("chat_type").getAsString();
-                if (type.equals("group")){
+                if (type.equals("group")) {
                     qChatRoom.setType("group");
                     if (jsonChatRoom.has("is_public_channel")) {
-                        if (jsonChatRoom.get("is_public_channel").getAsBoolean() == true){
+                        if (jsonChatRoom.get("is_public_channel").getAsBoolean() == true) {
                             qChatRoom.setType("channel");
                         }
                     }
-                }else{
+                } else {
                     qChatRoom.setType("single");
                 }
 

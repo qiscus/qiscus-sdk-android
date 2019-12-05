@@ -107,28 +107,28 @@ final class QiscusDb {
                         COLUMN_USER_EXTRAS + " TEXT" +
                         " ); ";
 
-        static ContentValues toContentValues(QParticipant QParticipant) {
+        static ContentValues toContentValues(QParticipant qParticipant) {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_USER_EMAIL, QParticipant.getId());
-            values.put(COLUMN_USER_NAME, QParticipant.getName());
-            values.put(COLUMN_USER_AVATAR, QParticipant.getAvatarUrl());
-            values.put(COLUMN_USER_EXTRAS, QParticipant.getExtras() == null ? null :
-                    QParticipant.getExtras().toString());
+            values.put(COLUMN_USER_EMAIL, qParticipant.getId());
+            values.put(COLUMN_USER_NAME, qParticipant.getName());
+            values.put(COLUMN_USER_AVATAR, qParticipant.getAvatarUrl());
+            values.put(COLUMN_USER_EXTRAS, qParticipant.getExtras() == null ? null :
+                    qParticipant.getExtras().toString());
             return values;
         }
 
         static QParticipant getMember(Cursor cursor) {
-            QParticipant QParticipant = new QParticipant();
-            QParticipant.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
-            QParticipant.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_NAME)));
-            QParticipant.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_AVATAR)));
+            QParticipant qParticipant = new QParticipant();
+            qParticipant.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
+            qParticipant.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_NAME)));
+            qParticipant.setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_AVATAR)));
             try {
                 String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
-                QParticipant.setExtras(extras == null ? null : new JSONObject(extras));
+                qParticipant.setExtras(extras == null ? null : new JSONObject(extras));
             } catch (JSONException ignored) {
                 //Do nothing
             }
-            return QParticipant;
+            return qParticipant;
         }
     }
 

@@ -20,13 +20,13 @@ import com.qiscus.sdk.chat.core.data.model.QParticipant;
 
 public interface QiscusRoomMemberStore {
 
-    void add(QParticipant QParticipant);
+    void add(QParticipant qParticipant);
 
-    boolean isContains(QParticipant QParticipant);
+    boolean isContains(QParticipant qParticipant);
 
-    void update(QParticipant QParticipant);
+    void update(QParticipant qParticipant);
 
-    void addOrUpdate(QParticipant QParticipant);
+    void addOrUpdate(QParticipant qParticipant);
 
     QParticipant getMember(String email);
 }

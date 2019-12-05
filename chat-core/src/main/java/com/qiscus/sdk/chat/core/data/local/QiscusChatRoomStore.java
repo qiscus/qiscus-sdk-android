@@ -58,13 +58,13 @@ public interface QiscusChatRoomStore {
 
     void deleteChatRoom(long roomId);
 
-    void addRoomMember(long roomId, QParticipant QParticipant, String distinctId);
+    void addRoomMember(long roomId, QParticipant qParticipant, String distinctId);
 
     boolean isContainsRoomMember(long roomId, String email);
 
-    void updateRoomMember(long roomId, QParticipant QParticipant, String distinctId);
+    void updateRoomMember(long roomId, QParticipant qParticipant, String distinctId);
 
-    void addOrUpdateRoomMember(long roomId, QParticipant QParticipant, String distinctId);
+    void addOrUpdateRoomMember(long roomId, QParticipant qParticipant, String distinctId);
 
     List<QParticipant> getRoomMembers(long roomId);
 
