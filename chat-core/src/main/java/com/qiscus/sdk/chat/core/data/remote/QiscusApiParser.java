@@ -119,12 +119,18 @@ final class QiscusApiParser {
             }
 
             qChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
-            try {
-                qChatRoom.setExtras(jsonChatRoom.get("options").isJsonNull() ? null :
-                        new JSONObject(jsonChatRoom.get("options").getAsString()));
-            } catch (JSONException ignored) {
-                //Do nothing
+
+            if (jsonChatRoom.getAsJsonObject().has("options") &&
+                    !jsonChatRoom.getAsJsonObject().get("options").isJsonNull()) {
+                try {
+                    qChatRoom.setExtras(jsonChatRoom.get("options").isJsonNull() ? null :
+                            new JSONObject(jsonChatRoom.get("options").getAsString()));
+                } catch (JSONException ignored) {
+                    //Do nothing
+                }
+
             }
+
             qChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
 
             if (jsonChatRoom.has("room_total_participants")) {
@@ -211,12 +217,17 @@ final class QiscusApiParser {
 
                 qChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
 
-                try {
-                    qChatRoom.setExtras(jsonChatRoom.get("options").isJsonNull() ? null :
-                            new JSONObject(jsonChatRoom.get("options").getAsString()));
-                } catch (JSONException ignored) {
-                    //Do nothing
+
+                if (jsonChatRoom.getAsJsonObject().has("options") &&
+                        !jsonChatRoom.getAsJsonObject().get("options").isJsonNull()) {
+                    try {
+                        qChatRoom.setExtras(jsonChatRoom.get("options").isJsonNull() ? null :
+                                new JSONObject(jsonChatRoom.get("options").getAsString()));
+                    } catch (JSONException ignored) {
+                        //Do nothing
+                    }
                 }
+
                 qChatRoom.setAvatarUrl(jsonChatRoom.get("avatar_url").getAsString());
                 qChatRoom.setUnreadCount(jsonChatRoom.get("unread_count").getAsInt());
 
