@@ -140,10 +140,34 @@ public class Qiscus {
         initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, null);
     }
 
+    /**
+     * The first method you need to be invoke to using qiscus sdk. Call this method from your Application
+     * class. You can not using another qiscus feature if you not invoke this method first. Here sample
+     * to call this method:
+     * <pre>
+     * {@code
+     * public class SampleApps extends Application {
+     *  public void onCreate() {
+     *      super.onCreate();
+     *      QiscusCore.initWithCustomServer(this, my-app-id, "http://myserver.com/", "ssl://mqtt.myserver.com:1885");
+     *  }
+     * }
+     * }
+     * </pre>
+     *
+     * @param application Application instance
+     * @param appId       Your Qiscus App Id
+     * @param baseUrl     Your qiscus chat engine base url
+     * @param brokerUrl   Your Mqtt Broker url
+     */
 
-    public static void setupWithCustomServer(Application application, String AppID,
-                                            String baseUrl, String brokerUrl, String brokerUrlLb) {
-        initWithCustomServer(application, AppID, baseUrl, brokerUrl, true, brokerUrlLb);
+    public static void setupWithCustomServer(Application application, String appId, String baseUrl,
+                                             String brokerUrl, String brokerLBUrl) {
+        if (brokerLBUrl == null) {
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl);
+        } else {
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl);
+        }
     }
 
     public static void setupWithCustomServer(Application application, String AppID,
@@ -151,13 +175,6 @@ public class Qiscus {
         initWithCustomServer(application, AppID, baseUrl, brokerUrl, false, null);
     }
 
-    /**
-     * will have onNext Release
-     */
-//    public static void initWithCustomServer(Application application, String qiscusAppId,
-//                          String serverBaseUrl, String mqttBrokerUrl, String baseURLLB) {
-//        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, true, baseURLLB);
-//    }
 
     /**
      * This method @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
