@@ -82,7 +82,7 @@ public class QiscusCore {
      * public class SampleApps extends Application {
      *  public void onCreate() {
      *      super.onCreate();
-     *      QiscusCore.init(this, "yourQiscusAppId");
+     *      QiscusCore.setup(this, "yourQiscusAppId");
      *  }
      * }
      * }
@@ -115,7 +115,7 @@ public class QiscusCore {
      * @param application Application instance
      * @param appID       Your qiscus application Id
      */
-    public static void initWithAppId(Application application, String appID) {
+    public static void setup(Application application, String appID) {
         initWithCustomServer(application, appID, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
@@ -140,6 +140,7 @@ public class QiscusCore {
      * @param baseUrl     Your qiscus chat engine base url
      * @param brokerUrl   Your Mqtt Broker url
      */
+    @Deprecated
     public static void initWithCustomServer(Application application, String appId, String baseUrl,
                                             String brokerUrl, String brokerLBUrl) {
         if (brokerLBUrl == null) {
@@ -148,6 +149,38 @@ public class QiscusCore {
             initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl);
         }
     }
+
+    /**
+     * The first method you need to be invoke to using qiscus sdk. Call this method from your Application
+     * class. You can not using another qiscus feature if you not invoke this method first. Here sample
+     * to call this method:
+     * <pre>
+     * {@code
+     * public class SampleApps extends Application {
+     *  public void onCreate() {
+     *      super.onCreate();
+     *      QiscusCore.initWithCustomServer(this, my-app-id, "http://myserver.com/", "ssl://mqtt.myserver.com:1885");
+     *  }
+     * }
+     * }
+     * </pre>
+     *
+     * @param application Application instance
+     * @param appId       Your Qiscus App Id
+     * @param baseUrl     Your qiscus chat engine base url
+     * @param brokerUrl   Your Mqtt Broker url
+     */
+
+    public static void setupWithCustomServer(Application application, String appId, String baseUrl,
+                                             String brokerUrl, String brokerLBUrl) {
+        if (brokerLBUrl == null) {
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl);
+        } else {
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl);
+        }
+    }
+
+
 
     /**
      * This method @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
