@@ -269,7 +269,6 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
         }, Emitter.BackpressureMode.BUFFER);
     }
 
-    //TODO change to a prepared statement
     @Override
     public List<QiscusChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds) {
         List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
