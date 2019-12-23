@@ -790,11 +790,11 @@ public class QiscusCore {
         private final SharedPreferences sharedPreferences;
         private final Gson gson;
         private String token;
-        private static char[] SEKRIT="QiscusJogja".toCharArray();
-        private static byte[] SALT=null;
+        private static char[] SEKRIT = "QiscusJogja".toCharArray();
+        private static byte[] SALT = null;
         private static final String UTF8 = "UTF-8";
         private static String saltString = "Qiscus";
-        private static String SK  = "PBEWithMD5AndDES";//secretkey
+        private static String SK  = "PBEWithMD5AndDES"; //secretkey
 
         LocalDataManager() {
             sharedPreferences = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
@@ -809,15 +809,14 @@ public class QiscusCore {
                 return value;
             }
             try {
-                final byte[] bytes = value!=null ? value.getBytes(UTF8) : new byte[0];
+                final byte[] bytes = value != null ? value.getBytes(UTF8) : new byte[0];
                 SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(SK);
                 SecretKey key = keyFactory.generateSecret(new PBEKeySpec(SEKRIT));
                 Cipher pbeCipher = Cipher.getInstance(SK);
                 pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
-                return new String(Base64.encode(pbeCipher.doFinal(bytes), Base64.NO_WRAP),UTF8);
+                return new String(Base64.encode(pbeCipher.doFinal(bytes), Base64.NO_WRAP), UTF8);
 
-            } catch( Exception e ) {
-                QiscusErrorLogger.print("QiscusCore ENCRYPT error = ", e.getMessage());
+            } catch ( Exception e ) {
                 return value;
             }
 
@@ -825,7 +824,7 @@ public class QiscusCore {
 
 
 
-        protected String decrypt(String value){
+        protected String decrypt(String value) {
             try {
                 SALT = saltString.getBytes(UTF8);
             } catch (UnsupportedEncodingException e) {
@@ -833,15 +832,14 @@ public class QiscusCore {
             }
 
             try {
-                final byte[] bytes = value!=null ? Base64.decode(value,Base64.DEFAULT) : new byte[0];
+                final byte[] bytes = value != null ? Base64.decode(value, Base64.DEFAULT) : new byte[0];
                 SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(SK);
                 SecretKey key = keyFactory.generateSecret(new PBEKeySpec(SEKRIT));
                 Cipher pbeCipher = Cipher.getInstance(SK);
                 pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
-                return new String(pbeCipher.doFinal(bytes),UTF8);
+                return new String(pbeCipher.doFinal(bytes), UTF8);
 
-            } catch( Exception e) {
-                QiscusErrorLogger.print("QiscusCore DECRYPT error = ", e.getMessage());
+            } catch ( Exception e) {
                 return value;
             }
         }
