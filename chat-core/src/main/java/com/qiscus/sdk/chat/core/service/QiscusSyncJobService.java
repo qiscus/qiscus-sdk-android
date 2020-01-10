@@ -162,8 +162,10 @@ public class QiscusSyncJobService extends JobService {
         if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
-            syncJob(this);
+
         }
+
+        syncJob(this);
 
         return true;
     }

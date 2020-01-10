@@ -35,6 +35,8 @@ import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
+import com.qiscus.sdk.chat.core.service.QiscusSyncAutomaticService;
+import com.qiscus.sdk.chat.core.service.QiscusSyncJobAutomaticService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
@@ -63,6 +65,7 @@ public class QiscusCore {
     private static String baseURLLB;
     private static LocalDataManager localDataManager;
     private static long heartBeat;
+    private static long automaticHeartBeat;
     private static QiscusDataStore dataStore;
     private static QiscusCoreChatConfig chatConfig;
     private static Handler appHandler;
@@ -204,6 +207,7 @@ public class QiscusCore {
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
         heartBeat = 5000;
+        automaticHeartBeat = 30000;
 
         QiscusCore.enableMqttLB = enableMqttLB;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
@@ -223,6 +227,8 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
+                appInstance.getApplicationContext()
+                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncAutomaticService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
                 QiscusErrorLogger.print(e);
@@ -234,6 +240,8 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
+                appInstance.getApplicationContext()
+                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobAutomaticService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
                 QiscusErrorLogger.print(e);
@@ -404,6 +412,15 @@ public class QiscusCore {
     public static String getToken() {
         checkUserSetup();
         return localDataManager.getToken();
+    }
+
+    /**
+     * Get the current qiscus automaticheartbeat duration (default 30s)
+     *
+     * @return automaticHeartbeat duration in milliseconds
+     */
+    public static long getAutomaticHeartBeat() {
+        return automaticHeartBeat;
     }
 
     /**

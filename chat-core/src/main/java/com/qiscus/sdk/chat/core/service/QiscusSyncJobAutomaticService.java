@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * Copyright (c) 2016 Qiscus.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package com.qiscus.sdk.chat.core.service;
 
-import android.app.Service;
+import android.app.job.JobInfo;
+import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
-import androidx.annotation.Nullable;
+import android.os.Build;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
@@ -51,41 +38,53 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
+import androidx.annotation.RequiresApi;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created on : June 29, 2016
- * Author     : zetbaitsu
- * Name       : Zetra
- * GitHub     : https://github.com/zetbaitsu
+ * Created on : November 23, 2018
+ * Author     : adicatur
+ * Name       : Catur Adi Nugroho
+ * GitHub     : https://github.com/adicatur
  */
-public class QiscusSyncService extends Service {
-    private static final String TAG = QiscusSyncService.class.getSimpleName();
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+public class QiscusSyncJobAutomaticService extends JobService {
 
-    private QiscusAccount qiscusAccount;
-    private ScheduledFuture<?> scheduledSync;
+    private static final String TAG = QiscusSyncJobAutomaticService.class.getSimpleName();
+    private static final int STATIC_JOB_ID = 301;
+
+    public static void syncJob(Context context) {
+        QiscusLogger.print(TAG, "syncJob...");
+
+        ComponentName componentName = new ComponentName(context, QiscusSyncJobAutomaticService.class);
+        JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
+                .setMinimumLatency(QiscusCore.getAutomaticHeartBeat())
+                .setOverrideDeadline(QiscusCore.getAutomaticHeartBeat())
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+                .build();
+
+        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if (jobScheduler != null) {
+            jobScheduler.schedule(jobInfo);
+        }
+
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         QiscusLogger.print(TAG, "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
 
         if (QiscusCore.hasSetupUser()) {
-            scheduleSync(QiscusCore.getHeartBeat());
+            syncJob(this);
         }
-    }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 
     @Override
@@ -93,18 +92,11 @@ public class QiscusSyncService extends Service {
         return START_STICKY;
     }
 
-    private void scheduleSync(long period) {
-        qiscusAccount = QiscusCore.getQiscusAccount();
-        stopSync();
-
-        scheduledSync = QiscusCore.getTaskExecutor()
-                .scheduleWithFixedDelay(() -> {
-                    if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
-                        QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                        syncComments();
-                        syncEvents();
-                    }
-                }, 0, period, TimeUnit.MILLISECONDS);
+    private void scheduleSync() {
+        if (QiscusCore.isOnForeground()) {
+            syncComments();
+            syncEvents();
+        }
     }
 
     private void syncEvents() {
@@ -119,24 +111,25 @@ public class QiscusSyncService extends Service {
         QiscusApi.getInstance().sync()
                 .doOnSubscribe(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
-                    QiscusLogger.print("Sync started...");
+                    QiscusLogger.print("Sync automatic started...");
                 })
                 .doOnCompleted(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
-                    QiscusLogger.print("Sync completed...");
+                    QiscusLogger.print("Sync automatic completed...");
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
-                    QiscusLogger.print("Sync failed...");
+                    QiscusLogger.print("Sync automatic failed...");
                 });
     }
 
     private void stopSync() {
-        if (scheduledSync != null) {
-            scheduledSync.cancel(true);
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if (jobScheduler != null) {
+            jobScheduler.cancel(STATIC_JOB_ID);
         }
     }
 
@@ -144,8 +137,7 @@ public class QiscusSyncService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                scheduleSync(QiscusCore.getHeartBeat());
+                syncJob(this);
                 break;
             case LOGOUT:
                 stopSync();
@@ -157,8 +149,27 @@ public class QiscusSyncService extends Service {
     public void onDestroy() {
         QiscusLogger.print(TAG, "Destroying...");
         EventBus.getDefault().unregister(this);
-        sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
-        stopSync();
         super.onDestroy();
     }
+
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        QiscusLogger.print(TAG, "Job Automatic started...");
+
+        if (QiscusCore.hasSetupUser() && QiscusPusherApi.getInstance().isConnected()) {
+            scheduleSync();
+        }
+
+        syncJob(this);
+
+        return true;
+    }
+
+    @Override
+    public boolean onStopJob(JobParameters params) {
+        QiscusLogger.print(TAG, "Job stopped...");
+
+        return true;
+    }
+
 }
