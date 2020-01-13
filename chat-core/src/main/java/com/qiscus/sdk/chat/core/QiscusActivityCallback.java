@@ -19,6 +19,7 @@ package com.qiscus.sdk.chat.core;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -88,13 +89,14 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     private void startActivityTransitionTimer() {
         activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() -> foreground = false,
                 MAX_ACTIVITY_TRANSITION_TIME);
+        QiscusCore.setIsForeground(false);
     }
 
     private void stopActivityTransitionTimer() {
         if (activityTransition != null) {
             activityTransition.cancel(true);
         }
-
         foreground = true;
+        QiscusCore.setIsForeground(true);
     }
 }

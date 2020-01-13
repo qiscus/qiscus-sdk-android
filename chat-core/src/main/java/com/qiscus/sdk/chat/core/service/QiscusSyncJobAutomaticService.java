@@ -25,8 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
-
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
@@ -40,6 +38,7 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import androidx.annotation.RequiresApi;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -50,18 +49,18 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/adicatur
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class QiscusSyncJobService extends JobService {
+public class QiscusSyncJobAutomaticService extends JobService {
 
-    private static final String TAG = QiscusSyncJobService.class.getSimpleName();
-    private static final int STATIC_JOB_ID = 100;
+    private static final String TAG = QiscusSyncJobAutomaticService.class.getSimpleName();
+    private static final int STATIC_JOB_ID = 301;
 
     public static void syncJob(Context context) {
         QiscusLogger.print(TAG, "syncJob...");
 
-        ComponentName componentName = new ComponentName(context, QiscusSyncJobService.class);
+        ComponentName componentName = new ComponentName(context, QiscusSyncJobAutomaticService.class);
         JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
-                .setMinimumLatency(QiscusCore.getHeartBeat())
-                .setOverrideDeadline(QiscusCore.getHeartBeat())
+                .setMinimumLatency(QiscusCore.getAutomaticHeartBeat())
+                .setOverrideDeadline(QiscusCore.getAutomaticHeartBeat())
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
@@ -112,18 +111,18 @@ public class QiscusSyncJobService extends JobService {
         QiscusApi.getInstance().sync()
                 .doOnSubscribe(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
-                    QiscusLogger.print("Sync started...");
+                    QiscusLogger.print("Sync automatic started...");
                 })
                 .doOnCompleted(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
-                    QiscusLogger.print("Sync completed...");
+                    QiscusLogger.print("Sync automatic completed...");
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
-                    QiscusLogger.print("Sync failed...");
+                    QiscusLogger.print("Sync automatic failed...");
                 });
     }
 
@@ -138,7 +137,6 @@ public class QiscusSyncJobService extends JobService {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().connect());
                 syncJob(this);
                 break;
             case LOGOUT:
@@ -156,12 +154,10 @@ public class QiscusSyncJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        QiscusLogger.print(TAG, "Job started...");
+        QiscusLogger.print(TAG, "Job Automatic started...");
 
-        if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
-            QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+        if (QiscusCore.hasSetupUser() && QiscusPusherApi.getInstance().isConnected()) {
             scheduleSync();
-
         }
 
         syncJob(this);
