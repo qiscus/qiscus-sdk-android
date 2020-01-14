@@ -326,8 +326,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
      * If isEnableMqttLB = true, MQTT broker url is from own MQTT_LB and save to shared pref
      */
     private void getMqttBrokerUrlFromLB() {
-        QiscusLogger.print("isEnableMqttLB : " + QiscusCore.isEnableMqttLB());
-        QiscusLogger.print("urlLB : " + QiscusCore.getBaseURLLB());
+        QiscusLogger.print(TAG, "isEnableMqttLB : " + QiscusCore.isEnableMqttLB());
+        QiscusLogger.print(TAG, "urlLB : " + QiscusCore.getBaseURLLB());
 
         boolean isValid = QiscusCore.isEnableMqttLB() &&
                 QiscusCore.willGetNewNodeMqttBrokerUrl() &&
@@ -342,7 +342,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(mqttBaseUrl -> {
-                                QiscusLogger.print("New MQTT Broker URL = " + mqttBaseUrl);
+                                QiscusLogger.print(TAG, "New MQTT Broker URL = " + mqttBaseUrl);
                                 buildClient();
                             },
                             QiscusErrorLogger::print);
@@ -1050,7 +1050,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             // if connected, update flag to true
             QiscusCore.setCacheMqttBrokerUrl(QiscusCore.getMqttBrokerUrl(), true);
 
-            QiscusLogger.print(TAG, "Connected..." + QiscusCore.getMqttBrokerUrl());
+            QiscusLogger.print(TAG, "Connected..." +  mqttAndroidClient.getClientId() + " " + QiscusCore.getMqttBrokerUrl());
             eventReport("MQTT", "CONNECTED", "connectComplete... " + QiscusCore.getMqttBrokerUrl());
             EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
             try {

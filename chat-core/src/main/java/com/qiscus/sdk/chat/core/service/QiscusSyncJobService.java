@@ -55,7 +55,7 @@ public class QiscusSyncJobService extends JobService {
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();
     private static final int STATIC_JOB_ID = 100;
 
-    public static void syncJob(Context context) {
+    public void syncJob(Context context) {
         QiscusLogger.print(TAG, "syncJob...");
 
         ComponentName componentName = new ComponentName(context, QiscusSyncJobService.class);
@@ -161,7 +161,6 @@ public class QiscusSyncJobService extends JobService {
         if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
-
         }
 
         syncJob(this);

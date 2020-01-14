@@ -54,7 +54,7 @@ public class QiscusSyncJobAutomaticService extends JobService {
     private static final String TAG = QiscusSyncJobAutomaticService.class.getSimpleName();
     private static final int STATIC_JOB_ID = 301;
 
-    public static void syncJob(Context context) {
+    public void syncJob(Context context) {
         QiscusLogger.print(TAG, "syncJob...");
 
         ComponentName componentName = new ComponentName(context, QiscusSyncJobAutomaticService.class);
