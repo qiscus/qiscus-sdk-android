@@ -38,7 +38,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
 
     private ScheduledFuture<?> activityTransition;
-    private boolean foreground;
+    private static boolean foreground;
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -89,7 +89,6 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     private void startActivityTransitionTimer() {
         activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() -> foreground = false,
                 MAX_ACTIVITY_TRANSITION_TIME);
-        QiscusCore.setIsForeground(false);
     }
 
     private void stopActivityTransitionTimer() {
@@ -97,6 +96,5 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
             activityTransition.cancel(true);
         }
         foreground = true;
-        QiscusCore.setIsForeground(true);
     }
 }

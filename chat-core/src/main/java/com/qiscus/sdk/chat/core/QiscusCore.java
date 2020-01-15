@@ -748,15 +748,7 @@ public class QiscusCore {
      * @return true if apps on foreground, and false if on background
      */
     public static boolean isOnForeground() {
-        return localDataManager.getIsForeground();
-    }
-
-    /**
-     * Set foreground
-     *
-     */
-    public static void setIsForeground(Boolean isForeground) {
-        localDataManager.setIsForeground(isForeground);
+        return QiscusActivityCallback.INSTANCE.isForeground();
     }
 
     /**
@@ -831,14 +823,6 @@ public class QiscusCore {
 
         private void setToken(String token) {
             this.token = token;
-        }
-
-        private Boolean getIsForeground() {
-            return sharedPreferences.getBoolean("isForeground", false);
-        }
-
-        private void setIsForeground(Boolean isForeground) {
-            sharedPreferences.edit().putBoolean("isForeground", isForeground).apply();
         }
 
         private String getFcmToken() {
