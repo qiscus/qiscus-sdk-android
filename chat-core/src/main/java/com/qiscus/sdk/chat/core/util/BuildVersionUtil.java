@@ -25,6 +25,10 @@ public final class BuildVersionUtil {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.O;
     }
 
+    public static boolean isQlower() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
+    }
+
     public static boolean isOreoOrHigher() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }

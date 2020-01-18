@@ -34,6 +34,7 @@ import android.os.Environment;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 
 import java.io.File;
@@ -242,9 +243,14 @@ public final class QiscusImageUtil {
     }
 
     public static File createImageFile() throws IOException {
+        File storageDir;
+        if (BuildVersionUtil.isQlower()) {
+            storageDir =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        } else {
+            storageDir = QiscusCore.getApps().getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        }
         String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG-" + timeStamp + "-";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         QiscusCacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());
         return image;
