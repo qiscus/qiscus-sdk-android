@@ -59,10 +59,12 @@
             android:label="QiscusSyncJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <service android:name=".service.QiscusSyncAutomaticService" />
+
         <service
-            android:name=".service.QiscusSyncJobConnectionService"
+            android:name=".service.QiscusSyncJobAutomaticService"
             android:exported="true"
-            android:label="QiscusSyncJobService"
+            android:label="QiscusSyncJobAutomaticService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 

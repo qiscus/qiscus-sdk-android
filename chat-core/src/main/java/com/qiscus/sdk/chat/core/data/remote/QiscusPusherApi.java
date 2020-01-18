@@ -18,9 +18,6 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.provider.Settings;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -63,6 +60,8 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -72,8 +71,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     INSTANCE;
     private static final String TAG = QiscusPusherApi.class.getSimpleName();
     private static final long RETRY_PERIOD = 4000;
-    public static final long CONNECTED_SYNC_INTERVAL = 30000;
-    public static final long DISCONNECTED_SYNC_INTERVAL = 5000;
 
     private static Gson gson;
     private static long reconnectCounter;
@@ -127,7 +124,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     private static void handleComment(QiscusComment qiscusComment) {
         QiscusComment savedComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
-
         if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
             return;
         }
@@ -330,8 +326,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
      * If isEnableMqttLB = true, MQTT broker url is from own MQTT_LB and save to shared pref
      */
     private void getMqttBrokerUrlFromLB() {
-        QiscusLogger.print("isEnableMqttLB : " + QiscusCore.isEnableMqttLB());
-        QiscusLogger.print("urlLB : " + QiscusCore.getBaseURLLB());
+        QiscusLogger.print(TAG, "isEnableMqttLB : " + QiscusCore.isEnableMqttLB());
+        QiscusLogger.print(TAG, "urlLB : " + QiscusCore.getBaseURLLB());
 
         boolean isValid = QiscusCore.isEnableMqttLB() &&
                 QiscusCore.willGetNewNodeMqttBrokerUrl() &&
@@ -346,7 +342,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(mqttBaseUrl -> {
-                                QiscusLogger.print("New MQTT Broker URL = " + mqttBaseUrl);
+                                QiscusLogger.print(TAG, "New MQTT Broker URL = " + mqttBaseUrl);
                                 buildClient();
                             },
                             QiscusErrorLogger::print);
@@ -476,7 +472,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void disconnect() {
         QiscusLogger.print(TAG, "Disconnecting...");
-        QiscusCore.setSyncInterval(DISCONNECTED_SYNC_INTERVAL);
         publishOnlinePresence(false);
         try {
             connecting = false;
@@ -1048,16 +1043,14 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     @Override
     public void connectComplete(boolean reconnect, String serverUri) {
         if (!isConnected()) {
-            QiscusCore.setSyncInterval(DISCONNECTED_SYNC_INTERVAL);
             connecting = false;
             reconnectCounter = 0;
             connect();
         } else {
-            QiscusCore.setSyncInterval(CONNECTED_SYNC_INTERVAL);
             // if connected, update flag to true
             QiscusCore.setCacheMqttBrokerUrl(QiscusCore.getMqttBrokerUrl(), true);
 
-            QiscusLogger.print(TAG, "Connected..." + QiscusCore.getMqttBrokerUrl());
+            QiscusLogger.print(TAG, "Connected..." +  mqttAndroidClient.getClientId() + " " + QiscusCore.getMqttBrokerUrl());
             eventReport("MQTT", "CONNECTED", "connectComplete... " + QiscusCore.getMqttBrokerUrl());
             EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
             try {
@@ -1096,12 +1089,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Override
     public void onSuccess(IMqttToken asyncActionToken) {
-        QiscusCore.setSyncInterval(CONNECTED_SYNC_INTERVAL);
+
     }
 
     @Override
     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-        QiscusCore.setSyncInterval(DISCONNECTED_SYNC_INTERVAL);
         if (reconnectCounter == 0) {
             getMqttBrokerUrlFromLB();
         }

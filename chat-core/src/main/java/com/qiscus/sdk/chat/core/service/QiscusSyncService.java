@@ -34,11 +34,11 @@ package com.qiscus.sdk.chat.core.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-
 import androidx.annotation.Nullable;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
+import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
@@ -49,6 +49,9 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -62,6 +65,9 @@ import rx.schedulers.Schedulers;
 public class QiscusSyncService extends Service {
     private static final String TAG = QiscusSyncService.class.getSimpleName();
 
+    private QiscusAccount qiscusAccount;
+    private ScheduledFuture<?> scheduledSync;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -72,7 +78,6 @@ public class QiscusSyncService extends Service {
 
         if (QiscusCore.hasSetupUser()) {
             scheduleSync(QiscusCore.getHeartBeat());
-            scheduleConnectionCheck();
         }
     }
 
@@ -88,45 +93,17 @@ public class QiscusSyncService extends Service {
     }
 
     private void scheduleSync(long period) {
-        if (QiscusCore.hasSetupUser()) {
-            QiscusCore.getTaskExecutor()
-                    .execute(() -> {
-                        try {
-                            Thread.sleep(period);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (QiscusCore.isOnForeground() && QiscusCore.hasSetupUser()) {
-                            if (!QiscusPusherApi.getInstance().isConnected()) {
-                                QiscusPusherApi.getInstance().restartConnection();
-                            }
-                            syncComments();
-                            syncEvents();
-                            if (QiscusPusherApi.getInstance().isConnected()) {
-                                scheduleSync(QiscusCore.getHeartBeat());
-                            }
-                        }
-                    });
-        }
-    }
+        qiscusAccount = QiscusCore.getQiscusAccount();
+        stopSync();
 
-    private void scheduleConnectionCheck() {
-        if (QiscusCore.hasSetupUser()) {
-            QiscusCore.getTaskExecutor()
-                    .execute(() -> {
-                        try {
-                            Thread.sleep(QiscusPusherApi.DISCONNECTED_SYNC_INTERVAL);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (QiscusCore.isOnForeground() && QiscusCore.hasSetupUser()) {
-                            if (!QiscusPusherApi.getInstance().isConnected()) {
-                                scheduleSync(QiscusCore.getHeartBeat());
-                            }
-                            scheduleConnectionCheck();
-                        }
-                    });
-        }
+        scheduledSync = QiscusCore.getTaskExecutor()
+                .scheduleWithFixedDelay(() -> {
+                    if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
+                        QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                        syncComments();
+                        syncEvents();
+                    }
+                }, 0, period, TimeUnit.MILLISECONDS);
     }
 
     private void syncEvents() {
@@ -156,15 +133,21 @@ public class QiscusSyncService extends Service {
                 });
     }
 
+    private void stopSync() {
+        if (scheduledSync != null) {
+            scheduledSync.cancel(true);
+        }
+    }
+
     @Subscribe
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
                 QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                 scheduleSync(QiscusCore.getHeartBeat());
-                scheduleConnectionCheck();
                 break;
             case LOGOUT:
+                stopSync();
                 break;
         }
     }
@@ -174,6 +157,7 @@ public class QiscusSyncService extends Service {
         QiscusLogger.print(TAG, "Destroying...");
         EventBus.getDefault().unregister(this);
         sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
+        stopSync();
         super.onDestroy();
     }
 }

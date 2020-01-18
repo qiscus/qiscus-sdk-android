@@ -867,15 +867,15 @@ public enum QiscusApi {
     }
 
     @Deprecated
-    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId,
+    public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset,
                                                              MetaRoomMembersListener metaRoomMembersListener) {
-        return getRoomMembers(roomUniqueId, 0, null, metaRoomMembersListener);
+        return getRoomMembers(roomUniqueId, offset, null, metaRoomMembersListener);
     }
 
     @Deprecated
     public Observable<List<QiscusRoomMember>> getRoomMembers(String roomUniqueId, int offset, String sorting,
                                                              MetaRoomMembersListener metaRoomMembersListener) {
-        return api.getRoomParticipants(roomUniqueId, offset, sorting)
+        return api.getRoomParticipants(roomUniqueId, 0, 0, offset, sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
@@ -895,17 +895,17 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset,
-                                                              String sorting, MetaRoomMembersListener metaRoomMembersListener) {
-        return api.getRoomParticipants(roomUniqueId, offset,
+    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int page, int limit,
+                                                              String sorting, MetaRoomParticipantsListener metaRoomParticipantListener) {
+        return api.getRoomParticipants(roomUniqueId, page, limit, 0,
                 sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
                     JsonObject meta = jsonResults.getAsJsonObject("meta");
-                    if (metaRoomMembersListener != null) {
-                        metaRoomMembersListener.onMetaReceived(
-                                meta.get("current_offset").getAsInt(),
+                    if (metaRoomParticipantListener != null) {
+                        metaRoomParticipantListener.onMetaReceived(
+                                meta.get("current_page").getAsInt(),
                                 meta.get("per_page").getAsInt(),
                                 meta.get("total").getAsInt()
                         );
@@ -918,8 +918,8 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int offset, String sorting) {
-        return api.getRoomParticipants(roomUniqueId, offset, sorting)
+    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId,  int page, int limit, String sorting) {
+        return api.getRoomParticipants(roomUniqueId, page, limit, 0, sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .doOnNext(jsonResults -> {
@@ -1153,6 +1153,8 @@ public enum QiscusApi {
         @GET("/api/v2/mobile/room_participants")
         Observable<JsonElement> getRoomParticipants(
                 @Query("room_unique_id") String roomUniqId,
+                @Query("page") int page,
+                @Query("limit") int limit,
                 @Query("offset") int offset,
                 @Query("sorting") String sorting
         );
@@ -1168,6 +1170,10 @@ public enum QiscusApi {
 
     public interface MetaRoomMembersListener {
         void onMetaReceived(int currentOffset, int perPage, int total);
+    }
+
+    public interface MetaRoomParticipantsListener {
+        void onMetaReceived(int currentPage, int perPage, int total);
     }
 
     public interface ProgressListener {

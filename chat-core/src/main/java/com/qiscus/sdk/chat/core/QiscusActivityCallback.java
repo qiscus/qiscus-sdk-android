@@ -19,6 +19,7 @@ package com.qiscus.sdk.chat.core;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -37,7 +38,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
 
     private ScheduledFuture<?> activityTransition;
-    private boolean foreground;
+    private static boolean foreground;
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -94,7 +95,6 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
         if (activityTransition != null) {
             activityTransition.cancel(true);
         }
-
         foreground = true;
     }
 }

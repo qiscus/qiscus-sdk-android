@@ -42,7 +42,7 @@ import rx.schedulers.Schedulers;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusChannelActivity extends QiscusGroupChatActivity implements QiscusApi.MetaRoomMembersListener {
+public class QiscusChannelActivity extends QiscusGroupChatActivity implements QiscusApi.MetaRoomParticipantsListener {
     protected String subtitle;
 
     public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
@@ -78,7 +78,8 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
 
     @Override
     protected void generateSubtitle() {
-        QiscusApi.getInstance().getParticipants(qiscusChatRoom.getUniqueId(), 0, null, this)
+        QiscusApi.getInstance().getParticipants(qiscusChatRoom.getUniqueId(),1,100,
+                null,this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
@@ -125,7 +126,7 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
     }
 
     @Override
-    public void onMetaReceived(int currentOffset, int perPage, int total) {
+    public void onMetaReceived(int currentPage, int perPage, int total) {
         subtitle = getResources().getQuantityString(R.plurals.qiscus_channel_participant_count_subtitle,
                 total, total);
     }
