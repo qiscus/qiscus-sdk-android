@@ -164,8 +164,15 @@ public final class QiscusFileUtil {
     }
 
     public static String generateFilePath(String fileName, String extension) {
-        File file = new File(Environment.getExternalStorageDirectory().getPath(),
-                isImage(fileName) ? IMAGE_PATH : FILES_PATH);
+        File file;
+        if (BuildVersionUtil.isQlower()) {
+            file = new File(Environment.getExternalStorageDirectory().getPath(),
+                    isImage(fileName) ? IMAGE_PATH : FILES_PATH);
+
+        } else {
+            file = new File(QiscusCore.getApps().getApplicationContext().getFilesDir().getPath(),
+                    isImage(fileName) ? IMAGE_PATH : FILES_PATH);
+        }
 
         if (!file.exists()) {
             file.mkdirs();
