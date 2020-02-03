@@ -99,7 +99,7 @@ public class QiscusSyncService extends Service {
         scheduledSync = QiscusCore.getTaskExecutor()
                 .scheduleWithFixedDelay(() -> {
                     if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
-                        QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                        QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
                         syncComments();
                         syncEvents();
                     }
@@ -109,7 +109,6 @@ public class QiscusSyncService extends Service {
     private void syncEvents() {
         QiscusApi.getInstance().synchronizeEvent(QiscusEventCache.getInstance().getLastEventId())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(events -> {
                 }, QiscusErrorLogger::print);
     }
@@ -125,7 +124,6 @@ public class QiscusSyncService extends Service {
                     QiscusLogger.print("Sync completed...");
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
@@ -143,7 +141,7 @@ public class QiscusSyncService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
                 scheduleSync(QiscusCore.getHeartBeat());
                 break;
             case LOGOUT:
