@@ -101,7 +101,6 @@ public class QiscusSyncJobAutomaticService extends JobService {
     private void syncEvents() {
         QiscusApi.getInstance().synchronizeEvent(QiscusEventCache.getInstance().getLastEventId())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(events -> {
                 }, QiscusErrorLogger::print);
     }
@@ -117,7 +116,6 @@ public class QiscusSyncJobAutomaticService extends JobService {
                     QiscusLogger.print("Sync automatic completed...");
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     EventBus.getDefault().post(QiscusSyncEvent.FAILED);
