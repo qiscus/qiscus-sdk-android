@@ -98,14 +98,14 @@ import rx.schedulers.Schedulers;
  */
 public enum QiscusApi {
     INSTANCE;
-    private final OkHttpClient httpClient;
-    private final Api api;
+    private OkHttpClient httpClient;
+    private Api api;
     private String baseUrl;
 
     QiscusApi() {
         baseUrl = QiscusCore.getAppServer();
 
-        if ( Build.VERSION.SDK_INT <= 19 ) {
+        if (Build.VERSION.SDK_INT <= 19) {
             ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
                     .supportsTlsExtensions(true)
                     .allEnabledTlsVersions()
@@ -120,7 +120,7 @@ public enum QiscusApi {
                     .connectionSpecs(Collections.singletonList(spec))
                     .build();
 
-        }else{
+        } else {
             httpClient = new OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
@@ -140,6 +140,42 @@ public enum QiscusApi {
 
     public static QiscusApi getInstance() {
         return INSTANCE;
+    }
+
+    public void reInitiateInstance() {
+        baseUrl = QiscusCore.getAppServer();
+
+        if (Build.VERSION.SDK_INT <= 19) {
+            ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                    .supportsTlsExtensions(true)
+                    .allEnabledTlsVersions()
+                    .allEnabledCipherSuites()
+                    .build();
+
+            httpClient = new OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(this::headersInterceptor)
+                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .connectionSpecs(Collections.singletonList(spec))
+                    .build();
+
+        } else {
+            httpClient = new OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(this::headersInterceptor)
+                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .build();
+        }
+
+        api = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .client(httpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build()
+                .create(Api.class);
     }
 
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
@@ -938,7 +974,7 @@ public enum QiscusApi {
                 .toList();
     }
 
-    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId,  int page, int limit, String sorting) {
+    public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int page, int limit, String sorting) {
         return api.getRoomParticipants(roomUniqueId, page, limit, 0, sorting)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))

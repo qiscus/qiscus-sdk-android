@@ -23,17 +23,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 
-import androidx.annotation.RestrictTo;
-
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncAutomaticService;
@@ -49,9 +47,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import androidx.annotation.RestrictTo;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -74,7 +72,7 @@ public class QiscusCore {
     private static ScheduledThreadPoolExecutor taskExecutor;
     private static boolean enableMqttLB = true;
     private static JSONObject customHeader;
-    private static Boolean enableEventReport;
+    private static Boolean enableEventReport = true;
 
     private QiscusCore() {
     }
@@ -205,6 +203,7 @@ public class QiscusCore {
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
 
         chatConfig = new QiscusCoreChatConfig();
+
         appHandler = new Handler(QiscusCore.getApps().getApplicationContext().getMainLooper());
         taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
@@ -233,18 +232,36 @@ public class QiscusCore {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(appConfig -> {
-                    if (!appConfig.getBaseURL().isEmpty()) {
-                        appServer = !appConfig.getBaseURL().endsWith("/") ?
-                                appConfig.getBaseURL() + "/" : appConfig.getBaseURL();
-                    }
+                    enableEventReport = appConfig.getEnableEventReport();
 
-                    if (!appConfig.getBrokerURL().isEmpty()) {
-                        QiscusCore.mqttBrokerUrl = String.format("ssl://%s:1885",
-                                appConfig.getBrokerURL());
+                    if (!appConfig.getBaseURL().isEmpty()) {
+                        String oldAppServer = appServer;
+                        String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
+                                appConfig.getBaseURL() + "/" : appConfig.getBaseURL();
+
+                        if (!oldAppServer.equals(newAppServer)) {
+                            appServer = newAppServer;
+                            QiscusApi.getInstance().reInitiateInstance();
+                        }
+
                     }
 
                     if (!appConfig.getBrokerLBURL().isEmpty()) {
                         QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
+                    }
+
+                    if (!appConfig.getBrokerURL().isEmpty()) {
+
+                        String oldMqttBrokerUrl = QiscusCore.mqttBrokerUrl;
+                        String newMqttBrokerUrl = String.format("ssl://%s:1885",
+                                appConfig.getBrokerURL());
+
+                        if (!oldMqttBrokerUrl.equals(newMqttBrokerUrl)) {
+                            QiscusCore.mqttBrokerUrl = newMqttBrokerUrl;
+                            QiscusCore.setCacheMqttBrokerUrl(newMqttBrokerUrl, false);
+                            QiscusPusherApi.getInstance().disconnect();
+                            QiscusPusherApi.getInstance().restartConnection();
+                        }
                     }
 
                     if (appConfig.getSyncInterval() != 0) {
@@ -255,8 +272,8 @@ public class QiscusCore {
                         automaticHeartBeat = appConfig.getSyncOnConnect();
                     }
 
-                    enableEventReport = appConfig.getEnableEventReport();
-                }, QiscusErrorLogger::print );
+
+                }, QiscusErrorLogger::print);
 
     }
 
