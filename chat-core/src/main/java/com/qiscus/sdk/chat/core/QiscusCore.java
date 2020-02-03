@@ -31,6 +31,7 @@ import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
@@ -50,6 +51,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -72,6 +74,7 @@ public class QiscusCore {
     private static ScheduledThreadPoolExecutor taskExecutor;
     private static boolean enableMqttLB = true;
     private static JSONObject customHeader;
+    private static Boolean enableEventReport;
 
     private QiscusCore() {
     }
@@ -195,8 +198,10 @@ public class QiscusCore {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
+
         appInstance = application;
         appId = qiscusAppId;
+
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
 
         chatConfig = new QiscusCoreChatConfig();
@@ -210,12 +215,49 @@ public class QiscusCore {
         QiscusCore.enableMqttLB = enableMqttLB;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
         QiscusCore.baseURLLB = baseURLLB;
+        enableEventReport = false;
         localDataManager.setURLLB(baseURLLB);
+
+        getAppConfig();
+
         startPusherService();
         startNetworkCheckerService();
         QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
         configureFcmToken();
+    }
+
+    private static void getAppConfig() {
+        QiscusApi.getInstance()
+                .getAppConfig()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(appConfig -> {
+                    if (!appConfig.getBaseURL().isEmpty()) {
+                        appServer = !appConfig.getBaseURL().endsWith("/") ?
+                                appConfig.getBaseURL() + "/" : appConfig.getBaseURL();
+                    }
+
+                    if (!appConfig.getBrokerURL().isEmpty()) {
+                        QiscusCore.mqttBrokerUrl = String.format("ssl://%s:1885",
+                                appConfig.getBrokerURL());
+                    }
+
+                    if (!appConfig.getBrokerLBURL().isEmpty()) {
+                        QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
+                    }
+
+                    if (appConfig.getSyncInterval() != 0) {
+                        heartBeat = appConfig.getSyncInterval();
+                    }
+
+                    if (appConfig.getSyncOnConnect() != 0) {
+                        automaticHeartBeat = appConfig.getSyncOnConnect();
+                    }
+
+                    enableEventReport = appConfig.getEnableEventReport();
+                }, QiscusErrorLogger::print );
+
     }
 
     public static void startPusherService() {
@@ -309,6 +351,16 @@ public class QiscusCore {
     public static boolean isEnableMqttLB() {
         checkAppIdSetup();
         return enableMqttLB;
+    }
+
+    /**
+     * enableEventReport
+     * Checker for enable or disable EventReport
+     *
+     * @return boolean
+     */
+    public static boolean getEnableEventReport() {
+        return enableEventReport;
     }
 
     /**

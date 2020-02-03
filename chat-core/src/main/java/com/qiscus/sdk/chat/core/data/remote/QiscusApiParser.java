@@ -24,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -342,5 +343,56 @@ final class QiscusApiParser {
         for (JsonElement el : arr) {
             memberList.add(parseQiscusRoomMember(el.getAsJsonObject().getAsJsonObject("user")));
         }
+    }
+
+    static QiscusAppConfig parseQiscusAppConfig(JsonElement jsonElement) {
+        if (jsonElement != null) {
+            QiscusAppConfig appConfig = new QiscusAppConfig();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject results = jsonObject.getAsJsonObject("results");
+
+
+            if (results.has("base_url")) {
+                appConfig.setBaseURL(results.get("base_url").getAsString());
+            } else {
+                appConfig.setBaseURL("");
+            }
+
+            if (results.has("broker_lb_url")) {
+                appConfig.setBrokerLBURL(results.get("broker_lb_url").getAsString());
+            } else {
+                appConfig.setBrokerLBURL("");
+            }
+
+            if (results.has("broker_url")) {
+                appConfig.setBrokerURL(results.get("broker_url").getAsString());
+            } else {
+                appConfig.setBrokerURL("");
+            }
+
+            if (results.has("enable_event_report")) {
+                appConfig.setEnableEventReport(results.get("enable_event_report").getAsBoolean());
+            } else {
+                appConfig.setEnableEventReport(false);
+            }
+
+            if (results.has("sync_interval")) {
+                appConfig.setSyncInterval(results.get("sync_interval").getAsInt());
+            } else {
+                appConfig.setSyncInterval(0);
+            }
+
+            if (results.has("sync_on_connect")) {
+                appConfig.setSyncOnConnect(results.get("sync_on_connect").getAsInt());
+            } else {
+                appConfig.setSyncOnConnect(0);
+            }
+
+            return appConfig;
+
+        } else {
+            return null;
+        }
+
     }
 }
