@@ -18,6 +18,7 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
@@ -28,6 +29,7 @@ import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -58,6 +60,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -102,12 +105,29 @@ public enum QiscusApi {
     QiscusApi() {
         baseUrl = QiscusCore.getAppServer();
 
-        httpClient = new OkHttpClient.Builder()
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .addInterceptor(this::headersInterceptor)
-                .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
-                .build();
+        if ( Build.VERSION.SDK_INT <= 19 ) {
+            ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                    .supportsTlsExtensions(true)
+                    .allEnabledTlsVersions()
+                    .allEnabledCipherSuites()
+                    .build();
+
+            httpClient = new OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(this::headersInterceptor)
+                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .connectionSpecs(Collections.singletonList(spec))
+                    .build();
+
+        }else{
+            httpClient = new OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(this::headersInterceptor)
+                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .build();
+        }
 
         api = new Retrofit.Builder()
                 .baseUrl(baseUrl)
@@ -985,6 +1005,13 @@ public enum QiscusApi {
                 .map(jsonElement -> null);
     }
 
+    public Observable<QiscusAppConfig> getAppConfig() {
+        return api.getAppConfig()
+                .map(QiscusApiParser::parseQiscusAppConfig);
+
+
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1166,6 +1193,9 @@ public enum QiscusApi {
                 @Query("order_query") String orderQuery,
                 @Query("query") String query
         );
+
+        @GET("api/v2/mobile/config")
+        Observable<JsonElement> getAppConfig();
     }
 
     public interface MetaRoomMembersListener {
