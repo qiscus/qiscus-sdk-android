@@ -227,7 +227,7 @@ public class QiscusCore {
         configureFcmToken();
     }
 
-    static void getAppConfig() {
+    private static void getAppConfig() {
         QiscusApi.getInstance()
                 .getAppConfig()
                 .subscribeOn(Schedulers.io())
