@@ -66,7 +66,6 @@ public class QiscusSyncService extends Service {
 
     private QiscusAccount qiscusAccount;
     private Timer timer;
-    private int counter = 0;
 
     @Override
     public void onCreate() {
@@ -101,19 +100,9 @@ public class QiscusSyncService extends Service {
             public void run() {
                 // time ran out.
                 if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
-                    QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                    QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                     syncComments();
                     syncEvents();
-                }
-
-                counter++;
-                if (counter == (QiscusCore.getAutomaticHeartBeat() / QiscusCore.getHeartBeat())) {
-                    if (QiscusCore.isOnForeground() && QiscusCore.hasSetupUser() && QiscusPusherApi.getInstance().isConnected()) {
-                        //run automatic sync
-                        syncComments();
-                        syncEvents();
-                    }
-                    counter = 0;
                 }
 
                 scheduleSync(period);
@@ -157,7 +146,7 @@ public class QiscusSyncService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                 scheduleSync(QiscusCore.getHeartBeat());
                 break;
             case LOGOUT:
