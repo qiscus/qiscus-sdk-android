@@ -72,7 +72,7 @@ public class QiscusSyncJobService extends JobService {
         QiscusLogger.print(TAG, "Job started...");
 
         if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
-            QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+            QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
         }
         counter++;
@@ -150,7 +150,7 @@ public class QiscusSyncJobService extends JobService {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().connect());
+                QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().connect());
                 syncJob(this);
                 break;
             case LOGOUT:

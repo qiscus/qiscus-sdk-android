@@ -101,7 +101,7 @@ public class QiscusSyncService extends Service {
             public void run() {
                 // time ran out.
                 if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
-                    QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                    QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
                     syncComments();
                     syncEvents();
                 }
@@ -157,7 +157,7 @@ public class QiscusSyncService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
                 scheduleSync(QiscusCore.getHeartBeat());
                 break;
             case LOGOUT:
