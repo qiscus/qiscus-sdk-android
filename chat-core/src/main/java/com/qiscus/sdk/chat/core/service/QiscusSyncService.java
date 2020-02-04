@@ -67,6 +67,7 @@ public class QiscusSyncService extends Service {
     private QiscusAccount qiscusAccount;
     private Timer timer;
     private int counter = 0;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -105,7 +106,7 @@ public class QiscusSyncService extends Service {
                     syncEvents();
                 }
 
-                counter ++;
+                counter++;
                 if (counter == (QiscusCore.getAutomaticHeartBeat() / QiscusCore.getHeartBeat())) {
                     if (QiscusCore.isOnForeground() && QiscusCore.hasSetupUser() && QiscusPusherApi.getInstance().isConnected()) {
                         //run automatic sync
