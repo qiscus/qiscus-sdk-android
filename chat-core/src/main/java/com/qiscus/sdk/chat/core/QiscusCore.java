@@ -50,6 +50,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import androidx.annotation.RestrictTo;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -241,10 +242,11 @@ public class QiscusCore {
 
                         if (!oldAppServer.equals(newAppServer)) {
                             appServer = newAppServer;
-                            QiscusApi.getInstance().reInitiateInstance();
                         }
 
                     }
+
+                    QiscusApi.getInstance().reInitiateInstance();
 
                     if (!appConfig.getBrokerLBURL().isEmpty()) {
                         QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
@@ -273,7 +275,10 @@ public class QiscusCore {
                     }
 
 
-                }, QiscusErrorLogger::print);
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    QiscusApi.getInstance().reInitiateInstance();
+                });
 
     }
 
@@ -284,8 +289,8 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
-                appInstance.getApplicationContext()
-                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncAutomaticService.class));
+//                appInstance.getApplicationContext()
+//                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncAutomaticService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
                 QiscusErrorLogger.print(e);
@@ -297,8 +302,8 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
-                appInstance.getApplicationContext()
-                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobAutomaticService.class));
+//                appInstance.getApplicationContext()
+//                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobAutomaticService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
                 QiscusErrorLogger.print(e);
