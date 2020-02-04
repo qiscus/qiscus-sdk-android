@@ -49,6 +49,8 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +68,7 @@ public class QiscusSyncAutomaticService extends Service {
     private static final String TAG = QiscusSyncAutomaticService.class.getSimpleName();
 
     private QiscusAccount qiscusAccount;
-    private ScheduledFuture<?> scheduledSync;
+    private Timer timer;
 
     @Override
     public void onCreate() {
@@ -96,13 +98,20 @@ public class QiscusSyncAutomaticService extends Service {
         qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
 
-        scheduledSync = QiscusCore.getTaskExecutor()
-                .scheduleWithFixedDelay(() -> {
-                    if (QiscusCore.isOnForeground() & QiscusPusherApi.getInstance().isConnected()) {
-                        syncComments();
-                        syncEvents();
-                    }
-                }, 0, period, TimeUnit.MILLISECONDS);
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                // time ran out.
+                if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
+                    QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                    syncComments();
+                    syncEvents();
+                }
+
+                scheduleSync(period);
+            }
+        }, period);
+
     }
 
     private void syncEvents() {
@@ -131,8 +140,8 @@ public class QiscusSyncAutomaticService extends Service {
     }
 
     private void stopSync() {
-        if (scheduledSync != null) {
-            scheduledSync.cancel(true);
+        if (timer != null) {
+            timer.cancel();
         }
     }
 

@@ -34,6 +34,7 @@ package com.qiscus.sdk.chat.core.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
 import androidx.annotation.Nullable;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
@@ -50,6 +51,8 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +69,7 @@ public class QiscusSyncService extends Service {
     private static final String TAG = QiscusSyncService.class.getSimpleName();
 
     private QiscusAccount qiscusAccount;
-    private ScheduledFuture<?> scheduledSync;
+    private Timer timer;
 
     @Override
     public void onCreate() {
@@ -96,14 +99,20 @@ public class QiscusSyncService extends Service {
         qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
 
-        scheduledSync = QiscusCore.getTaskExecutor()
-                .scheduleWithFixedDelay(() -> {
-                    if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
-                        QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                        syncComments();
-                        syncEvents();
-                    }
-                }, 0, period, TimeUnit.MILLISECONDS);
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                // time ran out.
+                if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
+                    QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                    syncComments();
+                    syncEvents();
+                }
+
+                scheduleSync(period);
+            }
+        }, period);
+
     }
 
     private void syncEvents() {
@@ -132,8 +141,8 @@ public class QiscusSyncService extends Service {
     }
 
     private void stopSync() {
-        if (scheduledSync != null) {
-            scheduledSync.cancel(true);
+        if (timer != null) {
+            timer.cancel();
         }
     }
 

@@ -37,6 +37,9 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import androidx.annotation.RequiresApi;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -51,25 +54,32 @@ import rx.schedulers.Schedulers;
 public class QiscusSyncJobAutomaticService extends JobService {
 
     private static final String TAG = QiscusSyncJobAutomaticService.class.getSimpleName();
-    private static final int STATIC_JOB_ID = 301;
+    private Timer timer;
 
     public void syncJob(Context context) {
         QiscusLogger.print(TAG, "syncJob...");
 
-        ComponentName componentName = new ComponentName(context, QiscusSyncJobAutomaticService.class);
-        JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
-                .setMinimumLatency(QiscusCore.getAutomaticHeartBeat())
-                .setOverrideDeadline(QiscusCore.getAutomaticHeartBeat())
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPersisted(true)
-                .build();
+        stopSync();
 
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.schedule(jobInfo);
-        }
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                newSchedule(context);
+            }
+        }, QiscusCore.getAutomaticHeartBeat());
 
     }
+
+    private void newSchedule(Context context) {
+        QiscusLogger.print(TAG, "Job Automatic started...");
+
+        if (QiscusCore.hasSetupUser() && QiscusPusherApi.getInstance().isConnected()) {
+            scheduleSync();
+        }
+
+        syncJob(context);
+    }
+
 
     @Override
     public void onCreate() {
@@ -124,9 +134,8 @@ public class QiscusSyncJobAutomaticService extends JobService {
     }
 
     private void stopSync() {
-        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.cancel(STATIC_JOB_ID);
+        if (timer != null) {
+            timer.cancel();
         }
     }
 
