@@ -37,6 +37,7 @@ import android.os.IBinder;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
+import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
@@ -48,7 +49,6 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -64,10 +64,9 @@ import rx.schedulers.Schedulers;
 public class QiscusSyncService extends Service {
     private static final String TAG = QiscusSyncService.class.getSimpleName();
 
+    private QiscusAccount qiscusAccount;
     private Timer timer;
-    private Boolean firstCallSync = true;
-    private Boolean firstCallAutomaticSync = true;
-
+    private int counter = 0;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -77,7 +76,7 @@ public class QiscusSyncService extends Service {
         }
 
         if (QiscusCore.hasSetupUser()) {
-            syncJob();
+            scheduleSync(QiscusCore.getHeartBeat());
         }
     }
 
@@ -92,53 +91,33 @@ public class QiscusSyncService extends Service {
         return START_STICKY;
     }
 
-    private void scheduleSync() {
-        if (QiscusCore.isOnForeground()) {
-            syncComments();
-            syncEvents();
-        }
-    }
-
-    private void syncJob() {
+    private void scheduleSync(long period) {
+        qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
-        firstCallSync = false;
-        firstCallAutomaticSync = false;
+
         timer = new Timer();
-        // scheduling the task
-        // creating timer task, timer
-        TimerTask taskFor5s = new TimerTask() {
-            @Override
+        timer.schedule(new TimerTask() {
             public void run() {
-                if (!firstCallSync) {
-                    // no action
-                    firstCallSync = true;
-                } else {
-                    if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
-                        QiscusLogger.print(TAG, "Job when disconnect started...");
-                        QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                // time ran out.
+                if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
+                    QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                    syncComments();
+                    syncEvents();
+                }
+
+                counter ++;
+                if (counter == (QiscusCore.getAutomaticHeartBeat() / QiscusCore.getHeartBeat())) {
+                    if (QiscusCore.isOnForeground() && QiscusCore.hasSetupUser() && QiscusPusherApi.getInstance().isConnected()) {
+                        //run automatic sync
                         syncComments();
+                        syncEvents();
                     }
+                    counter = 0;
                 }
-            }
-        };
 
-        TimerTask taskFor30s = new TimerTask() {
-            @Override
-            public void run() {
-                if (!firstCallAutomaticSync) {
-                    // no action
-                    firstCallAutomaticSync = true;
-                } else {
-                    if (QiscusCore.hasSetupUser() && QiscusPusherApi.getInstance().isConnected()) {
-                        QiscusLogger.print(TAG, "Job when connected started...");
-                        scheduleSync();
-                    }
-                }
+                scheduleSync(period);
             }
-        };
-
-        timer.scheduleAtFixedRate(taskFor5s, new Date(), QiscusCore.getHeartBeat());
-        timer.scheduleAtFixedRate(taskFor30s, new Date(), QiscusCore.getAutomaticHeartBeat());
+        }, period);
 
     }
 
@@ -177,8 +156,8 @@ public class QiscusSyncService extends Service {
     public void onUserEvent(QiscusUserEvent userEvent) {
         switch (userEvent) {
             case LOGIN:
-                QiscusAndroidUtil.runOnBackgroundThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                syncJob();
+                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                scheduleSync(QiscusCore.getHeartBeat());
                 break;
             case LOGOUT:
                 stopSync();
