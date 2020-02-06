@@ -484,8 +484,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
         } catch (MqttException e) {
-            //Do nothing
+            eventReport("MQTT", "FAILED_LISTEN_COMMENT", e.toString());
+            disconnect();
+            restartConnection();
         } catch (NullPointerException | IllegalArgumentException e) {
+            eventReport("MQTT", "FAILED_LISTEN_COMMENT", e.toString());
             QiscusErrorLogger.print(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenComment = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenComment, RETRY_PERIOD);
@@ -497,8 +500,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/n", 2);
         } catch (MqttException e) {
-            //Do nothing
+            eventReport("MQTT", "FAILED_LISTEN_NOTIFICATION", e.toString());
         } catch (NullPointerException | IllegalArgumentException e) {
+            eventReport("MQTT", "FAILED_LISTEN_NOTIFICATION", e.toString());
             QiscusErrorLogger.print(TAG, "Failure listen notification, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenNotification = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenNotification, RETRY_PERIOD);

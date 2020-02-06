@@ -34,8 +34,6 @@ import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
-import com.qiscus.sdk.chat.core.service.QiscusSyncAutomaticService;
-import com.qiscus.sdk.chat.core.service.QiscusSyncJobAutomaticService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
@@ -50,7 +48,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import androidx.annotation.RestrictTo;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -289,8 +286,6 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
-//                appInstance.getApplicationContext()
-//                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncAutomaticService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
                 QiscusErrorLogger.print(e);
@@ -302,8 +297,6 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
-//                appInstance.getApplicationContext()
-//                        .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobAutomaticService.class));
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
                 QiscusErrorLogger.print(e);
