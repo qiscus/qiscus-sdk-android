@@ -44,7 +44,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         QiscusAndroidUtil.runOnBackgroundThread(() -> {
             try {
-                if (!QiscusPusherApi.getInstance().isConnected() && QiscusCore.hasSetupUser()) {
+                if (!QiscusPusherApi.getInstance().isConnected() && QiscusCore.hasSetupUser() && QiscusCore.getEnableRealtime()) {
                     QiscusPusherApi.getInstance().restartConnection();
                 }
             } catch (IllegalArgumentException e) {

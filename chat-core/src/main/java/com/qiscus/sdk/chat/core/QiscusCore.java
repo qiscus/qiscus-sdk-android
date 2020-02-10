@@ -71,6 +71,7 @@ public class QiscusCore {
     private static boolean enableMqttLB = true;
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
+    private static Boolean enableRealtime = true;
 
     private QiscusCore() {
     }
@@ -271,6 +272,14 @@ public class QiscusCore {
                         automaticHeartBeat = appConfig.getSyncOnConnect();
                     }
 
+                    enableRealtime = appConfig.getEnableRealtime();
+
+                    if (!enableRealtime) {
+                        //enable realtime false
+                        QiscusPusherApi.getInstance().disconnect();
+
+                    }
+
 
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
@@ -376,6 +385,16 @@ public class QiscusCore {
      */
     public static boolean getEnableEventReport() {
         return enableEventReport;
+    }
+
+    /**
+     * enableRealtime
+     * Checker for enable or disable Realtime
+     *
+     * @return boolean
+     */
+    public static boolean getEnableRealtime() {
+        return enableRealtime;
     }
 
     /**
