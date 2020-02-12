@@ -12,6 +12,7 @@ public class QiscusAppConfig  {
     private Boolean enableEventReport;
     private Integer syncInterval;
     private Integer syncOnConnect;
+    private Boolean enableRealtime;
 
     public QiscusAppConfig() {
         super();
@@ -34,6 +35,7 @@ public class QiscusAppConfig  {
         if (!brokerLBURL.equals(that.brokerLBURL)) return false;
         if (!brokerURL.equals(that.brokerURL)) return false;
         if (!enableEventReport.equals(that.enableEventReport)) return false;
+        if (!enableRealtime.equals(that.enableRealtime)) return false;
         if (!syncInterval.equals(that.syncInterval)) return false;
         return syncOnConnect.equals(that.syncOnConnect);
     }
@@ -44,6 +46,7 @@ public class QiscusAppConfig  {
         result = 31 * result + brokerLBURL.hashCode();
         result = 31 * result + brokerURL.hashCode();
         result = 31 * result + enableEventReport.hashCode();
+        result = 31 * result + enableRealtime.hashCode();
         result = 31 * result + syncInterval.hashCode();
         result = 31 * result + syncOnConnect.hashCode();
         return result;
@@ -97,5 +100,13 @@ public class QiscusAppConfig  {
 
     public void setSyncOnConnect(Integer syncOnConnect) {
         this.syncOnConnect = syncOnConnect;
+    }
+
+    public Boolean getEnableRealtime() {
+        return enableRealtime;
+    }
+
+    public void setEnableRealtime(Boolean enableRealtime) {
+        this.enableRealtime = enableRealtime;
     }
 }

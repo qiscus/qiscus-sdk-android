@@ -363,7 +363,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void connect() {
-        if (QiscusCore.hasSetupUser() && !connecting && QiscusAndroidUtil.isNetworkAvailable()) {
+        if (QiscusCore.hasSetupUser() && !connecting && QiscusAndroidUtil.isNetworkAvailable() && QiscusCore.getEnableRealtime()) {
             connecting = true;
             qiscusAccount = QiscusCore.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
@@ -420,6 +420,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             return;
         }
 
+        if (!QiscusCore.getEnableRealtime()) {
+            QiscusLogger.print("QiscusPusherApi", "Disconnect from AppConfig.");
+            return;
+        }
+
         getMqttBrokerUrlFromLB();
         QiscusLogger.print("QiscusPusherApi", "Restart connection...");
         try {
@@ -465,6 +470,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void disconnect() {
         QiscusLogger.print(TAG, "Disconnecting...");
+        if ( mqttAndroidClient == null ) {
+            return;
+        }
         publishOnlinePresence(false);
         try {
             connecting = false;
@@ -535,6 +543,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     @Deprecated
     public void listenRoom(QiscusChatRoom qiscusChatRoom) {
+        if (!QiscusCore.getEnableRealtime()) {
+            return;
+        }
         QiscusLogger.print(TAG, "Listening room...");
         fallBackListenRoom = () -> listenRoom(qiscusChatRoom);
         try {
@@ -557,6 +568,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void subscribeChatRoom(QiscusChatRoom qiscusChatRoom) {
+        if (!QiscusCore.getEnableRealtime()) {
+            return;
+        }
         QiscusLogger.print(TAG, "Listening room...");
         fallBackListenRoom = () -> subscribeChatRoom(qiscusChatRoom);
         try {
@@ -1017,6 +1031,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         } else {
             // if connected, update flag to true
             QiscusCore.setCacheMqttBrokerUrl(QiscusCore.getMqttBrokerUrl(), true);
+
+            if (!QiscusCore.getEnableRealtime()) {
+                disconnect();
+                QiscusLogger.print("QiscusPusherApi", "Disconnect from AppConfig.");
+                return;
+            }
 
             QiscusLogger.print(TAG, "Connected..." +  mqttAndroidClient.getClientId() + " " + QiscusCore.getMqttBrokerUrl());
             EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);

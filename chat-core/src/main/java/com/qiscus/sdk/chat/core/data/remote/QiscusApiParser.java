@@ -376,6 +376,12 @@ final class QiscusApiParser {
                 appConfig.setEnableEventReport(false);
             }
 
+            if (results.has("enable_realtime")) {
+                appConfig.setEnableRealtime(results.get("enable_realtime").getAsBoolean());
+            } else {
+                appConfig.setEnableRealtime(true);
+            }
+
             if (results.has("sync_interval")) {
                 appConfig.setSyncInterval(results.get("sync_interval").getAsInt());
             } else {
