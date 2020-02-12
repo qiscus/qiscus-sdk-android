@@ -470,7 +470,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void disconnect() {
         QiscusLogger.print(TAG, "Disconnecting...");
-        if ( mqttAndroidClient == null ){
+        if ( mqttAndroidClient == null ) {
             return;
         }
         publishOnlinePresence(false);
