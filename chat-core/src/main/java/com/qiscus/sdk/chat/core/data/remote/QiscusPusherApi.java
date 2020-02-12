@@ -484,11 +484,23 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
         } catch (MqttException e) {
-            eventReport("MQTT", "FAILED_LISTEN_COMMENT", e.toString());
+            try {
+                eventReport("MQTT", "FAILED_LISTEN_COMMENT", e.toString());
+            } catch (NullPointerException d) {
+                //ignored
+            } catch (Exception d) {
+                //ignored
+            }
             disconnect();
             restartConnection();
         } catch (NullPointerException | IllegalArgumentException e) {
-            eventReport("MQTT", "FAILED_LISTEN_COMMENT", e.toString());
+            try {
+                eventReport("MQTT", "FAILED_LISTEN_COMMENT", e.toString());
+            } catch (NullPointerException d) {
+                //ignored
+            } catch (Exception d) {
+                //ignored
+            }
             QiscusErrorLogger.print(TAG, "Failure listen comment, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenComment = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenComment, RETRY_PERIOD);
@@ -500,9 +512,21 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/n", 2);
         } catch (MqttException e) {
-            eventReport("MQTT", "FAILED_LISTEN_NOTIFICATION", e.toString());
+            try {
+                eventReport("MQTT", "FAILED_LISTEN_NOTIFICATION", e.toString());
+            } catch (NullPointerException d) {
+                //ignored
+            } catch (Exception d) {
+                //ignored
+            }
         } catch (NullPointerException | IllegalArgumentException e) {
-            eventReport("MQTT", "FAILED_LISTEN_NOTIFICATION", e.toString());
+            try {
+                eventReport("MQTT", "FAILED_LISTEN_NOTIFICATION", e.toString());
+            } catch (NullPointerException d) {
+                //ignored
+            } catch (Exception d) {
+                //ignored
+            }
             QiscusErrorLogger.print(TAG, "Failure listen notification, try again in " + RETRY_PERIOD + " ms");
             connect();
             scheduledListenNotification = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenNotification, RETRY_PERIOD);
