@@ -17,10 +17,16 @@
 package com.qiscus.sdk.chat.core;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 
+import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
+import com.qiscus.sdk.chat.core.service.QiscusSyncService;
+import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -43,7 +49,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(Activity activity) {
-        if (!QiscusCore.isServiceRunning()) {
+        if (!QiscusServiceUtil.isMyServiceRunning()){
             QiscusCore.startPusherService();
         }
     }
