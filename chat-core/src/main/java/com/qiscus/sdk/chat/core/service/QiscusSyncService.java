@@ -76,7 +76,7 @@ public class QiscusSyncService extends Service {
         }
 
         if (QiscusCore.hasSetupUser()) {
-            scheduleSync(QiscusCore.getHeartBeat());
+            scheduleSync();
         }
     }
 
@@ -91,7 +91,8 @@ public class QiscusSyncService extends Service {
         return START_STICKY;
     }
 
-    private void scheduleSync(long period) {
+    private void scheduleSync() {
+        long period = QiscusCore.getHeartBeat();
         qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
 
@@ -105,7 +106,7 @@ public class QiscusSyncService extends Service {
                     syncEvents();
                 }
 
-                scheduleSync(period);
+                scheduleSync();
             }
         }, period);
 
@@ -147,7 +148,7 @@ public class QiscusSyncService extends Service {
         switch (userEvent) {
             case LOGIN:
                 QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                scheduleSync(QiscusCore.getHeartBeat());
+                scheduleSync();
                 break;
             case LOGOUT:
                 stopSync();
