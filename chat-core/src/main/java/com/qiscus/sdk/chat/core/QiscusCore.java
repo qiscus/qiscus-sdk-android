@@ -73,7 +73,6 @@ public class QiscusCore {
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
     private static Boolean enableRealtime = true;
-    private static Boolean serviceRunning = false;
 
     private QiscusCore() {
     }
@@ -296,28 +295,22 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
-                serviceRunning = true;
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
-                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             } catch (RuntimeException e) {
                 //Prevent crash because trying to start service while application on background
-                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             }
         } else {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
-                serviceRunning = true;
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
-                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             } catch (RuntimeException e) {
                 //Prevent crash because trying to start service while application on background
-                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             }
         }
@@ -382,10 +375,6 @@ public class QiscusCore {
     public static boolean isEnableMqttLB() {
         checkAppIdSetup();
         return enableMqttLB;
-    }
-
-    public static boolean isServiceRunning() {
-        return serviceRunning;
     }
 
     /**
