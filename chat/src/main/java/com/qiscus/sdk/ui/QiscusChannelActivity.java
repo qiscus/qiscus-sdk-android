@@ -78,8 +78,8 @@ public class QiscusChannelActivity extends QiscusGroupChatActivity implements Qi
 
     @Override
     protected void generateSubtitle() {
-        QiscusApi.getInstance().getParticipants(qiscusChatRoom.getUniqueId(),1,100,
-                null,this)
+        QiscusApi.getInstance().getParticipants(qiscusChatRoom.getUniqueId(), 1, 100,
+                null, this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();

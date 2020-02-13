@@ -108,6 +108,15 @@ public class QiscusChatRoomEventHandler {
             if (qiscusComment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
                 handleChatRoomChanged(qiscusComment);
             }
+
+            if (!QiscusCore.getEnableRealtime() && qiscusChatRoom.getId() == qiscusComment.getRoomId()) {
+                QiscusChatRoom room = QiscusCore.getDataStore().getChatRoom(qiscusChatRoom.getId());
+                if ( room.getLastComment().getState() == QiscusComment.STATE_ON_QISCUS ||
+                        room.getLastComment().getState() == QiscusComment.STATE_DELIVERED ) {
+                    QiscusCore.getDataStore().updateLastReadComment(qiscusChatRoom.getId(), qiscusComment.getId());
+                    listener.onChangeLastRead(qiscusComment.getId());
+                }
+            }
         }
     }
 

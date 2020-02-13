@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 
+import androidx.annotation.RestrictTo;
+
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
@@ -45,7 +47,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import androidx.annotation.RestrictTo;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -71,6 +72,8 @@ public class QiscusCore {
     private static boolean enableMqttLB = true;
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
+    private static Boolean enableRealtime = true;
+    private static Boolean serviceRunning = false;
 
     private QiscusCore() {
     }
@@ -271,6 +274,13 @@ public class QiscusCore {
                         automaticHeartBeat = appConfig.getSyncOnConnect();
                     }
 
+                    enableRealtime = appConfig.getEnableRealtime();
+
+                    if (!enableRealtime) {
+                        //enable realtime false
+                        QiscusPusherApi.getInstance().disconnect();
+
+                    }
 
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
@@ -286,22 +296,28 @@ public class QiscusCore {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncService.class));
+                serviceRunning = true;
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
+                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             } catch (RuntimeException e) {
                 //Prevent crash because trying to start service while application on background
+                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             }
         } else {
             try {
                 appInstance.getApplicationContext()
                         .startService(new Intent(appInstance.getApplicationContext(), QiscusSyncJobService.class));
+                serviceRunning = true;
             } catch (IllegalStateException e) {
                 //Prevent crash because trying to start service while application on background
+                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             } catch (RuntimeException e) {
                 //Prevent crash because trying to start service while application on background
+                serviceRunning = false;
                 QiscusErrorLogger.print(e);
             }
         }
@@ -368,6 +384,10 @@ public class QiscusCore {
         return enableMqttLB;
     }
 
+    public static boolean isServiceRunning() {
+        return serviceRunning;
+    }
+
     /**
      * enableEventReport
      * Checker for enable or disable EventReport
@@ -376,6 +396,16 @@ public class QiscusCore {
      */
     public static boolean getEnableEventReport() {
         return enableEventReport;
+    }
+
+    /**
+     * enableRealtime
+     * Checker for enable or disable Realtime
+     *
+     * @return boolean
+     */
+    public static boolean getEnableRealtime() {
+        return enableRealtime;
     }
 
     /**
@@ -489,16 +519,6 @@ public class QiscusCore {
     }
 
     /**
-     * Get the current qiscus automaticheartbeat duration (default 30s)
-     *
-     * @return automaticHeartbeat duration in milliseconds
-     */
-    public static long getAutomaticHeartBeat() {
-        return automaticHeartBeat;
-    }
-
-
-    /**
      * Set the heartbeat of qiscus synchronization chat data. Default value is 500ms
      *
      * @param heartBeat Heartbeat duration in milliseconds
@@ -507,6 +527,15 @@ public class QiscusCore {
     public static void setHeartBeat(long heartBeat) {
         checkAppIdSetup();
         QiscusCore.heartBeat = heartBeat;
+    }
+
+    /**
+     * Get the current qiscus automaticheartbeat duration (default 30s)
+     *
+     * @return automaticHeartbeat duration in milliseconds
+     */
+    public static long getAutomaticHeartBeat() {
+        return automaticHeartBeat;
     }
 
     /**

@@ -19,9 +19,7 @@ package com.qiscus.sdk.chat.core;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 
 import java.util.concurrent.ScheduledFuture;
@@ -36,27 +34,18 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     INSTANCE;
 
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
-
-    private ScheduledFuture<?> activityTransition;
     private static boolean foreground;
+    private ScheduledFuture<?> activityTransition;
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> {
-            try {
-                if (!QiscusPusherApi.getInstance().isConnected() && QiscusCore.hasSetupUser()) {
-                    QiscusPusherApi.getInstance().restartConnection();
-                }
-            } catch (IllegalArgumentException e) {
-                // ignore
-            } catch (RuntimeException e) {
-                //ignore
-            }
-        });
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
+        if (!QiscusCore.isServiceRunning()) {
+            QiscusCore.startPusherService();
+        }
     }
 
     @Override
