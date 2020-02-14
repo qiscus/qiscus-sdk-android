@@ -49,7 +49,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(Activity activity) {
-        if (!QiscusServiceUtil.isMyServiceRunning()){
+        if (!QiscusServiceUtil.isMyServiceRunning()) {
             QiscusCore.startPusherService();
         }
     }

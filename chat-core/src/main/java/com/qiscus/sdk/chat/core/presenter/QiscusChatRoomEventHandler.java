@@ -109,7 +109,7 @@ public class QiscusChatRoomEventHandler {
                 handleChatRoomChanged(qiscusComment);
             }
 
-            if (!QiscusCore.getEnableRealtime() && qiscusChatRoom.getId() == qiscusComment.getRoomId()) {
+            if (qiscusChatRoom.getId() == qiscusComment.getRoomId()) {
                 QiscusChatRoom room = QiscusCore.getDataStore().getChatRoom(qiscusChatRoom.getId());
                 if ( room.getLastComment().getState() == QiscusComment.STATE_ON_QISCUS ||
                         room.getLastComment().getState() == QiscusComment.STATE_DELIVERED ) {
