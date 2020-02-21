@@ -377,7 +377,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 mqttAndroidClient.connect(mqttConnectOptions, null, this);
                 QiscusLogger.print(TAG, "Connecting...");
             } catch (MqttException | IllegalStateException e) {
-                //Do nothing
+                connecting = false;
                 if (e != null) {
                     try {
                         QiscusLogger.print(TAG, "Connecting... error" + e.toString());
@@ -390,6 +390,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     QiscusLogger.print(TAG, "Connecting... " + "Failure to connecting");
                 }
             } catch (NullPointerException | IllegalArgumentException e) {
+                connecting = false;
                 if (e != null) {
                     try {
                         QiscusLogger.print(TAG, "Connecting... error" + e.toString());
@@ -415,13 +416,18 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void restartConnection() {
-        if (isConnected()) {
+        if (isConnected() ) {
             QiscusLogger.print(TAG, "Connected... " + "connectCompleteFromRestartConnection");
             return;
         }
 
         if (!QiscusCore.getEnableRealtime()) {
             QiscusLogger.print("QiscusPusherApi", "Disconnect from AppConfig.");
+            return;
+        }
+
+        if (connecting) {
+            QiscusLogger.print(TAG, "Connecting... " + "connectingFromRestartConnection");
             return;
         }
 
@@ -434,6 +440,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
+            connecting = false;
         }
 
         clearTasks();
@@ -1027,7 +1034,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         if (!isConnected()) {
             connecting = false;
             reconnectCounter = 0;
-            connect();
+            restartConnection();
         } else {
             // if connected, update flag to true
             QiscusCore.setCacheMqttBrokerUrl(QiscusCore.getMqttBrokerUrl(), true);
@@ -1059,11 +1066,13 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 scheduleUserStatus();
             } catch (NullPointerException e) {
                 //ignored
-            } catch (IllegalArgumentException ignored) {
+                QiscusErrorLogger.print("QiscusPusherApi 2", "listen nullpointer: " + e);
+            } catch (IllegalArgumentException e1) {
                 //Do nothing
-                if (ignored != null) {
+                QiscusErrorLogger.print("QiscusPusherApi 2", "listen nullpointer: " + e1);
+                if (e1 != null) {
                     try {
-                        QiscusLogger.print(TAG, "Connected..." + ignored.toString());
+                        QiscusLogger.print(TAG, "Connected..." + e1.toString());
                     } catch (NullPointerException e) {
                         //ignored
                     } catch (Exception e) {
