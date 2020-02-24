@@ -13,6 +13,7 @@ public class QiscusAppConfig  {
     private Integer syncInterval;
     private Integer syncOnConnect;
     private Boolean enableRealtime;
+    private Boolean enableRealtimeCheck;
 
     public QiscusAppConfig() {
         super();
@@ -37,6 +38,7 @@ public class QiscusAppConfig  {
         if (!enableEventReport.equals(that.enableEventReport)) return false;
         if (!enableRealtime.equals(that.enableRealtime)) return false;
         if (!syncInterval.equals(that.syncInterval)) return false;
+        if (!enableRealtimeCheck.equals(that.enableRealtimeCheck)) return false;
         return syncOnConnect.equals(that.syncOnConnect);
     }
 
@@ -49,6 +51,7 @@ public class QiscusAppConfig  {
         result = 31 * result + enableRealtime.hashCode();
         result = 31 * result + syncInterval.hashCode();
         result = 31 * result + syncOnConnect.hashCode();
+        result = 31 * result + enableRealtimeCheck.hashCode();
         return result;
     }
 
@@ -108,5 +111,13 @@ public class QiscusAppConfig  {
 
     public void setEnableRealtime(Boolean enableRealtime) {
         this.enableRealtime = enableRealtime;
+    }
+
+    public Boolean getEnableRealtimeCheck() {
+        return enableRealtimeCheck;
+    }
+
+    public void setEnableRealtimeCheck(Boolean enableRealtimeCheck) {
+        this.enableRealtimeCheck = enableRealtimeCheck;
     }
 }

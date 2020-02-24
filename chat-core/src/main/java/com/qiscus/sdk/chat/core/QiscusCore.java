@@ -73,6 +73,7 @@ public class QiscusCore {
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
     private static Boolean enableRealtime = true;
+    private static Boolean enableRealtimeCheck = false;
 
     private QiscusCore() {
     }
@@ -233,7 +234,7 @@ public class QiscusCore {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(appConfig -> {
                     enableEventReport = appConfig.getEnableEventReport();
-
+                    enableRealtimeCheck = appConfig.getEnableRealtimeCheck();
                     if (!appConfig.getBaseURL().isEmpty()) {
                         String oldAppServer = appServer;
                         String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
@@ -395,6 +396,16 @@ public class QiscusCore {
      */
     public static boolean getEnableRealtime() {
         return enableRealtime;
+    }
+
+    /**
+     * enableRealtimeCheck
+     * Checker for enable or disable RealtimeCheck
+     *
+     * @return boolean
+     */
+    public static boolean getEnableRealtimeCheck() {
+        return enableRealtimeCheck;
     }
 
     /**

@@ -28,6 +28,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
+import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -394,11 +395,35 @@ final class QiscusApiParser {
                 appConfig.setSyncOnConnect(0);
             }
 
+            if (results.has("enable_realtime_check")) {
+                appConfig.setEnableRealtimeCheck(results.get("enable_realtime_check").getAsBoolean());
+            } else {
+                appConfig.setEnableRealtimeCheck(false);
+            }
+
             return appConfig;
 
         } else {
             return null;
         }
+    }
 
+    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement){
+        if (jsonElement != null) {
+            QiscusRealtimeStatus realtimeStatus = new QiscusRealtimeStatus();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject results = jsonObject.getAsJsonObject("results");
+
+
+            if (results.has("status")) {
+                realtimeStatus.setRealtimeStatus(results.get("status").getAsBoolean());
+            } else {
+                realtimeStatus.setRealtimeStatus(false);
+            }
+
+            return realtimeStatus;
+        } else {
+            return null;
+        }
     }
 }

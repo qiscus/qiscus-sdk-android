@@ -198,4 +198,12 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> getRealtimeStatus(String topic) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        hashMap.put("topic", topic);
+
+        return hashMap;
+    }
 }

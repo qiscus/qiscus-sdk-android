@@ -93,7 +93,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private ScheduledFuture<?> scheduledListenEvent;
     private boolean connecting;
     private boolean reporting = true;
-    private Runnable fallbackConnect = this::connect;
+    private Runnable fallbackConnect = this::restartConnection;
     private Runnable fallBackListenComment = this::listenComment;
     private Runnable fallBackListenNotification = this::listenNotification;
     private ScheduledFuture<?> scheduledUserStatus;
@@ -1152,4 +1152,23 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             scheduledUserStatus.cancel(true);
         }
     }
+
+    public void getRealtimeStatus() {
+        if (!QiscusCore.getEnableRealtimeCheck()) {
+            return;
+        }
+        qiscusAccount = QiscusCore.getQiscusAccount();
+        QiscusApi.getInstance()
+                .getRealtimeStatus(qiscusAccount.getToken()+"/c")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(realtimeStatus -> {
+                    if (!realtimeStatus.getRealtimeStatus()) {
+                        listenComment();
+                    }
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                });
+    }
+
 }

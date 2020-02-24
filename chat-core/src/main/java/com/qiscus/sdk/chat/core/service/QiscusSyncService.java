@@ -100,10 +100,16 @@ public class QiscusSyncService extends Service {
         timer.schedule(new TimerTask() {
             public void run() {
                 // time ran out.
-                if (QiscusCore.isOnForeground() & !QiscusPusherApi.getInstance().isConnected()) {
+                if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
                     QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                    syncComments();
-                    syncEvents();
+                    if (QiscusCore.isOnForeground()) {
+                        syncComments();
+                        syncEvents();
+                    }
+                } else {
+                    if (QiscusCore.hasSetupUser() && QiscusCore.isOnForeground() ) {
+                        QiscusPusherApi.getInstance().getRealtimeStatus();
+                    }
                 }
 
                 scheduleSync();
