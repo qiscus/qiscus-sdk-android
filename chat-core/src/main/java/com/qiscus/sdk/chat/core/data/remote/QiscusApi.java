@@ -33,6 +33,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
+import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentSentEvent;
@@ -1045,7 +1046,11 @@ public enum QiscusApi {
         return api.getAppConfig()
                 .map(QiscusApiParser::parseQiscusAppConfig);
 
+    }
 
+    public Observable<QiscusRealtimeStatus> getRealtimeStatus(String topic) {
+        return api.getRealtimeStatus(QiscusHashMapUtil.getRealtimeStatus(topic))
+                .map(QiscusApiParser::parseQiscusRealtimeStatus);
     }
 
     private interface Api {
@@ -1232,6 +1237,12 @@ public enum QiscusApi {
 
         @GET("api/v2/mobile/config")
         Observable<JsonElement> getAppConfig();
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/realtime")
+        Observable<JsonElement> getRealtimeStatus(
+                @Body HashMap<String, Object> data
+        );
     }
 
     public interface MetaRoomMembersListener {
