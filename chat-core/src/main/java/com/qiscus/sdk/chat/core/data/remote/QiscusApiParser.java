@@ -408,7 +408,7 @@ final class QiscusApiParser {
         }
     }
 
-    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement){
+    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement) {
         if (jsonElement != null) {
             QiscusRealtimeStatus realtimeStatus = new QiscusRealtimeStatus();
             JsonObject jsonObject = jsonElement.getAsJsonObject();

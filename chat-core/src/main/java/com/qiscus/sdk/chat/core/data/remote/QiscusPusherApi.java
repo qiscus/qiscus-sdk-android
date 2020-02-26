@@ -1159,7 +1159,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
         qiscusAccount = QiscusCore.getQiscusAccount();
         QiscusApi.getInstance()
-                .getRealtimeStatus(qiscusAccount.getToken()+"/c")
+                .getRealtimeStatus(qiscusAccount.getToken() + "/c")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(realtimeStatus -> {
