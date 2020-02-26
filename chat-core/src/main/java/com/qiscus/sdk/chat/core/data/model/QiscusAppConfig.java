@@ -1,7 +1,5 @@
 package com.qiscus.sdk.chat.core.data.model;
 
-import org.json.JSONObject;
-
 import androidx.annotation.NonNull;
 
 public class QiscusAppConfig  {

@@ -1,9 +1,9 @@
 package com.qiscus.sdk.chat.core.data.model;
 
 public class QiscusRealtimeStatus {
-    private Boolean realtimeStatus;
+    private boolean realtimeStatus;
 
-    public Boolean getRealtimeStatus() {
+    public boolean getRealtimeStatus() {
         return realtimeStatus;
     }
 
@@ -16,20 +16,5 @@ public class QiscusRealtimeStatus {
         return "QiscusRealtimeStatus{" +
                 "realtimeStatus=" + realtimeStatus +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        QiscusRealtimeStatus that = (QiscusRealtimeStatus) o;
-
-        return realtimeStatus.equals(that.realtimeStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return realtimeStatus.hashCode();
     }
 }

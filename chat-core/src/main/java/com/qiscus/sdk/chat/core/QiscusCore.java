@@ -243,7 +243,6 @@ public class QiscusCore {
                         if (!oldAppServer.equals(newAppServer)) {
                             appServer = newAppServer;
                         }
-
                     }
 
                     QiscusApi.getInstance().reInitiateInstance();
@@ -279,7 +278,6 @@ public class QiscusCore {
                     if (!enableRealtime) {
                         //enable realtime false
                         QiscusPusherApi.getInstance().disconnect();
-
                     }
 
                 }, throwable -> {
@@ -320,7 +318,7 @@ public class QiscusCore {
     /**
      * start network checker job service if in oreo or higher
      */
-    public static void startNetworkCheckerService() {
+    private static void startNetworkCheckerService() {
         if (BuildVersionUtil.isOreoOrHigher()) {
             QiscusNetworkCheckerJobService.scheduleJob(getApps());
         }
@@ -400,7 +398,7 @@ public class QiscusCore {
 
     /**
      * enableRealtimeCheck
-     * Checker for enable or disable RealtimeCheck
+     * Checker for enable or disable realtime checker
      *
      * @return boolean
      */

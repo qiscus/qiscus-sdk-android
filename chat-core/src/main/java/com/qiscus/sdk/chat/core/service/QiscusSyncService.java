@@ -37,7 +37,6 @@ import android.os.IBinder;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
@@ -64,7 +63,6 @@ import rx.schedulers.Schedulers;
 public class QiscusSyncService extends Service {
     private static final String TAG = QiscusSyncService.class.getSimpleName();
 
-    private QiscusAccount qiscusAccount;
     private Timer timer;
 
     @Override
@@ -93,7 +91,6 @@ public class QiscusSyncService extends Service {
 
     private void scheduleSync() {
         long period = QiscusCore.getHeartBeat();
-        qiscusAccount = QiscusCore.getQiscusAccount();
         stopSync();
 
         timer = new Timer();
@@ -107,7 +104,8 @@ public class QiscusSyncService extends Service {
                         syncEvents();
                     }
                 } else {
-                    if (QiscusCore.hasSetupUser() && QiscusCore.isOnForeground() ) {
+                    // to check subscribe message when is connected (edge case)
+                    if (QiscusCore.hasSetupUser() && QiscusCore.isOnForeground() && QiscusPusherApi.getInstance().isConnected()) {
                         QiscusPusherApi.getInstance().getRealtimeStatus();
                     }
                 }

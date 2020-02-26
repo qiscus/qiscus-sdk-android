@@ -1166,9 +1166,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     if (!realtimeStatus.getRealtimeStatus()) {
                         listenComment();
                     }
-                }, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                });
+                }, QiscusErrorLogger::print);
     }
 
 }
