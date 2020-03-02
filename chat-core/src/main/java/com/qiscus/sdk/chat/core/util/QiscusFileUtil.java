@@ -263,6 +263,10 @@ public final class QiscusFileUtil {
         return getThumbnailURL(url, 320, 320, 0);
     }
 
+    public static String getBlurryThumbnailURL(String url) {
+        return getThumbnailURL(url, 320, 320, 300);
+    }
+
     private static String getThumbnailURL(String url, int width, int height, int blur) {
         if (url == null) {
             return null;
@@ -271,14 +275,19 @@ public final class QiscusFileUtil {
         int i = url.indexOf("upload/");
         if (i > 0) {
             i += 7;
-            String blurryImageUrl = url.substring(0, i);
-            blurryImageUrl += "w_" + width + ",h_" + height + ",c_limit,e_blur:" + blur + "/";
+            String thumbnailUrl = url.substring(0, i);
+
+            if (blur == 300) {
+                thumbnailUrl += "w_" + width + ",h_" + height + ",c_limit,e_blur:" + blur + "/";
+            } else {
+                thumbnailUrl += "w_" + width + ",h_" + height + ",c_limit" + "/";
+            }
             String file = url.substring(i);
             i = file.lastIndexOf('.');
             if (i > 0) {
                 file = file.substring(0, i);
             }
-            return blurryImageUrl + file + ".png";
+            return thumbnailUrl + file + ".png";
         }
         return url;
     }

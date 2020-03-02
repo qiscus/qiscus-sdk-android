@@ -33,6 +33,7 @@ import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
@@ -63,12 +64,16 @@ public class QiscusCore {
     private static String baseURLLB;
     private static LocalDataManager localDataManager;
     private static long heartBeat;
+    private static long automaticHeartBeat;
     private static QiscusDataStore dataStore;
     private static QiscusCoreChatConfig chatConfig;
     private static Handler appHandler;
     private static ScheduledThreadPoolExecutor taskExecutor;
     private static boolean enableMqttLB = true;
     private static JSONObject customHeader;
+    private static Boolean enableEventReport = true;
+    private static Boolean enableRealtime = true;
+    private static Boolean enableRealtimeCheck = false;
 
     private QiscusCore() {
     }
@@ -106,7 +111,7 @@ public class QiscusCore {
      * public class SampleApps extends Application {
      *  public void onCreate() {
      *      super.onCreate();
-     *      QiscusCore.init(this, "yourQiscusAppId");
+     *      QiscusCore.setup(this, "yourQiscusAppId");
      *  }
      * }
      * }
@@ -115,7 +120,7 @@ public class QiscusCore {
      * @param application Application instance
      * @param appID       Your qiscus application Id
      */
-    public static void initWithAppId(Application application, String appID) {
+    public static void setup(Application application, String appID) {
         initWithCustomServer(application, appID, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
@@ -140,8 +145,39 @@ public class QiscusCore {
      * @param baseUrl     Your qiscus chat engine base url
      * @param brokerUrl   Your Mqtt Broker url
      */
+    @Deprecated
     public static void initWithCustomServer(Application application, String appId, String baseUrl,
                                             String brokerUrl, String brokerLBUrl) {
+        if (brokerLBUrl == null) {
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl);
+        } else {
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl);
+        }
+    }
+
+    /**
+     * The first method you need to be invoke to using qiscus sdk. Call this method from your Application
+     * class. You can not using another qiscus feature if you not invoke this method first. Here sample
+     * to call this method:
+     * <pre>
+     * {@code
+     * public class SampleApps extends Application {
+     *  public void onCreate() {
+     *      super.onCreate();
+     *      QiscusCore.initWithCustomServer(this, my-app-id, "http://myserver.com/", "ssl://mqtt.myserver.com:1885");
+     *  }
+     * }
+     * }
+     * </pre>
+     *
+     * @param application Application instance
+     * @param appId       Your Qiscus App Id
+     * @param baseUrl     Your qiscus chat engine base url
+     * @param brokerUrl   Your Mqtt Broker url
+     */
+
+    public static void setupWithCustomServer(Application application, String appId, String baseUrl,
+                                             String brokerUrl, String brokerLBUrl) {
         if (brokerLBUrl == null) {
             initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl);
         } else {
@@ -161,26 +197,94 @@ public class QiscusCore {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
+
         appInstance = application;
         appId = qiscusAppId;
+
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
 
         chatConfig = new QiscusCoreChatConfig();
+
         appHandler = new Handler(QiscusCore.getApps().getApplicationContext().getMainLooper());
         taskExecutor = new ScheduledThreadPoolExecutor(5);
         localDataManager = new LocalDataManager();
         dataStore = new QiscusDataBaseHelper();
         heartBeat = 5000;
+        automaticHeartBeat = 30000;
 
         QiscusCore.enableMqttLB = enableMqttLB;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
         QiscusCore.baseURLLB = baseURLLB;
+        enableEventReport = false;
         localDataManager.setURLLB(baseURLLB);
+
+        getAppConfig();
+
         startPusherService();
         startNetworkCheckerService();
         QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
         configureFcmToken();
+    }
+
+    private static void getAppConfig() {
+        QiscusApi.getInstance()
+                .getAppConfig()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(appConfig -> {
+                    enableEventReport = appConfig.getEnableEventReport();
+                    enableRealtimeCheck = appConfig.getEnableRealtimeCheck();
+                    if (!appConfig.getBaseURL().isEmpty()) {
+                        String oldAppServer = appServer;
+                        String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
+                                appConfig.getBaseURL() + "/" : appConfig.getBaseURL();
+
+                        if (!oldAppServer.equals(newAppServer)) {
+                            appServer = newAppServer;
+                        }
+                    }
+
+                    QiscusApi.getInstance().reInitiateInstance();
+
+                    if (!appConfig.getBrokerLBURL().isEmpty()) {
+                        QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
+                    }
+
+                    if (!appConfig.getBrokerURL().isEmpty()) {
+
+                        String oldMqttBrokerUrl = QiscusCore.mqttBrokerUrl;
+                        String newMqttBrokerUrl = String.format("ssl://%s:1885",
+                                appConfig.getBrokerURL());
+
+                        if (!oldMqttBrokerUrl.equals(newMqttBrokerUrl)) {
+                            QiscusCore.mqttBrokerUrl = newMqttBrokerUrl;
+                            QiscusCore.setCacheMqttBrokerUrl(newMqttBrokerUrl, false);
+                            QiscusPusherApi.getInstance().disconnect();
+                            QiscusPusherApi.getInstance().restartConnection();
+                        }
+                    }
+
+                    if (appConfig.getSyncInterval() != 0) {
+                        heartBeat = appConfig.getSyncInterval();
+                    }
+
+                    if (appConfig.getSyncOnConnect() != 0) {
+                        automaticHeartBeat = appConfig.getSyncOnConnect();
+                    }
+
+                    enableRealtime = appConfig.getEnableRealtime();
+
+                    if (!enableRealtime) {
+                        //enable realtime false
+                        QiscusPusherApi.getInstance().disconnect();
+                    }
+
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    QiscusApi.getInstance().reInitiateInstance();
+                });
+
     }
 
     public static void startPusherService() {
@@ -214,7 +318,7 @@ public class QiscusCore {
     /**
      * start network checker job service if in oreo or higher
      */
-    public static void startNetworkCheckerService() {
+    private static void startNetworkCheckerService() {
         if (BuildVersionUtil.isOreoOrHigher()) {
             QiscusNetworkCheckerJobService.scheduleJob(getApps());
         }
@@ -270,6 +374,36 @@ public class QiscusCore {
     public static boolean isEnableMqttLB() {
         checkAppIdSetup();
         return enableMqttLB;
+    }
+
+    /**
+     * enableEventReport
+     * Checker for enable or disable EventReport
+     *
+     * @return boolean
+     */
+    public static boolean getEnableEventReport() {
+        return enableEventReport;
+    }
+
+    /**
+     * enableRealtime
+     * Checker for enable or disable Realtime
+     *
+     * @return boolean
+     */
+    public static boolean getEnableRealtime() {
+        return enableRealtime;
+    }
+
+    /**
+     * enableRealtimeCheck
+     * Checker for enable or disable realtime checker
+     *
+     * @return boolean
+     */
+    public static boolean getEnableRealtimeCheck() {
+        return enableRealtimeCheck;
     }
 
     /**
@@ -391,6 +525,15 @@ public class QiscusCore {
     public static void setHeartBeat(long heartBeat) {
         checkAppIdSetup();
         QiscusCore.heartBeat = heartBeat;
+    }
+
+    /**
+     * Get the current qiscus automaticheartbeat duration (default 30s)
+     *
+     * @return automaticHeartbeat duration in milliseconds
+     */
+    public static long getAutomaticHeartBeat() {
+        return automaticHeartBeat;
     }
 
     /**

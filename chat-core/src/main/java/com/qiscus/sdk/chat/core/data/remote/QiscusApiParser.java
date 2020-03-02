@@ -16,15 +16,19 @@
 
 package com.qiscus.sdk.chat.core.data.remote;
 
+import android.util.Log;
+
 import androidx.core.util.Pair;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
+import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -256,8 +260,8 @@ final class QiscusApiParser {
             qiscusComment.setRoomName(jsonComment.get("room_name").getAsString());
         }
 
-        if (jsonComment.has("chat_type")) {
-            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("chat_type").getAsString()));
+        if (jsonComment.has("room_type")) {
+            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
         }
 
         if (jsonComment.has("unique_id")) {
@@ -339,6 +343,87 @@ final class QiscusApiParser {
         }
         for (JsonElement el : arr) {
             memberList.add(parseQiscusRoomMember(el.getAsJsonObject().getAsJsonObject("user")));
+        }
+    }
+
+    static QiscusAppConfig parseQiscusAppConfig(JsonElement jsonElement) {
+        if (jsonElement != null) {
+            QiscusAppConfig appConfig = new QiscusAppConfig();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject results = jsonObject.getAsJsonObject("results");
+
+
+            if (results.has("base_url")) {
+                appConfig.setBaseURL(results.get("base_url").getAsString());
+            } else {
+                appConfig.setBaseURL("");
+            }
+
+            if (results.has("broker_lb_url")) {
+                appConfig.setBrokerLBURL(results.get("broker_lb_url").getAsString());
+            } else {
+                appConfig.setBrokerLBURL("");
+            }
+
+            if (results.has("broker_url")) {
+                appConfig.setBrokerURL(results.get("broker_url").getAsString());
+            } else {
+                appConfig.setBrokerURL("");
+            }
+
+            if (results.has("enable_event_report")) {
+                appConfig.setEnableEventReport(results.get("enable_event_report").getAsBoolean());
+            } else {
+                appConfig.setEnableEventReport(false);
+            }
+
+            if (results.has("enable_realtime")) {
+                appConfig.setEnableRealtime(results.get("enable_realtime").getAsBoolean());
+            } else {
+                appConfig.setEnableRealtime(true);
+            }
+
+            if (results.has("sync_interval")) {
+                appConfig.setSyncInterval(results.get("sync_interval").getAsInt());
+            } else {
+                appConfig.setSyncInterval(0);
+            }
+
+            if (results.has("sync_on_connect")) {
+                appConfig.setSyncOnConnect(results.get("sync_on_connect").getAsInt());
+            } else {
+                appConfig.setSyncOnConnect(0);
+            }
+
+            if (results.has("enable_realtime_check")) {
+                appConfig.setEnableRealtimeCheck(results.get("enable_realtime_check").getAsBoolean());
+            } else {
+                appConfig.setEnableRealtimeCheck(false);
+            }
+
+            return appConfig;
+
+        } else {
+            return null;
+        }
+    }
+
+    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement) {
+        if (jsonElement != null) {
+            QiscusRealtimeStatus realtimeStatus = new QiscusRealtimeStatus();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject results = jsonObject.getAsJsonObject("results");
+
+
+            if (results.has("status")) {
+                realtimeStatus.setRealtimeStatus(results.get("status").getAsBoolean());
+            } else {
+                realtimeStatus.setRealtimeStatus(false);
+            }
+
+            return realtimeStatus;
+        } else {
+            return null;
         }
     }
 }

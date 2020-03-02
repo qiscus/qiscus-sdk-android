@@ -107,10 +107,10 @@ public class Qiscus {
      * </pre>
      *
      * @param application Application instance
-     * @param AppID Your qiscus application Id
+     * @param appID Your qiscus application Id
      */
-    public static void setup(Application application, String AppID) {
-        initWithCustomServer(application, AppID, BuildConfig.BASE_URL_SERVER,
+    public static void setup(Application application, String appID) {
+        initWithCustomServer(application, appID, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
 
@@ -141,14 +141,14 @@ public class Qiscus {
     }
 
 
-    public static void setupWithCustomServer(Application application, String AppID,
-                                            String baseUrl, String brokerUrl, String brokerUrlLb) {
-        initWithCustomServer(application, AppID, baseUrl, brokerUrl, true, brokerUrlLb);
+    public static void setupWithCustomServer(Application application, String appID,
+                                             String baseUrl, String brokerUrl, String brokerUrlLb) {
+        initWithCustomServer(application, appID, baseUrl, brokerUrl, true, brokerUrlLb);
     }
 
-    public static void setupWithCustomServer(Application application, String AppID,
+    public static void setupWithCustomServer(Application application, String appID,
                                              String baseUrl, String brokerUrl) {
-        initWithCustomServer(application, AppID, baseUrl, brokerUrl, false, null);
+        initWithCustomServer(application, appID, baseUrl, brokerUrl, false, null);
     }
 
     /**

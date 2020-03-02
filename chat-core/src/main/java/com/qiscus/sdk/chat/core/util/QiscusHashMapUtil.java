@@ -3,7 +3,6 @@ package com.qiscus.sdk.chat.core.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.BuildConfig;
-import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 import java.util.HashMap;
@@ -14,7 +13,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> eventReport(String moduleName, String event, String message) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("module_name", moduleName);
         hashMap.put("event", event);
         hashMap.put("message", message);
@@ -22,10 +20,10 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> login(String token) {
+    public static HashMap<String, Object> login(String identityToken) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("identity_token", token);
+        hashMap.put("identity_token", identityToken);
 
         return hashMap;
     }
@@ -55,7 +53,6 @@ public class QiscusHashMapUtil {
             jsonExtras = new JsonParser().parse(extras).getAsJsonObject();
         }
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("name", username);
         hashMap.put("avatar_url", avatarUrl);
         hashMap.put("extras", jsonExtras);
@@ -66,7 +63,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> getChatRoom(Object withEmail, String options) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("emails", withEmail);
         hashMap.put("options", options);
 
@@ -76,7 +72,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> createGroupChatRoom(String name, List<String> emails, String avatarUrl, String options) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("name", name);
         hashMap.put("participants", emails);
         hashMap.put("avatar_url", avatarUrl);
@@ -88,7 +83,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> getGroupChatRoom(String uniqueId, String name, String avatarUrl, String options) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("unique_id", uniqueId);
         hashMap.put("name", name);
         hashMap.put("avatar_url", avatarUrl);
@@ -110,7 +104,7 @@ public class QiscusHashMapUtil {
         if (qiscusComment.getExtras() != null) {
             jsonExtras = new JsonParser().parse(qiscusComment.getExtras().toString()).getAsJsonObject();
         }
-        hashMap.put("token", QiscusCore.getToken());
+
         hashMap.put("comment", qiscusComment.getMessage());
         hashMap.put("topic_id", String.valueOf(qiscusComment.getRoomId()));
         hashMap.put("unique_temp_id", qiscusComment.getUniqueId());
@@ -124,7 +118,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> updateChatRoom(String roomId, String name, String avatarUrl, String options) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("id", roomId);
         hashMap.put("room_name", name);
         hashMap.put("avatar_url", avatarUrl);
@@ -136,7 +129,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> updateCommentStatus(String roomId, String lastReadId, String lastReceivedId) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("room_id", roomId);
         hashMap.put("last_comment_read_id", lastReadId);
         hashMap.put("last_comment_received_id", lastReceivedId);
@@ -147,7 +139,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> registerOrRemoveFcmToken(String fcmToken) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("device_platform", "android");
         hashMap.put("device_token", fcmToken);
         hashMap.put("is_development", BuildConfig.DEBUG);
@@ -159,7 +150,6 @@ public class QiscusHashMapUtil {
                                                        boolean showRemoved) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
 
         if (roomIds != null) {
             hashMap.put("room_id", roomIds);
@@ -178,7 +168,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> addRoomMember(String roomId, List<String> emails) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("room_id", roomId);
         hashMap.put("emails", emails);
 
@@ -188,7 +177,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> removeRoomMember(String roomId, List<String> emails) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("room_id", roomId);
         hashMap.put("emails", emails);
 
@@ -198,7 +186,6 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> blockUser(String userEmail) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("user_email", userEmail);
 
         return hashMap;
@@ -207,8 +194,15 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> unblockUser(String userEmail) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("token", QiscusCore.getToken());
         hashMap.put("user_email", userEmail);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> getRealtimeStatus(String topic) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        hashMap.put("topic", topic);
 
         return hashMap;
     }
