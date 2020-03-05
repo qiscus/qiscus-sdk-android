@@ -206,4 +206,11 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> getChannelsInfo(List<String> uniqueIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("unique_ids", uniqueIds);
+
+        return hashMap;
+    }
 }

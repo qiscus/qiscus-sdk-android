@@ -25,6 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
+import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -425,5 +426,60 @@ final class QiscusApiParser {
         } else {
             return null;
         }
+    }
+
+    static List<QiscusChannels> parseQiscusChannels(JsonElement jsonElement) {
+        if (jsonElement != null) {
+
+            JsonArray channels = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("channels").getAsJsonArray();
+            List<QiscusChannels> qiscusChannels = new ArrayList<>();
+            if (channels.isJsonArray()) {
+                for (JsonElement channel : channels) {
+                    qiscusChannels.add(parseQiscusChannel(channel.getAsJsonObject()));
+                }
+            }
+
+            return qiscusChannels;
+        } else {
+            return null;
+        }
+    }
+
+    static QiscusChannels parseQiscusChannel(JsonObject jsonChannel) {
+        QiscusChannels channel = new QiscusChannels();
+        if (jsonChannel.has("avatar_url")) {
+            channel.setAvatarUrl(jsonChannel.get("avatar_url").getAsString());
+        }
+
+        if (jsonChannel.has("created_at")) {
+            channel.setCreatedAt(jsonChannel.get("created_at").getAsString());
+        }
+
+        try {
+            if (jsonChannel.has("extras")) {
+                channel.setExtras(new JSONObject(jsonChannel.get("extras").getAsJsonObject().toString()));
+            }
+        } catch (JSONException ignored) {
+            //Do nothing
+        }
+
+        if (jsonChannel.has("is_joined")) {
+            channel.setJoined(jsonChannel.get("is_joined").getAsBoolean());
+        }
+
+        if (jsonChannel.has("name")) {
+            channel.setName(jsonChannel.get("name").getAsString());
+        }
+
+        if (jsonChannel.has("unique_id")) {
+            channel.setUniqueId(jsonChannel.get("unique_id").getAsString());
+        }
+
+        if (jsonChannel.has("id")) {
+            channel.setRoomId(jsonChannel.get("id").getAsLong());
+        }
+
+
+        return channel;
     }
 }

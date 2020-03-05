@@ -30,6 +30,7 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
+import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -1053,6 +1054,16 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusRealtimeStatus);
     }
 
+    public Observable<List<QiscusChannels>> getChannels() {
+        return api.getChannels()
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QiscusChannels>> getChannelsInfo(List<String> uniqueIds) {
+        return api.getChannelsInfo(QiscusHashMapUtil.getChannelsInfo(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1241,6 +1252,15 @@ public enum QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/realtime")
         Observable<JsonElement> getRealtimeStatus(
+                @Body HashMap<String, Object> data
+        );
+
+        @GET("api/v2/mobile/channels")
+        Observable<JsonElement> getChannels();
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/info")
+        Observable<JsonElement> getChannelsInfo(
                 @Body HashMap<String, Object> data
         );
     }
