@@ -398,7 +398,12 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> getComments(long roomId, long lastCommentId) {
-        return api.getComments(roomId, lastCommentId, false, 20)
+        Long lastCommenID = lastCommentId;
+        if (lastCommenID == 0) {
+            lastCommenID = null;
+        }
+
+        return api.getComments(roomId, lastCommenID, false, 20)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
@@ -406,21 +411,50 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> getCommentsAfter(long roomId, long lastCommentId) {
-        return api.getComments(roomId, lastCommentId, true, 20)
+        Long lastCommentID = lastCommentId;
+        if (lastCommentID == 0) {
+            lastCommentID = null;
+        }
+
+        return api.getComments(roomId, lastCommentID, true, 20)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getPreviousMessagesById(long roomId, int limit, long messageId) {
-        return api.getComments(roomId, messageId, false, limit)
+        Long messageID = messageId;
+        if (messageID == 0) {
+            messageID = null;
+        }
+
+        return api.getComments(roomId, messageID, false, limit)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
+    }
+
+    public Observable<QiscusComment> getPreviousMessagesById(long roomId, int limit) {
+        return api.getComments(roomId, null, false, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getNextMessagesById(long roomId, int limit, long messageId) {
-        return api.getComments(roomId, messageId, true, limit)
+        Long messageID = messageId;
+        if (messageID == 0) {
+            messageID = null;
+        }
+
+        return api.getComments(roomId, messageID, true, limit)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
+    }
+
+    public Observable<QiscusComment> getNextMessagesById(long roomId, int limit) {
+        return api.getComments(roomId, null, true, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
@@ -1124,7 +1158,7 @@ public enum QiscusApi {
         @GET("api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(
                 @Query("topic_id") long roomId,
-                @Query("last_comment_id") long lastCommentId,
+                @Query("last_comment_id") Long lastCommentId,
                 @Query("after") boolean after,
                 @Query("limit") int limit
         );
