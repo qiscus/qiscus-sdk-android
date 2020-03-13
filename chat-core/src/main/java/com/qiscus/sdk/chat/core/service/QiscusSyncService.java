@@ -103,11 +103,6 @@ public class QiscusSyncService extends Service {
                         syncComments();
                         syncEvents();
                     }
-                } else {
-                    // to check subscribe message when is connected (edge case)
-                    if (QiscusCore.hasSetupUser() && QiscusCore.isOnForeground() && QiscusPusherApi.getInstance().isConnected()) {
-                        QiscusPusherApi.getInstance().getRealtimeStatus();
-                    }
                 }
 
                 scheduleSync();

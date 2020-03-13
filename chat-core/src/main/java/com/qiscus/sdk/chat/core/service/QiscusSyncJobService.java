@@ -73,9 +73,6 @@ public class QiscusSyncJobService extends JobService {
         if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
-            // to check subscribe message when is connected (edge case)
-        } else if (QiscusCore.hasSetupUser() && QiscusCore.isOnForeground() && QiscusPusherApi.getInstance().isConnected()) {
-            QiscusPusherApi.getInstance().getRealtimeStatus();
         }
 
         syncJob(context);

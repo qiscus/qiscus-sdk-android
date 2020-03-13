@@ -79,7 +79,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     api firebaseLibs
-    api qiscusUtilLibs
     api qiscusMqttLibs
     api qiscusManggilWithoutEmoji
     api networkLibs
