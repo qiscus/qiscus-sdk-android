@@ -18,6 +18,9 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.provider.Settings;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -60,8 +63,6 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -94,10 +95,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private boolean connecting;
     private boolean reporting = true;
     private Runnable fallbackConnect = this::restartConnection;
-    private Runnable fallBackListenComment = this::listenComment;
     private Runnable fallBackListenNotification = this::listenNotification;
     private ScheduledFuture<?> scheduledUserStatus;
-
+    private Runnable fallBackListenComment = this::listenComment;
     private int setOfflineCounter;
 
     QiscusPusherApi() {
@@ -416,7 +416,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void restartConnection() {
-        if (isConnected() ) {
+        if (isConnected()) {
             QiscusLogger.print(TAG, "Connected... " + "connectCompleteFromRestartConnection");
             return;
         }
@@ -477,7 +477,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void disconnect() {
         QiscusLogger.print(TAG, "Disconnecting...");
-        if ( mqttAndroidClient == null ) {
+        if (mqttAndroidClient == null) {
             return;
         }
         publishOnlinePresence(false);
@@ -1045,7 +1045,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 return;
             }
 
-            QiscusLogger.print(TAG, "Connected..." +  mqttAndroidClient.getClientId() + " " + QiscusCore.getMqttBrokerUrl());
+            QiscusLogger.print(TAG, "Connected..." + mqttAndroidClient.getClientId() + " " + QiscusCore.getMqttBrokerUrl());
             EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
             reporting = true;
             try {
@@ -1151,22 +1151,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         if (scheduledUserStatus != null) {
             scheduledUserStatus.cancel(true);
         }
-    }
-
-    public void getRealtimeStatus() {
-        if (!QiscusCore.getEnableRealtimeCheck()) {
-            return;
-        }
-        qiscusAccount = QiscusCore.getQiscusAccount();
-        QiscusApi.getInstance()
-                .getRealtimeStatus(qiscusAccount.getToken() + "/c")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(realtimeStatus -> {
-                    if (!realtimeStatus.getRealtimeStatus()) {
-                        listenComment();
-                    }
-                }, QiscusErrorLogger::print);
     }
 
 }

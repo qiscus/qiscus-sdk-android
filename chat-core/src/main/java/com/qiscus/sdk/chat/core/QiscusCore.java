@@ -73,7 +73,7 @@ public class QiscusCore {
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
     private static Boolean enableRealtime = true;
-    private static Boolean enableRealtimeCheck = false;
+    private static Boolean syncServiceDisabled = false;
 
     private QiscusCore() {
     }
@@ -220,7 +220,7 @@ public class QiscusCore {
 
         getAppConfig();
 
-        startPusherService();
+        startSyncService();
         startNetworkCheckerService();
         QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
@@ -234,7 +234,6 @@ public class QiscusCore {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(appConfig -> {
                     enableEventReport = appConfig.getEnableEventReport();
-                    enableRealtimeCheck = appConfig.getEnableRealtimeCheck();
                     if (!appConfig.getBaseURL().isEmpty()) {
                         String oldAppServer = appServer;
                         String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
@@ -287,7 +286,12 @@ public class QiscusCore {
 
     }
 
-    public static void startPusherService() {
+    /**
+     * Use this method to start sync service from qiscus
+     */
+
+    public static void startSyncService() {
+        syncServiceDisabled = false;
         checkAppIdSetup();
         Application appInstance = QiscusCore.getApps();
         if (BuildVersionUtil.isOreoLower()) {
@@ -310,6 +314,36 @@ public class QiscusCore {
                 QiscusErrorLogger.print(e);
             } catch (RuntimeException e) {
                 //Prevent crash because trying to start service while application on background
+                QiscusErrorLogger.print(e);
+            }
+        }
+    }
+
+    /**
+     * Use this method to stop sync service from qiscus
+     *
+     * @WARNING : when this method used, we can't restart mqtt automatically if there
+     * are any problem, and we can't get message from sync if mqtt down
+     */
+
+    public static void stopSyncService() {
+        syncServiceDisabled = true;
+        if (BuildVersionUtil.isOreoLower()) {
+            try {
+                getApps().getApplicationContext()
+                        .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncService.class));
+            } catch (Exception e) {
+                //Prevent crash because trying to stop service
+                syncServiceDisabled = false;
+                QiscusErrorLogger.print(e);
+            }
+        } else {
+            try {
+                getApps().getApplicationContext()
+                        .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncJobService.class));
+            } catch (Exception e) {
+                //Prevent crash because trying to stop service
+                syncServiceDisabled = false;
                 QiscusErrorLogger.print(e);
             }
         }
@@ -397,13 +431,14 @@ public class QiscusCore {
     }
 
     /**
-     * enableRealtimeCheck
-     * Checker for enable or disable realtime checker
+     * syncServiceDisabled
+     * Checker for know if we force stop the sync service
      *
      * @return boolean
      */
-    public static boolean getEnableRealtimeCheck() {
-        return enableRealtimeCheck;
+
+    public static Boolean isSyncServiceDisabledManually() {
+        return syncServiceDisabled;
     }
 
     /**
