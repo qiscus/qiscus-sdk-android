@@ -40,6 +40,7 @@ import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
@@ -239,14 +240,16 @@ public class QiscusCore {
                         String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
                                 appConfig.getBaseURL() + "/" : appConfig.getBaseURL();
 
-                        if (!oldAppServer.equals(newAppServer)) {
+                        if (!oldAppServer.equals(newAppServer) &&
+                                QiscusServiceUtil.isValidUrl(newAppServer)) {
                             appServer = newAppServer;
                         }
                     }
 
                     QiscusApi.getInstance().reInitiateInstance();
 
-                    if (!appConfig.getBrokerLBURL().isEmpty()) {
+                    if (!appConfig.getBrokerLBURL().isEmpty() &&
+                            QiscusServiceUtil.isValidUrl(appConfig.getBrokerLBURL())) {
                         QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
                     }
 
