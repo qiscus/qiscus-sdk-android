@@ -25,27 +25,27 @@ import org.json.JSONObject;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusReplyCommentDraft extends QiscusCommentDraft {
+public class QiscusReplyMessageDraft extends QMessageDraft {
     private String repliedPayload;
 
-    public QiscusReplyCommentDraft(String message, QiscusComment repliedComment) {
+    public QiscusReplyMessageDraft(String message, QMessage repliedMessage) {
         super(message);
         JSONObject json = new JSONObject();
         try {
             json.put("text", message)
-                    .put("replied_comment_id", repliedComment.getId())
-                    .put("replied_comment_message", repliedComment.getMessage())
-                    .put("replied_comment_sender_username", repliedComment.getSender())
-                    .put("replied_comment_sender_email", repliedComment.getSenderEmail())
-                    .put("replied_comment_type", repliedComment.getRawType())
-                    .put("replied_comment_payload", repliedComment.getExtraPayload());
+                    .put("replied_comment_id", repliedMessage.getId())
+                    .put("replied_comment_message", repliedMessage.getText())
+                    .put("replied_comment_sender_username", repliedMessage.getSender())
+                    .put("replied_comment_sender_email", repliedMessage.getSender().getId())
+                    .put("replied_comment_type", repliedMessage.getRawType())
+                    .put("replied_comment_payload", repliedMessage.getPayload());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         repliedPayload = json.toString();
     }
 
-    public QiscusReplyCommentDraft(String message, String repliedPayload) {
+    public QiscusReplyMessageDraft(String message, String repliedPayload) {
         super(message);
         this.repliedPayload = repliedPayload;
     }
@@ -54,18 +54,24 @@ public class QiscusReplyCommentDraft extends QiscusCommentDraft {
         return repliedPayload;
     }
 
-    public QiscusComment getRepliedComment() {
-        QiscusComment replyTo = null;
+    public QMessage getRepliedComment() {
+        QMessage replyTo = null;
         try {
             JSONObject payload = new JSONObject(repliedPayload);
-            replyTo = new QiscusComment();
+            replyTo = new QMessage();
             replyTo.setId(payload.getLong("replied_comment_id"));
             replyTo.setUniqueId(replyTo.getId() + "");
-            replyTo.setMessage(payload.getString("replied_comment_message"));
-            replyTo.setSender(payload.getString("replied_comment_sender_username"));
-            replyTo.setSenderEmail(payload.getString("replied_comment_sender_email"));
+            replyTo.setText(payload.getString("replied_comment_message"));
+
+            QUser qUser = new QUser();
+            qUser.setName(payload.getString("replied_comment_sender_username"));
+            qUser.setId(payload.getString("replied_comment_sender_email"));
+
+            replyTo.setSender(qUser);
+            replyTo.getSender().setId(payload.getString("replied_comment_sender_email"));
             replyTo.setRawType(payload.optString("replied_comment_type"));
-            replyTo.setExtraPayload(payload.optString("replied_comment_payload"));
+            replyTo.setPayload(payload.getJSONObject("replied_comment_payload"));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

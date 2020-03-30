@@ -8,10 +8,10 @@ public class QiscusCoreChatConfig {
 
     private boolean enableLog = false;
     private boolean enableFcmPushNotification = false;
-    private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
+    private QMessageSendingInterceptor qMessageSendingInterceptor = qMessage -> qMessage;
     private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
     private NotificationListener notificationListener;
-    private DeleteCommentListener deleteCommentListener;
+    private DeleteMessageListener deleteMessageListener;
 
     public boolean isEnableFcmPushNotification() {
         return enableFcmPushNotification;
@@ -22,13 +22,13 @@ public class QiscusCoreChatConfig {
         return this;
     }
 
-    public QiscusCommentSendingInterceptor getCommentSendingInterceptor() {
-        return qiscusCommentSendingInterceptor;
+    public QMessageSendingInterceptor getCommentSendingInterceptor() {
+        return qMessageSendingInterceptor;
     }
 
-    public QiscusCoreChatConfig setCommentSendingInterceptor(QiscusCommentSendingInterceptor
-                                                                     qiscusCommentSendingInterceptor) {
-        this.qiscusCommentSendingInterceptor = qiscusCommentSendingInterceptor;
+    public QiscusCoreChatConfig setCommentSendingInterceptor(QMessageSendingInterceptor
+                                                                     qMessageSendingInterceptor) {
+        this.qMessageSendingInterceptor = qMessageSendingInterceptor;
         return this;
     }
 
@@ -50,12 +50,12 @@ public class QiscusCoreChatConfig {
         return this;
     }
 
-    public DeleteCommentListener getDeleteCommentListener() {
-        return deleteCommentListener;
+    public DeleteMessageListener getDeleteMessageListener() {
+        return deleteMessageListener;
     }
 
-    public QiscusCoreChatConfig setDeleteCommentListener(DeleteCommentListener deleteCommentListener) {
-        this.deleteCommentListener = deleteCommentListener;
+    public QiscusCoreChatConfig setDeleteMessageListener(DeleteMessageListener deleteMessageListener) {
+        this.deleteMessageListener = deleteMessageListener;
         return this;
     }
 

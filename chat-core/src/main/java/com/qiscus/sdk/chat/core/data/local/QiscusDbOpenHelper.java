@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 import java.io.BufferedReader;
@@ -32,11 +33,13 @@ import java.io.InputStreamReader;
 
 class QiscusDbOpenHelper extends SQLiteOpenHelper {
 
-    private Context context;
+    private static final String TAG = "Qiscus";
+    private QiscusCore qiscusCore;
 
-    QiscusDbOpenHelper(Context context) {
-        super(context, QiscusDb.DATABASE_NAME, null, QiscusDb.DATABASE_VERSION);
-        this.context = context;
+    public QiscusDbOpenHelper(QiscusCore qiscusCore) {
+        super(qiscusCore.getApps(), qiscusCore.getAppId() + "_" + QiscusDb.DATABASE_NAME,
+                null, QiscusDb.DATABASE_VERSION);
+        this.qiscusCore = qiscusCore;
     }
 
     @Override
@@ -57,13 +60,13 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
-        QiscusLogger.print("Opening database.. ");
+        Log.d(TAG, "Opening database.. ");
         db.enableWriteAheadLogging();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        QiscusLogger.print("Upgrade database from : " + oldVersion + " to : " + newVersion);
+        Log.d(TAG, "Upgrade database from : " + oldVersion + " to : " + newVersion);
 
         // Before version 14, we just clear old data
         if (oldVersion < 14) {
@@ -79,23 +82,23 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
         try {
             for (int i = oldVersion; i < newVersion; i++) {
                 String migrationName = String.format("qiscus.db_from_%d_to_%d.sql", i, (i + 1));
-                QiscusLogger.print("Looking for migration file : " + migrationName);
-                readAndExecSQL(db, context, migrationName);
+                Log.d(TAG, "Looking for migration file : " + migrationName);
+                readAndExecSQL(db, migrationName);
             }
 
         } catch (Exception e) {
-            QiscusLogger.print("Exception running upgrade scripts : " + e.getMessage());
+            Log.d(TAG, "Exception running upgrade scripts : " + e.getMessage());
         }
     }
 
-    private void readAndExecSQL(SQLiteDatabase db, Context context, String migrationName) {
+    private void readAndExecSQL(SQLiteDatabase db, String migrationName) {
         if (TextUtils.isEmpty(migrationName)) {
-            QiscusLogger.print("SQL Script migration name is empty...");
+            Log.d(TAG, "SQL Script migration name is empty...");
             return;
         }
 
-        QiscusLogger.print("SQL Script found...");
-        AssetManager assets = context.getAssets();
+        Log.d(TAG, "SQL Script found...");
+        AssetManager assets = qiscusCore.getApps().getAssets();
         BufferedReader reader = null;
 
         try {
@@ -104,13 +107,13 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
             reader = new BufferedReader(inputStreamReader);
             execSQLScript(db, reader);
         } catch (IOException e) {
-            QiscusLogger.print("Failed read SQL Script : " + e.getMessage());
+            Log.d(TAG, "Failed read SQL Script : " + e.getMessage());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    QiscusLogger.print("Failed close reader : " + e.getMessage());
+                    Log.d(TAG, "Failed close reader : " + e.getMessage());
                 }
             }
         }

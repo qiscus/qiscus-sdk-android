@@ -16,8 +16,8 @@
 
 package com.qiscus.sdk.chat.core.data.local;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 
 import java.util.List;
 
@@ -30,43 +30,41 @@ import rx.Observable;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusChatRoomStore {
-    void add(QiscusChatRoom qiscusChatRoom);
+    void add(QChatRoom qiscusChatRoom);
 
-    boolean isContains(QiscusChatRoom qiscusChatRoom);
+    boolean isContains(QChatRoom qiscusChatRoom);
 
-    void update(QiscusChatRoom qiscusChatRoom);
+    void update(QChatRoom qiscusChatRoom);
 
-    void addOrUpdate(QiscusChatRoom qiscusChatRoom);
+    void addOrUpdate(QChatRoom qiscusChatRoom);
 
-    QiscusChatRoom getChatRoom(long roomId);
+    QChatRoom getChatRoom(long roomId);
 
-    QiscusChatRoom getChatRoom(String email);
+    QChatRoom getChatRoom(String email);
 
-    QiscusChatRoom getChatRoom(String email, String distinctId);
+    QChatRoom getChatRoomWithUniqueId(String uniqueId);
 
-    QiscusChatRoom getChatRoomWithUniqueId(String uniqueId);
+    List<QChatRoom> getChatRooms(int limit);
 
-    List<QiscusChatRoom> getChatRooms(int limit);
+    List<QChatRoom> getChatRooms(int limit, int offset);
 
-    List<QiscusChatRoom> getChatRooms(int limit, int offset);
+    Observable<List<QChatRoom>> getObservableChatRooms(int limit);
 
-    Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit);
+    Observable<List<QChatRoom>> getObservableChatRooms(int limit, int offset);
 
-    Observable<List<QiscusChatRoom>> getObservableChatRooms(int limit, int offset);
-
-    List<QiscusChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds);
+    List<QChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds);
 
     void deleteChatRoom(long roomId);
 
-    void addRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void addRoomMember(long roomId, QParticipant qiscusRoomMember);
 
     boolean isContainsRoomMember(long roomId, String email);
 
-    void updateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void updateRoomMember(long roomId, QParticipant qiscusRoomMember);
 
-    void addOrUpdateRoomMember(long roomId, QiscusRoomMember qiscusRoomMember, String distinctId);
+    void addOrUpdateRoomMember(long roomId, QParticipant qiscusRoomMember);
 
-    List<QiscusRoomMember> getRoomMembers(long roomId);
+    List<QParticipant> getRoomMembers(long roomId);
 
     void deleteRoomMember(long roomId, String email);
 

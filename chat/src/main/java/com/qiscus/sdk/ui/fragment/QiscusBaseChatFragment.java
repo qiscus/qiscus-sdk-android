@@ -62,7 +62,7 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusCommentDraft;
 import com.qiscus.sdk.chat.core.data.model.QiscusContact;
@@ -252,7 +252,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     protected View goToBottomButton;
 
     protected QiscusChatConfig chatConfig;
-    protected QiscusChatRoom qiscusChatRoom;
+    protected QChatRoom qiscusChatRoom;
     protected String startingMessage;
     protected List<File> shareFiles;
     protected boolean autoSendExtra;
@@ -630,7 +630,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 qiscusChatPresenter.loadComments(20);
             } else {
                 showComments(qiscusChatPresenter.loadLocalComments(commentsLoadedSize));
-                chatAdapter.setQiscusChatRoom(qiscusChatRoom);
+                chatAdapter.setQChatRoom(qiscusChatRoom);
                 updateMentionSuggestionData();
                 messageRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerState);
             }
@@ -1360,19 +1360,19 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     @Override
-    public void initRoomData(QiscusChatRoom qiscusChatRoom, List<QiscusComment> comments) {
+    public void initRoomData(QChatRoom qiscusChatRoom, List<QiscusComment> comments) {
         this.qiscusChatRoom = qiscusChatRoom;
         if (roomChangedListener != null) {
             roomChangedListener.onRoomUpdated(qiscusChatRoom);
         }
-        chatAdapter.setQiscusChatRoom(qiscusChatRoom);
+        chatAdapter.setQChatRoom(qiscusChatRoom);
         updateMentionSuggestionData();
         showComments(comments);
         resolveScrollToComment();
     }
 
     @Override
-    public void onRoomChanged(QiscusChatRoom qiscusChatRoom) {
+    public void onRoomChanged(QChatRoom qiscusChatRoom) {
         this.qiscusChatRoom = qiscusChatRoom;
         if (roomChangedListener != null) {
             roomChangedListener.onRoomUpdated(qiscusChatRoom);
@@ -1890,6 +1890,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     public interface RoomChangedListener {
-        void onRoomUpdated(QiscusChatRoom qiscusChatRoom);
+        void onRoomUpdated(QChatRoom qiscusChatRoom);
     }
 }

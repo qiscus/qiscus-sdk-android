@@ -31,8 +31,12 @@ public final class QiscusDateUtil {
     private static DateFormat hourDateFormat;
 
     static {
-        fullDateFormat = new SimpleDateFormat(QiscusTextUtil.getString(R.string.qiscus_date_format), Locale.getDefault());
-        hourDateFormat = new SimpleDateFormat(QiscusTextUtil.getString(R.string.qiscus_hour_format), Locale.getDefault());
+        fullDateFormat = new SimpleDateFormat(
+                QiscusConst.getApps().getString(R.string.qiscus_date_format),
+                Locale.getDefault());
+        hourDateFormat = new SimpleDateFormat(
+                QiscusConst.getApps().getString(R.string.qiscus_hour_format),
+                Locale.getDefault());
     }
 
     private QiscusDateUtil() {
@@ -42,7 +46,7 @@ public final class QiscusDateUtil {
     public static String toTodayOrDate(Date date) {
         String currentDateInString = fullDateFormat.format(new Date());
         String dateInString = fullDateFormat.format(date);
-        return currentDateInString.equals(dateInString) ? QiscusTextUtil.getString(R.string.qiscus_today) : dateInString;
+        return currentDateInString.equals(dateInString) ? QiscusConst.getApps().getString(R.string.qiscus_today) : dateInString;
     }
 
     public static String toHour(Date date) {
@@ -58,13 +62,13 @@ public final class QiscusDateUtil {
                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString();
 
         if (timeDiff.contains("0 ")) {
-            timeDiff = QiscusTextUtil.getString(R.string.qiscus_few_seconds_ago);
+            timeDiff = QiscusConst.getApps().getString(R.string.qiscus_few_seconds_ago);
         }
 
         return timeDiff;
     }
 
     public static String toFullDateFormat(Date date) {
-        return QiscusTextUtil.getString(R.string.qiscus_date_and_time, toTodayOrDate(date), toHour(date));
+        return QiscusConst.getApps().getString(R.string.qiscus_date_and_time, toTodayOrDate(date), toHour(date));
     }
 }

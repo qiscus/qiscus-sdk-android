@@ -41,7 +41,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusPushNotificationMessage;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
@@ -110,7 +110,7 @@ public final class QiscusPushNotificationUtil {
     }
 
     private static void updateUnreadCount(QiscusComment qiscusComment) {
-        QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
+        QChatRoom room = Qiscus.getDataStore().getChatRoom(qiscusComment.getRoomId());
         if (room == null) {
             fetchRoomData(qiscusComment.getRoomId());
             return;
@@ -144,7 +144,7 @@ public final class QiscusPushNotificationUtil {
         QiscusMentionConfig mentionConfig = Qiscus.getChatConfig().getMentionConfig();
         Map<String, QiscusRoomMember> members = new HashMap<>();
         if (mentionConfig.isEnableMention()) {
-            QiscusChatRoom room = Qiscus.getDataStore().getChatRoom(comment.getRoomId());
+            QChatRoom room = Qiscus.getDataStore().getChatRoom(comment.getRoomId());
             if (room != null) {
                 for (QiscusRoomMember member : room.getMember()) {
                     members.put(member.getEmail(), member);

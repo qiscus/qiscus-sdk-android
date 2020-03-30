@@ -8,5 +8,5 @@ import android.content.Context;
  **/
 public interface NotificationListener {
 
-    void onHandlePushNotification(Context context, QiscusComment qiscusComment);
+    void onHandlePushNotification(Context context, QMessage qMessage);
 }

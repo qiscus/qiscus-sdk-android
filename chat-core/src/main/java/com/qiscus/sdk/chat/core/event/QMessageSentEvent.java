@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.service;
+package com.qiscus.sdk.chat.core.event;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 
-import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
-public class QiscusStartServiceReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (QiscusCore.hasSetupUser()) {
-            QiscusAndroidUtil.runOnUIThread(QiscusCore::startPusherService);
-        }
+public class QMessageSentEvent {
+    private QMessage qMessage;
+
+    public QMessageSentEvent(QMessage qMessage) {
+        this.qMessage = qMessage;
+    }
+
+    public QMessage getQiscusComment() {
+        return qMessage;
     }
 }

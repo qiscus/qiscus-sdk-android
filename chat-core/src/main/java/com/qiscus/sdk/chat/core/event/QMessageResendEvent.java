@@ -16,32 +16,22 @@
 
 package com.qiscus.sdk.chat.core.event;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
- * Created on : February 12, 2018
+ * Created on : August 25, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusCommentDeletedEvent {
-    private QiscusComment qiscusComment;
-    private boolean hardDelete;
+public class QMessageResendEvent {
+    private QMessage qMessage;
 
-    public QiscusCommentDeletedEvent(QiscusComment qiscusComment) {
-        this.qiscusComment = qiscusComment;
+    public QMessageResendEvent(QMessage qMessage) {
+        this.qMessage = qMessage;
     }
 
-    public QiscusCommentDeletedEvent(QiscusComment qiscusComment, boolean hardDelete) {
-        this.qiscusComment = qiscusComment;
-        this.hardDelete = hardDelete;
-    }
-
-    public QiscusComment getQiscusComment() {
-        return qiscusComment;
-    }
-
-    public boolean isHardDelete() {
-        return hardDelete;
+    public QMessage getQiscusComment() {
+        return qMessage;
     }
 }

@@ -37,7 +37,10 @@ public final class QiscusAndroidUtil {
 
     private static final Random random = new Random();
 
-    private QiscusAndroidUtil() {
+    private static QiscusCore qiscusCore;
+
+    public QiscusAndroidUtil(QiscusCore qiscusCore) {
+        QiscusAndroidUtil.qiscusCore = qiscusCore;
     }
 
     public static void runOnUIThread(Runnable runnable) {
@@ -46,14 +49,14 @@ public final class QiscusAndroidUtil {
 
     public static void runOnUIThread(Runnable runnable, long delay) {
         if (delay == 0) {
-            QiscusCore.getAppsHandler().post(runnable);
+            qiscusCore.getAppsHandler().post(runnable);
         } else {
-            QiscusCore.getAppsHandler().postDelayed(runnable, delay);
+            qiscusCore.getAppsHandler().postDelayed(runnable, delay);
         }
     }
 
     public static void cancelRunOnUIThread(Runnable runnable) {
-        QiscusCore.getAppsHandler().removeCallbacks(runnable);
+        qiscusCore.getAppsHandler().removeCallbacks(runnable);
     }
 
     public static ScheduledFuture<?> runOnBackgroundThread(Runnable runnable) {
@@ -62,23 +65,23 @@ public final class QiscusAndroidUtil {
 
     public static ScheduledFuture<?> runOnBackgroundThread(Runnable runnable, long delay) {
         if (delay == 0) {
-            return QiscusCore.getTaskExecutor().schedule(runnable, 0, MILLISECONDS);
+            return qiscusCore.getTaskExecutor().schedule(runnable, 0, MILLISECONDS);
         }
-        return QiscusCore.getTaskExecutor().schedule(runnable, delay, MILLISECONDS);
+        return qiscusCore.getTaskExecutor().schedule(runnable, delay, MILLISECONDS);
     }
 
-    public static boolean isNetworkAvailable() {
+    public boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager)
-                QiscusCore.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
+                qiscusCore.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm != null ? cm.getActiveNetworkInfo() : null;
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    public static int compare(int x, int y) {
+    public int compare(int x, int y) {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 
-    public static int compare(long x, long y) {
+    public int compare(long x, long y) {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 }

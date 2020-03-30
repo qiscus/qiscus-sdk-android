@@ -17,12 +17,12 @@
 package com.qiscus.sdk.chat.core.data.remote;
 
 import androidx.annotation.RestrictTo;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
-import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
-import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
-import com.qiscus.sdk.chat.core.util.QiscusPushNotificationUtil;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
+import com.qiscus.sdk.chat.core.event.QiscusClearMessageEvent;
+import com.qiscus.sdk.chat.core.util.QiscusNumberUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -39,31 +39,36 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public final class QiscusClearCommentsHandler {
-    private QiscusClearCommentsHandler() {
+public class QiscusClearCommentsHandler {
 
+    private QiscusCore qiscusCore;
+
+    public QiscusClearCommentsHandler(QiscusCore qiscusCore) {
+        this.qiscusCore = qiscusCore;
     }
 
-    public static void handle(ClearCommentsData clearCommentsData) {
-        if (clearCommentsData.getActor().getEmail().equals(QiscusCore.getQiscusAccount().getEmail())) {
+    public void handle(ClearCommentsData clearCommentsData) {
+        if (clearCommentsData.getActor().getId().equals(qiscusCore.getQiscusAccount().getId())) {
             Observable.from(clearCommentsData.getRoomIds())
                     .doOnNext(roomId -> {
-                        if (QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {
-                            EventBus.getDefault().post(new QiscusClearCommentsEvent(roomId, clearCommentsData.timestamp));
-                            QiscusPushNotificationUtil.clearPushNotification(QiscusCore.getApps(), roomId);
+                        if (qiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {
+                            EventBus.getDefault().post(new QiscusClearMessageEvent(roomId, clearCommentsData.timestamp));
+//                            QiscusPushNotificationUtil.clearPushNotification(qiscusCore.getApps(), roomId);
+                            NotificationManagerCompat.from(qiscusCore.getApps()).cancel(QiscusNumberUtil.convertToInt(roomId));
+                            qiscusCore.getCacheManager().clearMessageNotifItems(roomId);
                         }
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(roomId -> {
-                    }, QiscusErrorLogger::print);
+                    }, qiscusCore.getErrorLogger()::print);
         }
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static class ClearCommentsData {
         private long timestamp;
-        private QiscusRoomMember actor;
+        private QParticipant actor;
         private List<Long> roomIds;
 
         public long getTimestamp() {
@@ -74,11 +79,11 @@ public final class QiscusClearCommentsHandler {
             this.timestamp = timestamp;
         }
 
-        public QiscusRoomMember getActor() {
+        public QParticipant getActor() {
             return actor;
         }
 
-        public void setActor(QiscusRoomMember actor) {
+        public void setActor(QParticipant actor) {
             this.actor = actor;
         }
 

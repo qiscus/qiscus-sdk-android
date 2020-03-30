@@ -30,7 +30,7 @@ import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.ui.fragment.QiscusBaseChatFragment;
@@ -51,12 +51,12 @@ public class QiscusChatActivity extends QiscusBaseChatActivity {
 
     protected QiscusAccount qiscusAccount;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
+    public static Intent generateIntent(Context context, QChatRoom qiscusChatRoom) {
         return generateIntent(context, qiscusChatRoom, null, null,
                 false, null, null);
     }
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
+    public static Intent generateIntent(Context context, QChatRoom qiscusChatRoom,
                                         String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {

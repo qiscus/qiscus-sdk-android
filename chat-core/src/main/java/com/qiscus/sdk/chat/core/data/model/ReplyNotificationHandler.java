@@ -10,5 +10,5 @@ import android.content.Context;
  */
 
 public interface ReplyNotificationHandler {
-    void onSend(Context context, QiscusComment qiscusComment);
+    void onSend(Context context, QMessage qMessage);
 }

@@ -29,7 +29,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.ui.adapter.QiscusChatAdapter;
 import com.qiscus.sdk.ui.view.QiscusAudioRecorderView;
@@ -52,7 +52,7 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
 
     protected UserTypingListener userTypingListener;
 
-    public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom) {
+    public static QiscusChatFragment newInstance(QChatRoom qiscusChatRoom) {
         QiscusChatFragment fragment = new QiscusChatFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHAT_ROOM_DATA, qiscusChatRoom);
@@ -60,7 +60,7 @@ public class QiscusChatFragment extends QiscusBaseChatFragment<QiscusChatAdapter
         return fragment;
     }
 
-    public static QiscusChatFragment newInstance(QiscusChatRoom qiscusChatRoom,
+    public static QiscusChatFragment newInstance(QChatRoom qiscusChatRoom,
                                                  String startingMessage,
                                                  List<File> shareFiles,
                                                  boolean autoSendExtra,

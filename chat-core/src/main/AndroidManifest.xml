@@ -23,43 +23,7 @@
     <application
         android:requestLegacyExternalStorage="true">
 
-
-        <receiver
-            android:name=".service.QiscusStartServiceReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="com.qiscus.START_SERVICE" />
-                <action android:name="android.intent.action.USER_PRESENT" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".service.QiscusNetworkStateReceiver"
-            android:exported="false"
-            android:label="QiscusNetworkStateReceiver">
-            <intent-filter>
-                <action
-                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
-                    tools:ignore="BatteryLife" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
-                <action android:name="android.net.wifi.STATE_CHANGE" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".service.QiscusNetworkCheckerJobService"
-            android:exported="true"
-            android:label="QiscusNetworkCheckerJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
-        <service android:name=".service.QiscusSyncService" />
-
-        <service
-            android:name=".service.QiscusSyncJobService"
-            android:exported="true"
-            android:label="QiscusSyncJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

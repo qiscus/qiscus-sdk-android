@@ -16,17 +16,30 @@
 
 package com.qiscus.sdk.chat.core.event;
 
+/**
+ * Created on : February 14, 2018
+ * Author     : zetbaitsu
+ * Name       : Zetra
+ * GitHub     : https://github.com/zetbaitsu
+ */
+public class QiscusClearMessageEvent {
+    private long roomId;
+    private long timestamp;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-
-public class QiscusCommentSentEvent {
-    private QiscusComment qiscusComment;
-
-    public QiscusCommentSentEvent(QiscusComment qiscusComment) {
-        this.qiscusComment = qiscusComment;
+    public QiscusClearMessageEvent(long roomId) {
+        this(roomId, System.currentTimeMillis());
     }
 
-    public QiscusComment getQiscusComment() {
-        return qiscusComment;
+    public QiscusClearMessageEvent(long roomId, long timestamp) {
+        this.roomId = roomId;
+        this.timestamp = timestamp;
+    }
+
+    public long getRoomId() {
+        return roomId;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
     }
 }

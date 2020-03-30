@@ -14,14 +14,34 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.data.model;
+package com.qiscus.sdk.chat.core.event;
+
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 /**
- * Created on : July 11, 2017
+ * Created on : February 12, 2018
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public interface CommentInfoHandler {
-    void showInfo(QiscusComment qiscusComment);
+public class QMessageDeletedEvent {
+    private QMessage qMessage;
+    private boolean hardDelete;
+
+    public QMessageDeletedEvent(QMessage qMessage) {
+        this.qMessage = qMessage;
+    }
+
+    public QMessageDeletedEvent(QMessage qMessage, boolean hardDelete) {
+        this.qMessage = qMessage;
+        this.hardDelete = hardDelete;
+    }
+
+    public QMessage getQiscusComment() {
+        return qMessage;
+    }
+
+    public boolean isHardDelete() {
+        return hardDelete;
+    }
 }

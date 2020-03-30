@@ -16,8 +16,9 @@
 
 package com.qiscus.sdk.chat.core.util;
 
-import androidx.annotation.RestrictTo;
 import android.util.Log;
+
+import androidx.annotation.RestrictTo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 
@@ -36,26 +37,31 @@ import retrofit2.HttpException;
 public final class QiscusErrorLogger {
 
     private static final String TAG = "Qiscus";
+    private QiscusCore qiscusCore;
 
-    public static void print(Throwable throwable) {
-        if (QiscusCore.getChatConfig().isEnableLog()) {
+    public QiscusErrorLogger(QiscusCore qiscusCore) {
+        this.qiscusCore = qiscusCore;
+    }
+
+    public void print(Throwable throwable) {
+        if (qiscusCore.getChatConfig().isEnableLog()) {
             Log.e(TAG, getMessage(throwable));
         }
     }
 
-    public static void print(String tag, Throwable throwable) {
-        if (QiscusCore.getChatConfig().isEnableLog()) {
+    public void print(String tag, Throwable throwable) {
+        if (qiscusCore.getChatConfig().isEnableLog()) {
             Log.e(tag, getMessage(throwable));
         }
     }
 
-    public static void print(String tag, String errorMessage) {
-        if (QiscusCore.getChatConfig().isEnableLog()) {
+    public void print(String tag, String errorMessage) {
+        if (qiscusCore.getChatConfig().isEnableLog()) {
             Log.e(tag, errorMessage);
         }
     }
 
-    public static String getMessage(Throwable throwable) {
+    public String getMessage(Throwable throwable) {
         if (throwable instanceof HttpException) { //Error response from server
             HttpException e = (HttpException) throwable;
             try {

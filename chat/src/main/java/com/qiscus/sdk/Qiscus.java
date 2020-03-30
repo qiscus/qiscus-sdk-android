@@ -20,6 +20,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+
 import androidx.annotation.RestrictTo;
 
 import com.qiscus.jupuk.Jupuk;
@@ -27,8 +28,8 @@ import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
@@ -61,8 +62,9 @@ import static com.qiscus.sdk.chat.core.QiscusCore.checkUserSetup;
  */
 public class Qiscus {
 
-    private static QiscusChatConfig chatConfig;
-    private static String authorities;
+    private QiscusChatConfig chatConfig;
+    private String authorities;
+    private QiscusCore qiscusCore;
 
     private Qiscus() {
     }
@@ -86,7 +88,7 @@ public class Qiscus {
      * @param qiscusAppId Your qiscus application Id
      */
     @Deprecated
-    public static void init(Application application, String qiscusAppId) {
+    public void init(Application application, String qiscusAppId) {
         initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
@@ -107,9 +109,9 @@ public class Qiscus {
      * </pre>
      *
      * @param application Application instance
-     * @param appID Your qiscus application Id
+     * @param appID       Your qiscus application Id
      */
-    public static void setup(Application application, String appID) {
+    public void setup(Application application, String appID) {
         initWithCustomServer(application, appID, BuildConfig.BASE_URL_SERVER,
                 BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
     }
@@ -135,26 +137,26 @@ public class Qiscus {
      * @param mqttBrokerUrl Your Mqtt Broker url
      */
     @Deprecated
-    public static void initWithCustomServer(Application application, String qiscusAppId,
-                                            String serverBaseUrl, String mqttBrokerUrl) {
+    public void initWithCustomServer(Application application, String qiscusAppId,
+                                     String serverBaseUrl, String mqttBrokerUrl) {
         initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, false, null);
     }
 
 
-    public static void setupWithCustomServer(Application application, String appID,
-                                            String baseUrl, String brokerUrl, String brokerUrlLb) {
+    public void setupWithCustomServer(Application application, String appID,
+                                      String baseUrl, String brokerUrl, String brokerUrlLb) {
         initWithCustomServer(application, appID, baseUrl, brokerUrl, true, brokerUrlLb);
     }
 
-    public static void setupWithCustomServer(Application application, String appID,
-                                             String baseUrl, String brokerUrl) {
+    public void setupWithCustomServer(Application application, String appID,
+                                      String baseUrl, String brokerUrl) {
         initWithCustomServer(application, appID, baseUrl, brokerUrl, false, null);
     }
 
     /**
      * will have onNext Release
      */
-//    public static void initWithCustomServer(Application application, String qiscusAppId,
+//    public  void initWithCustomServer(Application application, String qiscusAppId,
 //                          String serverBaseUrl, String mqttBrokerUrl, String baseURLLB) {
 //        initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, true, baseURLLB);
 //    }
@@ -169,18 +171,19 @@ public class Qiscus {
      * @param enableMqttLB  | Qiscus using own MQTT Load Balancer for get mqtt server url
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
-                                            String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
-        QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
+    public void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
+                                     String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
+        qiscusCore = new qiscusCore();
+        qiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
         chatConfig = new QiscusChatConfig();
-        authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
+        authorities = qiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
 
         Jupuk.init(application);
         EmojiManager.install(new EmojiOneProvider());
-        QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
+        QiscusLogger.print("init Qiscus with app Id " + qiscusCore.getAppId());
 
-        QiscusCore.getChatConfig()
+        qiscusCore.getChatConfig()
                 .setNotificationListener(QiscusPushNotificationUtil::handlePushNotification)
                 .setDeleteCommentListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
     }
@@ -193,8 +196,8 @@ public class Qiscus {
      * @param userKey   Qiscus user key
      * @return User builder
      */
-    public static QiscusCore.SetUserBuilder setUser(String userEmail, String userKey) {
-        return QiscusCore.setUser(userEmail, userKey);
+    public QiscusCore.SetUserBuilder setUser(String userEmail, String userKey) {
+        return qiscusCore.setUser(userEmail, userKey);
     }
 
 
@@ -204,8 +207,8 @@ public class Qiscus {
      * @param token the jwt token
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> setUserAsObservable(String token) {
-        return QiscusCore.setUserWithIdentityToken(token);
+    public Observable<QAccount> setUserAsObservable(String token) {
+        return qiscusCore.setUserWithIdentityToken(token);
     }
 
     /**
@@ -214,8 +217,8 @@ public class Qiscus {
      * @param token    the jwt token
      * @param listener completion listener
      */
-    public static void setUser(String token, QiscusCore.SetUserListener listener) {
-        QiscusCore.setUserWithIdentityToken(token, listener);
+    public void setUser(String token, QiscusCore.SetUserListener listener) {
+        qiscusCore.setUserWithIdentityToken(token, listener);
     }
 
     /**
@@ -225,8 +228,8 @@ public class Qiscus {
      * @param avatarUrl user avatar url
      * @return observable of qiscus account
      */
-    public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
-        return QiscusCore.updateUserAsObservable(name, avatarUrl);
+    public Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
+        return qiscusCore.updateUserAsObservable(name, avatarUrl);
     }
 
     /**
@@ -236,8 +239,8 @@ public class Qiscus {
      * @param avatarUrl user avatar url
      * @param listener  completion listener
      */
-    public static void updateUser(String name, String avatarUrl, QiscusCore.SetUserListener listener) {
-        QiscusCore.updateUser(name, avatarUrl, listener);
+    public void updateUser(String name, String avatarUrl, QiscusCore.SetUserListener listener) {
+        qiscusCore.updateUser(name, avatarUrl, listener);
     }
 
     /**
@@ -245,8 +248,8 @@ public class Qiscus {
      *
      * @return Your application instance
      */
-    public static Application getApps() {
-        return QiscusCore.getApps();
+    public Application getApps() {
+        return qiscusCore.getApps();
     }
 
     /**
@@ -254,8 +257,8 @@ public class Qiscus {
      *
      * @return The apps name.
      */
-    public static String getAppsName() {
-        return QiscusCore.getAppsName();
+    public String getAppsName() {
+        return qiscusCore.getAppsName();
     }
 
     /**
@@ -263,8 +266,8 @@ public class Qiscus {
      *
      * @return Main thread handler
      */
-    public static Handler getAppsHandler() {
-        return QiscusCore.getAppsHandler();
+    public Handler getAppsHandler() {
+        return qiscusCore.getAppsHandler();
     }
 
     /**
@@ -272,8 +275,8 @@ public class Qiscus {
      *
      * @return ScheduledExecutorService instance
      */
-    public static ScheduledThreadPoolExecutor getTaskExecutor() {
-        return QiscusCore.getTaskExecutor();
+    public ScheduledThreadPoolExecutor getTaskExecutor() {
+        return qiscusCore.getTaskExecutor();
     }
 
     /**
@@ -281,8 +284,8 @@ public class Qiscus {
      *
      * @return Current app id
      */
-    public static String getAppId() {
-        return QiscusCore.getAppId();
+    public String getAppId() {
+        return qiscusCore.getAppId();
     }
 
     /**
@@ -290,8 +293,8 @@ public class Qiscus {
      *
      * @return Current qiscus app server
      */
-    public static String getAppServer() {
-        return QiscusCore.getAppServer();
+    public String getAppServer() {
+        return qiscusCore.getAppServer();
     }
 
     /**
@@ -299,8 +302,8 @@ public class Qiscus {
      *
      * @return Current mqtt broker url
      */
-    public static String getMqttBrokerUrl() {
-        return QiscusCore.getMqttBrokerUrl();
+    public String getMqttBrokerUrl() {
+        return qiscusCore.getMqttBrokerUrl();
     }
 
     /**
@@ -308,8 +311,8 @@ public class Qiscus {
      *
      * @return true if already setup, false if not yet
      */
-    public static boolean hasSetupUser() {
-        return QiscusCore.hasSetupUser();
+    public boolean hasSetupUser() {
+        return qiscusCore.hasSetupUser();
     }
 
     /**
@@ -317,8 +320,8 @@ public class Qiscus {
      *
      * @return Current qiscus user account
      */
-    public static QiscusAccount getQiscusAccount() {
-        return QiscusCore.getQiscusAccount();
+    public QiscusAccount getQiscusAccount() {
+        return qiscusCore.getQiscusAccount();
     }
 
     /**
@@ -326,8 +329,8 @@ public class Qiscus {
      *
      * @return Current qiscus user token
      */
-    public static String getToken() {
-        return QiscusCore.getToken();
+    public String getToken() {
+        return qiscusCore.getToken();
     }
 
     /**
@@ -335,8 +338,8 @@ public class Qiscus {
      *
      * @return Singleton of qiscus data store
      */
-    public static QiscusDataStore getDataStore() {
-        return QiscusCore.getDataStore();
+    public QiscusDataStore getDataStore() {
+        return qiscusCore.getDataStore();
     }
 
     /**
@@ -345,8 +348,8 @@ public class Qiscus {
      *
      * @param dataStore Your own chat datastore
      */
-    public static void setDataStore(QiscusDataStore dataStore) {
-        QiscusCore.setDataStore(dataStore);
+    public void setDataStore(QiscusDataStore dataStore) {
+        qiscusCore.setDataStore(dataStore);
     }
 
     /**
@@ -354,7 +357,7 @@ public class Qiscus {
      *
      * @return Current qiscus chatting configuration
      */
-    public static QiscusChatConfig getChatConfig() {
+    public QiscusChatConfig getChatConfig() {
         checkAppIdSetup();
         return chatConfig;
     }
@@ -365,7 +368,7 @@ public class Qiscus {
      * @param email Email or username of other user to chat.
      * @return Chat room builder
      */
-    public static ChatBuilder buildChatRoomWith(String email) {
+    public ChatBuilder buildChatRoomWith(String email) {
         checkUserSetup();
         return new ChatBuilder(email);
     }
@@ -376,7 +379,7 @@ public class Qiscus {
      * @param email Email or username of other user to chat.
      * @return Chatting Activity builder
      */
-    public static ChatActivityBuilder buildChatWith(String email) {
+    public ChatActivityBuilder buildChatWith(String email) {
         checkUserSetup();
         return new ChatActivityBuilder(email);
     }
@@ -387,7 +390,7 @@ public class Qiscus {
      * @param email Email or username of other user to chat.
      * @return Chatting Fragment builder
      */
-    public static ChatFragmentBuilder buildChatFragmentWith(String email) {
+    public ChatFragmentBuilder buildChatFragmentWith(String email) {
         checkUserSetup();
         return new ChatFragmentBuilder(email);
     }
@@ -398,7 +401,7 @@ public class Qiscus {
      * @param email Email or username of group chat member.
      * @return Group Chat room builder
      */
-    public static GroupChatBuilder buildGroupChatRoom(String name, String email) {
+    public GroupChatBuilder buildGroupChatRoom(String name, String email) {
         checkUserSetup();
         return new GroupChatBuilder(name, email);
     }
@@ -409,7 +412,7 @@ public class Qiscus {
      * @param emails Emails or username of group chat member.
      * @return Group Chat room builder
      */
-    public static GroupChatBuilder buildGroupChatRoom(String name, List<String> emails) {
+    public GroupChatBuilder buildGroupChatRoom(String name, List<String> emails) {
         checkUserSetup();
         return new GroupChatBuilder(name, emails);
     }
@@ -420,7 +423,7 @@ public class Qiscus {
      * @param channelName the room channel name (must be unique).
      * @return Defined Id Group Chat room builder
      */
-    public static DefinedIdGroupChatBuilder buildGroupChatRoomWith(String channelName) {
+    public DefinedIdGroupChatBuilder buildGroupChatRoomWith(String channelName) {
         checkUserSetup();
         return new DefinedIdGroupChatBuilder(channelName);
     }
@@ -430,8 +433,8 @@ public class Qiscus {
      *
      * @return Heartbeat duration in milliseconds
      */
-    public static long getHeartBeat() {
-        return QiscusCore.getHeartBeat();
+    public long getHeartBeat() {
+        return qiscusCore.getHeartBeat();
     }
 
     /**
@@ -439,15 +442,15 @@ public class Qiscus {
      *
      * @param heartBeat Heartbeat duration in milliseconds
      */
-    public static void setHeartBeat(long heartBeat) {
-        QiscusCore.setSyncInterval(heartBeat);
+    public void setHeartBeat(long heartBeat) {
+        qiscusCore.setSyncInterval(heartBeat);
     }
 
     /**
      * @return current fcm token, null if not set
      */
-    public static String getFcmToken() {
-        return QiscusCore.getFcmToken();
+    public String getFcmToken() {
+        return qiscusCore.getFcmToken();
     }
 
     /**
@@ -455,15 +458,15 @@ public class Qiscus {
      *
      * @param fcmToken the token
      */
-    public static void setFcmToken(String fcmToken) {
-        QiscusCore.registerDeviceToken(fcmToken);
+    public void setFcmToken(String fcmToken) {
+        qiscusCore.registerDeviceToken(fcmToken);
     }
 
-    public static String getProviderAuthorities() {
+    public String getProviderAuthorities() {
         return authorities;
     }
 
-    public static void setProviderAuthorities(String providerAuthorities) {
+    public void setProviderAuthorities(String providerAuthorities) {
         authorities = providerAuthorities;
     }
 
@@ -472,15 +475,15 @@ public class Qiscus {
      *
      * @return true if apps on foreground, and false if on background
      */
-    public static boolean isOnForeground() {
-        return QiscusCore.isOnForeground();
+    public boolean isOnForeground() {
+        return qiscusCore.isOnForeground();
     }
 
     /**
      * Clear all current user qiscus data, you can call this method when user logout for example.
      */
-    public static void clearUser() {
-        QiscusCore.clearUser();
+    public void clearUser() {
+        qiscusCore.clearUser();
     }
 
     /**
@@ -489,8 +492,8 @@ public class Qiscus {
      * @return enableLog status in boolean
      */
     @Deprecated
-    public static boolean isEnableLog() {
-        return QiscusCore.getChatConfig().isEnableLog();
+    public boolean isEnableLog() {
+        return qiscusCore.getChatConfig().isEnableLog();
     }
 
     /**
@@ -499,12 +502,12 @@ public class Qiscus {
      * @param enableLog boolean
      */
     @Deprecated
-    public static void setEnableLog(boolean enableLog) {
-        QiscusCore.getChatConfig().setEnableLog(enableLog);
+    public void setEnableLog(boolean enableLog) {
+        qiscusCore.getChatConfig().setEnableLog(enableLog);
     }
 
-    public static void enableDebugMode(boolean enableLog) {
-        QiscusCore.getChatConfig().enableDebugMode(enableLog);
+    public void enableDebugMode(boolean enableLog) {
+        qiscusCore.getChatConfig().enableDebugMode(enableLog);
     }
 
 
@@ -514,7 +517,7 @@ public class Qiscus {
          *
          * @param qiscusChatRoom Built chat room
          */
-        void onSuccess(QiscusChatRoom qiscusChatRoom);
+        void onSuccess(QChatRoom qiscusChatRoom);
 
         /**
          * Called if error happened while building chat room. e.g network error
@@ -556,7 +559,7 @@ public class Qiscus {
         void onError(Throwable throwable);
     }
 
-    public static class ChatBuilder {
+    public class ChatBuilder {
         private String email;
         private String distinctId;
         private JSONObject options;
@@ -627,14 +630,14 @@ public class Qiscus {
          *
          * @return Observable chat room
          */
-        public Observable<QiscusChatRoom> build() {
+        public Observable<QChatRoom> build() {
             return QiscusApi.getInstance()
                     .chatUser(email, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
 
-    public static class ChatActivityBuilder {
+    public class ChatActivityBuilder {
         private String email;
         private String distinctId;
         private JSONObject options;
@@ -780,7 +783,7 @@ public class Qiscus {
         }
     }
 
-    public static class ChatFragmentBuilder {
+    public class ChatFragmentBuilder {
         private String email;
         private String distinctId;
         private JSONObject options;
@@ -924,7 +927,7 @@ public class Qiscus {
         }
     }
 
-    public static class GroupChatBuilder {
+    public class GroupChatBuilder {
         private Set<String> emails;
         private String name;
         private JSONObject options;
@@ -990,14 +993,14 @@ public class Qiscus {
          *
          * @return Observable chat room
          */
-        public Observable<QiscusChatRoom> build() {
+        public Observable<QChatRoom> build() {
             return QiscusApi.getInstance()
                     .createGroupChat(name, new ArrayList<>(emails), avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));
         }
     }
 
-    public static class DefinedIdGroupChatBuilder {
+    public class DefinedIdGroupChatBuilder {
         private String uniqueId;
         private String name;
         private JSONObject options;
@@ -1057,7 +1060,7 @@ public class Qiscus {
          *
          * @return Observable chat room
          */
-        public Observable<QiscusChatRoom> build() {
+        public Observable<QChatRoom> build() {
             return QiscusApi.getInstance()
                     .createChannel(uniqueId, name, avatarUrl, options)
                     .doOnNext(qiscusChatRoom -> Qiscus.getDataStore().addOrUpdate(qiscusChatRoom));

@@ -16,22 +16,17 @@
 
 package com.qiscus.sdk.chat.core.event;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
-/**
- * Created on : August 25, 2017
- * Author     : zetbaitsu
- * Name       : Zetra
- * GitHub     : https://github.com/zetbaitsu
- */
-public class QiscusCommentResendEvent {
-    private QiscusComment qiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
-    public QiscusCommentResendEvent(QiscusComment qiscusComment) {
-        this.qiscusComment = qiscusComment;
+public class QMessageReceivedEvent {
+    private QMessage qMessage;
+
+    public QMessageReceivedEvent(QMessage qMessage) {
+        this.qMessage = qMessage;
     }
 
-    public QiscusComment getQiscusComment() {
-        return qiscusComment;
+    public QMessage getQiscusComment() {
+        return qMessage;
     }
 }

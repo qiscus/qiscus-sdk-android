@@ -1,7 +1,8 @@
 package com.qiscus.sdk.chat.core.util;
 
-import androidx.annotation.RestrictTo;
 import android.util.Log;
+
+import androidx.annotation.RestrictTo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 
@@ -15,13 +16,18 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 public final class QiscusLogger {
 
     private static final String TAG = "Qiscus";
+    private QiscusCore qiscusCore;
 
-    public static void print(String message) {
+    public QiscusLogger(QiscusCore qiscusCore) {
+        this.qiscusCore = qiscusCore;
+    }
+
+    public void print(String message) {
         print(TAG, message);
     }
 
-    public static void print(String tag, String message) {
-        if (QiscusCore.getChatConfig().isEnableLog()) {
+    public void print(String tag, String message) {
+        if (qiscusCore.getChatConfig().isEnableLog()) {
             Log.d(tag, message);
         }
     }

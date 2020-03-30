@@ -1,11 +1,10 @@
 package com.qiscus.sdk.chat.core.presenter;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
-import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.data.model.QAccount;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
@@ -26,15 +25,17 @@ import java.util.concurrent.TimeUnit;
  **/
 public class QiscusChatRoomEventHandler {
 
-    private QiscusAccount qiscusAccount;
+    private QiscusCore qiscusCore;
+    private QAccount qiscusAccount;
     private StateListener listener;
-    private QiscusChatRoom qiscusChatRoom;
+    private QChatRoom qiscusChatRoom;
     private Runnable listenChatRoomTask;
-    private HashMap<String, QiscusRoomMember> memberState;
+    private HashMap<String, QParticipant> memberState;
 
-    public QiscusChatRoomEventHandler(QiscusChatRoom qiscusChatRoom, StateListener listener) {
+    public QiscusChatRoomEventHandler(QiscusCore qiscusCore, QChatRoom qiscusChatRoom, StateListener listener) {
+        this.qiscusCore = qiscusCore;
         this.listener = listener;
-        this.qiscusAccount = QiscusCore.getQiscusAccount();
+        this.qiscusAccount = qiscusCore.getQiscusAccount();
         setChatRoom(qiscusChatRoom);
 
         if (!EventBus.getDefault().isRegistered(this)) {
@@ -46,7 +47,7 @@ public class QiscusChatRoomEventHandler {
         QiscusAndroidUtil.runOnUIThread(listenChatRoomTask, TimeUnit.SECONDS.toMillis(1));
     }
 
-    public void setChatRoom(QiscusChatRoom qiscusChatRoom) {
+    public void setChatRoom(QChatRoom qiscusChatRoom) {
         this.qiscusChatRoom = qiscusChatRoom;
         setMemberState();
     }
@@ -58,22 +59,22 @@ public class QiscusChatRoomEventHandler {
             memberState.clear();
         }
 
-        if (qiscusChatRoom.getMember().isEmpty()) {
+        if (qiscusChatRoom.getParticipants().isEmpty()) {
             return;
         }
 
-        for (QiscusRoomMember member : qiscusChatRoom.getMember()) {
-            memberState.put(member.getEmail(), member);
+        for (QParticipant participant : qiscusChatRoom.getParticipants()) {
+            memberState.put(participant.getId(), participant);
         }
     }
 
     private void listenChatRoomEvent() {
-        QiscusPusherApi.getInstance().subscribeChatRoom(qiscusChatRoom);
+        qiscusCore.getPusherApi().subscribeChatRoom(qiscusChatRoom);
     }
 
     public void detach() {
         QiscusAndroidUtil.cancelRunOnUIThread(listenChatRoomTask);
-        QiscusPusherApi.getInstance().unsubsribeChatRoom(qiscusChatRoom);
+        qiscusCore.getPusherApi().unsubsribeChatRoom(qiscusChatRoom);
         EventBus.getDefault().unregister(this);
     }
 
@@ -90,60 +91,60 @@ public class QiscusChatRoomEventHandler {
                     break;
                 case DELIVERED:
                     long lastDeliveredCommentId = event.getCommentId();
-                    QiscusCore.getDataStore().updateLastDeliveredComment(qiscusChatRoom.getId(), lastDeliveredCommentId);
+                    qiscusCore.getDataStore().updateLastDeliveredComment(qiscusChatRoom.getId(), lastDeliveredCommentId);
                     listener.onChangeLastDelivered(lastDeliveredCommentId);
                     break;
                 case READ:
                     long lastReadCommentId = event.getCommentId();
-                    QiscusCore.getDataStore().updateLastReadComment(qiscusChatRoom.getId(), lastReadCommentId);
+                    qiscusCore.getDataStore().updateLastReadComment(qiscusChatRoom.getId(), lastReadCommentId);
                     listener.onChangeLastRead(lastReadCommentId);
                     break;
             }
         }
     }
 
-    public void onGotComment(QiscusComment qiscusComment) {
-        if (!qiscusComment.getSender().equals(qiscusAccount.getEmail())) {
+    public void onGotComment(QMessage qMessage) {
+        if (!qMessage.getSender().equals(qiscusAccount.getId())) {
             // handle room event such s invite user, kick user
-            if (qiscusComment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
-                handleChatRoomChanged(qiscusComment);
+            if (qMessage.getType() == QMessage.Type.SYSTEM_EVENT) {
+                handleChatRoomChanged(qMessage);
             }
 
-            if (qiscusChatRoom.getId() == qiscusComment.getRoomId()) {
-                QiscusChatRoom room = QiscusCore.getDataStore().getChatRoom(qiscusChatRoom.getId());
-                if ( room.getLastComment().getState() == QiscusComment.STATE_ON_QISCUS ||
-                        room.getLastComment().getState() == QiscusComment.STATE_DELIVERED ) {
-                    QiscusCore.getDataStore().updateLastReadComment(qiscusChatRoom.getId(), qiscusComment.getId());
-                    listener.onChangeLastRead(qiscusComment.getId());
+            if (qiscusChatRoom.getId() == qMessage.getChatRoomId()) {
+                QChatRoom room = qiscusCore.getDataStore().getChatRoom(qiscusChatRoom.getId());
+                if ( room.getLastMessage().getStatus() == QMessage.STATE_SENT ||
+                        room.getLastMessage().getStatus() == QMessage.STATE_DELIVERED ) {
+                    qiscusCore.getDataStore().updateLastReadComment(qiscusChatRoom.getId(), qMessage.getId());
+                    listener.onChangeLastRead(qMessage.getId());
                 }
             }
         }
     }
 
-    private void handleChatRoomChanged(QiscusComment qiscusComment) {
+    private void handleChatRoomChanged(QMessage qMessage) {
         try {
-            JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
-            QiscusRoomMember member = new QiscusRoomMember();
+            JSONObject payload = QiscusRawDataExtractor.getPayload(qMessage);
+            QParticipant participant = new QParticipant();
             switch (payload.optString("type")) {
                 case "add_member":
-                    member.setEmail(payload.optString("object_email"));
-                    member.setUsername(payload.optString("object_username"));
-                    handleMemberAdded(member);
+                    participant.setId(payload.optString("object_email"));
+                    participant.setName(payload.optString("object_username"));
+                    handleMemberAdded(participant);
                     break;
                 case "join_room":
-                    member.setEmail(payload.optString("subject_email"));
-                    member.setUsername(payload.optString("subject_username"));
-                    handleMemberAdded(member);
+                    participant.setId(payload.optString("subject_email"));
+                    participant.setName(payload.optString("subject_username"));
+                    handleMemberAdded(participant);
                     break;
                 case "remove_member":
-                    member.setEmail(payload.optString("object_email"));
-                    member.setUsername(payload.optString("object_username"));
-                    handleMemberRemoved(member);
+                    participant.setId(payload.optString("object_email"));
+                    participant.setName(payload.optString("object_username"));
+                    handleMemberRemoved(participant);
                     break;
                 case "left_room":
-                    member.setEmail(payload.optString("subject_email"));
-                    member.setUsername(payload.optString("subject_username"));
-                    handleMemberRemoved(member);
+                    participant.setId(payload.optString("subject_email"));
+                    participant.setName(payload.optString("subject_username"));
+                    handleMemberRemoved(participant);
                     break;
                 case "change_room_name":
                     listener.onChatRoomNameChanged(payload.optString("room_name"));
@@ -154,31 +155,31 @@ public class QiscusChatRoomEventHandler {
         }
     }
 
-    private void handleMemberAdded(QiscusRoomMember member) {
-        if (!memberState.containsKey(member.getEmail())) {
-            memberState.put(member.getEmail(), member);
+    private void handleMemberAdded(QParticipant participant) {
+        if (!memberState.containsKey(participant.getId())) {
+            memberState.put(participant.getId(), participant);
 
-            listener.onChatRoomMemberAdded(member);
+            listener.onChatRoomMemberAdded(participant);
             QiscusAndroidUtil.runOnBackgroundThread(() ->
-                    QiscusCore.getDataStore().addOrUpdateRoomMember(qiscusChatRoom.getId(), member, qiscusChatRoom.getDistinctId()));
+                    qiscusCore.getDataStore().addOrUpdateRoomMember(qiscusChatRoom.getId(), participant));
         }
     }
 
-    private void handleMemberRemoved(QiscusRoomMember member) {
-        if (memberState.remove(member.getEmail()) != null) {
+    private void handleMemberRemoved(QParticipant participant) {
+        if (memberState.remove(participant.getId()) != null) {
 
-            listener.onChatRoomMemberRemoved(member);
+            listener.onChatRoomMemberRemoved(participant);
             QiscusAndroidUtil.runOnBackgroundThread(() ->
-                    QiscusCore.getDataStore().deleteRoomMember(qiscusChatRoom.getId(), member.getEmail()));
+                    qiscusCore.getDataStore().deleteRoomMember(qiscusChatRoom.getId(), participant.getId()));
         }
     }
 
     public interface StateListener {
         void onChatRoomNameChanged(String name);
 
-        void onChatRoomMemberAdded(QiscusRoomMember member);
+        void onChatRoomMemberAdded(QParticipant participant);
 
-        void onChatRoomMemberRemoved(QiscusRoomMember member);
+        void onChatRoomMemberRemoved(QParticipant participant);
 
         void onUserTypng(String email, boolean typing);
 

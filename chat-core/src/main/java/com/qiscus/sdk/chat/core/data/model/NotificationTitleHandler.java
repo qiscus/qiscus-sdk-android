@@ -23,5 +23,5 @@ package com.qiscus.sdk.chat.core.data.model;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface NotificationTitleHandler {
-    String getTitle(QiscusComment qiscusComment);
+    String getTitle(QMessage qMessage);
 }

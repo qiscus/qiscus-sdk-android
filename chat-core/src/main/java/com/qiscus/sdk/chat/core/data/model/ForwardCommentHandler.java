@@ -25,5 +25,5 @@ import java.util.List;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface ForwardCommentHandler {
-    void forward(List<QiscusComment> comments);
+    void forward(List<QMessage> comments);
 }

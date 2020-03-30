@@ -45,7 +45,7 @@
             android:name=".ui.QiscusChannelActivity"
             android:theme="@style/QiscusTheme" />
         <activity
-            android:name=".ui.QiscusAccountLinkingActivity"
+            android:name=".ui.QAccountLinkingActivity"
             android:theme="@style/QiscusTheme" />
         <activity
             android:name=".ui.QiscusPhotoViewerActivity"

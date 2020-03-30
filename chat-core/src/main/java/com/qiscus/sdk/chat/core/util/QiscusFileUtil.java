@@ -24,8 +24,6 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
-import com.qiscus.sdk.chat.core.QiscusCore;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,9 +37,9 @@ import java.util.Locale;
 
 public final class QiscusFileUtil {
 
-    public static final String FILES_PATH = QiscusCore.getAppsName() + File.separator + "Files";
-    public static final String IMAGE_PATH = QiscusCore.getAppsName() + File.separator +
-            QiscusCore.getAppsName() + " Images";
+    public static final String FILES_PATH = QiscusConst.getAppsName() + File.separator + "Files";
+    public static final String IMAGE_PATH = QiscusConst.getAppsName() + File.separator +
+            QiscusConst.getAppsName() + " Images";
     private static final int EOF = -1;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
@@ -51,7 +49,7 @@ public final class QiscusFileUtil {
 
     public static File from(Uri uri) throws IOException {
         if (uri != null) {
-            InputStream inputStream = QiscusCore.getApps().getContentResolver().openInputStream(uri);
+            InputStream inputStream = QiscusConst.getApps().getContentResolver().openInputStream(uri);
             String fileName = getFileName(uri);
             String[] splitName = splitFileName(fileName);
             File tempFile = File.createTempFile(splitName[0], splitName[1]);
@@ -109,7 +107,7 @@ public final class QiscusFileUtil {
     public static String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = QiscusCore.getApps().getContentResolver().query(uri, null, null, null, null);
+            Cursor cursor = QiscusConst.getApps().getContentResolver().query(uri, null, null, null, null);
             try {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
@@ -133,7 +131,7 @@ public final class QiscusFileUtil {
     }
 
     public static String getRealPathFromURI(Uri contentUri) {
-        Cursor cursor = QiscusCore.getApps().getContentResolver().query(contentUri, null, null, null, null);
+        Cursor cursor = QiscusConst.getApps().getContentResolver().query(contentUri, null, null, null, null);
         if (cursor == null) {
             return contentUri.getPath();
         } else {
@@ -256,7 +254,7 @@ public final class QiscusFileUtil {
     public static void notifySystem(File file) {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         mediaScanIntent.setData(Uri.fromFile(file));
-        QiscusCore.getApps().sendBroadcast(mediaScanIntent);
+        QiscusConst.getApps().sendBroadcast(mediaScanIntent);
     }
 
     public static String getThumbnailURL(String url) {

@@ -24,9 +24,9 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusCommentDraft;
+import com.qiscus.sdk.chat.core.data.model.QMessageDraft;
 import com.qiscus.sdk.chat.core.data.model.QiscusPushNotificationMessage;
-import com.qiscus.sdk.chat.core.data.model.QiscusReplyCommentDraft;
+import com.qiscus.sdk.chat.core.data.model.QiscusReplyMessageDraft;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,18 +40,16 @@ import java.util.List;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public enum QiscusCacheManager {
-    INSTANCE;
+public class QiscusCacheManager {
+
     private final SharedPreferences sharedPreferences;
     private final Gson gson;
+    private QiscusCore qiscusCore;
 
-    QiscusCacheManager() {
-        sharedPreferences = QiscusCore.getApps().getSharedPreferences("qiscus.cache", Context.MODE_PRIVATE);
+    public QiscusCacheManager(QiscusCore qiscusCore) {
+        this.qiscusCore = qiscusCore;
+        sharedPreferences = qiscusCore.getApps().getSharedPreferences(qiscusCore.getAppId() + "_qiscus.cache", Context.MODE_PRIVATE);
         gson = new Gson();
-    }
-
-    public static QiscusCacheManager getInstance() {
-        return INSTANCE;
     }
 
     public void cacheLastImagePath(String path) {
@@ -140,22 +138,22 @@ public enum QiscusCacheManager {
                 sharedPreferences.getLong("last_active_chat", 0));
     }
 
-    public void setDraftComment(long roomId, QiscusCommentDraft draft) {
+    public void setDraftComment(long roomId, QMessageDraft draft) {
         sharedPreferences.edit()
                 .putString("draft_comment_" + roomId, gson.toJson(draft))
                 .apply();
     }
 
-    public QiscusCommentDraft getDraftComment(long roomId) {
+    public QMessageDraft getDraftComment(long roomId) {
         String json = sharedPreferences.getString("draft_comment_" + roomId, null);
         if (json != null) {
             try {
                 JSONObject jsonObject = new JSONObject(json);
                 if (jsonObject.has("repliedPayload")) {
-                    return new QiscusReplyCommentDraft(jsonObject.optString("message", ""),
+                    return new QiscusReplyMessageDraft(jsonObject.optString("message", ""),
                             jsonObject.optString("repliedPayload", ""));
                 }
-                return new QiscusCommentDraft(jsonObject.optString("message", ""));
+                return new QMessageDraft(jsonObject.optString("message", ""));
             } catch (JSONException e) {
                 return null;
             }

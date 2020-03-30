@@ -49,7 +49,7 @@ import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusPhoto;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.ui.adapter.QiscusPhotoAdapter;
@@ -81,7 +81,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     private ViewPager viewPager;
     private QiscusMentionSuggestionView mentionSuggestionView;
-    private QiscusChatRoom qiscusChatRoom;
+    private QChatRoom qiscusChatRoom;
     private List<QiscusPhoto> qiscusPhotos;
     private Map<String, String> captions;
     private int position = -1;
@@ -94,7 +94,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
 
     private QiscusChatConfig chatConfig;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom room, List<QiscusPhoto> qiscusPhotos) {
+    public static Intent generateIntent(Context context, QChatRoom room, List<QiscusPhoto> qiscusPhotos) {
         Intent intent = new Intent(context, QiscusSendPhotoConfirmationActivity.class);
         intent.putExtra(EXTRA_ROOM, room);
         intent.putParcelableArrayListExtra(EXTRA_QISCUS_PHOTOS, (ArrayList<QiscusPhoto>) qiscusPhotos);

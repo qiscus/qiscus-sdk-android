@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
@@ -57,7 +57,7 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
     protected ReplyItemClickListener replyItemClickListener;
     protected CommentChainingListener commentChainingListener;
 
-    protected QiscusChatRoom qiscusChatRoom;
+    protected QChatRoom qiscusChatRoom;
     protected QiscusAccount qiscusAccount;
     protected long lastDeliveredCommentId;
     protected long lastReadCommentId;
@@ -143,11 +143,11 @@ public abstract class QiscusBaseChatAdapter<E extends QiscusComment, H extends Q
         this.channelRoom = channelRoom;
     }
 
-    public QiscusChatRoom getQiscusChatRoom() {
+    public QChatRoom getQChatRoom() {
         return qiscusChatRoom;
     }
 
-    public void setQiscusChatRoom(QiscusChatRoom qiscusChatRoom) {
+    public void setQChatRoom(QChatRoom qiscusChatRoom) {
         this.qiscusChatRoom = qiscusChatRoom;
         updateMember();
     }

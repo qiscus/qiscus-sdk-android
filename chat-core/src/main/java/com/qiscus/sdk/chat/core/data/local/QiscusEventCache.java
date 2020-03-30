@@ -29,16 +29,15 @@ import com.qiscus.sdk.chat.core.QiscusCore;
  * GitHub     : https://github.com/zetbaitsu
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public enum QiscusEventCache {
-    INSTANCE;
+public class QiscusEventCache {
+
     private final SharedPreferences sharedPreferences;
+    private QiscusCore qiscusCore;
 
-    QiscusEventCache() {
-        sharedPreferences = QiscusCore.getApps().getSharedPreferences("events.cache", Context.MODE_PRIVATE);
-    }
+    public QiscusEventCache(QiscusCore qiscusCore) {
+        this.qiscusCore = qiscusCore;
 
-    public static QiscusEventCache getInstance() {
-        return INSTANCE;
+        sharedPreferences = qiscusCore.getApps().getSharedPreferences(qiscusCore.getAppId() + "_events.cache", Context.MODE_PRIVATE);
     }
 
     public long getLastEventId() {

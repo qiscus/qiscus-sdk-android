@@ -22,7 +22,7 @@ import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
-import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
@@ -46,12 +46,12 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
 
     protected String subtitle;
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom) {
+    public static Intent generateIntent(Context context, QChatRoom qiscusChatRoom) {
         return generateIntent(context, qiscusChatRoom, null, null,
                 false, null, null);
     }
 
-    public static Intent generateIntent(Context context, QiscusChatRoom qiscusChatRoom,
+    public static Intent generateIntent(Context context, QChatRoom qiscusChatRoom,
                                         String startingMessage, List<File> shareFiles,
                                         boolean autoSendExtra, List<QiscusComment> comments,
                                         QiscusComment scrollToComment) {

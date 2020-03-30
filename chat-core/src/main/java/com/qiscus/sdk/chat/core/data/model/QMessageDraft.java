@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core.event;
+package com.qiscus.sdk.chat.core.data.model;
 
 /**
- * Created on : February 14, 2018
+ * Created on : September 06, 2017
  * Author     : zetbaitsu
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusClearCommentsEvent {
-    private long roomId;
-    private long timestamp;
+public class QMessageDraft {
+    private String message;
 
-    public QiscusClearCommentsEvent(long roomId) {
-        this(roomId, System.currentTimeMillis());
+    public QMessageDraft(String message) {
+        this.message = message;
     }
 
-    public QiscusClearCommentsEvent(long roomId, long timestamp) {
-        this.roomId = roomId;
-        this.timestamp = timestamp;
+    public String getMessage() {
+        return message;
     }
 
-    public long getRoomId() {
-        return roomId;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
+    @Override
+    public String toString() {
+        return "QMessageDraft{" +
+                "message='" + message + '\'' +
+                '}';
     }
 }

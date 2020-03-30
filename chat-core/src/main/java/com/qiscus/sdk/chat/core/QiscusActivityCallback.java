@@ -17,16 +17,8 @@
 package com.qiscus.sdk.chat.core;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Application;
-import android.content.Context;
 import android.os.Bundle;
-
-import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
-import com.qiscus.sdk.chat.core.service.QiscusSyncService;
-import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
-import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -36,12 +28,16 @@ import java.util.concurrent.ScheduledFuture;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
-    INSTANCE;
+public class QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
     private static boolean foreground;
     private ScheduledFuture<?> activityTransition;
+    private QiscusCore qiscusCore;
+
+    public QiscusActivityCallback(QiscusCore qiscusCore) {
+        this.qiscusCore = qiscusCore;
+    }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -49,9 +45,6 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(Activity activity) {
-        if (!QiscusServiceUtil.isMyServiceRunning()) {
-            QiscusCore.startPusherService();
-        }
     }
 
     @Override
@@ -82,7 +75,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     }
 
     private void startActivityTransitionTimer() {
-        activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() -> foreground = false,
+        activityTransition = qiscusCore.getAndroidUtil().runOnBackgroundThread(() -> foreground = false,
                 MAX_ACTIVITY_TRANSITION_TIME);
     }
 

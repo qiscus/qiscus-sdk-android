@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.chat.core.data.local;
 
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import java.util.List;
 
@@ -29,15 +29,15 @@ import rx.Observable;
  * GitHub     : https://github.com/zetbaitsu
  */
 public interface QiscusCommentStore {
-    void add(QiscusComment qiscusComment);
+    void add(QMessage qMessage);
 
-    boolean isContains(QiscusComment qiscusComment);
+    boolean isContains(QMessage qMessage);
 
-    void update(QiscusComment qiscusComment);
+    void update(QMessage qMessage);
 
-    void addOrUpdate(QiscusComment qiscusComment);
+    void addOrUpdate(QMessage qMessage);
 
-    void delete(QiscusComment qiscusComment);
+    void delete(QMessage qMessage);
 
     boolean deleteCommentsByRoomId(long roomId);
 
@@ -47,41 +47,41 @@ public interface QiscusCommentStore {
 
     void updateLastReadComment(long roomId, long commentId);
 
-    QiscusComment getComment(String uniqueId);
+    QMessage getComment(String uniqueId);
 
-    QiscusComment getCommentByBeforeId(long beforeId);
+    QMessage getCommentByBeforeId(long beforeId);
 
-    List<QiscusComment> getComments(long roomId);
+    List<QMessage> getComments(long roomId);
 
-    List<QiscusComment> getComments(long roomId, int limit);
+    List<QMessage> getComments(long roomId, int limit);
 
-    List<QiscusComment> getComments(long roomId, long timestampOffset);
+    List<QMessage> getComments(long roomId, long timestampOffset);
 
-    Observable<List<QiscusComment>> getObservableComments(long roomId);
+    Observable<List<QMessage>> getObservableComments(long roomId);
 
-    Observable<List<QiscusComment>> getObservableComments(long roomId, int limit);
+    Observable<List<QMessage>> getObservableComments(long roomId, int limit);
 
-    List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit);
+    List<QMessage> getOlderCommentsThan(QMessage qMessage, long roomId, int limit);
 
-    Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit);
+    Observable<List<QMessage>> getObservableOlderCommentsThan(QMessage qMessage, long roomId, int limit);
 
-    List<QiscusComment> getCommentsAfter(QiscusComment qiscusComment, long roomId);
+    List<QMessage> getCommentsAfter(QMessage qMessage, long roomId);
 
-    Observable<List<QiscusComment>> getObservableCommentsAfter(QiscusComment qiscusComment, long roomId);
+    Observable<List<QMessage>> getObservableCommentsAfter(QMessage qMessage, long roomId);
 
-    QiscusComment getLatestComment();
+    QMessage getLatestComment();
 
-    QiscusComment getLatestComment(long roomId);
+    QMessage getLatestComment(long roomId);
 
-    QiscusComment getLatestDeliveredComment(long roomId);
+    QMessage getLatestDeliveredComment(long roomId);
 
-    QiscusComment getLatestReadComment(long roomId);
+    QMessage getLatestReadComment(long roomId);
 
-    List<QiscusComment> getPendingComments();
+    List<QMessage> getPendingComments();
 
-    Observable<List<QiscusComment>> getObservablePendingComments();
+    Observable<List<QMessage>> getObservablePendingComments();
 
-    List<QiscusComment> searchComments(String query, long roomId, int limit, int offset);
+    List<QMessage> searchComments(String query, long roomId, int limit, int offset);
 
-    List<QiscusComment> searchComments(String query, int limit, int offset);
+    List<QMessage> searchComments(String query, int limit, int offset);
 }

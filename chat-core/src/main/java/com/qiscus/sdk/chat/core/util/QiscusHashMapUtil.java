@@ -3,7 +3,7 @@ package com.qiscus.sdk.chat.core.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.BuildConfig;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -91,24 +91,24 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> postComment(QiscusComment qiscusComment) {
+    public static HashMap<String, Object> postComment(QMessage qMessage) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         JsonObject jsonPayload = null;
         JsonObject jsonExtras = null;
 
-        if (qiscusComment.getExtraPayload() != null && !qiscusComment.getExtraPayload().equals("")) {
-            jsonPayload = new JsonParser().parse(qiscusComment.getExtraPayload()).getAsJsonObject();
+        if (qMessage.getPayload() != null && !qMessage.getPayload().equals("")) {
+            jsonPayload = new JsonParser().parse(qMessage.getPayload().toString()).getAsJsonObject();
         }
 
-        if (qiscusComment.getExtras() != null) {
-            jsonExtras = new JsonParser().parse(qiscusComment.getExtras().toString()).getAsJsonObject();
+        if (qMessage.getExtras() != null) {
+            jsonExtras = new JsonParser().parse(qMessage.getExtras().toString()).getAsJsonObject();
         }
 
-        hashMap.put("comment", qiscusComment.getMessage());
-        hashMap.put("topic_id", String.valueOf(qiscusComment.getRoomId()));
-        hashMap.put("unique_temp_id", qiscusComment.getUniqueId());
-        hashMap.put("type", qiscusComment.getRawType());
+        hashMap.put("comment", qMessage.getText());
+        hashMap.put("topic_id", String.valueOf(qMessage.getChatRoomId()));
+        hashMap.put("unique_temp_id", qMessage.getUniqueId());
+        hashMap.put("type", qMessage.getRawType());
         hashMap.put("payload", jsonPayload);
         hashMap.put("extras", jsonExtras);
 
@@ -206,4 +206,12 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> getChannelsInfo(List<String> uniqueIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("unique_ids", uniqueIds);
+
+        return hashMap;
+    }
+
 }

@@ -36,6 +36,6 @@ public final class QiscusPushNotificationUtil {
 
     public static void clearPushNotification(Context context, long roomId) {
         NotificationManagerCompat.from(context).cancel(QiscusNumberUtil.convertToInt(roomId));
-        QiscusCacheManager.getInstance().clearMessageNotifItems(roomId);
+//        QiscusCacheManager.getInstance().clearMessageNotifItems(roomId);
     }
 }

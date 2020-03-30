@@ -2,8 +2,7 @@ package com.qiscus.sdk.chat.core.util;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import org.json.JSONObject;
 
@@ -11,9 +10,12 @@ import org.json.JSONObject;
  * @author Yuana andhikayuana@gmail.com
  * @since Aug, Tue 14 2018 15.33
  **/
-public final class QiscusFirebaseMessagingUtil {
+public class QiscusFirebaseMessagingUtil {
 
-    private QiscusFirebaseMessagingUtil() {
+    private QiscusCore qiscusCore;
+
+    public QiscusFirebaseMessagingUtil(QiscusCore qiscusCore) {
+        this.qiscusCore = qiscusCore;
     }
 
     /**
@@ -22,11 +24,11 @@ public final class QiscusFirebaseMessagingUtil {
      * @param remoteMessage The message from firebase
      * @return true if the message is for Qiscus SDK, false if the message is not for Qiscus SDK
      */
-    public static boolean handleMessageReceived(RemoteMessage remoteMessage) {
+    public boolean handleMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getData().containsKey("qiscus_sdk")) {
-            if (QiscusCore.hasSetupUser()) {
-                if (!QiscusPusherApi.getInstance().isConnected()) {
-                    QiscusPusherApi.getInstance().restartConnection();
+            if (qiscusCore.hasSetupUser()) {
+                if (!qiscusCore.getPusherApi().isConnected()) {
+                    qiscusCore.getPusherApi().restartConnection();
                 }
                 if (remoteMessage.getData().containsKey("payload")) {
                     if (remoteMessage.getData().get("qiscus_sdk").equals("post_comment")) {
@@ -43,25 +45,25 @@ public final class QiscusFirebaseMessagingUtil {
         return false;
     }
 
-    private static void handlePostCommentEvent(RemoteMessage remoteMessage) {
-        QiscusComment qiscusComment = QiscusPusherApi.jsonToComment(remoteMessage.getData().get("payload"));
-        if (qiscusComment == null) {
+    private void handlePostCommentEvent(RemoteMessage remoteMessage) {
+        QMessage qMessage = qiscusCore.getPusherApi().jsonToComment(remoteMessage.getData().get("payload"));
+        if (qMessage == null) {
             return;
         }
-        QiscusPusherApi.handleReceivedComment(qiscusComment);
+        qiscusCore.getPusherApi().handleReceivedComment(qMessage);
     }
 
-    private static void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {
+    private void handleDeleteCommentsEvent(RemoteMessage remoteMessage) {
         try {
-            QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
+            qiscusCore.getPusherApi().handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void handleClearComments(RemoteMessage remoteMessage) {
+    private void handleClearComments(RemoteMessage remoteMessage) {
         try {
-            QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
+            qiscusCore.getPusherApi().handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
         } catch (Exception e) {
             e.printStackTrace();
         }
