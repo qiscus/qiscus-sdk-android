@@ -1098,6 +1098,16 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChannels);
     }
 
+    public Observable<List<QiscusChannels>> joinChannels(List<String> uniqueIds) {
+        return api.joinChannels(QiscusHashMapUtil.joinChannels(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QiscusChannels>> leaveChannels(List<String> uniqueIds) {
+        return api.leaveChannels(QiscusHashMapUtil.leaveChannels(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1295,6 +1305,18 @@ public enum QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/channels/info")
         Observable<JsonElement> getChannelsInfo(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/join")
+        Observable<JsonElement> joinChannels(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/leave")
+        Observable<JsonElement> leaveChannels(
                 @Body HashMap<String, Object> data
         );
     }

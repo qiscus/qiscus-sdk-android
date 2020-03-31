@@ -213,4 +213,18 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> joinChannels(List<String> uniqueIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("unique_ids", uniqueIds);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> leaveChannels(List<String> uniqueIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("unique_ids", uniqueIds);
+
+        return hashMap;
+    }
 }
