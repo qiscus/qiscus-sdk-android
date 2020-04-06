@@ -50,6 +50,7 @@ public class QiscusFirebaseMessagingUtil {
         if (qMessage == null) {
             return;
         }
+
         qiscusCore.getPusherApi().handleReceivedComment(qMessage);
     }
 

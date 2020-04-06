@@ -157,7 +157,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public QChatRoom getChatRoom(String email) {
         String query = "SELECT * FROM "
                 + QiscusDb.RoomMemberTable.TABLE_NAME + " WHERE "
-                + " AND " + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL
+                + QiscusDb.RoomMemberTable.COLUMN_USER_EMAIL
                 + " = " + DatabaseUtils.sqlEscapeString(email);
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);

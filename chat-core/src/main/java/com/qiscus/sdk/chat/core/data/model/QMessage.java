@@ -23,8 +23,6 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusConst;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
@@ -37,10 +35,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Date;
-import java.util.List;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 18, 2016
@@ -78,6 +72,7 @@ public class QMessage implements Parcelable {
     private String rawType;
     private JSONObject payload;
     private JSONObject extras;
+    private String appId;
     private QMessage replyTo;
     private String attachmentName;
 
@@ -91,6 +86,7 @@ public class QMessage implements Parcelable {
         uniqueId = in.readString();
         previousMessageId = in.readLong();
         text = in.readString();
+        appId = in.readString();
         sender = in.readParcelable(QUser.class.getClassLoader());
         timestamp = new Date(in.readLong());
         status = in.readInt();
@@ -288,6 +284,14 @@ public class QMessage implements Parcelable {
         this.extras = extras;
     }
 
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
     public QMessage getReplyTo() {
         if (replyTo == null && getType() == Type.REPLY) {
             try {
@@ -461,6 +465,7 @@ public class QMessage implements Parcelable {
                 ", timestamp=" + timestamp +
                 ", status=" + status +
                 ", deleted=" + deleted +
+                ", appId=" + appId +
                 '}';
     }
 
@@ -476,6 +481,7 @@ public class QMessage implements Parcelable {
         dest.writeString(uniqueId);
         dest.writeLong(previousMessageId);
         dest.writeString(text);
+        dest.writeString(appId);
         dest.writeParcelable(sender, flags);
         if (timestamp == null) {
             timestamp = new Date();
@@ -513,7 +519,8 @@ public class QMessage implements Parcelable {
                 && sender.equals(qiscusMessage.sender)
                 && timestamp.equals(qiscusMessage.timestamp)
                 && status == qiscusMessage.status
-                && deleted == qiscusMessage.deleted;
+                && deleted == qiscusMessage.deleted
+                && appId.equals(qiscusMessage.appId);
     }
 
     public enum Type {

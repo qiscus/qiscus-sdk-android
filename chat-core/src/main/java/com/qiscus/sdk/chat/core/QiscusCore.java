@@ -544,7 +544,7 @@ public class QiscusCore {
         return chatConfig;
     }
 
-    public void sendMessage(QMessage qMessage, onSendMessageListener onCalbackSendMessage) {
+    public void sendMessage(QMessage qMessage, OnSendMessageListener onCalbackSendMessage) {
         QAccount qAccount = getQiscusAccount();
         QUser qUser = new QUser();
         qUser.setAvatarUrl(qAccount.getAvatarUrl());
@@ -572,7 +572,7 @@ public class QiscusCore {
         ;
     }
 
-    public void sendFileMessage(QMessage qMessage, File file, onProgressUploadListener onProgressUploadListener) {
+    public void sendFileMessage(QMessage qMessage, File file, OnProgressUploadListener onProgressUploadListener) {
         QAccount qAccount = getQiscusAccount();
         QUser qUser = new QUser();
         qUser.setAvatarUrl(qAccount.getAvatarUrl());
@@ -954,7 +954,7 @@ public class QiscusCore {
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
 
-    public interface onSendMessageListener {
+    public interface OnSendMessageListener {
         void onSending(QMessage qMessage);
 
         void onSuccess(QMessage qMessage);
@@ -962,7 +962,7 @@ public class QiscusCore {
         void onFailed(Throwable throwable, QMessage qMessage);
     }
 
-    public interface onProgressUploadListener {
+    public interface OnProgressUploadListener {
         void onSending(QMessage qMessage);
 
         void onProgress(long progress);

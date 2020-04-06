@@ -46,8 +46,6 @@ public class QiscusPushNotificationMessage implements Parcelable {
     public QiscusPushNotificationMessage(QMessage qMessage) {
         this.commentId = qMessage.id;
         this.message = qMessage.text;
-//        this.roomName = qMessage.roomName;
-//        this.roomAvatar = qMessage.roomAvatar;
     }
 
     protected QiscusPushNotificationMessage(Parcel in) {

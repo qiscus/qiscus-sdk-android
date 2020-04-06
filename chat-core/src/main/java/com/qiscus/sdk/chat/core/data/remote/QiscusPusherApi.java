@@ -30,8 +30,8 @@ import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QUser;
-import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.event.QMessageReceivedEvent;
+import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent;
@@ -248,6 +248,9 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
             qMessage.setUniqueId(jsonObject.get("unique_temp_id").getAsString());
             qMessage.setPreviousMessageId(jsonObject.get("comment_before_id").getAsLong());
             qMessage.setText(jsonObject.get("message").getAsString());
+            if (jsonObject.has("app_code")){
+                qMessage.setAppId(jsonObject.get("app_code").getAsString());
+            }
 
             QUser qUser = new QUser();
             qUser.setAvatarUrl(jsonObject.get("user_avatar").getAsString());
@@ -356,7 +359,9 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
     }
 
     public void connect() {
-        if (qiscusCore.hasSetupUser() && !connecting && qiscusCore.getAndroidUtil().isNetworkAvailable() && qiscusCore.getEnableRealtime()) {
+        if (qiscusCore.hasSetupUser() && !connecting
+                && qiscusCore.getAndroidUtil().isNetworkAvailable()
+                && qiscusCore.getEnableRealtime()) {
             connecting = true;
             qAccount = qiscusCore.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();

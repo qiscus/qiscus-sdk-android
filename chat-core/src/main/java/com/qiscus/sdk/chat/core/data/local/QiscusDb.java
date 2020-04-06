@@ -252,7 +252,6 @@ final class QiscusDb {
             qiscusMessage.setTimestamp(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
             qiscusMessage.setStatus(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             qiscusMessage.setDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETED)) == 1);
-//            qiscusMessage.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
             qiscusMessage.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             try {
                 String payload = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD));

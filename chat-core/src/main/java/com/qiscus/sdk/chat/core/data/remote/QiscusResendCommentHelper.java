@@ -135,7 +135,8 @@ public class QiscusResendCommentHelper {
         EventBus.getDefault().post(new QMessageResendEvent(qMessage));
 
         Subscription subscription = qiscusCore.getApi()
-                .upload(file, total -> {})
+                .upload(file, total -> {
+                })
                 .flatMap(uri -> {
                     qMessage.updateAttachmentUrl(uri.toString());
                     return qiscusCore.getApi().sendMessage(qMessage);

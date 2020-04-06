@@ -22,14 +22,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
-import com.qiscus.sdk.chat.core.data.model.QUser;
-import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
+import com.qiscus.sdk.chat.core.data.model.QParticipant;
+import com.qiscus.sdk.chat.core.data.model.QUser;
+import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
-import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.json.JSONException;
@@ -114,12 +114,6 @@ final class QiscusApiParser {
             }
 
             qChatRoom.setName(jsonChatRoom.get("room_name").getAsString());
-
-            /*ccccif (qChatRoom.getType().equals("group")) {
-                qChatRoom.setDistinctId(jsonChatRoom.get("unique_id").getAsString());
-            } else {
-                qChatRoom.setDistinctId(jsonChatRoom.get("raw_room_name").getAsString());
-            }*/
 
             qChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
 
@@ -212,12 +206,6 @@ final class QiscusApiParser {
                     qChatRoom.setType("single");
                 }
 
-                /*ccccif (qChatRoom.getType().equals("group")) {
-                    qChatRoom.setDistinctId(jsonChatRoom.get("unique_id").getAsString());
-                } else {
-                    qChatRoom.setDistinctId(jsonChatRoom.get("raw_room_name").getAsString());
-                }*/
-
                 qChatRoom.setUniqueId(jsonChatRoom.get("unique_id").getAsString());
 
 
@@ -242,26 +230,26 @@ final class QiscusApiParser {
                 if (jsonChatRoom.has("participants") && jsonChatRoom.get("participants").isJsonArray()) {
                     JsonArray jsonMembers = jsonChatRoom.get("participants").getAsJsonArray();
                     for (JsonElement jsonMember : jsonMembers) {
-                        QParticipant parseQMessage = new QParticipant();
-                        parseQMessage.setId(jsonMember.getAsJsonObject().get("email").getAsString());
-                        parseQMessage.setAvatarUrl(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
-                        parseQMessage.setName(jsonMember.getAsJsonObject().get("username").getAsString());
+                        QParticipant qParticipant = new QParticipant();
+                        qParticipant.setId(jsonMember.getAsJsonObject().get("email").getAsString());
+                        qParticipant.setAvatarUrl(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
+                        qParticipant.setName(jsonMember.getAsJsonObject().get("username").getAsString());
                         if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
-                            parseQMessage.setLastMessageDeliveredId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsLong());
+                            qParticipant.setLastMessageDeliveredId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsLong());
                         }
                         if (jsonMember.getAsJsonObject().has("last_comment_read_id")) {
-                            parseQMessage.setLastMessageReadId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsLong());
+                            qParticipant.setLastMessageReadId(jsonMember.getAsJsonObject().get("last_comment_read_id").getAsLong());
                         }
 
                         if (jsonMember.getAsJsonObject().has("extras") && !jsonMember.getAsJsonObject().get("extras").isJsonNull()) {
                             try {
-                                parseQMessage.setExtras(new JSONObject(jsonMember.getAsJsonObject().get("extras").getAsJsonObject().toString()));
+                                qParticipant.setExtras(new JSONObject(jsonMember.getAsJsonObject().get("extras").getAsJsonObject().toString()));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
 
-                        members.add(parseQMessage);
+                        members.add(qParticipant);
                     }
                 }
                 qChatRoom.setParticipants(members);
@@ -314,6 +302,9 @@ final class QiscusApiParser {
         qiscusMessage.setSender(qUser);
         qiscusMessage.getSender().setId(jsonComment.get("email").getAsString());
         qiscusMessage.getSender().setAvatarUrl(jsonComment.get("user_avatar_url").getAsString());
+        if (jsonComment.has("app_code")) {
+            qiscusMessage.setAppId(jsonComment.get("app_code").getAsString());
+        }
         determineCommentState(qiscusMessage, jsonComment.get("status").getAsString());
 
         //timestamp is in nano seconds format, convert it to milliseconds by divide it
@@ -322,14 +313,6 @@ final class QiscusApiParser {
 
         if (jsonComment.has("is_deleted")) {
             qiscusMessage.setDeleted(jsonComment.get("is_deleted").getAsBoolean());
-        }
-
-        if (jsonComment.has("room_name")) {
-//            qiscusMessage.setRoomName(jsonComment.get("room_name").getAsString());
-        }
-
-        if (jsonComment.has("room_type")) {
-//            qiscusMessage.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
         }
 
         if (jsonComment.has("unique_id")) {
@@ -482,7 +465,7 @@ final class QiscusApiParser {
         }
     }
 
-    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement){
+    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement) {
         if (jsonElement != null) {
             QiscusRealtimeStatus realtimeStatus = new QiscusRealtimeStatus();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
