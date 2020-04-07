@@ -2,10 +2,15 @@ package com.qiscus.sdk.chat.core.util;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.util.Patterns;
+import android.webkit.URLUtil;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class QiscusServiceUtil {
 
@@ -29,5 +34,13 @@ public class QiscusServiceUtil {
             }
         }
         return false;
+    }
+
+    public static boolean isValidUrl(String urlString) {
+        if (URLUtil.isValidUrl(urlString) && Patterns.WEB_URL.matcher(urlString).matches()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

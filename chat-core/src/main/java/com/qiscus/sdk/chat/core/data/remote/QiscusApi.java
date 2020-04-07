@@ -171,13 +171,19 @@ public enum QiscusApi {
                     .build();
         }
 
-        api = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .client(httpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build()
-                .create(Api.class);
+        try {
+            api = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .client(httpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .build()
+                    .create(Api.class);
+        } catch (IllegalArgumentException e) {
+            QiscusErrorLogger.print(e);
+            return ;
+        }
+
     }
 
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
