@@ -1041,7 +1041,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
             if (!QiscusCore.getEnableRealtime()) {
                 disconnect();
-                QiscusLogger.print("QiscusPusherApi", "Disconnect from AppConfig.");
                 return;
             }
 
