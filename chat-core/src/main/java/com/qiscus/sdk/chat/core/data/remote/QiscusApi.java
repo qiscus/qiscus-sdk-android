@@ -28,6 +28,7 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
+import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
@@ -60,8 +61,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.CacheControl;
 import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -1032,21 +1035,41 @@ public enum QiscusApi {
 
     public Observable<String> getMqttBaseUrl() {
         return Observable.create(subscriber -> {
-            Request request = new Request.Builder()
-                    .url(QiscusCore.getBaseURLLB())
-                    .build();
+            OkHttpClient httpClientLB;
+            if (Build.VERSION.SDK_INT <= 19) {
+                ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                        .supportsTlsExtensions(true)
+                        .allEnabledTlsVersions()
+                        .allEnabledCipherSuites()
+                        .build();
 
+                httpClientLB = new OkHttpClient.Builder()
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .addInterceptor(this::headersInterceptor)
+                        .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                        .connectionSpecs(Collections.singletonList(spec))
+                        .build();
+
+            } else {
+                httpClientLB = new OkHttpClient.Builder()
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .addInterceptor(this::headersInterceptor)
+                        .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                        .build();
+            }
+
+            String url = QiscusCore.getBaseURLLB();
+            Request okHttpRequest = new Request.Builder().url(url).build();
             try {
-                Response response = httpClient.newCall(request).execute();
+                Response response = httpClientLB.newCall(okHttpRequest).execute();
                 JSONObject jsonResponse = new JSONObject(response.body().string());
                 String node = jsonResponse.getString("node");
-
                 subscriber.onNext(node);
                 subscriber.onCompleted();
-
-            } catch (JSONException | IOException e) {
-                QiscusErrorLogger.print("getMqttBaseUrl", e);
-                subscriber.onError(e);
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
             }
         }, Emitter.BackpressureMode.BUFFER);
     }
@@ -1112,6 +1135,11 @@ public enum QiscusApi {
     public Observable<List<QiscusChannels>> leaveChannels(List<String> uniqueIds) {
         return api.leaveChannels(QiscusHashMapUtil.leaveChannels(uniqueIds))
                 .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    private Observable<List<QUserPresence>> getUserPresence(List<String> userIds) {
+        return api.usersPresence(QiscusHashMapUtil.usersPresence(userIds))
+                .map(QiscusApiParser::parseQiscusUserPresence);
     }
 
     private interface Api {
@@ -1323,6 +1351,12 @@ public enum QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/channels/leave")
         Observable<JsonElement> leaveChannels(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/users/status")
+        Observable<JsonElement> usersPresence(
                 @Body HashMap<String, Object> data
         );
     }

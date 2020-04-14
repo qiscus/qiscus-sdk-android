@@ -23,6 +23,7 @@ import androidx.core.util.Pair;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
@@ -481,5 +482,45 @@ final class QiscusApiParser {
 
 
         return channel;
+    }
+
+    static List<QUserPresence> parseQiscusUserPresence(JsonElement jsonElement) {
+        if (jsonElement != null) {
+
+            JsonArray usersStatus = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user_status").getAsJsonArray();
+            List<QUserPresence> userPresence = new ArrayList<>();
+            if (usersStatus.isJsonArray()) {
+                for (JsonElement userStatus : usersStatus) {
+                    userPresence.add(parseQUserPresence(userStatus.getAsJsonObject()));
+                }
+            }
+
+            return userPresence;
+        } else {
+            return null;
+        }
+    }
+
+    static QUserPresence parseQUserPresence(JsonObject JsonUserStatus) {
+        QUserPresence userPresence = new QUserPresence();
+        if (JsonUserStatus.has("email")) {
+            userPresence.setUserId(JsonUserStatus.get("email").getAsString());
+        }
+
+        if (JsonUserStatus.has("status")) {
+            int value =  JsonUserStatus.get("status").getAsInt();
+            if (value == 0) {
+                userPresence.setStatus(false);
+            } else {
+                userPresence.setStatus(true);
+            }
+        }
+
+        if (JsonUserStatus.has("timestamp")) {
+            long timestamp = JsonUserStatus.get("timestamp").getAsLong() / 1000000L;
+            userPresence.setTimestamp(new Date(timestamp));
+        }
+
+        return userPresence;
     }
 }

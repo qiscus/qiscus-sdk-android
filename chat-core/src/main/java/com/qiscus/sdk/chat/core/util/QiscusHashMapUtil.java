@@ -227,4 +227,11 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> usersPresence(List<String> userIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("user_ids", userIds);
+
+        return hashMap;
+    }
 }
