@@ -184,7 +184,7 @@ public enum QiscusApi {
                     .create(Api.class);
         } catch (IllegalArgumentException e) {
             QiscusErrorLogger.print(e);
-            return ;
+            return;
         }
 
     }

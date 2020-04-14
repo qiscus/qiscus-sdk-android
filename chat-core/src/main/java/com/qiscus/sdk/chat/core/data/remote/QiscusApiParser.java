@@ -501,14 +501,14 @@ final class QiscusApiParser {
         }
     }
 
-    static QUserPresence parseQUserPresence(JsonObject JsonUserStatus) {
+    static QUserPresence parseQUserPresence(JsonObject jsonUserStatus) {
         QUserPresence userPresence = new QUserPresence();
-        if (JsonUserStatus.has("email")) {
-            userPresence.setUserId(JsonUserStatus.get("email").getAsString());
+        if (jsonUserStatus.has("email")) {
+            userPresence.setUserId(jsonUserStatus.get("email").getAsString());
         }
 
-        if (JsonUserStatus.has("status")) {
-            int value =  JsonUserStatus.get("status").getAsInt();
+        if (jsonUserStatus.has("status")) {
+            int value =  jsonUserStatus.get("status").getAsInt();
             if (value == 0) {
                 userPresence.setStatus(false);
             } else {
@@ -516,8 +516,8 @@ final class QiscusApiParser {
             }
         }
 
-        if (JsonUserStatus.has("timestamp")) {
-            long timestamp = JsonUserStatus.get("timestamp").getAsLong() / 1000000L;
+        if (jsonUserStatus.has("timestamp")) {
+            long timestamp = jsonUserStatus.get("timestamp").getAsLong() / 1000000L;
             userPresence.setTimestamp(new Date(timestamp));
         }
 
