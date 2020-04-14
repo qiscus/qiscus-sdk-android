@@ -26,6 +26,7 @@ import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QUser;
+import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -36,9 +37,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created on : February 02, 2017
@@ -537,5 +540,41 @@ final class QiscusApiParser {
 
 
         return channel;
+    }
+
+    static List<QUserPresence> parseQUsersPresence(JsonElement jsonElement) {
+        if (jsonElement != null) {
+
+            JsonArray userStatus = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user_status").getAsJsonArray();
+            List<QUserPresence> qiscusUserStatus = new ArrayList<>();
+            if (userStatus.isJsonArray()) {
+                for (JsonElement presence : userStatus) {
+                    qiscusUserStatus.add(parseQUserPresence(presence.getAsJsonObject()));
+                }
+            }
+
+            return qiscusUserStatus;
+        } else {
+            return null;
+        }
+    }
+
+    static QUserPresence parseQUserPresence(JsonObject jsonPresence) {
+        QUserPresence userStatus = new QUserPresence();
+        if (jsonPresence.has("email")) {
+            userStatus.setUserId(jsonPresence.get("email").getAsString());
+        }
+
+        if (jsonPresence.has("status")) {
+            userStatus.setStatus(jsonPresence.get("status").getAsInt() == 1);
+        }
+
+        if (jsonPresence.has("timestamp")) {
+            Calendar cal = Calendar.getInstance(Locale.getDefault());
+            cal.setTimeInMillis(jsonPresence.get("timestamp").getAsLong() * 1000L);
+            userStatus.setTimestamp(cal.getTime());
+        }
+
+        return userStatus;
     }
 }

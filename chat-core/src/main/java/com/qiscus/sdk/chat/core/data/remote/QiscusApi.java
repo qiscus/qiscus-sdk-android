@@ -32,12 +32,13 @@ import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QUser;
+import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
-import com.qiscus.sdk.chat.core.event.QiscusClearMessageEvent;
 import com.qiscus.sdk.chat.core.event.QMessageSentEvent;
+import com.qiscus.sdk.chat.core.event.QiscusClearMessageEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
@@ -1076,6 +1077,21 @@ public class QiscusApi {
                 .map(QiscusApiParser::parseQiscusChannels);
     }
 
+    public Observable<List<QiscusChannels>> joinChannels(List<String> uniqueIds) {
+        return api.joinChannels(QiscusHashMapUtil.joinChannels(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QiscusChannels>> leaveChannels(List<String> uniqueIds) {
+        return api.leaveChannels(QiscusHashMapUtil.leaveChannels(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QUserPresence>> getUsersPresence(List<String> userIds) {
+        return api.getUsersPresence(QiscusHashMapUtil.getUsersPresence(userIds))
+                .map(QiscusApiParser::parseQUsersPresence);
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1273,6 +1289,24 @@ public class QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/channels/info")
         Observable<JsonElement> getChannelsInfo(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/join")
+        Observable<JsonElement> joinChannels(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/leave")
+        Observable<JsonElement> leaveChannels(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/users/status")
+        Observable<JsonElement> getUsersPresence(
                 @Body HashMap<String, Object> data
         );
     }
