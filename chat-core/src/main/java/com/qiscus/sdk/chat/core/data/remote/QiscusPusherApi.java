@@ -420,7 +420,6 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
         }
 
         if (!qiscusCore.getEnableRealtime()) {
-            qiscusCore.getLogger().print("QiscusPusherApi", "Disconnect from AppConfig.");
             return;
         }
 
@@ -1039,7 +1038,6 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
 
             if (!qiscusCore.getEnableRealtime()) {
                 disconnect();
-                qiscusCore.getLogger().print("QiscusPusherApi", "Disconnect from AppConfig.");
                 return;
             }
 
