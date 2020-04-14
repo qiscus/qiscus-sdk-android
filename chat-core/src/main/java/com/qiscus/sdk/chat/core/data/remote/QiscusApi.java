@@ -1005,21 +1005,41 @@ public class QiscusApi {
 
     public Observable<String> getMqttBaseUrl() {
         return Observable.create(subscriber -> {
-            Request request = new Request.Builder()
-                    .url(qiscusCore.getBaseURLLB())
-                    .build();
+            OkHttpClient httpClientLB;
+            if (Build.VERSION.SDK_INT <= 19) {
+                ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                        .supportsTlsExtensions(true)
+                        .allEnabledTlsVersions()
+                        .allEnabledCipherSuites()
+                        .build();
 
+                httpClientLB = new OkHttpClient.Builder()
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .addInterceptor(this::headersInterceptor)
+                        .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                        .connectionSpecs(Collections.singletonList(spec))
+                        .build();
+
+            } else {
+                httpClientLB = new OkHttpClient.Builder()
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .addInterceptor(this::headersInterceptor)
+                        .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                        .build();
+            }
+
+            String url = qiscusCore.getBaseURLLB();
+            Request okHttpRequest = new Request.Builder().url(url).build();
             try {
-                Response response = httpClient.newCall(request).execute();
+                Response response = httpClientLB.newCall(okHttpRequest).execute();
                 JSONObject jsonResponse = new JSONObject(response.body().string());
                 String node = jsonResponse.getString("node");
-
                 subscriber.onNext(node);
                 subscriber.onCompleted();
-
-            } catch (JSONException | IOException e) {
-                qiscusCore.getErrorLogger().print("getMqttBaseUrl", e);
-                subscriber.onError(e);
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
             }
         }, Emitter.BackpressureMode.BUFFER);
     }
