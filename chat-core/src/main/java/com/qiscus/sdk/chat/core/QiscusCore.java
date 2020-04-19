@@ -43,6 +43,7 @@ import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -946,7 +947,28 @@ public class QiscusCore {
         }
 
         private QiscusAccount getAccountInfo() {
-            return gson.fromJson(sharedPreferences.getString("cached_account", ""), QiscusAccount.class);
+            QiscusAccount qiscusAccount = new QiscusAccount();
+            try {
+                JSONObject jsonObject = new JSONObject(sharedPreferences.getString("cached_account", ""));
+                if (jsonObject.has("avatar")) {
+                    qiscusAccount.setAvatar(jsonObject.optString("avatar", ""));
+                }
+                if (jsonObject.has("email")) {
+                    qiscusAccount.setEmail(jsonObject.optString("email", ""));
+                }
+                if (jsonObject.has("id")) {
+                    qiscusAccount.setId(jsonObject.optInt("id", 0));
+                }
+                if (jsonObject.has("token")) {
+                    qiscusAccount.setToken(jsonObject.optString("token", ""));
+                }
+                if (jsonObject.has("username")) {
+                    qiscusAccount.setUsername(jsonObject.optString("username", ""));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return qiscusAccount;
         }
 
         private String getToken() {
