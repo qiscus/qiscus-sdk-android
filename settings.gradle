@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-include ':app', ':chat', ':chat-core'
+include ':chat-core'
