@@ -16,8 +16,6 @@
 
 package com.qiscus.sdk.chat.core.data.remote;
 
-import android.util.Log;
-
 import androidx.core.util.Pair;
 
 import com.google.gson.JsonArray;
@@ -57,23 +55,29 @@ final class QiscusApiParser {
     }
 
     static QiscusAccount parseQiscusAccount(JsonElement jsonElement) {
-        JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user").getAsJsonObject();
+        JSONObject jsonAccount = null;
+        try {
+            jsonAccount = new JSONObject(jsonElement.getAsJsonObject().get("results")
+                    .getAsJsonObject().get("user").getAsJsonObject().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return parseQiscusAccount(jsonAccount, true);
     }
 
-    static QiscusAccount parseQiscusAccount(JsonObject jsonAccount, Boolean isSelf) {
+    static QiscusAccount parseQiscusAccount(JSONObject jsonAccount, Boolean isSelf) {
         QiscusAccount qiscusAccount = new QiscusAccount();
-        qiscusAccount.setId(jsonAccount.get("id").getAsInt());
-        qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
-        qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
-        qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
+        qiscusAccount.setId(jsonAccount.optInt("id"));
+        qiscusAccount.setUsername(jsonAccount.optString("username"));
+        qiscusAccount.setEmail(jsonAccount.optString("email"));
+        qiscusAccount.setAvatar(jsonAccount.optString("avatar_url"));
         try {
-            qiscusAccount.setExtras(new JSONObject(jsonAccount.get("extras").getAsJsonObject().toString()));
+            qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
         } catch (Exception ignored) {
             //Do nothing
         }
         if (isSelf) {
-            qiscusAccount.setToken(jsonAccount.get("token").getAsString());
+            qiscusAccount.setToken(jsonAccount.optString("token"));
         }
         return qiscusAccount;
     }
@@ -508,7 +512,7 @@ final class QiscusApiParser {
         }
 
         if (jsonUserStatus.has("status")) {
-            int value =  jsonUserStatus.get("status").getAsInt();
+            int value = jsonUserStatus.get("status").getAsInt();
             if (value == 0) {
                 userPresence.setStatus(false);
             } else {

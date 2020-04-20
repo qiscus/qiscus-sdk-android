@@ -18,7 +18,6 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
@@ -61,10 +60,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.CacheControl;
 import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -941,7 +938,15 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonObject("user"))
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
     }
 
     public Observable<QiscusAccount> unblockUser(String userId) {
@@ -949,7 +954,15 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonObject("user"))
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
     }
 
     public Observable<List<QiscusAccount>> getBlockedUsers() {
@@ -963,7 +976,15 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .toList();
     }
 
@@ -1086,7 +1107,15 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .toList();
     }
 
@@ -1097,7 +1126,15 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .toList();
     }
 
