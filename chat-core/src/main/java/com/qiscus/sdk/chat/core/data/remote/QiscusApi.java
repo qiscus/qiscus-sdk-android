@@ -1174,7 +1174,7 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusChannels);
     }
 
-    private Observable<List<QUserPresence>> getUserPresence(List<String> userIds) {
+    public Observable<List<QUserPresence>> getUserPresence(List<String> userIds) {
         return api.usersPresence(QiscusHashMapUtil.usersPresence(userIds))
                 .map(QiscusApiParser::parseQiscusUserPresence);
     }
