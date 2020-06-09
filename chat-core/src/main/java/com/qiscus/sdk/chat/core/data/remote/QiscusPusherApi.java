@@ -418,6 +418,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public void restartConnection() {
         if (isConnected()) {
             QiscusLogger.print(TAG, "Connected... " + "connectCompleteFromRestartConnection");
+            if (!QiscusCore.getEnableRealtime()){
+                disconnect();
+            }
             return;
         }
 

@@ -221,11 +221,6 @@ public class QiscusCore {
         localDataManager.setURLLB(baseURLLB);
 
         getAppConfig();
-
-        startSyncService();
-        startNetworkCheckerService();
-        QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
-
         configureFcmToken();
     }
 
@@ -263,8 +258,8 @@ public class QiscusCore {
                         if (!oldMqttBrokerUrl.equals(newMqttBrokerUrl)) {
                             QiscusCore.mqttBrokerUrl = newMqttBrokerUrl;
                             QiscusCore.setCacheMqttBrokerUrl(newMqttBrokerUrl, false);
-                            QiscusPusherApi.getInstance().disconnect();
-                            QiscusPusherApi.getInstance().restartConnection();
+                        }else{
+                            QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
                         }
                     }
 
@@ -277,15 +272,17 @@ public class QiscusCore {
                     }
 
                     enableRealtime = appConfig.getEnableRealtime();
-
-                    if (!enableRealtime) {
-                        //enable realtime false
-                        QiscusPusherApi.getInstance().disconnect();
-                    }
+                    startSyncService();
+                    startNetworkCheckerService();
+                    QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     QiscusApi.getInstance().reInitiateInstance();
+                    QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
+                    startSyncService();
+                    startNetworkCheckerService();
+                    QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
                 });
 
     }
