@@ -258,7 +258,7 @@ public class QiscusCore {
                         if (!oldMqttBrokerUrl.equals(newMqttBrokerUrl)) {
                             QiscusCore.mqttBrokerUrl = newMqttBrokerUrl;
                             QiscusCore.setCacheMqttBrokerUrl(newMqttBrokerUrl, false);
-                        }else{
+                        } else {
                             QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
                         }
                     }
