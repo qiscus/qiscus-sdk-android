@@ -99,6 +99,7 @@ public class QiscusComment implements Parcelable {
     private QiscusLocation location;
     private String rawType;
     private String extraPayload;
+    private JSONObject userExtras;
     private JSONObject extras;
     private MediaObserver observer;
     private MediaPlayer player;
@@ -129,6 +130,12 @@ public class QiscusComment implements Parcelable {
         replyTo = in.readParcelable(QiscusComment.class.getClassLoader());
         try {
             extras = new JSONObject(in.readString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            userExtras = new JSONObject(in.readString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -410,6 +417,14 @@ public class QiscusComment implements Parcelable {
 
     public void setExtras(JSONObject extras) {
         this.extras = extras;
+    }
+
+    public JSONObject getUserExtras() {
+        return userExtras;
+    }
+
+    public void setUserExtras(JSONObject userExtras) {
+        this.userExtras = userExtras;
     }
 
     public boolean isMyComment() {
@@ -891,6 +906,15 @@ public class QiscusComment implements Parcelable {
             }
         }
         dest.writeString(extras.toString());
+
+        if (userExtras == null) {
+            try {
+                userExtras = new JSONObject("{}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        dest.writeString(userExtras.toString());
     }
 
     public boolean areContentsTheSame(QiscusComment qiscusComment) {

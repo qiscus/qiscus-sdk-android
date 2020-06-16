@@ -302,6 +302,14 @@ final class QiscusApiParser {
             }
         }
 
+        if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+            try {
+                qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         return qiscusComment;
     }
 
