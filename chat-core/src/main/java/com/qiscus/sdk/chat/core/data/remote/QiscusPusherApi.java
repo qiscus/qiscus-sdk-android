@@ -317,10 +317,19 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         String epochTime = epochTimeLong.toString();
 
         mqttAndroidClient = null;
-        mqttAndroidClient = new MqttAndroidClient(QiscusCore.getApps().getApplicationContext(),
-                QiscusCore.getMqttBrokerUrl(), clientId + epochTime, new MemoryPersistence());
-        mqttAndroidClient.setCallback(this);
-        mqttAndroidClient.setTraceEnabled(false);
+
+        try {
+            mqttAndroidClient = new MqttAndroidClient(QiscusCore.getApps().getApplicationContext(),
+                    QiscusCore.getMqttBrokerUrl(), clientId + epochTime, new MemoryPersistence());
+            mqttAndroidClient.setCallback(this);
+            mqttAndroidClient.setTraceEnabled(false);
+        } catch (NullPointerException n) {
+            mqttAndroidClient = new MqttAndroidClient(QiscusCore.getApps().getApplicationContext(),
+                    QiscusCore.getMqttBrokerUrl(), clientId + epochTime);
+            mqttAndroidClient.setCallback(this);
+            mqttAndroidClient.setTraceEnabled(false);
+        }
+
     }
 
     /**
