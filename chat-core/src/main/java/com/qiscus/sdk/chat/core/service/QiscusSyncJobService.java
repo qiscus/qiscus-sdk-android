@@ -134,6 +134,7 @@ public class QiscusSyncJobService extends JobService {
     private void stopSync() {
         if (timer != null) {
             timer.cancel();
+            timer = null;
         }
     }
 
