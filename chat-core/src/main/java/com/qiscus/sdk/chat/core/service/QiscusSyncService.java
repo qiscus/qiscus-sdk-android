@@ -139,6 +139,7 @@ public class QiscusSyncService extends Service {
     private void stopSync() {
         if (timer != null) {
             timer.cancel();
+            timer = null;
         }
     }
 
