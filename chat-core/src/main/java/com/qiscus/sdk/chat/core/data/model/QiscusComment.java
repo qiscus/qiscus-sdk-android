@@ -24,6 +24,8 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -99,7 +101,9 @@ public class QiscusComment implements Parcelable {
     private QiscusLocation location;
     private String rawType;
     private String extraPayload;
-    private JSONObject userExtras;
+    //fix
+    private String userExtras;
+    //private JSONObject userExtras;
     private JSONObject extras;
     private MediaObserver observer;
     private MediaPlayer player;
@@ -134,11 +138,13 @@ public class QiscusComment implements Parcelable {
             e.printStackTrace();
         }
 
-        try {
-            userExtras = new JSONObject(in.readString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //fix
+        userExtras = in.readString();
+//        try {
+//            userExtras = new JSONObject(in.readString());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static QiscusComment generateMessage(long roomId, String content) {
@@ -419,12 +425,41 @@ public class QiscusComment implements Parcelable {
         this.extras = extras;
     }
 
-    public JSONObject getUserExtras() {
+    //fix
+
+    public String getUserExtras() {
         return userExtras;
     }
 
-    public void setUserExtras(JSONObject userExtras) {
+    public void setUserExtras(String userExtras) {
         this.userExtras = userExtras;
+    }
+
+//    public JSONObject getUserExtras() {
+//        return userExtras;
+//    }
+//
+//    public void setUserExtras(JSONObject userExtras) {
+//        this.userExtras = userExtras;
+//    }
+
+    public JSONObject getUserExtrasObject() {
+        JSONObject json = null;
+
+        if (userExtras.equals("")){
+            try {
+                json = new JSONObject("{}");
+            } catch (JSONException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            try {
+                json = new JSONObject(userExtras);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return json;
     }
 
     public boolean isMyComment() {
@@ -869,6 +904,9 @@ public class QiscusComment implements Parcelable {
                 ", state=" + state +
                 ", deleted=" + deleted +
                 ", hardDeleted=" + hardDeleted +
+                ", userExtras=" + userExtras +
+                ", extraPayload=" + extraPayload +
+                ", extras=" + extras +
                 '}';
     }
 
@@ -907,14 +945,16 @@ public class QiscusComment implements Parcelable {
         }
         dest.writeString(extras.toString());
 
-        if (userExtras == null) {
-            try {
-                userExtras = new JSONObject("{}");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        dest.writeString(userExtras.toString());
+        //fix
+        dest.writeString(userExtras);
+//        if (userExtras == null) {
+//            try {
+//                userExtras = new JSONObject("{}");
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        dest.writeString(userExtras.toString());
     }
 
     public boolean areContentsTheSame(QiscusComment qiscusComment) {
@@ -933,7 +973,8 @@ public class QiscusComment implements Parcelable {
                 && selected == qiscusComment.selected
                 && highlighted == qiscusComment.highlighted
                 && downloading == qiscusComment.downloading
-                && progress == qiscusComment.progress;
+                && progress == qiscusComment.progress
+                && userExtras == qiscusComment.getUserExtras();
     }
 
     public enum Type {

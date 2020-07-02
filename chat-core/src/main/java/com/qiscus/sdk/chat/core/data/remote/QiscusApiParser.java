@@ -302,13 +302,23 @@ final class QiscusApiParser {
             }
         }
 
+        //fix
         if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
-            try {
-                qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
-            } catch (JSONException e) {
-                e.printStackTrace();
+
+            if (jsonComment.get("user_extras").toString().equals("{}") == false) {
+                qiscusComment.setUserExtras(jsonComment.get("user_extras").toString());
+            }else{
+                qiscusComment.setUserExtras("");
             }
         }
+
+//        if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+//            try {
+//                qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         return qiscusComment;
     }

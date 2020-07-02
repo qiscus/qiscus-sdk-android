@@ -218,10 +218,10 @@ final class QiscusDb {
                         COLUMN_DELETED + " INTEGER DEFAULT 0," +
                         COLUMN_HARD_DELETED + " INTEGER DEFAULT 0," +
                         COLUMN_TYPE + " TEXT," +
-                        COLUMN_PAYLOAD + " TEXT, " +
-                        COLUMN_EXTRAS + " TEXT " +
-                        COLUMN_USER_EXTRAS + " TEXT " +
-                        " ); ";
+                        COLUMN_PAYLOAD + " TEXT," +
+                        COLUMN_EXTRAS + " TEXT," +
+                        COLUMN_USER_EXTRAS + " TEXT" +
+                        ");";
 
         static ContentValues toContentValues(QiscusComment qiscusComment) {
             ContentValues values = new ContentValues();
@@ -241,8 +241,10 @@ final class QiscusDb {
             values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
             values.put(COLUMN_EXTRAS, qiscusComment.getExtras() == null ? null :
                     qiscusComment.getExtras().toString());
-            values.put(COLUMN_USER_EXTRAS, qiscusComment.getUserExtras() == null ? null :
-                    qiscusComment.getUserExtras().toString());
+
+            //fix
+            values.put(COLUMN_USER_EXTRAS, qiscusComment.getUserExtras());
+            //values.put(COLUMN_USER_EXTRAS, qiscusComment.getUserExtras().toString());
             return values;
         }
 
@@ -262,6 +264,8 @@ final class QiscusDb {
             qiscusComment.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
             qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
+            //fix
+            qiscusComment.setUserExtras(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS)));
             try {
                 String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
                 qiscusComment.setExtras(extras == null ? null : new JSONObject(extras));
@@ -269,12 +273,12 @@ final class QiscusDb {
                 e.printStackTrace();
             }
 
-            try {
-                String userExtras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
-                qiscusComment.setUserExtras(userExtras == null ? null : new JSONObject(userExtras));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                String userExtras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
+//                qiscusComment.setExtras(userExtras == null ? null : new JSONObject(userExtras));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
             return qiscusComment;
         }
     }
