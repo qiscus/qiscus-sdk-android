@@ -101,9 +101,7 @@ public class QiscusComment implements Parcelable {
     private QiscusLocation location;
     private String rawType;
     private String extraPayload;
-    //fix
-    private String userExtras;
-    //private JSONObject userExtras;
+    private JSONObject userExtras;
     private JSONObject extras;
     private MediaObserver observer;
     private MediaPlayer player;
@@ -138,13 +136,11 @@ public class QiscusComment implements Parcelable {
             e.printStackTrace();
         }
 
-        //fix
-        userExtras = in.readString();
-//        try {
-//            userExtras = new JSONObject(in.readString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            userExtras = new JSONObject(in.readString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static QiscusComment generateMessage(long roomId, String content) {
@@ -425,41 +421,12 @@ public class QiscusComment implements Parcelable {
         this.extras = extras;
     }
 
-    //fix
-
-    public String getUserExtras() {
+    public JSONObject getUserExtras() {
         return userExtras;
     }
 
-    public void setUserExtras(String userExtras) {
+    public void setUserExtras(JSONObject userExtras) {
         this.userExtras = userExtras;
-    }
-
-//    public JSONObject getUserExtras() {
-//        return userExtras;
-//    }
-//
-//    public void setUserExtras(JSONObject userExtras) {
-//        this.userExtras = userExtras;
-//    }
-
-    public JSONObject getUserExtrasObject() {
-        JSONObject json = null;
-
-        if (userExtras.equals("")){
-            try {
-                json = new JSONObject("{}");
-            } catch (JSONException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            try {
-                json = new JSONObject(userExtras);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return json;
     }
 
     public boolean isMyComment() {
@@ -945,16 +912,14 @@ public class QiscusComment implements Parcelable {
         }
         dest.writeString(extras.toString());
 
-        //fix
-        dest.writeString(userExtras);
-//        if (userExtras == null) {
-//            try {
-//                userExtras = new JSONObject("{}");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        dest.writeString(userExtras.toString());
+        if (userExtras == null) {
+            try {
+                userExtras = new JSONObject("{}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        dest.writeString(userExtras.toString());
     }
 
     public boolean areContentsTheSame(QiscusComment qiscusComment) {

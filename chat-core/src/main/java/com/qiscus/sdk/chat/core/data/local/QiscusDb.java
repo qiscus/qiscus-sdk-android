@@ -242,9 +242,8 @@ final class QiscusDb {
             values.put(COLUMN_EXTRAS, qiscusComment.getExtras() == null ? null :
                     qiscusComment.getExtras().toString());
 
-            //fix
-            values.put(COLUMN_USER_EXTRAS, qiscusComment.getUserExtras());
-            //values.put(COLUMN_USER_EXTRAS, qiscusComment.getUserExtras().toString());
+            values.put(COLUMN_USER_EXTRAS, qiscusComment.getUserExtras() == null ? null :
+                    qiscusComment.getUserExtras().toString());
             return values;
         }
 
@@ -264,8 +263,7 @@ final class QiscusDb {
             qiscusComment.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
             qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
-            //fix
-            qiscusComment.setUserExtras(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS)));
+
             try {
                 String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
                 qiscusComment.setExtras(extras == null ? null : new JSONObject(extras));
@@ -273,12 +271,12 @@ final class QiscusDb {
                 e.printStackTrace();
             }
 
-//            try {
-//                String userExtras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
-//                qiscusComment.setExtras(userExtras == null ? null : new JSONObject(userExtras));
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                String userExtras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
+                qiscusComment.setUserExtras(userExtras == null ? null : new JSONObject(userExtras));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return qiscusComment;
         }
     }
