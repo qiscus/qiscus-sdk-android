@@ -235,14 +235,14 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> fileList(List<Long> roomIds) {
+    public static HashMap<String, Object> fileList(List<String> roomIds) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("room_ids", roomIds);
 
         return hashMap;
     }
 
-    public static HashMap<String, Object> searchMessage(String query, List<Long> roomIds, String messagetype, String senderEmail) {
+    public static HashMap<String, Object> searchMessage(String query, List<String> roomIds, String messagetype, String senderEmail) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("query", query);
         hashMap.put("room_ids[]", roomIds);

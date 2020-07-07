@@ -1180,16 +1180,25 @@ public enum QiscusApi {
     }
 
     public Observable<List<QiscusComment>> getFileList(List<Long> roomIds) {
-        return api.fileList(QiscusHashMapUtil.fileList(roomIds))
+        List<String> listOfRoomIds = new ArrayList<>();
+        for (Long roomId : roomIds) {
+            listOfRoomIds.add(String.valueOf(roomId));
+        }
+        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds))
                 .map(QiscusApiParser::parseFileListAndSearchMessage);
     }
 
     public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String messagetype, String senderEmail) {
+        List<String> listOfRoomIds = new ArrayList<>();
+        for (Long roomId : roomIds) {
+            listOfRoomIds.add(String.valueOf(roomId));
+        }
+
         if (senderEmail == null) {
-            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, roomIds, messagetype, senderEmail))
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, messagetype, senderEmail))
                     .map(QiscusApiParser::parseFileListAndSearchMessage);
         } else {
-            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, roomIds, messagetype, ""))
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, messagetype, ""))
                     .map(QiscusApiParser::parseFileListAndSearchMessage);
         }
     }
