@@ -1179,6 +1179,21 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusUserPresence);
     }
 
+    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds) {
+        return api.fileList(QiscusHashMapUtil.fileList(roomIds))
+                .map(QiscusApiParser::parseFileListAndSearchMessage);
+    }
+
+    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String messagetype, String senderEmail) {
+        if (senderEmail == null) {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, roomIds, messagetype, senderEmail))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        } else {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, roomIds, messagetype, ""))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        }
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1394,6 +1409,18 @@ public enum QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/users/status")
         Observable<JsonElement> usersPresence(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/filelist")
+        Observable<JsonElement> fileList(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/search")
+        Observable<JsonElement> searchMessage(
                 @Body HashMap<String, Object> data
         );
     }

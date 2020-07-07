@@ -234,4 +234,23 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> fileList(List<Long> roomIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("room_ids", roomIds);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> searchMessage(String query, List<Long> roomIds, String messagetype, String senderEmail) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("query", query);
+        hashMap.put("room_ids[]", roomIds);
+        hashMap.put("type", messagetype);
+        hashMap.put("sender", senderEmail);
+
+        return hashMap;
+    }
+
+
 }
