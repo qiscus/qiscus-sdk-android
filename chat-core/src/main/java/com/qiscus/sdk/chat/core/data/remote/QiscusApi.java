@@ -1179,26 +1179,26 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusUserPresence);
     }
 
-    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds) {
+    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds, int page, int limit) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
             listOfRoomIds.add(String.valueOf(roomId));
         }
-        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds))
+        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds, page, limit))
                 .map(QiscusApiParser::parseFileListAndSearchMessage);
     }
 
-    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String messagetype, String senderEmail) {
+    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String userId, List<String> type, int page, int limit) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
             listOfRoomIds.add(String.valueOf(roomId));
         }
 
-        if (senderEmail == null) {
-            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, messagetype, senderEmail))
+        if (userId == null) {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, page, limit))
                     .map(QiscusApiParser::parseFileListAndSearchMessage);
         } else {
-            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, messagetype, ""))
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, null, type , page, limit))
                     .map(QiscusApiParser::parseFileListAndSearchMessage);
         }
     }
@@ -1422,7 +1422,7 @@ public enum QiscusApi {
         );
 
         @Headers("Content-Type: application/json")
-        @POST("api/v2/mobile/filelist")
+        @POST("api/v2/mobile/file_list")
         Observable<JsonElement> fileList(
                 @Body HashMap<String, Object> data
         );
