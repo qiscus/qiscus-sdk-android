@@ -101,7 +101,6 @@ public class QiscusSyncService extends Service {
                     QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                     if (QiscusCore.isOnForeground()) {
                         syncComments();
-                        syncEvents();
                     }
                 }
 
@@ -127,6 +126,7 @@ public class QiscusSyncService extends Service {
                 .doOnCompleted(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
                     QiscusLogger.print("Sync completed...");
+                    syncEvents();
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {

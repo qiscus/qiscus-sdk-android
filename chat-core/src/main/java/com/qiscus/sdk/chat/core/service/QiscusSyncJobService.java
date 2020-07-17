@@ -102,7 +102,6 @@ public class QiscusSyncJobService extends JobService {
     private void scheduleSync() {
         if (QiscusCore.isOnForeground()) {
             syncComments();
-            syncEvents();
         }
     }
 
@@ -121,6 +120,7 @@ public class QiscusSyncJobService extends JobService {
                 })
                 .doOnCompleted(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
+                    syncEvents();
                     QiscusLogger.print("Sync completed...");
                 })
                 .subscribeOn(Schedulers.io())
