@@ -27,7 +27,7 @@ public class QiscusStartServiceReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (QiscusCore.hasSetupUser()) {
-            QiscusAndroidUtil.runOnUIThread(QiscusCore::startPusherService);
+            QiscusAndroidUtil.runOnUIThread(QiscusCore::startSyncService);
         }
     }
 }

@@ -65,8 +65,8 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         QiscusLogger.print("Upgrade database from : " + oldVersion + " to : " + newVersion);
 
-        // Before version 14, we just clear old data
-        if (oldVersion < 14) {
+        // Before version 19, we just clear old data
+        if (oldVersion < 19) {
             clearOldData(db);
             onCreate(db);
             return;

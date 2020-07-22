@@ -28,19 +28,19 @@ repositories {
 ext {
 
     minSDKVersion = 16
-    targetSDKVersion = 28
-    compileSDKVersion = 28
+    targetSDKVersion = 29
+    compileSDKVersion = 29
 
     versions = [
             support          : "28.0.0",
-            firebaseCore     : "16.0.5",
-            firebaseMessaging: "17.3.4",
-            okHttp           : "3.9.1",
+            firebaseCore     : "17.2.2",
+            firebaseMessaging: "20.1.0",
+            okHttp           : "3.12.5",
             retrofit         : "2.3.0",
 
-            nirmana          : "1.2.1",
+            nirmana          : "1.3.0",
             manggil          : "1.0.1",
-            jupuk            : "1.1.4",
+            jupuk            : "1.2.0",
 
             rxJava           : "1.3.4",
             rxAndroid        : "1.2.1",

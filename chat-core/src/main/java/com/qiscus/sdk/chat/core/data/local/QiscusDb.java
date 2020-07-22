@@ -30,7 +30,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 17;
+    static final int DATABASE_VERSION = 19;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -201,6 +201,7 @@ final class QiscusDb {
         static final String COLUMN_TYPE = "type";
         static final String COLUMN_PAYLOAD = "payload";
         static final String COLUMN_EXTRAS = "extras";
+        static final String COLUMN_USER_EXTRAS = "user_extras";
 
         static final String CREATE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
@@ -217,9 +218,10 @@ final class QiscusDb {
                         COLUMN_DELETED + " INTEGER DEFAULT 0," +
                         COLUMN_HARD_DELETED + " INTEGER DEFAULT 0," +
                         COLUMN_TYPE + " TEXT," +
-                        COLUMN_PAYLOAD + " TEXT, " +
-                        COLUMN_EXTRAS + " TEXT " +
-                        " ); ";
+                        COLUMN_PAYLOAD + " TEXT," +
+                        COLUMN_EXTRAS + " TEXT," +
+                        COLUMN_USER_EXTRAS + " TEXT" +
+                        ");";
 
         static ContentValues toContentValues(QiscusComment qiscusComment) {
             ContentValues values = new ContentValues();
@@ -239,6 +241,9 @@ final class QiscusDb {
             values.put(COLUMN_PAYLOAD, qiscusComment.getExtraPayload());
             values.put(COLUMN_EXTRAS, qiscusComment.getExtras() == null ? null :
                     qiscusComment.getExtras().toString());
+
+            values.put(COLUMN_USER_EXTRAS, qiscusComment.getUserExtras() == null ? null :
+                    qiscusComment.getUserExtras().toString());
             return values;
         }
 
@@ -258,9 +263,17 @@ final class QiscusDb {
             qiscusComment.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
             qiscusComment.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
             qiscusComment.setExtraPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
+
             try {
                 String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
                 qiscusComment.setExtras(extras == null ? null : new JSONObject(extras));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                String userExtras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
+                qiscusComment.setUserExtras(userExtras == null ? null : new JSONObject(userExtras));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

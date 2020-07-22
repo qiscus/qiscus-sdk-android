@@ -21,10 +21,14 @@ import androidx.core.util.Pair;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
+import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
+import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
+import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -51,23 +55,29 @@ final class QiscusApiParser {
     }
 
     static QiscusAccount parseQiscusAccount(JsonElement jsonElement) {
-        JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user").getAsJsonObject();
+        JSONObject jsonAccount = null;
+        try {
+            jsonAccount = new JSONObject(jsonElement.getAsJsonObject().get("results")
+                    .getAsJsonObject().get("user").getAsJsonObject().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return parseQiscusAccount(jsonAccount, true);
     }
 
-    static QiscusAccount parseQiscusAccount(JsonObject jsonAccount, Boolean isSelf) {
+    static QiscusAccount parseQiscusAccount(JSONObject jsonAccount, Boolean isSelf) {
         QiscusAccount qiscusAccount = new QiscusAccount();
-        qiscusAccount.setId(jsonAccount.get("id").getAsInt());
-        qiscusAccount.setUsername(jsonAccount.get("username").getAsString());
-        qiscusAccount.setEmail(jsonAccount.get("email").getAsString());
-        qiscusAccount.setAvatar(jsonAccount.get("avatar_url").getAsString());
+        qiscusAccount.setId(jsonAccount.optInt("id"));
+        qiscusAccount.setUsername(jsonAccount.optString("username"));
+        qiscusAccount.setEmail(jsonAccount.optString("email"));
+        qiscusAccount.setAvatar(jsonAccount.optString("avatar_url"));
         try {
-            qiscusAccount.setExtras(new JSONObject(jsonAccount.get("extras").getAsJsonObject().toString()));
+            qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
         } catch (Exception ignored) {
             //Do nothing
         }
         if (isSelf) {
-            qiscusAccount.setToken(jsonAccount.get("token").getAsString());
+            qiscusAccount.setToken(jsonAccount.optString("token"));
         }
         return qiscusAccount;
     }
@@ -232,10 +242,28 @@ final class QiscusApiParser {
         return null;
     }
 
-    static QiscusComment parseQiscusComment(JsonElement jsonElement, long roomId) {
+    static List<QiscusComment> parseFileListAndSearchMessage(JsonElement jsonElement) {
+        if (jsonElement != null) {
+            JsonArray comments = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("comments").getAsJsonArray();
+            List<QiscusComment> qiscusComments = new ArrayList<>();
+            for (JsonElement jsonComment : comments) {
+                qiscusComments.add(parseFileListAndSearch(jsonComment));
+            }
+
+            return qiscusComments;
+        }
+
+        return null;
+    }
+
+    static QiscusComment parseFileListAndSearch(JsonElement jsonElement) {
         QiscusComment qiscusComment = new QiscusComment();
         JsonObject jsonComment = jsonElement.getAsJsonObject();
-        qiscusComment.setRoomId(roomId);
+
+        if (jsonComment.has("room_id")) {
+            qiscusComment.setRoomId(jsonComment.get("room_id").getAsLong());
+        }
+
         qiscusComment.setId(jsonComment.get("id").getAsLong());
         qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsLong());
         qiscusComment.setMessage(jsonComment.get("message").getAsString());
@@ -256,8 +284,12 @@ final class QiscusApiParser {
             qiscusComment.setRoomName(jsonComment.get("room_name").getAsString());
         }
 
-        if (jsonComment.has("chat_type")) {
-            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("chat_type").getAsString()));
+        if (jsonComment.has("room_avatar")) {
+            qiscusComment.setRoomAvatar(jsonComment.get("room_avatar").getAsString());
+        }
+
+        if (jsonComment.has("room_type")) {
+            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
         }
 
         if (jsonComment.has("unique_id")) {
@@ -287,6 +319,85 @@ final class QiscusApiParser {
         if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
             try {
                 qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+            try {
+                qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return qiscusComment;
+    }
+
+    static QiscusComment parseQiscusComment(JsonElement jsonElement, long roomId) {
+        QiscusComment qiscusComment = new QiscusComment();
+        JsonObject jsonComment = jsonElement.getAsJsonObject();
+        qiscusComment.setRoomId(roomId);
+        qiscusComment.setId(jsonComment.get("id").getAsLong());
+        qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsLong());
+        qiscusComment.setMessage(jsonComment.get("message").getAsString());
+        qiscusComment.setSender(jsonComment.get("username").getAsString());
+        qiscusComment.setSenderEmail(jsonComment.get("email").getAsString());
+        qiscusComment.setSenderAvatar(jsonComment.get("user_avatar_url").getAsString());
+        determineCommentState(qiscusComment, jsonComment.get("status").getAsString());
+
+        //timestamp is in nano seconds format, convert it to milliseconds by divide it
+        long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
+        qiscusComment.setTime(new Date(timestamp));
+
+        if (jsonComment.has("is_deleted")) {
+            qiscusComment.setDeleted(jsonComment.get("is_deleted").getAsBoolean());
+        }
+
+        if (jsonComment.has("room_name")) {
+            qiscusComment.setRoomName(jsonComment.get("room_name").getAsString());
+        }
+
+        if (jsonComment.has("room_type")) {
+            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
+        }
+
+        if (jsonComment.has("unique_id")) {
+            qiscusComment.setUniqueId(jsonComment.get("unique_id").getAsString());
+        } else if (jsonComment.has("unique_temp_id")) {
+            qiscusComment.setUniqueId(jsonComment.get("unique_temp_id").getAsString());
+        } else {
+            qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
+        }
+
+        if (jsonComment.has("type")) {
+            qiscusComment.setRawType(jsonComment.get("type").getAsString());
+            qiscusComment.setExtraPayload(jsonComment.get("payload").toString());
+            if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
+                    || qiscusComment.getType() == QiscusComment.Type.REPLY
+                    || qiscusComment.getType() == QiscusComment.Type.CARD) {
+                JsonObject payload = jsonComment.get("payload").getAsJsonObject();
+                if (payload.has("text")) {
+                    String text = payload.get("text").getAsString();
+                    if (QiscusTextUtil.isNotBlank(text)) {
+                        qiscusComment.setMessage(text.trim());
+                    }
+                }
+            }
+        }
+
+        if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
+            try {
+                qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+            try {
+                qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -340,5 +451,181 @@ final class QiscusApiParser {
         for (JsonElement el : arr) {
             memberList.add(parseQiscusRoomMember(el.getAsJsonObject().getAsJsonObject("user")));
         }
+    }
+
+    static QiscusAppConfig parseQiscusAppConfig(JsonElement jsonElement) {
+        if (jsonElement != null) {
+            QiscusAppConfig appConfig = new QiscusAppConfig();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject results = jsonObject.getAsJsonObject("results");
+
+
+            if (results.has("base_url")) {
+                appConfig.setBaseURL(results.get("base_url").getAsString());
+            } else {
+                appConfig.setBaseURL("");
+            }
+
+            if (results.has("broker_lb_url")) {
+                appConfig.setBrokerLBURL(results.get("broker_lb_url").getAsString());
+            } else {
+                appConfig.setBrokerLBURL("");
+            }
+
+            if (results.has("broker_url")) {
+                appConfig.setBrokerURL(results.get("broker_url").getAsString());
+            } else {
+                appConfig.setBrokerURL("");
+            }
+
+            if (results.has("enable_event_report")) {
+                appConfig.setEnableEventReport(results.get("enable_event_report").getAsBoolean());
+            } else {
+                appConfig.setEnableEventReport(false);
+            }
+
+            if (results.has("enable_realtime")) {
+                appConfig.setEnableRealtime(results.get("enable_realtime").getAsBoolean());
+            } else {
+                appConfig.setEnableRealtime(true);
+            }
+
+            if (results.has("sync_interval")) {
+                appConfig.setSyncInterval(results.get("sync_interval").getAsInt());
+            } else {
+                appConfig.setSyncInterval(0);
+            }
+
+            if (results.has("sync_on_connect")) {
+                appConfig.setSyncOnConnect(results.get("sync_on_connect").getAsInt());
+            } else {
+                appConfig.setSyncOnConnect(0);
+            }
+
+            if (results.has("enable_realtime_check")) {
+                appConfig.setEnableRealtimeCheck(results.get("enable_realtime_check").getAsBoolean());
+            } else {
+                appConfig.setEnableRealtimeCheck(false);
+            }
+
+            return appConfig;
+
+        } else {
+            return null;
+        }
+    }
+
+    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement) {
+        if (jsonElement != null) {
+            QiscusRealtimeStatus realtimeStatus = new QiscusRealtimeStatus();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject results = jsonObject.getAsJsonObject("results");
+
+
+            if (results.has("status")) {
+                realtimeStatus.setRealtimeStatus(results.get("status").getAsBoolean());
+            } else {
+                realtimeStatus.setRealtimeStatus(false);
+            }
+
+            return realtimeStatus;
+        } else {
+            return null;
+        }
+    }
+
+    static List<QiscusChannels> parseQiscusChannels(JsonElement jsonElement) {
+        if (jsonElement != null) {
+
+            JsonArray channels = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("channels").getAsJsonArray();
+            List<QiscusChannels> qiscusChannels = new ArrayList<>();
+            if (channels.isJsonArray()) {
+                for (JsonElement channel : channels) {
+                    qiscusChannels.add(parseQiscusChannel(channel.getAsJsonObject()));
+                }
+            }
+
+            return qiscusChannels;
+        } else {
+            return null;
+        }
+    }
+
+    static QiscusChannels parseQiscusChannel(JsonObject jsonChannel) {
+        QiscusChannels channel = new QiscusChannels();
+        if (jsonChannel.has("avatar_url")) {
+            channel.setAvatarUrl(jsonChannel.get("avatar_url").getAsString());
+        }
+
+        if (jsonChannel.has("created_at")) {
+            channel.setCreatedAt(jsonChannel.get("created_at").getAsString());
+        }
+
+        try {
+            if (jsonChannel.has("extras")) {
+                channel.setExtras(new JSONObject(jsonChannel.get("extras").getAsJsonObject().toString()));
+            }
+        } catch (JSONException ignored) {
+            //Do nothing
+        }
+
+        if (jsonChannel.has("is_joined")) {
+            channel.setJoined(jsonChannel.get("is_joined").getAsBoolean());
+        }
+
+        if (jsonChannel.has("name")) {
+            channel.setName(jsonChannel.get("name").getAsString());
+        }
+
+        if (jsonChannel.has("unique_id")) {
+            channel.setUniqueId(jsonChannel.get("unique_id").getAsString());
+        }
+
+        if (jsonChannel.has("id")) {
+            channel.setRoomId(jsonChannel.get("id").getAsLong());
+        }
+
+
+        return channel;
+    }
+
+    static List<QUserPresence> parseQiscusUserPresence(JsonElement jsonElement) {
+        if (jsonElement != null) {
+
+            JsonArray usersStatus = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user_status").getAsJsonArray();
+            List<QUserPresence> userPresence = new ArrayList<>();
+            if (usersStatus.isJsonArray()) {
+                for (JsonElement userStatus : usersStatus) {
+                    userPresence.add(parseQUserPresence(userStatus.getAsJsonObject()));
+                }
+            }
+
+            return userPresence;
+        } else {
+            return null;
+        }
+    }
+
+    static QUserPresence parseQUserPresence(JsonObject jsonUserStatus) {
+        QUserPresence userPresence = new QUserPresence();
+        if (jsonUserStatus.has("email")) {
+            userPresence.setUserId(jsonUserStatus.get("email").getAsString());
+        }
+
+        if (jsonUserStatus.has("status")) {
+            int value = jsonUserStatus.get("status").getAsInt();
+            if (value == 0) {
+                userPresence.setStatus(false);
+            } else {
+                userPresence.setStatus(true);
+            }
+        }
+
+        if (jsonUserStatus.has("timestamp")) {
+            long timestamp = jsonUserStatus.get("timestamp").getAsLong() / 1000000L;
+            userPresence.setTimestamp(new Date(timestamp));
+        }
+
+        return userPresence;
     }
 }
