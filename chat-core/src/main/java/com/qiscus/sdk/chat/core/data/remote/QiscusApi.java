@@ -18,7 +18,6 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
@@ -28,8 +27,10 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
+import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
+import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
@@ -170,13 +171,19 @@ public enum QiscusApi {
                     .build();
         }
 
-        api = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .client(httpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build()
-                .create(Api.class);
+        try {
+            api = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .client(httpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .build()
+                    .create(Api.class);
+        } catch (IllegalArgumentException e) {
+            QiscusErrorLogger.print(e);
+            return;
+        }
+
     }
 
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
@@ -397,7 +404,12 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> getComments(long roomId, long lastCommentId) {
-        return api.getComments(roomId, lastCommentId, false, 20)
+        Long lastCommenID = lastCommentId;
+        if (lastCommenID == 0) {
+            lastCommenID = null;
+        }
+
+        return api.getComments(roomId, lastCommenID, false, 20)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
@@ -405,21 +417,50 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> getCommentsAfter(long roomId, long lastCommentId) {
-        return api.getComments(roomId, lastCommentId, true, 20)
+        Long lastCommentID = lastCommentId;
+        if (lastCommentID == 0) {
+            lastCommentID = null;
+        }
+
+        return api.getComments(roomId, lastCommentID, true, 20)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getPreviousMessagesById(long roomId, int limit, long messageId) {
-        return api.getComments(roomId, messageId, false, limit)
+        Long messageID = messageId;
+        if (messageID == 0) {
+            messageID = null;
+        }
+
+        return api.getComments(roomId, messageID, false, limit)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
+    }
+
+    public Observable<QiscusComment> getPreviousMessagesById(long roomId, int limit) {
+        return api.getComments(roomId, null, false, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getNextMessagesById(long roomId, int limit, long messageId) {
-        return api.getComments(roomId, messageId, true, limit)
+        Long messageID = messageId;
+        if (messageID == 0) {
+            messageID = null;
+        }
+
+        return api.getComments(roomId, messageID, true, limit)
+                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                        .getAsJsonObject().get("comments").getAsJsonArray()))
+                .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
+    }
+
+    public Observable<QiscusComment> getNextMessagesById(long roomId, int limit) {
+        return api.getComments(roomId, null, true, limit)
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
@@ -897,7 +938,15 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonObject("user"))
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
     }
 
     public Observable<QiscusAccount> unblockUser(String userId) {
@@ -905,7 +954,15 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonObject("user"))
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false));
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
     }
 
     public Observable<List<QiscusAccount>> getBlockedUsers() {
@@ -919,7 +976,15 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .toList();
     }
 
@@ -991,21 +1056,41 @@ public enum QiscusApi {
 
     public Observable<String> getMqttBaseUrl() {
         return Observable.create(subscriber -> {
-            Request request = new Request.Builder()
-                    .url(QiscusCore.getBaseURLLB())
-                    .build();
+            OkHttpClient httpClientLB;
+            if (Build.VERSION.SDK_INT <= 19) {
+                ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                        .supportsTlsExtensions(true)
+                        .allEnabledTlsVersions()
+                        .allEnabledCipherSuites()
+                        .build();
 
+                httpClientLB = new OkHttpClient.Builder()
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .addInterceptor(this::headersInterceptor)
+                        .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                        .connectionSpecs(Collections.singletonList(spec))
+                        .build();
+
+            } else {
+                httpClientLB = new OkHttpClient.Builder()
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .addInterceptor(this::headersInterceptor)
+                        .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                        .build();
+            }
+
+            String url = QiscusCore.getBaseURLLB();
+            Request okHttpRequest = new Request.Builder().url(url).build();
             try {
-                Response response = httpClient.newCall(request).execute();
+                Response response = httpClientLB.newCall(okHttpRequest).execute();
                 JSONObject jsonResponse = new JSONObject(response.body().string());
                 String node = jsonResponse.getString("node");
-
                 subscriber.onNext(node);
                 subscriber.onCompleted();
-
-            } catch (JSONException | IOException e) {
-                QiscusErrorLogger.print("getMqttBaseUrl", e);
-                subscriber.onError(e);
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
             }
         }, Emitter.BackpressureMode.BUFFER);
     }
@@ -1022,7 +1107,15 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .toList();
     }
 
@@ -1033,7 +1126,15 @@ public enum QiscusApi {
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
                 .flatMap(Observable::from)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQiscusAccount(jsonAccount, false))
+                .map(jsonAccount -> {
+                    try {
+                        return QiscusApiParser.parseQiscusAccount(
+                                new JSONObject(jsonAccount.toString()), false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .toList();
     }
 
@@ -1051,6 +1152,55 @@ public enum QiscusApi {
     public Observable<QiscusRealtimeStatus> getRealtimeStatus(String topic) {
         return api.getRealtimeStatus(QiscusHashMapUtil.getRealtimeStatus(topic))
                 .map(QiscusApiParser::parseQiscusRealtimeStatus);
+    }
+
+    public Observable<List<QiscusChannels>> getChannels() {
+        return api.getChannels()
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QiscusChannels>> getChannelsInfo(List<String> uniqueIds) {
+        return api.getChannelsInfo(QiscusHashMapUtil.getChannelsInfo(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QiscusChannels>> joinChannels(List<String> uniqueIds) {
+        return api.joinChannels(QiscusHashMapUtil.joinChannels(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QiscusChannels>> leaveChannels(List<String> uniqueIds) {
+        return api.leaveChannels(QiscusHashMapUtil.leaveChannels(uniqueIds))
+                .map(QiscusApiParser::parseQiscusChannels);
+    }
+
+    public Observable<List<QUserPresence>> getUserPresence(List<String> userIds) {
+        return api.usersPresence(QiscusHashMapUtil.usersPresence(userIds))
+                .map(QiscusApiParser::parseQiscusUserPresence);
+    }
+
+    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds, int page, int limit) {
+        List<String> listOfRoomIds = new ArrayList<>();
+        for (Long roomId : roomIds) {
+            listOfRoomIds.add(String.valueOf(roomId));
+        }
+        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds, page, limit))
+                .map(QiscusApiParser::parseFileListAndSearchMessage);
+    }
+
+    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String userId, List<String> type, int page, int limit) {
+        List<String> listOfRoomIds = new ArrayList<>();
+        for (Long roomId : roomIds) {
+            listOfRoomIds.add(String.valueOf(roomId));
+        }
+
+        if (userId == null) {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        } else {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, null, type , page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        }
     }
 
     private interface Api {
@@ -1113,7 +1263,7 @@ public enum QiscusApi {
         @GET("api/v2/mobile/load_comments")
         Observable<JsonElement> getComments(
                 @Query("topic_id") long roomId,
-                @Query("last_comment_id") long lastCommentId,
+                @Query("last_comment_id") Long lastCommentId,
                 @Query("after") boolean after,
                 @Query("limit") int limit
         );
@@ -1241,6 +1391,45 @@ public enum QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/realtime")
         Observable<JsonElement> getRealtimeStatus(
+                @Body HashMap<String, Object> data
+        );
+
+        @GET("api/v2/mobile/channels")
+        Observable<JsonElement> getChannels();
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/info")
+        Observable<JsonElement> getChannelsInfo(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/join")
+        Observable<JsonElement> joinChannels(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/channels/leave")
+        Observable<JsonElement> leaveChannels(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/users/status")
+        Observable<JsonElement> usersPresence(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/file_list")
+        Observable<JsonElement> fileList(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/search")
+        Observable<JsonElement> searchMessage(
                 @Body HashMap<String, Object> data
         );
     }

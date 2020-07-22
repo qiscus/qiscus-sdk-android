@@ -206,4 +206,55 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> getChannelsInfo(List<String> uniqueIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("unique_ids", uniqueIds);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> joinChannels(List<String> uniqueIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("unique_ids", uniqueIds);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> leaveChannels(List<String> uniqueIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("unique_ids", uniqueIds);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> usersPresence(List<String> userIds) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("user_ids", userIds);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> fileList(List<String> roomIds, int page, int limit) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("room_ids", roomIds);
+        hashMap.put("page", page);
+        hashMap.put("limit", limit);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> searchMessage(String query, List<String> roomIds, String userId, List<String> type, int page, int limit) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("query", query);
+        hashMap.put("room_ids", roomIds);
+        hashMap.put("type", type);
+        hashMap.put("sender", userId);
+        hashMap.put("page", page);
+        hashMap.put("limit", limit);
+
+        return hashMap;
+    }
+
+
 }

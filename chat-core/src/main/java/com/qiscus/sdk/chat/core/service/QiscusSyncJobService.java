@@ -73,9 +73,6 @@ public class QiscusSyncJobService extends JobService {
         if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
-            // to check subscribe message when is connected (edge case)
-        } else if (QiscusCore.hasSetupUser() && QiscusCore.isOnForeground() && QiscusPusherApi.getInstance().isConnected()) {
-            QiscusPusherApi.getInstance().getRealtimeStatus();
         }
 
         syncJob(context);
@@ -105,7 +102,6 @@ public class QiscusSyncJobService extends JobService {
     private void scheduleSync() {
         if (QiscusCore.isOnForeground()) {
             syncComments();
-            syncEvents();
         }
     }
 
@@ -124,6 +120,7 @@ public class QiscusSyncJobService extends JobService {
                 })
                 .doOnCompleted(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
+                    syncEvents();
                     QiscusLogger.print("Sync completed...");
                 })
                 .subscribeOn(Schedulers.io())
@@ -137,6 +134,7 @@ public class QiscusSyncJobService extends JobService {
     private void stopSync() {
         if (timer != null) {
             timer.cancel();
+            timer = null;
         }
     }
 

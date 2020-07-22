@@ -40,8 +40,10 @@ import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -73,7 +75,7 @@ public class QiscusCore {
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
     private static Boolean enableRealtime = true;
-    private static Boolean enableRealtimeCheck = false;
+    private static Boolean syncServiceDisabled = false;
 
     private QiscusCore() {
     }
@@ -219,11 +221,6 @@ public class QiscusCore {
         localDataManager.setURLLB(baseURLLB);
 
         getAppConfig();
-
-        startPusherService();
-        startNetworkCheckerService();
-        QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
-
         configureFcmToken();
     }
 
@@ -234,20 +231,21 @@ public class QiscusCore {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(appConfig -> {
                     enableEventReport = appConfig.getEnableEventReport();
-                    enableRealtimeCheck = appConfig.getEnableRealtimeCheck();
                     if (!appConfig.getBaseURL().isEmpty()) {
                         String oldAppServer = appServer;
                         String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
                                 appConfig.getBaseURL() + "/" : appConfig.getBaseURL();
 
-                        if (!oldAppServer.equals(newAppServer)) {
+                        if (!oldAppServer.equals(newAppServer) &&
+                                QiscusServiceUtil.isValidUrl(newAppServer)) {
                             appServer = newAppServer;
                         }
                     }
 
                     QiscusApi.getInstance().reInitiateInstance();
 
-                    if (!appConfig.getBrokerLBURL().isEmpty()) {
+                    if (!appConfig.getBrokerLBURL().isEmpty() &&
+                            QiscusServiceUtil.isValidUrl(appConfig.getBrokerLBURL())) {
                         QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
                     }
 
@@ -260,8 +258,8 @@ public class QiscusCore {
                         if (!oldMqttBrokerUrl.equals(newMqttBrokerUrl)) {
                             QiscusCore.mqttBrokerUrl = newMqttBrokerUrl;
                             QiscusCore.setCacheMqttBrokerUrl(newMqttBrokerUrl, false);
-                            QiscusPusherApi.getInstance().disconnect();
-                            QiscusPusherApi.getInstance().restartConnection();
+                        } else {
+                            QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
                         }
                     }
 
@@ -274,20 +272,27 @@ public class QiscusCore {
                     }
 
                     enableRealtime = appConfig.getEnableRealtime();
-
-                    if (!enableRealtime) {
-                        //enable realtime false
-                        QiscusPusherApi.getInstance().disconnect();
-                    }
+                    startSyncService();
+                    startNetworkCheckerService();
+                    QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
 
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     QiscusApi.getInstance().reInitiateInstance();
+                    QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
+                    startSyncService();
+                    startNetworkCheckerService();
+                    QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
                 });
 
     }
 
-    public static void startPusherService() {
+    /**
+     * Use this method to start sync service from qiscus
+     */
+
+    public static void startSyncService() {
+        syncServiceDisabled = false;
         checkAppIdSetup();
         Application appInstance = QiscusCore.getApps();
         if (BuildVersionUtil.isOreoLower()) {
@@ -310,6 +315,36 @@ public class QiscusCore {
                 QiscusErrorLogger.print(e);
             } catch (RuntimeException e) {
                 //Prevent crash because trying to start service while application on background
+                QiscusErrorLogger.print(e);
+            }
+        }
+    }
+
+    /**
+     * Use this method to stop sync service from qiscus
+     *
+     * @WARNING : when this method used, we can't restart mqtt automatically if there
+     * are any problem, and we can't get message from sync if mqtt down
+     */
+
+    public static void stopSyncService() {
+        syncServiceDisabled = true;
+        if (BuildVersionUtil.isOreoLower()) {
+            try {
+                getApps().getApplicationContext()
+                        .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncService.class));
+            } catch (Exception e) {
+                //Prevent crash because trying to stop service
+                syncServiceDisabled = false;
+                QiscusErrorLogger.print(e);
+            }
+        } else {
+            try {
+                getApps().getApplicationContext()
+                        .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncJobService.class));
+            } catch (Exception e) {
+                //Prevent crash because trying to stop service
+                syncServiceDisabled = false;
                 QiscusErrorLogger.print(e);
             }
         }
@@ -397,13 +432,14 @@ public class QiscusCore {
     }
 
     /**
-     * enableRealtimeCheck
-     * Checker for enable or disable realtime checker
+     * syncServiceDisabled
+     * Checker for know if we force stop the sync service
      *
      * @return boolean
      */
-    public static boolean getEnableRealtimeCheck() {
-        return enableRealtimeCheck;
+
+    public static Boolean isSyncServiceDisabledManually() {
+        return syncServiceDisabled;
     }
 
     /**
@@ -903,12 +939,49 @@ public class QiscusCore {
         }
 
         private void saveAccountInfo(QiscusAccount qiscusAccount) {
-            sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
+            try {
+                JSONObject data = new JSONObject(qiscusAccount.toString().substring(13));
+                sharedPreferences.edit().putString("cached_account",data.toString()).apply();
+            } catch (JSONException e) {
+                sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
+                e.printStackTrace();
+            }
+
             setToken(qiscusAccount.getToken());
         }
 
         private QiscusAccount getAccountInfo() {
-            return gson.fromJson(sharedPreferences.getString("cached_account", ""), QiscusAccount.class);
+            QiscusAccount qiscusAccount = new QiscusAccount();
+            try {
+                JSONObject jsonObject = new JSONObject(sharedPreferences.getString("cached_account", ""));
+                if (jsonObject.has("avatar")) {
+                    qiscusAccount.setAvatar(jsonObject.optString("avatar", ""));
+                }
+                if (jsonObject.has("email")) {
+                    qiscusAccount.setEmail(jsonObject.optString("email", ""));
+                }
+                if (jsonObject.has("id")) {
+                    qiscusAccount.setId(jsonObject.optInt("id", 0));
+                }
+                if (jsonObject.has("token")) {
+                    qiscusAccount.setToken(jsonObject.optString("token", ""));
+                }
+                if (jsonObject.has("username")) {
+                    qiscusAccount.setUsername(jsonObject.optString("username", ""));
+                }
+
+                if (jsonObject.has("extras")){
+                    if (jsonObject.optJSONObject("extras").toString().contains("nameValuePairs")) {
+                        //migration from latest
+                        qiscusAccount.setExtras(jsonObject.optJSONObject("extras").getJSONObject("nameValuePairs"));
+                    }else{
+                        qiscusAccount.setExtras(jsonObject.optJSONObject("extras"));
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return qiscusAccount;
         }
 
         private String getToken() {

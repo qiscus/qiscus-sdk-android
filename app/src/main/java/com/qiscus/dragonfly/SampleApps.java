@@ -36,9 +36,7 @@ public class SampleApps extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
-        //Qiscus.setup(this, QISCUS_SDK_APP_ID);
-        Qiscus.setupWithCustomServer(this,"dragongo", "https://dragongo.qiscus.com","ssl://realtime-stage.qiscus.com:1885");
-
+        Qiscus.setup(this, QISCUS_SDK_APP_ID);
         Qiscus.getChatConfig()
                 .enableDebugMode(true)
                 .setEnableAddLocation(false)
