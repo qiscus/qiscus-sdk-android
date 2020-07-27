@@ -622,7 +622,7 @@ final class QiscusApiParser {
         }
 
         if (jsonUserStatus.has("timestamp")) {
-            long timestamp = jsonUserStatus.get("timestamp").getAsLong() / 1000000L;
+            long timestamp = jsonUserStatus.get("timestamp").getAsLong() * 1000;
             userPresence.setTimestamp(new Date(timestamp));
         }
 
