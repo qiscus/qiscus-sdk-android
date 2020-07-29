@@ -15,17 +15,17 @@
  */
 
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
 apply from: rootProject.file('gradle/quality.gradle')
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.qiscus.dragonfly"
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -75,4 +75,6 @@ dependencies {
 
     implementation project(':chat')
     implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.android.support:multidex:1.0.1'
+
 }

@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
@@ -28,6 +27,7 @@ android {
         targetSdkVersion targetSDKVersion
         versionCode 1
         versionName "${chatVersionMajor}.${chatVersionMinor}.${chatVersionPatch}"
+
     }
     buildTypes {
         release {
@@ -75,7 +75,8 @@ dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
 
     api supportLibs
-    api placesLib
+    api placePickerLib
+    api placeLib
     api firebaseLibs
     api qiscusUtilLibs
     api qiscusMqttLibs

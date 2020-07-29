@@ -16,8 +16,17 @@
 
 package com.qiscus.sdk.service;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.util.QiscusFirebaseMessagingUtil;
 
 public class QiscusFirebaseService extends FirebaseMessagingService {
@@ -37,5 +46,33 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
         if (handleMessageReceived(remoteMessage)) {
             return;
         }
+    }
+
+    @Override
+    public void onNewToken(@NonNull String s) {
+        super.onNewToken(s);
+
+        QiscusCore.registerDeviceToken(s);
+    }
+
+    public static void getCurrentDeviceToken() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.e("Qiscus", "getCurrentDeviceToken Failed : " +
+                                    task.getException());
+                            return;
+                        }
+
+                        if (task.getResult() != null) {
+                            String currentToken = task.getResult().getToken();
+
+                            QiscusCore.registerDeviceToken(currentToken);
+                        }
+
+                    }
+                });
     }
 }

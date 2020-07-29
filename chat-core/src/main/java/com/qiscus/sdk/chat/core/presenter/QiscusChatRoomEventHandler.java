@@ -68,12 +68,12 @@ public class QiscusChatRoomEventHandler {
     }
 
     private void listenChatRoomEvent() {
-        QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().subscribeChatRoom(qiscusChatRoom);
     }
 
     public void detach() {
         QiscusAndroidUtil.cancelRunOnUIThread(listenChatRoomTask);
-        QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().unsubsribeChatRoom(qiscusChatRoom);
         EventBus.getDefault().unregister(this);
     }
 
@@ -107,6 +107,15 @@ public class QiscusChatRoomEventHandler {
             // handle room event such s invite user, kick user
             if (qiscusComment.getType() == QiscusComment.Type.SYSTEM_EVENT) {
                 handleChatRoomChanged(qiscusComment);
+            }
+
+            if (qiscusChatRoom.getId() == qiscusComment.getRoomId()) {
+                QiscusChatRoom room = QiscusCore.getDataStore().getChatRoom(qiscusChatRoom.getId());
+                if ( room.getLastComment().getState() == QiscusComment.STATE_ON_QISCUS ||
+                        room.getLastComment().getState() == QiscusComment.STATE_DELIVERED ) {
+                    QiscusCore.getDataStore().updateLastReadComment(qiscusChatRoom.getId(), qiscusComment.getId());
+                    listener.onChangeLastRead(qiscusComment.getId());
+                }
             }
         }
     }

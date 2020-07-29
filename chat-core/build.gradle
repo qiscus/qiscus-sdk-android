@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
@@ -79,10 +78,7 @@ apply from: '../buildsystem/installv1.gradle'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api supportLibs
-    api placesLib
     api firebaseLibs
-    api qiscusUtilLibs
     api qiscusMqttLibs
     api qiscusManggilWithoutEmoji
     api networkLibs
@@ -91,6 +87,6 @@ dependencies {
     api rxUrlExtractorLib
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
 }

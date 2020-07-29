@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.presenter;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;

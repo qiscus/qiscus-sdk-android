@@ -18,12 +18,13 @@ package com.qiscus.dragonfly;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
@@ -65,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
             mLoginButton.setText("Login");
         } else {
             showLoading();
-            Qiscus.setUser("zetra25@gmail.com", "12345678")
-                    .withUsername("Zetra")
+            Qiscus.setUser("arief99", "arief99")
+                    .withUsername("arief99")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChat(View view) {
         showLoading();
-        Qiscus.buildChatWith("rya.meyvriska24@gmail.com")
+        Qiscus.buildChatWith("arief77")
                 .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -223,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             data.put("msg", "Listening Music...");
             data.put("active", !publishCustomEvent);
 
-            QiscusPusherApi.getInstance().setEvent(1353686, data);
+            QiscusPusherApi.getInstance().publishCustomEvent(1353686, data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -233,12 +234,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        QiscusPusherApi.getInstance().listenEvent(1353686);
+        QiscusPusherApi.getInstance().subsribeCustomEvent(1353686);
     }
 
     @Override
     protected void onPause() {
-        QiscusPusherApi.getInstance().unlistenEvent(1353686);
+        QiscusPusherApi.getInstance().unsubsribeCustomEvent(1353686);
         EventBus.getDefault().unregister(this);
         super.onPause();
     }

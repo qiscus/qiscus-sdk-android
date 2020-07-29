@@ -18,8 +18,8 @@ package com.qiscus.sdk.ui.view;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.content.ContextCompat;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;

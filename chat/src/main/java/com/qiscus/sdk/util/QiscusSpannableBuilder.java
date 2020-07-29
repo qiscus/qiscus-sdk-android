@@ -16,8 +16,8 @@
 
 package com.qiscus.sdk.util;
 
-import android.support.annotation.ColorInt;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.ColorInt;
+import androidx.core.content.ContextCompat;
 import android.text.Spannable;
 
 import com.qiscus.sdk.Qiscus;

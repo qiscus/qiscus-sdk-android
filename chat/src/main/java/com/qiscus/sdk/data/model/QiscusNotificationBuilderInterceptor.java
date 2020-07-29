@@ -16,7 +16,7 @@
 
 package com.qiscus.sdk.data.model;
 
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 

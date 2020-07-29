@@ -54,7 +54,7 @@ Second, you need to add SDK dependencies inside your app .gradle. Then, you need
 ```
 dependencies { 
        ... 
-       implementation 'com.qiscus.sdk:chat-core:1.2.8' 
+       implementation 'com.qiscus.sdk:chat-core:1.3.17'
 }
 ```
 
@@ -68,7 +68,7 @@ public class SampleApp extends Application {
     public void onCreate() {
         super.onCreate();
 
-        QiscusCore.init(this, APPID);
+        QiscusCore.initWithAppId(this, APPID);
 
  }
 ```
@@ -143,7 +143,7 @@ QiscusCore.clearUser();
 We assume that you already know a targeted user you want to chat with. Make sure that your targeted user has been registered in Qiscus Chat SDK through setUser() method, as explained in the previous section. To start a conversation with your targeted user, it can be done with `getChatRoom()` method. Qiscus Chat SDK, then, will serve you a new Chat Room, asynchronously. When the room is succesfully created, Qiscus Chat SDK will return a Chat Room package through `onSuccess()` listener.
 
 ```java
-QiscusApi.getInstance().getChatRoom(userId, distinctId, options)
+QiscusApi.getInstance().chatUser(userId, options)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(chatRoom -> {
@@ -166,7 +166,7 @@ Where:
 When you want your many users to chat together in a 1-on-1 chat room, you need to create Group Room. Basically Group Room has the same concept as 1-on-1 Chat Room, but the different is that Group Room will target array of userIds in a single method. Here how you can create Group Room:
 
 ```java
-QiscusApi.getInstance().createGroupChatRoom(roomName, userIds, avatarUrl, options);
+QiscusApi.getInstance().createGroupChat(roomName, userIds, avatarUrl, options);
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(chatRoom -> {
@@ -186,7 +186,7 @@ When the room doesn't exist at the very first call and you do not send avatarUrl
 For example the implementation creating channel:
 
 ```java
-QiscusApi.getInstance().getGroupChatRoom(uniqueId, roomName, avatarUrl, options)
+QiscusApi.getInstance().createChannel(uniqueId, roomName, avatarUrl, options)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(chatRoom -> {
@@ -205,7 +205,7 @@ In some cases, you may need to add additional participants into your room chat o
 To get all room list you can call QiscusApi.getInstance().getChatRooms(int page, int limit, boolean showMembers), page start from 1, limit indicate the max rooms per page, showMembers is flag for load room members also or not. Here sample code:
 
 ```java
-QiscusApi.getInstance().getChatRooms(page, limit, showMembers)
+QiscusApi.getInstance().getAllChatRooms(showParticipant, showRemoved, showEmpty, page, limit)
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
     .subscribe(chatRooms -> {
@@ -219,7 +219,7 @@ QiscusApi.getInstance().getChatRooms(page, limit, showMembers)
 You can add more than a participant in Chat Room by calling addRoomMember method. You can also pass multiple userIds. Once a participant succeeds to join the Chat Room, they will get a new Chat Room in their Chat Room list.
 
 ```java
-QiscusApi.getInstance().addRoomMember(roomId, userId)
+QiscusApi.getInstance().addParticipants(roomId, userId)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(chatRoom -> {
@@ -233,7 +233,7 @@ QiscusApi.getInstance().addRoomMember(roomId, userId)
 You can remove more than a participant in Chat Room by calling removeRoomMember method. You can also pass multiple userId. Once a participant is removed from the Chat Room, they will not find related Chat Room in their Chat Room list.
 
 ```java
-QiscusApi.getInstance().removeRoomMember(roomId, userId)
+QiscusApi.getInstance().removeParticipants(roomId, userId)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(chatRoom -> {
@@ -337,10 +337,10 @@ public class MyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my);
 
         // listen room event
-        QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().subscribeChatRoom(qiscusChatRoom);
 
         // listen user status
-        QiscusPusherApi.getInstance().listenUserStatus("userId");
+        QiscusPusherApi.getInstance().subscribeUserOnlinePresence("userId");
     }
 
     @Override
@@ -399,10 +399,10 @@ public class MyActivity extends AppCompatActivity {
         super.onDestroy();
 
         // stop listening room event
-        QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().unsubsribeChatRoom(qiscusChatRoom);
 
         // stop listening user status
-        QiscusPusherApi.getInstance().unListenUserStatus("qiscus_user_id");
+        QiscusPusherApi.getInstance().unsubscribeUserOnlinePresence("qiscus_user_id");
     }
 }
 ```

@@ -1,7 +1,7 @@
 package com.qiscus.sdk.util;
 
 import android.graphics.Color;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 
 import java.util.Random;
 

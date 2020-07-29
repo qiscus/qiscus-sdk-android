@@ -16,7 +16,7 @@
 
 package com.qiscus.dragonfly;
 
-import android.app.Application;
+import androidx.multidex.MultiDexApplication;
 
 import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
@@ -30,16 +30,17 @@ import static com.qiscus.dragonfly.BuildConfig.QISCUS_SDK_APP_ID;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class SampleApps extends Application {
+public class SampleApps extends MultiDexApplication {
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        Qiscus.init(this, QISCUS_SDK_APP_ID);
+        Qiscus.setup(this, QISCUS_SDK_APP_ID);
 
         Qiscus.getChatConfig()
-                .setEnableLog(true)
+                .enableDebugMode(true)
+                .setEnableAddLocation(false)
                 .setDeleteCommentConfig(new QiscusDeleteCommentConfig()
                         .setEnableDeleteComment(true)
                         .setEnableHardDelete(true));
