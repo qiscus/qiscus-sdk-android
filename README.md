@@ -52,8 +52,9 @@ allprojects {
 Second, you need to add SDK dependencies inside your app .gradle. Then, you need to synchronize to compile the Qiscus Chat SDK for your app.
 
 ```
-dependencies {
-    implementation 'com.qiscus.sdk:chat-core:1.3.17'
+dependencies { 
+       ... 
+       implementation 'com.qiscus.sdk:chat-core:1.3.18'
 }
 ```
 
@@ -69,6 +70,7 @@ public class SampleApp extends Application {
 
         QiscusCore.initWithAppId(this, APPID);
 
+  }
  }
 ```
 > The initialization should be called once across an Android app . The best practice you can put in application class.
