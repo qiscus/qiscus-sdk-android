@@ -1179,12 +1179,12 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusUserPresence);
     }
 
-    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds, int page, int limit) {
+    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds, String fileType, int page, int limit) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
             listOfRoomIds.add(String.valueOf(roomId));
         }
-        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds, page, limit))
+        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds, fileType, page, limit))
                 .map(QiscusApiParser::parseFileListAndSearchMessage);
     }
 

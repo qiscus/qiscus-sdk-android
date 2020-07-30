@@ -235,9 +235,10 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> fileList(List<String> roomIds, int page, int limit) {
+    public static HashMap<String, Object> fileList(List<String> roomIds, String fileType, int page, int limit) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("room_ids", roomIds);
+        hashMap.put("file_type", fileType);
         hashMap.put("page", page);
         hashMap.put("limit", limit);
 
