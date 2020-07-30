@@ -142,7 +142,7 @@ public class Qiscus {
 
 
     public static void setupWithCustomServer(Application application, String appID,
-                                            String baseUrl, String brokerUrl, String brokerUrlLb) {
+                                             String baseUrl, String brokerUrl, String brokerUrlLb) {
         initWithCustomServer(application, appID, baseUrl, brokerUrl, true, brokerUrlLb);
     }
 

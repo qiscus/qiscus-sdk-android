@@ -37,7 +37,6 @@ public class SampleApps extends MultiDexApplication {
         super.onCreate();
 
         Qiscus.setup(this, QISCUS_SDK_APP_ID);
-
         Qiscus.getChatConfig()
                 .enableDebugMode(true)
                 .setEnableAddLocation(false)
