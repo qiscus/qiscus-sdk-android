@@ -823,6 +823,7 @@ public enum QiscusApi {
                     actor.setEmail(account.getEmail());
                     actor.setUsername(account.getUsername());
                     actor.setAvatar(account.getAvatar());
+                    actor.setExtras(account.getExtras());
 
                     List<QiscusDeleteCommentHandler.DeletedCommentsData.DeletedComment> deletedComments = new ArrayList<>();
                     for (QiscusComment comment : comments) {
@@ -1194,7 +1195,7 @@ public enum QiscusApi {
             listOfRoomIds.add(String.valueOf(roomId));
         }
 
-        if (userId == null) {
+        if (userId != null) {
             return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, page, limit))
                     .map(QiscusApiParser::parseFileListAndSearchMessage);
         } else {
