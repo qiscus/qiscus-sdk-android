@@ -36,8 +36,8 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = "Qiscus";
     private QiscusCore qiscusCore;
 
-    public QiscusDbOpenHelper(QiscusCore qiscusCore) {
-        super(qiscusCore.getApps(), qiscusCore.getAppId() + "_" + QiscusDb.DATABASE_NAME,
+    public QiscusDbOpenHelper(QiscusCore qiscusCore, String localPrefKey) {
+        super(qiscusCore.getApps(), qiscusCore.getAppId() + "_" + localPrefKey + "+" + QiscusDb.DATABASE_NAME,
                 null, QiscusDb.DATABASE_VERSION);
         this.qiscusCore = qiscusCore;
     }

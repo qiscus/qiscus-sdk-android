@@ -40,9 +40,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     protected final SQLiteDatabase sqLiteWriteDatabase;
     private QiscusCore qiscusCore;
 
-    public QiscusDataBaseHelper(QiscusCore qiscusCore) {
+    public QiscusDataBaseHelper(QiscusCore qiscusCore, String localPrefKey) {
         this.qiscusCore = qiscusCore;
-        QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(qiscusCore);
+        QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(qiscusCore, localPrefKey);
         sqLiteReadDatabase = qiscusDbOpenHelper.getReadableDatabase();
         sqLiteWriteDatabase = qiscusDbOpenHelper.getWritableDatabase();
     }

@@ -70,6 +70,7 @@ public class QiscusCore {
     private String appServer;
     private String mqttBrokerUrl;
     private String baseURLLB;
+    private Long userIsActive;
     private LocalDataManager localDataManager;
     private SetUserBuilder setUserBuilder;
     private long heartBeat;
@@ -106,9 +107,9 @@ public class QiscusCore {
      * @param qiscusAppId Your qiscus application Id
      */
     @Deprecated
-    public void init(Application application, String qiscusAppId) {
+    public void init(Application application, String qiscusAppId, String localPrefKey) {
         initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
-                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
+                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB, localPrefKey);
     }
 
     /**
@@ -129,9 +130,9 @@ public class QiscusCore {
      * @param application Application instance
      * @param appID       Your qiscus application Id
      */
-    public void setup(Application application, String appID) {
+    public void setup(Application application, String appID, String localPrefKey) {
         initWithCustomServer(application, appID, BuildConfig.BASE_URL_SERVER,
-                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB);
+                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB, localPrefKey);
     }
 
     /**
@@ -156,11 +157,11 @@ public class QiscusCore {
      */
     @Deprecated
     public void initWithCustomServer(Application application, String appId, String baseUrl,
-                                     String brokerUrl, String brokerLBUrl) {
+                                     String brokerUrl, String brokerLBUrl, String localPrefKey) {
         if (brokerLBUrl == null) {
-            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl);
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl, localPrefKey);
         } else {
-            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl);
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl, localPrefKey);
         }
     }
 
@@ -186,11 +187,11 @@ public class QiscusCore {
      */
 
     public void setupWithCustomServer(Application application, String appId, String baseUrl,
-                                      String brokerUrl, String brokerLBUrl) {
+                                      String brokerUrl, String brokerLBUrl, String localPrefKey) {
         if (brokerLBUrl == null) {
-            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl);
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, false, brokerLBUrl, localPrefKey);
         } else {
-            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl);
+            initWithCustomServer(application, appId, baseUrl, brokerUrl, true, brokerLBUrl, localPrefKey);
         }
     }
 
@@ -205,7 +206,7 @@ public class QiscusCore {
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
-                                     String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
+                                     String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB, String localPrefKey) {
 
         appInstance = application;
         appId = qiscusAppId;
@@ -216,9 +217,9 @@ public class QiscusCore {
 
         appHandler = new Handler(getApps().getApplicationContext().getMainLooper());
         taskExecutor = new ScheduledThreadPoolExecutor(5);
-        localDataManager = new LocalDataManager();
+        localDataManager = new LocalDataManager(localPrefKey);
         setUserBuilder = new SetUserBuilder();
-        dataStore = new QiscusDataBaseHelper(this);
+        dataStore = new QiscusDataBaseHelper(this, localPrefKey);
         qiscusMediator = new QiscusMediator();
         heartBeat = 5000;
         automaticHeartBeat = 30000;
@@ -267,8 +268,8 @@ public class QiscusCore {
                         if (!oldMqttBrokerUrl.equals(newMqttBrokerUrl)) {
                             this.mqttBrokerUrl = newMqttBrokerUrl;
                             setCacheMqttBrokerUrl(newMqttBrokerUrl, false);
-                            getPusherApi().disconnect();
-                            getPusherApi().restartConnection();
+                        } else {
+                            setCacheMqttBrokerUrl(mqttBrokerUrl, false);
                         }
                     }
 
@@ -290,6 +291,7 @@ public class QiscusCore {
                 }, throwable -> {
                     getErrorLogger().print(throwable);
                     getApi().reInitiateInstance();
+                    setCacheMqttBrokerUrl(mqttBrokerUrl, false);
                 });
 
     }
@@ -994,8 +996,8 @@ public class QiscusCore {
         private final Gson gson;
         private String token;
 
-        LocalDataManager() {
-            sharedPreferences = getApps().getSharedPreferences(getAppId() + "qiscus.cfg", Context.MODE_PRIVATE);
+        LocalDataManager(String localPrefKey) {
+            sharedPreferences = getApps().getSharedPreferences(getAppId() + localPrefKey + "qiscus.cfg", Context.MODE_PRIVATE);
             gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : null;
         }

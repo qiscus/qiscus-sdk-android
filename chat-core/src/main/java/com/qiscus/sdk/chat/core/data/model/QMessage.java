@@ -75,6 +75,8 @@ public class QMessage implements Parcelable {
     private String appId;
     private QMessage replyTo;
     private String attachmentName;
+    protected boolean selected;
+    protected boolean highlighted;
 
     public QMessage() {
 
@@ -92,11 +94,17 @@ public class QMessage implements Parcelable {
         status = in.readInt();
         deleted = in.readByte() != 0;
         rawType = in.readString();
+        selected = in.readByte() != 0;
 
         replyTo = in.readParcelable(QMessage.class.getClassLoader());
         try {
-            extras = new JSONObject(in.readString());
             payload = new JSONObject(in.readString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            extras = new JSONObject(in.readString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -292,12 +300,28 @@ public class QMessage implements Parcelable {
         this.appId = appId;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
+    }
+
     public QMessage getReplyTo() {
         if (replyTo == null && getType() == Type.REPLY) {
             try {
                 JSONObject payload = QiscusRawDataExtractor.getPayload(this);
                 replyTo = new QMessage();
-                replyTo.id = payload.getInt("replied_comment_id");
+                replyTo.id = payload.getLong("replied_comment_id");
                 replyTo.uniqueId = replyTo.id + "";
                 replyTo.text = payload.getString("replied_comment_message");
 
@@ -466,6 +490,8 @@ public class QMessage implements Parcelable {
                 ", status=" + status +
                 ", deleted=" + deleted +
                 ", appId=" + appId +
+                ", payload=" + payload +
+                ", extras=" + extras +
                 '}';
     }
 
@@ -489,6 +515,7 @@ public class QMessage implements Parcelable {
         dest.writeLong(timestamp.getTime());
         dest.writeInt(status);
         dest.writeByte((byte) (deleted ? 1 : 0));
+        dest.writeByte((byte) (selected ? 1 : 0));
         dest.writeString(rawType);
         dest.writeParcelable(replyTo, flags);
         if (extras == null) {
@@ -520,6 +547,8 @@ public class QMessage implements Parcelable {
                 && timestamp.equals(qiscusMessage.timestamp)
                 && status == qiscusMessage.status
                 && deleted == qiscusMessage.deleted
+                && selected == qiscusMessage.selected
+                && highlighted == qiscusMessage.highlighted
                 && appId.equals(qiscusMessage.appId);
     }
 

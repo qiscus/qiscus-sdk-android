@@ -36,6 +36,6 @@ public final class QiscusRawDataExtractor {
     }
 
     public static JSONObject getPayload(QMessage qMessage) throws JSONException {
-        return qMessage.getExtras();
+        return qMessage.getPayload();
     }
 }

@@ -53,8 +53,7 @@ public class QiscusSyncTimer {
     }
 
     private void scheduleSync() {
-        if (qiscusCore.isOnForeground()) {
-            syncComments();
+        if (qiscusCore.isOnForeground()) { syncComments();
             syncEvents();
         }
     }
@@ -87,6 +86,7 @@ public class QiscusSyncTimer {
     private void stopSync() {
         if (timer != null) {
             timer.cancel();
+            timer = null;
         }
     }
 
