@@ -205,6 +205,15 @@ final class QiscusApiParser {
                         member.setEmail(jsonMember.getAsJsonObject().get("email").getAsString());
                         member.setAvatar(jsonMember.getAsJsonObject().get("avatar_url").getAsString());
                         member.setUsername(jsonMember.getAsJsonObject().get("username").getAsString());
+
+                        try {
+                            if (jsonMember.getAsJsonObject().has("extras")) {
+                                member.setExtras(new JSONObject(jsonMember.getAsJsonObject()
+                                        .get("extras").toString()));
+                            }
+                        } catch (JSONException ignored) {
+                            //Do nothing
+                        }
                         if (jsonMember.getAsJsonObject().has("last_comment_received_id")) {
                             member.setLastDeliveredCommentId(jsonMember.getAsJsonObject().get("last_comment_received_id").getAsLong());
                         }
