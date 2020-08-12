@@ -226,4 +226,8 @@ public class QiscusChatRoom implements Parcelable {
                 ", memberCount=" + memberCount +
                 '}';
     }
+
+    public enum RoomType {
+        GROUP, SINGLE, CHANNEL
+    }
 }

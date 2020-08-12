@@ -3,6 +3,7 @@ package com.qiscus.sdk.chat.core.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.BuildConfig;
+import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 import java.util.HashMap;
@@ -245,7 +246,7 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> searchMessage(String query, List<String> roomIds, String userId, List<String> type, int page, int limit) {
+    public static HashMap<String, Object> searchMessage(String query, List<String> roomIds, String userId, List<String> type, QiscusChatRoom.RoomType roomType, int page, int limit) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("query", query);
         hashMap.put("room_ids", roomIds);
@@ -253,6 +254,19 @@ public class QiscusHashMapUtil {
         hashMap.put("sender", userId);
         hashMap.put("page", page);
         hashMap.put("limit", limit);
+
+        if (roomType != null) {
+            if (roomType == QiscusChatRoom.RoomType.SINGLE) {
+                hashMap.put("room_type", "single");
+                hashMap.put("is_public", false);
+            } else if (roomType == QiscusChatRoom.RoomType.GROUP){
+                hashMap.put("room_type", "group");
+                hashMap.put("is_public", false);
+            } else if (roomType == QiscusChatRoom.RoomType.CHANNEL)  {
+                hashMap.put("room_type", "group");
+                hashMap.put("is_public", true);
+            }
+        }
 
         return hashMap;
     }

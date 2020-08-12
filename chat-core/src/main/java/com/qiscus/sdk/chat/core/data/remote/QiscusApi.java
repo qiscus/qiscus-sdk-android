@@ -1196,10 +1196,25 @@ public enum QiscusApi {
         }
 
         if (userId != null) {
-            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, page, limit))
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, null, page, limit))
                     .map(QiscusApiParser::parseFileListAndSearchMessage);
         } else {
-            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, null, type , page, limit))
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, null, type, null, page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        }
+    }
+
+    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String userId, List<String> type, QiscusChatRoom.RoomType roomType, int page, int limit) {
+        List<String> listOfRoomIds = new ArrayList<>();
+        for (Long roomId : roomIds) {
+            listOfRoomIds.add(String.valueOf(roomId));
+        }
+
+        if (userId != null) {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, roomType, page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        } else {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, null, type, roomType, page, limit))
                     .map(QiscusApiParser::parseFileListAndSearchMessage);
         }
     }
