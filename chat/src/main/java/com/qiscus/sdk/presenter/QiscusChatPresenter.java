@@ -106,7 +106,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 //if throwable from JSONException, e.g response from server not json as expected
                 (throwable instanceof JSONException) ||
                 // if attachment type
-                qiscusComment.isAttachment());
+                qiscusComment.isAttachment() || qiscusComment.getType() == QiscusComment.Type.REPLY);
     }
 
     private void commentFail(Throwable throwable, QiscusComment qiscusComment) {

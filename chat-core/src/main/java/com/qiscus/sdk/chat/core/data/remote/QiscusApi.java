@@ -88,6 +88,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 import rx.Emitter;
 import rx.Observable;
+import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.OnErrorThrowable;
 import rx.schedulers.Schedulers;
@@ -468,6 +469,20 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
+        if (qiscusComment.getType() == QiscusComment.Type.REPLY){
+            if (qiscusComment.getExtraPayload() != null && !qiscusComment.getExtraPayload().equals("")) {
+                try {
+                    JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
+                    if (payload.optString("replied_comment_type").equals("system_event")) {
+                        return  Observable.error(new Error("can't reply on system_event type"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
         QiscusCore.getChatConfig().getCommentSendingInterceptor().sendComment(qiscusComment);
         return api.postComment(QiscusHashMapUtil.postComment(qiscusComment))
                 .map(jsonElement -> {
@@ -486,6 +501,21 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> sendMessage(QiscusComment message) {
+
+        if (message.getType() == QiscusComment.Type.REPLY){
+            if (message.getExtraPayload() != null && !message.getExtraPayload().equals("")) {
+                try {
+                    JSONObject payload = new JSONObject(message.getExtraPayload());
+                    if (payload.optString("replied_comment_type").equals("system_event")) {
+                        return  Observable.error(new Error("can't reply on system_event type"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
         QiscusCore.getChatConfig().getCommentSendingInterceptor().sendComment(message);
         return api.postComment(QiscusHashMapUtil.postComment(message))
                 .map(jsonElement -> {
