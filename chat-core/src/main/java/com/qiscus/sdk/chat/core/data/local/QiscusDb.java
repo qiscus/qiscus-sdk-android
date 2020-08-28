@@ -247,8 +247,7 @@ final class QiscusDb {
                 e.printStackTrace();
             }
             qUser.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
-            qiscusMessage.getSender().setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_EMAIL)));
-            qiscusMessage.getSender().setAvatarUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER_AVATAR)));
+            qiscusMessage.setSender(qUser);
             qiscusMessage.setTimestamp(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))));
             qiscusMessage.setStatus(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             qiscusMessage.setDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETED)) == 1);

@@ -446,13 +446,13 @@ final class QiscusApiParser {
             if (results.has("sync_interval")) {
                 appConfig.setSyncInterval(results.get("sync_interval").getAsInt());
             } else {
-                appConfig.setSyncInterval(0);
+                appConfig.setSyncInterval(5000);
             }
 
             if (results.has("sync_on_connect")) {
                 appConfig.setSyncOnConnect(results.get("sync_on_connect").getAsInt());
             } else {
-                appConfig.setSyncOnConnect(0);
+                appConfig.setSyncOnConnect(30000);
             }
 
             if (results.has("enable_realtime_check")) {

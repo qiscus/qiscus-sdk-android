@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.chat.core.data.model;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -23,6 +24,9 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusConst;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
@@ -32,9 +36,16 @@ import com.schinizer.rxunfurl.model.PreviewData;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 18, 2016
@@ -77,6 +88,18 @@ public class QMessage implements Parcelable {
     private String attachmentName;
     protected boolean selected;
     protected boolean highlighted;
+    private QiscusLocation location;
+    protected boolean downloading;
+    protected int progress;
+    protected ProgressListener progressListener;
+    protected DownloadingListener downloadingListener;
+    protected PlayingAudioListener playingAudioListener;
+    protected LinkPreviewListener linkPreviewListener;
+    private MediaObserver observer;
+    private MediaPlayer player;
+    private List<String> urls;
+    private PreviewData previewData;
+    private QiscusContact contact;
 
     public QMessage() {
 
@@ -168,6 +191,24 @@ public class QMessage implements Parcelable {
         qiscusMessage.setRawType("button_postback_response");
         qiscusMessage.setPayload(payload);
         return qiscusMessage;
+    }
+
+    public static QMessage generateLocationMessage(long roomId, QiscusLocation location) {
+        QMessage qiscusComment = generateMessage(roomId, location.getName() + " - " + location.getAddress()
+                + "\n" + location.getMapUrl());
+        qiscusComment.setRawType("location");
+        qiscusComment.setLocation(location);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("name", location.getName()).put("address", location.getAddress())
+                    .put("latitude", location.getLatitude()).put("longitude", location.getLongitude())
+                    .put("map_url", location.getMapUrl());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusComment.setPayload(json);
+
+        return qiscusComment;
     }
 
     /**
@@ -316,6 +357,27 @@ public class QMessage implements Parcelable {
         this.highlighted = highlighted;
     }
 
+    public QiscusLocation getLocation() {
+        if (location == null && getType() == Type.LOCATION) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                location = new QiscusLocation();
+                location.setName(payload.optString("name"));
+                location.setAddress(payload.optString("address"));
+                location.setLatitude(payload.optDouble("latitude"));
+                location.setLongitude(payload.optDouble("longitude"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return location;
+    }
+
+    public void setLocation(QiscusLocation location) {
+        this.location = location;
+    }
+
+
     public QMessage getReplyTo() {
         if (replyTo == null && getType() == Type.REPLY) {
             try {
@@ -437,8 +499,85 @@ public class QMessage implements Parcelable {
         return QiscusFileUtil.getExtension(getAttachmentName());
     }
 
+    public boolean isVideo() {
+        if (isAttachment()) {
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
+            if (type == null) {
+                return false;
+            } else if (type.contains("video")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAudio() {
+        if (isAttachment()) {
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension());
+            if (type == null) {
+                return false;
+            } else if (type.contains("audio")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsUrl() {
+        if (urls == null) {
+            urls = QiscusTextUtil.extractUrl(text);
+        }
+        return !urls.isEmpty();
+    }
+
+    public List<String> getUrls() {
+        if (urls == null) {
+            urls = QiscusTextUtil.extractUrl(text);
+        }
+        return urls;
+    }
+
+    public void loadLinkPreviewData() {
+        if (getType() == Type.LINK) {
+            if (previewData != null) {
+                linkPreviewListener.onLinkPreviewReady(this, previewData);
+            } else {
+                QiscusUrlScraper.getInstance()
+                        .generatePreviewData(urls.get(0))
+                        .doOnNext(previewData -> previewData.setUrl(urls.get(0)))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(previewData -> {
+                            this.previewData = previewData;
+                            if (linkPreviewListener != null) {
+                                linkPreviewListener.onLinkPreviewReady(this, previewData);
+                            }
+                        }, Throwable::printStackTrace);
+            }
+        }
+    }
+
+    public QiscusContact getContact() {
+        if (contact == null && getType() == Type.CONTACT) {
+            try {
+                JSONObject payload = QiscusRawDataExtractor.getPayload(this);
+                contact = new QiscusContact(payload.optString("name"), payload.optString("value"),
+                        payload.optString("type", "phone"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return contact;
+    }
+
+    public void setContact(QiscusContact contact) {
+        this.contact = contact;
+    }
+
     public Type getType() {
-        if (!TextUtils.isEmpty(rawType) && rawType.equals("buttons")) {
+        if (!TextUtils.isEmpty(rawType) && rawType.equals("account_linking")) {
+            return Type.ACCOUNT_LINKING;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("buttons")) {
             return Type.BUTTONS;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("reply")) {
             return Type.REPLY;
@@ -446,14 +585,25 @@ public class QMessage implements Parcelable {
             return Type.CARD;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("system_event")) {
             return Type.SYSTEM_EVENT;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("contact_person")) {
+            return Type.CONTACT;
+        } else if (!TextUtils.isEmpty(rawType) && rawType.equals("location")) {
+            return Type.LOCATION;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("carousel")) {
             return Type.CAROUSEL;
         } else if (!TextUtils.isEmpty(rawType) && rawType.equals("custom")) {
             return Type.CUSTOM;
         } else if (!isAttachment()) {
+            if (containsUrl()) {
+                return Type.LINK;
+            }
             return Type.TEXT;
         } else if (isImage()) {
             return Type.IMAGE;
+        } else if (isVideo()) {
+            return Type.VIDEO;
+        } else if (isAudio()) {
+            return Type.AUDIO;
         } else {
             return Type.FILE;
         }
@@ -553,19 +703,170 @@ public class QMessage implements Parcelable {
     }
 
     public enum Type {
-        TEXT, IMAGE, FILE, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
-        CAROUSEL, CUSTOM
+        TEXT, IMAGE, VIDEO, FILE, AUDIO, LINK, ACCOUNT_LINKING, BUTTONS, REPLY, SYSTEM_EVENT, CARD,
+        CONTACT, LOCATION, CAROUSEL, CUSTOM
+    }
+
+    public boolean isDownloading() {
+        return downloading;
+    }
+
+    public void setDownloading(boolean downloading) {
+        this.downloading = downloading;
+        QiscusAndroidUtil.runOnUIThread(() -> {
+            if (downloadingListener != null) {
+                downloadingListener.onDownloading(this, downloading);
+            }
+        });
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int percentage) {
+        this.progress = percentage;
+        QiscusAndroidUtil.runOnUIThread(() -> {
+            if (progressListener != null) {
+                progressListener.onProgress(this, progress);
+            }
+        });
+    }
+
+    private void setupPlayer(QiscusCore qiscusCore) {
+        if (player == null) {
+            File localPath = qiscusCore.getDataStore().getLocalPath(id);
+            if (localPath != null) {
+                try {
+                    player = new MediaPlayer();
+                    player.setDataSource(localPath.getAbsolutePath());
+                    player.prepare();
+                    player.setOnCompletionListener(mp -> {
+                        observer.stop();
+                        if (playingAudioListener != null) {
+                            playingAudioListener.onStopAudio(this);
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void playAudio(QiscusCore qiscusCore) {
+        if (!isAudio()) {
+            throw new RuntimeException("Current comment is not an audio");
+        }
+
+        if (observer == null) {
+            observer = new MediaObserver();
+        }
+
+        setupPlayer(qiscusCore);
+
+        if (!player.isPlaying()) {
+            player.start();
+            observer.start();
+            new Thread(observer).start();
+        } else {
+            player.pause();
+            observer.stop();
+            if (playingAudioListener != null) {
+                playingAudioListener.onPauseAudio(this);
+            }
+        }
+    }
+
+    public boolean isPlayingAudio() {
+        return player != null && player.isPlaying();
+    }
+
+    public int getAudioDuration(QiscusCore qiscusCore) {
+        if (player == null && isAudio()) {
+            File localPath = qiscusCore.getDataStore().getLocalPath(id);
+            if (localPath == null) {
+                return 0;
+            } else {
+                setupPlayer(qiscusCore);
+            }
+        }
+        return player.getDuration();
+    }
+
+    public int getCurrentAudioPosition(QiscusCore qiscusCore) {
+        if (player == null && isAudio()) {
+            File localPath = qiscusCore.getDataStore().getLocalPath(id);
+            if (localPath == null) {
+                return 0;
+            } else {
+                setupPlayer(qiscusCore);
+            }
+        }
+        return player.getCurrentPosition();
+    }
+
+    public void setProgressListener(ProgressListener progressListener) {
+        this.progressListener = progressListener;
+    }
+
+    public void setDownloadingListener(DownloadingListener downloadingListener) {
+        this.downloadingListener = downloadingListener;
+    }
+
+    public void setPlayingAudioListener(PlayingAudioListener playingAudioListener) {
+        this.playingAudioListener = playingAudioListener;
+    }
+
+    public void setLinkPreviewListener(LinkPreviewListener linkPreviewListener) {
+        this.linkPreviewListener = linkPreviewListener;
     }
 
     public interface ProgressListener {
-        void onProgress(QMessage qiscusMessage, int percentage);
+        void onProgress(QMessage qiscusComment, int percentage);
     }
 
     public interface DownloadingListener {
-        void onDownloading(QMessage qiscusMessage, boolean downloading);
+        void onDownloading(QMessage qiscusComment, boolean downloading);
+    }
+
+    public interface PlayingAudioListener {
+        void onPlayingAudio(QMessage qiscusComment, int currentPosition);
+
+        void onPauseAudio(QMessage qiscusComment);
+
+        void onStopAudio(QMessage qiscusComment);
     }
 
     public interface LinkPreviewListener {
-        void onLinkPreviewReady(QMessage qiscusMessage, PreviewData previewData);
+        void onLinkPreviewReady(QMessage qiscusComment, PreviewData previewData);
+    }
+
+    private class MediaObserver implements Runnable {
+        private AtomicBoolean stopPlay = new AtomicBoolean(false);
+
+        public void stop() {
+            stopPlay.set(true);
+        }
+
+        public void start() {
+            stopPlay.set(false);
+        }
+
+        @Override
+        public void run() {
+            while (!stopPlay.get()) {
+                QiscusAndroidUtil.runOnUIThread(() -> {
+                    if (playingAudioListener != null) {
+                        playingAudioListener.onPlayingAudio(QMessage.this, player.getCurrentPosition());
+                    }
+                });
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

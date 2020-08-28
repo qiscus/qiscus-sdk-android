@@ -47,9 +47,18 @@ public class QiscusSyncTimer {
         if (qiscusCore.hasSetupUser() && !qiscusCore.getPusherApi().isConnected()) {
             QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().restartConnection());
             scheduleSync();
+            checkPendingMessage();
         }
 
         syncJob(context);
+    }
+
+    private void checkPendingMessage(){
+        boolean isConnected = qiscusCore.getAndroidUtil().isNetworkAvailable();
+
+        if (isConnected && qiscusCore.getDataStore().getPendingComments().size() > 0) {
+            qiscusCore.getQiscusResendCommentHelper().tryResendPendingComment();
+        }
     }
 
     private void scheduleSync() {
