@@ -28,8 +28,8 @@ repositories {
 ext {
 
     minSDKVersion = 16
-    targetSDKVersion = 28
-    compileSDKVersion = 28
+    targetSDKVersion = 29
+    compileSDKVersion = 29
 
     versions = [
             support          : "28.0.0",
