@@ -329,11 +329,7 @@ final class QiscusApiParser {
         if (jsonComment.has("type")) {
             qiscusMessage.setRawType(jsonComment.get("type").getAsString());
             if (jsonComment.has("payload") && !jsonComment.get("payload").isJsonNull()) {
-                try {
-                    qiscusMessage.setPayload(new JSONObject(jsonComment.get("payload").getAsJsonObject().toString()));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                qiscusMessage.setPayload(jsonComment.get("payload").toString());
             }
             if (qiscusMessage.getType() == QMessage.Type.BUTTONS
                     || qiscusMessage.getType() == QMessage.Type.REPLY

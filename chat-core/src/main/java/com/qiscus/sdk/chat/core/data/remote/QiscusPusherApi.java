@@ -276,7 +276,7 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
             if (jsonObject.has("type")) {
                 qMessage.setRawType(jsonObject.get("type").getAsString());
                 if (jsonObject.has("payload") && !jsonObject.get("payload").isJsonNull()) {
-                    qMessage.setPayload(new JSONObject(jsonObject.get("payload").getAsJsonObject().toString()));
+                    qMessage.setPayload(jsonObject.get("payload").toString());
                 }
 
                 if (qMessage.getType() == QMessage.Type.BUTTONS

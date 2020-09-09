@@ -81,7 +81,7 @@ public class QMessage implements Parcelable {
     protected int status;
     protected boolean deleted;
     private String rawType;
-    private JSONObject payload;
+    private String payload;
     private JSONObject extras;
     private String appId;
     private QMessage replyTo;
@@ -116,16 +116,11 @@ public class QMessage implements Parcelable {
         timestamp = new Date(in.readLong());
         status = in.readInt();
         deleted = in.readByte() != 0;
-        rawType = in.readString();
         selected = in.readByte() != 0;
-
+        rawType = in.readString();
         replyTo = in.readParcelable(QMessage.class.getClassLoader());
-        try {
-            payload = new JSONObject(in.readString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
+        payload = in.readString();
         try {
             extras = new JSONObject(in.readString());
         } catch (Exception e) {
@@ -161,7 +156,7 @@ public class QMessage implements Parcelable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusMessage.setPayload(json);
+        qiscusMessage.setPayload(json.toString());
         return qiscusMessage;
     }
 
@@ -177,11 +172,11 @@ public class QMessage implements Parcelable {
                     .put("replied_comment_sender_username", repliedComment.getSender().getName())
                     .put("replied_comment_sender_email", repliedComment.getSender().getId())
                     .put("replied_comment_type", repliedComment.getRawType())
-                    .put("replied_comment_payload", repliedComment.getPayload().toString());
+                    .put("replied_comment_payload", repliedComment.getPayload());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusMessage.setPayload(json);
+        qiscusMessage.setPayload(json.toString());
 
         return qiscusMessage;
     }
@@ -189,7 +184,7 @@ public class QMessage implements Parcelable {
     public static QMessage generatePostBackMessage(long roomId, String content, JSONObject payload) {
         QMessage qiscusMessage = generateMessage(roomId, content);
         qiscusMessage.setRawType("button_postback_response");
-        qiscusMessage.setPayload(payload);
+        qiscusMessage.setPayload(payload.toString());
         return qiscusMessage;
     }
 
@@ -206,7 +201,7 @@ public class QMessage implements Parcelable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusComment.setPayload(json);
+        qiscusComment.setPayload(json.toString());
 
         return qiscusComment;
     }
@@ -229,7 +224,7 @@ public class QMessage implements Parcelable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        qiscusMessage.setPayload(json);
+        qiscusMessage.setPayload(json.toString());
         return qiscusMessage;
     }
 
@@ -317,11 +312,11 @@ public class QMessage implements Parcelable {
         this.rawType = rawType;
     }
 
-    public JSONObject getPayload() {
+    public String getPayload() {
         return payload;
     }
 
-    public void setPayload(JSONObject payload) {
+    public void setPayload(String payload) {
         this.payload = payload;
     }
 
@@ -394,7 +389,7 @@ public class QMessage implements Parcelable {
                 replyTo.sender = qUser;
                 replyTo.sender.id = payload.getString("replied_comment_sender_email");
                 replyTo.rawType = payload.optString("replied_comment_type");
-                replyTo.payload = payload.getJSONObject("replied_comment_payload");
+                replyTo.payload = payload.optString("replied_comment_payload");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -409,9 +404,9 @@ public class QMessage implements Parcelable {
     public void updateAttachmentUrl(String url) {
         setText(String.format("[file] %s [/file]", url));
         try {
-            JSONObject json = getPayload();
+            JSONObject json = new JSONObject(getPayload());
             json.put("url", url);
-            setPayload(json);
+            setPayload(json.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -668,6 +663,7 @@ public class QMessage implements Parcelable {
         dest.writeByte((byte) (selected ? 1 : 0));
         dest.writeString(rawType);
         dest.writeParcelable(replyTo, flags);
+        dest.writeString(payload);
         if (extras == null) {
             try {
                 extras = new JSONObject("{}");
@@ -677,14 +673,6 @@ public class QMessage implements Parcelable {
         }
         dest.writeString(extras.toString());
 
-        if (payload == null) {
-            try {
-                payload = new JSONObject("{}");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        dest.writeString(payload.toString());
     }
 
     public boolean areContentsTheSame(QMessage qiscusMessage) {

@@ -112,6 +112,8 @@ public class QiscusChatRoomEventHandler {
 
             if (qiscusChatRoom.getId() == qMessage.getChatRoomId()) {
                 QChatRoom room = qiscusCore.getDataStore().getChatRoom(qiscusChatRoom.getId());
+                //room.setLastMessage(qMessage);
+                //qiscusCore.getDataStore().addOrUpdate(room);
                 if ( room.getLastMessage().getStatus() == QMessage.STATE_SENT ||
                         room.getLastMessage().getStatus() == QMessage.STATE_DELIVERED ) {
                     qiscusCore.getDataStore().updateLastReadComment(qiscusChatRoom.getId(), qMessage.getId());

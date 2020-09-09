@@ -31,7 +31,7 @@ import java.util.Date;
 
 final class QiscusDb {
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 18;
+    static final int DATABASE_VERSION = 19;
 
     abstract static class RoomTable {
         static final String TABLE_NAME = "rooms";
@@ -220,10 +220,9 @@ final class QiscusDb {
             values.put(COLUMN_TIME, qiscusMessage.getTimestamp().getTime());
             values.put(COLUMN_STATE, qiscusMessage.getStatus());
             values.put(COLUMN_DELETED, qiscusMessage.isDeleted() ? 1 : 0);
-            values.put(COLUMN_HARD_DELETED, 1);
+            values.put(COLUMN_HARD_DELETED, qiscusMessage.isDeleted() ? 1 : 0);
             values.put(COLUMN_TYPE, qiscusMessage.getRawType());
-            values.put(COLUMN_PAYLOAD, qiscusMessage.getPayload() == null ? null :
-                    qiscusMessage.getPayload().toString());
+            values.put(COLUMN_PAYLOAD, qiscusMessage.getPayload());
             values.put(COLUMN_EXTRAS, qiscusMessage.getExtras() == null ? null :
                     qiscusMessage.getExtras().toString());
             return values;
@@ -252,12 +251,7 @@ final class QiscusDb {
             qiscusMessage.setStatus(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)));
             qiscusMessage.setDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETED)) == 1);
             qiscusMessage.setRawType(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE)));
-            try {
-                String payload = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD));
-                qiscusMessage.setPayload(payload == null ? null : new JSONObject(payload));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            qiscusMessage.setPayload(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYLOAD)));
             try {
                 String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
                 qiscusMessage.setExtras(extras == null ? null : new JSONObject(extras));

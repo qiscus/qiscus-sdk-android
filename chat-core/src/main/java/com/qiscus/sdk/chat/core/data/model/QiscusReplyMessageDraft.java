@@ -70,7 +70,7 @@ public class QiscusReplyMessageDraft extends QMessageDraft {
             replyTo.setSender(qUser);
             replyTo.getSender().setId(payload.getString("replied_comment_sender_email"));
             replyTo.setRawType(payload.optString("replied_comment_type"));
-            replyTo.setPayload(payload.getJSONObject("replied_comment_payload"));
+            replyTo.setPayload(payload.optString("replied_comment_payload"));
 
         } catch (JSONException e) {
             e.printStackTrace();
