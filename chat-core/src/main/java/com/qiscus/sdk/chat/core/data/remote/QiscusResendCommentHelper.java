@@ -32,11 +32,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
-import rx.Observable;
+import io.reactivex.Observable;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 22, 2017
@@ -52,7 +52,7 @@ public final class QiscusResendCommentHelper {
     public static void tryResendPendingComment() {
         QiscusCore.getDataStore()
                 .getObservablePendingComments()
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .doOnNext(qiscusComment -> {
                     if (qiscusComment.isAttachment() && !pendingTask.containsKey(qiscusComment.getUniqueId())) {
                         resendFile(qiscusComment);
@@ -96,7 +96,7 @@ public final class QiscusResendCommentHelper {
 
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
+        Subscription subscription = (Subscription) QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnNext(QiscusResendCommentHelper::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qiscusComment))
                 .subscribeOn(Schedulers.io())
@@ -132,7 +132,7 @@ public final class QiscusResendCommentHelper {
         qiscusComment.setProgress(0);
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        Subscription subscription = QiscusApi.getInstance()
+        Subscription subscription = (Subscription) QiscusApi.getInstance()
                 .upload(file, percentage -> qiscusComment.setProgress((int) percentage))
                 .flatMap(uri -> {
                     qiscusComment.updateAttachmentUrl(uri.toString());
@@ -159,7 +159,7 @@ public final class QiscusResendCommentHelper {
         qiscusComment.setProgress(100);
         EventBus.getDefault().post(new QiscusCommentResendEvent(qiscusComment));
 
-        Subscription subscription = QiscusApi.getInstance().sendMessage(qiscusComment)
+        Subscription subscription = (Subscription) QiscusApi.getInstance().sendMessage(qiscusComment)
                 .doOnNext(commentSend -> {
                     qiscusComment.setDownloading(false);
                     commentSuccess(commentSend);

@@ -24,6 +24,7 @@ import android.os.Build;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
@@ -39,7 +40,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.annotation.RequiresApi;
-import rx.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created on : November 23, 2018
@@ -114,11 +115,11 @@ public class QiscusSyncJobService extends JobService {
 
     private void syncComments() {
         QiscusApi.getInstance().sync()
-                .doOnSubscribe(() -> {
+                .doOnSubscribe(disposable -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
                     QiscusLogger.print("Sync started...");
                 })
-                .doOnCompleted(() -> {
+                .doOnComplete(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
                     syncEvents();
                     QiscusLogger.print("Sync completed...");

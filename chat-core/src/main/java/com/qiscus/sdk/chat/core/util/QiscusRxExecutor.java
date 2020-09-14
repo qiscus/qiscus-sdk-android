@@ -16,11 +16,11 @@
 
 package com.qiscus.sdk.chat.core.util;
 
-import rx.Observable;
-import rx.Scheduler;
+import io.reactivex.Observable;;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created on : September 06, 2017
@@ -30,13 +30,13 @@ import rx.schedulers.Schedulers;
  */
 public class QiscusRxExecutor {
 
-    public static <T> Subscription execute(Observable<T> observable, Listener<T> listener) {
-        return execute(observable, Schedulers.io(), AndroidSchedulers.mainThread(), listener);
+    public static <T> Subscription execute(Observable<T> Observable, Listener<T> listener) {
+        return execute(Observable, Schedulers.io(), AndroidSchedulers.mainThread(), listener);
     }
 
-    public static <T> Subscription execute(Observable<T> observable, Scheduler subscribeOn,
+    public static <T> Subscription execute(Observable<T> Observable, Scheduler subscribeOn,
                                            Scheduler observeOn, Listener<T> listener) {
-        return observable
+        return (Subscription) Observable
                 .subscribeOn(subscribeOn)
                 .observeOn(observeOn)
                 .subscribe(listener::onSuccess, listener::onError);

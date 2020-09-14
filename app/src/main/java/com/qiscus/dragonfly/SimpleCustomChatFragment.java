@@ -33,8 +33,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created on : October 27, 2016

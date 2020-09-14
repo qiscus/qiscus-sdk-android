@@ -801,7 +801,7 @@ QiscusCore.getDataStore().getChatRooms(limit, offset);
 QiscusCore.getDataStore().getChatRooms(limit);
 
 /**
- * or you want return observable
+ * or you want return Observable
  */
  
 QiscusCore.getDataStore().getObservableChatRooms(limit, offset);

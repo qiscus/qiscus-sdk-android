@@ -33,6 +33,9 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.RemoteInput;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 import android.text.TextUtils;
 
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -62,9 +65,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 import static com.qiscus.sdk.chat.core.util.BuildVersionUtil.isNougatOrHigher;
 

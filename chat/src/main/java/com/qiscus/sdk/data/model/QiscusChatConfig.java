@@ -46,8 +46,8 @@ import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.QiscusGroupChatActivity;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created on : June 15, 2017
@@ -193,7 +193,9 @@ public class QiscusChatConfig {
 
     private ReplyNotificationHandler replyNotificationHandler =
             (context, qiscusComment) -> QiscusApi.getInstance().sendMessage(qiscusComment)
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                    .doOnSubscribe(disposable -> {
+                        Qiscus.getDataStore().addOrUpdate(qiscusComment);
+                    })
                     .doOnNext(comment -> {
                         comment.setState(QiscusComment.STATE_ON_QISCUS);
                         QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getUniqueId());

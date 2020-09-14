@@ -52,7 +52,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.annotation.Nullable;
-import rx.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created on : June 29, 2016
@@ -119,11 +119,11 @@ public class QiscusSyncService extends Service {
 
     private void syncComments() {
         QiscusApi.getInstance().sync()
-                .doOnSubscribe(() -> {
+                .doOnSubscribe(disposable -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
                     QiscusLogger.print("Sync started...");
                 })
-                .doOnCompleted(() -> {
+                .doOnComplete(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
                     QiscusLogger.print("Sync completed...");
                     syncEvents();

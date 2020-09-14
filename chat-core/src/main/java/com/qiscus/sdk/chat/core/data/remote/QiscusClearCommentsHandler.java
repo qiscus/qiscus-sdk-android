@@ -28,9 +28,9 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created on : February 14, 2018
@@ -46,7 +46,7 @@ public final class QiscusClearCommentsHandler {
 
     public static void handle(ClearCommentsData clearCommentsData) {
         if (clearCommentsData.getActor().getEmail().equals(QiscusCore.getQiscusAccount().getEmail())) {
-            Observable.from(clearCommentsData.getRoomIds())
+            Observable.fromIterable(clearCommentsData.getRoomIds())
                     .doOnNext(roomId -> {
                         if (QiscusCore.getDataStore().deleteCommentsByRoomId(roomId, clearCommentsData.timestamp)) {
                             EventBus.getDefault().post(new QiscusClearCommentsEvent(roomId, clearCommentsData.timestamp));

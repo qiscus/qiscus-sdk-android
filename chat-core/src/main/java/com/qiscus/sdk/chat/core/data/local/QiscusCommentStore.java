@@ -20,7 +20,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Observable;;
 
 /**
  * Created on : November 07, 2016

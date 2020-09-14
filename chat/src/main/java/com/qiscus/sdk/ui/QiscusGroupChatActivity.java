@@ -32,9 +32,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
+;
 
 /**
  * Created on : November 24, 2016
@@ -111,11 +113,11 @@ public class QiscusGroupChatActivity extends QiscusChatActivity {
     @Override
     public void onUserTyping(String user, boolean typing) {
         if (typing) {
-            Observable.from(qiscusChatRoom.getMember())
+            Observable.fromIterable(qiscusChatRoom.getMember())
                     .filter(qiscusRoomMember -> qiscusRoomMember.getEmail().equals(user))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .compose(bindToLifecycle())
+                    //.compose(bindToLifecycle())
                     .subscribe(qiscusRoomMember -> tvSubtitle.setText(getString(R.string.qiscus_group_member_typing,
                             qiscusRoomMember.getUsername())), throwable -> {
                     });

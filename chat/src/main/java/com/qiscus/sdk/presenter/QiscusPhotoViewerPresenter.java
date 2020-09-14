@@ -17,6 +17,9 @@
 package com.qiscus.sdk.presenter;
 
 import androidx.core.util.Pair;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import rx.Subscription;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -30,10 +33,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created on : March 23, 2017
@@ -88,12 +87,12 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
             return;
         }
         qiscusComment.setDownloading(true);
-        downloadSubscription = QiscusApi.getInstance()
+        downloadSubscription = (Subscription) QiscusApi.getInstance()
                 .downloadFile(qiscusComment.getAttachmentUri().toString(), qiscusComment.getAttachmentName(),
                         percentage -> qiscusComment.setProgress((int) percentage))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
+                //.compose(bindToLifecycle())
                 .doOnNext(file1 -> {
                     QiscusFileUtil.notifySystem(file1);
                     qiscusComment.setDownloading(false);

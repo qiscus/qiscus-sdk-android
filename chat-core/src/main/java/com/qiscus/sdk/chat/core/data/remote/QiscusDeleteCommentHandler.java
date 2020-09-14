@@ -29,9 +29,10 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created on : February 08, 2018
@@ -54,7 +55,7 @@ public final class QiscusDeleteCommentHandler {
     }
 
     private static void handleSoftDelete(DeletedCommentsData deletedCommentsData) {
-        Observable.from(deletedCommentsData.getDeletedComments())
+        Observable.fromIterable(deletedCommentsData.getDeletedComments())
                 .map(deletedComment -> {
                     QiscusComment qiscusComment = QiscusCore.getDataStore().getComment(deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
@@ -74,21 +75,27 @@ public final class QiscusDeleteCommentHandler {
                     EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment));
                 })
                 .toList()
-                .doOnNext(qiscusComments -> {
-                    if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
-                        QiscusCore.getChatConfig().getDeleteCommentListener()
-                                .onHandleDeletedCommentNotification(QiscusCore.getApps(),
-                                        qiscusComments, false);
-                    }
-                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(comments -> {
-                }, QiscusErrorLogger::print);
+                .subscribeWith(new DisposableSingleObserver<List<QiscusComment>>() {
+                    @Override
+                    public void onSuccess(List<QiscusComment> qiscusComments) {
+                        if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
+                            QiscusCore.getChatConfig().getDeleteCommentListener()
+                                    .onHandleDeletedCommentNotification(QiscusCore.getApps(),
+                                            qiscusComments, false);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        QiscusErrorLogger.print(e);
+                    }
+                });
     }
 
     private static void handleHardDelete(DeletedCommentsData deletedCommentsData) {
-        Observable.from(deletedCommentsData.getDeletedComments())
+        Observable.fromIterable(deletedCommentsData.getDeletedComments())
                 .map(deletedComment -> {
                     QiscusComment qiscusComment = QiscusCore.getDataStore().getComment(deletedComment.getCommentUniqueId());
                     if (qiscusComment != null) {
@@ -115,17 +122,23 @@ public final class QiscusDeleteCommentHandler {
                     EventBus.getDefault().post(new QiscusCommentDeletedEvent(qiscusComment, true));
                 })
                 .toList()
-                .doOnNext(qiscusComments -> {
-                    if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
-                        QiscusCore.getChatConfig().getDeleteCommentListener()
-                                .onHandleDeletedCommentNotification(QiscusCore.getApps(),
-                                        qiscusComments, true);
-                    }
-                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(comments -> {
-                }, QiscusErrorLogger::print);
+                .subscribeWith(new DisposableSingleObserver<List<QiscusComment>>() {
+                    @Override
+                    public void onSuccess(List<QiscusComment> qiscusComments) {
+                        if (QiscusCore.getChatConfig().getDeleteCommentListener() != null) {
+                            QiscusCore.getChatConfig().getDeleteCommentListener()
+                                    .onHandleDeletedCommentNotification(QiscusCore.getApps(),
+                                            qiscusComments, true);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        QiscusErrorLogger.print(e);
+                    }
+                });
     }
 
     private static void setRoomData(QiscusComment qiscusComment) {

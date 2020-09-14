@@ -19,9 +19,6 @@ package com.qiscus.sdk.chat.core.data.remote;
 import android.net.Uri;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
-import androidx.core.util.Pair;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.BuildConfig;
@@ -62,6 +59,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -77,7 +81,7 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -86,12 +90,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import rx.Emitter;
-import rx.Observable;
-import rx.Single;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.OnErrorThrowable;
-import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 18, 2016
@@ -136,7 +135,7 @@ public enum QiscusApi {
                 .baseUrl(baseUrl)
                 .client(httpClient)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(Api.class);
     }
@@ -177,7 +176,7 @@ public enum QiscusApi {
                     .baseUrl(baseUrl)
                     .client(httpClient)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build()
                     .create(Api.class);
         } catch (IllegalArgumentException e) {
@@ -340,7 +339,7 @@ public enum QiscusApi {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .take(1);
     }
 
@@ -348,7 +347,7 @@ public enum QiscusApi {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .take(1);
     }
 
@@ -411,7 +410,7 @@ public enum QiscusApi {
         }
 
         return api.getComments(roomId, lastCommenID, false, 20)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
@@ -424,7 +423,7 @@ public enum QiscusApi {
         }
 
         return api.getComments(roomId, lastCommentID, true, 20)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
@@ -436,14 +435,14 @@ public enum QiscusApi {
         }
 
         return api.getComments(roomId, messageID, false, limit)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getPreviousMessagesById(long roomId, int limit) {
         return api.getComments(roomId, null, false, limit)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
@@ -455,26 +454,26 @@ public enum QiscusApi {
         }
 
         return api.getComments(roomId, messageID, true, limit)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     public Observable<QiscusComment> getNextMessagesById(long roomId, int limit) {
         return api.getComments(roomId, null, true, limit)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
     }
 
     @Deprecated
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
-        if (qiscusComment.getType() == QiscusComment.Type.REPLY){
+        if (qiscusComment.getType() == QiscusComment.Type.REPLY) {
             if (qiscusComment.getExtraPayload() != null && !qiscusComment.getExtraPayload().equals("")) {
                 try {
                     JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
                     if (payload.optString("replied_comment_type").equals("system_event")) {
-                        return  Observable.error(new Error("can't reply on system_event type"));
+                        return Observable.error(new Error("can't reply on system_event type"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -502,12 +501,12 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> sendMessage(QiscusComment message) {
 
-        if (message.getType() == QiscusComment.Type.REPLY){
+        if (message.getType() == QiscusComment.Type.REPLY) {
             if (message.getExtraPayload() != null && !message.getExtraPayload().equals("")) {
                 try {
                     JSONObject payload = new JSONObject(message.getExtraPayload());
                     if (payload.optString("replied_comment_type").equals("system_event")) {
-                        return  Observable.error(new Error("can't reply on system_event type"));
+                        return Observable.error(new Error("can't reply on system_event type"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -517,6 +516,8 @@ public enum QiscusApi {
         }
 
         QiscusCore.getChatConfig().getCommentSendingInterceptor().sendComment(message);
+
+
         return api.postComment(QiscusHashMapUtil.postComment(message))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject()
@@ -534,52 +535,54 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> sendFileMessage(QiscusComment message, File file, ProgressListener progressUploadListener) {
-        return Observable.create(subscriber -> {
-            long fileLength = file.length();
+        return Observable.create(new ObservableOnSubscribe<QiscusComment>() {
+            @Override
+            public void subscribe(ObservableEmitter<QiscusComment> emitter) throws Exception {
+                long fileLength = file.length();
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
-                                int progress = (int) (totalBytes * 100 / fileLength);
-                                progressUploadListener.onProgress(progress);
-                            }))
-                    .build();
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("file", file.getName(),
+                                new CountingFileRequestBody(file, totalBytes -> {
+                                    int progress = (int) (totalBytes * 100 / fileLength);
+                                    progressUploadListener.onProgress(progress);
+                                }))
+                        .build();
 
-            Request request = new Request.Builder()
-                    .url(baseUrl + "api/v2/mobile/upload")
-                    .post(requestBody).build();
+                Request request = new Request.Builder()
+                        .url(baseUrl + "api/v2/mobile/upload")
+                        .post(requestBody).build();
 
-            try {
-                Response response = httpClient.newCall(request).execute();
-                JSONObject responseJ = new JSONObject(response.body().string());
-                String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
-                message.updateAttachmentUrl(Uri.parse(result).toString());
-                QiscusCore.getDataStore().addOrUpdate(message);
+                try {
+                    Response response = httpClient.newCall(request).execute();
+                    JSONObject responseJ = new JSONObject(response.body().string());
+                    String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
+                    message.updateAttachmentUrl(Uri.parse(result).toString());
+                    QiscusCore.getDataStore().addOrUpdate(message);
 
-                QiscusApi.getInstance().sendMessage(message)
-                        .doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(message))
-                        .doOnError(throwable -> {
-                            subscriber.onError(throwable);
-                        })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(commentSend -> {
-                            subscriber.onNext(commentSend);
-                            subscriber.onCompleted();
-                        }, throwable -> {
-                            QiscusErrorLogger.print(throwable);
-                            throwable.printStackTrace();
-                            subscriber.onError(throwable);
-                        });
+                    QiscusApi.getInstance().sendMessage(message)
+                            .doOnSubscribe(disposable -> QiscusCore.getDataStore().addOrUpdate(message))
+                            .doOnError(throwable -> {
+                                emitter.onError(throwable);
+                            })
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(commentSend -> {
+                                emitter.onNext(commentSend);
+                                emitter.onComplete();
+                            }, throwable -> {
+                                QiscusErrorLogger.print(throwable);
+                                throwable.printStackTrace();
+                                emitter.onError(throwable);
+                            });
 
 
-            } catch (IOException | JSONException e) {
-                QiscusErrorLogger.print("UploadFile", e);
-                subscriber.onError(e);
+                } catch (IOException | JSONException e) {
+                    QiscusErrorLogger.print("UploadFile", e);
+                    emitter.onError(e);
+                }
             }
-        }, Emitter.BackpressureMode.BUFFER);
-
+        });
     }
 
     @Deprecated
@@ -590,7 +593,7 @@ public enum QiscusApi {
                     return null;
                 })
                 .filter(jsonElement -> jsonElement != null)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
@@ -605,7 +608,7 @@ public enum QiscusApi {
                     return null;
                 })
                 .filter(jsonElement -> jsonElement != null)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
@@ -624,7 +627,7 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
-        return Observable.create(subscriber -> {
+        return Observable.create(emitter -> {
             long fileLength = file.length();
 
             RequestBody requestBody = new MultipartBody.Builder()
@@ -645,17 +648,17 @@ public enum QiscusApi {
                 JSONObject responseJ = new JSONObject(response.body().string());
                 String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
 
-                subscriber.onNext(Uri.parse(result));
-                subscriber.onCompleted();
+                emitter.onNext(Uri.parse(result));
+                emitter.onComplete();
             } catch (IOException | JSONException e) {
                 QiscusErrorLogger.print("UploadFile", e);
-                subscriber.onError(e);
+                emitter.onError(e);
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<Uri> upload(File file, ProgressListener progressListener) {
-        return Observable.create(subscriber -> {
+        return Observable.create(emitter -> {
             long fileLength = file.length();
 
             RequestBody requestBody = new MultipartBody.Builder()
@@ -676,17 +679,17 @@ public enum QiscusApi {
                 JSONObject responseJ = new JSONObject(response.body().string());
                 String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
 
-                subscriber.onNext(Uri.parse(result));
-                subscriber.onCompleted();
+                emitter.onNext(Uri.parse(result));
+                emitter.onComplete();
             } catch (IOException | JSONException e) {
                 QiscusErrorLogger.print("UploadFile", e);
-                subscriber.onError(e);
+                emitter.onError(e);
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<File> downloadFile(String url, String fileName, ProgressListener progressListener) {
-        return Observable.create(subscriber -> {
+        return Observable.create(emitter -> {
             InputStream inputStream = null;
             FileOutputStream fos = null;
             try {
@@ -716,8 +719,8 @@ public enum QiscusApi {
                     }
                     fos.flush();
 
-                    subscriber.onNext(output);
-                    subscriber.onCompleted();
+                    emitter.onNext(output);
+                    emitter.onComplete();
                 }
             } catch (Exception e) {
                 throw OnErrorThrowable.from(OnErrorThrowable.addValueAsLastCause(e, url));
@@ -733,7 +736,7 @@ public enum QiscusApi {
                     //Do nothing
                 }
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<QiscusChatRoom> updateChatRoom(long roomId, String name, String avatarURL, JSONObject extras) {
@@ -776,11 +779,11 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
                 .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("unique_id").getAsString())
                 .toList()
-                .flatMap(this::clearCommentsByRoomUniqueIds);
+                .flatMapObservable(this::clearMessagesByChatRoomUniqueIds);
     }
 
     @Deprecated
@@ -789,7 +792,7 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .doOnNext(json -> {
                     long roomId = json.get("id").getAsLong();
@@ -798,7 +801,7 @@ public enum QiscusApi {
                     }
                 })
                 .toList()
-                .map(qiscusChatRooms -> null);
+                .flatMapObservable(qiscusChatRooms -> null);
     }
 
     public Observable<Void> clearMessagesByChatRoomIds(List<Long> roomIds) {
@@ -811,11 +814,11 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
                 .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("unique_id").getAsString())
                 .toList()
-                .flatMap(this::clearMessagesByChatRoomUniqueIds);
+                .flatMapObservable(this::clearMessagesByChatRoomUniqueIds);
     }
 
     public Observable<Void> clearMessagesByChatRoomUniqueIds(List<String> roomUniqueIds) {
@@ -823,7 +826,7 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .doOnNext(json -> {
                     long roomId = json.get("id").getAsLong();
@@ -832,7 +835,7 @@ public enum QiscusApi {
                     }
                 })
                 .toList()
-                .map(qiscusChatRooms -> null);
+                .flatMapObservable(qiscusChatRooms -> null);
     }
 
     @Deprecated
@@ -840,13 +843,14 @@ public enum QiscusApi {
                                                           boolean isHardDelete) {
         // isDeleteForEveryone => akan selalu true, karena deleteForMe deprecated
         return api.deleteComments(commentUniqueIds, true, isHardDelete)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
                 .toList()
+                .toObservable()
                 .doOnNext(comments -> {
                     QiscusAccount account = QiscusCore.getQiscusAccount();
                     QiscusRoomMember actor = new QiscusRoomMember();
@@ -873,13 +877,14 @@ public enum QiscusApi {
 
     public Observable<List<QiscusComment>> deleteMessages(List<String> messageUniqueIds) {
         return api.deleteComments(messageUniqueIds, true, true)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseQiscusComment(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
                 .toList()
+                .toObservable()
                 .doOnNext(comments -> {
                     QiscusAccount account = QiscusCore.getQiscusAccount();
                     QiscusRoomMember actor = new QiscusRoomMember();
@@ -906,7 +911,7 @@ public enum QiscusApi {
     @Deprecated
     public Observable<List<JSONObject>> getEvents(long startEventId) {
         return api.getEvents(startEventId)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
                 .map(jsonEvent -> {
                     try {
                         return new JSONObject(jsonEvent.toString());
@@ -916,12 +921,17 @@ public enum QiscusApi {
                 })
                 .filter(jsonObject -> jsonObject != null)
                 .doOnNext(QiscusPusherApi::handleNotification)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<JSONObject>> synchronizeEvent(long lastEventId) {
         return api.getEvents(lastEventId)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
                 .map(jsonEvent -> {
                     try {
                         return new JSONObject(jsonEvent.toString());
@@ -931,7 +941,8 @@ public enum QiscusApi {
                 })
                 .filter(jsonObject -> jsonObject != null)
                 .doOnNext(QiscusPusherApi::handleNotification)
-                .toList();
+                .toList()
+                .toObservable();
     }
 
     public Observable<Long> getTotalUnreadCount() {
@@ -1005,7 +1016,7 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonAccount -> {
                     try {
@@ -1016,7 +1027,12 @@ public enum QiscusApi {
                     }
                     return null;
                 })
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     @Deprecated
@@ -1042,10 +1058,15 @@ public enum QiscusApi {
                     }
                 })
                 .map(jsonResults -> jsonResults.getAsJsonArray("participants"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(QiscusApiParser::parseQiscusRoomMember)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int page, int limit,
@@ -1065,10 +1086,15 @@ public enum QiscusApi {
                     }
                 })
                 .map(jsonResults -> jsonResults.getAsJsonArray("participants"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(QiscusApiParser::parseQiscusRoomMember)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<QiscusRoomMember>> getParticipants(String roomUniqueId, int page, int limit, String sorting) {
@@ -1079,14 +1105,19 @@ public enum QiscusApi {
 
                 })
                 .map(jsonResults -> jsonResults.getAsJsonArray("participants"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(QiscusApiParser::parseQiscusRoomMember)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<String> getMqttBaseUrl() {
-        return Observable.create(subscriber -> {
+        return Observable.create(emitter -> {
             OkHttpClient httpClientLB;
             if (Build.VERSION.SDK_INT <= 19) {
                 ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
@@ -1118,12 +1149,12 @@ public enum QiscusApi {
                 Response response = httpClientLB.newCall(okHttpRequest).execute();
                 JSONObject jsonResponse = new JSONObject(response.body().string());
                 String node = jsonResponse.getString("node");
-                subscriber.onNext(node);
-                subscriber.onCompleted();
+                emitter.onNext(node);
+                emitter.onComplete();
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<List<QiscusAccount>> getUsers(String searchUsername) {
@@ -1136,7 +1167,7 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonAccount -> {
                     try {
@@ -1147,7 +1178,12 @@ public enum QiscusApi {
                     }
                     return null;
                 })
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<QiscusAccount>> getUsers(String searchUsername, long page, long limit) {
@@ -1155,7 +1191,7 @@ public enum QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonAccount -> {
                     try {
@@ -1166,7 +1202,12 @@ public enum QiscusApi {
                     }
                     return null;
                 })
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<Void> eventReport(String moduleName, String event, String message) {

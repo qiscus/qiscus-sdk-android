@@ -23,8 +23,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 
-import androidx.annotation.RestrictTo;
-
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
@@ -33,7 +31,6 @@ import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
-import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
@@ -49,9 +46,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import androidx.annotation.RestrictTo;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
+;
 
 /**
  * @author Yuana andhikayuana@gmail.com
@@ -627,7 +627,7 @@ public class QiscusCore {
      * Use this method to set qiscus user with jwt token from your apps backend
      *
      * @param token the jwt token
-     * @return observable of qiscus account
+     * @return Observable of qiscus account
      */
     @Deprecated
     public static Observable<QiscusAccount> setUserAsObservable(String token) {
@@ -649,7 +649,7 @@ public class QiscusCore {
      * Use this method to set qiscus user with jwt token from your apps backend
      *
      * @param token the jwt token
-     * @return observable of qiscus account
+     * @return Observable of qiscus account
      */
     public static Observable<QiscusAccount> setUserWithIdentityToken(String token) {
         return QiscusApi.getInstance()
@@ -699,7 +699,7 @@ public class QiscusCore {
      * @param name      user name
      * @param avatarUrl user avatar url
      * @param extras    user extras
-     * @return observable of qiscus account
+     * @return Observable of qiscus account
      */
     public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarUrl, extras)
@@ -712,7 +712,7 @@ public class QiscusCore {
      * @param name      user name
      * @param avatarURL user avatar url
      * @param extras    user extras
-     * @return observable of qiscus account
+     * @return Observable of qiscus account
      */
     public static Observable<QiscusAccount> updateUser(String name, String avatarURL, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarURL, extras)
@@ -724,7 +724,7 @@ public class QiscusCore {
      *
      * @param name      user name
      * @param avatarUrl user avatar url
-     * @return observable of qiscus account
+     * @return Observable of qiscus account
      */
     public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
         return updateUserAsObservable(name, avatarUrl, null);
@@ -941,7 +941,7 @@ public class QiscusCore {
         private void saveAccountInfo(QiscusAccount qiscusAccount) {
             try {
                 JSONObject data = new JSONObject(qiscusAccount.toString().substring(13));
-                sharedPreferences.edit().putString("cached_account",data.toString()).apply();
+                sharedPreferences.edit().putString("cached_account", data.toString()).apply();
             } catch (JSONException e) {
                 sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
                 e.printStackTrace();
@@ -970,11 +970,11 @@ public class QiscusCore {
                     qiscusAccount.setUsername(jsonObject.optString("username", ""));
                 }
 
-                if (jsonObject.has("extras")){
+                if (jsonObject.has("extras")) {
                     if (jsonObject.optJSONObject("extras").toString().contains("nameValuePairs")) {
                         //migration from latest
                         qiscusAccount.setExtras(jsonObject.optJSONObject("extras").getJSONObject("nameValuePairs"));
-                    }else{
+                    } else {
                         qiscusAccount.setExtras(jsonObject.optJSONObject("extras"));
                     }
                 }

@@ -48,9 +48,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;;
 
 import static com.qiscus.sdk.chat.core.QiscusCore.checkAppIdSetup;
 import static com.qiscus.sdk.chat.core.QiscusCore.checkUserSetup;
@@ -202,7 +202,7 @@ public class Qiscus {
      * Use this method to set qiscus user with jwt token from your apps backend
      *
      * @param token the jwt token
-     * @return observable of qiscus account
+     * @return Observable of qiscus account
      */
     public static Observable<QiscusAccount> setUserAsObservable(String token) {
         return QiscusCore.setUserWithIdentityToken(token);
@@ -223,7 +223,7 @@ public class Qiscus {
      *
      * @param name      user name
      * @param avatarUrl user avatar url
-     * @return observable of qiscus account
+     * @return Observable of qiscus account
      */
     public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl) {
         return QiscusCore.updateUserAsObservable(name, avatarUrl);
@@ -765,7 +765,7 @@ public class Qiscus {
         }
 
         /**
-         * Build the chat activity as observable
+         * Build the chat activity as Observable
          *
          * @param context Context to start the activity
          * @return Observable of Intent for start chat activity
@@ -910,7 +910,7 @@ public class Qiscus {
         }
 
         /**
-         * Build the chat fragment as observable
+         * Build the chat fragment as Observable
          *
          * @return Observable of chat fragment
          */
