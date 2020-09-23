@@ -93,20 +93,26 @@ public class QiscusSyncService extends Service {
         long period = QiscusCore.getHeartBeat();
         stopSync();
 
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            public void run() {
-                // time ran out.
-                if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
-                    QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-                    if (QiscusCore.isOnForeground()) {
-                        syncComments();
+        try {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                public void run() {
+                    // time ran out.
+                    if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
+                        QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                        if (QiscusCore.isOnForeground()) {
+                            syncComments();
+                        }
                     }
-                }
 
-                scheduleSync();
-            }
-        }, period);
+                    scheduleSync();
+                }
+            }, period);
+        } catch (IllegalStateException e) {
+            QiscusLogger.print(TAG, "Error timer canceled");
+        } catch (Exception e) {
+            QiscusLogger.print(TAG, "Error timer exception");
+        }
 
     }
 
@@ -139,6 +145,7 @@ public class QiscusSyncService extends Service {
     private void stopSync() {
         if (timer != null) {
             timer.cancel();
+            timer.purge();
             timer = null;
         }
     }
