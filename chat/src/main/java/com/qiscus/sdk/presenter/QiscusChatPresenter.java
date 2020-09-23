@@ -60,9 +60,11 @@ import java.util.Objects;
 
 import androidx.core.util.Pair;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
@@ -502,6 +504,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     if (isValidOlderComments(qiscusComments, qiscusComment)){
                         return Observable.fromIterable(qiscusComments).toSortedList((p1,p2) -> p1.getTime().compareTo(p2.getTime()));
                     } else {
+                        List<QiscusComment> newQiscusComments = qiscusComments;
                         getCommentsFromNetwork(qiscusComment.getId()).map(comments1 -> {
                             for (QiscusComment localComment : qiscusComments) {
                                 if (localComment.getState() <= QiscusComment.STATE_SENDING) {
@@ -509,9 +512,14 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                                 }
                             }
                             return comments1;
-                        });
+                        }).subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .doOnNext(qiscusComments1 -> {
+                                    newQiscusComments.addAll(qiscusComments1);
+                                }).subscribe();
+
+                        return Observable.fromIterable(newQiscusComments).toSortedList((p1,p2) -> p1.getTime().compareTo(p2.getTime()));
                     }
-                    return null;
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
