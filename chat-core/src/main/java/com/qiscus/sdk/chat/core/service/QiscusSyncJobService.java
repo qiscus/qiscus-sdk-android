@@ -58,13 +58,19 @@ public class QiscusSyncJobService extends JobService {
 
         stopSync();
 
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            public void run() {
-                // time ran out.
-                newSchedule(context);
-            }
-        }, QiscusCore.getHeartBeat());
+        try {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                public void run() {
+                    // time ran out.
+                    newSchedule(context);
+                }
+            }, QiscusCore.getHeartBeat());
+        } catch (IllegalStateException e) {
+            QiscusLogger.print(TAG, "Error timer canceled");
+        } catch (Exception e) {
+            QiscusLogger.print(TAG, "Error timer exception");
+        }
     }
 
     private void newSchedule(Context context) {
@@ -134,6 +140,7 @@ public class QiscusSyncJobService extends JobService {
     private void stopSync() {
         if (timer != null) {
             timer.cancel();
+            timer.purge();
             timer = null;
         }
     }
