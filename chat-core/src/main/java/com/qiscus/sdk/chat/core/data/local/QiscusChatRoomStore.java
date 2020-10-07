@@ -21,7 +21,7 @@ import com.qiscus.sdk.chat.core.data.model.QParticipant;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 /**
  * Created on : November 07, 2016
@@ -50,7 +50,7 @@ public interface QiscusChatRoomStore {
 
     Observable<List<QChatRoom>> getObservableChatRooms(int limit);
 
-    Observable<List<QChatRoom>> getObservableChatRooms(int limit, int offset);
+    io.reactivex.Observable<List<QChatRoom>> getObservableChatRooms(int limit, int offset);
 
     List<QChatRoom> getChatRooms(List<Long> roomIds, List<String> uniqueIds);
 

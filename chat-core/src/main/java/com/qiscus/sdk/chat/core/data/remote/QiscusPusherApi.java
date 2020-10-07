@@ -20,6 +20,9 @@ import android.provider.Settings;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -61,9 +64,6 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener {
 

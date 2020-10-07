@@ -13,7 +13,8 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import rx.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
+
 
 public class QiscusSyncTimer {
 
@@ -76,11 +77,11 @@ public class QiscusSyncTimer {
 
     private void syncComments() {
         qiscusCore.getApi().sync()
-                .doOnSubscribe(() -> {
+                .doOnSubscribe(disposable -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
                     qiscusCore.getLogger().print("Sync started...");
                 })
-                .doOnCompleted(() -> {
+                .doOnComplete(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
                     qiscusCore.getLogger().print("Sync completed...");
                 })

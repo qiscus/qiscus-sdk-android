@@ -31,11 +31,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
 
 /**
  * Created on : August 22, 2017
@@ -45,7 +45,7 @@ import rx.schedulers.Schedulers;
  */
 public class QiscusResendCommentHelper {
 
-    private static final Map<String, Subscription> pendingTask = new ConcurrentHashMap<>();
+    private static final Map<String, Disposable> pendingTask = new ConcurrentHashMap<String, Disposable>();
     private static final Set<String> processingComment = new ConcurrentSkipListSet<>();
 
     private QiscusCore qiscusCore;
@@ -57,7 +57,7 @@ public class QiscusResendCommentHelper {
     public void tryResendPendingComment() {
         qiscusCore.getDataStore()
                 .getObservablePendingComments()
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .doOnNext(qMessage -> {
                     if (qMessage.isAttachment() && !pendingTask.containsKey(qMessage.getUniqueId())) {
                         resendFile(qMessage);
@@ -77,9 +77,9 @@ public class QiscusResendCommentHelper {
     }
 
     public void cancelPendingComment(QMessage qMessage) {
-        Subscription subscription = pendingTask.get(qMessage.getUniqueId());
-        if (subscription != null && !subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
+        Disposable subscription = pendingTask.get(qMessage.getUniqueId());
+        if (subscription != null && !subscription.isDisposed()) {
+            subscription.dispose();
         }
         pendingTask.remove(qMessage.getUniqueId());
         processingComment.remove(qMessage.getUniqueId());
@@ -101,7 +101,7 @@ public class QiscusResendCommentHelper {
 
         EventBus.getDefault().post(new QMessageResendEvent(qMessage));
 
-        Subscription subscription = qiscusCore.getApi().sendMessage(qMessage)
+        Disposable subscription = qiscusCore.getApi().sendMessage(qMessage)
                 .doOnNext(this::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qMessage))
                 .subscribeOn(Schedulers.io())
@@ -134,7 +134,7 @@ public class QiscusResendCommentHelper {
 
         EventBus.getDefault().post(new QMessageResendEvent(qMessage));
 
-        Subscription subscription = qiscusCore.getApi()
+        Disposable subscription = qiscusCore.getApi()
                 .upload(file, total -> {
                 })
                 .flatMap(uri -> {
@@ -159,7 +159,7 @@ public class QiscusResendCommentHelper {
     private void forwardFile(QMessage qMessage) {
         EventBus.getDefault().post(new QMessageResendEvent(qMessage));
 
-        Subscription subscription = qiscusCore.getApi().sendMessage(qMessage)
+        Disposable subscription = qiscusCore.getApi().sendMessage(qMessage)
                 .doOnNext(this::commentSuccess)
                 .doOnError(throwable -> commentFail(throwable, qMessage))
                 .subscribeOn(Schedulers.io())
@@ -219,9 +219,9 @@ public class QiscusResendCommentHelper {
     public void cancelAll() {
         List<QMessage> pendingComments = qiscusCore.getDataStore().getPendingComments();
         for (QMessage qMessage : pendingComments) {
-            Subscription subscription = pendingTask.get(qMessage.getUniqueId());
-            if (subscription != null && !subscription.isUnsubscribed()) {
-                subscription.unsubscribe();
+            Disposable subscription = pendingTask.get(qMessage.getUniqueId());
+            if (subscription != null && !subscription.isDisposed()) {
+                subscription.dispose();
             }
         }
         pendingTask.clear();

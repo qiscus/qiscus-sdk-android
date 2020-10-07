@@ -23,6 +23,12 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 
 import androidx.annotation.RestrictTo;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import rx.functions.Action1;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
@@ -54,10 +60,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  * @author Yuana andhikayuana@gmail.com
@@ -560,18 +562,27 @@ public class QiscusCore {
         getApi().sendMessage(qMessage)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<QMessage>() {
+                .subscribeWith(new Observer<QMessage>() {
                     @Override
-                    public void call(QMessage qMessage) {
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(QMessage qMessage) {
                         onCalbackSendMessage.onSuccess(qMessage);
                     }
-                }, new Action1<Throwable>() {
+
                     @Override
-                    public void call(Throwable throwable) {
-                        onCalbackSendMessage.onFailed(throwable, qMessage);
+                    public void onError(Throwable e) {
+                        onCalbackSendMessage.onFailed(e, qMessage);
                     }
-                })
-        ;
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     public void sendFileMessage(QMessage qMessage, File file, OnProgressUploadListener onProgressUploadListener) {
@@ -593,15 +604,25 @@ public class QiscusCore {
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<QMessage>() {
+                .subscribeWith(new Observer<QMessage>() {
                     @Override
-                    public void call(QMessage qMessage) {
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(QMessage qMessage) {
                         onProgressUploadListener.onSuccess(qMessage);
                     }
-                }, new Action1<Throwable>() {
+
                     @Override
-                    public void call(Throwable throwable) {
-                        onProgressUploadListener.onFailed(throwable, qMessage);
+                    public void onError(Throwable e) {
+                        onProgressUploadListener.onFailed(e, qMessage);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
                     }
                 });
     }
@@ -904,19 +925,11 @@ public class QiscusCore {
             if (fcmToken != null) {
                 registerDeviceToken(fcmToken);
             } else {
-                Observable.just(null)
-                        .doOnNext(o -> {
-                            try {
-                                FirebaseInstanceId.getInstance().deleteInstanceId();
-                            } catch (IOException ignored) {
-                                //Do nothing
-                            }
-                        })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(aVoid -> {
-                        }, throwable -> {
-                        });
+                try {
+                    FirebaseInstanceId.getInstance().deleteInstanceId();
+                } catch (IOException ignored) {
+                    //Do nothing
+                }
             }
         }
     }

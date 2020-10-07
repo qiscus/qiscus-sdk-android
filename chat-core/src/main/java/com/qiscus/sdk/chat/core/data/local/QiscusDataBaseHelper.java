@@ -31,8 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import rx.Emitter;
-import rx.Observable;
+import io.reactivex.Observable;;
 
 public class QiscusDataBaseHelper implements QiscusDataStore {
 
@@ -246,10 +245,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public Observable<List<QChatRoom>> getObservableChatRooms(int limit, int offset) {
-        return Observable.create(subscriber -> {
-            subscriber.onNext(getChatRooms(limit, offset));
-            subscriber.onCompleted();
-        }, Emitter.BackpressureMode.BUFFER);
+        return  Observable.create(emitter -> {
+            try {
+                emitter.onNext(getChatRooms(limit, offset));
+                emitter.onComplete();
+            } catch (Exception e){
+                emitter.onError(e);
+            }
+        });
     }
 
     @Override
@@ -933,16 +936,16 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public Observable<List<QMessage>> getObservableComments(final long roomId) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(roomId));
-            subscriber.onCompleted();
-        }, Emitter.BackpressureMode.BUFFER);
+            subscriber.onComplete();
+        });
     }
 
     @Override
     public Observable<List<QMessage>> getObservableComments(final long roomId, final int limit) {
         return Observable.create(subscriber -> {
             subscriber.onNext(getComments(roomId, limit));
-            subscriber.onCompleted();
-        }, Emitter.BackpressureMode.BUFFER);
+            subscriber.onComplete();
+        });
     }
 
     @Override
@@ -977,10 +980,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public Observable<List<QMessage>> getObservableOlderCommentsThan(QMessage qiscusMessage, long roomId, int limit) {
-        return Observable.create(subscriber -> {
-            subscriber.onNext(getOlderCommentsThan(qiscusMessage, roomId, limit));
-            subscriber.onCompleted();
-        }, Emitter.BackpressureMode.BUFFER);
+        return Observable.create(emitter -> {
+            try {
+                emitter.onNext(getOlderCommentsThan(qiscusMessage, roomId, limit));
+                emitter.onComplete();
+            } catch (Exception e) {
+                emitter.onError(e);
+            }
+        });
     }
 
     @Override
@@ -1020,10 +1027,14 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public Observable<List<QMessage>> getObservableCommentsAfter(QMessage qiscusMessage, long roomId) {
-        return Observable.create(subscriber -> {
-            subscriber.onNext(getCommentsAfter(qiscusMessage, roomId));
-            subscriber.onCompleted();
-        }, Emitter.BackpressureMode.BUFFER);
+        return Observable.create(emitter -> {
+            try {
+                emitter.onNext(getCommentsAfter(qiscusMessage, roomId));
+                emitter.onComplete();
+            } catch (Exception e) {
+                emitter.onError(e);
+            }
+        });
     }
 
     @Override
@@ -1171,8 +1182,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public Observable<List<QMessage>> getObservablePendingComments() {
         return Observable.create(subscriber -> {
             subscriber.onNext(getPendingComments());
-            subscriber.onCompleted();
-        }, Emitter.BackpressureMode.BUFFER);
+            subscriber.onComplete();
+        });
     }
 
     @Override

@@ -20,7 +20,7 @@ import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 /**
  * Created on : November 07, 2016
@@ -57,17 +57,17 @@ public interface QiscusCommentStore {
 
     List<QMessage> getComments(long roomId, long timestampOffset);
 
-    Observable<List<QMessage>> getObservableComments(long roomId);
+    io.reactivex.Observable<List<QMessage>> getObservableComments(long roomId);
 
-    Observable<List<QMessage>> getObservableComments(long roomId, int limit);
+    io.reactivex.Observable<List<QMessage>> getObservableComments(long roomId, int limit);
 
     List<QMessage> getOlderCommentsThan(QMessage qMessage, long roomId, int limit);
 
-    Observable<List<QMessage>> getObservableOlderCommentsThan(QMessage qMessage, long roomId, int limit);
+    io.reactivex.Observable<List<QMessage>> getObservableOlderCommentsThan(QMessage qMessage, long roomId, int limit);
 
     List<QMessage> getCommentsAfter(QMessage qMessage, long roomId);
 
-    Observable<List<QMessage>> getObservableCommentsAfter(QMessage qMessage, long roomId);
+    io.reactivex.Observable<List<QMessage>> getObservableCommentsAfter(QMessage qMessage, long roomId);
 
     QMessage getLatestComment();
 

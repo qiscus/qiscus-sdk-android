@@ -60,6 +60,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -75,7 +80,7 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -84,11 +89,8 @@ import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import rx.Emitter;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
+import io.reactivex.Emitter;
 import rx.exceptions.OnErrorThrowable;
-import rx.schedulers.Schedulers;
 
 /**
  * Created on : August 18, 2016
@@ -135,7 +137,7 @@ public class QiscusApi {
                 .baseUrl(baseUrl)
                 .client(httpClient)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(Api.class);
     }
@@ -171,7 +173,7 @@ public class QiscusApi {
                 .baseUrl(baseUrl)
                 .client(httpClient)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(Api.class);
     }
@@ -329,7 +331,7 @@ public class QiscusApi {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .take(1);
     }
 
@@ -337,7 +339,7 @@ public class QiscusApi {
         return api.getChatRooms(QiscusHashMapUtil.getChatRooms(
                 Collections.singletonList(String.valueOf(roomId)), new ArrayList<>(), true, false))
                 .map(QiscusApiParser::parseQiscusChatRoomInfo)
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .take(1);
     }
 
@@ -399,7 +401,7 @@ public class QiscusApi {
             lastCommentId1 = null;
         }
         return api.getComments(roomId, lastCommentId1, false, 20)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQMessage(jsonElement, roomId));
     }
@@ -411,7 +413,7 @@ public class QiscusApi {
             lastCommentId1 = null;
         }
         return api.getComments(roomId, lastCommentId1, true, 20)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQMessage(jsonElement, roomId));
     }
@@ -422,7 +424,7 @@ public class QiscusApi {
             messageId1 = null;
         }
         return api.getComments(roomId, messageId1, false, limit)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQMessage(jsonElement, roomId));
     }
@@ -433,7 +435,7 @@ public class QiscusApi {
             messageId1 = null;
         }
         return api.getComments(roomId, messageId1, true, limit)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQMessage(jsonElement, roomId));
     }
@@ -477,52 +479,54 @@ public class QiscusApi {
     }
 
     public Observable<QMessage> sendFileMessage(QMessage message, File file, ProgressListener progressUploadListener) {
-        return Observable.create(subscriber -> {
-            long fileLength = file.length();
+        return Observable.create(new ObservableOnSubscribe<QMessage>() {
+            @Override
+            public void subscribe(ObservableEmitter<QMessage> emitter) throws Exception {
+                long fileLength = file.length();
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
-                                int progress = (int) (totalBytes * 100 / fileLength);
-                                progressUploadListener.onProgress(progress);
-                            }))
-                    .build();
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("file", file.getName(),
+                                new CountingFileRequestBody(file, totalBytes -> {
+                                    int progress = (int) (totalBytes * 100 / fileLength);
+                                    progressUploadListener.onProgress(progress);
+                                }))
+                        .build();
 
-            Request request = new Request.Builder()
-                    .url(baseUrl + "api/v2/mobile/upload")
-                    .post(requestBody).build();
+                Request request = new Request.Builder()
+                        .url(baseUrl + "api/v2/mobile/upload")
+                        .post(requestBody).build();
 
-            try {
-                Response response = httpClient.newCall(request).execute();
-                JSONObject responseJ = new JSONObject(response.body().string());
-                String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
-                message.updateAttachmentUrl(Uri.parse(result).toString());
-                qiscusCore.getDataStore().addOrUpdate(message);
+                try {
+                    Response response = httpClient.newCall(request).execute();
+                    JSONObject responseJ = new JSONObject(response.body().string());
+                    String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
+                    message.updateAttachmentUrl(Uri.parse(result).toString());
+                    qiscusCore.getDataStore().addOrUpdate(message);
 
-                sendMessage(message)
-                        .doOnSubscribe(() -> qiscusCore.getDataStore().addOrUpdate(message))
-                        .doOnError(throwable -> {
-                            subscriber.onError(throwable);
-                        })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(commentSend -> {
-                            subscriber.onNext(commentSend);
-                            subscriber.onCompleted();
-                        }, throwable -> {
-                            qiscusCore.getErrorLogger().print(throwable);
-                            throwable.printStackTrace();
-                            subscriber.onError(throwable);
-                        });
+                    sendMessage(message)
+                            .doOnSubscribe(disposable -> qiscusCore.getDataStore().addOrUpdate(message))
+                            .doOnError(throwable -> {
+                                emitter.onError(throwable);
+                            })
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(commentSend -> {
+                                emitter.onNext(commentSend);
+                                emitter.onComplete();
+                            }, throwable -> {
+                                qiscusCore.getErrorLogger().print(throwable);
+                                throwable.printStackTrace();
+                                emitter.onError(throwable);
+                            });
 
 
-            } catch (IOException | JSONException e) {
-                qiscusCore.getErrorLogger().print("UploadFile", e);
-                subscriber.onError(e);
+                } catch (IOException | JSONException e) {
+                    qiscusCore.getErrorLogger().print("UploadFile", e);
+                    emitter.onError(e);
+                }
             }
-        }, Emitter.BackpressureMode.BUFFER);
-
+        });
     }
 
     @Deprecated
@@ -533,7 +537,7 @@ public class QiscusApi {
                     return null;
                 })
                 .filter(jsonElement -> jsonElement != null)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
@@ -548,7 +552,7 @@ public class QiscusApi {
                     return null;
                 })
                 .filter(jsonElement -> jsonElement != null)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
@@ -567,34 +571,37 @@ public class QiscusApi {
 
     @Deprecated
     public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
-        return Observable.create(subscriber -> {
-            long fileLength = file.length();
+        return Observable.create(new ObservableOnSubscribe<Uri>() {
+            @Override
+            public void subscribe(ObservableEmitter<Uri> emitter) throws Exception {
+                long fileLength = file.length();
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
-                                int progress = (int) (totalBytes * 100 / fileLength);
-                                progressListener.onProgress(progress);
-                            }))
-                    .build();
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("file", file.getName(),
+                                new CountingFileRequestBody(file, totalBytes -> {
+                                    int progress = (int) (totalBytes * 100 / fileLength);
+                                    progressListener.onProgress(progress);
+                                }))
+                        .build();
 
-            Request request = new Request.Builder()
-                    .url(baseUrl + "api/v2/mobile/upload")
-                    .post(requestBody).build();
+                Request request = new Request.Builder()
+                        .url(baseUrl + "api/v2/mobile/upload")
+                        .post(requestBody).build();
 
-            try {
-                Response response = httpClient.newCall(request).execute();
-                JSONObject responseJ = new JSONObject(response.body().string());
-                String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
+                try {
+                    Response response = httpClient.newCall(request).execute();
+                    JSONObject responseJ = new JSONObject(response.body().string());
+                    String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
 
-                subscriber.onNext(Uri.parse(result));
-                subscriber.onCompleted();
-            } catch (IOException | JSONException e) {
-                qiscusCore.getErrorLogger().print("UploadFile", e);
-                subscriber.onError(e);
+                    emitter.onNext(Uri.parse(result));
+                    emitter.onComplete();
+                } catch (IOException | JSONException e) {
+                    qiscusCore.getErrorLogger().print("UploadFile", e);
+                    emitter.onError(e);
+                }
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<Uri> upload(File file, ProgressListener progressListener) {
@@ -620,12 +627,12 @@ public class QiscusApi {
                 String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
 
                 subscriber.onNext(Uri.parse(result));
-                subscriber.onCompleted();
+                subscriber.onComplete();
             } catch (IOException | JSONException e) {
                 qiscusCore.getErrorLogger().print("UploadFile", e);
                 subscriber.onError(e);
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<File> downloadFile(String url, String fileName, ProgressListener progressListener) {
@@ -660,7 +667,7 @@ public class QiscusApi {
                     fos.flush();
 
                     subscriber.onNext(output);
-                    subscriber.onCompleted();
+                    subscriber.onComplete();
                 }
             } catch (Exception e) {
                 throw OnErrorThrowable.from(OnErrorThrowable.addValueAsLastCause(e, url));
@@ -676,7 +683,7 @@ public class QiscusApi {
                     //Do nothing
                 }
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<QChatRoom> updateChatRoom(long roomId, String name, String avatarURL, JSONObject extras) {
@@ -719,11 +726,11 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
                 .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("unique_id").getAsString())
                 .toList()
-                .flatMap(this::clearCommentsByRoomUniqueIds);
+                .flatMapObservable(this::clearCommentsByRoomUniqueIds);
     }
 
     @Deprecated
@@ -732,7 +739,7 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .doOnNext(json -> {
                     long roomId = json.get("id").getAsLong();
@@ -741,7 +748,7 @@ public class QiscusApi {
                     }
                 })
                 .toList()
-                .map(qiscusChatRooms -> null);
+                .flatMapObservable(qiscusChatRooms -> null);
     }
 
     public Observable<Void> clearMessagesByChatRoomIds(List<Long> roomIds) {
@@ -754,11 +761,11 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("results").getAsJsonObject())
                 .map(jsonObject -> jsonObject.get("rooms_info").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonObject -> jsonObject.get("unique_id").getAsString())
                 .toList()
-                .flatMap(this::clearMessagesByChatRoomUniqueIds);
+                .flatMapObservable(this::clearMessagesByChatRoomUniqueIds);
     }
 
     public Observable<Void> clearMessagesByChatRoomUniqueIds(List<String> roomUniqueIds) {
@@ -766,7 +773,7 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.get("results").getAsJsonObject())
                 .map(jsonResults -> jsonResults.get("rooms").getAsJsonArray())
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .doOnNext(json -> {
                     long roomId = json.get("id").getAsLong();
@@ -775,7 +782,7 @@ public class QiscusApi {
                     }
                 })
                 .toList()
-                .map(qiscusChatRooms -> null);
+                .flatMapObservable(qiscusChatRooms -> null);
     }
 
     @Deprecated
@@ -783,13 +790,14 @@ public class QiscusApi {
                                                      boolean isHardDelete) {
         // isDeleteForEveryone => akan selalu true, karena deleteForMe deprecated
         return api.deleteComments(commentUniqueIds, true, isHardDelete)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseQMessage(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
                 .toList()
+                .toObservable()
                 .doOnNext(comments -> {
                     QAccount account = qiscusCore.getQiscusAccount();
                     QParticipant actor = new QParticipant();
@@ -815,13 +823,14 @@ public class QiscusApi {
 
     public Observable<List<QMessage>> deleteMessages(List<String> messageUniqueIds) {
         return api.deleteComments(messageUniqueIds, true, true)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> {
                     JsonObject jsonComment = jsonElement.getAsJsonObject();
                     return QiscusApiParser.parseQMessage(jsonElement, jsonComment.get("room_id").getAsLong());
                 })
                 .toList()
+                .toObservable()
                 .doOnNext(comments -> {
                     QAccount account = qiscusCore.getQiscusAccount();
                     QParticipant actor = new QParticipant();
@@ -848,7 +857,7 @@ public class QiscusApi {
     @Deprecated
     public Observable<List<JSONObject>> getEvents(long startEventId) {
         return api.getEvents(startEventId)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
                 .map(jsonEvent -> {
                     try {
                         return new JSONObject(jsonEvent.toString());
@@ -858,12 +867,17 @@ public class QiscusApi {
                 })
                 .filter(jsonObject -> jsonObject != null)
                 .doOnNext(qiscusCore.getPusherApi()::handleNotification)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<JSONObject>> synchronizeEvent(long lastEventId) {
         return api.getEvents(lastEventId)
-                .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
+                .flatMap(jsonElement -> Observable.fromIterable(jsonElement.getAsJsonObject().get("events").getAsJsonArray()))
                 .map(jsonEvent -> {
                     try {
                         return new JSONObject(jsonEvent.toString());
@@ -873,7 +887,12 @@ public class QiscusApi {
                 })
                 .filter(jsonObject -> jsonObject != null)
                 .doOnNext(qiscusCore.getPusherApi()::handleNotification)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<Long> getTotalUnreadCount() {
@@ -931,10 +950,15 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("blocked_users"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount))
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     @Deprecated
@@ -960,10 +984,15 @@ public class QiscusApi {
                     }
                 })
                 .map(jsonResults -> jsonResults.getAsJsonArray("participants"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(QiscusApiParser::parseQiscusRoomMember)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<QParticipant>> getParticipants(String roomUniqueId, int page, int limit,
@@ -983,10 +1012,15 @@ public class QiscusApi {
                     }
                 })
                 .map(jsonResults -> jsonResults.getAsJsonArray("participants"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(QiscusApiParser::parseQiscusRoomMember)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<QParticipant>> getParticipants(String roomUniqueId, int page, int limit, String sorting) {
@@ -997,10 +1031,15 @@ public class QiscusApi {
 
                 })
                 .map(jsonResults -> jsonResults.getAsJsonArray("participants"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
                 .map(QiscusApiParser::parseQiscusRoomMember)
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<String> getMqttBaseUrl() {
@@ -1037,11 +1076,11 @@ public class QiscusApi {
                 JSONObject jsonResponse = new JSONObject(response.body().string());
                 String node = jsonResponse.getString("node");
                 subscriber.onNext(node);
-                subscriber.onCompleted();
+                subscriber.onComplete();
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-        }, Emitter.BackpressureMode.BUFFER);
+        });
     }
 
     public Observable<List<QUser>> getUsers(String searchUsername) {
@@ -1054,10 +1093,17 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount))
-                .toList();
+                .map(jsonAccount -> {
+                   return QiscusApiParser.parseQUser(jsonAccount);
+                })
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<List<QUser>> getUsers(String searchUsername, long page, long limit) {
@@ -1065,10 +1111,17 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject)
                 .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
                 .map(jsonResults -> jsonResults.getAsJsonArray("users"))
-                .flatMap(Observable::from)
+                .flatMap(Observable::fromIterable)
                 .map(JsonElement::getAsJsonObject)
-                .map(jsonAccount -> QiscusApiParser.parseQUser(jsonAccount))
-                .toList();
+                .map(jsonAccount -> {
+                    return QiscusApiParser.parseQUser(jsonAccount);
+                })
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.single())
+                .observeOn(Schedulers.computation())
+                .toObservable();
     }
 
     public Observable<Void> eventReport(String moduleName, String event, String message) {
