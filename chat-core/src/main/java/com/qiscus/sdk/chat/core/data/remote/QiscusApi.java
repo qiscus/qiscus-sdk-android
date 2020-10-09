@@ -1249,6 +1249,14 @@ public enum QiscusApi {
         }
     }
 
+    public Observable<Long> getRoomUnreadCount() {
+        return api.getRoomUnreadCount(QiscusCore.getQiscusAccount().getToken())
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
+
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1478,6 +1486,12 @@ public enum QiscusApi {
         Observable<JsonElement> searchMessage(
                 @Body HashMap<String, Object> data
         );
+
+        @GET("api/v2/mobile/get_room_unread_count")
+        Observable<JsonElement> getRoomUnreadCount(
+                @Query("token") String token
+        );
+
     }
 
     public interface MetaRoomMembersListener {
