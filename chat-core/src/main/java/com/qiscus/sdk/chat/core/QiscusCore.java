@@ -859,6 +859,8 @@ public class QiscusCore {
                     FirebaseInstanceId.getInstance().deleteInstanceId();
                 } catch (IOException ignored) {
                     //Do nothing
+                } catch ( IllegalStateException e) {
+                    //Do nothing
                 }
             }
         }
