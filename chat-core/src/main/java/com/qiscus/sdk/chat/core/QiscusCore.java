@@ -929,6 +929,8 @@ public class QiscusCore {
                     FirebaseInstanceId.getInstance().deleteInstanceId();
                 } catch (IOException ignored) {
                     //Do nothing
+                } catch ( IllegalStateException e) {
+                    //Do nothing
                 }
             }
         }
@@ -1012,7 +1014,7 @@ public class QiscusCore {
         LocalDataManager(String localPrefKey) {
             sharedPreferences = getApps().getSharedPreferences(getAppId() + localPrefKey + "qiscus.cfg", Context.MODE_PRIVATE);
             gson = new Gson();
-            token = isLogged() ? getAccountInfo().getToken() : null;
+            token = isLogged() ? getAccountInfo().getToken() : "";
         }
 
         private boolean isLogged() {
@@ -1095,7 +1097,7 @@ public class QiscusCore {
 
         private void clearData() {
             sharedPreferences.edit().clear().apply();
-            setToken(null);
+            setToken("");
         }
     }
 
