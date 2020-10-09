@@ -1112,6 +1112,14 @@ public class QiscusApi {
                 .map(QiscusApiParser::parseQUsersPresence);
     }
 
+    public Observable<Long> getRoomUnreadCount() {
+        return api.getRoomUnreadCount(qiscusCore.getToken())
+                .map(JsonElement::getAsJsonObject)
+                .map(jsonResponse -> jsonResponse.getAsJsonObject("results"))
+                .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
+
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1328,6 +1336,11 @@ public class QiscusApi {
         @POST("api/v2/mobile/users/status")
         Observable<JsonElement> getUsersPresence(
                 @Body HashMap<String, Object> data
+        );
+
+        @GET("api/v2/mobile/get_room_unread_count")
+        Observable<JsonElement> getRoomUnreadCount(
+                @Query("token") String token
         );
     }
 
