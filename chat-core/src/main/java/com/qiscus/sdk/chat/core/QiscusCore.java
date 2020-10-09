@@ -855,19 +855,11 @@ public class QiscusCore {
             if (fcmToken != null) {
                 registerDeviceToken(fcmToken);
             } else {
-                Observable.just(null)
-                        .doOnNext(o -> {
-                            try {
-                                FirebaseInstanceId.getInstance().deleteInstanceId();
-                            } catch (IOException ignored) {
-                                //Do nothing
-                            }
-                        })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(aVoid -> {
-                        }, throwable -> {
-                        });
+                try {
+                    FirebaseInstanceId.getInstance().deleteInstanceId();
+                } catch (IOException ignored) {
+                    //Do nothing
+                }
             }
         }
     }
@@ -931,7 +923,7 @@ public class QiscusCore {
         LocalDataManager() {
             sharedPreferences = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
             gson = new Gson();
-            token = isLogged() ? getAccountInfo().getToken() : null;
+            token = isLogged() ? getAccountInfo().getToken() : "";
         }
 
         private boolean isLogged() {
@@ -1051,7 +1043,7 @@ public class QiscusCore {
 
         private void clearData() {
             sharedPreferences.edit().clear().apply();
-            setToken(null);
+            setToken("");
         }
     }
 
