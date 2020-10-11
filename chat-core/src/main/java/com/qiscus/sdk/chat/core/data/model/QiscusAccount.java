@@ -73,7 +73,7 @@ public class QiscusAccount implements Parcelable {
     }
 
     public String getEmail() {
-        return email;
+        return email == null ? email = "" : email;
     }
 
     public void setEmail(String email) {
@@ -89,7 +89,7 @@ public class QiscusAccount implements Parcelable {
     }
 
     public String getToken() {
-        return token;
+        return token == null ? token = "" : token;
     }
 
     public void setToken(String token) {
