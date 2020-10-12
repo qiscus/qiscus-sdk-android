@@ -1031,7 +1031,7 @@ public class QiscusCore {
         }
 
         private String getToken() {
-            return token;
+            return token == null ? token = "" : token;
         }
 
         private void setToken(String token) {

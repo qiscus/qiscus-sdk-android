@@ -67,7 +67,7 @@ public class QAccount implements Parcelable {
     }
 
     public String getId() {
-        return id;
+        return id == null ? id = "" : id;
     }
 
     public void setId(String id) {
@@ -83,7 +83,7 @@ public class QAccount implements Parcelable {
     }
 
     public String getToken() {
-        return token;
+        return token == null ? token = "" : token;
     }
 
     public void setToken(String token) {
