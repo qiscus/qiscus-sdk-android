@@ -5,7 +5,7 @@ Now that we've migrated to RxJava 2, there are some notes and changes to sdk and
 ## Implementation Gradle
 
 ```
-    implementation 'com.qiscus.sdk:chat-core:1.5.0-beta.3'
+    implementation 'com.qiscus.sdk:chat-core:3.1.0-beta.3'
 ```
 
 ## What's changed?
