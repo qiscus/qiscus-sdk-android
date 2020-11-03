@@ -61,6 +61,7 @@ public class QiscusCore {
 
     private static Application appInstance;
     private static String appId;
+    private static Boolean isBuiltIn = false;
     private static String appServer;
     private static String mqttBrokerUrl;
     private static String baseURLLB;
@@ -222,6 +223,10 @@ public class QiscusCore {
 
         getAppConfig();
         configureFcmToken();
+    }
+
+    public static void isBuiltIn(Boolean isBuiltInSDK) {
+        isBuiltIn = isBuiltInSDK;
     }
 
     private static void getAppConfig() {
@@ -388,6 +393,15 @@ public class QiscusCore {
     public static String getAppId() {
         checkAppIdSetup();
         return appId;
+    }
+
+    /**
+     * Accessor to get current VersionSDK
+     *
+     * @return Current VersionSDK
+     */
+    public static Boolean getIsBuiltIn() {
+        return isBuiltIn;
     }
 
     /**

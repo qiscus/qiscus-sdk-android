@@ -26,7 +26,6 @@ android {
         minSdkVersion minSDKVersion
         targetSdkVersion targetSDKVersion
         versionCode 1
-        versionName "${chatVersionMajor}.${chatVersionMinor}.${chatVersionPatch}"
 
     }
     buildTypes {

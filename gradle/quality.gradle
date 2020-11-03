@@ -27,7 +27,7 @@
  */
 
 apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
+//apply plugin: 'findbugs'
 apply plugin: 'pmd'
 
 dependencies {
@@ -48,41 +48,41 @@ task checkstyle(type: Checkstyle, group: 'Verification', description: 'Runs code
     reports {
         xml.enabled = true
         xml {
-            destination "$reportsDir/checkstyle/checkstyle.xml"
+            destination file("$reportsDir/checkstyle/checkstyle.xml")
         }
     }
 
     classpath = files()
 }
-
-task findbugs(type: FindBugs,
-        group: 'Verification',
-        description: 'Inspect java bytecode for bugs',
-        dependsOn: ['compileDebugSources', 'compileReleaseSources']) {
-
-    ignoreFailures = false
-    effort = "max"
-    reportLevel = "high"
-    excludeFilter = new File("$qualityConfigDir/findbugs/android-exclude-filter.xml")
-    classes = files("$project.rootDir/app/build/intermediates/classes")
-
-    source 'src'
-    include '**/*.java'
-    exclude '**/gen/**'
-
-    reports {
-        xml.enabled = false
-        html.enabled = true
-        xml {
-            destination "$reportsDir/findbugs/findbugs.xml"
-        }
-        html {
-            destination "$reportsDir/findbugs/findbugs.html"
-        }
-    }
-
-    classpath = files()
-}
+//
+//task findbugs(type: FindBugs,
+//        group: 'Verification',
+//        description: 'Inspect java bytecode for bugs',
+//        dependsOn: ['compileDebugSources', 'compileReleaseSources']) {
+//
+//    ignoreFailures = false
+//    effort = "max"
+//    reportLevel = "high"
+//    excludeFilter = new File("$qualityConfigDir/findbugs/android-exclude-filter.xml")
+//    classes = files("$project.rootDir/app/build/intermediates/classes")
+//
+//    source 'src'
+//    include '**/*.java'
+//    exclude '**/gen/**'
+//
+//    reports {
+//        xml.enabled = false
+//        html.enabled = true
+//        xml {
+//            destination "$reportsDir/findbugs/findbugs.xml"
+//        }
+//        html {
+//            destination "$reportsDir/findbugs/findbugs.html"
+//        }
+//    }
+//
+//    classpath = files()
+//}
 
 
 task pmd(type: Pmd, group: 'Verification', description: 'Inspect sourcecode for bugs') {
@@ -98,10 +98,10 @@ task pmd(type: Pmd, group: 'Verification', description: 'Inspect sourcecode for 
         xml.enabled = true
         html.enabled = true
         xml {
-            destination "$reportsDir/pmd/pmd.xml"
+            destination file ("$reportsDir/pmd/pmd.xml")
         }
         html {
-            destination "$reportsDir/pmd/pmd.html"
+            destination file ("$reportsDir/pmd/pmd.html")
         }
         consoleOutput = true
     }

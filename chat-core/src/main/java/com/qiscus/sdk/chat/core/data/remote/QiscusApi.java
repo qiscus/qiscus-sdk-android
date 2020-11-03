@@ -194,7 +194,17 @@ public enum QiscusApi {
         builder.addHeader("QISCUS-SDK-APP-ID", QiscusCore.getAppId());
         builder.addHeader("QISCUS-SDK-TOKEN", QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
         builder.addHeader("QISCUS-SDK-USER-EMAIL", QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
-        builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" + BuildConfig.VERSION_NAME);
+        if (QiscusCore.getIsBuiltIn()) {
+            builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" +
+                    BuildConfig.CHAT_BUILT_IN_VERSION_MAJOR + "." +
+                    BuildConfig.CHAT_BUILT_IN_VERSION_MINOR + "." +
+                    BuildConfig.CHAT_BUILT_IN_VERSION_PATCH);
+        } else {
+            builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" +
+                    BuildConfig.CHAT_CORE_VERSION_MAJOR + "." +
+                    BuildConfig.CHAT_CORE_VERSION_MINOR + "." +
+                    BuildConfig.CHAT_CORE_VERSION_PATCH);
+        }
         builder.addHeader("QISCUS-SDK-PLATFORM", "ANDROID");
         builder.addHeader("QISCUS-SDK-DEVICE-BRAND", Build.MANUFACTURER);
         builder.addHeader("QISCUS-SDK-DEVICE-MODEL", Build.MODEL);
