@@ -19,6 +19,7 @@ package com.qiscus.sdk.chat.core.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
@@ -35,14 +36,19 @@ public class QiscusNetworkStateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        boolean isConnected = QiscusAndroidUtil.isNetworkAvailable();
-        QiscusLogger.print(TAG, "isConnected : " + isConnected);
-        QiscusAndroidUtil.runOnBackgroundThread(() -> {
-            if (needResend(isConnected)) {
-                QiscusResendCommentHelper.cancelAll();
-                QiscusResendCommentHelper.tryResendPendingComment();
-            }
-        });
+
+        if (QiscusCore.hasSetupAppID()) {
+            boolean isConnected = QiscusAndroidUtil.isNetworkAvailable();
+            QiscusLogger.print(TAG, "isConnected : " + isConnected);
+            QiscusAndroidUtil.runOnBackgroundThread(() -> {
+                if (needResend(isConnected)) {
+                    QiscusResendCommentHelper.cancelAll();
+                    QiscusResendCommentHelper.tryResendPendingComment();
+                }
+            });
+        } else {
+            Log.d("QiscusCore", "Logger from change network connection, please setup your appID first");
+        }
     }
 
     private boolean needResend(boolean isConnected) {

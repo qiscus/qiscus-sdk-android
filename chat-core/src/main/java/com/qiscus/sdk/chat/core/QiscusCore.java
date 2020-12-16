@@ -526,6 +526,15 @@ public class QiscusCore {
     }
 
     /**
+     * For checking is client has been setupAppID
+     *
+     * @return true if already hasSetupAppID, false if not yet
+     */
+    public static boolean hasSetupAppID() {
+        return appServer != null;
+    }
+
+    /**
      * Accessor to get current qiscus user account
      *
      * @return Current qiscus user account
