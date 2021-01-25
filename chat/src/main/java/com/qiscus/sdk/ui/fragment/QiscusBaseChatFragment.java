@@ -271,6 +271,8 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     private boolean typing;
     private Runnable stopTypingNotifyTask;
+    private boolean isEditMessage = false;
+    protected QiscusComment qiscusEditComment;
 
     @Nullable
     @Override
@@ -384,8 +386,10 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             }
             if (message.isEmpty()) {
                 showAttachmentPanel();
-            } else {
+            } else if (isEditMessage == false) {
                 sendMessage(message);
+            } else if (isEditMessage == true) {
+                sendUpdateMessage(message);
             }
         });
 
@@ -728,6 +732,13 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             hideAttachmentPanel();
             QiscusKeyboardUtil.showKeyboard(getActivity(), messageEditText);
         }
+    }
+
+    public void editComment(QiscusComment originComment) {
+        isEditMessage = true;
+        qiscusEditComment = originComment;
+        messageEditText.setText(originComment.getMessage());
+        QiscusKeyboardUtil.showKeyboard(getActivity(), messageEditText);
     }
 
     protected void hideAttachmentPanel() {
@@ -1214,6 +1225,15 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
+    public void sendUpdateMessage(String message) {
+        message = message.trim();
+        if (!message.isEmpty()) {
+            qiscusEditComment.setMessage(message);
+            qiscusChatPresenter.sendEditComment( qiscusEditComment);
+            messageEditText.setText("");
+        }
+    }
+
     public void sendFile(File file) {
         qiscusChatPresenter.sendFile(file);
     }
@@ -1422,6 +1442,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
 
     @Override
     public void onSuccessSendComment(QiscusComment qiscusComment) {
+        chatAdapter.addOrUpdate(qiscusComment);
+    }
+
+
+    @Override
+    public void onSuccessSendEditComment(QiscusComment qiscusComment) {
+        qiscusEditComment = null;
+        isEditMessage = false;
         chatAdapter.addOrUpdate(qiscusComment);
     }
 

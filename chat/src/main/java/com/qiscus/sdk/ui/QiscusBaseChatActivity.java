@@ -237,6 +237,7 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                 }
             } else {
                 actionMode.getMenu().findItem(R.id.action_reply).setVisible(false);
+                actionMode.getMenu().findItem(R.id.action_edit).setVisible(false);
                 actionMode.getMenu().findItem(R.id.action_share).setVisible(false);
                 actionMode.getMenu().findItem(R.id.action_info).setVisible(false);
             }
@@ -338,6 +339,8 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
             showCommentInfo(selectedComments.get(0));
         } else if (i == R.id.action_delete && selectedComments.size() > 0) {
             deleteComments(selectedComments);
+        } else if (i == R.id.action_edit && selectedComments.size() > 0) {
+            editComment(selectedComments.get(0));
         }
         mode.finish();
     }
@@ -409,6 +412,14 @@ public abstract class QiscusBaseChatActivity extends RxAppCompatActivity impleme
                 .findFragmentByTag(QiscusBaseChatFragment.class.getName());
         if (fragment != null) {
             fragment.replyComment(qiscusComment);
+        }
+    }
+
+    protected void editComment(QiscusComment qiscusComment) {
+        QiscusBaseChatFragment fragment = (QiscusBaseChatFragment) getSupportFragmentManager()
+                .findFragmentByTag(QiscusBaseChatFragment.class.getName());
+        if (fragment != null) {
+            fragment.editComment(qiscusComment);
         }
     }
 

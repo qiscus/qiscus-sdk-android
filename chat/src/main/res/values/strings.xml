@@ -49,6 +49,7 @@
     <string name="qiscus_sending_message_dialog_title">Sending message</string>
     <string name="qiscus_resend">Resend</string>
     <string name="qiscus_delete">Delete</string>
+    <string name="qiscus_edit">Edit</string>
     <string name="qiscus_failed_record_audio">Failed to record audio!</string>
     <string name="qiscus_microphone_in_use">Can not record audio, microphone may be in use!</string>
     <string name="qiscus_permission_request_title">Please grant permissions to make apps working properly!</string>

@@ -49,6 +49,7 @@
     <string name="qiscus_sending_message_dialog_title">Sedang mengirim pesan</string>
     <string name="qiscus_resend">Kirim ulang</string>
     <string name="qiscus_delete">Hapus</string>
+    <string name="qiscus_edit">Edit</string>
     <string name="qiscus_failed_record_audio">Gagal merekam suara!</string>
     <string name="qiscus_microphone_in_use">Tidak bisa merekam suara, microphone mungkin sedang digunakan!</string>
     <string name="qiscus_permission_request_title">Mohon izinkan permisi untuk membuat aplikasi dapat berjalan dengan baik!</string>

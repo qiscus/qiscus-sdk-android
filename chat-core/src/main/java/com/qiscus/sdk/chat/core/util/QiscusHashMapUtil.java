@@ -117,6 +117,29 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
+    public static HashMap<String, Object> updateComment(QiscusComment qiscusComment) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        JsonObject jsonPayload = null;
+        JsonObject jsonExtras = null;
+
+        if (qiscusComment.getExtraPayload() != null && !qiscusComment.getExtraPayload().equals("")) {
+            jsonPayload = new JsonParser().parse(qiscusComment.getExtraPayload()).getAsJsonObject();
+        }
+
+        if (qiscusComment.getExtras() != null) {
+            jsonExtras = new JsonParser().parse(qiscusComment.getExtras().toString()).getAsJsonObject();
+        }
+
+        hashMap.put("comment", qiscusComment.getMessage());
+        hashMap.put("unique_id", qiscusComment.getUniqueId());
+        hashMap.put("token", QiscusCore.getQiscusAccount().getToken());
+        hashMap.put("payload", jsonPayload);
+        hashMap.put("extras", jsonExtras);
+
+        return hashMap;
+    }
+
     public static HashMap<String, Object> updateChatRoom(String roomId, String name, String avatarUrl, String options) {
         HashMap<String, Object> hashMap = new HashMap<>();
 

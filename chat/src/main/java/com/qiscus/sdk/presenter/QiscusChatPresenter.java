@@ -36,6 +36,7 @@ import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentResendEvent;
+import com.qiscus.sdk.chat.core.event.QiscusCommentUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.chat.core.presenter.QiscusChatRoomEventHandler;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -96,6 +97,11 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         if (savedQiscusComment != null && savedQiscusComment.getState() > qiscusComment.getState()) {
             qiscusComment.setState(savedQiscusComment.getState());
         }
+        Qiscus.getDataStore().addOrUpdate(qiscusComment);
+    }
+
+    private void commentEditSuccess(QiscusComment qiscusComment) {
+        pendingTask.remove(qiscusComment);
         Qiscus.getDataStore().addOrUpdate(qiscusComment);
     }
 
@@ -166,9 +172,35 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         pendingTask.put(qiscusComment, subscription);
     }
 
+    private void sendEditCommentMessage(QiscusComment qiscusComment) {
+        Subscription subscription = QiscusApi.getInstance().updateMessage(qiscusComment)
+                .doOnNext(this::commentEditSuccess)
+                .doOnError(throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    throwable.printStackTrace();
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(commentSend -> {
+                    if (commentSend.getRoomId() == room.getId()) {
+                        view.onSuccessSendEditComment(commentSend);
+                    }
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    throwable.printStackTrace();
+                });
+
+        pendingTask.put(qiscusComment, subscription);
+    }
+
     public void sendComment(String content) {
         QiscusComment qiscusComment = QiscusComment.generateMessage(room.getId(), content);
         sendComment(qiscusComment);
+    }
+
+    public void sendEditComment(QiscusComment qiscusComment) {
+        sendEditCommentMessage(qiscusComment);
     }
 
     public void sendContact(QiscusContact contact) {
@@ -579,6 +611,13 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     @Subscribe
+    public void onCommentUpdateEvent(QiscusCommentUpdateEvent event) {
+        if (event.getQiscusComment().getRoomId() == room.getId()) {
+            onGotUpdateComment(event.getQiscusComment());
+        }
+    }
+
+    @Subscribe
     public void handleClearCommentsEvent(QiscusClearCommentsEvent event) {
         if (event.getRoomId() == room.getId()) {
             QiscusAndroidUtil.runOnUIThread(() -> {
@@ -604,6 +643,16 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 }
             });
             view.onNewComment(qiscusComment);
+        }
+    }
+
+    private void onGotUpdateComment(QiscusComment qiscusComment) {
+        if (qiscusComment.getRoomId() == room.getId()) {
+            QiscusAndroidUtil.runOnUIThread(() -> {
+                if (view != null) {
+                    view.refreshComment(qiscusComment);
+                }
+            });
         }
     }
 
@@ -853,6 +902,8 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         void onSendingComment(QiscusComment qiscusComment);
 
         void onSuccessSendComment(QiscusComment qiscusComment);
+
+        void onSuccessSendEditComment(QiscusComment qiscusComment);
 
         void onFailedSendComment(QiscusComment qiscusComment);
 

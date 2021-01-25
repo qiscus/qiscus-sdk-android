@@ -38,6 +38,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentSentEvent;
+import com.qiscus.sdk.chat.core.event.QiscusCommentUpdateEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
@@ -492,6 +493,16 @@ public enum QiscusApi {
                 .flatMap(jsonElement -> Observable.from(jsonElement.getAsJsonObject().get("results")
                         .getAsJsonObject().get("comments").getAsJsonArray()))
                 .map(jsonElement -> QiscusApiParser.parseQiscusComment(jsonElement, roomId));
+    }
+
+    public Observable<QiscusComment> updateMessage(QiscusComment message) {
+
+        return api.postUpdateComment(QiscusHashMapUtil.updateComment(message))
+                .map(jsonElement -> {
+                    QiscusLogger.print("Update Comment...");
+                    return message;
+                })
+                .doOnNext(comment -> EventBus.getDefault().post(new QiscusCommentUpdateEvent(comment)));
     }
 
     @Deprecated
@@ -1352,6 +1363,12 @@ public enum QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/post_comment")
         Observable<JsonElement> postComment(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/update_message")
+        Observable<JsonElement> postUpdateComment(
                 @Body HashMap<String, Object> data
         );
 
