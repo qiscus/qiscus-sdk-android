@@ -19,6 +19,7 @@ package com.qiscus.sdk.chat.core.util;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -160,11 +161,43 @@ public final class QiscusFileUtil {
 
     public static String generateFilePath(String fileName) {
         String[] fileNameSplit = splitFileName(fileName);
-        return generateFilePath(fileName, fileNameSplit[1]);
+
+        int androidVersion = Build.VERSION.SDK_INT;
+        if (androidVersion >= 30) {
+            return generateFilePath(fileName, fileNameSplit[1], getEnvironment(fileName));
+        } else {
+            return generateFilePath(fileName, fileNameSplit[1]);
+        }
     }
 
     public static String generateFilePath(String fileName, String extension) {
         File file = new File(Environment.getExternalStorageDirectory().getPath(),
+                isImage(fileName) ? IMAGE_PATH : FILES_PATH);
+
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        int index = 0;
+        String directory = file.getAbsolutePath() + File.separator;
+        String[] fileNameSplit = splitFileName(fileName);
+        while (true) {
+            File newFile;
+            if (index == 0) {
+                newFile = new File(directory + fileNameSplit[0] + extension);
+            } else {
+                newFile = new File(directory + fileNameSplit[0] + "-" + index + extension);
+            }
+            if (!newFile.exists()) {
+                return newFile.getAbsolutePath();
+            }
+            index++;
+        }
+    }
+
+    //api >=30
+    public static String generateFilePath(String fileName, String extension, String environment) {
+        File file = new File(Environment.getExternalStoragePublicDirectory(environment),
                 isImage(fileName) ? IMAGE_PATH : FILES_PATH);
 
         if (!file.exists()) {
@@ -198,6 +231,26 @@ public final class QiscusFileUtil {
 
         return false;
     }
+
+    public static String getEnvironment(String fileName) {
+        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension(fileName));
+        if (type == null) {
+            return Environment.DIRECTORY_DOWNLOADS;
+        } else if (type.contains("image")) {
+            return Environment.DIRECTORY_PICTURES;
+        } else if (type.contains("video")) {
+            return Environment.DIRECTORY_MOVIES;
+        } else if (type.contains("audio")) {
+            return Environment.DIRECTORY_MUSIC;
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                return Environment.DIRECTORY_DOCUMENTS;
+            } else {
+                return Environment.DIRECTORY_DOWNLOADS;
+            }
+        }
+    }
+
 
     public static File rename(File file, String newName) {
         File newFile = new File(file.getParent(), newName);
