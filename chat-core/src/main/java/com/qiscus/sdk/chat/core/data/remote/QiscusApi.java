@@ -354,15 +354,33 @@ public class QiscusApi {
 
     @Deprecated
     public Observable<List<QChatRoom>> getChatRooms(int page, int limit, boolean showMembers) {
-        return api.getChatRooms(page, limit, showMembers, false, false)
+        return api.getChatRooms(page, limit, showMembers, false, null, false)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
 
     public Observable<List<QChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved,
                                                        boolean showEmpty, int page, int limit) {
-        return api.getChatRooms(page, limit, showParticipant, showEmpty, showRemoved)
+        return api.getChatRooms(page, limit, showParticipant, showEmpty, null, showRemoved)
                 .map(QiscusApiParser::parseQiscusChatRoomInfo);
     }
+
+    public Observable<List<QChatRoom>> getAllChatRooms(boolean showParticipant, boolean showRemoved,
+                                                            boolean showEmpty, QChatRoom.RoomType roomType, int page, int limit) {
+        String type = "all";
+        if (roomType != null) {
+            if (roomType == QChatRoom.RoomType.SINGLE) {
+                type = "single";
+            } else if (roomType == QChatRoom.RoomType.GROUP){
+                type = "group";
+            } else if (roomType == QChatRoom.RoomType.CHANNEL)  {
+                type = "public_channel";
+            }
+        }
+
+        return api.getChatRooms(page, limit, showParticipant, showEmpty, type, showRemoved)
+                .map(QiscusApiParser::parseQiscusChatRoomInfo);
+    }
+
 
     @Deprecated
     public Observable<List<QChatRoom>> getChatRooms(List<Long> roomIds, List<String> uniqueIds, boolean showMembers) {
@@ -1226,6 +1244,7 @@ public class QiscusApi {
                 @Query("limit") int limit,
                 @Query("show_participants") boolean showParticipants,
                 @Query("show_empty") boolean showEmpty,
+                @Query("room_type")  String roomType,
                 @Query("show_removed") boolean showRemoved
         );
 

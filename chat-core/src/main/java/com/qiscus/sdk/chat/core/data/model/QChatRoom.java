@@ -203,4 +203,8 @@ public class QChatRoom implements Parcelable {
                 ", totalParticipants=" + totalParticipants +
                 '}';
     }
+
+    public enum RoomType {
+        GROUP, SINGLE, CHANNEL
+    }
 }
