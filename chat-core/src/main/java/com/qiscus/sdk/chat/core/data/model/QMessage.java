@@ -160,19 +160,33 @@ public class QMessage implements Parcelable {
         return qiscusMessage;
     }
 
-    public static QMessage generateReplyMessage(long roomId, String content, QMessage repliedComment) {
-        QMessage qiscusMessage = generateMessage(roomId, content);
-        qiscusMessage.setReplyTo(repliedComment);
+    public static QMessage generateFileAttachmentMessage(long roomId, String caption, String name) {
+        QMessage qiscusMessage = generateMessage(roomId, "");
+        qiscusMessage.setRawType("file_attachment");
+        JSONObject json = new JSONObject();
+        try {
+            json.put("caption", caption)
+                    .put("file_name", name);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        qiscusMessage.setPayload(json.toString());
+        return qiscusMessage;
+    }
+
+    public static QMessage generateReplyMessage(long roomId, String text, QMessage repliedMessage) {
+        QMessage qiscusMessage = generateMessage(roomId, text);
+        qiscusMessage.setReplyTo(repliedMessage);
         qiscusMessage.setRawType("reply");
         JSONObject json = new JSONObject();
         try {
             json.put("text", qiscusMessage.getText())
-                    .put("replied_comment_id", repliedComment.getId())
-                    .put("replied_comment_message", repliedComment.getText())
-                    .put("replied_comment_sender_username", repliedComment.getSender().getName())
-                    .put("replied_comment_sender_email", repliedComment.getSender().getId())
-                    .put("replied_comment_type", repliedComment.getRawType())
-                    .put("replied_comment_payload", repliedComment.getPayload());
+                    .put("replied_comment_id", repliedMessage.getId())
+                    .put("replied_comment_message", repliedMessage.getText())
+                    .put("replied_comment_sender_username", repliedMessage.getSender().getName())
+                    .put("replied_comment_sender_email", repliedMessage.getSender().getId())
+                    .put("replied_comment_type", repliedMessage.getRawType())
+                    .put("replied_comment_payload", repliedMessage.getPayload());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -211,16 +225,16 @@ public class QMessage implements Parcelable {
      *
      * @param text    default text message for older apps
      * @param type    your custom type
-     * @param content your custom payload
+     * @param payload your custom payload
      * @param roomId  room id for these comment
      * @return QMessage
      */
-    public static QMessage generateCustomMessage(long roomId, String text, String type, JSONObject content) {
+    public static QMessage generateCustomMessage(long roomId, String text, String type, JSONObject payload) {
         QMessage qiscusMessage = generateMessage(roomId, text);
         qiscusMessage.setRawType("custom");
         JSONObject json = new JSONObject();
         try {
-            json.put("type", type).put("content", content);
+            json.put("type", type).put("content", payload);
         } catch (JSONException e) {
             e.printStackTrace();
         }
