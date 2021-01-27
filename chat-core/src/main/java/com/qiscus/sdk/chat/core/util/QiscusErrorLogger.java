@@ -45,13 +45,21 @@ public final class QiscusErrorLogger {
 
     public void print(Throwable throwable) {
         if (qiscusCore.getChatConfig().isEnableLog()) {
-            Log.e(TAG, getMessage(throwable));
+            try {
+                Log.e(TAG, getMessage(throwable));
+            } catch (NullPointerException n) {
+                Log.e(TAG, "error with no message");
+            }
         }
     }
 
     public void print(String tag, Throwable throwable) {
         if (qiscusCore.getChatConfig().isEnableLog()) {
-            Log.e(tag, getMessage(throwable));
+            try {
+                Log.e(tag, getMessage(throwable));
+            } catch (NullPointerException n) {
+                Log.e(tag, "error with no message");
+            }
         }
     }
 
