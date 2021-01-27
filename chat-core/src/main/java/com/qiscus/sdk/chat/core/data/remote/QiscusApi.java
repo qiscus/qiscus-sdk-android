@@ -38,6 +38,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.event.QMessageSentEvent;
+import com.qiscus.sdk.chat.core.event.QMessageUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusClearMessageEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
@@ -473,6 +474,16 @@ public class QiscusApi {
                     return qMessage;
                 })
                 .doOnNext(comment -> EventBus.getDefault().post(new QMessageSentEvent(comment)));
+    }
+
+    public Observable<QMessage> updateMessage(QMessage message) {
+
+        return api.postUpdateComment(QiscusHashMapUtil.updateComment(message, qiscusCore.getQiscusAccount().getToken()))
+                .map(jsonElement -> {
+                    qiscusCore.getLogger().print("Update Comment...");
+                    return message;
+                })
+                .doOnNext(comment -> EventBus.getDefault().post(new QMessageUpdateEvent(comment)));
     }
 
     public Observable<QMessage> sendMessage(QMessage message) {
@@ -1206,6 +1217,12 @@ public class QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/post_comment")
         Observable<JsonElement> postComment(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/update_message")
+        Observable<JsonElement> postUpdateComment(
                 @Body HashMap<String, Object> data
         );
 

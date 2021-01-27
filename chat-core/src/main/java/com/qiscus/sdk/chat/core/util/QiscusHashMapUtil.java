@@ -91,6 +91,30 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
+    public static HashMap<String, Object> updateComment(QMessage qMessage, String token) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        JsonObject jsonPayload = null;
+        JsonObject jsonExtras = null;
+
+        if (qMessage.getPayload() != null && !qMessage.getPayload().equals("")) {
+            jsonPayload = new JsonParser().parse(qMessage.getPayload()).getAsJsonObject();
+        }
+
+        if (qMessage.getExtras() != null) {
+            jsonExtras = new JsonParser().parse(qMessage.getExtras().toString()).getAsJsonObject();
+        }
+
+        hashMap.put("comment", qMessage.getText());
+        hashMap.put("unique_id", qMessage.getUniqueId());
+        hashMap.put("token", token);
+        hashMap.put("payload", jsonPayload);
+        hashMap.put("extras", jsonExtras);
+
+        return hashMap;
+    }
+
+
     public static HashMap<String, Object> postComment(QMessage qMessage) {
         HashMap<String, Object> hashMap = new HashMap<>();
 

@@ -31,6 +31,7 @@ import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QParticipant;
 import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.event.QMessageReceivedEvent;
+import com.qiscus.sdk.chat.core.event.QMessageUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
@@ -112,10 +113,16 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public void handleReceivedComment(QMessage qMessage) {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qMessage));
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qMessage, false));
     }
 
-    private void handleComment(QMessage qMessage) {
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public void handleUpdateComment(QMessage qiscusComment) {
+        QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qiscusComment, true));
+    }
+
+
+    private void handleComment(QMessage qMessage, Boolean isMessageUpdate) {
         QMessage savedComment = qiscusCore.getDataStore().getComment(qMessage.getUniqueId());
         if (savedComment != null && savedComment.areContentsTheSame(qMessage)) {
             return;
@@ -125,11 +132,17 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
             markAsDelivered(qMessage.getChatRoomId(), qMessage.getId());
         }
 
-        if (qiscusCore.getChatConfig().getNotificationListener() != null) {
-            qiscusCore.getChatConfig().getNotificationListener()
-                    .onHandlePushNotification(qiscusCore.getApps(), qMessage);
+        if (isMessageUpdate == false) {
+            if (qiscusCore.getChatConfig().getNotificationListener() != null) {
+                qiscusCore.getChatConfig().getNotificationListener()
+                        .onHandlePushNotification(qiscusCore.getApps(), qMessage);
+            }
+
+            QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QMessageReceivedEvent(qMessage)));
+        } else {
+            QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QMessageUpdateEvent(qMessage)));
         }
-        QiscusAndroidUtil.runOnUIThread(() -> EventBus.getDefault().post(new QMessageReceivedEvent(qMessage)));
+
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -504,6 +517,7 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
         qiscusCore.getLogger().print(TAG, "Listening comment...");
         try {
             mqttAndroidClient.subscribe(qAccount.getToken() + "/c", 2);
+            mqttAndroidClient.subscribe(qAccount.getToken() + "/update", 2);
         } catch (MqttException e) {
             try {
                 eventReport("MQTT", "FAILED_LISTEN_COMMENT", e.toString());
@@ -959,6 +973,13 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
                 return;
             }
             handleReceivedComment(qMessage);
+        } else if (topic.equals(qAccount.getToken() + "/update")
+                || (topic.startsWith(qiscusCore.getAppId()) && topic.endsWith("/update"))) {
+            QMessage qMessage = jsonToComment(message);
+            if (qMessage == null) {
+                return;
+            }
+            handleUpdateComment(qMessage);
         } else if (topic.startsWith("r/") && topic.endsWith("/t")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qAccount.getId())) {
