@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.util.Base64;
 
 import androidx.annotation.RestrictTo;
 
@@ -47,11 +48,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
 
 /**
  * @author Yuana andhikayuana@gmail.com
@@ -942,35 +951,119 @@ public class QiscusCore {
 
     private static class LocalDataManager {
         private final SharedPreferences sharedPreferences;
+        private final SharedPreferences sharedPreferencesOld;
         private final Gson gson;
         private String token;
 
+        private static char[] SEKRIT = BuildConfig.EncryptDesc_SEKRIT.toCharArray();
+        private static byte[] SALT = null;
+        private static final String UTF8 = "UTF-8";
+        private static String saltString = BuildConfig.EncryptDesc_saltString;
+        private static String SK  = BuildConfig.EncryptDesc_SK;
+
         LocalDataManager() {
-            sharedPreferences = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
+            sharedPreferencesOld = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
+            sharedPreferences = QiscusCore.getApps().getSharedPreferences("qiscusNew.cfg", Context.MODE_PRIVATE);
             gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : "";
         }
 
+        protected String encrypt( String value ) {
+            try {
+                SALT = saltString.getBytes(UTF8);
+            } catch (UnsupportedEncodingException e) {
+                return value;
+            }
+            try {
+                final byte[] bytes = value != null ? value.getBytes(UTF8) : new byte[0];
+                SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(SK);
+                SecretKey key = keyFactory.generateSecret(new PBEKeySpec(SEKRIT));
+                Cipher pbeCipher = Cipher.getInstance(SK);
+                pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
+                return new String(Base64.encode(pbeCipher.doFinal(bytes), Base64.NO_WRAP), UTF8);
+
+            } catch ( Exception e ) {
+                return value;
+            }
+
+        }
+
+        protected String decrypt(String value) {
+            try {
+                SALT = saltString.getBytes(UTF8);
+            } catch (UnsupportedEncodingException e) {
+                return value;
+            }
+
+            try {
+                final byte[] bytes = value != null ? Base64.decode(value, Base64.DEFAULT) : new byte[0];
+                SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(SK);
+                SecretKey key = keyFactory.generateSecret(new PBEKeySpec(SEKRIT));
+                Cipher pbeCipher = Cipher.getInstance(SK);
+                pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
+                return new String(pbeCipher.doFinal(bytes), UTF8);
+
+            } catch ( Exception e) {
+                return value;
+            }
+        }
+
         private boolean isLogged() {
+            if (sharedPreferencesOld.contains("cached_account")){
+                //go migration
+                try {
+                    //migration cached_account
+                    JSONObject jsonObject = new JSONObject(sharedPreferencesOld.getString("cached_account", ""));
+                    sharedPreferences.edit().putString("cached_account",encrypt(jsonObject.toString())).apply();
+
+                    //migration token
+                    setToken(encrypt(getAccountInfo().getToken()));
+
+                    //migration fcm
+                    setFcmToken(sharedPreferencesOld.getString("fcm_token", null));
+
+                    //migration MqttBrokerUrl
+                    setMqttBrokerUrl(sharedPreferencesOld.getString("mqtt_broker_url", null));
+
+                    //migration URLLB
+                    setURLLB(sharedPreferencesOld.getString("mqtt_broker_url", null));
+
+                    //migration willGetNewNodeMqttBrokerUrl
+                    setWillGetNewNodeMqttBrokerUrl(sharedPreferencesOld.getBoolean("mqtt_will_get_new", true));
+
+                    //clear old data
+                    clearOldData();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+
+            } else if (sharedPreferences.contains("cached_account")) {
+                //was login
+                return true;
+            } else {
+                //not login
+                return false;
+            }
             return sharedPreferences.contains("cached_account");
         }
 
         private void saveAccountInfo(QiscusAccount qiscusAccount) {
             try {
                 JSONObject data = new JSONObject(qiscusAccount.toString().substring(13));
-                sharedPreferences.edit().putString("cached_account",data.toString()).apply();
+                sharedPreferences.edit().putString("cached_account",encrypt(data.toString())).apply();
             } catch (JSONException e) {
-                sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
+                sharedPreferences.edit().putString("cached_account", encrypt(gson.toJson(qiscusAccount))).apply();
                 e.printStackTrace();
             }
 
-            setToken(qiscusAccount.getToken());
+            setToken(encrypt(qiscusAccount.getToken()));
         }
 
         private QiscusAccount getAccountInfo() {
             QiscusAccount qiscusAccount = new QiscusAccount();
             try {
-                JSONObject jsonObject = new JSONObject(sharedPreferences.getString("cached_account", ""));
+                JSONObject jsonObject = new JSONObject(decrypt(sharedPreferences.getString("cached_account", "")));
                 if (jsonObject.has("avatar")) {
                     qiscusAccount.setAvatar(jsonObject.optString("avatar", ""));
                 }
@@ -1002,7 +1095,8 @@ public class QiscusCore {
         }
 
         private String getToken() {
-            return token == null ? token = "" : token;
+            String checkToken = decrypt(token);
+            return checkToken == null ? checkToken = "" : checkToken;
         }
 
         private void setToken(String token) {
@@ -1010,11 +1104,11 @@ public class QiscusCore {
         }
 
         private String getFcmToken() {
-            return sharedPreferences.getString("fcm_token", null);
+            return decrypt(sharedPreferences.getString("fcm_token", null));
         }
 
         private void setFcmToken(String fcmToken) {
-            sharedPreferences.edit().putString("fcm_token", fcmToken).apply();
+            sharedPreferences.edit().putString("fcm_token", encrypt(fcmToken)).apply();
         }
 
         /**
@@ -1023,7 +1117,7 @@ public class QiscusCore {
          * @return mqttBrokerUrl
          */
         private String getMqttBrokerUrl() {
-            return sharedPreferences.getString("mqtt_broker_url", null);
+            return decrypt(sharedPreferences.getString("mqtt_broker_url", null));
         }
 
         /**
@@ -1032,7 +1126,7 @@ public class QiscusCore {
          * @param mqttBrokerUrl
          */
         private void setMqttBrokerUrl(String mqttBrokerUrl) {
-            sharedPreferences.edit().putString("mqtt_broker_url", mqttBrokerUrl).apply();
+            sharedPreferences.edit().putString("mqtt_broker_url", encrypt(mqttBrokerUrl)).apply();
         }
 
         /**
@@ -1041,7 +1135,7 @@ public class QiscusCore {
          * @return UrlLB
          */
         private String getURLLB() {
-            return sharedPreferences.getString("lb_url", null);
+            return decrypt(sharedPreferences.getString("lb_url", null));
         }
 
         /**
@@ -1050,7 +1144,7 @@ public class QiscusCore {
          * @param urlLb
          */
         private void setURLLB(String urlLb) {
-            sharedPreferences.edit().putString("lb_url", urlLb).apply();
+            sharedPreferences.edit().putString("lb_url", encrypt(urlLb)).apply();
         }
 
         /**
@@ -1069,6 +1163,10 @@ public class QiscusCore {
         private void clearData() {
             sharedPreferences.edit().clear().apply();
             setToken("");
+        }
+
+        private void clearOldData(){
+            sharedPreferencesOld.edit().clear().apply();
         }
     }
 

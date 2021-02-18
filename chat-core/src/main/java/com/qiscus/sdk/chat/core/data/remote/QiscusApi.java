@@ -46,6 +46,7 @@ import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 import com.qiscus.sdk.chat.core.util.QiscusHashMapUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusVersion;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
@@ -202,9 +203,7 @@ public enum QiscusApi {
                     BuildConfig.CHAT_BUILT_IN_VERSION_PATCH);
         } else {
             builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" +
-                    BuildConfig.CHAT_CORE_VERSION_MAJOR + "." +
-                    BuildConfig.CHAT_CORE_VERSION_MINOR + "." +
-                    BuildConfig.CHAT_CORE_VERSION_PATCH);
+                    QiscusVersion.getVersionName());
         }
         builder.addHeader("QISCUS-SDK-PLATFORM", "ANDROID");
         builder.addHeader("QISCUS-SDK-DEVICE-BRAND", Build.MANUFACTURER);

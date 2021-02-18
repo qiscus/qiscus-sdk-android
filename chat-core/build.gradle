@@ -21,13 +21,18 @@ apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
 
 android {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
     compileSdkVersion compileSDKVersion
     defaultConfig {
         minSdkVersion minSDKVersion
         targetSdkVersion targetSDKVersion
         versionCode 1
-        versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
+        //versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
+        versionName "1.3.28-beta.1"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -38,12 +43,15 @@ android {
             it.buildConfigField("String", "BASE_URL_SERVER", BASE_URL_SERVER)
             it.buildConfigField("String", "BASE_URL_MQTT_BROKER", BASE_URL_MQTT_BROKER)
             it.buildConfigField("String", "BASE_URL_MQTT_LB", BASE_URL_MQTT_LB)
-            it.buildConfigField("Integer", "CHAT_CORE_VERSION_MAJOR", chatCoreVersionMajor)
-            it.buildConfigField("Integer", "CHAT_CORE_VERSION_MINOR", chatCoreVersionMinor)
-            it.buildConfigField("Integer", "CHAT_CORE_VERSION_PATCH", chatCoreVersionPatch)
+//            it.buildConfigField("Integer", "CHAT_CORE_VERSION_MAJOR", chatCoreVersionMajor)
+//            it.buildConfigField("Integer", "CHAT_CORE_VERSION_MINOR", chatCoreVersionMinor)
+//            it.buildConfigField("Integer", "CHAT_CORE_VERSION_PATCH", chatCoreVersionPatch)
             it.buildConfigField("Integer", "CHAT_BUILT_IN_VERSION_MAJOR", chatVersionMajor)
             it.buildConfigField("Integer", "CHAT_BUILT_IN_VERSION_MINOR", chatVersionMinor)
             it.buildConfigField("Integer", "CHAT_BUILT_IN_VERSION_PATCH", chatVersionPatch)
+            it.buildConfigField("String", "EncryptDesc_SEKRIT", properties.getProperty("EncryptDesc.SEKRIT",""))
+            it.buildConfigField("String", "EncryptDesc_saltString", properties.getProperty("EncryptDesc.saltString",""))
+            it.buildConfigField("String", "EncryptDesc_SK", properties.getProperty("EncryptDesc.SK",""))
         }
     }
     compileOptions {
