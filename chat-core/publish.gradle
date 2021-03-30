@@ -1,0 +1,55 @@
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+            setGroupId libraryGroupId
+            artifactId libraryArtifactId
+            version libraryVersion
+            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+
+            pom.withXml {
+                def dependencies = asNode().appendNode('dependencies')
+                configurations.getByName("releaseCompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+                    if (it.moduleGroup == 'com.android.databinding' || it.moduleVersion == 'unspecified') {
+                        println("ignoring dependency ${it.moduleGroup}:${it.moduleName}:${it.moduleVersion}")
+                        return;
+                    }
+
+                    def dependency = dependencies.appendNode('dependency')
+                    dependency.appendNode('groupId', it.moduleGroup)
+                    println(it.moduleGroup)
+                    println(it.moduleVersion)
+                    println(it.moduleName)
+                    dependency.appendNode('artifactId', it.moduleName)
+                    dependency.appendNode('version', it.moduleVersion)
+                }
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream()
+properties.load( inputStream )
+
+
+artifactory {
+    contextUrl = properties.getProperty('artifactory_url')
+    publish {
+        repository {
+            repoKey = properties.getProperty('artifactory_repokey')
+            username = properties.getProperty('artifactory_username')
+            password = properties.getProperty('artifactory_password')
+        }
+        defaults {
+            publications('aar')
+            publishArtifacts = true
+
+            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+            publishPom = true
+        }
+    }
+}
+

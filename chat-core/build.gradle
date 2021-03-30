@@ -18,7 +18,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
-//apply from: rootProject.file('gradle/quality.gradle')
+//apply from: rootProject.file('gradle/quality.gradle')git a
+apply plugin: 'jacoco'
+apply from: 'publish.gradle'
+apply plugin: "com.jfrog.artifactory"
 
 android {
     compileSdkVersion compileSDKVersion
@@ -34,10 +37,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
+        debug {
+            testCoverageEnabled true
+        }
+
         buildTypes.each {
             it.buildConfigField("String", "BASE_URL_SERVER", BASE_URL_SERVER)
             it.buildConfigField("String", "BASE_URL_MQTT_BROKER", BASE_URL_MQTT_BROKER)
             it.buildConfigField("String", "BASE_URL_MQTT_LB", BASE_URL_MQTT_LB)
+        }
+    }
+
+    android {
+        jacoco {
+            version = '0.7.9'
         }
     }
     compileOptions {
@@ -69,6 +82,7 @@ buildscript {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
     }
 }
 
@@ -80,7 +94,7 @@ dependencies {
 
     api firebaseLibs
     api qiscusMqttLibs
-    api qiscusManggilWithoutEmoji
+    api qiscusManggil
     api networkLibs
     api rxLibs
     api eventBusLib

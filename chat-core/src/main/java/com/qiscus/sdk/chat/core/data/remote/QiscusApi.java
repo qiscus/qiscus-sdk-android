@@ -1141,6 +1141,55 @@ public class QiscusApi {
                 .map(QiscusApiParser::parseQUsersPresence);
     }
 
+    public Observable<List<QMessage>> getFileList(List<Long> roomIds, String fileType, String userId,
+                                                       List<String> includeExtensions, List<String> excludeExtensions,
+                                                       int page, int limit) {
+
+        List<String> listOfRoomIds = new ArrayList<>();
+
+        if (roomIds != null) {
+            for (Long roomId : roomIds) {
+                listOfRoomIds.add(String.valueOf(roomId));
+            }
+        }
+
+        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds, fileType, userId, includeExtensions, excludeExtensions, page, limit))
+                .map(QiscusApiParser::parseFileListAndSearchMessage);
+    }
+
+    public Observable<List<QMessage>> searchMessage(String query, List<Long> roomIds,
+                                                         String userId, List<String> type, int page, int limit) {
+        List<String> listOfRoomIds = new ArrayList<>();
+        for (Long roomId : roomIds) {
+            listOfRoomIds.add(String.valueOf(roomId));
+        }
+
+        if (userId != null) {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, null, page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        } else {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, null, type, null, page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        }
+    }
+
+    public Observable<List<QMessage>> searchMessage(String query, List<Long> roomIds,
+                                                         String userId, List<String> type,
+                                                         QChatRoom.RoomType roomType, int page, int limit) {
+        List<String> listOfRoomIds = new ArrayList<>();
+        for (Long roomId : roomIds) {
+            listOfRoomIds.add(String.valueOf(roomId));
+        }
+
+        if (userId != null) {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, userId, type, roomType, page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        } else {
+            return api.searchMessage(QiscusHashMapUtil.searchMessage(query, listOfRoomIds, null, type, roomType, page, limit))
+                    .map(QiscusApiParser::parseFileListAndSearchMessage);
+        }
+    }
+
     public Observable<Long> getRoomUnreadCount() {
         return api.getRoomUnreadCount(qiscusCore.getToken())
                 .map(JsonElement::getAsJsonObject)
@@ -1377,6 +1426,18 @@ public class QiscusApi {
         @GET("api/v2/mobile/get_room_unread_count")
         Observable<JsonElement> getRoomUnreadCount(
                 @Query("token") String token
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/file_list")
+        Observable<JsonElement> fileList(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/search")
+        Observable<JsonElement> searchMessage(
+                @Body HashMap<String, Object> data
         );
     }
 

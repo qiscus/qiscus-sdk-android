@@ -3,6 +3,7 @@ package com.qiscus.sdk.chat.core.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.BuildConfig;
+import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
 
 import java.util.HashMap;
@@ -255,6 +256,62 @@ public class QiscusHashMapUtil {
     public static HashMap<String, Object> getUsersPresence(List<String> userIds) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("user_ids", userIds);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> fileList(List<String> roomIds, String fileType,
+                                                   String userId, List<String> includeExtensions,
+                                                   List<String> excludeExtensions, int page, int limit) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        if (roomIds.size() != 0) {
+            hashMap.put("room_ids", roomIds);
+        }
+
+        if (fileType != null && userId.isEmpty()) {
+            hashMap.put("file_type", fileType);
+        }
+
+        hashMap.put("page", page);
+        hashMap.put("limit", limit);
+
+        if (userId != null && userId.isEmpty()) {
+            hashMap.put("sender", userId);
+        }
+
+        if (includeExtensions != null && includeExtensions.size() != 0) {
+            hashMap.put("include_extensions", includeExtensions);
+        }
+
+        if (excludeExtensions != null && excludeExtensions.size() != 0) {
+            hashMap.put("exclude_extensions", excludeExtensions);
+        }
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> searchMessage(String query, List<String> roomIds, String userId,
+                                                        List<String> type, QChatRoom.RoomType roomType, int page, int limit) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("query", query);
+        hashMap.put("room_ids", roomIds);
+        hashMap.put("type", type);
+        hashMap.put("sender", userId);
+        hashMap.put("page", page);
+        hashMap.put("limit", limit);
+
+        if (roomType != null) {
+            if (roomType == QChatRoom.RoomType.SINGLE) {
+                hashMap.put("room_type", "single");
+                hashMap.put("is_public", false);
+            } else if (roomType == QChatRoom.RoomType.GROUP) {
+                hashMap.put("room_type", "group");
+                hashMap.put("is_public", false);
+            } else if (roomType == QChatRoom.RoomType.CHANNEL)  {
+                hashMap.put("room_type", "group");
+                hashMap.put("is_public", true);
+            }
+        }
 
         return hashMap;
     }

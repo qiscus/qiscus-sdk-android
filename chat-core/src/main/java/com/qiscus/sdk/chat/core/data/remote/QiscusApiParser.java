@@ -573,4 +573,100 @@ final class QiscusApiParser {
 
         return userStatus;
     }
+
+    static List<QMessage> parseFileListAndSearchMessage(JsonElement jsonElement) {
+        if (jsonElement != null) {
+            JsonArray comments = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("comments").getAsJsonArray();
+            List<QMessage> qiscusComments = new ArrayList<>();
+            for (JsonElement jsonComment : comments) {
+                qiscusComments.add(parseFileListAndSearch(jsonComment));
+            }
+
+            return qiscusComments;
+        }
+
+        return null;
+    }
+
+    static QMessage parseFileListAndSearch(JsonElement jsonElement) {
+        QMessage qiscusComment = new QMessage();
+        JsonObject jsonComment = jsonElement.getAsJsonObject();
+
+        if (jsonComment.has("room_id")) {
+            qiscusComment.setChatRoomId(jsonComment.get("room_id").getAsLong());
+        }
+
+        qiscusComment.setId(jsonComment.get("id").getAsLong());
+        qiscusComment.setPreviousMessageId(jsonComment.get("comment_before_id").getAsLong());
+        qiscusComment.setText(jsonComment.get("message").getAsString());
+
+        QUser qUser = new QUser();
+        qUser.setAvatarUrl(jsonComment.get("user_avatar_url").getAsString());
+        qUser.setName(jsonComment.get("username").getAsString());
+        qUser.setId(jsonComment.get("email").getAsString());
+        qiscusComment.setSender(qUser);
+        determineCommentState(qiscusComment, jsonComment.get("status").getAsString());
+
+        //timestamp is in nano seconds format, convert it to milliseconds by divide it
+        long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
+        qiscusComment.setTimestamp(new Date(timestamp));
+
+        if (jsonComment.has("is_deleted")) {
+            qiscusComment.setDeleted(jsonComment.get("is_deleted").getAsBoolean());
+        }
+
+//        if (jsonComment.has("room_name")) {
+//            qiscusComment.setRoomName(jsonComment.get("room_name").getAsString());
+//        }
+//
+//        if (jsonComment.has("room_avatar")) {
+//            qiscusComment.setRoomAvatar(jsonComment.get("room_avatar").getAsString());
+//        }
+//
+//        if (jsonComment.has("room_type")) {
+//            qiscusComment.setGroupMessage(!"single".equals(jsonComment.get("room_type").getAsString()));
+//        }
+
+        if (jsonComment.has("unique_id")) {
+            qiscusComment.setUniqueId(jsonComment.get("unique_id").getAsString());
+        } else if (jsonComment.has("unique_temp_id")) {
+            qiscusComment.setUniqueId(jsonComment.get("unique_temp_id").getAsString());
+        } else {
+            qiscusComment.setUniqueId(String.valueOf(qiscusComment.getId()));
+        }
+
+        if (jsonComment.has("type")) {
+            qiscusComment.setRawType(jsonComment.get("type").getAsString());
+            qiscusComment.setPayload(jsonComment.get("payload").toString());
+            if (qiscusComment.getType() == QMessage.Type.BUTTONS
+                    || qiscusComment.getType() == QMessage.Type.REPLY
+                    || qiscusComment.getType() == QMessage.Type.CARD) {
+                JsonObject payload = jsonComment.get("payload").getAsJsonObject();
+                if (payload.has("text")) {
+                    String text = payload.get("text").getAsString();
+                    if (QiscusTextUtil.isNotBlank(text)) {
+                        qiscusComment.setText(text.trim());
+                    }
+                }
+            }
+        }
+
+        if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
+            try {
+                qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+            try {
+                qiscusComment.getSender().setExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return qiscusComment;
+    }
 }
