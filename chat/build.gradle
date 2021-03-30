@@ -19,6 +19,8 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
+//apply from: 'publishChat.gradle'
+//apply plugin: "com.jfrog.artifactory"
 
 android {
     compileSdkVersion compileSDKVersion
@@ -64,6 +66,7 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'com.google.gms:google-services:4.2.0'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
     }
 }
 

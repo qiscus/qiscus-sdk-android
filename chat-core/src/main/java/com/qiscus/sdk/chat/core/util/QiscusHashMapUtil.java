@@ -260,17 +260,38 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> fileList(List<String> roomIds, String fileType, int page, int limit) {
+    public static HashMap<String, Object> fileList(List<String> roomIds, String fileType,
+                                                   String userId, List<String> includeExtensions,
+                                                   List<String> excludeExtensions, int page, int limit) {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("room_ids", roomIds);
-        hashMap.put("file_type", fileType);
+        if (roomIds.size() != 0) {
+            hashMap.put("room_ids", roomIds);
+        }
+
+        if (fileType != null && userId.isEmpty()) {
+            hashMap.put("file_type", fileType);
+        }
+
         hashMap.put("page", page);
         hashMap.put("limit", limit);
+
+        if (userId != null && userId.isEmpty()) {
+            hashMap.put("sender", userId);
+        }
+
+        if (includeExtensions != null && includeExtensions.size() != 0) {
+            hashMap.put("include_extensions", includeExtensions);
+        }
+
+        if (excludeExtensions != null && excludeExtensions.size() != 0) {
+            hashMap.put("exclude_extensions", excludeExtensions);
+        }
 
         return hashMap;
     }
 
-    public static HashMap<String, Object> searchMessage(String query, List<String> roomIds, String userId, List<String> type, QiscusChatRoom.RoomType roomType, int page, int limit) {
+    public static HashMap<String, Object> searchMessage(String query, List<String> roomIds, String userId,
+                                                        List<String> type, QiscusChatRoom.RoomType roomType, int page, int limit) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("query", query);
         hashMap.put("room_ids", roomIds);
@@ -283,7 +304,7 @@ public class QiscusHashMapUtil {
             if (roomType == QiscusChatRoom.RoomType.SINGLE) {
                 hashMap.put("room_type", "single");
                 hashMap.put("is_public", false);
-            } else if (roomType == QiscusChatRoom.RoomType.GROUP){
+            } else if (roomType == QiscusChatRoom.RoomType.GROUP) {
                 hashMap.put("room_type", "group");
                 hashMap.put("is_public", false);
             } else if (roomType == QiscusChatRoom.RoomType.CHANNEL)  {

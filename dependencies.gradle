@@ -72,8 +72,8 @@ ext {
     ]
 
     qiscusMqttDeps = [
-            client : "com.qiscus.mqtt:client:1.1.1",
-            android: "com.qiscus.mqtt:android:1.1.1-q1"
+            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0",
+            android: "com.qiscus.mqtt:android:1.1.2"
     ]
 
     okHttpDeps = [
@@ -104,7 +104,7 @@ ext {
     eventBusLib = "org.greenrobot:eventbus:3.0.0"
     rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
     qiscusManggil = "com.qiscus.utils:manggil:$versions.manggil"
-    qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:$versions.manggil-without-emoji"
+    //qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:$versions.manggil-without-emoji"
 
     supportLibs = supportDeps.values()
     firebaseLibs = firebaseDeps.values()
@@ -112,6 +112,5 @@ ext {
     qiscusMqttLibs = qiscusMqttDeps.values()
     networkLibs = okHttpDeps.values() + retrofitDeps.values()
     rxLibs = rxDebs.values() + trelloLifecycleDebs.values()
-
 
 }

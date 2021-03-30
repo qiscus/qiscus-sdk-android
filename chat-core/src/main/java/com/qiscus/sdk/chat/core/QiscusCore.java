@@ -958,7 +958,7 @@ public class QiscusCore {
         private void saveAccountInfo(QiscusAccount qiscusAccount) {
             try {
                 JSONObject data = new JSONObject(qiscusAccount.toString().substring(13));
-                sharedPreferences.edit().putString("cached_account",data.toString()).apply();
+                sharedPreferences.edit().putString("cached_account", data.toString()).apply();
             } catch (JSONException e) {
                 sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
                 e.printStackTrace();
@@ -987,11 +987,11 @@ public class QiscusCore {
                     qiscusAccount.setUsername(jsonObject.optString("username", ""));
                 }
 
-                if (jsonObject.has("extras")){
+                if (jsonObject.has("extras")) {
                     if (jsonObject.optJSONObject("extras").toString().contains("nameValuePairs")) {
                         //migration from latest
                         qiscusAccount.setExtras(jsonObject.optJSONObject("extras").getJSONObject("nameValuePairs"));
-                    }else{
+                    } else {
                         qiscusAccount.setExtras(jsonObject.optJSONObject("extras"));
                     }
                 }

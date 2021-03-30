@@ -392,7 +392,7 @@ public enum QiscusApi {
         if (roomType != null) {
             if (roomType == QiscusChatRoom.RoomType.SINGLE) {
                 type = "single";
-            } else if (roomType == QiscusChatRoom.RoomType.GROUP){
+            } else if (roomType == QiscusChatRoom.RoomType.GROUP) {
                 type = "group";
             } else if (roomType == QiscusChatRoom.RoomType.CHANNEL)  {
                 type = "public_channel";
@@ -507,7 +507,7 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusComment> postComment(QiscusComment qiscusComment) {
-        if (qiscusComment.getType() == QiscusComment.Type.REPLY){
+        if (qiscusComment.getType() == QiscusComment.Type.REPLY) {
             if (qiscusComment.getExtraPayload() != null && !qiscusComment.getExtraPayload().equals("")) {
                 try {
                     JSONObject payload = new JSONObject(qiscusComment.getExtraPayload());
@@ -540,7 +540,7 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> sendMessage(QiscusComment message) {
 
-        if (message.getType() == QiscusComment.Type.REPLY){
+        if (message.getType() == QiscusComment.Type.REPLY) {
             if (message.getExtraPayload() != null && !message.getExtraPayload().equals("")) {
                 try {
                     JSONObject payload = new JSONObject(message.getExtraPayload());
@@ -1248,16 +1248,24 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseQiscusUserPresence);
     }
 
-    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds, String fileType, int page, int limit) {
+    public Observable<List<QiscusComment>> getFileList(List<Long> roomIds, String fileType, String userId,
+                                                       List<String> includeExtensions, List<String> excludeExtensions,
+                                                       int page, int limit) {
+
         List<String> listOfRoomIds = new ArrayList<>();
-        for (Long roomId : roomIds) {
-            listOfRoomIds.add(String.valueOf(roomId));
+
+        if (roomIds != null) {
+            for (Long roomId : roomIds) {
+                listOfRoomIds.add(String.valueOf(roomId));
+            }
         }
-        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds, fileType, page, limit))
+
+        return api.fileList(QiscusHashMapUtil.fileList(listOfRoomIds, fileType, userId, includeExtensions, excludeExtensions, page, limit))
                 .map(QiscusApiParser::parseFileListAndSearchMessage);
     }
 
-    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String userId, List<String> type, int page, int limit) {
+    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds,
+                                                         String userId, List<String> type, int page, int limit) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
             listOfRoomIds.add(String.valueOf(roomId));
@@ -1272,7 +1280,9 @@ public enum QiscusApi {
         }
     }
 
-    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds, String userId, List<String> type, QiscusChatRoom.RoomType roomType, int page, int limit) {
+    public Observable<List<QiscusComment>> searchMessage(String query, List<Long> roomIds,
+                                                         String userId, List<String> type,
+                                                         QiscusChatRoom.RoomType roomType, int page, int limit) {
         List<String> listOfRoomIds = new ArrayList<>();
         for (Long roomId : roomIds) {
             listOfRoomIds.add(String.valueOf(roomId));
