@@ -744,7 +744,9 @@ public class QMessage implements Parcelable {
                     player.setDataSource(localPath.getAbsolutePath());
                     player.prepare();
                     player.setOnCompletionListener(mp -> {
-                        observer.stop();
+                        if (observer != null) {
+                            observer.stop();
+                        }
                         if (playingAudioListener != null) {
                             playingAudioListener.onStopAudio(this);
                         }

@@ -429,7 +429,11 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
 
     public boolean isConnected() {
         try {
-            return mqttAndroidClient != null && mqttAndroidClient.isConnected();
+            if (mqttAndroidClient != null) {
+                return mqttAndroidClient.isConnected();
+            } else {
+                return false;
+            }
         } catch (IllegalArgumentException e) {
             return false;
         }

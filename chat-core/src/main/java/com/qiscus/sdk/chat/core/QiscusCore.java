@@ -613,50 +613,62 @@ public class QiscusCore {
      */
 
     public QiscusApi getApi() {
+        checkAppIdSetup();
         return qiscusMediator.getApi();
     }
 
     public QiscusLogger getLogger() {
+        checkAppIdSetup();
         return qiscusMediator.getLogger();
     }
 
     public QiscusErrorLogger getErrorLogger() {
+        checkAppIdSetup();
         return qiscusMediator.getErrorLogger();
     }
 
     public QiscusPusherApi getPusherApi() {
+        checkAppIdSetup();
         return qiscusMediator.getPusherApi();
     }
 
     public QiscusAndroidUtil getAndroidUtil() {
+        checkAppIdSetup();
         return qiscusMediator.getAndroidUtil();
     }
 
     public QiscusActivityCallback getActivityCallback() {
+        checkAppIdSetup();
         return qiscusMediator.getActivityCallback();
     }
 
     public QiscusResendCommentHelper getQiscusResendCommentHelper() {
+        checkAppIdSetup();
         return qiscusMediator.getResendCommentHelper();
     }
 
     public QiscusEventCache getEventCache() {
+        checkAppIdSetup();
         return qiscusMediator.getEventCache();
     }
 
     public QiscusDeleteCommentHandler getDeleteCommentHandler() {
+        checkAppIdSetup();
         return qiscusMediator.getDeleteCommentHandler();
     }
 
     public QiscusFirebaseMessagingUtil getFirebaseMessagingUtil() {
+        checkAppIdSetup();
         return qiscusMediator.getFirebaseMessagingUtil();
     }
 
     public QiscusCacheManager getCacheManager() {
+        checkAppIdSetup();
         return qiscusMediator.getCacheManager();
     }
 
     public QiscusClearCommentsHandler getClearCommentsHandler() {
+        checkAppIdSetup();
         return qiscusMediator.getClearCommentsHandler();
     }
 
