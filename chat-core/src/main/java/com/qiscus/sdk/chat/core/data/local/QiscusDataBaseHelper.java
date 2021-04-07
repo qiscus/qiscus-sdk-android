@@ -1149,21 +1149,26 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
         Cursor cursor = sqLiteReadDatabase.rawQuery(query, null);
         List<QMessage> qiscusMessages = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
-            QParticipant qParticipant = getMember(qiscusMessage.getSender().getId());
-            if (qParticipant != null) {
-                QUser qUser = new QUser();
-                qUser.setId(qParticipant.getId());
-                qUser.setName(qParticipant.getName());
-                qUser.setExtras(qParticipant.getExtras());
-                qUser.setAvatarUrl(qParticipant.getAvatarUrl());
-                qiscusMessage.setSender(qUser);
-                qiscusMessage.getSender().setAvatarUrl(qParticipant.getAvatarUrl());
+        try {
+            while (cursor.moveToNext()) {
+                QMessage qiscusMessage = QiscusDb.CommentTable.parseCursor(cursor);
+                QParticipant qParticipant = getMember(qiscusMessage.getSender().getId());
+                if (qParticipant != null) {
+                    QUser qUser = new QUser();
+                    qUser.setId(qParticipant.getId());
+                    qUser.setName(qParticipant.getName());
+                    qUser.setExtras(qParticipant.getExtras());
+                    qUser.setAvatarUrl(qParticipant.getAvatarUrl());
+                    qiscusMessage.setSender(qUser);
+                    qiscusMessage.getSender().setAvatarUrl(qParticipant.getAvatarUrl());
+                }
+                qiscusMessages.add(qiscusMessage);
             }
-            qiscusMessages.add(qiscusMessage);
+        } catch (Exception e) {
+            return qiscusMessages;
+        } finally {
+            cursor.close();
         }
-        cursor.close();
         return qiscusMessages;
     }
 

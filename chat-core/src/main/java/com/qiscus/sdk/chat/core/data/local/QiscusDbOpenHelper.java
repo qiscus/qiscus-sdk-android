@@ -61,7 +61,11 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
         Log.d(TAG, "Opening database.. ");
-        db.enableWriteAheadLogging();
+        try {
+            db.enableWriteAheadLogging();
+        } catch (RuntimeException e) {
+            // do nothing
+        }
     }
 
     @Override
