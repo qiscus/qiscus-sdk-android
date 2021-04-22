@@ -96,3 +96,8 @@
 -keep class org.eclipse.paho.client.mqttv3.logging.JSR47Logger {
     *;
 }
+
+#Model data
+-keep class com.qiscus.sdk.chat.core.data.model.** {
+    *;
+}
