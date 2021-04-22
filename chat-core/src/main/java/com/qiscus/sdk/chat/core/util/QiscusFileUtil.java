@@ -25,6 +25,8 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
+import com.qiscus.sdk.chat.core.QiscusCore;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -160,7 +162,7 @@ public final class QiscusFileUtil {
     public static String generateFilePath(String fileName) {
         String[] fileNameSplit = splitFileName(fileName);
         int androidVersion = Build.VERSION.SDK_INT;
-        if (androidVersion >= 30) {
+        if (androidVersion >= 29) {
             return generateFilePath(fileName, fileNameSplit[1], getEnvironment(fileName));
         } else {
             return generateFilePath(fileName, fileNameSplit[1]);
@@ -168,9 +170,9 @@ public final class QiscusFileUtil {
 
     }
 
-    //api >=30
+    //api >=29
     public static String generateFilePath(String fileName, String extension, String environment) {
-        File file = new File(Environment.getExternalStoragePublicDirectory(environment),
+        File file = new File(QiscusConst.getApps().getExternalFilesDir(environment),
                 isImage(fileName) ? IMAGE_PATH : FILES_PATH);
 
         if (!file.exists()) {

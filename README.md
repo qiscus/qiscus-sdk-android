@@ -51,10 +51,10 @@ allprojects {
 
 Second, you need to add SDK dependencies inside your app .gradle. Then, you need to synchronize to compile the Qiscus Chat SDK for your app.
 
-```
+```ls
 dependencies { 
        ... 
-       implementation 'com.qiscus.sdk:chat-core:3.0.0-beta.14'
+       implementation 'com.qiscus.sdk:chat-core:3.0.0-beta.15'
 }
 ```
 
