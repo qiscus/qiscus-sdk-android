@@ -44,7 +44,7 @@ Qiscus Chat SDK requires minimum Android API 16 (Jelly Bean). To integrate your 
 allprojects { 
       repositories { 
            ... 
-           maven { url "https://dl.bintray.com/qiscustech/maven" } 
+           maven { url "https://artifactory.qiscus.com/artifactory/qiscus-library-open-source" } 
       } 
 }
 ```
@@ -54,7 +54,7 @@ Second, you need to add SDK dependencies inside your app .gradle. Then, you need
 ```
 dependencies { 
        ... 
-       implementation 'com.qiscus.sdk:chat-core:1.3.27'
+       implementation 'com.qiscus.sdk:chat-core:1.3.28'
 }
 ```
 
