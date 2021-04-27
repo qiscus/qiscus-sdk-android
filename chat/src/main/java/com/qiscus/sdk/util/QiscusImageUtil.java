@@ -16,6 +16,8 @@
 
 package com.qiscus.sdk.util;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -27,23 +29,33 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ExifInterface;
+import android.media.MediaScannerConnection;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.qiscus.sdk.chat.core.util.QiscusTextUtil.getString;
 
 public final class QiscusImageUtil {
 
@@ -249,12 +261,27 @@ public final class QiscusImageUtil {
     }
 
     public static File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG-" + timeStamp + "-";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-        QiscusCacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());
-        return image;
+        int androidVersion = Build.VERSION.SDK_INT;
+        if (androidVersion >= 29) {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+            File storageDir = QiscusCore.getApps().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File image = File.createTempFile(
+                    imageFileName,  /* prefix */
+                    ".jpg",         /* suffix */
+                    storageDir      /* directory */
+            );
+
+            QiscusCacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());
+            return image;
+        } else {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
+            String imageFileName = "JPEG-" + timeStamp + "-";
+            File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+            QiscusCacheManager.getInstance().cacheLastImagePath("file:" + image.getAbsolutePath());
+            return image;
+        }
     }
 
     public static Bitmap getCircularBitmap(Bitmap bm) {

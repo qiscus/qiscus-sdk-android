@@ -16,13 +16,18 @@
 
 package com.qiscus.sdk.chat.core.util;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
@@ -37,6 +42,9 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
+
+import androidx.annotation.NonNull;
 
 public final class QiscusFileUtil {
 
@@ -163,7 +171,7 @@ public final class QiscusFileUtil {
         String[] fileNameSplit = splitFileName(fileName);
 
         int androidVersion = Build.VERSION.SDK_INT;
-        if (androidVersion >= 30) {
+        if (androidVersion >= 29) {
             return generateFilePath(fileName, fileNameSplit[1], getEnvironment(fileName));
         } else {
             return generateFilePath(fileName, fileNameSplit[1]);
@@ -195,9 +203,9 @@ public final class QiscusFileUtil {
         }
     }
 
-    //api >=30
+    //api >=29
     public static String generateFilePath(String fileName, String extension, String environment) {
-        File file = new File(Environment.getExternalStoragePublicDirectory(environment),
+        File file = new File(QiscusCore.getApps().getExternalFilesDir(environment),
                 isImage(fileName) ? IMAGE_PATH : FILES_PATH);
 
         if (!file.exists()) {
