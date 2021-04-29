@@ -17,7 +17,10 @@
 package com.qiscus.sdk.util;
 
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Environment;
+
+import com.qiscus.sdk.chat.core.QiscusCore;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,13 +40,24 @@ public class QiscusAudioRecorder {
     private String fileName;
 
     public void startRecording() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String audioFileName = "AUDIO_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
-        storageDir.mkdirs();
-        String file = storageDir.getAbsolutePath();
-        file += File.separator + audioFileName + ".m4a";
-        startRecording(file);
+        if (Build.VERSION.SDK_INT >= 29) {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            String audioFileName = "AUDIO_" + timeStamp + "_";
+            File storageDir =
+                    QiscusCore.getApps().getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+            storageDir.mkdirs();
+            String file = storageDir.getAbsolutePath();
+            file += File.separator + audioFileName + ".m4a";
+            startRecording(file);
+        } else {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            String audioFileName = "AUDIO_" + timeStamp + "_";
+            File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+            storageDir.mkdirs();
+            String file = storageDir.getAbsolutePath();
+            file += File.separator + audioFileName + ".m4a";
+            startRecording(file);
+        }
     }
 
     private void startRecording(String fileName) throws IOException {
