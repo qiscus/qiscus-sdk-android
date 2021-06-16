@@ -146,7 +146,6 @@ public class QiscusSyncService extends Service {
         if (timer != null) {
             timer.cancel();
             timer.purge();
-            timer = null;
         }
     }
 

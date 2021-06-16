@@ -338,7 +338,12 @@ public class QiscusCore {
             try {
                 getApps().getApplicationContext()
                         .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncService.class));
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
+                //Prevent runtime crash because trying to stop service
+                syncServiceDisabled = false;
+                QiscusErrorLogger.print(e);
+            }
+            catch (Exception e) {
                 //Prevent crash because trying to stop service
                 syncServiceDisabled = false;
                 QiscusErrorLogger.print(e);
@@ -347,6 +352,10 @@ public class QiscusCore {
             try {
                 getApps().getApplicationContext()
                         .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncJobService.class));
+            } catch (RuntimeException e) {
+                //Prevent runtime crash because trying to stop service
+                syncServiceDisabled = false;
+                QiscusErrorLogger.print(e);
             } catch (Exception e) {
                 //Prevent crash because trying to stop service
                 syncServiceDisabled = false;
