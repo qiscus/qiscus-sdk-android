@@ -139,8 +139,16 @@ public class QiscusSyncJobService extends JobService {
 
     private void stopSync() {
         if (timer != null) {
-            timer.cancel();
-            timer.purge();
+            try {
+                timer.cancel();
+                timer.purge();
+            } catch (RuntimeException e) {
+                // do nothing
+            } catch (Exception e) {
+                // do nothing
+            }
+
+            timer = null;
         }
     }
 

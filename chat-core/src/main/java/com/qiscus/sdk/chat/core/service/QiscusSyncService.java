@@ -144,8 +144,16 @@ public class QiscusSyncService extends Service {
 
     private void stopSync() {
         if (timer != null) {
-            timer.cancel();
-            timer.purge();
+            try {
+                timer.cancel();
+                timer.purge();
+            } catch (RuntimeException e) {
+                // do nothing
+            } catch (Exception e) {
+                // do nothing
+            }
+
+            timer = null;
         }
     }
 
