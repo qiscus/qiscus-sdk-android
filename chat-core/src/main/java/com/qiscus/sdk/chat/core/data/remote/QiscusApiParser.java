@@ -46,7 +46,7 @@ import java.util.List;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-final class QiscusApiParser {
+public final class QiscusApiParser {
 
     static QiscusNonce parseNonce(JsonElement jsonElement) {
         JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
@@ -344,7 +344,7 @@ final class QiscusApiParser {
         return qiscusComment;
     }
 
-    static QiscusComment parseQiscusComment(JsonElement jsonElement, long roomId) {
+    public static QiscusComment parseQiscusComment(JsonElement jsonElement, long roomId) {
         QiscusComment qiscusComment = new QiscusComment();
         JsonObject jsonComment = jsonElement.getAsJsonObject();
         qiscusComment.setRoomId(roomId);
