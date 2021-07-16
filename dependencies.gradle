@@ -72,8 +72,8 @@ ext {
     ]
 
     qiscusMqttDeps = [
-            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0",
-            android: "com.qiscus.mqtt:android:1.1.2"
+            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1",
+            android: "com.qiscus.mqtt:android:1.1.5"
     ]
 
     okHttpDeps = [

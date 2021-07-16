@@ -31,14 +31,19 @@ public class QiscusSyncTimer {
         qiscusCore.getLogger().print(TAG, "syncTimer...");
 
         stopSync();
-
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            public void run() {
-                // time ran out.
-                newSchedule(context);
-            }
-        }, qiscusCore.getHeartBeat());
+        try {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                public void run() {
+                    // time ran out.
+                    newSchedule(context);
+                }
+            }, qiscusCore.getHeartBeat());
+        } catch (IllegalStateException e) {
+            qiscusCore.getLogger().print(TAG, "Error timer canceled");
+        } catch (Exception e) {
+            qiscusCore.getLogger().print(TAG, "Error timer exception");
+        }
     }
 
     private void newSchedule(Context context) {
@@ -94,7 +99,15 @@ public class QiscusSyncTimer {
 
     private void stopSync() {
         if (timer != null) {
-            timer.cancel();
+            try {
+                timer.cancel();
+                timer.purge();
+            } catch (RuntimeException e) {
+                // do nothing
+            } catch (Exception e) {
+                // do nothing
+            }
+
             timer = null;
         }
     }
