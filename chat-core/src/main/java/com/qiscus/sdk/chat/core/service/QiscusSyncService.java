@@ -91,6 +91,11 @@ public class QiscusSyncService extends Service {
 
     private void scheduleSync() {
         long period = QiscusCore.getHeartBeat();
+
+        if (!QiscusCore.getStatusRealtimeEnableDisable()) {
+            period = QiscusCore.getAutomaticHeartBeat();
+        }
+
         stopSync();
 
         try {
@@ -98,7 +103,8 @@ public class QiscusSyncService extends Service {
             timer.schedule(new TimerTask() {
                 public void run() {
                     // time ran out.
-                    if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
+                    if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()
+                            && QiscusCore.getStatusRealtimeEnableDisable()) {
                         QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                         if (QiscusCore.isOnForeground()) {
                             syncComments();

@@ -39,6 +39,7 @@ import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 
@@ -463,6 +464,44 @@ public class QiscusCore {
 
     public static Boolean isSyncServiceDisabledManually() {
         return syncServiceDisabled;
+    }
+
+
+    /**
+     * openRealtimeConnection
+     * Open realtime connection (manual)
+     *
+     * @return boolean
+     */
+    public static Boolean openRealtimeConnection(){
+        if (QiscusCore.hasSetupUser() && QiscusAndroidUtil.isNetworkAvailable() && QiscusCore.getEnableRealtime()) {
+            getLocalDataManager().setEnableDisableRealtimeManually(true);
+            QiscusPusherApi.getInstance().restartConnection();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * closeRealtimeConnection
+     * Close realtime connection (manual)
+     *
+     * @return boolean
+     */
+    public static Boolean closeRealtimeConnection(){
+        if (QiscusCore.hasSetupUser()) {
+            QiscusPusherApi.getInstance().disconnect();
+            getLocalDataManager().setEnableDisableRealtimeManually(false);
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public static Boolean getStatusRealtimeEnableDisable(){
+        return getLocalDataManager().getEnableDisableRealtimeManually();
     }
 
     /**
@@ -1032,6 +1071,20 @@ public class QiscusCore {
         private String getMqttBrokerUrl() {
             return sharedPreferences.getString("mqtt_broker_url", null);
         }
+
+        private void setEnableDisableRealtimeManually(Boolean enableDisableRealtimeManually) {
+            sharedPreferences.edit().putBoolean("realtime_enable_disable", enableDisableRealtimeManually).apply();
+        }
+
+        /**
+         * save local sharedPref for enable / disable realtime (manual)
+         *
+         * @return mqttBrokerUrl
+         */
+        private Boolean getEnableDisableRealtimeManually() {
+            return sharedPreferences.getBoolean("realtime_enable_disable", true);
+        }
+
 
         /**
          * this is used if enableMqttLB = true

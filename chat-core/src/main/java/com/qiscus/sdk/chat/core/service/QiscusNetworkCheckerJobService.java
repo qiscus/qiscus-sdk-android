@@ -29,6 +29,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -51,17 +52,24 @@ public class QiscusNetworkCheckerJobService extends JobService {
 
     public static void scheduleJob(Context context) {
         QiscusLogger.print(TAG, "scheduleJob: ");
-        ComponentName componentName = new ComponentName(context, QiscusNetworkCheckerJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
-                .setMinimumLatency(TimeUnit.SECONDS.toMillis(5))
-                .setOverrideDeadline(TimeUnit.SECONDS.toMillis(10))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPersisted(true)
-                .build();
+        try {
+            ComponentName componentName = new ComponentName(context, QiscusNetworkCheckerJobService.class);
+            JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
+                    .setMinimumLatency(TimeUnit.SECONDS.toMillis(5))
+                    .setOverrideDeadline(TimeUnit.SECONDS.toMillis(10))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setPersisted(true)
+                    .build();
 
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.schedule(jobInfo);
+            JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            if (jobScheduler != null) {
+                jobScheduler.schedule(jobInfo);
+            }
+
+        } catch (RuntimeException r) {
+            QiscusErrorLogger.print(r);
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
         }
 
     }
@@ -87,12 +95,20 @@ public class QiscusNetworkCheckerJobService extends JobService {
             EventBus.getDefault().register(this);
         }
 
-        networkStateReceiver = new QiscusNetworkStateReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(CONNECTIVITY_ACTION);
-        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        registerReceiver(networkStateReceiver, intentFilter);
+        try {
+            networkStateReceiver = new QiscusNetworkStateReceiver();
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(CONNECTIVITY_ACTION);
+            intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+            intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+            registerReceiver(networkStateReceiver, intentFilter);
+
+        } catch (RuntimeException r) {
+            QiscusErrorLogger.print(r);
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        }
+
     }
 
     @Override

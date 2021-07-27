@@ -58,6 +58,12 @@ public class QiscusSyncJobService extends JobService {
 
         stopSync();
 
+        Long hearbeat = QiscusCore.getHeartBeat();
+
+        if (!QiscusCore.getStatusRealtimeEnableDisable()) {
+            hearbeat = QiscusCore.getAutomaticHeartBeat();
+        }
+
         try {
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -65,7 +71,7 @@ public class QiscusSyncJobService extends JobService {
                     // time ran out.
                     newSchedule(context);
                 }
-            }, QiscusCore.getHeartBeat());
+            }, hearbeat);
         } catch (IllegalStateException e) {
             QiscusLogger.print(TAG, "Error timer canceled");
         } catch (Exception e) {
@@ -76,7 +82,8 @@ public class QiscusSyncJobService extends JobService {
     private void newSchedule(Context context) {
         QiscusLogger.print(TAG, "Job started...");
 
-        if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
+        if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()
+                && QiscusCore.getStatusRealtimeEnableDisable()) {
             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
             scheduleSync();
         }
@@ -107,6 +114,7 @@ public class QiscusSyncJobService extends JobService {
 
     private void scheduleSync() {
         if (QiscusCore.isOnForeground()) {
+            QiscusLogger.print(TAG, "Job started sync service... ");
             syncComments();
         }
     }
