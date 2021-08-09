@@ -121,7 +121,9 @@ public class QiscusChatConfig {
     private int recordAudioIcon = R.drawable.ic_qiscus_add_audio;
     private int recordBackgroundColor = R.color.qiscus_record_background;
     private String recordText = QiscusTextUtil.getString(R.string.qiscus_record);
-    private boolean enableRecordAudio = true;
+
+    //disable feature recordAudio
+    private boolean enableRecordAudio = false; //true
 
     private int addContactIcon = R.drawable.ic_qiscus_add_contact;
     private int addContactBackgroundColor = R.color.qiscus_contact_background;
@@ -751,10 +753,10 @@ public class QiscusChatConfig {
         return enableRecordAudio;
     }
 
-    public QiscusChatConfig setEnableRecordAudio(boolean enableRecordAudio) {
-        this.enableRecordAudio = enableRecordAudio;
-        return this;
-    }
+//    public QiscusChatConfig setEnableRecordAudio(boolean enableRecordAudio) {
+//        this.enableRecordAudio = enableRecordAudio;
+//        return this;
+//    }
 
     @DrawableRes
     public int getStopRecordIcon() {

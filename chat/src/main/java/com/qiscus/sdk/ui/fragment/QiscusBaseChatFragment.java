@@ -142,7 +142,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     private static final String[] PERMISSIONS = {
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.RECORD_AUDIO",
+            //"android.permission.RECORD_AUDIO",
             "android.permission.CAMERA",
             "android.permission.ACCESS_COARSE_LOCATION",
             "android.permission.ACCESS_FINE_LOCATION",
