@@ -82,10 +82,13 @@ public class QiscusSyncJobService extends JobService {
     private void newSchedule(Context context) {
         QiscusLogger.print(TAG, "Job started...");
 
-        if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()
-                && QiscusCore.getStatusRealtimeEnableDisable()) {
-            QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
-            scheduleSync();
+        if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
+            if (QiscusCore.getStatusRealtimeEnableDisable()) {
+                QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
+                scheduleSync();
+            } else {
+                scheduleSync();
+            }
         }
 
         syncJob(context);
