@@ -1597,16 +1597,19 @@ public enum QiscusApi {
                     total += read;
                     sink.flush();
 
-                    /**
-                     * When we use HttpLoggingInterceptor,
-                     * we have issue with progress update not valid.
-                     * So we must check, first call is to HttpLoggingInterceptor
-                     * second call is to request
-                     */
-                    if (numWriteToCall > IGNORE_FIRST_NUMBER_OF_WRITE_TO_CALL) {
+                    if (QiscusCore.getChatConfig().isEnableLog()) {
+                        /**
+                         * When we use HttpLoggingInterceptor,
+                         * we have issue with progress update not valid.
+                         * So we must check, first call is to HttpLoggingInterceptor
+                         * second call is to request
+                         */
+                        if (numWriteToCall > IGNORE_FIRST_NUMBER_OF_WRITE_TO_CALL) {
+                            progressListener.onProgress(total);
+                        }
+                    } else {
                         progressListener.onProgress(total);
                     }
-
                 }
             } finally {
                 Util.closeQuietly(source);
