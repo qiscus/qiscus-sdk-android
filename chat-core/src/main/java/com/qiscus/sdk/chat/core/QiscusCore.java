@@ -962,6 +962,54 @@ public class QiscusCore {
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
 
+
+    /**
+     * openRealtimeConnection
+     * Open realtime connection (manual)
+     *
+     * @return boolean
+     */
+    public Boolean openRealtimeConnection(){
+        if (hasSetupUser() && getAndroidUtil().isNetworkAvailable() && getEnableRealtime()) {
+            getLocalDataManager().setEnableDisableRealtimeManually(true);
+            qiscusMediator.getPusherApi().restartConnection();
+            qiscusMediator.getSyncTimer().startSchedule();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * closeRealtimeConnection
+     * Close realtime connection (manual)
+     *
+     * @return boolean
+     */
+    public Boolean closeRealtimeConnection(){
+        if (hasSetupUser()) {
+            qiscusMediator.getPusherApi().disconnect();
+            getLocalDataManager().setEnableDisableRealtimeManually(false);
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public Boolean getStatusRealtimeEnableDisable(){
+        return getLocalDataManager().getEnableDisableRealtimeManually();
+    }
+
+    public Boolean getStatusRealtimeIsConnected(){
+        if (hasSetupUser()) {
+            return qiscusMediator.getPusherApi().isConnected();
+        } else {
+            return false;
+        }
+    }
+
+
     public interface OnSendMessageListener {
         void onSending(QMessage qMessage);
 
@@ -1085,6 +1133,20 @@ public class QiscusCore {
         private void setWillGetNewNodeMqttBrokerUrl(boolean will) {
             sharedPreferences.edit().putBoolean("mqtt_will_get_new", will).apply();
         }
+
+        private void setEnableDisableRealtimeManually(Boolean enableDisableRealtimeManually) {
+            sharedPreferences.edit().putBoolean("realtime_enable_disable", enableDisableRealtimeManually).apply();
+        }
+
+        /**
+         * save local sharedPref for enable / disable realtime (manual)
+         *
+         * @return mqttBrokerUrl
+         */
+        private Boolean getEnableDisableRealtimeManually() {
+            return sharedPreferences.getBoolean("realtime_enable_disable", true);
+        }
+
 
         private void clearData() {
             sharedPreferences.edit().clear().apply();

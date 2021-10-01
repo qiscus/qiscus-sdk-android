@@ -31,6 +31,11 @@ public class QiscusSyncTimer {
         qiscusCore.getLogger().print(TAG, "syncTimer...");
 
         stopSync();
+
+        if (!qiscusCore.getStatusRealtimeEnableDisable()) {
+           return;
+        }
+
         try {
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -49,13 +54,22 @@ public class QiscusSyncTimer {
     private void newSchedule(Context context) {
         qiscusCore.getLogger().print(TAG, "Job started...");
 
-        if (qiscusCore.hasSetupUser() && !qiscusCore.getPusherApi().isConnected()) {
+        if (qiscusCore.hasSetupUser() && !qiscusCore.getPusherApi().isConnected() && qiscusCore.getStatusRealtimeEnableDisable()) {
             QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().restartConnection());
-            scheduleSync();
             checkPendingMessage();
         }
 
+        if (qiscusCore.hasSetupUser()) {
+            scheduleSync();
+        }
+
         syncJob(context);
+    }
+
+    public void startSchedule(){
+        if (qiscusCore != null) {
+            syncJob(qiscusCore.getApps());
+        }
     }
 
     private void checkPendingMessage(){
