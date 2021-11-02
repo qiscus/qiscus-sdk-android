@@ -28,11 +28,11 @@ repositories {
 ext {
 
     minSDKVersion = 16
-    targetSDKVersion = 30
-    compileSDKVersion = 30
+    targetSDKVersion = 31
+    compileSDKVersion = 31
 
     versions = [
-            support          : "30.0.0",
+            support          : "31.0.0",
             firebaseCore     : "19.0.0",
             firebaseMessaging: "22.0.0",
             okHttp           : "3.12.5",
@@ -73,7 +73,7 @@ ext {
 
     qiscusMqttDeps = [
             client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0",
-            android: "com.qiscus.mqtt:android:1.1.2"
+            android: "com.qiscus.mqtt:android:1.1.6"
     ]
 
     okHttpDeps = [

@@ -33,6 +33,8 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.RemoteInput;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
+
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -270,8 +272,14 @@ public final class QiscusPushNotificationUtil {
         PendingIntent pendingIntent;
         Intent openIntent = new Intent(context, QiscusPushNotificationClickReceiver.class);
         openIntent.putExtra("data", comment);
-        pendingIntent = PendingIntent.getBroadcast(context, QiscusNumberUtil.convertToInt(comment.getRoomId()),
-                openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            pendingIntent = PendingIntent.getBroadcast(context, QiscusNumberUtil.convertToInt(comment.getRoomId()),
+                    openIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(context, QiscusNumberUtil.convertToInt(comment.getRoomId()),
+                    openIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelId);
         notificationBuilder.setContentTitle(pushNotificationMessage.getRoomName())
