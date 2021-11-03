@@ -46,9 +46,9 @@ public final class QiscusErrorLogger {
     public void print(Throwable throwable) {
         if (qiscusCore.getChatConfig().isEnableLog()) {
             try {
-                Log.e(TAG, getMessage(throwable));
+                Log.e(TAG, qiscusCore.getAppId() + "-" + getMessage(throwable));
             } catch (NullPointerException n) {
-                Log.e(TAG, "error with no message");
+                Log.e(TAG, qiscusCore.getAppId() + "-" + "error with no message");
             }
         }
     }
@@ -56,16 +56,16 @@ public final class QiscusErrorLogger {
     public void print(String tag, Throwable throwable) {
         if (qiscusCore.getChatConfig().isEnableLog()) {
             try {
-                Log.e(tag, getMessage(throwable));
+                Log.e(tag, qiscusCore.getAppId() + "-" + getMessage(throwable));
             } catch (NullPointerException n) {
-                Log.e(tag, "error with no message");
+                Log.e(tag, qiscusCore.getAppId() + "-" + "error with no message");
             }
         }
     }
 
     public void print(String tag, String errorMessage) {
         if (qiscusCore.getChatConfig().isEnableLog()) {
-            Log.e(tag, errorMessage);
+            Log.e(tag, qiscusCore.getAppId() + "-" + errorMessage);
         }
     }
 
