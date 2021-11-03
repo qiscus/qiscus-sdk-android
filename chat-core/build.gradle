@@ -18,8 +18,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
-//apply from: rootProject.file('gradle/quality.gradle')git a
-apply plugin: 'jacoco'
+//apply from: rootProject.file('gradle/quality.gradle')
+//apply plugin: 'jacoco'
 apply from: 'publish.gradle'
 apply plugin: "com.jfrog.artifactory"
 
@@ -48,11 +48,11 @@ android {
         }
     }
 
-    android {
-        jacoco {
-            version = '0.7.9'
-        }
-    }
+//    android {
+//        jacoco {
+//            version = '0.7.9'
+//        }
+//    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
