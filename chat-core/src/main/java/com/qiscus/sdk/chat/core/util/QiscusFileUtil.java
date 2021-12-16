@@ -63,7 +63,13 @@ public final class QiscusFileUtil {
             InputStream inputStream = QiscusCore.getApps().getContentResolver().openInputStream(uri);
             String fileName = getFileName(uri);
             String[] splitName = splitFileName(fileName);
-            File tempFile = File.createTempFile(splitName[0], splitName[1]);
+            String tempName = "temp";
+            File tempFile;
+            if (splitName[0].length() < 4){
+                tempFile = File.createTempFile(tempName, splitName[1]);
+            } else {
+                tempFile = File.createTempFile(splitName[0], splitName[1]);
+            }
             tempFile = rename(tempFile, fileName);
             tempFile.deleteOnExit();
             FileOutputStream out = null;
