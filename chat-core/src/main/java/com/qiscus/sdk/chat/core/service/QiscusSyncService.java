@@ -158,6 +158,8 @@ public class QiscusSyncService extends Service {
             try {
                 timer.cancel();
                 timer.purge();
+            } catch (NullPointerException e) {
+                // do nothing
             } catch (RuntimeException e) {
                 // do nothing
             } catch (Exception e) {
