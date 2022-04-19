@@ -511,6 +511,12 @@ final class QiscusApiParser {
                 appConfig.setSyncOnConnect(0);
             }
 
+            if (results.has("network_connection_interval")) {
+                appConfig.setNetworkConnectionInterval(results.get("network_connection_interval").getAsInt());
+            } else {
+                appConfig.setNetworkConnectionInterval(0);
+            }
+
             if (results.has("enable_realtime_check")) {
                 appConfig.setEnableRealtimeCheck(results.get("enable_realtime_check").getAsBoolean());
             } else {

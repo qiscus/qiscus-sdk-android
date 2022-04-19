@@ -69,6 +69,7 @@ public class QiscusCore {
     private static LocalDataManager localDataManager;
     private static long heartBeat;
     private static long automaticHeartBeat;
+    private static long networkConnectionInterval;
     private static QiscusDataStore dataStore;
     private static QiscusCoreChatConfig chatConfig;
     private static Handler appHandler;
@@ -215,6 +216,7 @@ public class QiscusCore {
         dataStore = new QiscusDataBaseHelper();
         heartBeat = 5000;
         automaticHeartBeat = 30000;
+        networkConnectionInterval = 5000;
 
         QiscusCore.enableMqttLB = enableMqttLB;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
@@ -275,6 +277,10 @@ public class QiscusCore {
 
                     if (appConfig.getSyncOnConnect() != 0) {
                         automaticHeartBeat = appConfig.getSyncOnConnect();
+                    }
+
+                    if (appConfig.getNetworkConnectionInterval() != 0) {
+                        networkConnectionInterval = appConfig.getNetworkConnectionInterval();
                     }
 
                     enableRealtime = appConfig.getEnableRealtime();
@@ -641,6 +647,10 @@ public class QiscusCore {
      */
     public static long getAutomaticHeartBeat() {
         return automaticHeartBeat;
+    }
+
+    public static long getNetworkConnectionInterval(){
+        return networkConnectionInterval;
     }
 
     /**

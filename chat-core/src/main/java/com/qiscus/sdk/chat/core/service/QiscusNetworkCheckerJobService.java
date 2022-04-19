@@ -28,6 +28,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
 
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
@@ -55,8 +56,8 @@ public class QiscusNetworkCheckerJobService extends JobService {
         try {
             ComponentName componentName = new ComponentName(context, QiscusNetworkCheckerJobService.class);
             JobInfo jobInfo = new JobInfo.Builder(STATIC_JOB_ID, componentName)
-                    .setMinimumLatency(TimeUnit.SECONDS.toMillis(5))
-                    .setOverrideDeadline(TimeUnit.SECONDS.toMillis(10))
+                    .setMinimumLatency(TimeUnit.SECONDS.toMillis(QiscusCore.getNetworkConnectionInterval()))
+                    .setOverrideDeadline(TimeUnit.SECONDS.toMillis((QiscusCore.getNetworkConnectionInterval() + 5)))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .setPersisted(true)
                     .build();

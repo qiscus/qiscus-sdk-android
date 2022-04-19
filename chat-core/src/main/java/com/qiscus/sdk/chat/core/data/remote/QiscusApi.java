@@ -1218,11 +1218,6 @@ public enum QiscusApi {
 
     }
 
-    public Observable<QiscusRealtimeStatus> getRealtimeStatus(String topic) {
-        return api.getRealtimeStatus(QiscusHashMapUtil.getRealtimeStatus(topic))
-                .map(QiscusApiParser::parseQiscusRealtimeStatus);
-    }
-
     public Observable<List<QiscusChannels>> getChannels() {
         return api.getChannels()
                 .map(QiscusApiParser::parseQiscusChannels);
