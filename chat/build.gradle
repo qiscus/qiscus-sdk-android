@@ -19,7 +19,6 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
-apply plugin: "org.sonarqube"
 //apply from: 'publishChat.gradle'
 //apply plugin: "com.jfrog.artifactory"
 
@@ -71,7 +70,6 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'com.google.gms:google-services:4.2.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
     }
 }
 
@@ -93,6 +91,7 @@ dependencies {
     api eventBusLib
     api rxUrlExtractorLib
     api qiscusManggil
+    api securityDeps
 
     api project(':chat-core')
 

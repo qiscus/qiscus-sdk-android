@@ -22,8 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
-
 import androidx.annotation.RestrictTo;
+import androidx.security.crypto.EncryptedSharedPreferences;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
@@ -42,12 +42,14 @@ import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
+import com.qiscus.utils.jupukdata.JupukData;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
@@ -997,12 +999,62 @@ public class QiscusCore {
     }
 
     private static class LocalDataManager {
-        private final SharedPreferences sharedPreferences;
+        private SharedPreferences sharedPreferences;
         private final Gson gson;
         private String token;
 
         LocalDataManager() {
-            sharedPreferences = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferencesOld  = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
+
+            String sharedPrefsFile = JupukData.getFileName();
+            try {
+                sharedPreferences = EncryptedSharedPreferences.create(
+                        sharedPrefsFile,
+                        JupukData.getFileKey(),
+                        QiscusCore.getApps().getApplicationContext(),
+                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                );
+
+                String dataAccount = sharedPreferencesOld.getString("cached_account", "");
+                String LbUrl = sharedPreferencesOld.getString("lb_url", "");
+                String brokerUrl = sharedPreferencesOld.getString("mqtt_broker_url", "");
+                String fcmToken = sharedPreferencesOld.getString("fcm_token", "");
+
+
+                SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
+
+                if (!dataAccount.isEmpty()) {
+                    //migration to new Data
+                    sharedPrefsEditor.putString("cached_account", dataAccount);
+                }
+
+                if (!LbUrl.isEmpty()) {
+                    sharedPrefsEditor.putString("lb_url", LbUrl);
+                }
+
+                if (!brokerUrl.isEmpty()) {
+                    sharedPrefsEditor.putString("mqtt_broker_url", brokerUrl);
+                }
+
+                if (!fcmToken.isEmpty()) {
+                    sharedPrefsEditor.putString("fcm_token", fcmToken);
+                }
+
+                sharedPrefsEditor.apply();
+
+                //remove old data
+                sharedPreferencesOld.edit().clear().apply();
+
+
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (IOException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            }
+
             gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : "";
         }

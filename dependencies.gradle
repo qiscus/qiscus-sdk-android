@@ -27,7 +27,7 @@ repositories {
 
 ext {
 
-    minSDKVersion = 16
+    minSDKVersion = 21
     targetSDKVersion = 31
     compileSDKVersion = 31
 
@@ -64,6 +64,12 @@ ext {
     firebaseDeps = [
             core     : "com.google.firebase:firebase-core:$versions.firebaseCore",
             messaging: "com.google.firebase:firebase-messaging:$versions.firebaseMessaging"
+    ]
+
+    securityDeps = [
+            crypto : "androidx.security:security-crypto:1.1.0-alpha03",
+            jupukData : "com.qiscus.utils:jupukdata:1.0.0",
+            authenticator : "androidx.security:security-app-authenticator:1.0.0-alpha02"
     ]
 
     qiscusUtilDeps = [
@@ -103,10 +109,11 @@ ext {
     flexBoxLib = "com.google.android:flexbox:0.3.1"
     eventBusLib = "org.greenrobot:eventbus:3.0.0"
     rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
-    qiscusManggil = "com.qiscus.utils:manggil:$versions.manggil"
+    qiscusManggil = "com.qiscus.utils:manggil:1.0.1"
     //qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:$versions.manggil-without-emoji"
 
     supportLibs = supportDeps.values()
+    securityDeps = securityDeps.values()
     firebaseLibs = firebaseDeps.values()
     qiscusUtilLibs = qiscusUtilDeps.values()
     qiscusMqttLibs = qiscusMqttDeps.values()
