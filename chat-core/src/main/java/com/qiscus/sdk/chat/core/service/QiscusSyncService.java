@@ -107,11 +107,15 @@ public class QiscusSyncService extends Service {
                         if (QiscusCore.getStatusRealtimeEnableDisable()) {
                             QiscusAndroidUtil.runOnUIThread(() -> QiscusPusherApi.getInstance().restartConnection());
                             if (QiscusCore.isOnForeground()) {
-                                syncComments();
+                                if (QiscusCore.getEnableSync()) {
+                                    syncComments();
+                                }
                             }
                         } else {
                             if (QiscusCore.isOnForeground()) {
-                                syncComments();
+                                if (QiscusCore.getEnableSync()) {
+                                    syncComments();
+                                }
                             }
                         }
                     }
@@ -143,7 +147,10 @@ public class QiscusSyncService extends Service {
                 .doOnCompleted(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
                     QiscusLogger.print("Sync completed...");
-                    syncEvents();
+                    if (QiscusCore.getEnableSyncEvent()){
+                        syncEvents();
+                    }
+
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {

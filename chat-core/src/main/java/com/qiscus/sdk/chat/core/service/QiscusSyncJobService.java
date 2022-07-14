@@ -118,7 +118,9 @@ public class QiscusSyncJobService extends JobService {
     private void scheduleSync() {
         if (QiscusCore.isOnForeground()) {
             QiscusLogger.print(TAG, "Job started sync service... ");
-            syncComments();
+            if (QiscusCore.getEnableSync()){
+                syncComments();
+            }
         }
     }
 
@@ -137,7 +139,9 @@ public class QiscusSyncJobService extends JobService {
                 })
                 .doOnCompleted(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
-                    syncEvents();
+                    if (QiscusCore.getEnableSyncEvent()){
+                        syncEvents();
+                    }
                     QiscusLogger.print("Sync completed...");
                 })
                 .subscribeOn(Schedulers.io())

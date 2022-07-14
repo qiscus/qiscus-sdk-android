@@ -13,6 +13,8 @@ public class QiscusAppConfig  {
     private Integer networkConnectionInterval;
     private Boolean enableRealtime;
     private Boolean enableRealtimeCheck;
+    private Boolean enableSync;
+    private Boolean enableSyncEvent;
 
     public QiscusAppConfig() {
         super();
@@ -39,6 +41,8 @@ public class QiscusAppConfig  {
         if (!syncInterval.equals(that.syncInterval)) return false;
         if (!networkConnectionInterval.equals(that.networkConnectionInterval)) return false;
         if (!enableRealtimeCheck.equals(that.enableRealtimeCheck)) return false;
+        if (!enableSync.equals(that.enableSync)) return false;
+        if (!enableSyncEvent.equals(that.enableSyncEvent)) return false;
         return syncOnConnect.equals(that.syncOnConnect);
     }
 
@@ -52,6 +56,8 @@ public class QiscusAppConfig  {
         result = 31 * result + syncInterval.hashCode();
         result = 31 * result + syncOnConnect.hashCode();
         result = 31 * result + enableRealtimeCheck.hashCode();
+        result = 31 * result + enableSync.hashCode();
+        result = 31 * result + enableSyncEvent.hashCode();
         result = 31 * result + networkConnectionInterval.hashCode();
         return result;
     }
@@ -120,6 +126,22 @@ public class QiscusAppConfig  {
 
     public void setEnableRealtime(Boolean enableRealtime) {
         this.enableRealtime = enableRealtime;
+    }
+
+    public Boolean getEnableSync() {
+        return enableSync;
+    }
+
+    public void setEnableSync(Boolean enableSync) {
+        this.enableSync = enableSync;
+    }
+
+    public Boolean getEnableSyncEvent() {
+        return enableSyncEvent;
+    }
+
+    public void setEnableSyncEvent(Boolean enableSyncEvent) {
+        this.enableSyncEvent = enableSyncEvent;
     }
 
     public Boolean getEnableRealtimeCheck() {

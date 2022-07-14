@@ -81,6 +81,8 @@ public class QiscusCore {
     private static Boolean enableEventReport = true;
     private static Boolean enableRealtime = true;
     private static Boolean syncServiceDisabled = false;
+    private static Boolean enableSync = true;
+    private static Boolean enableSyncEvent = false;
 
     private QiscusCore() {
     }
@@ -286,6 +288,9 @@ public class QiscusCore {
                     }
 
                     enableRealtime = appConfig.getEnableRealtime();
+                    enableSync = appConfig.getEnableSync();
+                    enableSyncEvent = appConfig.getEnableSyncEvent();
+
                     startSyncService();
                     startNetworkCheckerService();
                     QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
@@ -461,6 +466,26 @@ public class QiscusCore {
      */
     public static boolean getEnableRealtime() {
         return enableRealtime;
+    }
+
+    /**
+     * enableSync
+     * Checker for enable or disable sync
+     *
+     * @return boolean
+     */
+    public static boolean getEnableSync() {
+        return enableSync;
+    }
+
+    /**
+     * enableSync
+     * Checker for enable or disable sync
+     *
+     * @return boolean
+     */
+    public static boolean getEnableSyncEvent() {
+        return enableSyncEvent;
     }
 
     /**
