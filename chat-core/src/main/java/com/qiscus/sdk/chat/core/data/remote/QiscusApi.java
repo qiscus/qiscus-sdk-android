@@ -184,7 +184,7 @@ public class QiscusApi {
         builder.addHeader("QISCUS-SDK-APP-ID", qiscusCore.getAppId());
         builder.addHeader("QISCUS-SDK-TOKEN", qiscusCore.hasSetupUser() ? qiscusCore.getToken() : "");
         builder.addHeader("QISCUS-SDK-USER-EMAIL", qiscusCore.hasSetupUser() ? qiscusCore.getQiscusAccount().getId() : "");
-        builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" + BuildConfig.VERSION_NAME);
+        builder.addHeader("QISCUS-SDK-VERSION", "ANDROID_" + BuildConfig.CHAT_CORE_VERSION_STRING);
         builder.addHeader("QISCUS-SDK-PLATFORM", "ANDROID");
         builder.addHeader("QISCUS-SDK-DEVICE-BRAND", Build.MANUFACTURER);
         builder.addHeader("QISCUS-SDK-DEVICE-MODEL", Build.MODEL);
@@ -512,7 +512,7 @@ public class QiscusApi {
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
+                            new CountingFileRequestBody(qiscusCore, file, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
                                 progressUploadListener.onProgress(progress);
                             }))
@@ -602,7 +602,7 @@ public class QiscusApi {
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
+                            new CountingFileRequestBody(qiscusCore, file, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
                                 progressListener.onProgress(progress);
                             }))
@@ -633,7 +633,7 @@ public class QiscusApi {
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
+                            new CountingFileRequestBody(qiscusCore, file, totalBytes -> {
                                 int progress = (int) (totalBytes * 100 / fileLength);
                                 progressListener.onProgress(progress);
                             }))
@@ -1111,10 +1111,10 @@ public class QiscusApi {
 
     }
 
-    public Observable<QiscusRealtimeStatus> getRealtimeStatus(String topic) {
-        return api.getRealtimeStatus(QiscusHashMapUtil.getRealtimeStatus(topic))
-                .map(QiscusApiParser::parseQiscusRealtimeStatus);
-    }
+//    public Observable<QiscusRealtimeStatus> getRealtimeStatus(String topic) {
+//        return api.getRealtimeStatus(QiscusHashMapUtil.getRealtimeStatus(topic))
+//                .map(QiscusApiParser::parseQiscusRealtimeStatus);
+//    }
 
     public Observable<List<QiscusChannels>> getChannels() {
         return api.getChannels()
@@ -1459,8 +1459,10 @@ public class QiscusApi {
         private final File file;
         private final ProgressListener progressListener;
         private int numWriteToCall = -1;
+        private QiscusCore qiscusCore;
 
-        private CountingFileRequestBody(File file, ProgressListener progressListener) {
+        private CountingFileRequestBody(QiscusCore qiscusCore, File file, ProgressListener progressListener) {
+            this.qiscusCore = qiscusCore;
             this.file = file;
             this.progressListener = progressListener;
         }
@@ -1489,15 +1491,20 @@ public class QiscusApi {
                     total += read;
                     sink.flush();
 
-                    /**
-                     * When we use HttpLoggingInterceptor,
-                     * we have issue with progress update not valid.
-                     * So we must check, first call is to HttpLoggingInterceptor
-                     * second call is to request
-                     */
-                    if (numWriteToCall > IGNORE_FIRST_NUMBER_OF_WRITE_TO_CALL) {
+                    if (qiscusCore.getChatConfig().isEnableLog()) {
+                        /**
+                         * When we use HttpLoggingInterceptor,
+                         * we have issue with progress update not valid.
+                         * So we must check, first call is to HttpLoggingInterceptor
+                         * second call is to request
+                         */
+                        if (numWriteToCall > IGNORE_FIRST_NUMBER_OF_WRITE_TO_CALL) {
+                            progressListener.onProgress(total);
+                        }
+                    } else {
                         progressListener.onProgress(total);
                     }
+
 
                 }
             } finally {

@@ -457,6 +457,24 @@ final class QiscusApiParser {
                 appConfig.setEnableRealtimeCheck(false);
             }
 
+            if (results.has("network_connection_interval")) {
+                appConfig.setNetworkConnectionInterval(results.get("network_connection_interval").getAsInt());
+            } else {
+                appConfig.setNetworkConnectionInterval(5000);
+            }
+
+            if (results.has("enable_sync")) {
+                appConfig.setEnableSync(results.get("enable_sync").getAsBoolean());
+            } else {
+                appConfig.setEnableSync(true);
+            }
+
+            if (results.has("enable_sync_event")) {
+                appConfig.setEnableSyncEvent(results.get("enable_sync_event").getAsBoolean());
+            } else {
+                appConfig.setEnableSyncEvent(false);
+            }
+
             return appConfig;
 
         } else {

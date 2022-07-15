@@ -84,6 +84,10 @@ public class QiscusCore {
     private Boolean enableEventReport = true;
     private Boolean enableRealtime = true;
     private QiscusMediator qiscusMediator;
+    private long networkConnectionInterval;
+    private Boolean enableSync = true;
+    private Boolean enableSyncEvent = false;
+
 
     public QiscusCore() {
     }
@@ -223,6 +227,8 @@ public class QiscusCore {
         qiscusMediator = new QiscusMediator();
         heartBeat = 5000;
         automaticHeartBeat = 30000;
+        networkConnectionInterval = 5000;
+
 
         this.enableMqttLB = enableMqttLB;
         this.mqttBrokerUrl = mqttBrokerUrl;
@@ -281,7 +287,15 @@ public class QiscusCore {
                         automaticHeartBeat = appConfig.getSyncOnConnect();
                     }
 
+                    if (appConfig.getNetworkConnectionInterval() != 0) {
+                        networkConnectionInterval = appConfig.getNetworkConnectionInterval();
+                    }
+
+
                     enableRealtime = appConfig.getEnableRealtime();
+                    enableSync = appConfig.getEnableSync();
+                    enableSyncEvent = appConfig.getEnableSyncEvent();
+
 
                     if (!enableRealtime) {
                         //enable realtime false
@@ -295,6 +309,32 @@ public class QiscusCore {
                 });
 
     }
+
+    public long getNetworkConnectionInterval(){
+        return networkConnectionInterval;
+    }
+
+    /**
+     * enableSync
+     * Checker for enable or disable sync
+     *
+     * @return boolean
+     */
+    public boolean getEnableSync() {
+        return enableSync;
+    }
+
+    /**
+     * enableSync
+     * Checker for enable or disable sync
+     *
+     * @return boolean
+     */
+    public boolean getEnableSyncEvent() {
+        return enableSyncEvent;
+    }
+
+
 
     /**
      * Use this method if we need application context instance

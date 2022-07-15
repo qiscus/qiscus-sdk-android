@@ -23,6 +23,7 @@ repositories {
     google()
     mavenCentral()
     maven { url "https://jitpack.io" }
+    jcenter()
 }
 
 ext {
@@ -40,7 +41,7 @@ ext {
 
             nirmana          : "1.3.0",
             manggil          : "1.0.1",
-            jupuk            : "1.5.0",
+            jupuk            : "1.5.2",
 
             rxJava           : "1.3.4",
             rxAndroid        : "1.2.1",

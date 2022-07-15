@@ -22,6 +22,8 @@ apply from: 'lib-version.gradle'
 //apply plugin: 'jacoco'
 apply from: 'publish.gradle'
 apply plugin: "com.jfrog.artifactory"
+apply plugin: "org.sonarqube"
+
 
 android {
     compileSdkVersion compileSDKVersion
@@ -45,6 +47,7 @@ android {
             it.buildConfigField("String", "BASE_URL_SERVER", BASE_URL_SERVER)
             it.buildConfigField("String", "BASE_URL_MQTT_BROKER", BASE_URL_MQTT_BROKER)
             it.buildConfigField("String", "BASE_URL_MQTT_LB", BASE_URL_MQTT_LB)
+            it.buildConfigField("String", "CHAT_CORE_VERSION_STRING", chatCoreVersionString)
         }
     }
 
@@ -75,14 +78,20 @@ android {
 buildscript {
     repositories {
         google()
-        mavenCentral()
+        gradlePluginPortal()
         jcenter()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
+
     }
 }
 

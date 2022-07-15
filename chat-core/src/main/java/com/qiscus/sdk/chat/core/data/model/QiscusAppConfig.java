@@ -12,6 +12,11 @@ public class QiscusAppConfig  {
     private Integer syncOnConnect;
     private Boolean enableRealtime;
     private Boolean enableRealtimeCheck;
+    private Integer networkConnectionInterval;
+    private Boolean enableSync;
+    private Boolean enableSyncEvent;
+
+
 
     public QiscusAppConfig() {
         super();
@@ -36,7 +41,10 @@ public class QiscusAppConfig  {
         if (!enableEventReport.equals(that.enableEventReport)) return false;
         if (!enableRealtime.equals(that.enableRealtime)) return false;
         if (!syncInterval.equals(that.syncInterval)) return false;
+        if (!networkConnectionInterval.equals(that.networkConnectionInterval)) return false;
         if (!enableRealtimeCheck.equals(that.enableRealtimeCheck)) return false;
+        if (!enableSync.equals(that.enableSync)) return false;
+        if (!enableSyncEvent.equals(that.enableSyncEvent)) return false;
         return syncOnConnect.equals(that.syncOnConnect);
     }
 
@@ -50,6 +58,9 @@ public class QiscusAppConfig  {
         result = 31 * result + syncInterval.hashCode();
         result = 31 * result + syncOnConnect.hashCode();
         result = 31 * result + enableRealtimeCheck.hashCode();
+        result = 31 * result + networkConnectionInterval.hashCode();
+        result = 31 * result + enableSync.hashCode();
+        result = 31 * result + enableSyncEvent.hashCode();
         return result;
     }
 
@@ -118,4 +129,30 @@ public class QiscusAppConfig  {
     public void setEnableRealtimeCheck(Boolean enableRealtimeCheck) {
         this.enableRealtimeCheck = enableRealtimeCheck;
     }
+
+    public Integer getNetworkConnectionInterval() {
+        return networkConnectionInterval;
+    }
+
+    public void setNetworkConnectionInterval(Integer networkConnectionInterval) {
+        this.networkConnectionInterval = networkConnectionInterval;
+    }
+
+    public Boolean getEnableSync() {
+        return enableSync;
+    }
+
+    public void setEnableSync(Boolean enableSync) {
+        this.enableSync = enableSync;
+    }
+
+    public Boolean getEnableSyncEvent() {
+        return enableSyncEvent;
+    }
+
+    public void setEnableSyncEvent(Boolean enableSyncEvent) {
+        this.enableSyncEvent = enableSyncEvent;
+    }
+
+
 }

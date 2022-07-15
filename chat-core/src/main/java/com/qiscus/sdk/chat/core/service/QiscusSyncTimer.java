@@ -28,12 +28,13 @@ public class QiscusSyncTimer {
     }
 
     public void syncJob(Context context) {
+        long period = qiscusCore.getHeartBeat();
         qiscusCore.getLogger().print(TAG, "syncTimer...");
 
         stopSync();
 
         if (!qiscusCore.getStatusRealtimeEnableDisable()) {
-           return;
+            period = qiscusCore.getAutomaticHeartBeat();
         }
 
         try {
@@ -43,7 +44,7 @@ public class QiscusSyncTimer {
                     // time ran out.
                     newSchedule(context);
                 }
-            }, qiscusCore.getHeartBeat());
+            }, period);
         } catch (IllegalStateException e) {
             qiscusCore.getLogger().print(TAG, "Error timer canceled");
         } catch (Exception e) {
@@ -54,14 +55,24 @@ public class QiscusSyncTimer {
     private void newSchedule(Context context) {
         qiscusCore.getLogger().print(TAG, "Job started...");
 
-        if (qiscusCore.hasSetupUser() && !qiscusCore.getPusherApi().isConnected() && qiscusCore.getStatusRealtimeEnableDisable()) {
-            QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().restartConnection());
-            checkPendingMessage();
+        if (qiscusCore.hasSetupUser() && !qiscusCore.getPusherApi().isConnected()) {
+            if (qiscusCore.getStatusRealtimeEnableDisable()){
+                QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().restartConnection());
+                checkPendingMessage();
+                scheduleSync();
+
+            }else{
+                checkPendingMessage();
+                scheduleSync();
+            }
+
+        }else{
+            if (qiscusCore.hasSetupUser()) {
+                checkPendingMessage();
+                scheduleSync();
+            }
         }
 
-        if (qiscusCore.hasSetupUser()) {
-            scheduleSync();
-        }
 
         syncJob(context);
     }
@@ -81,8 +92,14 @@ public class QiscusSyncTimer {
     }
 
     private void scheduleSync() {
-        if (qiscusCore.isOnForeground()) { syncComments();
-            syncEvents();
+        if (qiscusCore.isOnForeground()) {
+            if (qiscusCore.getEnableSync()) {
+                syncComments();
+            }
+
+            if (qiscusCore.getEnableSyncEvent()){
+                syncEvents();
+            }
         }
     }
 
@@ -116,6 +133,8 @@ public class QiscusSyncTimer {
             try {
                 timer.cancel();
                 timer.purge();
+            } catch (NullPointerException e) {
+                // do nothing
             } catch (RuntimeException e) {
                 // do nothing
             } catch (Exception e) {
