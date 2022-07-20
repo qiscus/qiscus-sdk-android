@@ -135,7 +135,7 @@ public class QiscusCarouselItemView extends FrameLayout {
         try {
             setUpButtons(payload.getJSONArray("buttons"));
         } catch (JSONException e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -162,7 +162,6 @@ public class QiscusCarouselItemView extends FrameLayout {
                     buttonViews.add(button);
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
 

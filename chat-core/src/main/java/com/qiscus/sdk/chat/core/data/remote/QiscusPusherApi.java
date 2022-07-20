@@ -158,7 +158,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public static void handleNotification(JSONObject jsonObject) {
         long eventId = jsonObject.optLong("id");
 
-        QiscusEventCache.getInstance().setLastEventId(eventId);
+        QiscusEventCache.getInstance().saveLastEventId(eventId);
 
         if (jsonObject.optString("action_topic").equals("delete_message")) {
             JSONObject payload = jsonObject.optJSONObject("payload");
@@ -319,7 +319,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
             return qiscusComment;
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         return null;
     }
@@ -405,29 +405,21 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 QiscusLogger.print(TAG, "Connecting...");
             } catch (MqttException | IllegalStateException e) {
                 connecting = false;
-                if (e != null) {
-                    try {
-                        QiscusLogger.print(TAG, "Connecting... error" + e.toString());
-                    } catch (NullPointerException d) {
-                        //ignored
-                    } catch (Exception d) {
-                        //ignored
-                    }
-                } else {
-                    QiscusLogger.print(TAG, "Connecting... " + "Failure to connecting");
+                try {
+                    QiscusLogger.print(TAG, "Connecting... error" + e.toString());
+                } catch (NullPointerException d) {
+                    //ignored
+                } catch (Exception d) {
+                    //ignored
                 }
             } catch (NullPointerException | IllegalArgumentException e) {
                 connecting = false;
-                if (e != null) {
-                    try {
-                        QiscusLogger.print(TAG, "Connecting... error" + e.toString());
-                    } catch (NullPointerException d) {
-                        //ignored
-                    } catch (Exception d) {
-                        //ignored
-                    }
-                } else {
-                    QiscusLogger.print(TAG, "Connecting... " + "Failure to connecting");
+                try {
+                    QiscusLogger.print(TAG, "Connecting... error" + e.toString());
+                } catch (NullPointerException d) {
+                    //ignored
+                } catch (Exception d) {
+                    //ignored
                 }
                 restartConnection();
             }

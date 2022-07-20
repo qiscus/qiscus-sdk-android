@@ -22,6 +22,7 @@ import android.database.Cursor;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -268,14 +269,14 @@ final class QiscusDb {
                 String extras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXTRAS));
                 qiscusComment.setExtras(extras == null ? null : new JSONObject(extras));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
 
             try {
                 String userExtras = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EXTRAS));
                 qiscusComment.setUserExtras(userExtras == null ? null : new JSONObject(userExtras));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
             return qiscusComment;
         }

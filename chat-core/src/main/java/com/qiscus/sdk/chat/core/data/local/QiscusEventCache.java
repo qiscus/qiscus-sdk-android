@@ -45,7 +45,7 @@ public enum QiscusEventCache {
         return sharedPreferences.getLong("last_event_id", 0);
     }
 
-    public void setLastEventId(long eventId) {
+    public void saveLastEventId(long eventId) {
         if (eventId > getLastEventId()) {
             sharedPreferences.edit()
                     .putLong("last_event_id", eventId)

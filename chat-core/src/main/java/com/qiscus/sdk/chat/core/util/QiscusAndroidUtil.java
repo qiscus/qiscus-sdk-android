@@ -35,8 +35,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  */
 public final class QiscusAndroidUtil {
 
-    private static final Random random = new Random();
-
     private QiscusAndroidUtil() {
     }
 

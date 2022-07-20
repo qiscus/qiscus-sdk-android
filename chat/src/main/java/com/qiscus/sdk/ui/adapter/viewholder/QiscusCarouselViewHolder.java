@@ -120,7 +120,6 @@ public class QiscusCarouselViewHolder extends QiscusBaseMessageViewHolder<Qiscus
             JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
             setUpCards(payload);
         } catch (JSONException | NullPointerException e) {
-            e.printStackTrace();
             cardsContainer.setVisibility(View.GONE);
         }
     }
@@ -142,7 +141,7 @@ public class QiscusCarouselViewHolder extends QiscusBaseMessageViewHolder<Qiscus
                 carouselItemView.render();
                 cardsContainer.addView(carouselItemView);
             } catch (JSONException e) {
-                e.printStackTrace();
+
             }
         }
         cardsContainer.setVisibility(View.VISIBLE);

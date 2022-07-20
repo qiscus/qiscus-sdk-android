@@ -16,7 +16,6 @@
 
 apply plugin: 'com.android.application'
 apply from: rootProject.file('gradle/quality.gradle')
-apply plugin: "org.sonarqube"
 
 android {
     compileSdkVersion 31
@@ -71,7 +70,6 @@ buildscript {
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.google.gms:google-services:4.2.0'
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
     }
 }
 

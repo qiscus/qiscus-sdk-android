@@ -159,7 +159,7 @@ public final class QiscusImageUtil {
                     scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix,
                     true);
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
 
         return scaledBitmap;
@@ -170,11 +170,11 @@ public final class QiscusImageUtil {
         FileOutputStream out = null;
         String filename = "";
         int androidVersion = Build.VERSION.SDK_INT;
-        if (androidVersion >= 30) {
-            filename =  QiscusFileUtil.generateFilePath(imageFile.getName(), ".jpg", Environment.DIRECTORY_PICTURES);
-        } else {
+//        if (androidVersion >= 30) {
+//            filename =  QiscusFileUtil.generateFilePath(imageFile.getName(), ".jpg", Environment.DIRECTORY_PICTURES);
+//        } else {
             filename = QiscusFileUtil.generateFilePath(imageFile.getName(), ".jpg");
-        }
+       // }
         try {
             out = new FileOutputStream(filename);
 
@@ -183,7 +183,7 @@ public final class QiscusImageUtil {
                     QiscusCore.getChatConfig().getQiscusImageCompressionConfig().getQuality(), out);
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
         } finally {
             try {
                 if (out != null) {
@@ -255,7 +255,7 @@ public final class QiscusImageUtil {
                     QiscusFileUtil.notifySystem(nomedia);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+
             }
         }
     }

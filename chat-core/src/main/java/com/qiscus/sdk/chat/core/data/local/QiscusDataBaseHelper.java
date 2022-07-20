@@ -39,9 +39,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     protected final SQLiteDatabase sqLiteReadDatabase;
     protected final SQLiteDatabase sqLiteWriteDatabase;
+    protected final QiscusDbOpenHelper qiscusDbOpenHelper;
 
     public QiscusDataBaseHelper() {
-        QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(QiscusCore.getApps());
+        qiscusDbOpenHelper = new QiscusDbOpenHelper(QiscusCore.getApps());
         sqLiteReadDatabase = qiscusDbOpenHelper.getReadableDatabase();
         sqLiteWriteDatabase = qiscusDbOpenHelper.getWritableDatabase();
     }
@@ -527,7 +528,10 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 cursor.close();
                 return qiscusRoomMember;
             } else {
-                cursor.close();
+                if (cursor != null) {
+                    cursor.close();
+                }
+
                 return null;
             }
         } catch (Exception e) {
@@ -804,7 +808,9 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     public void deleteLocalPath(long commentId) {
         File file = getLocalPath(commentId);
         if (file != null) {
-            file.delete();
+            if (!file.delete()) {
+                //no action
+            }
         }
 
         sqLiteWriteDatabase.beginTransactionNonExclusive();

@@ -47,7 +47,7 @@ public class CustomChatAdapter extends QiscusChatAdapter {
                 return TYPE_LOCKED_MESSAGE;
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+
         }
         return super.getItemViewTypeCustomMessage(qiscusComment, position);
     }

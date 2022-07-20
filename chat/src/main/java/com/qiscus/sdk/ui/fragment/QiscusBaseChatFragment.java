@@ -1321,7 +1321,6 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                 try {
                     recordAudioPanel.startRecord();
                 } catch (IOException e) {
-                    e.printStackTrace();
                     showError(getString(R.string.qiscus_failed_record_audio));
                     recordAudioPanel.cancelRecord();
                 } catch (IllegalStateException e) {
@@ -1348,7 +1347,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             try {
                 startActivityForResult(builder.build(getActivity()), PICK_LOCATION_REQUEST);
             } catch (GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
+
             }
             hideAttachmentPanel();
         } else {
@@ -1595,7 +1594,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         try {
             swipeRefreshLayout.setRefreshing(true);
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -1605,7 +1604,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             swipeRefreshLayout.setRefreshing(false);
             loadMoreProgressBar.setVisibility(View.VISIBLE);
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -1614,7 +1613,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         try {
             loadMoreProgressBar.setVisibility(View.VISIBLE);
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -1624,7 +1623,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             swipeRefreshLayout.setRefreshing(false);
             loadMoreProgressBar.setVisibility(View.GONE);
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -1675,7 +1674,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
                         SEND_PICTURE_CONFIRMATION_REQUEST);
             } catch (Exception e) {
                 showError(getString(R.string.qiscus_chat_error_failed_read_picture));
-                e.printStackTrace();
+
             }
         } else if (requestCode == SEND_PICTURE_CONFIRMATION_REQUEST && resultCode == Activity.RESULT_OK) {
             if (data == null) {

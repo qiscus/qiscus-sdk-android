@@ -114,7 +114,7 @@ public abstract class QiscusBaseButtonMessageViewHolder extends QiscusBaseTextMe
                     buttonViews.add(button);
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+
             }
         }
 

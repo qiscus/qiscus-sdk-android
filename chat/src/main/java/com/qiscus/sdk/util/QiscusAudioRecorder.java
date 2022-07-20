@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Environment;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class QiscusAudioRecorder {
                 recorder.release();
                 recorder = null;
             } catch (Exception e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
     }

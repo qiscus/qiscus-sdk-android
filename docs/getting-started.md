@@ -231,7 +231,7 @@ QiscusRxExecutor.execute(QiscusApi.getInstance().getChatRoom(roomID),
                         }
                         @Override
                         public void onError(Throwable throwable) {
-                            throwable.printStackTrace();
+                            
                         }
                     });
         }

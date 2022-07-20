@@ -126,7 +126,7 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
             JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
             setUpCard(payload);
         } catch (JSONException | NullPointerException e) {
-            e.printStackTrace();
+
             cardView.setVisibility(View.GONE);
         }
 
@@ -167,7 +167,7 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
         try {
             setUpButtons(payload.getJSONArray("buttons"));
         } catch (JSONException e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -198,7 +198,7 @@ public abstract class QiscusBaseCardMessageViewHolder extends QiscusBaseTextMess
                     buttonViews.add(button);
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+
             }
         }
 

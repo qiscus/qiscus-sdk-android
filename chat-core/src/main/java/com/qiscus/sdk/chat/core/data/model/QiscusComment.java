@@ -29,6 +29,7 @@ import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
@@ -133,13 +134,13 @@ public class QiscusComment implements Parcelable {
         try {
             extras = new JSONObject(in.readString());
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
 
         try {
             userExtras = new JSONObject(in.readString());
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
     }
 
@@ -172,7 +173,7 @@ public class QiscusComment implements Parcelable {
                     .put("caption", caption)
                     .put("file_name", name);
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         qiscusComment.setExtraPayload(json.toString());
         return qiscusComment;
@@ -192,7 +193,7 @@ public class QiscusComment implements Parcelable {
                     .put("replied_comment_type", repliedComment.getRawType())
                     .put("replied_comment_payload", repliedComment.getExtraPayload());
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         qiscusComment.setExtraPayload(json.toString());
 
@@ -207,7 +208,7 @@ public class QiscusComment implements Parcelable {
         try {
             json.put("name", contact.getName()).put("value", contact.getValue());
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         qiscusComment.setExtraPayload(json.toString());
 
@@ -225,7 +226,7 @@ public class QiscusComment implements Parcelable {
                     .put("latitude", location.getLatitude()).put("longitude", location.getLongitude())
                     .put("map_url", location.getMapUrl());
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         qiscusComment.setExtraPayload(json.toString());
 
@@ -255,7 +256,7 @@ public class QiscusComment implements Parcelable {
         try {
             json.put("type", type).put("content", content);
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         qiscusComment.setExtraPayload(json.toString());
         return qiscusComment;
@@ -446,7 +447,7 @@ public class QiscusComment implements Parcelable {
                 replyTo.rawType = payload.optString("replied_comment_type");
                 replyTo.extraPayload = payload.optString("replied_comment_payload");
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
         return replyTo;
@@ -463,7 +464,7 @@ public class QiscusComment implements Parcelable {
             json.put("url", url);
             setExtraPayload(json.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
     }
 
@@ -535,7 +536,7 @@ public class QiscusComment implements Parcelable {
                 attachmentName = URLDecoder.decode(fileName, "UTF-8");
                 return attachmentName;
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
 
             throw new RuntimeException("The filename '" + fileName + "' is not valid UTF-8");
@@ -629,7 +630,7 @@ public class QiscusComment implements Parcelable {
                 contact = new QiscusContact(payload.optString("name"), payload.optString("value"),
                         payload.optString("type", "phone"));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
         return contact;
@@ -649,7 +650,7 @@ public class QiscusComment implements Parcelable {
                 location.setLatitude(payload.optDouble("latitude"));
                 location.setLongitude(payload.optDouble("longitude"));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
         return location;
@@ -735,7 +736,7 @@ public class QiscusComment implements Parcelable {
                         }
                     });
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    QiscusErrorLogger.print(e);
                 }
             }
         }
@@ -906,20 +907,28 @@ public class QiscusComment implements Parcelable {
         if (extras == null) {
             try {
                 extras = new JSONObject("{}");
+                dest.writeString(extras.toString());
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
+                dest.writeString("{}");
             }
+        }else{
+            dest.writeString(extras.toString());
         }
-        dest.writeString(extras.toString());
+
 
         if (userExtras == null) {
             try {
                 userExtras = new JSONObject("{}");
+                dest.writeString(userExtras.toString());
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
+                dest.writeString("{}");
             }
+        }else{
+            dest.writeString(userExtras.toString());
         }
-        dest.writeString(userExtras.toString());
+
     }
 
     public boolean areContentsTheSame(QiscusComment qiscusComment) {
@@ -989,7 +998,8 @@ public class QiscusComment implements Parcelable {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    QiscusErrorLogger.print(e);
+                    Thread.currentThread().interrupt();
                 }
             }
         }

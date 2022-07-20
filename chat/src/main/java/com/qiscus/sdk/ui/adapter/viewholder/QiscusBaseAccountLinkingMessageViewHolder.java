@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
@@ -90,7 +91,7 @@ public abstract class QiscusBaseAccountLinkingMessageViewHolder extends QiscusBa
             }
             accountLinkingView.setText(text);
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
             accountLinkingView.setText(accountLinkingText);
         }
     }

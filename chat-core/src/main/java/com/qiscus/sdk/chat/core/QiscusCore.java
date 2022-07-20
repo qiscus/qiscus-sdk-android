@@ -21,6 +21,7 @@ import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.os.Handler;
 import androidx.annotation.RestrictTo;
 import androidx.security.crypto.EncryptedSharedPreferences;
@@ -1073,10 +1074,10 @@ public class QiscusCore {
 
 
             } catch (GeneralSecurityException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
                 sharedPreferences = sharedPreferencesOld;
             } catch (IOException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
                 sharedPreferences = sharedPreferencesOld;
             }
 
@@ -1094,7 +1095,7 @@ public class QiscusCore {
                 sharedPreferences.edit().putString("cached_account", data.toString()).apply();
             } catch (JSONException e) {
                 sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
 
             setToken(qiscusAccount.getToken());
@@ -1129,7 +1130,7 @@ public class QiscusCore {
                     }
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
             return qiscusAccount;
         }

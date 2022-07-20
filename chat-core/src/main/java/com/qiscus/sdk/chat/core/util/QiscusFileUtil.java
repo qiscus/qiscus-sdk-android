@@ -16,18 +16,13 @@
 
 package com.qiscus.sdk.chat.core.util;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
@@ -42,9 +37,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
-
-import androidx.annotation.NonNull;
 
 public final class QiscusFileUtil {
 
@@ -53,6 +45,8 @@ public final class QiscusFileUtil {
             QiscusCore.getAppsName() + " Images";
     private static final int EOF = -1;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    private static InputStream inputStream ;
+    private static FileInputStream in;
 
     private QiscusFileUtil() {
 
@@ -60,7 +54,7 @@ public final class QiscusFileUtil {
 
     public static File from(Uri uri) throws IOException {
         if (uri != null) {
-            InputStream inputStream = QiscusCore.getApps().getContentResolver().openInputStream(uri);
+            inputStream = QiscusCore.getApps().getContentResolver().openInputStream(uri);
             String fileName = getFileName(uri);
             String[] splitName = splitFileName(fileName);
             String tempName = "temp";
@@ -76,7 +70,7 @@ public final class QiscusFileUtil {
             try {
                 out = new FileOutputStream(tempFile);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
             if (inputStream != null) {
                 copy(inputStream, out);
@@ -99,7 +93,7 @@ public final class QiscusFileUtil {
         try {
             out = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         copy(inputStream, out);
 
@@ -130,7 +124,7 @@ public final class QiscusFileUtil {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -164,11 +158,11 @@ public final class QiscusFileUtil {
         String path = generateFilePath(file.getName());
         File newFile = new File(path);
         try {
-            FileInputStream in = new FileInputStream(file);
+            in = new FileInputStream(file);
             FileOutputStream out = new FileOutputStream(newFile);
             copy(in, out);
         } catch (IOException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         return newFile;
     }
@@ -270,9 +264,14 @@ public final class QiscusFileUtil {
         File newFile = new File(file.getParent(), newName);
         if (!newFile.equals(file)) {
             if (newFile.exists()) {
-                newFile.delete();
+                if (!newFile.delete()) {
+                    // file delete failed; take appropriate action
+                }
             }
-            file.renameTo(newFile);
+
+            if (!file.renameTo(newFile)){
+                // file failed to rename
+            }
         }
         return newFile;
     }

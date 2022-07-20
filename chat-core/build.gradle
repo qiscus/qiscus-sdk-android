@@ -21,6 +21,7 @@ apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
 apply from: 'publish.gradle'
 apply plugin: "com.jfrog.artifactory"
+apply plugin: 'org.sonarqube'
 
 android {
     compileSdkVersion compileSDKVersion
@@ -72,12 +73,16 @@ buildscript {
         google()
         mavenCentral()
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
     }
 }
 

@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
             QiscusPusherApi.getInstance().publishCustomEvent(1353686, data);
         } catch (JSONException e) {
-            e.printStackTrace();
+
         }
     }
 

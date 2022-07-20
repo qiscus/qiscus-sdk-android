@@ -33,10 +33,10 @@ import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.regex.Matcher;
 
 /**
@@ -46,7 +46,8 @@ import java.util.regex.Matcher;
  * GitHub     : https://github.com/zetbaitsu
  */
 public final class QiscusTextUtil {
-    private static final Random random = new Random();
+
+    private static final SecureRandom random = new SecureRandom();
     private static final char[] symbols;
 
     static {

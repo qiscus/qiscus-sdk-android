@@ -30,7 +30,9 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
+import com.qiscus.sdk.chat.core.util.QiscusValueUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,42 +51,48 @@ import java.util.List;
 final class QiscusApiParser {
 
     static QiscusNonce parseNonce(JsonElement jsonElement) {
-        JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
+        JsonObject result = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults()).getAsJsonObject();
         return new QiscusNonce(new Date(result.get("expired_at").getAsLong() * 1000L),
                 result.get("nonce").getAsString());
     }
 
     static QiscusAccount parseQiscusAccount(JsonElement jsonElement) {
-        JSONObject jsonAccount = null;
         try {
-            jsonAccount = new JSONObject(jsonElement.getAsJsonObject().get("results")
+            JSONObject jsonAccount = new JSONObject(jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults())
                     .getAsJsonObject().get("user").getAsJsonObject().toString());
+            return parseQiscusAccount(jsonAccount, true);
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
+            return parseQiscusAccount(null, true);
         }
-        return parseQiscusAccount(jsonAccount, true);
+
     }
 
     static QiscusAccount parseQiscusAccount(JSONObject jsonAccount, Boolean isSelf) {
-        QiscusAccount qiscusAccount = new QiscusAccount();
-        qiscusAccount.setId(jsonAccount.optInt("id"));
-        qiscusAccount.setUsername(jsonAccount.optString("username"));
-        qiscusAccount.setEmail(jsonAccount.optString("email"));
-        qiscusAccount.setAvatar(jsonAccount.optString("avatar_url"));
-        try {
-            qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
-        } catch (Exception ignored) {
-            //Do nothing
+        if (jsonAccount != null) {
+            QiscusAccount qiscusAccount = new QiscusAccount();
+            qiscusAccount.setId(jsonAccount.optInt("id"));
+            qiscusAccount.setUsername(jsonAccount.optString("username"));
+            qiscusAccount.setEmail(jsonAccount.optString("email"));
+            qiscusAccount.setAvatar(jsonAccount.optString("avatar_url"));
+            try {
+                qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
+            } catch (Exception ignored) {
+                //Do nothing
+            }
+            if (isSelf) {
+                qiscusAccount.setToken(jsonAccount.optString("token"));
+            }
+            return qiscusAccount;
+        }else{
+            QiscusAccount qiscusAccount = new QiscusAccount();
+            return qiscusAccount;
         }
-        if (isSelf) {
-            qiscusAccount.setToken(jsonAccount.optString("token"));
-        }
-        return qiscusAccount;
     }
 
     static QiscusChatRoom parseQiscusChatRoom(JsonElement jsonElement) {
         if (jsonElement != null) {
-            JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("room").getAsJsonObject();
+            JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults()).getAsJsonObject().get("room").getAsJsonObject();
             QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
             qiscusChatRoom.setId(jsonChatRoom.get("id").getAsLong());
             qiscusChatRoom.setGroup(!"single".equals(jsonChatRoom.get("chat_type").getAsString()));
@@ -123,7 +131,7 @@ final class QiscusApiParser {
             }
             qiscusChatRoom.setMember(members);
 
-            JsonArray comments = jsonElement.getAsJsonObject().get("results")
+            JsonArray comments = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults())
                     .getAsJsonObject().get("comments").getAsJsonArray();
 
             if (comments.size() > 0) {
@@ -165,7 +173,7 @@ final class QiscusApiParser {
         List<QiscusChatRoom> qiscusChatRooms = new ArrayList<>();
         if (jsonElement != null) {
             JsonArray jsonRoomInfo = jsonElement.getAsJsonObject()
-                    .get("results").getAsJsonObject().get("rooms_info").getAsJsonArray();
+                    .get(QiscusValueUtil.getValueDataResults()).getAsJsonObject().get("rooms_info").getAsJsonArray();
             for (JsonElement item : jsonRoomInfo) {
                 JsonObject jsonChatRoom = item.getAsJsonObject();
                 QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
@@ -239,7 +247,7 @@ final class QiscusApiParser {
         if (jsonElement != null) {
             QiscusChatRoom qiscusChatRoom = parseQiscusChatRoom(jsonElement);
 
-            JsonArray comments = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("comments").getAsJsonArray();
+            JsonArray comments = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults()).getAsJsonObject().get("comments").getAsJsonArray();
             List<QiscusComment> qiscusComments = new ArrayList<>();
             for (JsonElement jsonComment : comments) {
                 qiscusComments.add(parseQiscusComment(jsonComment, qiscusChatRoom.getId()));
@@ -253,7 +261,7 @@ final class QiscusApiParser {
 
     static List<QiscusComment> parseFileListAndSearchMessage(JsonElement jsonElement) {
         if (jsonElement != null) {
-            JsonArray comments = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("comments").getAsJsonArray();
+            JsonArray comments = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults()).getAsJsonObject().get("comments").getAsJsonArray();
             List<QiscusComment> qiscusComments = new ArrayList<>();
             for (JsonElement jsonComment : comments) {
                 qiscusComments.add(parseFileListAndSearch(jsonComment));
@@ -329,7 +337,7 @@ final class QiscusApiParser {
             try {
                 qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
 
@@ -337,7 +345,7 @@ final class QiscusApiParser {
             try {
                 qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
 
@@ -400,7 +408,7 @@ final class QiscusApiParser {
             try {
                 qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
 
@@ -408,7 +416,7 @@ final class QiscusApiParser {
             try {
                 qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
             } catch (JSONException e) {
-                e.printStackTrace();
+                QiscusErrorLogger.print(e);
             }
         }
 
@@ -466,7 +474,7 @@ final class QiscusApiParser {
         if (jsonElement != null) {
             QiscusAppConfig appConfig = new QiscusAppConfig();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            JsonObject results = jsonObject.getAsJsonObject("results");
+            JsonObject results = jsonObject.getAsJsonObject(QiscusValueUtil.getValueDataResults());
 
 
             if (results.has("base_url")) {
@@ -546,7 +554,7 @@ final class QiscusApiParser {
         if (jsonElement != null) {
             QiscusRealtimeStatus realtimeStatus = new QiscusRealtimeStatus();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            JsonObject results = jsonObject.getAsJsonObject("results");
+            JsonObject results = jsonObject.getAsJsonObject(QiscusValueUtil.getValueDataResults());
 
 
             if (results.has("status")) {
@@ -564,7 +572,7 @@ final class QiscusApiParser {
     static List<QiscusChannels> parseQiscusChannels(JsonElement jsonElement) {
         if (jsonElement != null) {
 
-            JsonArray channels = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("channels").getAsJsonArray();
+            JsonArray channels = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults()).getAsJsonObject().get("channels").getAsJsonArray();
             List<QiscusChannels> qiscusChannels = new ArrayList<>();
             if (channels.isJsonArray()) {
                 for (JsonElement channel : channels) {
@@ -619,7 +627,7 @@ final class QiscusApiParser {
     static List<QUserPresence> parseQiscusUserPresence(JsonElement jsonElement) {
         if (jsonElement != null) {
 
-            JsonArray usersStatus = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user_status").getAsJsonArray();
+            JsonArray usersStatus = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults()).getAsJsonObject().get("user_status").getAsJsonArray();
             List<QUserPresence> userPresence = new ArrayList<>();
             if (usersStatus.isJsonArray()) {
                 for (JsonElement userStatus : usersStatus) {

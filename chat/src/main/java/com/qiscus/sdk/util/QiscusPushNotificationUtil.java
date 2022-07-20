@@ -195,7 +195,6 @@ public final class QiscusPushNotificationUtil {
                         messageText += "\uD83D\uDCDA " + QiscusTextUtil.getString(R.string.qiscus_send_a_carousel);
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
                     messageText += "\uD83D\uDCDA " + QiscusTextUtil.getString(R.string.qiscus_send_a_carousel);
                 }
                 break;

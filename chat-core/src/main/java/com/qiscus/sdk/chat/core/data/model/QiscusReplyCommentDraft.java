@@ -16,6 +16,8 @@
 
 package com.qiscus.sdk.chat.core.data.model;
 
+import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,7 +42,7 @@ public class QiscusReplyCommentDraft extends QiscusCommentDraft {
                     .put("replied_comment_type", repliedComment.getRawType())
                     .put("replied_comment_payload", repliedComment.getExtraPayload());
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         repliedPayload = json.toString();
     }
@@ -67,7 +69,7 @@ public class QiscusReplyCommentDraft extends QiscusCommentDraft {
             replyTo.setRawType(payload.optString("replied_comment_type"));
             replyTo.setExtraPayload(payload.optString("replied_comment_payload"));
         } catch (JSONException e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
         return replyTo;
     }

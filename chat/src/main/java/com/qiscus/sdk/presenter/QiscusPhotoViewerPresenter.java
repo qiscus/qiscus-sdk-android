@@ -74,7 +74,6 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                         view.dismissLoading();
                     }
                 }, throwable -> {
-                    throwable.printStackTrace();
                     if (view != null) {
                         view.showError(QiscusTextUtil.getString(R.string.qiscus_general_error));
                         view.closePage();
@@ -102,7 +101,6 @@ public class QiscusPhotoViewerPresenter extends QiscusPresenter<QiscusPhotoViewe
                 })
                 .subscribe(file1 -> view.onFileDownloaded(Pair.create(qiscusComment, file1)), throwable -> {
                     QiscusErrorLogger.print(throwable);
-                    throwable.printStackTrace();
                     qiscusComment.setDownloading(false);
                     view.showError(QiscusTextUtil.getString(R.string.qiscus_failed_download_file));
                 });

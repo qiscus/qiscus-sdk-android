@@ -57,7 +57,7 @@ public final class QiscusFirebaseMessagingUtil {
         try {
             QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
     }
 
@@ -65,7 +65,7 @@ public final class QiscusFirebaseMessagingUtil {
         try {
             QiscusPusherApi.handleNotification(new JSONObject(remoteMessage.getData().get("payload")));
         } catch (Exception e) {
-            e.printStackTrace();
+            QiscusErrorLogger.print(e);
         }
     }
 
