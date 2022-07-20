@@ -30,6 +30,7 @@ import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import rx.Emitter;
@@ -543,6 +544,13 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void add(QiscusComment qiscusComment) {
+        if (qiscusComment.getTime() == null) {
+            qiscusComment.setTime(new Date());
+            QiscusErrorLogger.print("QiscusCore" ,
+                    "call the func QiscusCore.getDataStore().add() without set datetime in commentId : "
+                            + qiscusComment.getId() + "will overwrite with the current date");
+        }
+
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
             sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
@@ -600,6 +608,13 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void update(QiscusComment qiscusComment) {
+        if (qiscusComment.getTime() == null) {
+            qiscusComment.setTime(new Date());
+            QiscusErrorLogger.print("QiscusCore" ,
+                    "call the func QiscusCore.getDataStore().update() without set datetime in commentId : "
+                    + qiscusComment.getId() + "will overwrite with the current date");
+        }
+
         String where = QiscusDb.CommentTable.COLUMN_UNIQUE_ID + " =? ";
 
         String[] args = new String[]{qiscusComment.getUniqueId()};
@@ -637,6 +652,13 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void addOrUpdate(QiscusComment qiscusComment) {
+        if (qiscusComment.getTime() == null) {
+            qiscusComment.setTime(new Date());
+            QiscusErrorLogger.print("QiscusCore" ,
+                    "call the func QiscusCore.getDataStore().addOrUpdate() without set datetime in commentId : "
+                            + qiscusComment.getId() + "will overwrite with the current date");
+        }
+
         sqLiteWriteDatabase.beginTransactionNonExclusive();
         try {
             sqLiteWriteDatabase.insertWithOnConflict(QiscusDb.CommentTable.TABLE_NAME, null,
@@ -994,6 +1016,13 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public List<QiscusComment> getOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit) {
+        if (qiscusComment.getTime() == null){
+            qiscusComment.setTime(new Date());
+            QiscusErrorLogger.print("QiscusCore" ,
+                    "call the func getOlderCommentsThan without set datetime in commentId : "
+                            + qiscusComment.getId() + "will overwrite with the current date");
+        }
+
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ROOM_ID + " =? " + " AND "
@@ -1022,6 +1051,12 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public Observable<List<QiscusComment>> getObservableOlderCommentsThan(QiscusComment qiscusComment, long roomId, int limit) {
+        if (qiscusComment.getTime() == null){
+            qiscusComment.setTime(new Date());
+            QiscusErrorLogger.print("QiscusCore" ,
+                    "call the func getObservableOlderCommentsThan without set datetime in commentId : "
+                            + qiscusComment.getId() + "will overwrite with the current date");
+        }
         return Observable.create(subscriber -> {
             subscriber.onNext(getOlderCommentsThan(qiscusComment, roomId, limit));
             subscriber.onCompleted();
