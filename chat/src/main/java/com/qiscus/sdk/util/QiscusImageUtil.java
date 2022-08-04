@@ -170,11 +170,11 @@ public final class QiscusImageUtil {
         FileOutputStream out = null;
         String filename = "";
         int androidVersion = Build.VERSION.SDK_INT;
-//        if (androidVersion >= 30) {
-//            filename =  QiscusFileUtil.generateFilePath(imageFile.getName(), ".jpg", Environment.DIRECTORY_PICTURES);
-//        } else {
+        if (androidVersion >= 30) {
+            filename =  QiscusFileUtil.generateFilePath(imageFile.getName(), ".jpg", Environment.DIRECTORY_PICTURES);
+        } else {
             filename = QiscusFileUtil.generateFilePath(imageFile.getName(), ".jpg");
-       // }
+        }
         try {
             out = new FileOutputStream(filename);
 

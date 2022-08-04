@@ -28,11 +28,11 @@ repositories {
 ext {
 
     minSDKVersion = 21
-    targetSDKVersion = 31
-    compileSDKVersion = 31
+    targetSDKVersion = 32
+    compileSDKVersion = 32
 
     versions = [
-            support          : "31.0.0",
+            support          : "32.0.0",
             firebaseCore     : "19.0.0",
             firebaseMessaging: "22.0.0",
             okHttp           : "3.12.5",
@@ -68,7 +68,7 @@ ext {
 
     securityDeps = [
             crypto : "androidx.security:security-crypto:1.1.0-alpha03",
-            jupukData : "com.qiscus.utils:jupukdata:1.0.0",
+            jupukData : "com.qiscus.utils:jupukdata:1.0.2",
             authenticator : "androidx.security:security-app-authenticator:1.0.0-alpha02"
     ]
 

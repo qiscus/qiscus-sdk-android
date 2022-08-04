@@ -26,6 +26,7 @@ import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.utils.jupukdata.JupukData;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,9 +61,9 @@ public final class QiscusFileUtil {
             String tempName = "temp";
             File tempFile;
             if (splitName[0].length() < 4){
-                tempFile = File.createTempFile(tempName, splitName[1]);
+                tempFile = File.createTempFile(tempName, splitName[1], new File("/qiscusCoreDir"));
             } else {
-                tempFile = File.createTempFile(splitName[0], splitName[1]);
+                tempFile = File.createTempFile(splitName[0], splitName[1], new File("/qiscusCoreDir"));
             }
             tempFile = rename(tempFile, fileName);
             tempFile.deleteOnExit();
@@ -179,7 +180,8 @@ public final class QiscusFileUtil {
     }
 
     public static String generateFilePath(String fileName, String extension) {
-        File file = new File(Environment.getExternalStorageDirectory().getPath(),
+
+        File file = new File(JupukData.getBaseDirectory().getPath(),
                 isImage(fileName) ? IMAGE_PATH : FILES_PATH);
 
         if (!file.exists()) {
