@@ -22,7 +22,7 @@ package com.qiscus.sdk.chat.core.util;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public final class QiscusNumberUtil {
+public class QiscusNumberUtil {
     public static int convertToInt(long number) {
         return (int) (number % Integer.MAX_VALUE);
     }

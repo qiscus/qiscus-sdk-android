@@ -1,0 +1,25 @@
+apply plugin: 'org.sonarqube'
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "http://localhost:8081" // for local config
+        property "sonar.projectKey", "qiscus-sdk-android" // for local config
+        property "sonar.projectName", "qiscus-sdk-android" // for local config
+        property "sonar.login", "f8a549e8dd8bc334a70539332cf0c9146b4720dd" // for local config
+        property "sonar.projectVersion", "1"//"${android.defaultConfig.versionName}"
+        property "sonar.tests", "src/test/java"
+        property "sonar.test.inclusions", "**/*Test*/**"
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.sources", "src/main/java"
+        property "sonar.exclusions", '**/*Test*/**,' +
+                'build/**' +
+                '*.json,' +
+                '**/*test*/**,' +
+                '**/.gradle/**,' +
+                '**/R.class'
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.junit.reportPaths", "**/test-results/**/*.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "**/jacocoTestReport/jacocoTestReport.xml"
+        property "sonar.coverage.exclusions", "${coverageExclusions.join(', ')}"
+    }
+}
