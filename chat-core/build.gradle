@@ -89,7 +89,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
@@ -103,8 +102,8 @@ buildscript {
     }
 }
 
-apply from: '../buildsystem/bintrayv1.gradle'
-apply from: '../buildsystem/installv1.gradle'
+/*apply from: '../buildsystem/bintrayv1.gradle'
+apply from: '../buildsystem/installv1.gradle'*/
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
