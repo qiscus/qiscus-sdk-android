@@ -16,12 +16,16 @@
 
 package com.qiscus.sdk.chat.core;
 
+import android.app.AlarmManager;
 import android.app.Application;
 import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
@@ -80,6 +84,7 @@ public class QiscusCore {
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
     private static Boolean enableRealtime = true;
+    private static Boolean forceDisableRealtimeFromExactAlarm = false;
     private static Boolean syncServiceDisabled = false;
     private static Boolean enableSync = true;
     private static Boolean enableSyncEvent = false;
@@ -228,8 +233,45 @@ public class QiscusCore {
         enableEventReport = false;
         localDataManager.setURLLB(baseURLLB);
 
+
+        AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmMgr.canScheduleExactAlarms()) {
+                forceDisableRealtimeFromExactAlarm = true;
+                enableRealtime = false;
+            }else{
+                forceDisableRealtimeFromExactAlarm = false;
+            }
+
+        }
+
+        QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            checkExactAlarm(application);
+        }
+
         getAppConfig();
         configureFcmToken();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private static void checkExactAlarm(Application application){
+        PackageManager.OnChecksumsReadyListener check = ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
+
+            AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+            if (!alarmMgr.canScheduleExactAlarms()) {
+                forceDisableRealtimeFromExactAlarm = true;
+                enableRealtime = false;
+
+                if (QiscusPusherApi.getInstance().isConnected()) {
+                    QiscusPusherApi.getInstance().disconnect();
+                }
+            } else {
+                forceDisableRealtimeFromExactAlarm = false;
+                enableRealtime = true;
+            }
+        };
     }
 
     public static void isBuiltIn(Boolean isBuiltInSDK) {
@@ -259,6 +301,7 @@ public class QiscusCore {
                     if (!appConfig.getBrokerLBURL().isEmpty() &&
                             QiscusServiceUtil.isValidUrl(appConfig.getBrokerLBURL())) {
                         QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
+                        localDataManager.setURLLB(QiscusCore.baseURLLB);
                     }
 
                     if (!appConfig.getBrokerURL().isEmpty()) {
@@ -290,6 +333,10 @@ public class QiscusCore {
                     enableRealtime = appConfig.getEnableRealtime();
                     enableSync = appConfig.getEnableSync();
                     enableSyncEvent = appConfig.getEnableSyncEvent();
+
+                    if (forceDisableRealtimeFromExactAlarm){
+                        enableRealtime = false;
+                    }
 
                     startSyncService();
                     startNetworkCheckerService();
@@ -466,6 +513,10 @@ public class QiscusCore {
      */
     public static boolean getEnableRealtime() {
         return enableRealtime;
+    }
+
+    public static void setEnableDisableRealtime(Boolean enableDisableRealtime){
+        enableRealtime = enableDisableRealtime;
     }
 
     /**
