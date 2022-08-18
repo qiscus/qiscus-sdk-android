@@ -16,8 +16,22 @@
 
 package com.qiscus.dragonfly;
 
+import static android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM;
+
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,11 +39,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
+import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.ui.QiscusChannelActivity;
@@ -58,6 +75,32 @@ public class MainActivity extends AppCompatActivity {
 
         String versionSDK = getString(R.string.qiscus_version) + " " + "123"; //BuildConfig.VERSION_NAME;
         mVersion.setText(versionSDK);
+
+        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmMgr.canScheduleExactAlarms()) {
+
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+                alertBuilder.setCancelable(true);
+                alertBuilder.setTitle("Permission necessary");
+                alertBuilder.setMessage("Schedule Exact Alarm permission is necessary for realtime");
+                alertBuilder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        Intent intent = new Intent(
+                                ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                Uri.parse("package:" + this.getPackageName())
+                        );
+
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        this.getApplicationContext().startActivity(intent);
+                    }
+                });
+
+                AlertDialog alert = alertBuilder.create();
+                alert.show();
+
+            }
+        }
     }
 
     public void loginOrLogout(View view) {
