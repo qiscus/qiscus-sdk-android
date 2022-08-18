@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.qiscus.dragonfly">
 
-    <uses-permission android:name="android.permission.INSTALL_GRANT_RUNTIME_PERMISSIONS" />
-
     <application
         android:name=".SampleApps"
         android:allowBackup="true"

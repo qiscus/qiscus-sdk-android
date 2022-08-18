@@ -11,37 +11,37 @@ ext {
 }
 
 jacoco {
-    toolVersion = '0.8.3'
-    reportsDir = file("$buildDir/reports")
+    toolVersion = "0.8.3"
+//    reportsDir = file("$buildDir/reports")
 }
 
 tasks.withType(Test) {
-    jacoco.includeNoLocationClasses = true
-    // https://github.com/gradle/gradle/issues/5184#issuecomment-457865951
-    jacoco.excludes = ['jdk.internal.*']
+    jacoco {
+        includeNoLocationClasses = true
+        excludes = ['jdk.internal.*'] // Allows it to run on Java 11
+    }
 }
-
 
 tasks.withType(Test) {
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
     group = "Reporting"
-    description = "Generate Jacoco coverage reports for Debug build"
+    description = "Generate Jacoco coverage reports"
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required =  true
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
     }
 
     def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug/classes", excludes: coverageExclusions)
     def mainSrc = "/src/main/java"
 
-    additionalSourceDirs.from = files(mainSrc)
-    sourceDirectories.from = files([mainSrc])
-    classDirectories.from = files([debugTree])
-
-    executionData.from = files("$buildDir/jacoco/testDebugUnitTest.exec")
-
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+    executionData.setFrom(fileTree(dir: project.buildDir, includes: [
+            "**/**/*.exec", "**/**/*.ec"
+    ]))
 }

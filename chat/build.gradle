@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
@@ -28,7 +28,6 @@ android {
     defaultConfig {
         minSdkVersion minSDKVersion
         targetSdkVersion targetSDKVersion
-        versionCode 1
 
     }
     buildTypes {
@@ -68,15 +67,15 @@ buildscript {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.google.gms:google-services:4.3.10'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
 //        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.4'
 //        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
     }
 }
 
-apply from: '../buildsystem/bintrayv1.gradle'
-apply from: '../buildsystem/installv1.gradle'
+//apply from: '../buildsystem/bintrayv1.gradle'
+//apply from: '../buildsystem/installv1.gradle'
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])

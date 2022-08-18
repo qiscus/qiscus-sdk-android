@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
@@ -32,8 +32,6 @@ android {
     defaultConfig {
         minSdkVersion minSDKVersion
         targetSdkVersion targetSDKVersion
-        versionCode 1
-        versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
     }
     buildTypes {
         release {
@@ -74,14 +72,24 @@ android {
     }
 
     useLibrary 'org.apache.http.legacy'
+    useLibrary 'android.test.runner'
 
     testOptions {
-        execution 'ANDROID_TEST_ORCHESTRATOR'
+        //execution 'ANDROID_TEST_ORCHESTRATOR'
         animationsDisabled true
         unitTests {
             includeAndroidResources = true
 
         }
+    }
+
+    defaultConfig {
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 }
 
@@ -126,8 +134,16 @@ dependencies {
     testImplementation 'org.json:json:20180813'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:3.7.7'
+
     androidTestImplementation 'androidx.test:core:1.4.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    testImplementation 'androidx.test:core:1.4.0'
+    testImplementation 'androidx.test.ext:junit:1.1.3'
+    testImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    testImplementation 'androidx.test:runner:1.4.0'
+    androidTestUtil 'androidx.test:orchestrator:1.4.1'
+
 }

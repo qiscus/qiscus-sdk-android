@@ -4,9 +4,10 @@ sonarqube {
     properties {
         property "sonar.host.url", "http://localhost:8081" // for local config
         property "sonar.projectKey", "qiscus-sdk-android" // for local config
-        property "sonar.projectName", "qiscus-sdk-android" // for local config
-        property "sonar.login", "f8a549e8dd8bc334a70539332cf0c9146b4720dd" // for local config
-        property "sonar.projectVersion", "1"//"${android.defaultConfig.versionName}"
+        property "sonar.projectName", "qiscus-sdk-android Agent" // for local config
+        property "sonar.login", "e7799cb5bd7b23c29297c4b71e31596dea92e3da" // for local config
+        property "sonar.projectVersion", "123"
+
         property "sonar.tests", "src/test/java"
         property "sonar.test.inclusions", "**/*Test*/**"
         property "sonar.sourceEncoding", "UTF-8"
@@ -23,3 +24,5 @@ sonarqube {
         property "sonar.coverage.exclusions", "${coverageExclusions.join(', ')}"
     }
 }
+
+tasks.sonarqube.dependsOn ":chat-core:jacocoTestReport"
