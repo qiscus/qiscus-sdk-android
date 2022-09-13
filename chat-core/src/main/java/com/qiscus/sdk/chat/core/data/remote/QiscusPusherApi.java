@@ -104,6 +104,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private int setOfflineCounter;
 
     QiscusPusherApi() {
+        if (!QiscusCore.getEnableRealtime()) {
+            return;
+        }
         QiscusLogger.print("QiscusPusherApi", "Creating...");
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
