@@ -1032,6 +1032,10 @@ public class QiscusCore {
         return QiscusActivityCallback.INSTANCE.isForeground();
     }
 
+    public static void setAppInForeground(){
+        QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
+    }
+
     /**
      * Needed to run something at background thread handler
      *
