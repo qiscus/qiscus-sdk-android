@@ -29,6 +29,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -47,6 +48,11 @@ import java.util.List;
  * GitHub     : https://github.com/zetbaitsu
  */
 final class QiscusApiParser {
+
+    private static final String RESULTS = "results";
+    // token params
+    private static final String TOKEN = "token";
+    private static final String REFRESH_TOKEN = "refresh_token";
 
     static QiscusNonce parseNonce(JsonElement jsonElement) {
         JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
@@ -71,6 +77,7 @@ final class QiscusApiParser {
         qiscusAccount.setUsername(jsonAccount.optString("username"));
         qiscusAccount.setEmail(jsonAccount.optString("email"));
         qiscusAccount.setAvatar(jsonAccount.optString("avatar_url"));
+        qiscusAccount.setRefreshToken(jsonAccount.optString("refresh_token"));
         try {
             qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
         } catch (Exception ignored) {
@@ -655,4 +662,20 @@ final class QiscusApiParser {
 
         return userPresence;
     }
+
+    public static QiscusRefreshToken parseRefreshToken(JsonObject jsonRefreshToken) {
+        QiscusRefreshToken refreshToken = new QiscusRefreshToken();
+        if (jsonRefreshToken.has(RESULTS)) {
+            JsonObject jsonResult = jsonRefreshToken.get(RESULTS).getAsJsonObject();
+
+            if (jsonResult.has(TOKEN)) {
+                refreshToken.setToken(jsonResult.get(TOKEN).getAsString());
+            }
+            if (jsonResult.has(REFRESH_TOKEN)) {
+                refreshToken.setRefreshToken(jsonResult.get(REFRESH_TOKEN).getAsString());
+            }
+        }
+        return refreshToken;
+    }
+
 }

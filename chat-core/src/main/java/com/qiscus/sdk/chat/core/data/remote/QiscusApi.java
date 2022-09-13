@@ -34,7 +34,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
-import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentSentEvent;
@@ -89,7 +89,6 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 import rx.Emitter;
 import rx.Observable;
-import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.OnErrorThrowable;
 import rx.schedulers.Schedulers;
@@ -1300,6 +1299,19 @@ public enum QiscusApi {
 
     }
 
+    /**
+     * call this function if get error Unauthorized (403)
+     */
+    public Observable<QiscusRefreshToken> refreshToken(String userId, String refreshToken) {
+        if (refreshToken == null) {
+            throw new IllegalArgumentException("you need to logout first, and relogin");
+        }
+
+        return api.refreshToken(QiscusHashMapUtil.refreshToken(userId, refreshToken))
+                .map(JsonElement::getAsJsonObject)
+                .map(QiscusApiParser::parseRefreshToken);
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1542,6 +1554,11 @@ public enum QiscusApi {
                 @Query("token") String token
         );
 
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/refresh_user_token")
+        Observable<JsonElement> refreshToken(
+                @Body HashMap<String, Object> data
+        );
     }
 
     public interface MetaRoomMembersListener {

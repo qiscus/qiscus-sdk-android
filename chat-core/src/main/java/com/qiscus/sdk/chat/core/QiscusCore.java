@@ -32,6 +32,7 @@ import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
@@ -648,6 +649,29 @@ public class QiscusCore {
     }
 
     /**
+     * Accessor to get current qiscus refresh token
+     *
+     * @return Current qiscus user refresh token
+     */
+    public static String getRefreshToken() {
+        checkUserSetup();
+        return localDataManager.getRefreshToken();
+    }
+
+    /**
+     * Use this method to set new qiscus refresh token
+     *
+     * @param newToken the QiscusRefreshToken
+     */
+    public static void saveRefreshToken(QiscusRefreshToken newToken) {
+        checkUserSetup();
+        QiscusAccount account = localDataManager.getAccountInfo();
+        account.setToken(newToken.getToken());
+        account.setRefreshToken(newToken.getRefreshToken());
+        localDataManager.saveAccountInfo(account);
+    }
+
+    /**
      * Get the current qiscus heartbeat duration
      *
      * @return Heartbeat duration in milliseconds
@@ -1027,6 +1051,7 @@ public class QiscusCore {
         private SharedPreferences sharedPreferences;
         private final Gson gson;
         private String token;
+        private String refreshToken;
 
         LocalDataManager() {
             SharedPreferences sharedPreferencesOld  = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
@@ -1082,6 +1107,7 @@ public class QiscusCore {
 
             gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : "";
+            refreshToken = isLogged() ? getAccountInfo().getRefreshToken() : "";
         }
 
         private boolean isLogged() {
@@ -1098,6 +1124,7 @@ public class QiscusCore {
             }
 
             setToken(qiscusAccount.getToken());
+            setRefreshToken(qiscusAccount.getRefreshToken());
         }
 
         private QiscusAccount getAccountInfo() {
@@ -1115,6 +1142,9 @@ public class QiscusCore {
                 }
                 if (jsonObject.has("token")) {
                     qiscusAccount.setToken(jsonObject.optString("token", ""));
+                }
+                if (jsonObject.has("refresh_token")) {
+                    qiscusAccount.setRefreshToken(jsonObject.optString("refresh_token", ""));
                 }
                 if (jsonObject.has("username")) {
                     qiscusAccount.setUsername(jsonObject.optString("username", ""));
@@ -1140,6 +1170,14 @@ public class QiscusCore {
 
         private void setToken(String token) {
             this.token = token;
+        }
+
+        private String getRefreshToken() {
+            return refreshToken == null ? refreshToken = "" : refreshToken;
+        }
+
+        private void setRefreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
         }
 
         private String getFcmToken() {
@@ -1216,6 +1254,7 @@ public class QiscusCore {
         private void clearData() {
             sharedPreferences.edit().clear().apply();
             setToken("");
+            setRefreshToken("");
         }
     }
 
