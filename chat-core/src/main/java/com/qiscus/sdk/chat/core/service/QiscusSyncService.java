@@ -92,7 +92,7 @@ public class QiscusSyncService extends Service {
     private void scheduleSync() {
         long period = QiscusCore.getHeartBeat();
 
-        if (!QiscusCore.getStatusRealtimeEnableDisable()) {
+        if (QiscusCore.getStatusRealtimeEnableDisable()) {
             period = QiscusCore.getAutomaticHeartBeat();
         }
 
