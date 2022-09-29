@@ -25,9 +25,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Base64;
+
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
@@ -1113,13 +1116,23 @@ public class QiscusCore {
 
             String sharedPrefsFile = JupukData.getFileName();
             try {
-                sharedPreferences = EncryptedSharedPreferences.create(
+//                sharedPreferences = EncryptedSharedPreferences.create(
+//                        sharedPrefsFile,
+//                        JupukData.getFileKey(),
+//                        QiscusCore.getApps().getApplicationContext(),
+//                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+//                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+//                );
+
+                MasterKey masterKey = new MasterKey.Builder(QiscusCore.getApps().getApplicationContext(), JupukData.getFileKey())
+                                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                                .build();
+
+                sharedPreferences = EncryptedSharedPreferences.create(QiscusCore.getApps().getApplicationContext(),
                         sharedPrefsFile,
-                        JupukData.getFileKey(),
-                        QiscusCore.getApps().getApplicationContext(),
+                        masterKey,
                         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                );
+                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
 
                 String dataAccount = sharedPreferencesOld.getString("cached_account", "");
                 String LbUrl = sharedPreferencesOld.getString("lb_url", "");
@@ -1156,6 +1169,15 @@ public class QiscusCore {
                 e.printStackTrace();
                 sharedPreferences = sharedPreferencesOld;
             } catch (IOException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (SecurityException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (Exception e) {
                 e.printStackTrace();
                 sharedPreferences = sharedPreferencesOld;
             }
