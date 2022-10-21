@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 
@@ -110,6 +111,20 @@ public class QiscusInterceptor {
         if (!jsonResponse.has("error")) return;
         JSONObject jsonObject = jsonResponse.getJSONObject("error");
 
+        autoRefreshToken(code, jsonObject);
+        sendEvent(code, jsonObject);
+    }
+
+    private static void autoRefreshToken(int code, JSONObject jsonObject) throws JSONException {
+        if (QiscusCore.isAutoRefreshToken()
+                && code == EXPIRED_TOKEN
+                && jsonObject.getString("message").equals(TOKEN_EXPIRED_MESSAGE)
+        ) {
+            QiscusCore.refreshToken(null);
+        }
+    }
+
+    private static void sendEvent(int code, JSONObject jsonObject)  throws JSONException {
         if (jsonObject.getString("message").contains(UNAUTHORIZED_MESSAGE)) {
             EventBus.getDefault().post(
                     new QiscusRefreshTokenEvent(

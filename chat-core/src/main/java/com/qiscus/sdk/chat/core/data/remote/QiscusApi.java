@@ -1336,6 +1336,11 @@ public enum QiscusApi {
                 .map(QiscusApiParser::parseRefreshToken);
     }
 
+    public Observable<JsonObject> logout(String userId, String token) {
+        return api.logout(QiscusHashMapUtil.logout(userId, token))
+                .map(JsonElement::getAsJsonObject);
+    }
+
     private interface Api {
 
         @Headers("Content-Type: application/json")
@@ -1581,6 +1586,12 @@ public enum QiscusApi {
         @Headers("Content-Type: application/json")
         @POST("api/v2/mobile/refresh_user_token")
         Observable<JsonElement> refreshToken(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/sdk/logout")
+        Observable<JsonElement> logout(
                 @Body HashMap<String, Object> data
         );
     }

@@ -34,6 +34,7 @@ import androidx.security.crypto.MasterKey;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
@@ -95,6 +96,7 @@ public class QiscusCore {
     private static Boolean syncServiceDisabled = false;
     private static Boolean enableSync = true;
     private static Boolean enableSyncEvent = false;
+    private static Boolean autoRefreshToken = false;
 
     private QiscusCore() {
     }
@@ -286,7 +288,6 @@ public class QiscusCore {
         isBuiltIn = isBuiltInSDK;
     }
 
-    // add refresh token auto / manual
     private static void getAppConfig() {
         QiscusApi.getInstance()
                 .getAppConfig()
@@ -348,6 +349,7 @@ public class QiscusCore {
                     }
 
                     // call refresh token
+                    autoRefreshToken = appConfig.getAutoRefreshToken();
                     if (appConfig.getAutoRefreshToken()) {
                         autoRefreshToken();
                     }
@@ -568,6 +570,16 @@ public class QiscusCore {
         return syncServiceDisabled;
     }
 
+
+    /**
+     * autoRefreshToken
+     *
+     * @return boolean
+     */
+
+    public static Boolean isAutoRefreshToken() {
+        return autoRefreshToken;
+    }
 
     /**
      * openRealtimeConnection
@@ -1098,7 +1110,11 @@ public class QiscusCore {
             QiscusApi.getInstance().refreshToken(account.getEmail(), account.getRefreshToken())
                     .doOnNext(QiscusCore::saveRefreshToken)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(listener::onSuccess, listener::onError);
+                    .subscribe(refreshToken -> {
+                        if (listener != null) listener.onSuccess(refreshToken);
+                    }, throwable -> {
+                        if (listener != null) listener.onError(throwable);
+                    });
         }
     }
 
@@ -1132,6 +1148,16 @@ public class QiscusCore {
     /**
      * Clear all current user qiscus data, you can call this method when user logout for example.
      */
+    public static void logout(LogoutListener listener) {
+        if (hasSetupUser()) {
+            QiscusAccount account = localDataManager.getAccountInfo();
+            QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(jsonObject -> listener.onSuccess(), listener::onError);
+        }
+    }
+
     public static void clearUser() {
         if (BuildVersionUtil.isOreoOrHigher()) {
             JobScheduler jobScheduler = (JobScheduler) appInstance.getSystemService(Context.JOB_SCHEDULER_SERVICE);
@@ -1171,6 +1197,21 @@ public class QiscusCore {
 
         /**
          * Called if error happened while saving qiscus refresh token. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
+    public interface LogoutListener {
+        /**
+         * Called if logout succeed
+         *
+         */
+        void onSuccess();
+
+        /**
+         * Called if error happened while saving qiscus logout. e.g network error
          *
          * @param throwable The cause of error
          */

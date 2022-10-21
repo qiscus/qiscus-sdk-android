@@ -124,10 +124,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void logoutUser() {
-        if (QiscusCore.hasSetupUser()) Qiscus.clearUser();
-    }
-
     public void openChat(View view) {
         showLoading();
         Qiscus.buildChatWith("arief93")
@@ -271,6 +267,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void logoutUser() {
+        if (QiscusCore.hasSetupUser()) {
+            QiscusCore.logout(new QiscusCore.LogoutListener() {
+                @Override
+                public void onSuccess() {
+                    Qiscus.clearUser();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    QiscusErrorLogger.print(throwable);
+                }
+            });
+        }
+    }
+
     public void showLoading() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -332,8 +344,7 @@ public class MainActivity extends AppCompatActivity {
         if (event.isTokenExpired()) {
             callRefreshToken();
         } else if (event.isUnauthorized()) {
-            // default is background thread
-            QiscusAndroidUtil.runOnUIThread(this::logoutUser);
+            logoutUser();
         } else {
             // do somethings
         }

@@ -324,4 +324,13 @@ public class QiscusHashMapUtil {
 
         return hashMap;
     }
+
+    public static HashMap<String, Object> logout(String userId, String token) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        hashMap.put("user_id", userId);
+        hashMap.put("token", token);
+
+        return hashMap;
+    }
 }
