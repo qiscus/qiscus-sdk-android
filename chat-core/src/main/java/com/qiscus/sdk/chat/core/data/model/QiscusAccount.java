@@ -45,6 +45,7 @@ public class QiscusAccount implements Parcelable {
     protected String avatar;
     protected String token;
     protected String refreshToken;
+    protected String tokenExpiresAt;
     protected String username;
     protected JSONObject extras;
 
@@ -58,6 +59,7 @@ public class QiscusAccount implements Parcelable {
         avatar = in.readString();
         token = in.readString();
         refreshToken = in.readString();
+        tokenExpiresAt = in.readString();
         username = in.readString();
         try {
             extras = new JSONObject(in.readString());
@@ -106,6 +108,14 @@ public class QiscusAccount implements Parcelable {
         this.refreshToken = refreshToken;
     }
 
+    public String getTokenExpiresAt() {
+        return tokenExpiresAt == null ? tokenExpiresAt = "" : tokenExpiresAt;
+    }
+
+    public void setTokenExpiresAt(String tokenExpiresAt) {
+        this.tokenExpiresAt = tokenExpiresAt;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -134,6 +144,7 @@ public class QiscusAccount implements Parcelable {
         dest.writeString(avatar);
         dest.writeString(token);
         dest.writeString(refreshToken);
+        dest.writeString(tokenExpiresAt);
         dest.writeString(username);
         if (extras == null) {
             extras = new JSONObject();
@@ -148,6 +159,7 @@ public class QiscusAccount implements Parcelable {
         result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
         result = 31 * result + (token != null ? token.hashCode() : 0);
         result = 31 * result + (refreshToken != null ? refreshToken.hashCode() : 0);
+        result = 31 * result + (tokenExpiresAt != null ? tokenExpiresAt.hashCode() : 0);
         result = 31 * result + (username != null ? username.hashCode() : 0);
         return result;
     }
@@ -165,6 +177,7 @@ public class QiscusAccount implements Parcelable {
                 ", avatar='" + avatar + '\'' +
                 ", token='" + token + '\'' +
                 ", refresh_token='" + refreshToken + '\'' +
+                ", token_expires_at='" + tokenExpiresAt + '\'' +
                 ", username='" + username + '\'' +
                 ", extras=" + extras +
                 '}';

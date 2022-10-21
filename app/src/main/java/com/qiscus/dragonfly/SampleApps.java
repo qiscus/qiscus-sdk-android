@@ -16,13 +16,13 @@
 
 package com.qiscus.dragonfly;
 
+import static com.qiscus.dragonfly.BuildConfig.QISCUS_SDK_APP_ID;
+
 import androidx.multidex.MultiDexApplication;
 
 import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
-
-import static com.qiscus.dragonfly.BuildConfig.QISCUS_SDK_APP_ID;
 
 /**
  * Created on : August 18, 2016
@@ -40,10 +40,10 @@ public class SampleApps extends MultiDexApplication {
 
         // for test refresh token
         Qiscus.setupWithCustomServer(
-                this,"dragongo","https://dragongo.qiscus.com",
-                "ssl://realtime-stag.qiscus.com",null
-        )
-        ;
+                this, "dragongo", "https://dragongo.qiscus.com",
+                "ssl://realtime-stag.qiscus.com", null
+        );
+
         Qiscus.getChatConfig()
                 .enableDebugMode(true)
                 .setEnableAddLocation(false)

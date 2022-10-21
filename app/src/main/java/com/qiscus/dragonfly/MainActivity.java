@@ -18,20 +18,14 @@ package com.qiscus.dragonfly;
 
 import static android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM;
 
-import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -39,16 +33,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
-import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
-import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
+import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.ui.QiscusChannelActivity;
@@ -58,7 +50,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import retrofit2.HttpException;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -109,14 +100,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void loginOrLogout(View view) {
         if (Qiscus.hasSetupUser()) {
-            Qiscus.clearUser();
+            logoutUser();
             mLoginButton.setText("Login");
         } else {
             showLoading();
           /*  Qiscus.setUser("arief92", "arief92")
                     .withUsername("arief92")*/
-            Qiscus.setUser("testing21", "testing21")
-                    .withUsername("testing21")
+
+            Qiscus.setUser("y@mail.com", "123456")
+                    .withUsername("testing_y")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -130,6 +122,10 @@ public class MainActivity extends AppCompatActivity {
                         dismissLoading();
                     });
         }
+    }
+
+    private void logoutUser() {
+        if (QiscusCore.hasSetupUser()) Qiscus.clearUser();
     }
 
     public void openChat(View view) {
@@ -239,32 +235,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showError(Throwable throwable) {
-        if (isTokenExpired(throwable)) {
+       /* if (isTokenExpired(throwable)) {
             callRefreshToken();
-        } else {
-            String errorMessage = QiscusErrorLogger.getMessage(throwable);
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
-        }
+            return;
+        } */
+
+        String errorMessage = QiscusErrorLogger.getMessage(throwable);
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
 
-    private void callRefreshToken() {
-        QiscusAccount account = QiscusCore.getQiscusAccount();
-        QiscusApi.getInstance().refreshToken(account.getEmail(), account.getRefreshToken())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(QiscusCore::saveRefreshToken, throwable -> {
-                    QiscusErrorLogger.print(throwable);
-                    showError(throwable);
-                    dismissLoading();
-                });
-    }
-
-    private boolean isTokenExpired(Throwable throwable) {
+    // disable manual refresh token
+   /* private boolean isTokenExpired(Throwable throwable) {
         if(throwable instanceof HttpException) {
             HttpException httpException = (HttpException) throwable;
             return httpException.code() == UNAUTHORIZED;
         }
         return false;
+    }*/
+
+    private void callRefreshToken() {
+        QiscusCore.refreshToken(new QiscusCore.SetRefreshTokenListener() {
+            @Override
+            public void onSuccess(QiscusRefreshToken refreshToken) {
+                boolean isTokenValid = refreshToken != null && !refreshToken.getRefreshToken().isEmpty();
+                String message = isTokenValid ? "refresh token success" : "refresh token failed";
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                QiscusErrorLogger.print(throwable);
+                showError(throwable);
+                dismissLoading();
+            }
+        });
     }
 
     public void showLoading() {
@@ -321,6 +325,18 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onRoomChanged(QiscusChatRoomEvent event) {
         QiscusLogger.print(event.toString());
+    }
+
+    @Subscribe
+    public void onRefreshToken(QiscusRefreshTokenEvent event) {
+        if (event.isTokenExpired()) {
+            callRefreshToken();
+        } else if (event.isUnauthorized()) {
+            // default is background thread
+            QiscusAndroidUtil.runOnUIThread(this::logoutUser);
+        } else {
+            // do somethings
+        }
     }
 
 }

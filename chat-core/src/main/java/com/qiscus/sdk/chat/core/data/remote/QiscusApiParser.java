@@ -53,6 +53,7 @@ final class QiscusApiParser {
     // token params
     private static final String TOKEN = "token";
     private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String TOKEN_EXPIRES_AT = "token_expires_at";
 
     static QiscusNonce parseNonce(JsonElement jsonElement) {
         JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
@@ -78,6 +79,7 @@ final class QiscusApiParser {
         qiscusAccount.setEmail(jsonAccount.optString("email"));
         qiscusAccount.setAvatar(jsonAccount.optString("avatar_url"));
         qiscusAccount.setRefreshToken(jsonAccount.optString("refresh_token"));
+        qiscusAccount.setTokenExpiresAt(jsonAccount.optString("token_expires_at"));
         try {
             qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
         } catch (Exception ignored) {
@@ -542,6 +544,13 @@ final class QiscusApiParser {
                 appConfig.setEnableRealtimeCheck(false);
             }
 
+            // refresh token
+            if (results.has("auto_refresh_token")) {
+                appConfig.setAutoRefreshToken(results.get("auto_refresh_token").getAsBoolean());
+            } else {
+                appConfig.setAutoRefreshToken(false);
+            }
+
             return appConfig;
 
         } else {
@@ -673,6 +682,9 @@ final class QiscusApiParser {
             }
             if (jsonResult.has(REFRESH_TOKEN)) {
                 refreshToken.setRefreshToken(jsonResult.get(REFRESH_TOKEN).getAsString());
+            }
+            if (jsonResult.has(TOKEN_EXPIRES_AT)) {
+                refreshToken.setTokenExpiresAt(jsonResult.get(TOKEN_EXPIRES_AT).getAsString());
             }
         }
         return refreshToken;

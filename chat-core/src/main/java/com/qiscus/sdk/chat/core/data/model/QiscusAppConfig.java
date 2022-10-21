@@ -15,6 +15,7 @@ public class QiscusAppConfig  {
     private Boolean enableRealtimeCheck;
     private Boolean enableSync;
     private Boolean enableSyncEvent;
+    private Boolean autoRefreshToken;
 
     public QiscusAppConfig() {
         super();
@@ -43,6 +44,7 @@ public class QiscusAppConfig  {
         if (!enableRealtimeCheck.equals(that.enableRealtimeCheck)) return false;
         if (!enableSync.equals(that.enableSync)) return false;
         if (!enableSyncEvent.equals(that.enableSyncEvent)) return false;
+        if (!autoRefreshToken.equals(that.autoRefreshToken)) return false;
         return syncOnConnect.equals(that.syncOnConnect);
     }
 
@@ -59,6 +61,7 @@ public class QiscusAppConfig  {
         result = 31 * result + enableSync.hashCode();
         result = 31 * result + enableSyncEvent.hashCode();
         result = 31 * result + networkConnectionInterval.hashCode();
+        result = 31 * result + autoRefreshToken.hashCode();
         return result;
     }
 
@@ -150,5 +153,14 @@ public class QiscusAppConfig  {
 
     public void setEnableRealtimeCheck(Boolean enableRealtimeCheck) {
         this.enableRealtimeCheck = enableRealtimeCheck;
+    }
+
+    // refresh token
+    public Boolean getAutoRefreshToken() {
+        return autoRefreshToken;
+    }
+
+    public void setAutoRefreshToken(Boolean autoRefreshToken) {
+        this.autoRefreshToken = autoRefreshToken;
     }
 }

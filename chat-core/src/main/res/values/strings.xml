@@ -19,6 +19,7 @@
     <string name="qiscus_nomedia" translatable="false">.nomedia</string>
     <string name="qiscus_date_format" translatable="false">MMMM dd, yyyy</string>
     <string name="qiscus_hour_format" translatable="false">hh:mm a</string>
+    <string name="qiscus_sdf_format" translatable="false">yyyy-MM-dd\'T\'HH:mm:ss\'Z\'</string>
     <string name="qiscus_few_seconds_ago">in few seconds ago</string>
     <string name="qiscus_date_and_time">%1$s at %2$s</string>
 </resources>
