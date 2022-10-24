@@ -96,7 +96,7 @@ public class QiscusCore {
     private static Boolean syncServiceDisabled = false;
     private static Boolean enableSync = true;
     private static Boolean enableSyncEvent = false;
-    private static Boolean autoRefreshToken = false;
+    private static Boolean autoRefreshToken = true;
 
     private QiscusCore() {
     }
