@@ -1144,20 +1144,22 @@ public class QiscusCore {
                 || QiscusDateUtil.isPassingDateTimeSdf(expiredAt.getTime());
     }
 
-    /**
-     * Clear all current user qiscus data, you can call this method when user logout for example.
-     */
-    public static void logout(LogoutListener listener) {
+    public static void clearUser() {
         if (hasSetupUser()) {
             QiscusAccount account = localDataManager.getAccountInfo();
             QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(jsonObject -> listener.onSuccess(), listener::onError);
+                    .subscribe(jsonObject -> {
+                        clearData();
+                    }, throwable -> {
+                        clearData();
+                    });
         }
+
     }
 
-    public static void clearUser() {
+    private static void clearData(){
         if (BuildVersionUtil.isOreoOrHigher()) {
             JobScheduler jobScheduler = (JobScheduler) appInstance.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             if (jobScheduler != null) {

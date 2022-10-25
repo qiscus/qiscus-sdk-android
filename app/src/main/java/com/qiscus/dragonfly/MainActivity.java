@@ -107,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
           /*  Qiscus.setUser("arief92", "arief92")
                     .withUsername("arief92")*/
 
-            Qiscus.setUser("y@mail.com", "123456")
-                    .withUsername("testing_y")
+            Qiscus.setUser("testing34", "testing34")
+                    .withUsername("testing34")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -269,17 +269,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void logoutUser() {
         if (QiscusCore.hasSetupUser()) {
-            QiscusCore.logout(new QiscusCore.LogoutListener() {
-                @Override
-                public void onSuccess() {
-                    Qiscus.clearUser();
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-                    QiscusErrorLogger.print(throwable);
-                }
-            });
+            Qiscus.clearUser();
         }
     }
 
