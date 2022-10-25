@@ -25,7 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Base64;
+import android.text.format.DateUtils;
 
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
@@ -34,6 +34,7 @@ import androidx.security.crypto.MasterKey;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
@@ -48,7 +49,9 @@ import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncService;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 import com.qiscus.utils.jupukdata.JupukData;
 
@@ -58,6 +61,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
@@ -92,6 +96,7 @@ public class QiscusCore {
     private static Boolean syncServiceDisabled = false;
     private static Boolean enableSync = true;
     private static Boolean enableSyncEvent = false;
+    private static Boolean autoRefreshToken = true;
 
     private QiscusCore() {
     }
@@ -258,6 +263,7 @@ public class QiscusCore {
         configureFcmToken();
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     private static void checkExactAlarm(Application application){
         PackageManager.OnChecksumsReadyListener check = ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
@@ -335,6 +341,12 @@ public class QiscusCore {
                     enableSync = appConfig.getEnableSync();
                     enableSyncEvent = appConfig.getEnableSyncEvent();
 
+                    // call refresh token
+                    autoRefreshToken = appConfig.getAutoRefreshToken();
+                    if (appConfig.getAutoRefreshToken()) {
+                        autoRefreshToken();
+                    }
+
                     startSyncService();
                     startNetworkCheckerService();
                     QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
@@ -342,6 +354,10 @@ public class QiscusCore {
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     QiscusApi.getInstance().reInitiateInstance();
+
+                    // call refresh token
+                    autoRefreshToken();
+
                     QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
                     startSyncService();
                     startNetworkCheckerService();
@@ -557,6 +573,16 @@ public class QiscusCore {
 
 
     /**
+     * autoRefreshToken
+     *
+     * @return boolean
+     */
+
+    public static Boolean isAutoRefreshToken() {
+        return autoRefreshToken;
+    }
+
+    /**
      * openRealtimeConnection
      * Open realtime connection (manual)
      *
@@ -721,6 +747,7 @@ public class QiscusCore {
         QiscusAccount account = localDataManager.getAccountInfo();
         account.setToken(newToken.getToken());
         account.setRefreshToken(newToken.getRefreshToken());
+        account.setTokenExpiresAt(newToken.getTokenExpiresAt());
         localDataManager.saveAccountInfo(account);
     }
 
@@ -1073,8 +1100,63 @@ public class QiscusCore {
     }
 
     /**
+     * all current qiscus refresh token, You can call this method when you get Unauthorized event for example.
+     */
+
+    public static void refreshToken(SetRefreshTokenListener listener) {
+        if (hasSetupUser()) {
+            QiscusAccount account = localDataManager.getAccountInfo();
+            QiscusApi.getInstance().refreshToken(account.getEmail(), account.getRefreshToken())
+                    .doOnNext(QiscusCore::saveRefreshToken)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(refreshToken -> {
+                        if (listener != null) listener.onSuccess(refreshToken);
+                    }, throwable -> {
+                        if (listener != null) listener.onError(throwable);
+                    });
+        }
+    }
+
+    private static void autoRefreshToken() {
+        if (isValidToRefreshToken(localDataManager.getAccountInfo())) {
+            QiscusAndroidUtil.runOnBackgroundThread(() ->
+                    refreshToken(new SetRefreshTokenListener() {
+                        @Override
+                        public void onSuccess(QiscusRefreshToken refreshToken) {
+                            QiscusLogger.print(
+                                    "AutoRefreshToken", refreshToken != null ? "success" : "failed"
+                            );
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            QiscusErrorLogger.print(throwable);
+                        }
+                    })
+            );
+        }
+    }
+
+    private static boolean isValidToRefreshToken(QiscusAccount account) {
+        Date expiredAt = QiscusDateUtil.getDateTimeSdf(account.getTokenExpiresAt());
+        return DateUtils.isToday(expiredAt.getTime())
+                || QiscusDateUtil.isBeforeADaySdf(expiredAt.getTime())
+                || QiscusDateUtil.isPassingDateTimeSdf(expiredAt.getTime());
+    }
+
+    /**
      * Clear all current user qiscus data, you can call this method when user logout for example.
      */
+    public static void logout(LogoutListener listener) {
+        if (hasSetupUser()) {
+            QiscusAccount account = localDataManager.getAccountInfo();
+            QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(jsonObject -> listener.onSuccess(), listener::onError);
+        }
+    }
+
     public static void clearUser() {
         if (BuildVersionUtil.isOreoOrHigher()) {
             JobScheduler jobScheduler = (JobScheduler) appInstance.getSystemService(Context.JOB_SCHEDULER_SERVICE);
@@ -1104,6 +1186,37 @@ public class QiscusCore {
         void onError(Throwable throwable);
     }
 
+    public interface SetRefreshTokenListener {
+        /**
+         * Called if refresh token succeed
+         *
+         * @param refreshToken Saved qiscus refresh token
+         */
+        void onSuccess(QiscusRefreshToken refreshToken);
+
+        /**
+         * Called if error happened while saving qiscus refresh token. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
+    public interface LogoutListener {
+        /**
+         * Called if logout succeed
+         *
+         */
+        void onSuccess();
+
+        /**
+         * Called if error happened while saving qiscus logout. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
     private static class LocalDataManager {
         private SharedPreferences sharedPreferences;
         private final Gson gson;
@@ -1114,24 +1227,29 @@ public class QiscusCore {
             SharedPreferences sharedPreferencesOld  = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
 
             String sharedPrefsFile = JupukData.getFileName();
+            boolean isActive = false;
+
             try {
-//                sharedPreferences = EncryptedSharedPreferences.create(
-//                        sharedPrefsFile,
-//                        JupukData.getFileKey(),
-//                        QiscusCore.getApps().getApplicationContext(),
-//                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-//                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-//                );
+                if (isActive) {
+                    sharedPreferences = EncryptedSharedPreferences.create(
+                            sharedPrefsFile,
+                            JupukData.getFileKey(),
+                            QiscusCore.getApps().getApplicationContext(),
+                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                    );
 
-                MasterKey masterKey = new MasterKey.Builder(QiscusCore.getApps().getApplicationContext(), JupukData.getFileKey())
-                                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                                .build();
+                } else {
+                    MasterKey masterKey = new MasterKey.Builder(QiscusCore.getApps().getApplicationContext(), JupukData.getFileKey())
+                            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                            .build();
 
-                sharedPreferences = EncryptedSharedPreferences.create(QiscusCore.getApps().getApplicationContext(),
-                        sharedPrefsFile,
-                        masterKey,
-                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+                    sharedPreferences = EncryptedSharedPreferences.create(QiscusCore.getApps().getApplicationContext(),
+                            sharedPrefsFile,
+                            masterKey,
+                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+                }
 
                 String dataAccount = sharedPreferencesOld.getString("cached_account", "");
                 String LbUrl = sharedPreferencesOld.getString("lb_url", "");
@@ -1221,6 +1339,9 @@ public class QiscusCore {
                 }
                 if (jsonObject.has("refresh_token")) {
                     qiscusAccount.setRefreshToken(jsonObject.optString("refresh_token", ""));
+                }
+                if (jsonObject.has("token_expires_at")) {
+                    qiscusAccount.setTokenExpiresAt(jsonObject.optString("token_expires_at", ""));
                 }
                 if (jsonObject.has("username")) {
                     qiscusAccount.setUsername(jsonObject.optString("username", ""));
