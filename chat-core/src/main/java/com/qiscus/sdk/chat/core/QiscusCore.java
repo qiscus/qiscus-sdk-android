@@ -242,7 +242,6 @@ public class QiscusCore {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmMgr.canScheduleExactAlarms()) {
                 forceDisableRealtimeFromExactAlarm = true;
-                enableRealtime = false;
             }else{
                 forceDisableRealtimeFromExactAlarm = false;
             }
@@ -266,14 +265,12 @@ public class QiscusCore {
             AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
             if (!alarmMgr.canScheduleExactAlarms()) {
                 forceDisableRealtimeFromExactAlarm = true;
-                enableRealtime = false;
 
                 if (QiscusPusherApi.getInstance().isConnected()) {
                     QiscusPusherApi.getInstance().disconnect();
                 }
             } else {
                 forceDisableRealtimeFromExactAlarm = false;
-                enableRealtime = true;
             }
         };
     }
@@ -337,10 +334,6 @@ public class QiscusCore {
                     enableRealtime = appConfig.getEnableRealtime();
                     enableSync = appConfig.getEnableSync();
                     enableSyncEvent = appConfig.getEnableSyncEvent();
-
-                    if (forceDisableRealtimeFromExactAlarm){
-                        enableRealtime = false;
-                    }
 
                     startSyncService();
                     startNetworkCheckerService();
@@ -523,6 +516,14 @@ public class QiscusCore {
         enableRealtime = enableDisableRealtime;
     }
 
+    public static void setIsExactAlarmDisable(Boolean isExactAlarmDisable){
+        forceDisableRealtimeFromExactAlarm = isExactAlarmDisable;
+    }
+
+    public static boolean getIsExactAlarmDisable() {
+        return forceDisableRealtimeFromExactAlarm;
+    }
+
     /**
      * enableSync
      * Checker for enable or disable sync
@@ -600,9 +601,7 @@ public class QiscusCore {
     public static String getMqttBrokerUrl() {
         checkAppIdSetup();
 
-        if (localDataManager.getMqttBrokerUrl() == null) {
-            localDataManager.setMqttBrokerUrl(mqttBrokerUrl);
-        }
+        localDataManager.setMqttBrokerUrl(mqttBrokerUrl);
 
         return isEnableMqttLB() ? localDataManager.getMqttBrokerUrl() : mqttBrokerUrl;
     }

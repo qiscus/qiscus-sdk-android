@@ -60,7 +60,7 @@ public class QiscusSyncJobService extends JobService {
 
         Long hearbeat = QiscusCore.getHeartBeat();
 
-        if (QiscusCore.getStatusRealtimeEnableDisable()) {
+        if (QiscusCore.getStatusRealtimeEnableDisable() && QiscusPusherApi.getInstance().isConnected()) {
             hearbeat = QiscusCore.getAutomaticHeartBeat();
         }
 

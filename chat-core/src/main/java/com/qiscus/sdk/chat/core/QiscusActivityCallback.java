@@ -52,9 +52,9 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
         AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmMgr.canScheduleExactAlarms()) {
-                QiscusCore.setEnableDisableRealtime(false);
+                QiscusCore.setIsExactAlarmDisable(true);
             } else {
-                QiscusCore.setEnableDisableRealtime(true);
+                QiscusCore.setIsExactAlarmDisable(false);
             }
         }
 
@@ -105,7 +105,6 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     private void check(){
         if (!foreground) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                QiscusCore.setEnableDisableRealtime(false);
                 QiscusPusherApi.getInstance().disconnect();
             }
         }
