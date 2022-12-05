@@ -21,28 +21,18 @@ apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
 apply from: 'publish.gradle'
 apply plugin: "com.jfrog.artifactory"
-//apply plugin: 'org.sonarqube'
-
-apply from: '../jacoco.gradle'
-apply from: '../sonarqube.gradle'
-
+apply from: "../sonarqube.gradle"
+apply from: "../jacoco.gradle"
 
 android {
     compileSdkVersion compileSDKVersion
     defaultConfig {
         minSdkVersion minSDKVersion
         targetSdkVersion targetSDKVersion
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
     }
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-
-        debug {
-            testCoverageEnabled true
-        }
-
         buildTypes.each {
             it.buildConfigField("String", "BASE_URL_SERVER", BASE_URL_SERVER)
             it.buildConfigField("String", "BASE_URL_MQTT_BROKER", BASE_URL_MQTT_BROKER)
@@ -54,10 +44,23 @@ android {
             it.buildConfigField("Integer", "CHAT_BUILT_IN_VERSION_MINOR", chatVersionMinor)
             it.buildConfigField("Integer", "CHAT_BUILT_IN_VERSION_PATCH", chatVersionPatch)
         }
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+        }
     }
     lintOptions {
         abortOnError false
@@ -72,25 +75,6 @@ android {
     }
 
     useLibrary 'org.apache.http.legacy'
-    useLibrary 'android.test.runner'
-
-    testOptions {
-        //execution 'ANDROID_TEST_ORCHESTRATOR'
-        animationsDisabled true
-        unitTests {
-            includeAndroidResources = true
-
-        }
-    }
-
-    defaultConfig {
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments clearPackageData: 'true'
-    }
-
-    testOptions {
-        execution 'ANDROIDX_TEST_ORCHESTRATOR'
-    }
 }
 
 buildscript {
@@ -103,10 +87,19 @@ buildscript {
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+//        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency { details ->
+            if (details.requested.group == 'org.jacoco') {
+                details.useVersion jacocoVersion
+            }
+        }
     }
 }
 
@@ -125,25 +118,15 @@ dependencies {
     api rxUrlExtractorLib
     api securityDeps
 
-    //testImplementation 'junit:junit:4.12'
-    //androidTestImplementation 'androidx.test:runner:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    //androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+//    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     // test
     testImplementation 'org.json:json:20180813'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:3.7.7'
-
     androidTestImplementation 'androidx.test:core:1.4.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
-    testImplementation 'androidx.test:core:1.4.0'
-    testImplementation 'androidx.test.ext:junit:1.1.3'
-    testImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    testImplementation 'androidx.test:runner:1.4.0'
-    androidTestUtil 'androidx.test:orchestrator:1.4.1'
-
+    androidTestImplementation 'org.mockito:mockito-android:3.7.7'
 }

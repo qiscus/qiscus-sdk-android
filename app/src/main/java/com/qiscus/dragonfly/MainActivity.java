@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,11 +43,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.qiscus.sdk.BuildConfig;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
+import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.ui.QiscusChannelActivity;
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
     private TextView mVersion;
     private boolean publishCustomEvent = false;
+    private static final int UNAUTHORIZED = 403;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,12 +110,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void loginOrLogout(View view) {
         if (Qiscus.hasSetupUser()) {
-            Qiscus.clearUser();
+            logoutUser();
             mLoginButton.setText("Login");
         } else {
             showLoading();
-            Qiscus.setUser("arief92", "arief92")
-                    .withUsername("arief92")
+          /*  Qiscus.setUser("arief92", "arief92")
+                    .withUsername("arief92")*/
+
+            Qiscus.setUser("testing34", "testing34")
+                    .withUsername("testing34")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -120,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                         dismissLoading();
                     }, throwable -> {
                         QiscusErrorLogger.print(throwable);
-                        showError(QiscusErrorLogger.getMessage(throwable));
+                        showError(throwable);
                         dismissLoading();
                     });
         }
@@ -138,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     dismissLoading();
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
+                    showError(throwable);
                     dismissLoading();
                 });
     }
@@ -157,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                     dismissLoading();
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
+                    showError(throwable);
                     dismissLoading();
                 });
     }
@@ -175,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                     dismissLoading();
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
+                    showError(throwable);
                     dismissLoading();
                 });
     }
@@ -193,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     dismissLoading();
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
+                    showError(throwable);
                     dismissLoading();
                 });
     }
@@ -211,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                     dismissLoading();
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
+                    showError(throwable);
                     dismissLoading();
                 });
     }
@@ -227,13 +235,53 @@ public class MainActivity extends AppCompatActivity {
                             "Last message: " + qiscusChatRoom.getLastComment().getMessage());
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
-                    showError(QiscusErrorLogger.getMessage(throwable));
+                    showError(throwable);
                     dismissLoading();
                 });
     }
 
-    public void showError(String errorMessage) {
+    public void showError(Throwable throwable) {
+       /* if (isTokenExpired(throwable)) {
+            callRefreshToken();
+            return;
+        } */
+
+        String errorMessage = QiscusErrorLogger.getMessage(throwable);
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    // disable manual refresh token
+   /* private boolean isTokenExpired(Throwable throwable) {
+        if(throwable instanceof HttpException) {
+            HttpException httpException = (HttpException) throwable;
+            return httpException.code() == UNAUTHORIZED;
+        }
+        return false;
+    }*/
+
+    private void callRefreshToken() {
+        QiscusCore.refreshToken(new QiscusCore.SetRefreshTokenListener() {
+            @Override
+            public void onSuccess(QiscusRefreshToken refreshToken) {
+                boolean isTokenValid = refreshToken != null && !refreshToken.getRefreshToken().isEmpty();
+                String message = isTokenValid ? "refresh token success" : "refresh token failed";
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                QiscusErrorLogger.print(throwable);
+                showError(throwable);
+                dismissLoading();
+            }
+        });
+
+    }
+
+    private void logoutUser() {
+        if (QiscusCore.hasSetupUser()) {
+            Qiscus.clearUser();
+        }
     }
 
     public void showLoading() {
@@ -290,6 +338,17 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onRoomChanged(QiscusChatRoomEvent event) {
         QiscusLogger.print(event.toString());
+    }
+
+    @Subscribe
+    public void onRefreshToken(QiscusRefreshTokenEvent event) {
+        if (event.isTokenExpired()) {
+            callRefreshToken();
+        } else if (event.isUnauthorized()) {
+            logoutUser();
+        } else {
+            // do somethings
+        }
     }
 
 }

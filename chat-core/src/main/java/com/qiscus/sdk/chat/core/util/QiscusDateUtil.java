@@ -22,17 +22,22 @@ import com.qiscus.sdk.chat.core.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public final class QiscusDateUtil {
 
-    private static DateFormat fullDateFormat;
-    private static DateFormat hourDateFormat;
+    private static final DateFormat fullDateFormat;
+    private static final DateFormat hourDateFormat;
+    private static final DateFormat filterSdf;
 
     static {
         fullDateFormat = new SimpleDateFormat(QiscusTextUtil.getString(R.string.qiscus_date_format), Locale.getDefault());
         hourDateFormat = new SimpleDateFormat(QiscusTextUtil.getString(R.string.qiscus_hour_format), Locale.getDefault());
+        filterSdf = new SimpleDateFormat(QiscusTextUtil.getString(R.string.qiscus_sdf_format), Locale.getDefault());
+        filterSdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     private QiscusDateUtil() {
@@ -67,4 +72,26 @@ public final class QiscusDateUtil {
     public static String toFullDateFormat(Date date) {
         return QiscusTextUtil.getString(R.string.qiscus_date_and_time, toTodayOrDate(date), toHour(date));
     }
+
+    public static Date getDateTimeSdf(String dateTimeSdf) {
+        try {
+            return filterSdf.parse(dateTimeSdf);
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
+        }
+        return new Date();
+    }
+
+    public static boolean isBeforeADaySdf(long dateTime) {
+        long dayTime = 86400000;
+        Date c = Calendar.getInstance().getTime();
+        long time = dateTime - c.getTime();
+        return time <= dayTime;
+    }
+
+    public static boolean isPassingDateTimeSdf(long dateTime) {
+        Date c = Calendar.getInstance().getTime();
+        return c.getTime() > dateTime;
+    }
+
 }

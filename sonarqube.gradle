@@ -1,12 +1,26 @@
 apply plugin: 'org.sonarqube'
 
+def getPropertiesConfig() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties
+}
+
+def propertiesConfig = getPropertiesConfig()
+
 sonarqube {
     properties {
-        property "sonar.host.url", "http://localhost:8081" // for local config
-        property "sonar.projectKey", "qiscus-sdk-android" // for local config
-        property "sonar.projectName", "qiscus-sdk-android Agent" // for local config
-        property "sonar.login", "e7799cb5bd7b23c29297c4b71e31596dea92e3da" // for local config
-        property "sonar.projectVersion", "123"
+        boolean isLocal = propertiesConfig.getProperty("sonarqube_mode") == "local"
+
+        property "sonar.host.url", propertiesConfig.getProperty(
+                isLocal ? "sonarqube_local_url" : "sonarqube_online_url"
+        )
+        property "sonar.login", propertiesConfig.getProperty(
+                isLocal ? "sonarqube_local_login" : "sonarqube_online_login"
+        )
+        property "sonar.projectKey", propertiesConfig.getProperty("sonarqube_project_key")
+        property "sonar.projectName", propertiesConfig.getProperty("sonarqube_project_name")
+        property "sonar.projectVersion", "${android.defaultConfig.versionName}"
 
         property "sonar.tests", "src/test/java"
         property "sonar.test.inclusions", "**/*Test*/**"

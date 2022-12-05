@@ -11,11 +11,12 @@ ext {
 }
 
 jacoco {
-    toolVersion = "0.8.3"
+    toolVersion = "$jacocoVersion"
 //    reportsDir = file("$buildDir/reports")
 }
 
-tasks.withType(Test) {
+//tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     jacoco {
         includeNoLocationClasses = true
         excludes = ['jdk.internal.*'] // Allows it to run on Java 11

@@ -16,7 +16,7 @@
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.jacocoVersion = '0.8.2'
+    ext.jacocoVersion = '0.8.7'
     repositories {
         google()
         mavenCentral()
@@ -25,9 +25,9 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.0'
-        classpath 'com.google.gms:google-services:4.3.10'
-        classpath "org.jacoco:org.jacoco.core:0.8.3"
+        classpath 'com.android.tools.build:gradle:7.2.2'
+        classpath 'com.google.gms:google-services:4.3.14'
+        //classpath "org.jacoco:org.jacoco.core:0.8.3"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -52,6 +52,10 @@ allprojects {
                     details.useVersion jacocoVersion
                 }
             }
+        }
+
+        configurations.all {
+            resolutionStrategy.force 'org.objenesis:objenesis:2.6'
         }
     }
 }

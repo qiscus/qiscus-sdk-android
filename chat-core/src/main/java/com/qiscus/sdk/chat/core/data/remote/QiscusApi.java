@@ -18,9 +18,15 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.net.Uri;
 import android.os.Build;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
+import androidx.security.crypto.EncryptedFile;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
+import androidx.security.crypto.MasterKeys;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,6 +40,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentSentEvent;
@@ -51,10 +58,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -89,7 +99,6 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 import rx.Emitter;
 import rx.Observable;
-import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.OnErrorThrowable;
 import rx.schedulers.Schedulers;
@@ -119,8 +128,12 @@ public enum QiscusApi {
             httpClient = new OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
-                    .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(
+                            QiscusInterceptor.makeLoggingInterceptor(
+                                    QiscusCore.getChatConfig().isEnableLog()
+                            )
+                    )
                     .connectionSpecs(Collections.singletonList(spec))
                     .build();
 
@@ -128,8 +141,12 @@ public enum QiscusApi {
             httpClient = new OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
-                    .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(
+                            QiscusInterceptor.makeLoggingInterceptor(
+                                    QiscusCore.getChatConfig().isEnableLog()
+                            )
+                    )
                     .build();
         }
 
@@ -159,8 +176,12 @@ public enum QiscusApi {
             httpClient = new OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
-                    .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(
+                            QiscusInterceptor.makeLoggingInterceptor(
+                                    QiscusCore.getChatConfig().isEnableLog()
+                            )
+                    )
                     .connectionSpecs(Collections.singletonList(spec))
                     .build();
 
@@ -168,8 +189,12 @@ public enum QiscusApi {
             httpClient = new OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
-                    .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(
+                            QiscusInterceptor.makeLoggingInterceptor(
+                                    QiscusCore.getChatConfig().isEnableLog()
+                            )
+                    )
                     .build();
         }
 
@@ -188,7 +213,7 @@ public enum QiscusApi {
 
     }
 
-    private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
+    /*private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
         Request.Builder builder = chain.request().newBuilder();
         JSONObject jsonCustomHeader = QiscusCore.getCustomHeader();
 
@@ -235,7 +260,7 @@ public enum QiscusApi {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(isDebug ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
         return logging;
-    }
+    }*/
 
     @Deprecated
     public Observable<QiscusNonce> requestNonce() {
@@ -1135,8 +1160,12 @@ public enum QiscusApi {
                 httpClientLB = new OkHttpClient.Builder()
                         .connectTimeout(60, TimeUnit.SECONDS)
                         .readTimeout(60, TimeUnit.SECONDS)
-                        .addInterceptor(this::headersInterceptor)
-                        .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                        .addInterceptor(QiscusInterceptor::headersInterceptor)
+                        .addInterceptor(
+                                QiscusInterceptor.makeLoggingInterceptor(
+                                        QiscusCore.getChatConfig().isEnableLog()
+                                )
+                        )
                         .connectionSpecs(Collections.singletonList(spec))
                         .build();
 
@@ -1144,8 +1173,12 @@ public enum QiscusApi {
                 httpClientLB = new OkHttpClient.Builder()
                         .connectTimeout(60, TimeUnit.SECONDS)
                         .readTimeout(60, TimeUnit.SECONDS)
-                        .addInterceptor(this::headersInterceptor)
-                        .addInterceptor(makeLoggingInterceptor(QiscusCore.getChatConfig().isEnableLog()))
+                        .addInterceptor(QiscusInterceptor::headersInterceptor)
+                        .addInterceptor(
+                                QiscusInterceptor.makeLoggingInterceptor(
+                                        QiscusCore.getChatConfig().isEnableLog()
+                                )
+                        )
                         .build();
             }
 
@@ -1297,6 +1330,24 @@ public enum QiscusApi {
                 .map(jsonResponse -> jsonResponse.getAsJsonObject(QiscusValueUtil.getValueDataResults()))
                 .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
 
+    }
+
+    /**
+     * call this function if get error Unauthorized (403)
+     */
+    public Observable<QiscusRefreshToken> refreshToken(String userId, String refreshToken) {
+        if (refreshToken == null) {
+            throw new IllegalArgumentException("you need to logout first, and relogin");
+        }
+
+        return api.refreshToken(QiscusHashMapUtil.refreshToken(userId, refreshToken))
+                .map(JsonElement::getAsJsonObject)
+                .map(QiscusApiParser::parseRefreshToken);
+    }
+
+    public Observable<JsonObject> logout(String userId, String token) {
+        return api.logout(QiscusHashMapUtil.logout(userId, token))
+                .map(JsonElement::getAsJsonObject);
     }
 
     private interface Api {
@@ -1541,6 +1592,17 @@ public enum QiscusApi {
                 @Query("token") String token
         );
 
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/refresh_user_token")
+        Observable<JsonElement> refreshToken(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/sdk/logout")
+        Observable<JsonElement> logout(
+                @Body HashMap<String, Object> data
+        );
     }
 
     public interface MetaRoomMembersListener {
