@@ -1228,10 +1228,10 @@ public class QiscusCore {
         LocalDataManager() {
             SharedPreferences sharedPreferencesOld  = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
 
-            String sharedPrefsFile = JupukData.getFileName();
-            boolean isActive = false;
-
             try {
+                String sharedPrefsFile = JupukData.getFileName();
+                boolean isActive = false;
+
                 if (isActive) {
                     sharedPreferences = EncryptedSharedPreferences.create(
                             sharedPrefsFile,
@@ -1297,6 +1297,9 @@ public class QiscusCore {
                 e.printStackTrace();
                 sharedPreferences = sharedPreferencesOld;
             } catch (Exception e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (Error e) {
                 e.printStackTrace();
                 sharedPreferences = sharedPreferencesOld;
             }
