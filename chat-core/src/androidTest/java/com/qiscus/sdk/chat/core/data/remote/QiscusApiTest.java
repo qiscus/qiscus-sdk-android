@@ -1,21 +1,30 @@
 package com.qiscus.sdk.chat.core.data.remote;
 
+import androidx.core.util.Pair;
+
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
+import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -403,6 +412,218 @@ public class QiscusApiTest extends InstrumentationBaseTest {
         QiscusApi.getInstance().postComment(QiscusComment.generateMessage(roomId,"test"));
     }
 
+    @Test
+    public void sendMessage(){
+        QiscusApi.getInstance().sendMessage(QiscusComment.generateMessage(roomId,"test"));
+    }
+
+    @Test
+    public void sync(){
+        QiscusApi.getInstance().sync()
+                .doOnSubscribe(() -> {
+                })
+                .doOnCompleted(() -> {
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
+                });
+    }
+
+    @Test
+    public void sync2(){
+        QiscusApi.getInstance().getChatRooms(1,50,true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(chatRooms -> {
+                    //on success
+                    QiscusApi.getInstance().sync(chatRooms.get(1).getLastComment().getId());
+
+                }, throwable -> {
+                    //on error
+                });
+
+    }
+
+    @Test
+    public void synchronize(){
+        QiscusApi.getInstance().getChatRooms(1,50,true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(chatRooms -> {
+                    //on success
+                    QiscusApi.getInstance().synchronize(chatRooms.get(1).getLastComment().getId());
+
+                }, throwable -> {
+                    //on error
+                });
+
+    }
+
+    @Test
+    public void syncEvent(){
+        QiscusApi.getInstance().synchronizeEvent(0);
+    }
+
+    @Test
+    public void sendFile(){
+        File compressedFile = new File("/storage/emulated/0/Pictures/balita5b21fef3-aa03-46b8-8056-d4eb063e1725.png");
+
+        QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(roomId,
+                compressedFile.getPath(), "caption", "name file");
+        qiscusComment.setDownloading(true);
+
+        File finalCompressedFile = compressedFile;
+
+        QiscusApi.getInstance().sendFileMessage(
+                        qiscusComment, finalCompressedFile, percentage -> {
+                            qiscusComment.setProgress((int) percentage);
+                        }).doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(qiscusComment))
+                .doOnError(throwable -> {
+
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(commentSend -> {
+                    if (commentSend.getRoomId() == roomId) {
+                        commentSend.setDownloading(false);
+                        QiscusCore.getDataStore()
+                                .addOrUpdateLocalPath(commentSend.getRoomId(),
+                                        commentSend.getId(), finalCompressedFile.getAbsolutePath());
+                    }
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    if (qiscusComment.getRoomId() == roomId) {
+
+                    }
+                });
+    }
+
+    @Test
+    public void uploadFIle(){
+        File compressedFile = new File("/storage/emulated/0/Pictures/balita5b21fef3-aa03-46b8-8056-d4eb063e1725.png");
+
+        QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(roomId,
+                compressedFile.getPath(), "caption2", "name file2");
+        qiscusComment.setDownloading(true);
+
+        File finalCompressedFile = compressedFile;
+
+        QiscusApi.getInstance().uploadFile(
+                        finalCompressedFile, percentage -> {
+                            qiscusComment.setProgress((int) percentage);
+                        }).doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(qiscusComment))
+                .doOnError(throwable -> {
+
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(commentSend -> {
+
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    if (qiscusComment.getRoomId() == roomId) {
+
+                    }
+                });
+    }
+
+    @Test
+    public void upload(){
+        File compressedFile = new File("/storage/emulated/0/Pictures/balita5b21fef3-aa03-46b8-8056-d4eb063e1725.png");
+
+        QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(roomId,
+                compressedFile.getPath(), "caption2", "name file2");
+        qiscusComment.setDownloading(true);
+
+        File finalCompressedFile = compressedFile;
+
+        QiscusApi.getInstance().upload(
+                        finalCompressedFile, percentage -> {
+                            qiscusComment.setProgress((int) percentage);
+                        }).doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(qiscusComment))
+                .doOnError(throwable -> {
+
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(commentSend -> {
+
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    if (qiscusComment.getRoomId() == roomId) {
+
+                    }
+                });
+    }
+
+    @Test
+    public void downloadFile() {
+        QiscusApi.getInstance()
+                .downloadFile("https://www.shutterstock.com/image-vector/vector-illustration-sample-red-grunge-600w-2065712915.jpg", "name",
+                        percentage -> {
+
+                        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(file1 -> {
+                    QiscusFileUtil.notifySystem(file1);
+                })
+                .subscribe(file1 -> {
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                });
+    }
+
+    @Test
+    public void updateCommentStatus(){
+        QiscusApi.getInstance().loginOrRegister("testing21", "testing21","testing21","loginOrRegister");
+        QiscusApi.getInstance().updateCommentStatus(roomId,0,0);
+    }
+
+//    @Test
+//    public void clearCommentsByRoomIds(){
+//        ArrayList<Long> ids = new ArrayList<Long>();
+//        ids.add(Long.valueOf(roomId));
+//        QiscusApi.getInstance().clearCommentsByRoomIds(ids);
+//    }
+//
+//    @Test
+//    public void clearCommentsByRoomUniqueIds(){
+//        ArrayList<String> ids = new ArrayList<String>();
+//        ids.add(roomUniqId);
+//        QiscusApi.getInstance().clearCommentsByRoomUniqueIds(ids);
+//    }
+//
+//    @Test
+//    public void clearMessagesByChatRoomIds(){
+//        ArrayList<Long> ids = new ArrayList<Long>();
+//        ids.add(Long.valueOf(roomId));
+//        QiscusApi.getInstance().clearMessagesByChatRoomIds(ids);
+//    }
+//
+//    @Test
+//    public void clearMessagesByChatRoomUniqueIds(){
+//        ArrayList<String> ids = new ArrayList<String>();
+//        ids.add(roomUniqId);
+//        QiscusApi.getInstance().clearMessagesByChatRoomUniqueIds(ids);
+//    }
+
+    @Test
+    public void deleteComments(){
+        QiscusApi.getInstance().setUser("testing21", "testing21","testing21","loginOrRegister", new JSONObject());
+
+        ArrayList<String> uniqId = new ArrayList<String>();
+        uniqId.add("javascript-1670826465468");
+        QiscusApi.getInstance().deleteComments(uniqId, true);
+
+
+    }
+
+
+    @Test
+    public void getEvents(){
+        QiscusApi.getInstance().getEvents(0L);
+    }
 
 
 

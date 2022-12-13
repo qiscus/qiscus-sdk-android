@@ -1296,7 +1296,10 @@ public class QiscusCore {
             } catch (Exception e) {
                 QiscusErrorLogger.print(e);
                 sharedPreferences = sharedPreferencesOld;
-            }
+            } //catch (Error e) {
+            //QiscusErrorLogger.print(e);
+            //sharedPreferences = sharedPreferencesOld;
+            //}
 
             gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : "";
