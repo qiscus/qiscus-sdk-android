@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.chat.core.util;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -46,7 +47,7 @@ public final class QiscusFileUtil {
             QiscusCore.getAppsName() + " Images";
     private static final int EOF = -1;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-    private static InputStream inputStream ;
+    private static InputStream inputStream;
     private static FileInputStream in;
 
     private QiscusFileUtil() {
@@ -116,6 +117,7 @@ public final class QiscusFileUtil {
         return new String[]{name, extension};
     }
 
+    @SuppressLint("Range")
     public static String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {

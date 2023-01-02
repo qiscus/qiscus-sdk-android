@@ -1,7 +1,5 @@
 package com.qiscus.sdk.chat.core.util;
 
-import android.util.Log;
-
 import com.google.firebase.messaging.RemoteMessage;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
