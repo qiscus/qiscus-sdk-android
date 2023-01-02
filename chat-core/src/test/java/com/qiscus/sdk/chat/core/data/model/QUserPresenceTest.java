@@ -2,6 +2,7 @@ package com.qiscus.sdk.chat.core.data.model;
 
 import static org.junit.Assert.*;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,6 +57,44 @@ public class QUserPresenceTest {
         setTimestamp();
 
         qUserPresence.hashCode();
+    }
+
+    @Test
+    public void equals(){
+        setUserId();
+        setStatus();
+        setTimestamp();
+        qUserPresence.equals(qUserPresence);
+
+        qUserPresence.equals(new JSONObject());
+
+        qUserPresence.equals(new QUserPresence());
+
+
+        QUserPresence userPresence = new QUserPresence();
+        userPresence.setUserId("11");
+        userPresence.setStatus(false);
+        userPresence.setTimestamp(new Date(10000));
+
+        QUserPresence userPresence2 = new QUserPresence();
+        userPresence2.setUserId("112");
+        userPresence2.setStatus(true);
+        userPresence2.setTimestamp(new Date());
+
+        userPresence2.equals(userPresence);
+    }
+
+    @Test
+    public void equals2(){
+
+        QUserPresence userPresence = new QUserPresence();
+
+        QUserPresence userPresence2 = new QUserPresence();
+        userPresence2.setUserId("112");
+        userPresence2.setStatus(true);
+        userPresence2.setTimestamp(new Date());
+
+        userPresence.equals(userPresence2);
     }
 
     @Test

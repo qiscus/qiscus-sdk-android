@@ -184,6 +184,22 @@ public class QiscusCoreTest extends InstrumentationBaseTest {
     @Test
     public void otherTest() {
         setup();
+        QiscusCore.setUser("arief92", "arief92")
+                .withUsername("arief92")
+                .withAvatarUrl("https://")
+                .withExtras(null)
+                .save(new QiscusCore.SetUserListener() {
+                    @Override
+                    public void onSuccess(QiscusAccount qiscusAccount) {
+                        //on success
+                        QiscusCore.updateUser("testing", "https://", new JSONObject());
+
+                    }
+                    @Override
+                    public void onError(Throwable throwable) {
+                        //on error
+                    }});
+
         QiscusCore.startSyncService();
         QiscusCore.stopSyncService();
         QiscusCore.isEnableMqttLB();
@@ -276,6 +292,31 @@ public class QiscusCoreTest extends InstrumentationBaseTest {
             }
         });
 
+
+        QiscusCore.updateUserAsObservable("testing22","https://");
+        QiscusCore.updateUser("testing22X", "https://", new JSONObject(), new QiscusCore.SetUserListener() {
+            @Override
+            public void onSuccess(QiscusAccount qiscusAccount) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+
+            }
+        });
+
+        QiscusCore.updateUser("testing22Xy", "https://", new QiscusCore.SetUserListener() {
+            @Override
+            public void onSuccess(QiscusAccount qiscusAccount) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+
+            }
+        });
 
         QiscusCore.clearUser();
     }

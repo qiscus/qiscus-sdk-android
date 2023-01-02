@@ -49,7 +49,7 @@ import java.util.List;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-final class QiscusApiParser {
+public class QiscusApiParser {
 
     private static final String RESULTS = "results";
     // token params
@@ -99,7 +99,7 @@ final class QiscusApiParser {
         }
     }
 
-    static QiscusChatRoom parseQiscusChatRoom(JsonElement jsonElement) {
+    public static QiscusChatRoom parseQiscusChatRoom(JsonElement jsonElement) {
         if (jsonElement != null) {
             JsonObject jsonChatRoom = jsonElement.getAsJsonObject().get(QiscusValueUtil.getValueDataResults()).getAsJsonObject().get("room").getAsJsonObject();
             QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
@@ -449,27 +449,6 @@ final class QiscusApiParser {
         }
     }
 
-    public static HashMap<String, List<QiscusRoomMember>> parseQiscusCommentInfo(JsonObject jsonResults) {
-        HashMap<String, List<QiscusRoomMember>> commentInfo = new HashMap<>();
-        List<QiscusRoomMember> listDeliveredTo = new ArrayList<>();
-        List<QiscusRoomMember> listPending = new ArrayList<>();
-        List<QiscusRoomMember> listReadBy = new ArrayList<>();
-
-        JsonArray arrDeliveredTo = jsonResults.getAsJsonArray("delivered_to");
-        JsonArray arrPending = jsonResults.getAsJsonArray("pending");
-        JsonArray arrReadBy = jsonResults.getAsJsonArray("read_by");
-
-        parseMemberAndAddToList(listDeliveredTo, arrDeliveredTo);
-        parseMemberAndAddToList(listDeliveredTo, arrPending);
-        parseMemberAndAddToList(listDeliveredTo, arrReadBy);
-
-        commentInfo.put("delivered_to", listDeliveredTo);
-        commentInfo.put("sent", listPending); // karena pending yang dimaksud sudah masuk server qiscus
-        commentInfo.put("read_by", listReadBy);
-
-        return commentInfo;
-    }
-
     private static void parseMemberAndAddToList(List<QiscusRoomMember> memberList, JsonArray arr) {
         if (arr == null) {
             return;
@@ -561,25 +540,6 @@ final class QiscusApiParser {
 
             return appConfig;
 
-        } else {
-            return null;
-        }
-    }
-
-    static QiscusRealtimeStatus parseQiscusRealtimeStatus(JsonElement jsonElement) {
-        if (jsonElement != null) {
-            QiscusRealtimeStatus realtimeStatus = new QiscusRealtimeStatus();
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-            JsonObject results = jsonObject.getAsJsonObject(QiscusValueUtil.getValueDataResults());
-
-
-            if (results.has("status")) {
-                realtimeStatus.setRealtimeStatus(results.get("status").getAsBoolean());
-            } else {
-                realtimeStatus.setRealtimeStatus(false);
-            }
-
-            return realtimeStatus;
         } else {
             return null;
         }

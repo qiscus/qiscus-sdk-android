@@ -65,6 +65,8 @@ public class QiscusAppConfigTest {
         setSyncInterval();
         setSyncOnConnect();
         appConfig.hashCode();
+
+        appConfig.equals(appConfig);
     }
 
     @Test

@@ -41,6 +41,7 @@ public class QiscusChannelsTest {
         setUniqueId();
         setRoomId();
         qiscusChannels.hashCode();
+        qiscusChannels.equals(qiscusChannels);
     }
 
     @Test

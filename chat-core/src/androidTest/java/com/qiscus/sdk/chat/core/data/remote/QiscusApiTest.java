@@ -1,5 +1,7 @@
 package com.qiscus.sdk.chat.core.data.remote;
 
+import android.os.Build;
+
 import androidx.core.util.Pair;
 
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
@@ -20,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -625,6 +629,213 @@ public class QiscusApiTest extends InstrumentationBaseTest {
         QiscusApi.getInstance().getEvents(0L);
     }
 
+    @Test
+    public void getTotalUnreadCount(){
+        QiscusApi.getInstance().getTotalUnreadCount();
+    }
+
+    @Test
+    public void addRoomMember(){
+        ArrayList<String> emailId = new ArrayList<String>();
+        emailId.add("arief93");
+        QiscusApi.getInstance().addRoomMember(roomId,emailId);
+    }
+
+    @Test
+    public void addParticipants(){
+        ArrayList<String> emailId = new ArrayList<String>();
+        emailId.add("arief93");
+        QiscusApi.getInstance().addParticipants(roomId,emailId);
+    }
+
+    @Test
+    public void removeRoomMember(){
+        ArrayList<String> emailId = new ArrayList<String>();
+        emailId.add("arief93");
+        QiscusApi.getInstance().removeRoomMember(roomId,emailId);
+    }
+
+    @Test
+    public void removeParticipants(){
+        ArrayList<String> emailId = new ArrayList<String>();
+        emailId.add("arief93");
+        QiscusApi.getInstance().removeParticipants(roomId,emailId);
+    }
+
+
+    @Test
+    public void blockUser(){
+        QiscusApi.getInstance().blockUser("arief93");
+    }
+
+    @Test
+    public void unblockUser(){
+        QiscusApi.getInstance().unblockUser("arief93");
+    }
+
+    @Test
+    public void getBlockedUsers(){
+        QiscusApi.getInstance().getBlockedUsers(1,100);
+    }
+
+    @Test
+    public void getBlockedUsers2(){
+        QiscusApi.getInstance().getBlockedUsers();
+    }
+
+    @Test
+    public void getRoomMembers(){
+        QiscusApi.getInstance().getRoomMembers(roomUniqId, 0, new QiscusApi.MetaRoomMembersListener() {
+            @Override
+            public void onMetaReceived(int currentOffset, int perPage, int total) {
+
+            }
+        });
+    }
+
+    @Test
+    public void getRoomMembers2(){
+        QiscusApi.getInstance().getRoomMembers(roomUniqId, 0, "desc", new QiscusApi.MetaRoomMembersListener() {
+            @Override
+            public void onMetaReceived(int currentOffset, int perPage, int total) {
+
+            }
+        });
+    }
+
+    @Test
+    public void getParticipants(){
+        QiscusApi.getInstance().getParticipants(roomUniqId, 1, 100, "desc", new QiscusApi.MetaRoomParticipantsListener() {
+            @Override
+            public void onMetaReceived(int currentPage, int perPage, int total) {
+
+            }
+        });
+    }
+
+    @Test
+    public void getParticipants2(){
+        QiscusApi.getInstance().getParticipants(roomUniqId, 1, 100, "desc");
+    }
+
+    @Test
+    public void getMqttBaseUrl(){
+        QiscusApi.getInstance().getMqttBaseUrl();
+    }
+
+    @Test
+    public void getUsers(){
+        QiscusApi.getInstance().getUsers("arief94");
+    }
+
+    @Test
+    public void getUsers2(){
+        QiscusApi.getInstance().getUsers( 1,100,"arief94");
+    }
+
+    @Test
+    public void eventReport(){
+        QiscusApi.getInstance().eventReport( "codeCoverage","testing","testing");
+    }
+
+    @Test
+    public void getChannels(){
+        QiscusApi.getInstance().getChannels();
+    }
+
+    @Test
+    public void getChannelsInfo(){
+        ArrayList<String> uniqId = new ArrayList<String>();
+        uniqId.add(roomUniqId);
+        QiscusApi.getInstance().getChannelsInfo(uniqId);
+    }
+
+    @Test
+    public void joinChannels(){
+        ArrayList<String> uniqId = new ArrayList<String>();
+        uniqId.add(roomUniqId);
+        QiscusApi.getInstance().joinChannels(uniqId);
+    }
+
+    @Test
+    public void leaveChannels(){
+        ArrayList<String> uniqId = new ArrayList<String>();
+        uniqId.add(roomUniqId);
+        QiscusApi.getInstance().leaveChannels(uniqId);
+        QiscusApi.getInstance().joinChannels(uniqId);
+    }
+
+    @Test
+    public void getUserPresence(){
+        ArrayList<String> userId = new ArrayList<String>();
+        userId.add("arief94");
+        QiscusApi.getInstance().getUserPresence(userId);
+    }
+
+    @Test
+    public void getFileList(){
+        ArrayList<Long> id =  new ArrayList<Long>();
+        id.add(Long.valueOf(roomId));
+
+        ArrayList<String> includeExtensions = new ArrayList<String >();
+        includeExtensions.add(".mp4");
+
+        QiscusApi.getInstance().getFileList(id,"media", "arief94", includeExtensions, null, 1, 100);
+    }
+
+    @Test
+    public void searchMessage(){
+        ArrayList<Long> id =  new ArrayList<Long>();
+        id.add(Long.valueOf(roomId));
+
+        ArrayList<String> type =  new ArrayList<String>();
+        type.add("text");
+        QiscusApi.getInstance().searchMessage("testing",id, "arief94", type, 1, 100);
+    }
+
+    @Test
+    public void searchMessage2(){
+        ArrayList<Long> id =  new ArrayList<Long>();
+        id.add(Long.valueOf(roomId));
+
+        ArrayList<String> type =  new ArrayList<String>();
+        type.add("text");
+        QiscusApi.getInstance().searchMessage("testing",id, null, type, 1, 100);
+    }
+
+    @Test
+    public void searchMessage3(){
+        ArrayList<Long> id =  new ArrayList<Long>();
+        id.add(Long.valueOf(roomId));
+
+        ArrayList<String> type =  new ArrayList<String>();
+        type.add("text");
+        QiscusApi.getInstance().searchMessage("testing",id, "arief94",  type,  QiscusChatRoom.RoomType.SINGLE,1, 100);
+    }
+
+    @Test
+    public void searchMessage4(){
+        ArrayList<Long> id =  new ArrayList<Long>();
+        id.add(Long.valueOf(roomId));
+
+        ArrayList<String> type =  new ArrayList<String>();
+        type.add("text");
+        QiscusApi.getInstance().searchMessage("testing",id, null,  type,  QiscusChatRoom.RoomType.SINGLE,1, 100);
+    }
+
+    @Test
+    public void getRoomUnreadCount(){
+        QiscusApi.getInstance().getRoomUnreadCount();
+    }
+
+    @Test
+    public void refreshToken2(){
+        try {
+            QiscusApi.getInstance().refreshToken("arief92", null);
+        } catch (IllegalArgumentException e){
+
+        }
+    }
 
 
 }

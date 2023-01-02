@@ -43,6 +43,8 @@ public class QiscusAccountTest {
         account.getExtras();
         account.getUsername();
 
+        account.equals(account);
+
     }
 
 

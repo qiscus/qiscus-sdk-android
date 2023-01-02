@@ -159,6 +159,7 @@ public class QiscusChatRoomTest {
         setMemberCount();
 
         qiscusChatRoom.hashCode();
+        qiscusChatRoom.equals(qiscusChatRoom);
     }
 
     @Test

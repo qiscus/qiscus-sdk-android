@@ -51,7 +51,7 @@ public class QiscusChatRoomEventHandler {
         setMemberState();
     }
 
-    private void setMemberState() {
+    public void setMemberState() {
         if (memberState == null) {
             memberState = new HashMap<>();
         } else {
@@ -67,7 +67,7 @@ public class QiscusChatRoomEventHandler {
         }
     }
 
-    private void listenChatRoomEvent() {
+    public void listenChatRoomEvent() {
         QiscusPusherApi.getInstance().subscribeChatRoom(qiscusChatRoom);
     }
 
@@ -120,7 +120,7 @@ public class QiscusChatRoomEventHandler {
         }
     }
 
-    private void handleChatRoomChanged(QiscusComment qiscusComment) {
+    public void handleChatRoomChanged(QiscusComment qiscusComment) {
         try {
             JSONObject payload = QiscusRawDataExtractor.getPayload(qiscusComment);
             QiscusRoomMember member = new QiscusRoomMember();
