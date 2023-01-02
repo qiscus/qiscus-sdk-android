@@ -80,7 +80,7 @@ public final class QiscusResendCommentHelper {
         processingComment.remove(qiscusComment.getUniqueId());
     }
 
-    private static void resendComment(QiscusComment qiscusComment) {
+    public static void resendComment(QiscusComment qiscusComment) {
         if (qiscusComment.isAttachment()) {
             resendFile(qiscusComment);
             return;
@@ -185,7 +185,7 @@ public final class QiscusResendCommentHelper {
         QiscusCore.getDataStore().addOrUpdate(qiscusComment);
     }
 
-    private static boolean mustFailed(Throwable throwable, QiscusComment qiscusComment) {
+    public static boolean mustFailed(Throwable throwable, QiscusComment qiscusComment) {
         //Error response from server
         //Means something wrong with server, e.g user is not member of these room anymore
         return ((throwable instanceof HttpException && ((HttpException) throwable).code() >= 400) ||
@@ -195,7 +195,7 @@ public final class QiscusResendCommentHelper {
                 qiscusComment.isAttachment());
     }
 
-    private static void commentFail(Throwable throwable, QiscusComment qiscusComment) {
+    public static void commentFail(Throwable throwable, QiscusComment qiscusComment) {
         pendingTask.remove(qiscusComment.getUniqueId());
         if (!QiscusCore.getDataStore().isContains(qiscusComment)) { //Have been deleted
             return;

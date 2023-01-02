@@ -131,14 +131,14 @@ public class QiscusSyncService extends Service {
 
     }
 
-    private void syncEvents() {
+    public void syncEvents() {
         QiscusApi.getInstance().synchronizeEvent(QiscusEventCache.getInstance().getLastEventId())
                 .subscribeOn(Schedulers.io())
                 .subscribe(events -> {
                 }, QiscusErrorLogger::print);
     }
 
-    private void syncComments() {
+    public void syncComments() {
         QiscusApi.getInstance().sync()
                 .doOnSubscribe(() -> {
                     EventBus.getDefault().post((QiscusSyncEvent.STARTED));
@@ -160,7 +160,7 @@ public class QiscusSyncService extends Service {
                 });
     }
 
-    private void stopSync() {
+    public void stopSync() {
         if (timer != null) {
             try {
                 timer.cancel();
