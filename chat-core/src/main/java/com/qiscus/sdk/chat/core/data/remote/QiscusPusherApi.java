@@ -355,7 +355,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     /**
      * If isEnableMqttLB = true, MQTT broker url is from own MQTT_LB and save to shared pref
      */
-    private void getMqttBrokerUrlFromLB() {
+    public void getMqttBrokerUrlFromLB() {
         QiscusLogger.print(TAG, "isEnableMqttLB : " + QiscusCore.isEnableMqttLB());
         QiscusLogger.print(TAG, "urlLB : " + QiscusCore.getBaseURLLB());
 
@@ -379,7 +379,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    private void eventReport(String moduleName, String event, String message) {
+    public void eventReport(String moduleName, String event, String message) {
         if (QiscusCore.hasSetupUser() && reporting == true && QiscusCore.getEnableEventReport() == true) {
             QiscusApi.getInstance()
                     .eventReport(moduleName, event, message)
@@ -530,7 +530,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         stopUserStatus();
     }
 
-    private void listenComment() {
+    public void listenComment() {
         if (!QiscusCore.getEnableRealtime() || !QiscusCore.getStatusRealtimeEnableDisable()) {
             return;
         }
@@ -753,7 +753,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     @Deprecated
-    private void setUserStatus(boolean online) {
+    public void setUserStatus(boolean online) {
         if (!QiscusCore.getEnableRealtime() || !QiscusCore.getStatusRealtimeEnableDisable()) {
             return;
         }

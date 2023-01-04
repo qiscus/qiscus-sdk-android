@@ -516,6 +516,16 @@ public class QiscusCore {
     }
 
     /**
+     * enableEventReport
+     * Checker for enable or disable EventReport
+     *
+     * @return boolean
+     */
+    public static void setEnableEventReport(Boolean enable) {
+         enableEventReport = enable;
+    }
+
+    /**
      * enableRealtime
      * Checker for enable or disable Realtime
      *
@@ -661,6 +671,10 @@ public class QiscusCore {
      */
     public static boolean willGetNewNodeMqttBrokerUrl() {
         return localDataManager.willGetNewNodeMqttBrokerUrl();
+    }
+
+    public static void setWillGetNewNodeMqttBrokerUrl(Boolean set) {
+        localDataManager.setWillGetNewNodeMqttBrokerUrl(set);
     }
 
     /**

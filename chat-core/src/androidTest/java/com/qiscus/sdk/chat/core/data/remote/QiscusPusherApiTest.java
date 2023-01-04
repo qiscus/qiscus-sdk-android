@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 import junit.framework.TestCase;
@@ -232,5 +233,166 @@ public class QiscusPusherApiTest extends InstrumentationBaseTest {
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
         QiscusPusherApi.getInstance().jsonToComment(jsonObject);
     }
+
+    @Test
+    public void restartConnection(){
+        QiscusPusherApi.getInstance().restartConnection();
+    }
+
+    @Test
+    public void listenComment(){
+        QiscusPusherApi.getInstance().listenComment();
+    }
+
+    @Test
+    public void listenComment2(){
+        QiscusCore.setEnableDisableRealtime(true);
+
+        QiscusPusherApi.getInstance().listenComment();
+    }
+
+    @Test
+    public void isConnected(){
+        QiscusPusherApi.getInstance().isConnected();
+    }
+
+    @Test
+    public void eventReport(){
+        QiscusCore.setEnableEventReport(true);
+        QiscusPusherApi.getInstance().eventReport("test", "error","error data");
+    }
+
+    @Test
+    public void eventReport2(){
+        QiscusCore.setEnableEventReport(false);
+        QiscusPusherApi.getInstance().eventReport("test", "error","error data");
+    }
+
+    @Test
+    public void getMqttBrokerUrlFromLB(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+        QiscusPusherApi.getInstance().getMqttBrokerUrlFromLB();
+    }
+
+    @Test
+    public void getMqttBrokerUrlFromLB2(){
+        QiscusCore.setEnableDisableRealtime(false);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(false);
+        QiscusPusherApi.getInstance().getMqttBrokerUrlFromLB();
+    }
+
+
+    @Test
+    public void listenRoom(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+
+        QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+        qiscusChatRoom.setId(1234);
+        qiscusChatRoom.setGroup(true);
+        qiscusChatRoom.setChannel(false);
+
+        QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().subscribeChatRoom(qiscusChatRoom);
+    }
+
+    @Test
+    public void listenRoom2(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+
+        QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+        qiscusChatRoom.setId(1234);
+        qiscusChatRoom.setGroup(true);
+        qiscusChatRoom.setChannel(true);
+
+        QiscusPusherApi.getInstance().listenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().subscribeChatRoom(qiscusChatRoom);
+    }
+
+    @Test
+    public void unListenRoom(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+
+        QiscusChatRoom qiscusChatRoom = new QiscusChatRoom();
+        qiscusChatRoom.setId(1234);
+        qiscusChatRoom.setGroup(true);
+        qiscusChatRoom.setChannel(false);
+
+        QiscusPusherApi.getInstance().unListenRoom(qiscusChatRoom);
+        QiscusPusherApi.getInstance().unsubsribeChatRoom(qiscusChatRoom);
+    }
+
+
+    @Test
+    public void listenUserStatus(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().listenUserStatus("arief96");
+    }
+
+    @Test
+    public void subscribeUserOnlinePresence(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().subscribeUserOnlinePresence("arief96");
+    }
+
+    @Test
+    public void unListenUserStatus(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().unListenUserStatus("arief96");
+    }
+
+    @Test
+    public void unsubscribeUserOnlinePresence(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().unsubscribeUserOnlinePresence("arief96");
+    }
+
+    @Test
+    public void setUserStatus(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().setUserStatus(true);
+    }
+
+    @Test
+    public void setUserTyping(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().setUserTyping(roomId,true);
+    }
+
+    @Test
+    public void publishTyping(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().publishTyping(roomId,true);
+    }
+
+    @Test
+    public void setUserRead(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().setUserRead(roomId,123432);
+    }
+
+    @Test
+    public void setUserDelivery(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().setUserDelivery(roomId,123432);
+    }
+
+    @Test
+    public void markAsRead(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().markAsRead(roomId,123432);
+    }
+
+    @Test
+    public void markAsDelivered(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().markAsDelivered(roomId,123432);
+    }
+
+
+
 
 }
