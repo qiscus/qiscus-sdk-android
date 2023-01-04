@@ -64,6 +64,7 @@ public class InstrumentationBaseTest {
                     }});
 
         QiscusApi.getInstance().reInitiateInstance();
+        QiscusCore.getChatConfig().enableDebugMode(false);
     }
 
 }
