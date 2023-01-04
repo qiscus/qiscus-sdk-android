@@ -1,4 +1,4 @@
-package com.qiscus.sdk.chat.core.data.event;
+package com.qiscus.sdk.chat.core.event;
 
 import static org.junit.Assert.*;
 

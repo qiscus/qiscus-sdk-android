@@ -21,7 +21,6 @@ import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
