@@ -17,8 +17,7 @@
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
-    <application
-        android:requestLegacyExternalStorage="true">
+    <application>
         <receiver
             android:name=".service.QiscusStartServiceReceiver"
             android:enabled="true"

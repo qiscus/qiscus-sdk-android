@@ -26,6 +26,8 @@ public class InstrumentationBaseTest {
 
     protected Context context;
     protected Application application;
+    protected Integer roomId = 10185397;
+    protected String roomUniqId = "8d412fdd3411f5f261f8f30e0f90ff60";
 
     @Before
     public void setUp() throws Exception {

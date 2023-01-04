@@ -134,7 +134,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         QiscusAndroidUtil.runOnBackgroundThread(() -> handleComment(qiscusComment, true));
     }
 
-    private static void handleComment(QiscusComment qiscusComment, Boolean isMessageUpdate) {
+    public static void handleComment(QiscusComment qiscusComment, Boolean isMessageUpdate) {
         QiscusComment savedComment = QiscusCore.getDataStore().getComment(qiscusComment.getUniqueId());
         if (savedComment != null && (savedComment.isDeleted() || savedComment.areContentsTheSame(qiscusComment))) {
             return;

@@ -1,0 +1,236 @@
+package com.qiscus.sdk.chat.core.data.remote;
+
+import static org.junit.Assert.*;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
+import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+
+import junit.framework.TestCase;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+
+public class QiscusPusherApiTest extends InstrumentationBaseTest {
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @Test
+    @Override
+    public void setupEngine() {
+        super.setupEngine();
+    }
+
+    @Test
+    public void handleUpdateComment(){
+        QiscusComment qiscusComment = QiscusComment.generateMessage(roomId, "test");
+        QiscusPusherApi.getInstance().handleUpdateComment(qiscusComment);
+    }
+
+    @Test
+    public void handleUpdateComment2(){
+        QiscusComment qiscusComment = QiscusComment.generateMessage(roomId, "test");
+        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+        QiscusPusherApi.getInstance().handleUpdateComment(qiscusComment);
+    }
+
+    @Test
+    public void handleUpdateComment3(){
+        QiscusComment qiscusComment = QiscusComment.generateMessage(roomId, "test");
+        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+        QiscusPusherApi.getInstance().handleComment(qiscusComment, false);
+    }
+
+    @Test
+    public void handleUpdateComment4(){
+        QiscusComment qiscusComment = QiscusComment.generateMessage(roomId, "test2");
+        qiscusComment.setSenderEmail("arief95");
+        qiscusComment.setSender("arief95");
+        QiscusCore.getDataStore().addOrUpdate(qiscusComment);
+        QiscusPusherApi.getInstance().handleComment(qiscusComment, false);
+    }
+
+    @Test
+    public void handlePushNotificationClearRoom(){
+        String json = "{\n" +
+                "            \"id\": 1518505913641786359,\n" +
+                "            \"action_topic\": \"clear_room\",\n" +
+                "            \"payload\": {\n" +
+                "                \"actor\": {\n" +
+                "                    \"id\": \"144\",\n" +
+                "                    \"email\": \"userid_108_6285868231412@kiwari-prod.com\",\n" +
+                "                    \"name\": \"Yusufs\"\n" +
+                "                },\n" +
+                "                \"data\": {\n" +
+                "                    \"deleted_rooms\": [\n" +
+                "                        {\n" +
+                "                            \"avatar_url\": \"https://res.cloudinary.com/qiscus/image/upload/v1490343786/kiwari-prod_user_id_201/sa6r61reovri6dtrajly.jpg\",\n" +
+                "                            \"chat_type\": \"group\",\n" +
+                "                            \"id\": 23254,\n" +
+                "                            \"id_str\": \"23254\",\n" +
+                "                            \"last_comment\": null,\n" +
+                "                            \"options\": {},\n" +
+                "                            \"raw_room_name\": \"Qiscus Demo\",\n" +
+                "                            \"room_name\": \"Qiscus Demo\",\n" +
+                "                            \"unique_id\": \"4c8af24f-258a-4169-9c5d-0a110d2eac2c\",\n" +
+                "                            \"unread_count\": 0\n" +
+                "                        }\n" +
+                "                    ]\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }";
+
+        try {
+            QiscusPusherApi.getInstance().handleNotification(new JSONObject(json));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void handlePushNotificationDeleteMessage(){
+        String json = "{\n" +
+                "            \"id\": 1518503569096927668,\n" +
+                "            \"action_topic\": \"delete_message\",\n" +
+                "            \"payload\": {\n" +
+                "                \"actor\": {\n" +
+                "                    \"id\": \"144\",\n" +
+                "                    \"email\": \"userid_108_6285868231412@kiwari-prod.com\",\n" +
+                "                    \"name\": \"Yusufs\"\n" +
+                "                },\n" +
+                "                \"data\": {\n" +
+                "                    \"deleted_messages\": [\n" +
+                "                        {\n" +
+                "                            \"message_unique_ids\": [\n" +
+                "                                \"TZoM1BGrxsPNQAFoydQg\"\n" +
+                "                            ],\n" +
+                "                            \"room_id\": \"715\"\n" +
+                "                        }\n" +
+                "                    ],\n" +
+                "                    \"is_hard_delete\": false\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }";
+
+        try {
+            QiscusPusherApi.getInstance().handleNotification(new JSONObject(json));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void handlePushNotificationRead(){
+        String json = "{\n" +
+                "  \"id\": 1518503569096927668,\n" +
+                "  \"action_topic\": \"read\",\n" +
+                "  \"payload\": {\n" +
+                "    \"actor\": {\n" +
+                "      \"id\": \"144\",\n" +
+                "      \"email\": \"userid_108_6285868231412@kiwari-prod.com\",\n" +
+                "      \"name\": \"Yusufs\"\n" +
+                "    },\n" +
+                "    \"data\": {\n" +
+                "      \"room_id\": \"715\",\n" +
+                "      \"comment_id\": \"12345\",\n" +
+                "      \"comment_unique_id\": \"asbdaksd34234432\",\n" +
+                "      \"email\": \"arief96\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        try {
+            QiscusPusherApi.getInstance().handleNotification(new JSONObject(json));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void handlePushNotificationDelivered(){
+        QiscusComment comment = QiscusComment.generateMessage(roomId, "test");
+        comment.setSender("arief96");
+        comment.setSenderEmail("arief96");
+        comment.setId(12345);
+
+        QiscusCore.getDataStore().addOrUpdate(comment);
+        String json = "{\n" +
+                "  \"id\": 1518503569096927668,\n" +
+                "  \"action_topic\": \"delivered\",\n" +
+                "  \"payload\": {\n" +
+                "    \"actor\": {\n" +
+                "      \"id\": \"144\",\n" +
+                "      \"email\": \"userid_108_6285868231412@kiwari-prod.com\",\n" +
+                "      \"name\": \"Yusufs\"\n" +
+                "    },\n" +
+                "    \"data\": {\n" +
+                "      \"room_id\": \"715\",\n" +
+                "      \"comment_id\": \"12345\",\n" +
+                "      \"comment_unique_id\": \""+ comment.getUniqueId() +"\",\n" +
+                "      \"email\": \"arief96\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        try {
+            QiscusPusherApi.getInstance().handleNotification(new JSONObject(json));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void jsonToComment(){
+        String json = "{\n" +
+                "  \"comment_before_id\": 3,\n" +
+                "  \"comment_before_id_str\": \"3\",\n" +
+                "  \"disable_link_preview\": false,\n" +
+                "  \"email\": \"jarjit@mail.com\",\n" +
+                "  \"extras\": {\n" +
+                "    \n" +
+                "  },\n" +
+                "  \"id\": 4,\n" +
+                "  \"id_str\": \"4\",\n" +
+                "  \"is_deleted\": false,\n" +
+                "  \"is_public_channel\": false,\n" +
+                "  \"message\": \"wkwk halo\",\n" +
+                "  \"payload\": {\n" +
+                "    \"text\": \"new\"\n" +
+                "  },\n" +
+                "  \"room_avatar\": \"https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/E2nVru1t25/1507541900-avatar.png\",\n" +
+                "  \"room_id\": 1,\n" +
+                "  \"room_id_str\": \"1\",\n" +
+                "  \"room_name\": \"channelidrandomstring\",\n" +
+                "  \"room_type\": \"group\",\n" +
+                "  \"status\": \"sent\",\n" +
+                "  \"timestamp\": \"2019-02-13T16:19:23Z\",\n" +
+                "  \"topic_id\": 1,\n" +
+                "  \"topic_id_str\": \"1\",\n" +
+                "  \"type\": \"buttons\",\n" +
+                "  \"unique_temp_id\": \"o2jHsxcI4shjrpOS7MuC\",\n" +
+                "  \"unix_nano_timestamp\": 1550074763338823000,\n" +
+                "  \"unix_timestamp\": 1550074763,\n" +
+                "  \"user_avatar\": {\n" +
+                "    \"avatar\": {\n" +
+                "      \"url\": \"https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/75r6s_jOHa/1507541871-avatar-mine.png\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"user_avatar\": \"https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/75r6s_jOHa/1507541871-avatar-mine.png\",\n" +
+                "  \"user_id\": 13,\n" +
+                "  \"user_id_str\": \"13\",\n" +
+                "  \"username\": \"Jarjit singh\"\n" +
+                "}";
+
+        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+        QiscusPusherApi.getInstance().jsonToComment(jsonObject);
+    }
+
+}
