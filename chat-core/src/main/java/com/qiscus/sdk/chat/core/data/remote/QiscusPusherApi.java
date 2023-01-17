@@ -393,7 +393,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     public void connect() {
         if (QiscusCore.hasSetupUser() && !connecting && QiscusAndroidUtil.isNetworkAvailable()
-                && QiscusCore.getEnableRealtime() && QiscusCore.getStatusRealtimeEnableDisable() && !QiscusCore.getIsExactAlarmDisable()) {
+                && QiscusCore.getEnableRealtime() && QiscusCore.getStatusRealtimeEnableDisable()) {
             connecting = true;
             qiscusAccount = QiscusCore.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
@@ -465,10 +465,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             return;
         }
 
-        if (QiscusCore.getIsExactAlarmDisable()){
-            QiscusLogger.print(TAG, "QiscusPusherApi... " + "Disconnect manually from client (exact alarm is false)");
-            return;
-        }
 
         if (connecting) {
             QiscusLogger.print(TAG, "Connecting... " + "connectingFromRestartConnection");
