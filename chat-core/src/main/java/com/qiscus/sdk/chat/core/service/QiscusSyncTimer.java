@@ -33,7 +33,7 @@ public class QiscusSyncTimer {
 
         stopSync();
 
-        if (!qiscusCore.getStatusRealtimeEnableDisable()) {
+        if (qiscusCore.getStatusRealtimeEnableDisable()) {
             period = qiscusCore.getAutomaticHeartBeat();
         }
 
@@ -56,15 +56,22 @@ public class QiscusSyncTimer {
         qiscusCore.getLogger().print(TAG, "Job started...");
 
         if (qiscusCore.hasSetupUser() && !qiscusCore.getPusherApi().isConnected()) {
-            if (qiscusCore.getStatusRealtimeEnableDisable()){
-                QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().restartConnection());
-                checkPendingMessage();
-                scheduleSync();
+            if (qiscusCore.getEnableRealtime()) {
+                if (qiscusCore.getStatusRealtimeEnableDisable()){
+                    QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().restartConnection());
+                    checkPendingMessage();
+                    scheduleSync();
 
+                }else{
+                    checkPendingMessage();
+                    scheduleSync();
+                }
             }else{
                 checkPendingMessage();
                 scheduleSync();
             }
+
+
 
         }else{
             if (qiscusCore.hasSetupUser()) {

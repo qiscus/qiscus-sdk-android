@@ -16,11 +16,13 @@
 
 package com.qiscus.sdk.chat.core.util;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.service.QiscusSyncTimer;
 
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
@@ -75,6 +77,22 @@ public final class QiscusAndroidUtil {
                 qiscusCore.getApps().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm != null ? cm.getActiveNetworkInfo() : null;
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public static boolean isMyServiceRunning() {
+        Class<?> serviceClass;
+
+        serviceClass = QiscusSyncTimer.class;
+
+        ActivityManager manager = (ActivityManager) qiscusCore.getApps().getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (serviceClass.getName().equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public int compare(int x, int y) {

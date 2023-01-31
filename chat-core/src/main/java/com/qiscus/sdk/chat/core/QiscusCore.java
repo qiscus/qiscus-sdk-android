@@ -16,12 +16,17 @@
 
 package com.qiscus.sdk.chat.core;
 
+import android.app.AlarmManager;
 import android.app.Application;
 import android.app.job.JobScheduler;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -87,7 +92,8 @@ public class QiscusCore {
     private long networkConnectionInterval;
     private Boolean enableSync = true;
     private Boolean enableSyncEvent = false;
-
+    private static Boolean forceDisableRealtimeFromExactAlarm = false;
+    private static Boolean syncServiceDisabled = false;
 
     public QiscusCore() {
     }
@@ -237,6 +243,11 @@ public class QiscusCore {
         localDataManager.setURLLB(baseURLLB);
 
         qiscusMediator.initAllClass(this);
+
+        qiscusMediator.getActivityCallback().setAppActiveOrForground();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            checkExactAlarm(application);
+        }
 
         getAppConfig();
 
@@ -455,6 +466,35 @@ public class QiscusCore {
      */
     public boolean willGetNewNodeMqttBrokerUrl() {
         return localDataManager.willGetNewNodeMqttBrokerUrl();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private void checkExactAlarm(Application application){
+        PackageManager.OnChecksumsReadyListener check = ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
+
+            AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+            if (!alarmMgr.canScheduleExactAlarms()) {
+                forceDisableRealtimeFromExactAlarm = true;
+
+                if (getPusherApi().isConnected()) {
+                    getPusherApi().disconnect();
+                }
+            } else {
+                forceDisableRealtimeFromExactAlarm = false;
+            }
+        };
+    }
+
+    public static void setIsExactAlarmDisable(Boolean isExactAlarmDisable){
+        forceDisableRealtimeFromExactAlarm = isExactAlarmDisable;
+    }
+
+    public static boolean getIsExactAlarmDisable() {
+        return forceDisableRealtimeFromExactAlarm;
+    }
+
+    public static Boolean isSyncServiceDisabledManually() {
+        return syncServiceDisabled;
     }
 
     /**
@@ -947,7 +987,7 @@ public class QiscusCore {
                     }, throwable -> getErrorLogger().print("SetFCMToken", throwable));
         }
 
-        localDataManager.setFcmToken(null);
+        localDataManager.setFcmToken("");
     }
 
     private void configureFcmToken() {
@@ -972,6 +1012,10 @@ public class QiscusCore {
      */
     public boolean isOnForeground() {
         return getActivityCallback().isForeground();
+    }
+
+    public void setAppInForeground(){
+        getActivityCallback().setAppActiveOrForground();
     }
 
     /**

@@ -45,8 +45,19 @@ public final class QiscusDateUtil {
 
     public static String toTodayOrDate(Date date) {
         String currentDateInString = fullDateFormat.format(new Date());
-        String dateInString = fullDateFormat.format(date);
-        return currentDateInString.equals(dateInString) ? QiscusConst.getApps().getString(R.string.qiscus_today) : dateInString;
+        try {
+            String dateInString = fullDateFormat.format(date);
+            return currentDateInString.equals(dateInString) ? QiscusConst.getApps().getString(R.string.qiscus_today) : dateInString;
+        } catch (ArrayIndexOutOfBoundsException e){
+            return QiscusConst.getApps().getString(R.string.qiscus_today);
+        } catch (IndexOutOfBoundsException e){
+            return QiscusConst.getApps().getString(R.string.qiscus_today);
+        } catch (Exception e){
+            return QiscusConst.getApps().getString(R.string.qiscus_today);
+        } catch (Error e){
+            return QiscusConst.getApps().getString(R.string.qiscus_today);
+        }
+
     }
 
     public static String toHour(Date date) {

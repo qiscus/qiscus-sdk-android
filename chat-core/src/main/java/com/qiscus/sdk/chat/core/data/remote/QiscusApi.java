@@ -70,7 +70,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.internal.Util;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okio.BufferedSink;
 import okio.Okio;
@@ -589,7 +588,7 @@ public class QiscusApi {
         QMessage latestComment = qiscusCore.getDataStore().getLatestComment();
         if (latestComment == null || !qiscusCore.getApps().getString(R.string.qiscus_today)
                 .equals(QiscusDateUtil.toTodayOrDate(latestComment.getTimestamp()))) {
-            return Observable.empty();
+            return synchronize(0);
         }
         return synchronize(latestComment.getId());
     }
@@ -1508,7 +1507,14 @@ public class QiscusApi {
 
                 }
             } finally {
-                Util.closeQuietly(source);
+                if (source != null) {
+                    try {
+                        source.close();
+                    } catch (RuntimeException rethrown) {
+                        throw rethrown;
+                    } catch (Exception ignored) {
+                    }
+                }
             }
         }
     }

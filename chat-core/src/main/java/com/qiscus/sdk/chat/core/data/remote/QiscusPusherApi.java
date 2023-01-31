@@ -37,6 +37,7 @@ import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -383,7 +384,7 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
     public void connect() {
         if (qiscusCore.hasSetupUser() && !connecting
                 && qiscusCore.getAndroidUtil().isNetworkAvailable()
-                && qiscusCore.getEnableRealtime() && qiscusCore.getStatusRealtimeEnableDisable()) {
+                && qiscusCore.getEnableRealtime() && qiscusCore.getStatusRealtimeEnableDisable() && !QiscusCore.getIsExactAlarmDisable()) {
             connecting = true;
             qAccount = qiscusCore.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
@@ -451,6 +452,11 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
 
         if (!qiscusCore.getStatusRealtimeEnableDisable()) {
             qiscusCore.getLogger().print(TAG, "QiscusPusherApi... " + "Disconnect manually from client");
+            return;
+        }
+
+        if (qiscusCore.getIsExactAlarmDisable()){
+            qiscusCore.getLogger().print(TAG, "QiscusPusherApi... " + "Disconnect manually from client (exact alarm is false)");
             return;
         }
 

@@ -17,8 +17,14 @@
 package com.qiscus.sdk.chat.core;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Application;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -33,6 +39,7 @@ public class QiscusActivityCallback implements Application.ActivityLifecycleCall
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
     private static boolean foreground;
     private ScheduledFuture<?> activityTransition;
+    private ScheduledFuture<?> activityTransition2;
     private QiscusCore qiscusCore;
 
     public QiscusActivityCallback(QiscusCore qiscusCore) {
@@ -45,6 +52,20 @@ public class QiscusActivityCallback implements Application.ActivityLifecycleCall
 
     @Override
     public void onActivityStarted(Activity activity) {
+        AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmMgr.canScheduleExactAlarms()) {
+                qiscusCore.setIsExactAlarmDisable(true);
+            } else {
+                qiscusCore.setIsExactAlarmDisable(false);
+            }
+        }
+
+        foreground = true;
+
+//        if (!qiscusCore.getAndroidUtil().isMyServiceRunning() && !qiscusCore.isSyncServiceDisabledManually()) {
+//            qiscusCore.startSyncService();
+//        }
     }
 
     @Override
@@ -67,22 +88,40 @@ public class QiscusActivityCallback implements Application.ActivityLifecycleCall
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-
     }
 
     boolean isForeground() {
         return foreground;
     }
 
+    public static void setAppActiveOrForground(){
+        foreground = true;
+    }
+
     private void startActivityTransitionTimer() {
-        activityTransition = qiscusCore.getAndroidUtil().runOnBackgroundThread(() -> foreground = false,
+        activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() -> foreground = false,
                 MAX_ACTIVITY_TRANSITION_TIME);
+
+        activityTransition2 = QiscusAndroidUtil.runOnBackgroundThread(() -> check(), MAX_ACTIVITY_TRANSITION_TIME);
+    }
+
+    private void check(){
+        if (!foreground) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                qiscusCore.getPusherApi().disconnect();
+            }
+        }
     }
 
     private void stopActivityTransitionTimer() {
         if (activityTransition != null) {
             activityTransition.cancel(true);
         }
+
+        if (activityTransition2 != null) {
+            activityTransition2.cancel(true);
+        }
+
         foreground = true;
     }
 }
