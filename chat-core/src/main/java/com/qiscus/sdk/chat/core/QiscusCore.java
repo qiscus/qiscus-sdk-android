@@ -539,14 +539,6 @@ public class QiscusCore {
         enableRealtime = enableDisableRealtime;
     }
 
-    public static void setIsExactAlarmDisable(Boolean isExactAlarmDisable){
-        forceDisableRealtimeFromExactAlarm = isExactAlarmDisable;
-    }
-
-    public static boolean getIsExactAlarmDisable() {
-        return forceDisableRealtimeFromExactAlarm;
-    }
-
     /**
      * enableSync
      * Checker for enable or disable sync
@@ -1239,10 +1231,10 @@ public class QiscusCore {
         LocalDataManager() {
             SharedPreferences sharedPreferencesOld  = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
 
-            String sharedPrefsFile = JupukData.getFileName();
-            final boolean isActive = false;
-
             try {
+                String sharedPrefsFile = JupukData.getFileName();
+                boolean isActive = false;
+
                 if (isActive) {
                     sharedPreferences = EncryptedSharedPreferences.create(
                             sharedPrefsFile,
@@ -1310,10 +1302,10 @@ public class QiscusCore {
             } catch (Exception e) {
                 QiscusErrorLogger.print(e);
                 sharedPreferences = sharedPreferencesOld;
-            } //catch (Error e) {
-            //QiscusErrorLogger.print(e);
-            //sharedPreferences = sharedPreferencesOld;
-            //}
+            } catch (Error e) {
+            QiscusErrorLogger.print(e);
+                sharedPreferences = sharedPreferencesOld;
+            }
 
             gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : "";

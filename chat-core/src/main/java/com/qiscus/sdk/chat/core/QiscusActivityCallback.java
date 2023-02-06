@@ -17,10 +17,7 @@
 package com.qiscus.sdk.chat.core;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.Application;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
@@ -49,14 +46,6 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(Activity activity) {
-        AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!alarmMgr.canScheduleExactAlarms()) {
-                QiscusCore.setIsExactAlarmDisable(true);
-            } else {
-                QiscusCore.setIsExactAlarmDisable(false);
-            }
-        }
 
         foreground = true;
 
@@ -104,9 +93,7 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
 
     private void check(){
         if (!foreground) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                QiscusPusherApi.getInstance().disconnect();
-            }
+            QiscusPusherApi.getInstance().disconnect();
         }
     }
 

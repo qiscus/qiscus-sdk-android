@@ -206,8 +206,6 @@ public class QiscusCoreTest extends InstrumentationBaseTest {
         QiscusCore.getEnableEventReport();
         QiscusCore.getEnableRealtime();
         QiscusCore.setEnableDisableRealtime(true);
-        QiscusCore.setIsExactAlarmDisable(true);
-        QiscusCore.getIsExactAlarmDisable();
         QiscusCore.getEnableSync();
         QiscusCore.getEnableSyncEvent();
         QiscusCore.isSyncServiceDisabledManually();

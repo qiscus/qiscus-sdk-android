@@ -11,6 +11,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 
 import junit.framework.TestCase;
 
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -393,6 +394,133 @@ public class QiscusPusherApiTest extends InstrumentationBaseTest {
     }
 
 
+    @Test
+    public void setEvent(){
+        try {
+            QiscusPusherApi.getInstance().setEvent(roomId,new JSONObject("{}"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Test
+    public void setEvent2(){
+        QiscusCore.setEnableDisableRealtime(true);
+        try {
+            QiscusPusherApi.getInstance().setEvent(roomId,new JSONObject("{}"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void publishCustomEvent2(){
+        try {
+            QiscusPusherApi.getInstance().publishCustomEvent(roomId,new JSONObject("{}"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void publishCustomEvent(){
+        QiscusCore.setEnableDisableRealtime(true);
+        try {
+            QiscusPusherApi.getInstance().publishCustomEvent(roomId,new JSONObject("{}"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void listenEvent(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().listenEvent(roomId);
+    }
+
+    @Test
+    public void listenEvent2(){
+        QiscusPusherApi.getInstance().listenEvent(roomId);
+    }
+
+    @Test
+    public void subsribeCustomEvent(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().subsribeCustomEvent(roomId);
+    }
+
+    @Test
+    public void subsribeCustomEvent2(){
+        QiscusPusherApi.getInstance().subsribeCustomEvent(roomId);
+    }
+
+    @Test
+    public void unlistenEvent(){
+        QiscusPusherApi.getInstance().unlistenEvent(roomId);
+    }
+
+    @Test
+    public void unlistenEvent2(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().unlistenEvent(roomId);
+    }
+
+    @Test
+    public void unsubsribeCustomEvent(){
+        QiscusPusherApi.getInstance().unsubsribeCustomEvent(roomId);
+    }
+
+    @Test
+    public void unsubsribeCustomEvent2(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusPusherApi.getInstance().unsubsribeCustomEvent(roomId);
+    }
+
+    @Test
+    public void scheduleUserStatus(){
+        QiscusPusherApi.getInstance().scheduleUserStatus();
+    }
+
+    @Test
+    public void messageArrivedOnline(){
+
+        try {
+            QiscusPusherApi.getInstance().messageArrived("u/arief93/s", new MqttMessage(new byte[123]));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    @Test
+    public void handleMessageTyping(){
+        QiscusPusherApi.getInstance().handleMessage("r/96304367/96304367/arief93/t","1");
+    }
+
+    @Test
+    public void handleMessageOnline(){
+        QiscusPusherApi.getInstance().handleMessage("u/arief93/s","1:1674114394406");
+    }
+
+    @Test
+    public void handleMessageNewComment(){
+        QiscusPusherApi.getInstance().handleMessage("X0y1Nsd8u125k8gB6wiz1666680616/c","{\"app_code\":\"sdksample\",\"chat_type\":\"single\",\"comment_before_id\":1205442846,\"comment_before_id_str\":\"1205442846\",\"created_at\":\"2023-01-19T07:49:54.479861Z\",\"disable_link_preview\":false,\"email\":\"arief93\",\"extras\":{},\"id\":1207380921,\"id_str\":\"1207380921\",\"is_public_channel\":false,\"message\":\"abc\",\"payload\":{},\"raw_room_name\":\"testing34\",\"room_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"room_id\":96304367,\"room_id_str\":\"96304367\",\"room_name\":\"arief93\",\"room_options\":\"{}\",\"room_type\":\"single\",\"status\":\"sent\",\"timestamp\":\"2023-01-19T07:49:54Z\",\"topic_id\":96304367,\"topic_id_str\":\"96304367\",\"type\":\"text\",\"unique_temp_id\":\"javascript-1674114594284\",\"unix_nano_timestamp\":1674114594479861000,\"unix_timestamp\":1674114594,\"user_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_avatar_url\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_extras\":{},\"user_id\":133493390,\"user_id_str\":\"133493390\",\"username\":\"arief93\"}");
+    }
+
+    @Test
+    public void handleMessageUpdate(){
+        QiscusPusherApi.getInstance().handleMessage("X0y1Nsd8u125k8gB6wiz1666680616/update","{\"app_code\":\"sdksample\",\"chat_type\":\"single\",\"comment_before_id\":1205442846,\"comment_before_id_str\":\"1205442846\",\"created_at\":\"2023-01-19T07:49:54.479861Z\",\"disable_link_preview\":false,\"email\":\"arief93\",\"extras\":{},\"id\":1207380921,\"id_str\":\"1207380921\",\"is_public_channel\":false,\"message\":\"abc\",\"payload\":{},\"raw_room_name\":\"testing34\",\"room_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"room_id\":96304367,\"room_id_str\":\"96304367\",\"room_name\":\"arief93\",\"room_options\":\"{}\",\"room_type\":\"single\",\"status\":\"sent\",\"timestamp\":\"2023-01-19T07:49:54Z\",\"topic_id\":96304367,\"topic_id_str\":\"96304367\",\"type\":\"text\",\"unique_temp_id\":\"javascript-1674114594284\",\"unix_nano_timestamp\":1674114594479861000,\"unix_timestamp\":1674114594,\"user_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_avatar_url\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_extras\":{},\"user_id\":133493390,\"user_id_str\":\"133493390\",\"username\":\"arief93\"}");
+    }
+
+    @Test
+    public void handleMessageDelivery(){
+        QiscusPusherApi.getInstance().handleMessage("r/96304367/96304367/arief93/d","1207380921:javascript-1674114594284");
+    }
+
+    @Test
+    public void handleMessageRead(){
+        QiscusPusherApi.getInstance().handleMessage("r/96304367/96304367/arief93/r","1207380921:javascript-1674114594284");
+    }
 
 }
