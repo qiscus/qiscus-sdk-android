@@ -200,7 +200,7 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_action_add" />
 
-            <com.vanniktech.emoji.EmojiEditText
+            <com.qiscus.manggil.emojifull.EmojiEditText
                 android:id="@+id/field_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +46,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qiscus.jupuk.Jupuk;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
+import com.qiscus.manggil.emojifull.EmojiPopup;
 import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
@@ -58,7 +60,6 @@ import com.qiscus.sdk.ui.fragment.QiscusPhotoFragment;
 import com.qiscus.sdk.ui.view.QiscusCircularImageView;
 import com.qiscus.sdk.ui.view.QiscusMentionSuggestionView;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-import com.vanniktech.emoji.EmojiPopup;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -246,6 +247,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int i = item.getItemId();
@@ -340,6 +342,7 @@ public class QiscusSendPhotoConfirmationActivity extends RxAppCompatActivity imp
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

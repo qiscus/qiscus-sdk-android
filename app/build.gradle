@@ -19,11 +19,11 @@ apply from: rootProject.file('gradle/quality.gradle')
 apply plugin: "org.sonarqube"
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.qiscus.dragonfly"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -79,6 +79,6 @@ dependencies {
 
     implementation project(':chat')
     implementation 'com.facebook.stetho:stetho:1.5.0'
-    implementation 'com.android.support:multidex:1.0.1'
+    implementation 'androidx.multidex:multidex:2.0.0'
 
 }

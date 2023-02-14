@@ -70,32 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         String versionSDK = getString(R.string.qiscus_version) + " " + "123"; //BuildConfig.VERSION_NAME;
         mVersion.setText(versionSDK);
-
-        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!alarmMgr.canScheduleExactAlarms()) {
-
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-                alertBuilder.setCancelable(true);
-                alertBuilder.setTitle("Permission necessary");
-                alertBuilder.setMessage("Schedule Exact Alarm permission is necessary for realtime");
-                alertBuilder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Intent intent = new Intent(
-                                ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                                Uri.parse("package:" + this.getPackageName())
-                        );
-
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        this.getApplicationContext().startActivity(intent);
-                    }
-                });
-
-                AlertDialog alert = alertBuilder.create();
-                alert.show();
-
-            }
-        }
     }
 
     public void loginOrLogout(View view) {

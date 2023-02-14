@@ -83,7 +83,7 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <com.vanniktech.emoji.EmojiTextView
+        <com.qiscus.manggil.emojifull.EmojiTextView
             android:id="@+id/contents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
