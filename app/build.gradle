@@ -17,13 +17,14 @@
 apply plugin: 'com.android.application'
 apply from: rootProject.file('gradle/quality.gradle')
 apply plugin: "org.sonarqube"
+apply from: '../dependencies.gradle'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion compileSDKVersion
     defaultConfig {
         applicationId "com.qiscus.dragonfly"
-        minSdkVersion 21
-        targetSdkVersion 31
+        minSdkVersion minSDKVersion
+        targetSdkVersion targetSDKVersion
         versionCode 1
         versionName "1.0"
         multiDexEnabled true

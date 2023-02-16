@@ -103,7 +103,7 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
     private void setupWebView() {
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setAppCacheEnabled(true);
+//        webView.getSettings().setAppCacheEnabled(true);
         webView.setWebViewClient(new QiscusWebViewClient());
         webView.setWebChromeClient(new QiscusChromeClient());
     }
