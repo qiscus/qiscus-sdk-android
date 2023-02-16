@@ -123,7 +123,7 @@
             android:padding="64dp"
             android:src="@drawable/ic_qiscus_play_icon" />
 
-        <com.vanniktech.emoji.EmojiTextView
+        <com.qiscus.manggil.emojifull.EmojiTextView
             android:id="@+id/caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

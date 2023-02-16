@@ -23,6 +23,8 @@ import android.os.Handler;
 import androidx.annotation.RestrictTo;
 
 import com.qiscus.jupuk.Jupuk;
+import com.qiscus.manggil.emojifull.EmojiManager;
+import com.qiscus.manggil.emojione.EmojiOneProvider;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
@@ -36,8 +38,6 @@ import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
 import com.qiscus.sdk.util.QiscusPushNotificationUtil;
-import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.one.EmojiOneProvider;
 
 import org.json.JSONObject;
 

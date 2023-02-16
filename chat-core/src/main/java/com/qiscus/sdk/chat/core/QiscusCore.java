@@ -532,14 +532,6 @@ public class QiscusCore {
         enableRealtime = enableDisableRealtime;
     }
 
-    public static void setIsExactAlarmDisable(Boolean isExactAlarmDisable){
-        forceDisableRealtimeFromExactAlarm = isExactAlarmDisable;
-    }
-
-    public static boolean getIsExactAlarmDisable() {
-        return forceDisableRealtimeFromExactAlarm;
-    }
-
     /**
      * enableSync
      * Checker for enable or disable sync

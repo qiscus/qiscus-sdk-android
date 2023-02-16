@@ -136,7 +136,7 @@
                         android:tint="@color/qiscus_secondary_text"
                         android:visibility="gone" />
 
-                    <com.vanniktech.emoji.EmojiTextView
+                    <com.qiscus.manggil.emojifull.EmojiTextView
                         android:id="@+id/origin_content"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -164,7 +164,7 @@
 
         </LinearLayout>
 
-        <com.vanniktech.emoji.EmojiTextView
+        <com.qiscus.manggil.emojifull.EmojiTextView
             android:id="@+id/contents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

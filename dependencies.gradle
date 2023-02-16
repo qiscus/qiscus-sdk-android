@@ -79,7 +79,7 @@ ext {
 
     qiscusMqttDeps = [
             client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0",
-            android: "com.qiscus.mqtt:android:1.1.6"
+            android: "com.qiscus.mqtt:android:1.2.0"
     ]
 
     okHttpDeps = [
@@ -107,9 +107,9 @@ ext {
     placePickerLib = "com.github.adicatur:pingplacepicker:$versions.placePicker"
     placeLib = "com.google.android.libraries.places:places:$versions.places"
     flexBoxLib = "com.google.android:flexbox:0.3.1"
-    eventBusLib = "org.greenrobot:eventbus:3.0.0"
+    eventBusLib = "org.greenrobot:eventbus:3.3.1"
     rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
-    qiscusManggil = "com.qiscus.utils:manggil:1.0.1"
+    qiscusManggil = "com.qiscus.utils:manggil:1.2.0"
     //qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:$versions.manggil-without-emoji"
 
     supportLibs = supportDeps.values()
@@ -119,5 +119,5 @@ ext {
     qiscusMqttLibs = qiscusMqttDeps.values()
     networkLibs = okHttpDeps.values() + retrofitDeps.values()
     rxLibs = rxDebs.values() + trelloLifecycleDebs.values()
-
+    rxDebs = rxDebs.values()
 }
