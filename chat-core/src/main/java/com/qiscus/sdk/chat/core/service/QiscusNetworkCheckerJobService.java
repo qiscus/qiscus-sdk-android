@@ -139,7 +139,7 @@ public class QiscusNetworkCheckerJobService extends JobService {
         }
     }
 
-    private void stopJob() {
+    public void stopJob() {
         QiscusLogger.print(TAG, "stopJob");
         JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {

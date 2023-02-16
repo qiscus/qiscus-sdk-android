@@ -874,7 +874,7 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     }
 
     //done
-    private QiscusComment getComment(long id) {
+    public QiscusComment getComment(long id) {
         String query = "SELECT * FROM "
                 + QiscusDb.CommentTable.TABLE_NAME + " WHERE "
                 + QiscusDb.CommentTable.COLUMN_ID + " =? ";

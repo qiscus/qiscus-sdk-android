@@ -837,5 +837,32 @@ public class QiscusApiTest extends InstrumentationBaseTest {
         }
     }
 
+    @Test
+    public void clearCommentsByRoomIds(){
+        ArrayList<Long> id =  new ArrayList<Long>();
+        id.add(Long.valueOf(roomId));
+        QiscusApi.getInstance().clearCommentsByRoomIds(id);
+    }
+
+    @Test
+    public void clearCommentsByRoomUniqueIds(){
+        ArrayList<String> id =  new ArrayList<String>();
+        id.add(String.valueOf(roomUniqId));
+        QiscusApi.getInstance().clearCommentsByRoomUniqueIds(id);
+    }
+
+    @Test
+    public void clearMessagesByChatRoomIds(){
+        ArrayList<Long> id =  new ArrayList<Long>();
+        id.add(Long.valueOf(roomId));
+        QiscusApi.getInstance().clearMessagesByChatRoomIds(id);
+    }
+
+    @Test
+    public void clearMessagesByChatRoomUniqueIds(){
+        ArrayList<String> id =  new ArrayList<String>();
+        id.add(String.valueOf(roomUniqId));
+        QiscusApi.getInstance().clearMessagesByChatRoomUniqueIds(id);
+    }
 
 }

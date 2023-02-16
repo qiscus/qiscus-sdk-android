@@ -440,5 +440,37 @@ public class QiscusApiParserTest extends InstrumentationBaseTest {
 
     }
 
+    @Test
+    public void parseQiscusAppConfig(){
+
+        String  jsonString = "{\"results\":{\"app_code\":\"\",\"base_url\":\"https://api3.qiscus.com\",\"broker_lb_url\":\"https://realtime-lb-bali.qiscus.com\",\"broker_url\":\"realtime-bali.qiscus.com\",\"enable_event_report\":false,\"enable_realtime\":true,\"enable_realtime_check\":false,\"extras\":\"\",\"status\":\"Success\",\"sync_interval\":5000,\"sync_on_connect\":30000},\"status\":200}";
+        JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
+
+        String  jsonString2 = "{\"results\":{\"app_code\":\"\",\"enable_sync\":true,\"enable_sync_event\":true},\"status\":200}";
+        JsonObject jsonObject2 = new JsonParser().parse(jsonString2).getAsJsonObject();
+
+
+        QiscusApiParser.parseQiscusAppConfig(null);
+        QiscusApiParser.parseQiscusAppConfig(jsonObject);
+        QiscusApiParser.parseQiscusAppConfig(jsonObject2);
+
+    }
+
+    @Test
+    public void nonce(){
+        String jsonString = "{\n" +
+                "    \"results\": {\n" +
+                "        \"expired_at\": 1503025239,\n" +
+                "        \"nonce\": \"nabk2qL74OlVtdv5V5EhEYZGla5JoRyBlQPXp9xZ\"\n" +
+                "    },\n" +
+                "    \"status\": 200\n" +
+                "}";
+
+        JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
+        QiscusApiParser.parseNonce(jsonObject);
+    }
+
+
+
 
 }

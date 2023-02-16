@@ -6,6 +6,7 @@ import android.app.job.JobParameters;
 import android.content.Intent;
 
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 
 import org.junit.After;
@@ -35,6 +36,8 @@ public class QiscusNetworkCheckerJobServiceTest extends InstrumentationBaseTest 
     @Override
     public void setupEngine() {
         super.setupEngine();
+
+        receiver.onCreate();
     }
 
     @Test
@@ -60,6 +63,7 @@ public class QiscusNetworkCheckerJobServiceTest extends InstrumentationBaseTest 
     @Test
     public void onUserEventTest() {
         receiver.onUserEvent(QiscusUserEvent.LOGIN);
-//        receiver.onUserEvent(QiscusUserEvent.LOGOUT);
+
     }
+
 }

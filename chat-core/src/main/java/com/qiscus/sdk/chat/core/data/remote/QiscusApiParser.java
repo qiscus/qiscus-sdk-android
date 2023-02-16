@@ -449,14 +449,14 @@ public class QiscusApiParser {
         }
     }
 
-    private static void parseMemberAndAddToList(List<QiscusRoomMember> memberList, JsonArray arr) {
-        if (arr == null) {
-            return;
-        }
-        for (JsonElement el : arr) {
-            memberList.add(parseQiscusRoomMember(el.getAsJsonObject().getAsJsonObject("user")));
-        }
-    }
+//    private static void parseMemberAndAddToList(List<QiscusRoomMember> memberList, JsonArray arr) {
+//        if (arr == null) {
+//            return;
+//        }
+//        for (JsonElement el : arr) {
+//            memberList.add(parseQiscusRoomMember(el.getAsJsonObject().getAsJsonObject("user")));
+//        }
+//    }
 
     static QiscusAppConfig parseQiscusAppConfig(JsonElement jsonElement) {
         if (jsonElement != null) {
