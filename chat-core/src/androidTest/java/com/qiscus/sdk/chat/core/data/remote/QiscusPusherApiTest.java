@@ -22,11 +22,6 @@ public class QiscusPusherApiTest extends InstrumentationBaseTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-    }
-
-    @Test
-    @Override
-    public void setupEngine() {
         super.setupEngine();
     }
 

@@ -68,6 +68,8 @@ public class QiscusFirebaseService extends FirebaseMessagingService {
                         if (task.getResult() != null) {
                             String currentToken = task.getResult();
 
+                            Log.e("currentToken", "getCurrentDeviceToken : " +
+                                    currentToken);
                             QiscusCore.registerDeviceToken(currentToken);
                         }
                     }

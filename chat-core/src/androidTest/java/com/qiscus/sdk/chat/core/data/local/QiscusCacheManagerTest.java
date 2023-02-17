@@ -23,18 +23,13 @@ public class QiscusCacheManagerTest extends InstrumentationBaseTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        super.setupEngine();
+        manager = QiscusCacheManager.getInstance();
     }
 
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-    }
-
-    @Test
-    @Override
-    public void setupEngine() {
-        super.setupEngine();
-        manager = QiscusCacheManager.getInstance();
     }
 
     @Test

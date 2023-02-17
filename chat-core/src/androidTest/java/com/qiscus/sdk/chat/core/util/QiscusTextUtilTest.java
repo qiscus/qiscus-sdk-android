@@ -33,6 +33,7 @@ public class QiscusTextUtilTest extends InstrumentationBaseTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        super.setupEngine();
         color = ContextCompat.getColor(context, R.color.emoji_background);
         roomMembers.clear();
         roomMembers.put(member.getEmail(), member);
@@ -43,11 +44,6 @@ public class QiscusTextUtilTest extends InstrumentationBaseTest {
         super.tearDown();
     }
 
-    @Test
-    @Override
-    public void setupEngine() {
-        super.setupEngine();
-    }
 
     @Test
     public void getStringTest() {

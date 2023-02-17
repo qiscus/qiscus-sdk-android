@@ -80,32 +80,12 @@ public class MainActivity extends AppCompatActivity {
 
         String versionSDK = getString(R.string.qiscus_version) + " " + "123"; //BuildConfig.VERSION_NAME;
         mVersion.setText(versionSDK);
+        Qiscus.getChatConfig().setEnableFcmPushNotification(true);
 
-        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!alarmMgr.canScheduleExactAlarms()) {
-
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-                alertBuilder.setCancelable(true);
-                alertBuilder.setTitle("Permission necessary");
-                alertBuilder.setMessage("Schedule Exact Alarm permission is necessary for realtime");
-                alertBuilder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Intent intent = new Intent(
-                                ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                                Uri.parse("package:" + this.getPackageName())
-                        );
-
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        this.getApplicationContext().startActivity(intent);
-                    }
-                });
-
-                AlertDialog alert = alertBuilder.create();
-                alert.show();
-
-            }
+        if (Qiscus.hasSetupUser()){
+            FirebaseUtil.sendCurrentToken();
         }
+
     }
 
     public void loginOrLogout(View view) {
@@ -117,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
           /*  Qiscus.setUser("arief92", "arief92")
                     .withUsername("arief92")*/
 
-            Qiscus.setUser("testing34", "testing34")
-                    .withUsername("testing34")
+            Qiscus.setUser("ariefnur", "ariefnur")
+                    .withUsername("ariefnur")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

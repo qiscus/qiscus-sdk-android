@@ -16,16 +16,10 @@ public class QiscusCommentResendEventTest extends InstrumentationBaseTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-    }
-
-    @Test
-    @Override
-    public void setupEngine() {
         super.setupEngine();
 
         getQiscusComment();
     }
-
 
     public void getQiscusComment() {
         QiscusComment qiscusComment = QiscusComment.generateMessage(123,"test");

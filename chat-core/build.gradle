@@ -113,7 +113,7 @@ dependencies {
     api qiscusMqttLibs
     api qiscusManggil
     api networkLibs
-    api rxLibs
+    api rxDebs
     api eventBusLib
     api rxUrlExtractorLib
     api securityDeps

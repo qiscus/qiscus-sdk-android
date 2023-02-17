@@ -19,6 +19,7 @@ public class QiscusDbOpenHelperTest extends InstrumentationBaseTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        super.setupEngine();
         helper = new QiscusDbOpenHelper(application);
     }
 
@@ -27,13 +28,6 @@ public class QiscusDbOpenHelperTest extends InstrumentationBaseTest {
         super.tearDown();
     }
 
-    @Test
-    @Override
-    public void setupEngine() {
-        super.setupEngine();
-    }
-
-    @Ignore
     @Test
     public void onCreateTest() {
         SQLiteDatabase sqLiteReadDatabase = helper.getReadableDatabase();

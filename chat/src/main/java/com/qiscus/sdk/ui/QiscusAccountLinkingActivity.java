@@ -30,6 +30,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -103,7 +104,7 @@ public class QiscusAccountLinkingActivity extends RxAppCompatActivity {
     private void setupWebView() {
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.setWebViewClient(new QiscusWebViewClient());
         webView.setWebChromeClient(new QiscusChromeClient());
     }

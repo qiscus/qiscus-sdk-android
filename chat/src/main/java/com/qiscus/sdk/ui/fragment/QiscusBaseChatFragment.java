@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -57,6 +58,8 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.libraries.places.api.model.Place;
 import com.qiscus.jupuk.JupukBuilder;
 import com.qiscus.jupuk.JupukConst;
+import com.qiscus.manggil.emojifull.EmojiEditText;
+import com.qiscus.manggil.emojifull.EmojiPopup;
 import com.qiscus.manggil.ui.MentionsEditText;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
@@ -97,8 +100,6 @@ import com.qiscus.sdk.util.QiscusKeyboardUtil;
 import com.qiscus.sdk.util.QiscusPermissionsUtil;
 import com.rtchagas.pingplacepicker.PingPlacePicker;
 import com.trello.rxlifecycle.components.support.RxFragment;
-import com.vanniktech.emoji.EmojiEditText;
-import com.vanniktech.emoji.EmojiPopup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1637,6 +1638,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

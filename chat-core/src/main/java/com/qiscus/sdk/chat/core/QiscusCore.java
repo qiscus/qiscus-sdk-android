@@ -91,7 +91,7 @@ public class QiscusCore {
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
     private static Boolean enableRealtime = true;
-    private static Boolean forceDisableRealtimeFromExactAlarm = false;
+    //private static Boolean forceDisableRealtimeFromExactAlarm = false;
     private static Boolean syncServiceDisabled = false;
     private static Boolean enableSync = true;
     private static Boolean enableSyncEvent = false;
@@ -242,42 +242,42 @@ public class QiscusCore {
         localDataManager.setURLLB(baseURLLB);
 
 
-        AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!alarmMgr.canScheduleExactAlarms()) {
-                forceDisableRealtimeFromExactAlarm = true;
-            }else{
-                forceDisableRealtimeFromExactAlarm = false;
-            }
-
-        }
+//        AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            if (!alarmMgr.canScheduleExactAlarms()) {
+//                forceDisableRealtimeFromExactAlarm = true;
+//            }else{
+//                forceDisableRealtimeFromExactAlarm = false;
+//            }
+//
+//        }
 
         QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            checkExactAlarm(application);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            checkExactAlarm(application);
+//        }
 
         getAppConfig();
         configureFcmToken();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private static void checkExactAlarm(Application application){
-        PackageManager.OnChecksumsReadyListener check = ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
-
-            AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
-            if (!alarmMgr.canScheduleExactAlarms()) {
-                forceDisableRealtimeFromExactAlarm = true;
-
-                if (QiscusPusherApi.getInstance().isConnected()) {
-                    QiscusPusherApi.getInstance().disconnect();
-                }
-            } else {
-                forceDisableRealtimeFromExactAlarm = false;
-            }
-        };
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.S)
+//    private static void checkExactAlarm(Application application){
+//        PackageManager.OnChecksumsReadyListener check = ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
+//
+//            AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+//            if (!alarmMgr.canScheduleExactAlarms()) {
+//                forceDisableRealtimeFromExactAlarm = true;
+//
+//                if (QiscusPusherApi.getInstance().isConnected()) {
+//                    QiscusPusherApi.getInstance().disconnect();
+//                }
+//            } else {
+//                forceDisableRealtimeFromExactAlarm = false;
+//            }
+//        };
+//    }
 
     public static void isBuiltIn(Boolean isBuiltInSDK) {
         isBuiltIn = isBuiltInSDK;

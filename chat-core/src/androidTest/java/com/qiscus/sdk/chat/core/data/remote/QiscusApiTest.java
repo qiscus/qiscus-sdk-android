@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -863,6 +864,30 @@ public class QiscusApiTest extends InstrumentationBaseTest {
         ArrayList<String> id =  new ArrayList<String>();
         id.add(String.valueOf(roomUniqId));
         QiscusApi.getInstance().clearMessagesByChatRoomUniqueIds(id);
+    }
+
+    @Test
+    public void deleteMessages(){
+        List<QiscusComment> array = new ArrayList<QiscusComment>();
+
+        QiscusComment qiscusComment = QiscusComment.generateMessage(10185397,"test");
+        qiscusComment.setId(1235108836);
+        qiscusComment.setUniqueId("android_1676515726263jfza6kax3c06857074d69d51");
+
+        array.add(qiscusComment);
+
+        Observable.from(array)
+                .map(QiscusComment::getUniqueId)
+                .toList()
+                .flatMap(uniqueIds -> QiscusApi.getInstance().deleteMessages(uniqueIds))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(deletedComments -> {
+
+                }, throwable -> {
+
+                    QiscusErrorLogger.print(throwable);
+                });
     }
 
 }
