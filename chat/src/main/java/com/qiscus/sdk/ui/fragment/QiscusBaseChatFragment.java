@@ -30,17 +30,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -53,6 +42,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.libraries.places.api.model.Place;
@@ -153,11 +152,14 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE"
     };
-    private static final String[] CAMERA_PERMISSION = {
-            "android.permission.CAMERA",
-            "android.permission.WRITE_EXTERNAL_STORAGE",
-            "android.permission.READ_EXTERNAL_STORAGE",
-    };
+    private static final String[] CAMERA_PERMISSION =
+            versionTiramisuOrAbove() ? new String[] {
+                    "android.permission.CAMERA"
+            } : new String[]{
+                    "android.permission.CAMERA",
+                    "android.permission.WRITE_EXTERNAL_STORAGE",
+                    "android.permission.READ_EXTERNAL_STORAGE",
+            };
     private static final String[] LOCATION_PERMISSION = {
             "android.permission.ACCESS_COARSE_LOCATION",
             "android.permission.ACCESS_FINE_LOCATION"
@@ -1258,7 +1260,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void addImage() {
-        if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+        if (versionTiramisuOrAbove() || QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
             new JupukBuilder().setMaxCount(10)
                     .enableVideoPicker(true)
                     .setColorPrimary(ContextCompat.getColor(getActivity(), chatConfig.getAppBarColor()))
@@ -1300,7 +1302,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void addFile() {
-        if (QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+        if (versionTiramisuOrAbove() || QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
             new JupukBuilder().setMaxCount(1)
                     .setColorPrimary(ContextCompat.getColor(getActivity(), chatConfig.getAppBarColor()))
                     .setColorPrimaryDark(ContextCompat.getColor(getActivity(), chatConfig.getStatusBarColor()))
@@ -1789,7 +1791,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void requestPermissions() {
-        if (!Qiscus.getChatConfig().isEnableRequestPermission()) {
+        if (versionTiramisuOrAbove() || !Qiscus.getChatConfig().isEnableRequestPermission()) {
             return;
         }
 
@@ -1807,7 +1809,7 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
     }
 
     protected void requestAddFilePermission() {
-        if (!QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
+        if (!versionTiramisuOrAbove() && !QiscusPermissionsUtil.hasPermissions(getActivity(), FILE_PERMISSION)) {
             QiscusPermissionsUtil.requestPermissions(this, getString(R.string.qiscus_permission_request_title),
                     RC_FILE_PERMISSION, FILE_PERMISSION);
         }
@@ -1827,6 +1829,9 @@ public abstract class QiscusBaseChatFragment<T extends QiscusBaseChatAdapter> ex
         }
     }
 
+    private static boolean versionTiramisuOrAbove() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
