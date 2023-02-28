@@ -70,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
         String versionSDK = getString(R.string.qiscus_version) + " " + "123"; //BuildConfig.VERSION_NAME;
         mVersion.setText(versionSDK);
+
+        if (Qiscus.hasSetupUser()) {
+            FirebaseUtil.sendCurrentToken();
+        }
     }
 
     public void loginOrLogout(View view) {
@@ -80,9 +84,8 @@ public class MainActivity extends AppCompatActivity {
             showLoading();
           /*  Qiscus.setUser("arief92", "arief92")
                     .withUsername("arief92")*/
-
-            Qiscus.setUser("testing34", "testing34")
-                    .withUsername("testing34")
+            Qiscus.setUser("bila75", "bila75")
+                    .withUsername("bila75")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -90,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("MainActivity", "Login with account: " + qiscusAccount);
                         mLoginButton.setText("Logout");
                         dismissLoading();
+
+                        FirebaseUtil.sendCurrentToken();
                     }, throwable -> {
                         QiscusErrorLogger.print(throwable);
                         showError(throwable);
@@ -100,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChat(View view) {
         showLoading();
-        Qiscus.buildChatWith("arief93")
+        Qiscus.buildChatWith("bila99")
                 .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

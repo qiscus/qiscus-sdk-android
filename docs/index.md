@@ -1365,37 +1365,27 @@ You can set FCM Secret Key by following these steps:
 QiscusCore.getChatConfig().setEnableFcmPushNotification(true); // default is **false**
 ```
 
-* Enable FCM in **ChatConfig, **you need register FCM token to notify Qiscus Chat SDK, for example:  
+* Enable FCM in **ChatConfig, **you need register FCM token to notify Qiscus Chat SDK, you can call sendCurrentToken() after login and in home page (was login in qiscus), for example:  
 
 ```
-public class AppFirebaseInstanceIdService extends FirebaseInstanceIdService {
-    @Override
-    public void onTokenRefresh() {
-        super.onTokenRefresh();
-        
-        // Notify Qiscus Chat SDK about FCM token
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        QiscusCore.setFcmToken(refreshedToken);
-        
-        //TODO : Application part here, maybe you need to send FCM token to your Backend
-    }
+if (Qiscus.hasSetupUser()) {
+    FirebaseUtil.sendCurrentToken();
 }
 ```
 
-* Add the service to your Manifest, for example: 
-
 ```
-<service android:name=".service.AppFirebaseInstanceIdService">
-    <intent-filter>
-        <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-    </intent-filter>
-</service>
-```
+public class FirebaseUtil {
 
+    public static void sendCurrentToken() {
+        AppFirebaseMessagingService.getCurrentDeviceToken();
+    }
+}
+```
 * Add the service.AppFirebaseMessagingService in Manifest as well, for example: 
 
 ```
-<service android:name=".service.AppFirebaseMessagingService">
+<service android:name=".AppFirebaseMessagingService"
+         android:exported="true">
     <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
     </intent-filter>
@@ -1407,19 +1397,60 @@ public class AppFirebaseInstanceIdService extends FirebaseInstanceIdService {
 After registering your FCM token, you will get data from FCM Qiscus Chat SDK, you can handle by  using `handleMessageReceived()` method, for example: 
 
 ```
+
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.util.QiscusFirebaseMessagingUtil;
+
 public class AppFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        // Qiscus will handle incoming message
+        Log.d("Qiscus", "onMessageReceived " + remoteMessage.getData().toString());
         if (QiscusFirebaseMessagingUtil.handleMessageReceived(remoteMessage)) {
             return;
         }
+    }
 
-        // TODO : here is handle for your notification
+    @Override
+    public void onNewToken(@NonNull String s) {
+        super.onNewToken(s);
 
+        Log.d("Qiscus", "onNewToken " + s);
+        QiscusCore.registerDeviceToken(s);
+    }
+
+    public static void getCurrentDeviceToken() {
+        final String token = QiscusCore.getFcmToken();
+        if (token != null) {
+            FirebaseMessaging.getInstance().deleteToken()
+                    .addOnCompleteListener(task -> {
+                        QiscusCore.removeDeviceToken(token);
+                        getTokenFcm();
+                    })
+                    .addOnFailureListener(e -> QiscusCore.registerDeviceToken(token));
+        } else {
+            getTokenFcm();
+        }
+    }
+
+    private static void getTokenFcm() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        QiscusCore.registerDeviceToken(task.getResult());
+                    } else {
+                        Log.e("Qiscus", "getCurrentDeviceToken Failed : " +
+                                task.getException());
+                    }
+                });
     }
 }
 ```

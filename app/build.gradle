@@ -18,6 +18,7 @@ apply plugin: 'com.android.application'
 apply from: rootProject.file('gradle/quality.gradle')
 apply plugin: "org.sonarqube"
 apply from: '../dependencies.gradle'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion compileSDKVersion

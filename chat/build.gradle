@@ -15,12 +15,11 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
-//apply from: 'publishChat.gradle'
-//apply plugin: "com.jfrog.artifactory"
+apply from: 'publishChat.gradle'
+apply plugin: "com.jfrog.artifactory"
 
 android {
     compileSdkVersion compileSDKVersion
@@ -71,9 +70,6 @@ buildscript {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
     }
 }
-
-apply from: '../buildsystem/bintrayv1.gradle'
-apply from: '../buildsystem/installv1.gradle'
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])

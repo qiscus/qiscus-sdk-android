@@ -33,8 +33,8 @@ ext {
 
     versions = [
             support          : "31.0.0",
-            firebaseCore     : "19.0.0",
-            firebaseMessaging: "22.0.0",
+            firebaseCore     : "21.0.0",
+            firebaseMessaging: "23.0.4",
             okHttp           : "3.12.5",
             retrofit         : "2.3.0",
 

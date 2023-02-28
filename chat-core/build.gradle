@@ -15,12 +15,11 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
-apply from: 'publish.gradle'
-apply plugin: "com.jfrog.artifactory"
+//apply from: 'publish.gradle'
+//apply plugin: "com.jfrog.artifactory"
 
 android {
     compileSdkVersion compileSDKVersion

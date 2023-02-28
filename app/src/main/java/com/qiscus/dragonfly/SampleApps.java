@@ -22,6 +22,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 
 /**
