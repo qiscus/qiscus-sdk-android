@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'com.android.library'
-//apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 apply from: rootProject.file('gradle/quality.gradle')
@@ -73,9 +72,6 @@ buildscript {
 //        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
     }
 }
-
-//apply from: '../buildsystem/bintrayv1.gradle'
-//apply from: '../buildsystem/installv1.gradle'
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])

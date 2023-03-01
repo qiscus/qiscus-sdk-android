@@ -54,7 +54,7 @@ Second, you need to add SDK dependencies inside your app .gradle. Then, you need
 ```
 dependencies { 
        ... 
-       implementation 'com.qiscus.sdk:chat-core:1.6.1'
+       implementation 'com.qiscus.sdk:chat-core:1.6.3'
 }
 ```
 
@@ -253,59 +253,93 @@ Now lets integrate with Qiscus client sdk, first enable FCM at Qiscus chat confi
 Qiscus.getChatConfig().setEnableFcmPushNotification(true);
 ```
 
-After that, you need to change your firebase service to extend 'Qiscus firebase service' instead of firebase service class.
+After that, you need register FCM token to notify Qiscus Chat SDK, you can call sendCurrentToken() after login and in home page (was login in qiscus), for example:  
 
 ```java
-public class MyFirebaseIdService extends QiscusFirebaseIdService {
-    @Override
-    public void onTokenRefresh() {
-        super.onTokenRefresh(); // Must call super
-        
-        // Below is your own apps specific code
-        // e.g register the token to your backend
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        sendTokenToMyBackend(refreshedToken);
-    }
+if (Qiscus.hasSetupUser()) {
+    FirebaseUtil.sendCurrentToken();
 }
+```
 
-public class MyFirebaseMessagingService extends QiscusFirebaseService {
-    @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        if (handleMessageReceived(remoteMessage)) { // For qiscus
-            return;
-        }
+```
+public class FirebaseUtil {
 
-        //Your FCM PN here
+    public static void sendCurrentToken() {
+        AppFirebaseMessagingService.getCurrentDeviceToken();
     }
 }
 ```
 
-If extension is not possible or desirable, use the following code the ensure Qiscus handle the FCM.
+* Add the .AppFirebaseMessagingService in Manifest as well, for example: 
 
-```java
-public class MyFirebaseIdService extends FirebaseInstanceIdService {
-    @Override
-    public void onTokenRefresh() {
-        super.onTokenRefresh();
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+```
+<service android:name=".AppFirebaseMessagingService"
+         android:exported="true">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+```
 
-        // Register token to qiscus
-        QiscusCore.setFcmToken(refreshedToken);
+### Handle Incoming Message From Push Notification
 
-        // Below is your own apps specific code
-        // e.g register the token to your backend
-        sendTokenToMyBackend(refreshedToken);
-    }
-}
+After registering your FCM token, you will get data from FCM Qiscus Chat SDK, you can handle by  using `handleMessageReceived()` method, for example: 
 
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+```
+
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.util.QiscusFirebaseMessagingUtil;
+
+public class AppFirebaseMessagingService extends FirebaseMessagingService {
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        if (QiscusFirebaseService.handleMessageReceived(remoteMessage)) { // For qiscus
+        super.onMessageReceived(remoteMessage);
+
+        Log.d("Qiscus", "onMessageReceived " + remoteMessage.getData().toString());
+        if (QiscusFirebaseMessagingUtil.handleMessageReceived(remoteMessage)) {
             return;
         }
+    }
 
-        // Your FCM PN here
+    @Override
+    public void onNewToken(@NonNull String s) {
+        super.onNewToken(s);
+
+        Log.d("Qiscus", "onNewToken " + s);
+        QiscusCore.registerDeviceToken(s);
+    }
+
+    public static void getCurrentDeviceToken() {
+        final String token = QiscusCore.getFcmToken();
+        if (token != null) {
+            FirebaseMessaging.getInstance().deleteToken()
+                    .addOnCompleteListener(task -> {
+                        QiscusCore.removeDeviceToken(token);
+                        getTokenFcm();
+                    })
+                    .addOnFailureListener(e -> QiscusCore.registerDeviceToken(token));
+        } else {
+            getTokenFcm();
+        }
+    }
+
+    private static void getTokenFcm() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        QiscusCore.registerDeviceToken(task.getResult());
+                    } else {
+                        Log.e("Qiscus", "getCurrentDeviceToken Failed : " +
+                                task.getException());
+                    }
+                });
     }
 }
 ```

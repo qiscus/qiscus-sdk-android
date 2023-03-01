@@ -106,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("MainActivity", "Login with account: " + qiscusAccount);
                         mLoginButton.setText("Logout");
                         dismissLoading();
+
+                        FirebaseUtil.sendCurrentToken();
                     }, throwable -> {
                         QiscusErrorLogger.print(throwable);
                         showError(throwable);

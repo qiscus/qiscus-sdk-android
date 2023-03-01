@@ -17,13 +17,14 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply from: rootProject.file('gradle/quality.gradle')
+apply from: '../dependencies.gradle'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion compileSDKVersion
     defaultConfig {
         applicationId "com.qiscus.dragonfly"
-        minSdkVersion 21
-        targetSdkVersion 33
+        minSdkVersion minSDKVersion
+        targetSdkVersion targetSDKVersion
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
