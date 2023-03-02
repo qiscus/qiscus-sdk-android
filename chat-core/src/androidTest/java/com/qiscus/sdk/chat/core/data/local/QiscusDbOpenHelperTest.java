@@ -45,7 +45,7 @@ public class QiscusDbOpenHelperTest extends InstrumentationBaseTest {
 
     @Test
     public void onUpgrade() {
-        SQLiteDatabase sqLiteReadDatabase = helper.getReadableDatabase();
-        helper.onUpgrade(sqLiteReadDatabase, 1, 2);
+        SQLiteDatabase sqLiteWriteDatabase = helper.getWritableDatabase();
+        helper.onUpgrade(sqLiteWriteDatabase, 1, 2);
     }
 }

@@ -14,9 +14,11 @@ public class QiscusRefreshTokenEventTest extends InstrumentationBaseTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-
         super.setupEngine();
+    }
 
+    @Test
+    public void refreshTokenEventTest(){
         QiscusRefreshTokenEvent event = new QiscusRefreshTokenEvent(403, "Unauthorized. Token is expired");
         event.getCode();
         event.getMessage();
@@ -40,6 +42,5 @@ public class QiscusRefreshTokenEventTest extends InstrumentationBaseTest {
         event4.getMessage();
         event4.isTokenExpired();
         event4.isUnauthorized();
-
     }
 }

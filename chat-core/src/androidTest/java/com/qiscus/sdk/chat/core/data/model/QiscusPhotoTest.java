@@ -17,7 +17,10 @@ public class QiscusPhotoTest extends InstrumentationBaseTest {
     public void setUp() throws Exception {
         super.setUp();
         super.setupEngine();
+    }
 
+    @Test
+    public void photoTest(){
         QiscusPhoto qiscusPhoto = new QiscusPhoto(new File("/storage/emulated/0/Android/data/com.qiscus.dragonfly/files/Pictures/DragonFly/DragonFly Images/IMG-20230214-WA0000.jpg"));
         qiscusPhoto.getPhotoFile();
 

@@ -77,8 +77,10 @@ public class QiscusCommentTest extends InstrumentationBaseTest {
     @Test
     public void generateContactMessage2() {
         QiscusComment qiscusComment = new QiscusComment();
-        qiscusComment.generateContactMessage(roomId, new QiscusContact("arief", "0938732423", "phone")).getContact();
+        qiscusComment.generateContactMessage(roomId, new QiscusContact("arief", "0938732423", "phone"));
         qiscusComment.setRawType("contact_person");
+        qiscusComment.setContact( new QiscusContact("arief", "0938732423", "phone"));
+        qiscusComment.getContact();
     }
 
     @Test
@@ -90,6 +92,13 @@ public class QiscusCommentTest extends InstrumentationBaseTest {
         location.setLongitude(67890);
 
         qiscusComment.generateLocationMessage(roomId,location);
+
+        location.describeContents();
+        location.getThumbnailUrl();
+        location.generateThumbnail();
+        location.setThumbnailUrl("https://");
+
+        location.toString();
     }
 
     @Test
@@ -102,6 +111,8 @@ public class QiscusCommentTest extends InstrumentationBaseTest {
 
         QiscusComment qiscusComment2 = new QiscusComment();
         qiscusComment2.generateLocationMessage(roomId,location).getLocation();
+        qiscusComment2.setLocation(location);
+        qiscusComment2.getLocation();
     }
 
     @Test
@@ -176,6 +187,60 @@ public class QiscusCommentTest extends InstrumentationBaseTest {
 
     @Test
     public void destroy() {
+
+    }
+
+    @Test
+    public void getRoomAvatar(){
+        qiscusComment = new QiscusComment();
+
+        qiscusComment.setGroupMessage(true);
+        qiscusComment.setRoomAvatar("https://");
+
+        QiscusComment qiscusComment2 = new QiscusComment();
+
+        qiscusComment2.setGroupMessage(false);
+        qiscusComment2.setSenderAvatar("https://");
+        qiscusComment2.setRoomAvatar("https://");
+
+        qiscusComment.getRoomAvatar();
+    }
+
+    @Test
+    public void isAttachment(){
+
+        QiscusComment qiscusComment2 = new QiscusComment();
+        qiscusComment2.generateFileAttachmentMessage(roomId, "https://fujifilm-x.com/wp-content/uploads/2021/01/gfx100s_sample_01_thum.jpg","caption", "name");
+        qiscusComment2.setMessage(" [file] https://fujifilm-x.com/wp-content/uploads/2021/01/gfx100s_sample_01_thum.jpg [/file]");
+
+
+        qiscusComment2.getAttachmentUri();
+        qiscusComment2.getCaption();
+        qiscusComment2.getAttachmentName();
+
+        qiscusComment2.getUrls();
+        qiscusComment2.isAttachment();
+
+    }
+
+    @Test
+    public void loadLinkPreviewData(){
+        QiscusComment qiscusComment = new QiscusComment();
+        qiscusComment.setMessage("https://fujifilm-x.com/wp-content/uploads/2021/01/gfx100s_sample_01_thum.jpg");
+        qiscusComment.setRawType("link");
+        qiscusComment.loadLinkPreviewData();
+    }
+
+    @Test
+    public void hashCodee(){
+
+        QiscusComment qiscusComment = new QiscusComment();
+        qiscusComment.generateFileAttachmentMessage(roomId,"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3","","audio.mp3");
+        qiscusComment.setMessage("[file] https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3 [/file]");
+        qiscusComment.setUniqueId("123453212123123213");
+
+        qiscusComment.hashCode();
+        qiscusComment.describeContents();
 
     }
 

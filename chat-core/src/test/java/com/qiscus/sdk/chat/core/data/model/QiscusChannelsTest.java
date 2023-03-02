@@ -154,4 +154,150 @@ public class QiscusChannelsTest {
     public void setRoomId() {
         qiscusChannels.setRoomId(1L);
     }
+
+
+    @Test
+    public void testEqual(){
+       QiscusChannels qiscusChannels = new QiscusChannels();
+       qiscusChannels.setAvatarUrl("https://");
+       qiscusChannels.setRoomId(1L);
+       qiscusChannels.setUniqueId("123avc");
+       qiscusChannels.setName("name");
+       qiscusChannels.setJoined(true);
+
+        String json_string = "{\n" +
+                "  \"title\":\"JSONParserTutorial\",\n" +
+                "  \"array\":[\n" +
+                "    {\n" +
+                "    \"company\":\"Google\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\":\"Facebook\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "    \"company\":\"LinkedIn\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\" : \"Microsoft\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\": \"Apple\"\n" +
+                "    }\n" +
+                "    ],\n" +
+                "    \"nested\":{\n" +
+                "    \"flag\": true,\n" +
+                "    \"random_number\":1\n" +
+                "    }\n" +
+                "}";
+        try {
+            qiscusChannels.setExtras(new JSONObject(json_string));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        qiscusChannels.setCreatedAt("1234");
+        qiscusChannels.setAvatarUrl("https://");
+
+
+
+        QiscusChannels qiscusChannels2 = new QiscusChannels();
+        qiscusChannels2.setAvatarUrl("https://qiscus.com");
+        qiscusChannels2.setRoomId(1L);
+        qiscusChannels2.setUniqueId("123avca");
+        qiscusChannels2.setName("named");
+        qiscusChannels2.setJoined(true);
+
+        String json_string2 = "{\n" +
+                "  \"title\":\"JSONParserTutorial\",\n" +
+                "  \"array\":[\n" +
+                "    {\n" +
+                "    \"company\":\"Google\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\":\"Facebook\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "    \"company\":\"LinkedIn\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\" : \"Microsoft\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\": \"Apple\"\n" +
+                "    }\n" +
+                "    ],\n" +
+                "    \"nested\":{\n" +
+                "    \"flag\": true,\n" +
+                "    \"random_number\":1\n" +
+                "    }\n" +
+                "}";
+        try {
+            qiscusChannels2.setExtras(new JSONObject(json_string2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        qiscusChannels2.setCreatedAt("123425");
+        qiscusChannels2.setAvatarUrl("https://qiscus.com");
+
+
+
+        QiscusChannels qiscusChannels3 = new QiscusChannels();
+        qiscusChannels3.setAvatarUrl(null);
+        qiscusChannels3.setRoomId(null);
+        qiscusChannels3.setUniqueId(null);
+        qiscusChannels3.setName(null);
+        qiscusChannels3.setJoined(null);
+        qiscusChannels3.setExtras(null);
+        qiscusChannels3.setCreatedAt(null);
+        qiscusChannels3.setAvatarUrl(null);
+
+
+        QiscusChannels qiscusChannels4 = new QiscusChannels();
+        qiscusChannels4.setAvatarUrl("https://");
+        qiscusChannels4.setRoomId(1L);
+        qiscusChannels4.setUniqueId("123avc");
+        qiscusChannels4.setName("name");
+        qiscusChannels4.setJoined(true);
+
+        String json_string4 = "{\n" +
+                "  \"title\":\"JSONParserTutorial\",\n" +
+                "  \"array\":[\n" +
+                "    {\n" +
+                "    \"company\":\"Google\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\":\"Facebook\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "    \"company\":\"LinkedIn\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\" : \"Microsoft\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"company\": \"Apple\"\n" +
+                "    }\n" +
+                "    ],\n" +
+                "    \"nested\":{\n" +
+                "    \"flag\": true,\n" +
+                "    \"random_number\":1\n" +
+                "    }\n" +
+                "}";
+        try {
+            qiscusChannels4.setExtras(new JSONObject(json_string4));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        qiscusChannels4.setCreatedAt("1234");
+        qiscusChannels4.setAvatarUrl("https://");
+
+        qiscusChannels.equals(qiscusChannels3);
+        qiscusChannels.equals(qiscusChannels2);
+        qiscusChannels.equals(qiscusChannels);
+        qiscusChannels.equals(qiscusChannels4);
+
+
+    }
 }

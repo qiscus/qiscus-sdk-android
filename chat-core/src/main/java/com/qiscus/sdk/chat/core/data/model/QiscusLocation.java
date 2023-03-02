@@ -112,7 +112,7 @@ public class QiscusLocation implements Parcelable {
         this.thumbnailUrl = thumbnailUrl;
     }
 
-    private void generateThumbnail() {
+    public void generateThumbnail() {
         thumbnailUrl = "http://maps.google.com/maps/api/staticmap?center="
                 + latitude + "," + longitude + "&zoom=17&size=512x300&sensor=false";
     }

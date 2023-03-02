@@ -15,7 +15,10 @@ public class QiscusRealtimeStatusTest extends InstrumentationBaseTest {
     public void setUp() throws Exception {
         super.setUp();
         super.setupEngine();
+    }
 
+    @Test
+    public void realtimeStatusTest(){
         QiscusRealtimeStatus status = new QiscusRealtimeStatus();
         status.setRealtimeStatus(true);
         status.getRealtimeStatus();

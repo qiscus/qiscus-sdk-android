@@ -26,12 +26,13 @@ import java.io.InputStream;
 
 public class QiscusFileUtilTest extends InstrumentationBaseTest {
 
-    private File file =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/test/sample3.txt");
+    private File file =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "ig_post-1-_nov__monthly_hiring_poster.png");
     private Uri uri = Uri.fromFile(file);
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        super.setupEngine();
     }
 
     @After

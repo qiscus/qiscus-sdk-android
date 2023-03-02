@@ -52,6 +52,13 @@ public class QiscusCoreChatConfigTest extends InstrumentationBaseTest {
     @Test
     public void getQiscusImageCompressionConfig() {
         qiscusCoreChatConfig.getQiscusImageCompressionConfig();
+        qiscusCoreChatConfig.getQiscusImageCompressionConfig().getMaxHeight();
+        qiscusCoreChatConfig.getQiscusImageCompressionConfig().setMaxHeight(123);
+        qiscusCoreChatConfig.getQiscusImageCompressionConfig().getMaxWidth();
+        qiscusCoreChatConfig.getQiscusImageCompressionConfig().setMaxWidth(123);
+        qiscusCoreChatConfig.getQiscusImageCompressionConfig().getQuality();
+        qiscusCoreChatConfig.getQiscusImageCompressionConfig().setQuality(100);
+
     }
 
     @Test
