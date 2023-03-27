@@ -12,29 +12,43 @@ import java.lang.reflect.Field;
  */
 public final class BuildVersionUtil {
     public static final String OS_VERSION_NAME;
+    private static int OS_SDK_VERSION;
 
     static {
         OS_VERSION_NAME = getOsVersionName();
+        OS_SDK_VERSION = Build.VERSION.SDK_INT;
     }
 
     private BuildVersionUtil() {
 
     }
 
+    public static void setOsSdkVersion(int version) {
+        OS_SDK_VERSION = version;
+    }
+
+    public static int getOsSdkVersion() {
+        return OS_SDK_VERSION;
+    }
+
+    public static void resetVersion() {
+        OS_SDK_VERSION = Build.VERSION.SDK_INT;
+    }
+
     public static boolean isOreoLower() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O;
+        return OS_SDK_VERSION < Build.VERSION_CODES.O;
     }
 
     public static boolean isOreoOrHigher() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+        return OS_SDK_VERSION >= Build.VERSION_CODES.O;
     }
 
     public static boolean isNougatOrHigher() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+        return OS_SDK_VERSION >= Build.VERSION_CODES.N;
     }
 
     public static boolean isAtLeastNMR1() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1;
+        return OS_SDK_VERSION >= Build.VERSION_CODES.N_MR1;
     }
 
     private static String getOsVersionName() {
@@ -63,4 +77,24 @@ public final class BuildVersionUtil {
         }
         return builder.toString();
     }
+
+    public static boolean isSame(int version) {
+        return OS_SDK_VERSION == version;
+    }
+    public static boolean isUnderOrSame(int version) {
+        return OS_SDK_VERSION <= version;
+    }
+
+    public static boolean isAboveOrSame(int version) {
+        return OS_SDK_VERSION >= version;
+    }
+
+    public static boolean isUnder(int version) {
+        return OS_SDK_VERSION < version;
+    }
+
+    public static boolean isAbove(int version) {
+        return OS_SDK_VERSION > version;
+    }
+
 }

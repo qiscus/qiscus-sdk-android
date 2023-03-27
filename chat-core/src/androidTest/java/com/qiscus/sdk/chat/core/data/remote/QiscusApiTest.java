@@ -1,38 +1,42 @@
 package com.qiscus.sdk.chat.core.data.remote;
 
+import android.content.res.AssetManager;
 import android.os.Build;
 
-import androidx.core.util.Pair;
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
+import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
-import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
+import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
-import com.qiscus.sdk.chat.core.util.QiscusLogger;
-import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
-import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+@RunWith(AndroidJUnit4ClassRunner.class)
 public class QiscusApiTest extends InstrumentationBaseTest {
 
     Integer roomId = 10185397;
@@ -41,27 +45,16 @@ public class QiscusApiTest extends InstrumentationBaseTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        setupEngine();
+    }
 
-        QiscusCore.setup(application, "sdksample");
-        QiscusCore.setUser("arief92", "arief92")
-                .withUsername("arief92")
-                .withAvatarUrl("https://")
-                .withExtras(null)
-                .save(new QiscusCore.SetUserListener() {
-                    @Override
-                    public void onSuccess(QiscusAccount qiscusAccount) {
-                        //on success
-                        QiscusCore.updateUser("testing", "https://", new JSONObject());
-
-                    }
-                    @Override
-                    public void onError(Throwable throwable) {
-                        //on error
-                    }});
-
+    @Test
+    public void changeOsVersionTest() {
+        BuildVersionUtil.setOsSdkVersion(Build.VERSION_CODES.KITKAT);
         QiscusApi.getInstance().reInitiateInstance();
 
-
+        BuildVersionUtil.resetVersion();
+        QiscusApi.getInstance().reInitiateInstance();
     }
 
     @Test
@@ -69,7 +62,6 @@ public class QiscusApiTest extends InstrumentationBaseTest {
         QiscusApi.getInstance().requestNonce();
         QiscusApi.getInstance().getJWTNonce();
     }
-
 
     @Test
     public void loginOrRegister() {
@@ -418,8 +410,63 @@ public class QiscusApiTest extends InstrumentationBaseTest {
     }
 
     @Test
+    public void postCommentReplyTest() {
+        QiscusApi.getInstance().postComment(generateReply(null));
+    }
+    @Test
+    public void postCommentReplyExtrasEmptyTest() {
+        QiscusApi.getInstance().postComment(generateReply(""));
+    }
+
+    @Test
     public void sendMessage(){
         QiscusApi.getInstance().sendMessage(QiscusComment.generateMessage(roomId,"test"));
+    }
+
+    @Test
+    public void sendMessageReplyExtrasNullTest(){
+        QiscusComment message = QiscusComment.generateMessage(roomId,"reply");
+        message.setRawType("reply");
+        message.setExtraPayload(null);
+
+        QiscusApi.getInstance().sendMessage(message);
+    }
+
+    @Test
+    public void sendMessageReplyExtrasEmptyTest(){
+        QiscusComment message = QiscusComment.generateMessage(roomId,"reply");
+        message.setRawType("reply");
+        message.setExtraPayload("");
+
+        QiscusApi.getInstance().sendMessage(message);
+    }
+
+    @Test
+    public void sendMessageReplyTest() {
+        QiscusApi.getInstance().sendMessage(generateReply("text"));
+    }
+
+    @Test
+    public void sendMessageReplySystemEventTest() {
+        QiscusApi.getInstance().sendMessage(generateReply("system_event"));
+    }
+
+    private QiscusComment generateReply(String type) {
+        QiscusComment commentReply = QiscusComment.generateMessage(roomId, "test");
+        QiscusComment message =  QiscusComment.generateReplyMessage(
+                roomId, "replyTo", commentReply
+        );
+
+        try {
+            JSONObject payload = new JSONObject(message.getExtraPayload());
+            payload.put("replied_comment_type", type);
+            message.setExtraPayload(payload.toString());
+
+        } catch (JSONException e) {
+            // igonred
+        }
+
+        return message;
     }
 
     @Test
@@ -470,11 +517,12 @@ public class QiscusApiTest extends InstrumentationBaseTest {
     }
 
     @Test
-    public void sendFile(){
-        File compressedFile = new File("/storage/emulated/0/Pictures/balita5b21fef3-aa03-46b8-8056-d4eb063e1725.png");
+    public void sendFile() {
+        String fileName = "name file";
+        File compressedFile = getFileFromAsset(fileName);
 
         QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(roomId,
-                compressedFile.getPath(), "caption", "name file");
+                compressedFile.getPath(), "caption", fileName);
         qiscusComment.setDownloading(true);
 
         File finalCompressedFile = compressedFile;
@@ -502,13 +550,39 @@ public class QiscusApiTest extends InstrumentationBaseTest {
                     }
                 });
     }
+    private File getFileFromAsset(String fileName) {
+        try{
+            AssetManager am = context.getAssets();
+            InputStream inputStream = am.open("sample.pdf");
+
+            File f = new File(context.getCacheDir()+"/"+ fileName +".pdf");
+
+            OutputStream outputStream = new FileOutputStream(f);
+            byte buffer[] = new byte[1024];
+            int length = 0;
+
+            while((length=inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer,0,length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return f;
+        }catch (IOException e) {
+            //Logging exception
+        }
+
+        return null;
+    }
 
     @Test
-    public void uploadFIle(){
-        File compressedFile = new File("/storage/emulated/0/Pictures/balita5b21fef3-aa03-46b8-8056-d4eb063e1725.png");
+    public void uploadFIle() {
+        String fileName = "name file2";
+        File compressedFile = getFileFromAsset(fileName);
 
         QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(roomId,
-                compressedFile.getPath(), "caption2", "name file2");
+                compressedFile.getPath(), "caption2", fileName);
         qiscusComment.setDownloading(true);
 
         File finalCompressedFile = compressedFile;
@@ -533,11 +607,12 @@ public class QiscusApiTest extends InstrumentationBaseTest {
     }
 
     @Test
-    public void upload(){
-        File compressedFile = new File("/storage/emulated/0/Pictures/balita5b21fef3-aa03-46b8-8056-d4eb063e1725.png");
+    public void upload() {
+        String fileName = "name file2";
+        File compressedFile = getFileFromAsset(fileName);
 
         QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(roomId,
-                compressedFile.getPath(), "caption2", "name file2");
+                compressedFile.getPath(), "caption2", fileName);
         qiscusComment.setDownloading(true);
 
         File finalCompressedFile = compressedFile;
@@ -585,6 +660,25 @@ public class QiscusApiTest extends InstrumentationBaseTest {
         QiscusApi.getInstance().updateCommentStatus(roomId,0,0);
     }
 
+    @Test
+    public void updateChatRoomTest(){
+        QiscusComment message = QiscusComment.generateMessage(roomId,"test");
+
+        QiscusApi.getInstance().updateChatRoom(
+                message.getRoomId(),"name", message.getRoomAvatar(), message.getExtras()
+        );
+    }
+
+    @Test
+    public void updateChatRoomWithExtrasTest(){
+        QiscusComment message = QiscusComment.generateMessage(roomId,"test");
+        message.setExtras(new JSONObject());
+
+        QiscusApi.getInstance().updateChatRoom(
+                message.getRoomId(),"name", message.getRoomAvatar(), message.getExtras()
+        );
+    }
+
 //    @Test
 //    public void clearCommentsByRoomIds(){
 //        ArrayList<Long> ids = new ArrayList<Long>();
@@ -620,8 +714,6 @@ public class QiscusApiTest extends InstrumentationBaseTest {
         ArrayList<String> uniqId = new ArrayList<String>();
         uniqId.add("javascript-1670826465468");
         QiscusApi.getInstance().deleteComments(uniqId, true);
-
-
     }
 
 
@@ -705,6 +797,42 @@ public class QiscusApiTest extends InstrumentationBaseTest {
     }
 
     @Test
+    public void getRoomMemberMeta() {
+        JsonObject jsonResults = new JsonObject();
+        jsonResults.add("meta", new JsonObject());
+
+        try {
+            Method getRoomMemberMeta =  extractMethode(QiscusApi.getInstance(), "getRoomMemberMeta", QiscusApi.MetaRoomMembersListener.class, JsonObject.class);
+            getRoomMemberMeta.invoke(QiscusApi.getInstance(), null, jsonResults);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+
+    @Test
+    public void getRoomMemberMetaListenerNotNull() {
+
+        JsonObject json = new JsonObject();
+        json.addProperty("current_offset", 0);
+        json.addProperty("per_page", 0);
+        json.addProperty("total", 0);
+
+        JsonObject jsonResults = new JsonObject();
+        jsonResults.add("meta", json);
+
+        QiscusApi.MetaRoomMembersListener listener = (currentOffset, perPage, total) -> {
+            //ignored
+        };
+
+        try {
+            Method getRoomMemberMeta =  extractMethode(QiscusApi.getInstance(), "getRoomMemberMeta", QiscusApi.MetaRoomMembersListener.class, JsonObject.class);
+            getRoomMemberMeta.invoke(QiscusApi.getInstance(), listener, jsonResults);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+
+    @Test
     public void getParticipants(){
         QiscusApi.getInstance().getParticipants(roomUniqId, 1, 100, "desc", new QiscusApi.MetaRoomParticipantsListener() {
             @Override
@@ -720,8 +848,51 @@ public class QiscusApiTest extends InstrumentationBaseTest {
     }
 
     @Test
+    public void getParticipantsMeta() {
+        JsonObject jsonResults = new JsonObject();
+        jsonResults.add("meta", new JsonObject());
+
+        try {
+            Method getRoomMemberParticipantMeta =  extractMethode(QiscusApi.getInstance(), "getRoomMemberParticipantMeta", QiscusApi.MetaRoomParticipantsListener.class, JsonObject.class);
+            getRoomMemberParticipantMeta.invoke(QiscusApi.getInstance(), null, jsonResults);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+
+    @Test
+    public void getParticipantsMetaListenerNotNull() {
+
+        JsonObject json = new JsonObject();
+        json.addProperty("current_offset", 0);
+        json.addProperty("per_page", 0);
+        json.addProperty("total", 0);
+
+        JsonObject jsonResults = new JsonObject();
+        jsonResults.add("meta", json);
+
+        QiscusApi.MetaRoomParticipantsListener listener = (currentOffset, perPage, total) -> {
+            //ignored
+        };
+
+        try {
+            Method getRoomMemberParticipantMeta = extractMethode(QiscusApi.getInstance(), "getRoomMemberParticipantMeta", QiscusApi.MetaRoomParticipantsListener.class, JsonObject.class);
+            getRoomMemberParticipantMeta.invoke(QiscusApi.getInstance(), listener, jsonResults);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+
+    @Test
     public void getMqttBaseUrl(){
-        QiscusApi.getInstance().getMqttBaseUrl();
+        QiscusApi.getInstance().getMqttBaseUrl().subscribe();
+    }
+
+    @Test
+    public void getMqttBaseUrlChangeOsVersion(){
+        BuildVersionUtil.setOsSdkVersion(Build.VERSION_CODES.KITKAT);
+        QiscusApi.getInstance().getMqttBaseUrl().subscribe();
+        BuildVersionUtil.resetVersion();
     }
 
     @Test
@@ -732,6 +903,18 @@ public class QiscusApiTest extends InstrumentationBaseTest {
     @Test
     public void getUsers2(){
         QiscusApi.getInstance().getUsers( 1,100,"arief94");
+    }
+
+    @Test
+    public void parseQiscusAccount() {
+        JsonObject jsonAccount = new JsonObject();
+
+        try {
+            Method getRoomMemberParticipantMeta = extractMethode(QiscusApi.getInstance(), "parseQiscusAccount", JsonObject.class);
+            getRoomMemberParticipantMeta.invoke(QiscusApi.getInstance(),  jsonAccount);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
     }
 
     @Test
@@ -890,4 +1073,69 @@ public class QiscusApiTest extends InstrumentationBaseTest {
                 });
     }
 
+    @Test
+    public void handleDeleteMessage() {
+        QiscusComment qiscusComment = QiscusComment.generateMessage(10185397,"test");
+        qiscusComment.setId(1235108836);
+        qiscusComment.setUniqueId("android_1676515726263jfza6kax3c06857074d69d51");
+
+        List<QiscusComment> comments = new ArrayList<>();
+        comments.add(qiscusComment);
+
+        try {
+            Method handleDeleteMessage =  extractMethode(
+                    QiscusApi.getInstance(), "handleDeleteMessage",
+                    List.class, Boolean.class
+            );
+            handleDeleteMessage.invoke(QiscusApi.getInstance(), comments, true);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+
+    @Test
+    public void deleteMessageAndPostEvent() {
+        long roomId = 212;
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("id", roomId);
+
+        QiscusCore.getDataStore().addOrUpdate(
+                QiscusComment.generateMessage(roomId, "test")
+        );
+
+        try {
+            Method handleDeleteMessage =  extractMethode(
+                    QiscusApi.getInstance(), "deleteMessageAndPostEvent",
+                    JsonObject.class
+            );
+            handleDeleteMessage.invoke(QiscusApi.getInstance(), jsonObject);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+    @Test
+    public void validationNonNull() {
+        long roomId = 212;
+        try {
+            Method handleDeleteMessage =  extractMethode(
+                    QiscusApi.getInstance(), "validationNonNull",
+                    Object.class
+            );
+            handleDeleteMessage.invoke(QiscusApi.getInstance(), roomId);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+    @Test
+    public void validationNull() {
+        try {
+            Method handleDeleteMessage =  extractMethode(
+                    QiscusApi.getInstance(), "validationNonNull",
+                    Object.class
+            );
+            handleDeleteMessage.invoke(QiscusApi.getInstance(), (Object) null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
 }

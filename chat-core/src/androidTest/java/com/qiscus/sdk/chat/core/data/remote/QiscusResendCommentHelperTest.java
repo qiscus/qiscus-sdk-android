@@ -2,6 +2,8 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import static org.junit.Assert.*;
 
+import android.content.res.AssetManager;
+
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
@@ -13,6 +15,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class QiscusResendCommentHelperTest extends InstrumentationBaseTest {
     Integer roomId = 10185397;
@@ -116,5 +124,57 @@ public class QiscusResendCommentHelperTest extends InstrumentationBaseTest {
         qiscusComment.setState(0);
         QiscusCore.getDataStore().addOrUpdate(qiscusComment);
         QiscusResendCommentHelper.commentFail(new Throwable("error"),qiscusComment);
+    }
+
+    @Test
+    public void resendFileTest() {
+        QiscusResendCommentHelper helper = new QiscusResendCommentHelper();
+
+        AssetManager am = context.getAssets();
+        try {
+            InputStream inputStream = am.open("sample.pdf");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String fileName = "name file";
+        File f = getFileFromAsset(fileName);
+
+        QiscusComment qiscusComment = QiscusComment.generateFileAttachmentMessage(
+                roomId, f.getAbsolutePath(), "caption", fileName + ".pdf"
+        );
+
+        try {
+            Method resendFile = extractMethode(helper, "resendFile", QiscusComment.class);
+            resendFile.invoke(helper, qiscusComment);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // ignored
+        }
+    }
+
+    private File getFileFromAsset(String fileName) {
+        try{
+            AssetManager am = context.getAssets();
+            InputStream inputStream = am.open("sample.pdf");
+
+            File f = new File(context.getCacheDir()+"/"+ fileName +".pdf");
+
+            OutputStream outputStream = new FileOutputStream(f);
+            byte buffer[] = new byte[1024];
+            int length = 0;
+
+            while((length=inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer,0,length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return f;
+        }catch (IOException e) {
+            //Logging exception
+        }
+
+        return null;
     }
 }

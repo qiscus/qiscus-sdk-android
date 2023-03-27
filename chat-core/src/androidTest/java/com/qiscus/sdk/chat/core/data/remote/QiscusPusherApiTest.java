@@ -2,6 +2,8 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import static org.junit.Assert.*;
 
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
@@ -16,13 +18,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(AndroidJUnit4ClassRunner.class)
 public class QiscusPusherApiTest extends InstrumentationBaseTest {
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         super.setupEngine();
+        QiscusPusherApi.getInstance().restartConnection();
     }
 
     @Test
@@ -207,6 +212,7 @@ public class QiscusPusherApiTest extends InstrumentationBaseTest {
                 "  \"room_id_str\": \"1\",\n" +
                 "  \"room_name\": \"channelidrandomstring\",\n" +
                 "  \"room_type\": \"group\",\n" +
+                "  \"chat_type\": \"single\",\n" +
                 "  \"status\": \"sent\",\n" +
                 "  \"timestamp\": \"2019-02-13T16:19:23Z\",\n" +
                 "  \"topic_id\": 1,\n" +

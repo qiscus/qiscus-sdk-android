@@ -147,4 +147,5 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
     }
+
 }

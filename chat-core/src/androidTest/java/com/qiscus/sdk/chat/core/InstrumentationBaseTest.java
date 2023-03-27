@@ -13,12 +13,10 @@ import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -60,13 +58,39 @@ public class InstrumentationBaseTest {
                         QiscusCore.updateUser("testing", "https://", new JSONObject());
 
                     }
+
                     @Override
                     public void onError(Throwable throwable) {
                         //on error
-                    }});
+                    }
+                });
 
         QiscusApi.getInstance().reInitiateInstance();
         QiscusCore.getChatConfig().enableDebugMode(false);
+    }
+
+
+    public Field extractField(Object o, String name) {
+        Field f = null; //NoSuchFieldException
+        List<Integer> viewTypes = new ArrayList<>();
+        try {
+            f = o.getClass().getDeclaredField(name);
+            f.setAccessible(true);
+            return f;
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Method extractMethode(Object o, String name, Class<?>... parameterTypes) {
+        try {
+            Method m = o.getClass().getDeclaredMethod(name, parameterTypes);
+            m.setAccessible(true);
+            return m;
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

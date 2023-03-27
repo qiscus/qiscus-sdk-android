@@ -1,6 +1,7 @@
 package com.qiscus.sdk.chat.core.util;
 
 import androidx.core.content.ContextCompat;
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
 import com.qiscus.sdk.chat.core.R;
@@ -10,11 +11,12 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
+@RunWith(AndroidJUnit4ClassRunner.class)
 public class QiscusTextUtilTest extends InstrumentationBaseTest {
 
     Map<String, QiscusRoomMember> roomMembers = new HashMap();
