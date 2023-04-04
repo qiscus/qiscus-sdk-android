@@ -77,7 +77,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     private static final long RETRY_PERIOD = 4000;
 
     private static Gson gson;
-    private static long reconnectCounter;
+    public static long reconnectCounter;
 
     static {
         gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
@@ -373,7 +373,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(mqttBaseUrl -> {
                                 QiscusLogger.print(TAG, "New MQTT Broker URL = " + mqttBaseUrl);
-                                buildClient();
+                                //buildClient();
                             },
                             QiscusErrorLogger::print);
         }
@@ -558,7 +558,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    private void listenNotification() {
+    public void listenNotification() {
         QiscusLogger.print(TAG, "Listening notification...");
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/n", 2);
@@ -970,7 +970,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         }
     }
 
-    private JSONObject parseEventData(String message) {
+    public JSONObject parseEventData(String message) {
         try {
             return new JSONObject(message);
         } catch (JSONException e) {

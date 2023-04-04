@@ -8,8 +8,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.InstrumentationBaseTest;
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 
 import junit.framework.TestCase;
 
@@ -493,6 +495,28 @@ public class QiscusPusherApiTest extends InstrumentationBaseTest {
 
     }
 
+    @Test
+    public void handleMessageNotification(){
+        QiscusPusherApi.getInstance().handleMessage(QiscusCore.getQiscusAccount().getToken() + "/n","1");
+    }
+
+    @Test
+    public void handleMessageNotification2(){
+        QiscusPusherApi.getInstance().handleMessage(QiscusCore.getQiscusAccount().getToken() + "/n","{}");
+    }
+
+    @Test
+    public void handleMessageupdate2(){
+        QiscusPusherApi.getInstance().handleMessage(QiscusCore.getQiscusAccount().getToken() + "/update","{}");
+        QiscusPusherApi.getInstance().handleMessage(QiscusCore.getAppId() + "/update","{}");
+    }
+
+    @Test
+    public void handleMessageEvent(){
+        QiscusPusherApi.getInstance().handleMessage("r/r/e","{\n" +
+                "  \"sender\": \""+QiscusCore.getQiscusAccount().getEmail()+"\",\n" +
+                "}");
+    }
 
     @Test
     public void handleMessageTyping(){
@@ -510,6 +534,11 @@ public class QiscusPusherApiTest extends InstrumentationBaseTest {
     }
 
     @Test
+    public void handleMessageNewComment2(){
+        QiscusPusherApi.getInstance().handleMessage(QiscusCore.getQiscusAccount().getToken() + "/c","{\"app_code\":\"sdksample\",\"chat_type\":\"single\",\"comment_before_id\":1205442846,\"comment_before_id_str\":\"1205442846\",\"created_at\":\"2023-01-19T07:49:54.479861Z\",\"disable_link_preview\":false,\"email\":\"arief93\",\"extras\":{},\"id\":1207380921,\"id_str\":\"1207380921\",\"is_public_channel\":false,\"message\":\"abc\",\"payload\":{},\"raw_room_name\":\"testing34\",\"room_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"room_id\":96304367,\"room_id_str\":\"96304367\",\"room_name\":\"arief93\",\"room_options\":\"{}\",\"room_type\":\"single\",\"status\":\"sent\",\"timestamp\":\"2023-01-19T07:49:54Z\",\"topic_id\":96304367,\"topic_id_str\":\"96304367\",\"type\":\"text\",\"unique_temp_id\":\"javascript-1674114594284\",\"unix_nano_timestamp\":1674114594479861000,\"unix_timestamp\":1674114594,\"user_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_avatar_url\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_extras\":{},\"user_id\":133493390,\"user_id_str\":\"133493390\",\"username\":\"arief93\"}");
+    }
+
+    @Test
     public void handleMessageUpdate(){
         QiscusPusherApi.getInstance().handleMessage("X0y1Nsd8u125k8gB6wiz1666680616/update","{\"app_code\":\"sdksample\",\"chat_type\":\"single\",\"comment_before_id\":1205442846,\"comment_before_id_str\":\"1205442846\",\"created_at\":\"2023-01-19T07:49:54.479861Z\",\"disable_link_preview\":false,\"email\":\"arief93\",\"extras\":{},\"id\":1207380921,\"id_str\":\"1207380921\",\"is_public_channel\":false,\"message\":\"abc\",\"payload\":{},\"raw_room_name\":\"testing34\",\"room_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"room_id\":96304367,\"room_id_str\":\"96304367\",\"room_name\":\"arief93\",\"room_options\":\"{}\",\"room_type\":\"single\",\"status\":\"sent\",\"timestamp\":\"2023-01-19T07:49:54Z\",\"topic_id\":96304367,\"topic_id_str\":\"96304367\",\"type\":\"text\",\"unique_temp_id\":\"javascript-1674114594284\",\"unix_nano_timestamp\":1674114594479861000,\"unix_timestamp\":1674114594,\"user_avatar\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_avatar_url\":\"https://robohash.org/arief93/bgset_bg2/3.14160?set=set4\",\"user_extras\":{},\"user_id\":133493390,\"user_id_str\":\"133493390\",\"username\":\"arief93\"}");
     }
@@ -523,5 +552,91 @@ public class QiscusPusherApiTest extends InstrumentationBaseTest {
     public void handleMessageRead(){
         QiscusPusherApi.getInstance().handleMessage("r/96304367/96304367/arief93/r","1207380921:javascript-1674114594284");
     }
+
+    @Test
+    public void connectFailedTest(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+        QiscusCore.setCacheMqttBrokerUrl("ssl://realtime-test.qiscus.com",true);
+        QiscusPusherApi.getInstance().restartConnection();
+        QiscusPusherApi.getInstance().listenNotification();
+    }
+
+    @Test
+    public void connectFailedTest2(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+        QiscusCore.setCacheMqttBrokerUrl("ssl://realtime-test.qiscus.com",true);
+        QiscusPusherApi.getInstance().restartConnection();
+        QiscusPusherApi.getInstance().listenNotification();
+    }
+
+    @Test
+    public void connectFailedTest3(){
+        QiscusPusherApi.getInstance().onFailure(null,new Throwable());
+    }
+
+    @Test
+    public void connectFailedTest4(){
+        QiscusPusherApi.getInstance().reconnectCounter = 1;
+        QiscusPusherApi.getInstance().onFailure(null,null);
+    }
+
+    @Test
+    public void connectFailedTest5(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+        QiscusCore.setCacheMqttBrokerUrl("ssl://realtime-test.qiscus.com",true);
+        QiscusPusherApi.getInstance().restartConnection();
+        QiscusPusherApi.getInstance().connectComplete(false,null);
+    }
+
+    @Test
+    public void connectFailedTest6(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+        QiscusCore.setCacheMqttBrokerUrl("ssl://realtime-test.qiscus.com",true);
+        QiscusPusherApi.getInstance().listenNotification();
+    }
+
+    @Test
+    public void connectFailedTest7(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+        QiscusCore.setCacheMqttBrokerUrl("ssl://realtime-test.qiscus.com",true);
+        QiscusPusherApi.getInstance().restartConnection();
+        QiscusPusherApi.getInstance().listenNotification();
+    }
+
+    @Test
+    public void connectSuccessTest1(){
+        QiscusCore.setEnableDisableRealtime(true);
+        QiscusCore.setWillGetNewNodeMqttBrokerUrl(true);
+        QiscusCore.setCacheMqttBrokerUrl("ssl://realtime-bali.qiscus.com:1885",true);
+        QiscusPusherApi.getInstance().restartConnection();
+        QiscusPusherApi.getInstance().connectComplete(true,"ssl://realtime-bali.qiscus.com:1885");
+        QiscusPusherApi.getInstance().scheduleUserStatus();
+    }
+
+    @Test
+    public void deliveryComplete(){
+        QiscusPusherApi.getInstance().deliveryComplete(null);
+    }
+
+    @Test
+    public void parseEventData(){
+        QiscusPusherApi.getInstance().parseEventData("");
+        QiscusPusherApi.getInstance().parseEventData("null");
+
+    }
+
+    @Test
+    public void connectionLost(){
+        QiscusPusherApi.getInstance().connectionLost(new Throwable());
+
+    }
+
+
+
 
 }
