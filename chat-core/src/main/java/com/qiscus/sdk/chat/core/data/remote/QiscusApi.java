@@ -668,8 +668,7 @@ public enum QiscusApi {
 
     public Observable<QiscusComment> sync() {
         QiscusComment latestComment = QiscusCore.getDataStore().getLatestComment();
-        if (latestComment == null || !QiscusTextUtil.getString(R.string.qiscus_today)
-                .equals(QiscusDateUtil.toTodayOrDate(latestComment.getTime()))) {
+        if (latestComment == null) {
             return synchronize(0);
         }
         return synchronize(latestComment.getId());

@@ -23,6 +23,8 @@ repositories {
     google()
     mavenCentral()
     maven { url "https://jitpack.io" }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+
 }
 
 ext {
@@ -33,10 +35,10 @@ ext {
 
     versions = [
             support          : "31.0.0",
-            firebaseCore     : "21.0.0",
-            firebaseMessaging: "23.0.4",
+            firebaseCore     : "21.1.1",
+            firebaseMessaging: "23.1.2",
             okHttp           : "3.12.5",
-            retrofit         : "2.3.0",
+            retrofit         : "2.10.0-SNAPSHOT",
 
             nirmana          : "1.3.0",
             manggil          : "1.0.1",
@@ -47,12 +49,12 @@ ext {
 
             trelloLifecycle  : "1.0",
 
-            places           : "1.1.0",
+            places           : "3.1.0",
             placePicker      : "v1.0.5a"
     ]
 
     supportDeps = [
-            appcompat   : "com.android.support:appcompat-v7:$versions.support",
+            appcompat   : "androidx.appcompat:appcompat:1.2.0",
             design      : "com.android.support:design:$versions.support",
             cardView    : "com.android.support:cardview-v7:$versions.support",
             recyclerView: "com.android.support:recyclerview-v7:$versions.support",
@@ -90,7 +92,8 @@ ext {
     retrofitDeps = [
             retrofit    : "com.squareup.retrofit2:retrofit:${versions.retrofit}",
             retrofitGson: "com.squareup.retrofit2:converter-gson:${versions.retrofit}",
-            retrofitRx  : "com.squareup.retrofit2:adapter-rxjava:${versions.retrofit}"
+            retrofitRx  : "com.squareup.retrofit2:adapter-rxjava:${versions.retrofit}",
+            scalars : "com.squareup.retrofit2:converter-scalars:2.1.0",
     ]
 
     rxDebs = [
@@ -102,6 +105,10 @@ ext {
             trelloLifecycle          : "com.trello:rxlifecycle:${versions.trelloLifecycle}",
             trelloLifecycleAndroid   : "com.trello:rxlifecycle-android:${versions.trelloLifecycle}",
             trelloLifecycleComponents: "com.trello:rxlifecycle-components:${versions.trelloLifecycle}"
+    ]
+
+    lifeCircleDeb = [
+            lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0"
     ]
 
     placePickerLib = "com.github.adicatur:pingplacepicker:$versions.placePicker"
@@ -117,6 +124,7 @@ ext {
     firebaseLibs = firebaseDeps.values()
     qiscusUtilLibs = qiscusUtilDeps.values()
     qiscusMqttLibs = qiscusMqttDeps.values()
+    lifeCircleDeb = lifeCircleDeb.values()
     networkLibs = okHttpDeps.values() + retrofitDeps.values()
     rxLibs = rxDebs.values() + trelloLifecycleDebs.values()
     rxDebs = rxDebs.values()

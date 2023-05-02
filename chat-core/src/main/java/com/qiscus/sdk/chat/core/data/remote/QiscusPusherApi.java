@@ -373,7 +373,6 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(mqttBaseUrl -> {
                                 QiscusLogger.print(TAG, "New MQTT Broker URL = " + mqttBaseUrl);
-                                buildClient();
                             },
                             QiscusErrorLogger::print);
         }
