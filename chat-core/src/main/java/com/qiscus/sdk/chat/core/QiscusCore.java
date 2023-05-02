@@ -29,6 +29,7 @@ import android.text.format.DateUtils;
 
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
@@ -349,7 +350,7 @@ public class QiscusCore {
 
                     startSyncService();
                     startNetworkCheckerService();
-                    QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
 
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
@@ -361,7 +362,7 @@ public class QiscusCore {
                     QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
                     startSyncService();
                     startNetworkCheckerService();
-                    QiscusCore.getApps().registerActivityLifecycleCallbacks(QiscusActivityCallback.INSTANCE);
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
                 });
 
     }

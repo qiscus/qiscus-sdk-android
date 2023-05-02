@@ -16,12 +16,9 @@
 
 package com.qiscus.sdk.chat.core;
 
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.Application;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -35,7 +32,7 @@ import java.util.concurrent.ScheduledFuture;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
+enum QiscusActivityCallback implements LifecycleObserver {
     INSTANCE;
 
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
@@ -43,12 +40,13 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     private ScheduledFuture<?> activityTransition;
     private ScheduledFuture<?> activityTransition2;
 
-    @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    public void onCreate() {
+
     }
 
-    @Override
-    public void onActivityStarted(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    public void onActivityStarted() {
 
         foreground = true;
 
@@ -57,26 +55,18 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
         }
     }
 
-    @Override
-    public void onActivityResumed(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    public void onActivityResumed() {
         stopActivityTransitionTimer();
     }
 
-    @Override
-    public void onActivityPaused(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    public void onActivityPaused() {
         startActivityTransitionTimer();
     }
 
-    @Override
-    public void onActivityStopped(Activity activity) {
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-    }
-
-    @Override
-    public void onActivityDestroyed(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onActivityStopped() {
     }
 
     boolean isForeground() {
@@ -88,8 +78,9 @@ enum QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
     }
 
     private void startActivityTransitionTimer() {
-        activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() -> foreground = false,
-                MAX_ACTIVITY_TRANSITION_TIME);
+        activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() ->{
+            foreground = false ;
+        }, MAX_ACTIVITY_TRANSITION_TIME);
 
         activityTransition2 = QiscusAndroidUtil.runOnBackgroundThread(() -> check(), MAX_ACTIVITY_TRANSITION_TIME);
     }

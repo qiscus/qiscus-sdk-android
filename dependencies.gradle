@@ -54,7 +54,7 @@ ext {
     ]
 
     supportDeps = [
-            appcompat   : "com.android.support:appcompat-v7:$versions.support",
+            appcompat   : "androidx.appcompat:appcompat:1.2.0",
             design      : "com.android.support:design:$versions.support",
             cardView    : "com.android.support:cardview-v7:$versions.support",
             recyclerView: "com.android.support:recyclerview-v7:$versions.support",
@@ -107,6 +107,10 @@ ext {
             trelloLifecycleComponents: "com.trello:rxlifecycle-components:${versions.trelloLifecycle}"
     ]
 
+    lifeCircleDeb = [
+            lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    ]
+
     placePickerLib = "com.github.adicatur:pingplacepicker:$versions.placePicker"
     placeLib = "com.google.android.libraries.places:places:$versions.places"
     flexBoxLib = "com.google.android:flexbox:0.3.1"
@@ -120,6 +124,7 @@ ext {
     firebaseLibs = firebaseDeps.values()
     qiscusUtilLibs = qiscusUtilDeps.values()
     qiscusMqttLibs = qiscusMqttDeps.values()
+    lifeCircleDeb = lifeCircleDeb.values()
     networkLibs = okHttpDeps.values() + retrofitDeps.values()
     rxLibs = rxDebs.values() + trelloLifecycleDebs.values()
     rxDebs = rxDebs.values()

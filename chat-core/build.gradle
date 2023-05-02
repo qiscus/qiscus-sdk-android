@@ -98,6 +98,7 @@ dependencies {
     api eventBusLib
     api rxUrlExtractorLib
     api securityDeps
+    api lifeCircleDeb
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0'
