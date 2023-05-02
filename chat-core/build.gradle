@@ -17,9 +17,9 @@
 apply plugin: 'com.android.library'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
-apply from: rootProject.file('gradle/quality.gradle')
-//apply from: 'publish.gradle'
-//apply plugin: "com.jfrog.artifactory"
+//apply from: rootProject.file('gradle/quality.gradle')
+apply from: 'publish.gradle'
+apply plugin: "com.jfrog.artifactory"
 
 android {
     compileSdkVersion compileSDKVersion
@@ -64,6 +64,8 @@ android {
     }
 
     useLibrary 'org.apache.http.legacy'
+    namespace 'com.qiscus.sdk.chat.core'
+
 }
 
 buildscript {

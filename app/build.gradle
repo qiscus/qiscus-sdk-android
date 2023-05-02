@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.application'
-apply from: rootProject.file('gradle/quality.gradle')
+//apply from: rootProject.file('gradle/quality.gradle')
 apply plugin: "org.sonarqube"
 apply from: '../dependencies.gradle'
 apply plugin: 'com.google.gms.google-services'
@@ -38,6 +38,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
+        debug {
+            shrinkResources true
+            zipAlignEnabled true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+
         buildTypes.each {
             it.buildConfigField("String", "QISCUS_SDK_APP_ID", QISCUS_SDK_APP_ID)
         }
@@ -59,6 +67,7 @@ android {
     }
 
     useLibrary 'org.apache.http.legacy'
+    namespace 'com.qiscus.dragonfly'
 }
 
 buildscript {
