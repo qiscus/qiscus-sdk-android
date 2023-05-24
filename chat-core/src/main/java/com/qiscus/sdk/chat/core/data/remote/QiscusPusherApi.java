@@ -1013,6 +1013,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public void connectionLost(Throwable cause) {
         if (reconnectCounter == 0) {
             getMqttBrokerUrlFromLB();
+        }else if (reconnectCounter >= 3){
+            connecting = false;
+            QiscusCore.setEnableDisableRealtime(false);
+            EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
+            QiscusLogger.print(TAG, "Realtime using sync");
+            return;
         }
 
         EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
@@ -1204,6 +1210,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
         if (reconnectCounter == 0) {
             getMqttBrokerUrlFromLB();
+        }else if (reconnectCounter >= 3){
+            QiscusCore.setEnableDisableRealtime(false);
+            connecting = false;
+            EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
+            QiscusLogger.print(TAG, "Realtime using sync");
+            return;
         }
 
         EventBus.getDefault().post(QiscusMqttStatusEvent.DISCONNECTED);
