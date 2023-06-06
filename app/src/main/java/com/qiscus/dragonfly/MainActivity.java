@@ -293,12 +293,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        QiscusPusherApi.getInstance().subsribeCustomEvent(1353686);
+        //QiscusPusherApi.getInstance().subsribeCustomEvent(1353686);
     }
 
     @Override
     protected void onPause() {
-        QiscusPusherApi.getInstance().unsubsribeCustomEvent(1353686);
+        //QiscusPusherApi.getInstance().unsubsribeCustomEvent(1353686);
         EventBus.getDefault().unregister(this);
         super.onPause();
     }

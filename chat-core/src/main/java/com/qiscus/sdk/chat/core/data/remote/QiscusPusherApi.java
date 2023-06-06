@@ -398,11 +398,12 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
             mqttConnectOptions.setAutomaticReconnect(false);
             mqttConnectOptions.setCleanSession(false);
-            mqttConnectOptions.setWill("u/" + qiscusAccount.getEmail()
-                    + "/s", ("0:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis())
-                    .getBytes(), 2, true);
-            EventBus.getDefault().post(QiscusMqttStatusEvent.RECONNETING);
+
             try {
+                mqttConnectOptions.setWill("u/" + qiscusAccount.getEmail()
+                        + "/s", ("0:" + Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis())
+                        .getBytes(), 2, true);
+                EventBus.getDefault().post(QiscusMqttStatusEvent.RECONNETING);
                 mqttAndroidClient.connect(mqttConnectOptions, null, this);
                 QiscusLogger.print(TAG, "Connecting...");
             } catch (MqttException | IllegalStateException e) {
@@ -479,6 +480,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
+            connecting = false;
+        } catch (RuntimeException e) {
             connecting = false;
         }
 

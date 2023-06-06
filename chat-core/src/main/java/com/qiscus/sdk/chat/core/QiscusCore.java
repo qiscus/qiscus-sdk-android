@@ -1131,10 +1131,14 @@ public class QiscusCore {
     }
 
     private static boolean isValidToRefreshToken(QiscusAccount account) {
-        Date expiredAt = QiscusDateUtil.getDateTimeSdf(account.getTokenExpiresAt());
-        return DateUtils.isToday(expiredAt.getTime())
-                || QiscusDateUtil.isBeforeADaySdf(expiredAt.getTime())
-                || QiscusDateUtil.isPassingDateTimeSdf(expiredAt.getTime());
+        if (account.getTokenExpiresAt().isEmpty()) {
+            return false;
+        }else{
+            Date expiredAt = QiscusDateUtil.getDateTimeSdf(account.getTokenExpiresAt());
+            return DateUtils.isToday(expiredAt.getTime())
+                    || QiscusDateUtil.isBeforeADaySdf(expiredAt.getTime())
+                    || QiscusDateUtil.isPassingDateTimeSdf(expiredAt.getTime());
+        }
     }
 
     public static void clearUser() {
