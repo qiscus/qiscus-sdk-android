@@ -1,10 +1,25 @@
 package com.qiscus.sdk.chat.core.data.model;
 
+import com.qiscus.sdk.chat.core.QiscusAppComponent;
+
 /**
  * @author Yuana andhikayuana@gmail.com
  * @since Jul, Thu 26 2018 11.50
  **/
 public class QiscusCoreChatConfig {
+
+    private static QiscusCoreChatConfig INSTANCE;
+
+    public static QiscusCoreChatConfig getInstance() {
+        if (INSTANCE == null) {
+            synchronized (QiscusCoreChatConfig.class) {
+                if (INSTANCE == null) {
+                   INSTANCE = new QiscusCoreChatConfig();
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
     private boolean enableLog = false;
     private boolean enableFcmPushNotification = false;

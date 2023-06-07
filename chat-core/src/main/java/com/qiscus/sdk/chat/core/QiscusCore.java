@@ -73,12 +73,10 @@ import rx.schedulers.Schedulers;
  **/
 public class QiscusCore {
 
-    private static Application appInstance;
-    private static String appId;
+    /*private static Application appInstance;
+    private static String appId;*/
     private static Boolean isBuiltIn = false;
-    private static String appServer;
-    private static String mqttBrokerUrl;
-    private static String baseURLLB;
+    /*private static String appServer;
     private static LocalDataManager localDataManager;
     private static long heartBeat;
     private static long automaticHeartBeat;
@@ -86,7 +84,10 @@ public class QiscusCore {
     private static QiscusDataStore dataStore;
     private static QiscusCoreChatConfig chatConfig;
     private static Handler appHandler;
-    private static ScheduledThreadPoolExecutor taskExecutor;
+    private static ScheduledThreadPoolExecutor taskExecutor;*/
+    private static String mqttBrokerUrl;
+    private static String baseURLLB;
+
     private static boolean enableMqttLB = true;
     private static JSONObject customHeader;
     private static Boolean enableEventReport = true;
@@ -216,11 +217,14 @@ public class QiscusCore {
      * @param mqttBrokerUrl Your Mqtt Broker url
      * @param enableMqttLB  Qiscus using own MQTT Load Balancer for get mqtt server url
      */
+
+//    private static QiscusAppComponent component;
+
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
 
-        appInstance = application;
+        /*appInstance = application;
         appId = qiscusAppId;
 
         appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
@@ -233,13 +237,15 @@ public class QiscusCore {
         dataStore = new QiscusDataBaseHelper();
         heartBeat = 5000;
         automaticHeartBeat = 30000;
-        networkConnectionInterval = 5000;
+        networkConnectionInterval = 5000;*/
+        QiscusAppComponent.create(application, qiscusAppId, serverBaseUrl);
 
         QiscusCore.enableMqttLB = enableMqttLB;
         QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
         QiscusCore.baseURLLB = baseURLLB;
         enableEventReport = false;
-        localDataManager.setURLLB(baseURLLB);
+        QiscusAppComponent.getInstance().getLocalDataManager()
+                .setURLLB(baseURLLB);
 
 
 //        AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
@@ -291,13 +297,15 @@ public class QiscusCore {
                 .subscribe(appConfig -> {
                     enableEventReport = appConfig.getEnableEventReport();
                     if (!appConfig.getBaseURL().isEmpty()) {
-                        String oldAppServer = appServer;
+                        String oldAppServer = QiscusAppComponent.getInstance().getAppServer();
                         String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
                                 appConfig.getBaseURL() + "/" : appConfig.getBaseURL();
 
                         if (!oldAppServer.equals(newAppServer) &&
                                 QiscusServiceUtil.isValidUrl(newAppServer)) {
-                            appServer = newAppServer;
+                            QiscusAppComponent.getInstance().setAppServer(
+                                    newAppServer
+                            );
                         }
                     }
 
@@ -306,7 +314,8 @@ public class QiscusCore {
                     if (!appConfig.getBrokerLBURL().isEmpty() &&
                             QiscusServiceUtil.isValidUrl(appConfig.getBrokerLBURL())) {
                         QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
-                        localDataManager.setURLLB(QiscusCore.baseURLLB);
+                        QiscusAppComponent.getInstance().getLocalDataManager()
+                                .setURLLB(QiscusCore.baseURLLB);
                     }
 
                     if (!appConfig.getBrokerURL().isEmpty()) {
@@ -324,15 +333,15 @@ public class QiscusCore {
                     }
 
                     if (appConfig.getSyncInterval() != 0) {
-                        heartBeat = appConfig.getSyncInterval();
+//                        heartBeat = appConfig.getSyncInterval();
                     }
 
                     if (appConfig.getSyncOnConnect() != 0) {
-                        automaticHeartBeat = appConfig.getSyncOnConnect();
+//                        automaticHeartBeat = appConfig.getSyncOnConnect();
                     }
 
                     if (appConfig.getNetworkConnectionInterval() != 0) {
-                        networkConnectionInterval = appConfig.getNetworkConnectionInterval();
+//                        networkConnectionInterval = appConfig.getNetworkConnectionInterval();
                     }
 
                     enableRealtime = appConfig.getEnableRealtime();
@@ -451,7 +460,7 @@ public class QiscusCore {
      */
     public static Application getApps() {
         checkAppIdSetup();
-        return appInstance;
+        return QiscusAppComponent.getInstance().getApplication();
     }
 
     /**
@@ -460,7 +469,7 @@ public class QiscusCore {
      * @throws RuntimeException
      */
     public static void checkAppIdSetup() throws RuntimeException {
-        if (appServer == null) {
+        if (QiscusAppComponent.getInstance().getAppServer() == null) {
             throw new RuntimeException("Please init Qiscus with your app id before!");
         }
     }
@@ -472,7 +481,7 @@ public class QiscusCore {
      */
     public static String getAppId() {
         checkAppIdSetup();
-        return appId;
+        return  QiscusAppComponent.getInstance().getAppId();
     }
 
     /**
@@ -491,7 +500,7 @@ public class QiscusCore {
      */
     public static String getAppServer() {
         checkAppIdSetup();
-        return appServer;
+        return  QiscusAppComponent.getInstance().getAppServer();
     }
 
     /**
@@ -626,9 +635,11 @@ public class QiscusCore {
     public static String getMqttBrokerUrl() {
         checkAppIdSetup();
 
-        localDataManager.setMqttBrokerUrl(mqttBrokerUrl);
+         QiscusAppComponent.getInstance().getLocalDataManager()
+                 .setMqttBrokerUrl(mqttBrokerUrl);
 
-        return isEnableMqttLB() ? localDataManager.getMqttBrokerUrl() : mqttBrokerUrl;
+        return isEnableMqttLB() ?  QiscusAppComponent.getInstance().getLocalDataManager()
+                .getMqttBrokerUrl() : mqttBrokerUrl;
     }
 
     /**
@@ -639,11 +650,14 @@ public class QiscusCore {
     public static String getBaseURLLB() {
         checkAppIdSetup();
 
-        if (localDataManager.getURLLB() == null) {
-            localDataManager.setURLLB(baseURLLB);
+        if ( QiscusAppComponent.getInstance().getLocalDataManager()
+                .getURLLB() == null) {
+             QiscusAppComponent.getInstance().getLocalDataManager()
+                     .setURLLB(baseURLLB);
         }
 
-        return isEnableMqttLB() ? localDataManager.getURLLB() : baseURLLB;
+        return isEnableMqttLB() ?  QiscusAppComponent.getInstance().getLocalDataManager()
+                .getURLLB() : baseURLLB;
     }
 
     /**
@@ -652,8 +666,10 @@ public class QiscusCore {
      * @param mqttBaseUrl
      */
     public static void setCacheMqttBrokerUrl(String mqttBaseUrl, boolean everConnected) {
-        localDataManager.setMqttBrokerUrl(mqttBaseUrl);
-        localDataManager.setWillGetNewNodeMqttBrokerUrl(everConnected);
+         QiscusAppComponent.getInstance().getLocalDataManager()
+                 .setMqttBrokerUrl(mqttBaseUrl);
+         QiscusAppComponent.getInstance().getLocalDataManager()
+                 .setWillGetNewNodeMqttBrokerUrl(everConnected);
     }
 
     /**
@@ -662,11 +678,13 @@ public class QiscusCore {
      * @return boolean
      */
     public static boolean willGetNewNodeMqttBrokerUrl() {
-        return localDataManager.willGetNewNodeMqttBrokerUrl();
+        return  QiscusAppComponent.getInstance().getLocalDataManager()
+                .willGetNewNodeMqttBrokerUrl();
     }
 
     public static void setWillGetNewNodeMqttBrokerUrl(Boolean set) {
-        localDataManager.setWillGetNewNodeMqttBrokerUrl(set);
+         QiscusAppComponent.getInstance().getLocalDataManager()
+                 .setWillGetNewNodeMqttBrokerUrl(set);
     }
 
     /**
@@ -677,7 +695,8 @@ public class QiscusCore {
     @Deprecated
     public static LocalDataManager getLocalDataManager() {
         checkAppIdSetup();
-        return localDataManager;
+        return  QiscusAppComponent.getInstance().getLocalDataManager()
+                ;
     }
 
     /**
@@ -686,7 +705,8 @@ public class QiscusCore {
      * @return true if already setup, false if not yet
      */
     public static boolean hasSetupUser() {
-        return appServer != null && localDataManager.isLogged();
+        return  QiscusAppComponent.getInstance().getAppServer() != null
+                &&  QiscusAppComponent.getInstance().getLocalDataManager().isLogged();
     }
 
     /**
@@ -695,7 +715,7 @@ public class QiscusCore {
      * @return true if already hasSetupAppID, false if not yet
      */
     public static boolean hasSetupAppID() {
-        return appServer != null;
+        return  QiscusAppComponent.getInstance().getAppServer() != null;
     }
 
     /**
@@ -705,7 +725,8 @@ public class QiscusCore {
      */
     public static QiscusAccount getQiscusAccount() {
         checkUserSetup();
-        return localDataManager.getAccountInfo();
+        return  QiscusAppComponent.getInstance().getLocalDataManager()
+                .getAccountInfo();
     }
 
     /**
@@ -727,7 +748,8 @@ public class QiscusCore {
      */
     public static String getToken() {
         checkUserSetup();
-        return localDataManager.getToken();
+        return  QiscusAppComponent.getInstance().getLocalDataManager()
+                .getToken();
     }
 
     /**
@@ -737,7 +759,8 @@ public class QiscusCore {
      */
     public static String getRefreshToken() {
         checkUserSetup();
-        return localDataManager.getRefreshToken();
+        return  QiscusAppComponent.getInstance().getLocalDataManager()
+                .getRefreshToken();
     }
 
     /**
@@ -747,11 +770,13 @@ public class QiscusCore {
      */
     public static void saveRefreshToken(QiscusRefreshToken newToken) {
         checkUserSetup();
-        QiscusAccount account = localDataManager.getAccountInfo();
+        QiscusAccount account =  QiscusAppComponent.getInstance().getLocalDataManager()
+                .getAccountInfo();
         account.setToken(newToken.getToken());
         account.setRefreshToken(newToken.getRefreshToken());
         account.setTokenExpiresAt(newToken.getTokenExpiresAt());
-        localDataManager.saveAccountInfo(account);
+         QiscusAppComponent.getInstance().getLocalDataManager()
+                 .saveAccountInfo(account);
     }
 
     /**
@@ -760,7 +785,7 @@ public class QiscusCore {
      * @return Heartbeat duration in milliseconds
      */
     public static long getHeartBeat() {
-        return heartBeat;
+        return  QiscusAppComponent.getInstance().getHeartBeat();
     }
 
     /**
@@ -771,7 +796,7 @@ public class QiscusCore {
     @Deprecated
     public static void setHeartBeat(long heartBeat) {
         checkAppIdSetup();
-        QiscusCore.heartBeat = heartBeat;
+//        QiscusCore.heartBeat = heartBeat;
     }
 
     /**
@@ -780,11 +805,11 @@ public class QiscusCore {
      * @return automaticHeartbeat duration in milliseconds
      */
     public static long getAutomaticHeartBeat() {
-        return automaticHeartBeat;
+        return  QiscusAppComponent.getInstance().getAutomaticHeartBeat();
     }
 
     public static long getNetworkConnectionInterval(){
-        return networkConnectionInterval;
+        return  QiscusAppComponent.getInstance().getNetworkConnectionInterval();
     }
 
     /**
@@ -794,7 +819,7 @@ public class QiscusCore {
      */
     public static void setSyncInterval(long interval) {
         checkAppIdSetup();
-        QiscusCore.heartBeat = interval;
+//        QiscusCore.heartBeat = interval;
     }
 
     /**
@@ -803,7 +828,7 @@ public class QiscusCore {
      * @return Singleton of qiscus data store
      */
     public static QiscusDataStore getDataStore() {
-        return dataStore;
+        return  QiscusAppComponent.getInstance().getDataStore();
     }
 
     /**
@@ -813,7 +838,7 @@ public class QiscusCore {
      * @param dataStore Your own chat datastore
      */
     public static void setDataStore(QiscusDataStore dataStore) {
-        QiscusCore.dataStore = dataStore;
+//        QiscusCore.dataStore = dataStore;
     }
 
     /**
@@ -822,8 +847,8 @@ public class QiscusCore {
      * @return Current qiscus chatting configuration
      */
     public static QiscusCoreChatConfig getChatConfig() {
-        checkAppIdSetup();
-        return chatConfig;
+//        checkAppIdSetup();
+        return QiscusCoreChatConfig.getInstance();
     }
 
     /**
@@ -850,10 +875,10 @@ public class QiscusCore {
                 .login(token)
                 .doOnNext(qiscusAccount -> {
                     if (QiscusCore.hasSetupUser()) {
-                        QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                        QiscusAppComponent.getInstance().getLocalDataManager().saveAccountInfo(qiscusAccount);
                         configureFcmToken();
                     } else {
-                        QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                        QiscusAppComponent.getInstance().getLocalDataManager().saveAccountInfo(qiscusAccount);
                         configureFcmToken();
                         EventBus.getDefault().post(QiscusUserEvent.LOGIN);
                     }
@@ -871,10 +896,12 @@ public class QiscusCore {
                 .setUserWithIdentityToken(token)
                 .doOnNext(qiscusAccount -> {
                     if (QiscusCore.hasSetupUser()) {
-                        QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                        QiscusAppComponent.getInstance().getLocalDataManager()
+                                .saveAccountInfo(qiscusAccount);
                         configureFcmToken();
                     } else {
-                        QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                        QiscusAppComponent.getInstance().getLocalDataManager()
+                                .saveAccountInfo(qiscusAccount);
                         configureFcmToken();
                         EventBus.getDefault().post(QiscusUserEvent.LOGIN);
                     }
@@ -918,7 +945,8 @@ public class QiscusCore {
      */
     public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarUrl, extras)
-                .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
+                .doOnNext(qiscusAccount -> QiscusAppComponent.getInstance().getLocalDataManager()
+                        .saveAccountInfo(qiscusAccount));
     }
 
     /**
@@ -931,7 +959,8 @@ public class QiscusCore {
      */
     public static Observable<QiscusAccount> updateUser(String name, String avatarURL, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarURL, extras)
-                .doOnNext(qiscusAccount -> QiscusCore.localDataManager.saveAccountInfo(qiscusAccount));
+                .doOnNext(qiscusAccount -> QiscusAppComponent.getInstance().getLocalDataManager()
+                        .saveAccountInfo(qiscusAccount));
     }
 
     /**
@@ -979,7 +1008,10 @@ public class QiscusCore {
      */
     public static String getAppsName() {
         checkAppIdSetup();
-        return appInstance.getApplicationInfo().loadLabel(appInstance.getPackageManager()).toString();
+        return QiscusAppComponent.getInstance().getApplication()
+                .getApplicationInfo().loadLabel(
+                        QiscusAppComponent.getInstance().getApplication().getPackageManager()
+                ).toString();
     }
 
     /**
@@ -989,7 +1021,7 @@ public class QiscusCore {
      */
     public static Handler getAppsHandler() {
         checkAppIdSetup();
-        return appHandler;
+        return QiscusAppComponent.getInstance().getAppHandler();
     }
 
     public static JSONObject getCustomHeader() {
@@ -1009,7 +1041,7 @@ public class QiscusCore {
      * @return current fcm token, null if not set
      */
     public static String getFcmToken() {
-        return localDataManager.getFcmToken();
+        return QiscusAppComponent.getInstance().getLocalDataManager().getFcmToken();
     }
 
     /**
@@ -1027,7 +1059,8 @@ public class QiscusCore {
                     }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
         }
 
-        localDataManager.setFcmToken(fcmToken);
+        QiscusAppComponent.getInstance().getLocalDataManager()
+                .setFcmToken(fcmToken);
     }
 
     /**
@@ -1044,7 +1077,8 @@ public class QiscusCore {
                     }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
         }
 
-        localDataManager.setFcmToken(token);
+        QiscusAppComponent.getInstance().getLocalDataManager()
+                .setFcmToken(token);
     }
 
     /**
@@ -1061,7 +1095,8 @@ public class QiscusCore {
                     }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
         }
 
-        localDataManager.setFcmToken(null);
+        QiscusAppComponent.getInstance().getLocalDataManager()
+                .setFcmToken(null);
     }
 
     private static void configureFcmToken() {
@@ -1099,7 +1134,7 @@ public class QiscusCore {
      */
     public static ScheduledThreadPoolExecutor getTaskExecutor() {
         checkAppIdSetup();
-        return taskExecutor;
+        return QiscusAppComponent.getInstance().getTaskExecutor();
     }
 
     /**
@@ -1108,7 +1143,8 @@ public class QiscusCore {
 
     public static void refreshToken(SetRefreshTokenListener listener) {
         if (hasSetupUser()) {
-            QiscusAccount account = localDataManager.getAccountInfo();
+            QiscusAccount account = QiscusAppComponent.getInstance().getLocalDataManager()
+                    .getAccountInfo();
             QiscusApi.getInstance().refreshToken(account.getEmail(), account.getRefreshToken())
                     .doOnNext(QiscusCore::saveRefreshToken)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -1121,7 +1157,10 @@ public class QiscusCore {
     }
 
     private static void autoRefreshToken() {
-        if (isValidToRefreshToken(localDataManager.getAccountInfo())) {
+        if (isValidToRefreshToken(
+                QiscusAppComponent.getInstance().getLocalDataManager()
+                .getAccountInfo())
+        ) {
             QiscusAndroidUtil.runOnBackgroundThread(() ->
                     refreshToken(new SetRefreshTokenListener() {
                         @Override
@@ -1149,7 +1188,8 @@ public class QiscusCore {
 
     public static void clearUser() {
         if (hasSetupUser()) {
-            QiscusAccount account = localDataManager.getAccountInfo();
+            QiscusAccount account = QiscusAppComponent.getInstance().getLocalDataManager()
+                    .getAccountInfo();
             QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -1164,13 +1204,14 @@ public class QiscusCore {
 
     private static void clearData(){
         if (BuildVersionUtil.isOreoOrHigher()) {
-            JobScheduler jobScheduler = (JobScheduler) appInstance.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobScheduler jobScheduler = (JobScheduler) QiscusAppComponent.getInstance().getApplication()
+                    .getSystemService(Context.JOB_SCHEDULER_SERVICE);
             if (jobScheduler != null) {
                 jobScheduler.cancelAll();
             }
         }
-        localDataManager.clearData();
-        dataStore.clear();
+        QiscusAppComponent.getInstance().getLocalDataManager().clearData();
+        QiscusAppComponent.getInstance().getDataStore().clear();
         QiscusCacheManager.getInstance().clearData();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
@@ -1222,14 +1263,14 @@ public class QiscusCore {
         void onError(Throwable throwable);
     }
 
-    private static class LocalDataManager {
+    public static class LocalDataManager {
         private SharedPreferences sharedPreferences;
         private final Gson gson;
         private String token;
         private String refreshToken;
 
-        LocalDataManager() {
-            SharedPreferences sharedPreferencesOld  = QiscusCore.getApps().getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
+        public LocalDataManager(Application application) {
+            SharedPreferences sharedPreferencesOld  = application.getSharedPreferences("qiscus.cfg", Context.MODE_PRIVATE);
 
             try {
                 String sharedPrefsFile = JupukData.getFileName();
@@ -1531,10 +1572,12 @@ public class QiscusCore {
                     .setUser(email, password, username, avatarUrl, extras)
                     .doOnNext(qiscusAccount -> {
                         if (QiscusCore.hasSetupUser()) {
-                            QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                            QiscusAppComponent.getInstance().getLocalDataManager()
+                                    .saveAccountInfo(qiscusAccount);
                             configureFcmToken();
                         } else {
-                            QiscusCore.localDataManager.saveAccountInfo(qiscusAccount);
+                            QiscusAppComponent.getInstance().getLocalDataManager()
+                                    .saveAccountInfo(qiscusAccount);
                             configureFcmToken();
                             EventBus.getDefault().post(QiscusUserEvent.LOGIN);
                         }

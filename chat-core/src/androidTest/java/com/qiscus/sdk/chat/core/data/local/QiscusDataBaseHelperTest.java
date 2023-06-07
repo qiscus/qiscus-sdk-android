@@ -48,7 +48,7 @@ public class QiscusDataBaseHelperTest extends InstrumentationBaseTest {
         super.setUp();
         super.setupEngine();
         MockitoAnnotations.openMocks(this);
-        dataBaseHelper = new QiscusDataBaseHelper();
+//        dataBaseHelper = new QiscusDataBaseHelper();
     }
 
     @Test

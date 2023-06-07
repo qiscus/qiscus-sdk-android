@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
@@ -172,18 +173,21 @@ public class Qiscus {
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
         QiscusCore.isBuiltIn(true);
-        QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
-        chatConfig = new QiscusChatConfig();
-        authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
-        QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
+            chatConfig = new QiscusChatConfig();
 
-        Jupuk.init(application);
-        EmojiManager.install(new EmojiOneProvider());
-        QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
+            authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
+            QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
 
-        QiscusCore.getChatConfig()
-                .setNotificationListener(QiscusPushNotificationUtil::handlePushNotification)
-                .setDeleteCommentListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
+            Jupuk.init(application);
+            EmojiManager.install(new EmojiOneProvider());
+            QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
+
+            QiscusCore.getChatConfig()
+                    .setNotificationListener(QiscusPushNotificationUtil::handlePushNotification)
+                    .setDeleteCommentListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
+        });
     }
 
     /**
@@ -356,7 +360,7 @@ public class Qiscus {
      * @return Current qiscus chatting configuration
      */
     public static QiscusChatConfig getChatConfig() {
-        checkAppIdSetup();
+//        checkAppIdSetup();
         return chatConfig;
     }
 
