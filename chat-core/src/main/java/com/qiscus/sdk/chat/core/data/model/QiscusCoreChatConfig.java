@@ -23,11 +23,10 @@ public class QiscusCoreChatConfig {
 
     }
 
-
     private boolean enableLog = false;
     private boolean enableFcmPushNotification = false;
     private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
-    private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
+    private QiscusImageCompressionConfig qiscusImageCompressionConfig = null;
     private NotificationListener notificationListener;
     private DeleteCommentListener deleteCommentListener;
 
@@ -51,6 +50,9 @@ public class QiscusCoreChatConfig {
     }
 
     public QiscusImageCompressionConfig getQiscusImageCompressionConfig() {
+        if (qiscusImageCompressionConfig == null) {
+            qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
+        }
         return qiscusImageCompressionConfig;
     }
 

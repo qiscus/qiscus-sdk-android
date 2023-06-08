@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.core.util.PatternsCompat;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -119,13 +120,16 @@ public final class QiscusTextUtil {
         return !isBlank(cs);
     }
 
+    @SuppressLint("RestrictedApi")
     public static boolean isUrl(String s) {
         return PatternsCompat.AUTOLINK_WEB_URL.matcher(s).matches();
     }
 
     public static List<String> extractUrl(String text) {
         List<String> urls = new ArrayList<>();
+        @SuppressLint("RestrictedApi")
         Matcher matcher = PatternsCompat.AUTOLINK_WEB_URL.matcher(text);
+
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && text.charAt(start - 1) == '@') {

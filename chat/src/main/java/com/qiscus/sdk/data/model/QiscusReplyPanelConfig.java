@@ -30,15 +30,18 @@ import com.qiscus.sdk.R;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusReplyPanelConfig {
-    private int backgroundColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_white);
-    private int senderNameColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_secondary_text);
-    private int messageColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_secondary_text);
-    private int barColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_primary);
-    private int cancelIconResourceId = R.drawable.ic_qiscus_action_close;
-    private int cancelIconTintColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_secondary_text);
+    private Integer backgroundColor = null;
+    private Integer senderNameColor = null;
+    private Integer messageColor = null;
+    private Integer barColor = null;
+    private Integer cancelIconResourceId = null;
+    private Integer cancelIconTintColor = null;
 
     @ColorInt
     public int getBackgroundColor() {
+        if (backgroundColor == null) {
+            backgroundColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_white);
+        }
         return backgroundColor;
     }
 
@@ -49,6 +52,9 @@ public class QiscusReplyPanelConfig {
 
     @ColorInt
     public int getSenderNameColor() {
+        if (senderNameColor == null) {
+            senderNameColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_secondary_text);
+        }
         return senderNameColor;
     }
 
@@ -59,6 +65,9 @@ public class QiscusReplyPanelConfig {
 
     @ColorInt
     public int getMessageColor() {
+        if (messageColor == null) {
+            messageColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_secondary_text);
+        }
         return messageColor;
     }
 
@@ -69,6 +78,9 @@ public class QiscusReplyPanelConfig {
 
     @ColorInt
     public int getBarColor() {
+        if (barColor == null) {
+            barColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_primary);
+        }
         return barColor;
     }
 
@@ -79,6 +91,9 @@ public class QiscusReplyPanelConfig {
 
     @DrawableRes
     public int getCancelIconResourceId() {
+        if (cancelIconResourceId == null) {
+            cancelIconResourceId = R.drawable.ic_qiscus_action_close;
+        }
         return cancelIconResourceId;
     }
 
@@ -89,6 +104,9 @@ public class QiscusReplyPanelConfig {
 
     @ColorInt
     public int getCancelIconTintColor() {
+        if (cancelIconTintColor == null) {
+            cancelIconTintColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_secondary_text);
+        }
         return cancelIconTintColor;
     }
 
