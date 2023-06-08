@@ -16,10 +16,13 @@
 
 package com.qiscus.sdk;
 
+import static com.qiscus.sdk.chat.core.QiscusCore.checkUserSetup;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+
 import androidx.annotation.RestrictTo;
 
 import com.qiscus.jupuk.Jupuk;
@@ -46,15 +49,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
-import static com.qiscus.sdk.chat.core.QiscusCore.checkAppIdSetup;
-import static com.qiscus.sdk.chat.core.QiscusCore.checkUserSetup;
 
 /**
  * The main class of Qiscus SDK. Init qiscus engine sdk, set qiscus user, start the chatting and all
@@ -62,7 +61,7 @@ import static com.qiscus.sdk.chat.core.QiscusCore.checkUserSetup;
  */
 public class Qiscus {
 
-    private static QiscusChatConfig chatConfig;
+    //    private static QiscusChatConfig chatConfig;
     private static String authorities;
 
     private Qiscus() {
@@ -108,7 +107,7 @@ public class Qiscus {
      * </pre>
      *
      * @param application Application instance
-     * @param appID Your qiscus application Id
+     * @param appID       Your qiscus application Id
      */
     public static void setup(Application application, String appID) {
         initWithCustomServer(application, appID, BuildConfig.BASE_URL_SERVER,
@@ -173,21 +172,20 @@ public class Qiscus {
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
         QiscusCore.isBuiltIn(true);
-        Executors.newSingleThreadExecutor().execute(() -> {
-            QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
-            chatConfig = new QiscusChatConfig();
+        QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
+//            chatConfig = new QiscusChatConfig();
 
-            authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
-            QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
+        authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
+        QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
 
-            Jupuk.init(application);
-            EmojiManager.install(new EmojiOneProvider());
-            QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
+        Jupuk.init(application);
+        EmojiManager.install(new EmojiOneProvider());
+        QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
 
-            QiscusCore.getChatConfig()
-                    .setNotificationListener(QiscusPushNotificationUtil::handlePushNotification)
-                    .setDeleteCommentListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
-        });
+        QiscusCore.getChatConfig()
+                .setNotificationListener(QiscusPushNotificationUtil::handlePushNotification)
+                .setDeleteCommentListener(QiscusPushNotificationUtil::handleDeletedCommentNotification);
+
     }
 
     /**
@@ -361,7 +359,7 @@ public class Qiscus {
      */
     public static QiscusChatConfig getChatConfig() {
 //        checkAppIdSetup();
-        return chatConfig;
+        return QiscusChatConfig.getInstance();
     }
 
     /**
@@ -562,7 +560,7 @@ public class Qiscus {
     }
 
     public static class ChatBuilder {
-        private String email;
+        private final String email;
         private String distinctId;
         private JSONObject options;
 
@@ -640,11 +638,11 @@ public class Qiscus {
     }
 
     public static class ChatActivityBuilder {
-        private String email;
+        private final String email;
         private String distinctId;
         private JSONObject options;
         private String message;
-        private List<File> shareFiles;
+        private final List<File> shareFiles;
         private boolean autoSendExtra;
         private List<QiscusComment> comments;
         private QiscusComment scrollToComment;
@@ -786,11 +784,11 @@ public class Qiscus {
     }
 
     public static class ChatFragmentBuilder {
-        private String email;
+        private final String email;
         private String distinctId;
         private JSONObject options;
         private String message;
-        private List<File> shareFiles;
+        private final List<File> shareFiles;
         private boolean autoSendExtra;
         private List<QiscusComment> comments;
         private QiscusComment scrollToComment;
@@ -930,8 +928,8 @@ public class Qiscus {
     }
 
     public static class GroupChatBuilder {
-        private Set<String> emails;
-        private String name;
+        private final Set<String> emails;
+        private final String name;
         private JSONObject options;
         private String avatarUrl;
 
@@ -1003,7 +1001,7 @@ public class Qiscus {
     }
 
     public static class DefinedIdGroupChatBuilder {
-        private String uniqueId;
+        private final String uniqueId;
         private String name;
         private JSONObject options;
         private String avatarUrl;

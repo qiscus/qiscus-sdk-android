@@ -29,7 +29,7 @@ public class QiscusAppComponent {
     private final Handler appHandler;
     private final ScheduledThreadPoolExecutor taskExecutor = new ScheduledThreadPoolExecutor(5);
     private final QiscusCore.LocalDataManager localDataManager;
-    private final QiscusCoreChatConfig chatConfig;
+//    private final QiscusCoreChatConfig chatConfig;
     private final QiscusDataBaseHelper dataStore;
 
     private static QiscusAppComponent INSTANCE;
@@ -58,7 +58,7 @@ public class QiscusAppComponent {
         this.appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
         this.appHandler =  new Handler(application.getMainLooper());
         this.localDataManager = new QiscusCore.LocalDataManager(application);
-        this.chatConfig = new QiscusCoreChatConfig();
+//        this.chatConfig = new QiscusCoreChatConfig();
         this.dataStore = new QiscusDataBaseHelper(application);
     }
 
@@ -98,9 +98,9 @@ public class QiscusAppComponent {
         return localDataManager;
     }
 
-    public QiscusCoreChatConfig getChatConfig() {
+    /*public QiscusCoreChatConfig getChatConfig() {
         return chatConfig;
-    }
+    }*/
 
     public QiscusDataBaseHelper getDataStore() {
         return dataStore;

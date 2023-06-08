@@ -846,9 +846,11 @@ public class QiscusCore {
      *
      * @return Current qiscus chatting configuration
      */
+    private static QiscusCoreChatConfig config = QiscusCoreChatConfig.getInstance();
+
     public static QiscusCoreChatConfig getChatConfig() {
 //        checkAppIdSetup();
-        return QiscusCoreChatConfig.getInstance();
+        return config;
     }
 
     /**

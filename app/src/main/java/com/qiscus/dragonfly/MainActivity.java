@@ -97,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
           /*  Qiscus.setUser("arief92", "arief92")
                     .withUsername("arief92")*/
 
-            Qiscus.setUser("arief93", "arief93")
-                    .withUsername("arief93")
+            Qiscus.setUser("bila75", "bila75")
+                    .withUsername("bila75")
                     .save()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void openChat(View view) {
         showLoading();
-        Qiscus.buildChatWith("ariefnur")
+        Qiscus.buildChatWith("bila99")
                 .build(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

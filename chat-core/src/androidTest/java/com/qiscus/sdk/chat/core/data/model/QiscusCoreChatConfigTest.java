@@ -36,7 +36,7 @@ public class QiscusCoreChatConfigTest extends InstrumentationBaseTest {
                         //on error
                     }});
 
-        qiscusCoreChatConfig = new QiscusCoreChatConfig();
+//        qiscusCoreChatConfig = new QiscusCoreChatConfig();
     }
 
     @Test

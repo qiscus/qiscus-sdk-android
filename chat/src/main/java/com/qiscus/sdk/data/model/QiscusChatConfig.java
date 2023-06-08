@@ -23,6 +23,7 @@ import android.os.Build;
 import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.RestrictTo;
 import androidx.core.content.ContextCompat;
 import android.widget.Toast;
 
@@ -231,6 +232,21 @@ public class QiscusChatConfig {
     private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
 
     private QiscusDeleteCommentConfig deleteCommentConfig = new QiscusDeleteCommentConfig();
+
+    private static QiscusChatConfig INSTANCE;
+
+    public static QiscusChatConfig getInstance() {
+        if (INSTANCE == null) {
+            synchronized (QiscusChatConfig.class) {
+                INSTANCE = new QiscusChatConfig();
+            }
+        }
+        return INSTANCE;
+    }
+
+    private QiscusChatConfig() {
+
+    }
 
     @ColorRes
     public int getStatusBarColor() {

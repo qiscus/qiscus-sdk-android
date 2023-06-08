@@ -23,7 +23,12 @@ import androidx.multidex.MultiDexApplication;
 import com.facebook.stetho.Stetho;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
+
+import java.util.concurrent.Executors;
+
+import rx.Observable;
 
 /**
  * Created on : August 18, 2016
@@ -37,7 +42,9 @@ public class SampleApps extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
-        Qiscus.setup(this, QISCUS_SDK_APP_ID);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            Qiscus.setup(this, QISCUS_SDK_APP_ID);
+        });
 
         // for test refresh token
 //        Qiscus.setupWithCustomServer(

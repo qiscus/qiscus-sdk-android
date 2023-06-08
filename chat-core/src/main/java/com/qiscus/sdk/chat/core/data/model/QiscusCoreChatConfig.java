@@ -14,11 +14,15 @@ public class QiscusCoreChatConfig {
         if (INSTANCE == null) {
             synchronized (QiscusCoreChatConfig.class) {
                 if (INSTANCE == null) {
-                   INSTANCE = new QiscusCoreChatConfig();
+                    INSTANCE = new QiscusCoreChatConfig();
                 }
             }
         }
         return INSTANCE;
+    }
+
+    private QiscusCoreChatConfig() {
+
     }
 
     private boolean enableLog = false;
