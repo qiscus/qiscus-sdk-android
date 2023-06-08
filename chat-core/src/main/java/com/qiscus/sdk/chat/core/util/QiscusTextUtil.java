@@ -52,13 +52,22 @@ public final class QiscusTextUtil {
     private static Application application;
 
     public static void createInstance(Application application) {
+        synchronized (QiscusTextUtil.class) {
+            if (QiscusTextUtil.application == null) {
+                QiscusTextUtil.application = application;
+            }
+        }
+    }
+
+    private static Application getApp() {
         if (QiscusTextUtil.application == null) {
             synchronized (QiscusTextUtil.class) {
                 if (QiscusTextUtil.application == null) {
-                    QiscusTextUtil.application = application;
+                    throw new IllegalArgumentException("application is null");
                 }
             }
         }
+        return application;
     }
 
     private static final Random random = new Random();
@@ -77,12 +86,12 @@ public final class QiscusTextUtil {
 
     @NonNull
     public static String getString(@StringRes int resId) {
-        return application.getString(resId);
+        return getApp().getString(resId);
     }
 
     @NonNull
     public static String getString(@StringRes int resId, Object... formatArgs) {
-        return application.getString(resId, formatArgs);
+        return getApp().getString(resId, formatArgs);
     }
 
     public static String getRandomString(int length) {
