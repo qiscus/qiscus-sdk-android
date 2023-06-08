@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.chat.core.data.local;
 
+import android.app.Application;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
@@ -41,8 +42,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
     protected final SQLiteDatabase sqLiteReadDatabase;
     protected final SQLiteDatabase sqLiteWriteDatabase;
 
-    public QiscusDataBaseHelper() {
-        QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(QiscusCore.getApps());
+    public QiscusDataBaseHelper(Application application) {
+        QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(application);
         sqLiteReadDatabase = qiscusDbOpenHelper.getReadableDatabase();
         sqLiteWriteDatabase = qiscusDbOpenHelper.getWritableDatabase();
     }

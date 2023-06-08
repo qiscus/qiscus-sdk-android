@@ -56,6 +56,23 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusChatConfig {
+
+    private static QiscusChatConfig INSTANCE;
+
+    public static QiscusChatConfig getInstance() {
+        if (INSTANCE == null) {
+            synchronized (QiscusChatConfig.class) {
+                INSTANCE = new QiscusChatConfig();
+            }
+        }
+        return INSTANCE;
+    }
+
+    private QiscusChatConfig() {
+
+    }
+
+
     private int statusBarColor = R.color.qiscus_primary_dark;
     private int appBarColor = R.color.qiscus_primary;
     private int accentColor = R.color.qiscus_accent;
