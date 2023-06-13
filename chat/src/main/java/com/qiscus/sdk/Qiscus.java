@@ -173,12 +173,11 @@ public class Qiscus {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
-        QiscusCore.isBuiltIn(true);
         QiscusTextUtil.createInstance(application);
         QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
         authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
-
+        QiscusCore.isBuiltIn(true);
         Jupuk.init(application);
         EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());

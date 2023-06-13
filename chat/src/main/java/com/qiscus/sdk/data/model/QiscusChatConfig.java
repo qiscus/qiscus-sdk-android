@@ -709,8 +709,8 @@ public class QiscusChatConfig {
     }
 
     public String getAddFileText() {
-        if (addPictureText == null) {
-            addPictureText = QiscusTextUtil.getString(R.string.qiscus_file);
+        if (addFileText == null) {
+            addFileText = QiscusTextUtil.getString(R.string.qiscus_file);
         }
         return addFileText;
     }

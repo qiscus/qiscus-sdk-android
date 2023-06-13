@@ -25,6 +25,9 @@ import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.data.model.QiscusDeleteCommentConfig;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -39,15 +42,18 @@ public class SampleApps extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+            try {
+                QiscusCore.setCustomHeader(new JSONObject("{\"QISCUS-OMNICHANNEL\": \"mobile-agent-android\"}"));
+            } catch (JSONException e) {
+                // ignored
+            }
+        Executors.newSingleThreadExecutor().execute(() -> {
 
-        Executors.newSingleThreadExecutor().execute(() -> Qiscus.setup(this, QISCUS_SDK_APP_ID));
+            Qiscus.setup(this, QISCUS_SDK_APP_ID);
 
 
-        // for test refresh token
-//        Qiscus.setupWithCustomServer(
-//                this, "dragongo", "https://dragongo.qiscus.com",
-//                "ssl://realtime-stag.qiscus.com", null
-//        );
+
+        });
 
         Qiscus.getChatConfig()
                 .enableDebugMode(true)
@@ -55,6 +61,13 @@ public class SampleApps extends MultiDexApplication {
                 .setDeleteCommentConfig(new QiscusDeleteCommentConfig()
                         .setEnableDeleteComment(true)
                         .setEnableHardDelete(true));
+
+        // for test refresh token
+//        Qiscus.setupWithCustomServer(
+//                this, "dragongo", "https://dragongo.qiscus.com",
+//                "ssl://realtime-stag.qiscus.com", null
+//        );
+
 
         Stetho.initializeWithDefaults(this);
     }

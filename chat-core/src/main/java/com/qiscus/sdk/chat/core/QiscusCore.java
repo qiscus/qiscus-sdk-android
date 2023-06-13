@@ -35,9 +35,7 @@ import androidx.security.crypto.MasterKey;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
-import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
@@ -74,32 +72,7 @@ import rx.schedulers.Schedulers;
  * @since Jul, Wed 25 2018 15.35
  **/
 public class QiscusCore {
-
-    /*private static Application appInstance;
-    private static String appId;*/
-    private static Boolean isBuiltIn = false;
-    private static String mqttBrokerUrl;
-    private static String baseURLLB;
-    //private static LocalDataManager localDataManager;
-    /*private static String appServer;
-    private static long heartBeat;
-    private static long automaticHeartBeat;
-    private static long networkConnectionInterval;
-    private static QiscusDataStore dataStore;
-    private static QiscusCoreChatConfig chatConfig;
-    private static Handler appHandler;
-    private static ScheduledThreadPoolExecutor taskExecutor;*/
-    private static boolean enableMqttLB = true;
     private static JSONObject customHeader;
-    private static Boolean enableEventReport = true;
-    private static Boolean enableRealtime = true;
-    //TODO ARIEF
-    private static Boolean forceDisableRealtimeFromExactAlarm = false;
-    private static Boolean syncServiceDisabled = false;
-    private static Boolean enableSync = true;
-    private static Boolean enableSyncEvent = false;
-    private static Boolean autoRefreshToken = true;
-
     private static QiscusCoreChatConfig config = QiscusCoreChatConfig.getInstance();
 
     private QiscusCore() {
@@ -225,72 +198,55 @@ public class QiscusCore {
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
 
-         /*appInstance = application;
-        appId = qiscusAppId;
-
-        appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
-
-        chatConfig = new QiscusCoreChatConfig();
-
-        appHandler = new Handler(QiscusCore.getApps().getApplicationContext().getMainLooper());
-        taskExecutor = new ScheduledThreadPoolExecutor(5);
-        localDataManager = new LocalDataManager();
-        dataStore = new QiscusDataBaseHelper();
-        heartBeat = 5000;
-        automaticHeartBeat = 30000;
-        networkConnectionInterval = 5000;*/
-
         QiscusAppComponent.create(application, qiscusAppId, serverBaseUrl);
-
-        QiscusCore.enableMqttLB = enableMqttLB;
-        QiscusCore.mqttBrokerUrl = mqttBrokerUrl;
-        QiscusCore.baseURLLB = baseURLLB;
-        enableEventReport = false;
-        //localDataManager.setURLLB(baseURLLB);
+        QiscusAppComponent.getInstance().setEnableMqttLB(enableMqttLB);
+        QiscusAppComponent.getInstance().setMqttBrokerUrl(mqttBrokerUrl);
+        QiscusAppComponent.getInstance().setBaseURLLB(baseURLLB);
+        QiscusAppComponent.getInstance().setEnableEventReport(false);
 
         QiscusAppComponent.getInstance().getLocalDataManager()
                 .setURLLB(baseURLLB);
 
-//        AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//            if (!alarmMgr.canScheduleExactAlarms()) {
-//                forceDisableRealtimeFromExactAlarm = true;
-//            }else{
-//                forceDisableRealtimeFromExactAlarm = false;
-//            }
-//
-//        }
+        AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmMgr.canScheduleExactAlarms()) {
+                QiscusAppComponent.getInstance().setForceDisableRealtimeFromExactAlarm(true);
+            }else{
+                QiscusAppComponent.getInstance().setForceDisableRealtimeFromExactAlarm(false);
+            }
+
+        }
 
         QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//            checkExactAlarm(application);
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            checkExactAlarm(application);
+        }
 
         getAppConfig();
         configureFcmToken();
     }
 
 
-//    @RequiresApi(api = Build.VERSION_CODES.S)
-//    private static void checkExactAlarm(Application application){
-//        PackageManager.OnChecksumsReadyListener check = ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
-//
-//            AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
-//            if (!alarmMgr.canScheduleExactAlarms()) {
-//                forceDisableRealtimeFromExactAlarm = true;
-//
-//                if (QiscusPusherApi.getInstance().isConnected()) {
-//                    QiscusPusherApi.getInstance().disconnect();
-//                }
-//            } else {
-//                forceDisableRealtimeFromExactAlarm = false;
-//            }
-//        };
-//    }
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private static void checkExactAlarm(Application application){
+        PackageManager.OnChecksumsReadyListener check = ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
+
+            AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+            if (!alarmMgr.canScheduleExactAlarms()) {
+                QiscusAppComponent.getInstance().setForceDisableRealtimeFromExactAlarm(true);
+
+                if (QiscusPusherApi.getInstance().isConnected()) {
+                    QiscusPusherApi.getInstance().disconnect();
+                }
+            } else {
+                QiscusAppComponent.getInstance().setForceDisableRealtimeFromExactAlarm(false);
+            }
+        };
+    }
 
     public static void isBuiltIn(Boolean isBuiltInSDK) {
-        isBuiltIn = isBuiltInSDK;
+        QiscusAppComponent.getInstance().setIsBuiltIn(isBuiltInSDK);
     }
 
     private static void getAppConfig() {
@@ -299,7 +255,7 @@ public class QiscusCore {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(appConfig -> {
-                    enableEventReport = appConfig.getEnableEventReport();
+                    QiscusAppComponent.getInstance().setEnableEventReport(appConfig.getEnableEventReport());
                     if (!appConfig.getBaseURL().isEmpty()) {
                         String oldAppServer = QiscusAppComponent.getInstance().getAppServer();
                         String newAppServer = !appConfig.getBaseURL().endsWith("/") ?
@@ -317,46 +273,43 @@ public class QiscusCore {
 
                     if (!appConfig.getBrokerLBURL().isEmpty() &&
                             QiscusServiceUtil.isValidUrl(appConfig.getBrokerLBURL())) {
-                        QiscusCore.baseURLLB = appConfig.getBrokerLBURL();
+                        QiscusAppComponent.getInstance().setBaseURLLB(appConfig.getBrokerLBURL());
                         QiscusAppComponent.getInstance().getLocalDataManager()
-                                .setURLLB(QiscusCore.baseURLLB);
+                                .setURLLB(appConfig.getBrokerLBURL());
                     }
 
                     if (!appConfig.getBrokerURL().isEmpty()) {
 
-                        String oldMqttBrokerUrl = QiscusCore.mqttBrokerUrl;
+                        String oldMqttBrokerUrl = QiscusAppComponent.getInstance().getMqttBrokerUrl();
                         String newMqttBrokerUrl = String.format("ssl://%s:1885",
                                 appConfig.getBrokerURL());
 
                         if (!oldMqttBrokerUrl.equals(newMqttBrokerUrl)) {
-                            QiscusCore.mqttBrokerUrl = newMqttBrokerUrl;
+                            QiscusAppComponent.getInstance().setMqttBrokerUrl(newMqttBrokerUrl);
                             QiscusCore.setCacheMqttBrokerUrl(newMqttBrokerUrl, false);
                         } else {
-                            QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
+                            QiscusCore.setCacheMqttBrokerUrl(QiscusAppComponent.getInstance().getMqttBrokerUrl(), false);
                         }
                     }
 
                     if (appConfig.getSyncInterval() != 0) {
-                        //TODO ARIEF
-                        //heartBeat = appConfig.getSyncInterval();
+                        QiscusAppComponent.getInstance().setHeartBeat(appConfig.getSyncInterval());
                     }
 
                     if (appConfig.getSyncOnConnect() != 0) {
-                        //TODO ARIEF
-                       // automaticHeartBeat = appConfig.getSyncOnConnect();
+                        QiscusAppComponent.getInstance().setAutomaticHeartBeat(appConfig.getSyncOnConnect());
                     }
 
                     if (appConfig.getNetworkConnectionInterval() != 0) {
-                        //TODO ARIEF
-                        //networkConnectionInterval = appConfig.getNetworkConnectionInterval();
+                        QiscusAppComponent.getInstance().setNetworkConnectionInterval(appConfig.getNetworkConnectionInterval());
                     }
 
-                    enableRealtime = appConfig.getEnableRealtime();
-                    enableSync = appConfig.getEnableSync();
-                    enableSyncEvent = appConfig.getEnableSyncEvent();
+                    QiscusAppComponent.getInstance().setEnableRealtime(appConfig.getEnableRealtime());
+                    QiscusAppComponent.getInstance().setEnableSync(appConfig.getEnableSync());
+                    QiscusAppComponent.getInstance().setEnableSyncEvent(appConfig.getEnableSyncEvent());
 
                     // call refresh token
-                    autoRefreshToken = appConfig.getAutoRefreshToken();
+                    QiscusAppComponent.getInstance().setAutoRefreshToken(appConfig.getAutoRefreshToken());
                     if (appConfig.getAutoRefreshToken()) {
                         autoRefreshToken();
                     }
@@ -372,7 +325,7 @@ public class QiscusCore {
                     // call refresh token
                     autoRefreshToken();
 
-                    QiscusCore.setCacheMqttBrokerUrl(mqttBrokerUrl, false);
+                    QiscusCore.setCacheMqttBrokerUrl(QiscusAppComponent.getInstance().getMqttBrokerUrl(), false);
                     startSyncService();
                     startNetworkCheckerService();
                     ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
@@ -385,7 +338,7 @@ public class QiscusCore {
      */
 
     public static void startSyncService() {
-        syncServiceDisabled = false;
+        QiscusAppComponent.getInstance().setSyncServiceDisabled(false);
         checkAppIdSetup();
         Application appInstance = QiscusCore.getApps();
         if (BuildVersionUtil.isOreoLower()) {
@@ -421,19 +374,19 @@ public class QiscusCore {
      */
 
     public static void stopSyncService() {
-        syncServiceDisabled = true;
+        QiscusAppComponent.getInstance().setSyncServiceDisabled(true);
         if (BuildVersionUtil.isOreoLower()) {
             try {
                 getApps().getApplicationContext()
                         .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncService.class));
             } catch (RuntimeException e) {
                 //Prevent runtime crash because trying to stop service
-                syncServiceDisabled = false;
+                QiscusAppComponent.getInstance().setSyncServiceDisabled(false);
                 QiscusErrorLogger.print(e);
             }
             catch (Exception e) {
                 //Prevent crash because trying to stop service
-                syncServiceDisabled = false;
+                QiscusAppComponent.getInstance().setSyncServiceDisabled(false);
                 QiscusErrorLogger.print(e);
             }
         } else {
@@ -442,11 +395,11 @@ public class QiscusCore {
                         .stopService(new Intent(getApps().getApplicationContext(), QiscusSyncJobService.class));
             } catch (RuntimeException e) {
                 //Prevent runtime crash because trying to stop service
-                syncServiceDisabled = false;
+                QiscusAppComponent.getInstance().setSyncServiceDisabled(false);
                 QiscusErrorLogger.print(e);
             } catch (Exception e) {
                 //Prevent crash because trying to stop service
-                syncServiceDisabled = false;
+                QiscusAppComponent.getInstance().setSyncServiceDisabled(false);
                 QiscusErrorLogger.print(e);
             }
         }
@@ -498,7 +451,7 @@ public class QiscusCore {
      * @return Current VersionSDK
      */
     public static Boolean getIsBuiltIn() {
-        return isBuiltIn;
+        return QiscusAppComponent.getInstance().getIsBuiltIn();
     }
 
     /**
@@ -519,7 +472,7 @@ public class QiscusCore {
      */
     public static boolean isEnableMqttLB() {
         checkAppIdSetup();
-        return enableMqttLB;
+        return QiscusAppComponent.getInstance().getEnableMqttLB();
     }
 
     /**
@@ -529,7 +482,7 @@ public class QiscusCore {
      * @return boolean
      */
     public static boolean getEnableEventReport() {
-        return enableEventReport;
+        return QiscusAppComponent.getInstance().getEnableEventReport();
     }
 
     /**
@@ -539,11 +492,11 @@ public class QiscusCore {
      * @return boolean
      */
     public static boolean getEnableRealtime() {
-        return enableRealtime;
+        return QiscusAppComponent.getInstance().getEnableRealtime();
     }
 
     public static void setEnableDisableRealtime(Boolean enableDisableRealtime){
-        enableRealtime = enableDisableRealtime;
+        QiscusAppComponent.getInstance().setEnableRealtime(enableDisableRealtime);
     }
 
     /**
@@ -553,7 +506,7 @@ public class QiscusCore {
      * @return boolean
      */
     public static boolean getEnableSync() {
-        return enableSync;
+        return QiscusAppComponent.getInstance().getEnableSync();
     }
 
     /**
@@ -563,7 +516,7 @@ public class QiscusCore {
      * @return boolean
      */
     public static boolean getEnableSyncEvent() {
-        return enableSyncEvent;
+        return QiscusAppComponent.getInstance().getEnableSyncEvent();
     }
 
     /**
@@ -574,7 +527,7 @@ public class QiscusCore {
      */
 
     public static Boolean isSyncServiceDisabledManually() {
-        return syncServiceDisabled;
+        return QiscusAppComponent.getInstance().getSyncServiceDisabled();
     }
 
 
@@ -585,7 +538,7 @@ public class QiscusCore {
      */
 
     public static Boolean isAutoRefreshToken() {
-        return autoRefreshToken;
+        return QiscusAppComponent.getInstance().getAutoRefreshToken();
     }
 
     /**
@@ -633,10 +586,10 @@ public class QiscusCore {
     public static String getMqttBrokerUrl() {
         checkAppIdSetup();
         QiscusAppComponent.getInstance().getLocalDataManager()
-                .setMqttBrokerUrl(mqttBrokerUrl);
+                .setMqttBrokerUrl(QiscusAppComponent.getInstance().getMqttBrokerUrl());
 
         return isEnableMqttLB() ?  QiscusAppComponent.getInstance().getLocalDataManager()
-                .getMqttBrokerUrl() : mqttBrokerUrl;
+                .getMqttBrokerUrl() : QiscusAppComponent.getInstance().getMqttBrokerUrl();
     }
 
     /**
@@ -650,11 +603,11 @@ public class QiscusCore {
         if ( QiscusAppComponent.getInstance().getLocalDataManager()
                 .getURLLB() == null) {
             QiscusAppComponent.getInstance().getLocalDataManager()
-                    .setURLLB(baseURLLB);
+                    .setURLLB(QiscusAppComponent.getInstance().getBaseURLLB());
         }
 
         return isEnableMqttLB() ?  QiscusAppComponent.getInstance().getLocalDataManager()
-                .getURLLB() : baseURLLB;
+                .getURLLB() : QiscusAppComponent.getInstance().getBaseURLLB();
     }
 
     /**
@@ -795,8 +748,8 @@ public class QiscusCore {
     @Deprecated
     public static void setHeartBeat(long heartBeat) {
         checkAppIdSetup();
-        //TODO ARIEF
-        //QiscusCore.heartBeat = heartBeat;
+        QiscusAppComponent.getInstance().setHeartBeat((int) heartBeat);
+
     }
 
     /**
@@ -819,8 +772,7 @@ public class QiscusCore {
      */
     public static void setSyncInterval(long interval) {
         checkAppIdSetup();
-        //TODO ARIEF
-        //QiscusCore.heartBeat = interval;
+        QiscusAppComponent.getInstance().setHeartBeat((int) interval);
     }
 
     /**
@@ -841,6 +793,7 @@ public class QiscusCore {
     public static void setDataStore(QiscusDataStore dataStore) {
         //TODO ARIEF
         //QiscusCore.dataStore = dataStore;
+        QiscusAppComponent.getInstance().setDataStore(dataStore);
     }
 
     /**
@@ -1029,6 +982,7 @@ public class QiscusCore {
 
     public static JSONObject getCustomHeader() {
         return customHeader;
+//        return QiscusAppComponent.getInstance().getCustomHeader();
     }
 
     /**
@@ -1038,6 +992,7 @@ public class QiscusCore {
      */
     public static void setCustomHeader(JSONObject customHeader) {
         QiscusCore.customHeader = customHeader;
+        //QiscusAppComponent.getInstance().setCustomHeader(customHeader);
     }
 
     /**
