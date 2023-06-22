@@ -13,7 +13,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class QiscusAppComponent {
 
-    private final Application application;
+    private Application application;
 
 //    public void setAppId(String appId) {
 //        this.appId = appId;
@@ -38,17 +38,17 @@ public class QiscusAppComponent {
 
     private JSONObject customHeader;
 
-    private final Handler appHandler;
+    private Handler appHandler;
     private final ScheduledThreadPoolExecutor taskExecutor = new ScheduledThreadPoolExecutor(5);
-    private final QiscusCore.LocalDataManager localDataManager;
+    private QiscusCore.LocalDataManager localDataManager;
 
     private QiscusDataBaseHelper dataBaseHelper;
     private QiscusDataStore dataStore;
-    private static QiscusAppComponent INSTANCE;
+    private static volatile QiscusAppComponent INSTANCE;
 
-    public static QiscusAppComponent create(Application application, String qiscusAppId, String serverBaseUrl) {
+    public static QiscusAppComponent create() {
         synchronized (QiscusAppComponent.class) {
-            INSTANCE = new QiscusAppComponent(application, qiscusAppId, serverBaseUrl);
+            INSTANCE = new QiscusAppComponent();
         }
         return INSTANCE;
     }
@@ -64,7 +64,7 @@ public class QiscusAppComponent {
         return INSTANCE;
     }
 
-    private QiscusAppComponent(Application application, String qiscusAppId, String serverBaseUrl) {
+    public synchronized void setup(Application application, String qiscusAppId, String serverBaseUrl) {
         this.application = application;
         this.appId = qiscusAppId;
         this.appServer = !serverBaseUrl.endsWith("/") ? serverBaseUrl + "/" : serverBaseUrl;
