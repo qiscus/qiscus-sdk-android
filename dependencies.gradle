@@ -80,7 +80,7 @@ ext {
     ]
 
     qiscusMqttDeps = [
-            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0",
+            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5",
             android: "com.qiscus.mqtt:android:1.2.0"
     ]
 
@@ -116,7 +116,8 @@ ext {
     eventBusLib = "org.greenrobot:eventbus:3.3.1"
     rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
     qiscusManggil = "com.qiscus.utils:manggil:1.2.0"
-    //qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:$versions.manggil-without-emoji"
+    qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:1.2.0-beta2-without-emoji"
+
 
     supportLibs = supportDeps.values()
     securityDeps = securityDeps.values()

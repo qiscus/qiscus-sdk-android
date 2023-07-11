@@ -92,7 +92,7 @@ dependencies {
 
     api firebaseLibs
     api qiscusMqttLibs
-    api qiscusManggil
+    api qiscusManggilWithoutEmoji
     api networkLibs
     api rxDebs
     api eventBusLib
