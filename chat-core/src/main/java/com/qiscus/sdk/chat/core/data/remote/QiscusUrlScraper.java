@@ -16,8 +16,8 @@
 
 package com.qiscus.sdk.chat.core.data.remote;
 
-import com.schinizer.rxunfurl.RxUnfurl;
-import com.schinizer.rxunfurl.model.PreviewData;
+import com.qiscus.sdk.chat.core.data.model.urlsextractor.PreviewData;
+import com.qiscus.sdk.chat.core.util.UrlsExtractorUtils;
 
 import rx.Observable;
 import rx.schedulers.Schedulers;
@@ -31,10 +31,10 @@ import rx.schedulers.Schedulers;
 public enum QiscusUrlScraper {
     INSTANCE;
 
-    private final RxUnfurl rxUnfurl;
+    private final UrlsExtractorUtils rxUnfurl;
 
     QiscusUrlScraper() {
-        rxUnfurl = new RxUnfurl.Builder()
+        rxUnfurl = new UrlsExtractorUtils.Builder()
                 .scheduler(Schedulers.io())
                 .build();
     }
