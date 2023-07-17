@@ -100,6 +100,7 @@ dependencies {
     api securityDeps
     api lifeCircleDeb
 
+    implementation 'com.google.code.gson:gson:2.10.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
