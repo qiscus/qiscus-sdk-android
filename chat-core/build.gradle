@@ -27,6 +27,7 @@ android {
         minSdkVersion minSDKVersion
         targetSdkVersion targetSDKVersion
         versionCode 1
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
     }
     buildTypes {
@@ -105,4 +106,8 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     //androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+
+    // test
+    testImplementation unitTestLibs
+    androidTestImplementation androidUnitTestLibs
 }

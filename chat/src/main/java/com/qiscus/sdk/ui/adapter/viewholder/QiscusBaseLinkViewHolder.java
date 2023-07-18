@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.ui.adapter.viewholder;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -29,10 +30,10 @@ import android.view.View;
 
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.urlsextractor.PreviewData;
 import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 import com.qiscus.sdk.ui.adapter.OnLongItemClickListener;
 import com.qiscus.sdk.ui.view.QiscusLinkPreviewView;
-import com.schinizer.rxunfurl.model.PreviewData;
 
 import java.util.regex.Matcher;
 
@@ -75,7 +76,9 @@ public abstract class QiscusBaseLinkViewHolder extends QiscusBaseTextMessageView
 
     private void setUpLinks() {
         String message = messageTextView.getText().toString();
+        @SuppressLint("RestrictedApi")
         Matcher matcher = PatternsCompat.AUTOLINK_WEB_URL.matcher(message);
+
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && message.charAt(start - 1) == '@') {

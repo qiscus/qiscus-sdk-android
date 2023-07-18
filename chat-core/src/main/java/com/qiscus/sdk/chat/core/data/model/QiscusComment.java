@@ -24,15 +24,13 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.model.urlsextractor.PreviewData;
 import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
-import com.schinizer.rxunfurl.model.PreviewData;
 
 import org.json.JSONException;
 import org.json.JSONObject;
