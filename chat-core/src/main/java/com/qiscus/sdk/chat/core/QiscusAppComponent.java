@@ -14,11 +14,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class QiscusAppComponent {
 
     private Application application;
-
-//    public void setAppId(String appId) {
-//        this.appId = appId;
-//    }
-
     private String appId;
     private String baseURLLB;
     private String mqttBrokerUrl;
@@ -35,9 +30,7 @@ public class QiscusAppComponent {
     private Boolean enableSyncEvent = false;
     private Boolean autoRefreshToken = true;
     private Boolean forceDisableRealtimeFromExactAlarm = false;
-
     private JSONObject customHeader;
-
     private Handler appHandler;
     private final ScheduledThreadPoolExecutor taskExecutor = new ScheduledThreadPoolExecutor(5);
     private QiscusCore.LocalDataManager localDataManager;
@@ -45,6 +38,7 @@ public class QiscusAppComponent {
     private QiscusDataBaseHelper dataBaseHelper;
     private QiscusDataStore dataStore;
     private static volatile QiscusAppComponent INSTANCE;
+
 
     public static QiscusAppComponent create() {
         synchronized (QiscusAppComponent.class) {
@@ -75,109 +69,107 @@ public class QiscusAppComponent {
         QiscusTextUtil.createInstance(application);
     }
 
-    public Application getApplication() {
+    public synchronized Application getApplication() {
         return application;
     }
 
-    public String getAppId() {
+    public synchronized String getAppId() {
         return appId;
     }
 
-    public String getAppServer() {
+    public synchronized String getAppServer() {
         return appServer;
     }
 
-
-    public void setAppServer(String appServer) {
+    public synchronized void setAppServer(String appServer) {
         this.appServer = appServer;
     }
 
-    public int getHeartBeat() {
+    public synchronized int getHeartBeat() {
         return heartBeat;
     }
 
-
-    public void setHeartBeat(int heartBeat) {
+    public synchronized void setHeartBeat(int heartBeat) {
         this.heartBeat = heartBeat;
     }
 
-    public int getAutomaticHeartBeat() {
+    public synchronized int getAutomaticHeartBeat() {
         return automaticHeartBeat;
     }
 
-    public void setAutomaticHeartBeat(int automaticHeartBeat) {
+    public synchronized void setAutomaticHeartBeat(int automaticHeartBeat) {
         this.automaticHeartBeat = automaticHeartBeat;
     }
 
-    public int getNetworkConnectionInterval() {
+    public synchronized int getNetworkConnectionInterval() {
         return networkConnectionInterval;
     }
 
-    public void setNetworkConnectionInterval(int automaticHeartBeatnetworkConnectionInterval) {
+    public synchronized void setNetworkConnectionInterval(int automaticHeartBeatnetworkConnectionInterval) {
         this.networkConnectionInterval = networkConnectionInterval;
     }
 
-    public Boolean getEnableEventReport() {
+    public synchronized Boolean getEnableEventReport() {
         return enableEventReport;
     }
 
-    public void setEnableEventReport(Boolean enableEventReport) {
+    public synchronized void setEnableEventReport(Boolean enableEventReport) {
         this.enableEventReport = enableEventReport;
     }
 
-    public String getBaseURLLB() {
+    public synchronized String getBaseURLLB() {
         return baseURLLB;
     }
 
-    public void setBaseURLLB(String baseURLLB) {
+    public synchronized void setBaseURLLB(String baseURLLB) {
         this.baseURLLB = baseURLLB;
     }
 
-    public Boolean getIsBuiltIn() {
+    public synchronized Boolean getIsBuiltIn() {
         return isBuiltIn;
     }
 
-    public void setIsBuiltIn(Boolean isBuiltIn) {
+    public synchronized void setIsBuiltIn(Boolean isBuiltIn) {
         this.isBuiltIn = isBuiltIn;
     }
 
-    public String getMqttBrokerUrl() {
+    public synchronized String getMqttBrokerUrl() {
         return mqttBrokerUrl;
     }
 
-    public void setMqttBrokerUrl(String mqttBrokerUrl) {
+    public synchronized void setMqttBrokerUrl(String mqttBrokerUrl) {
         this.mqttBrokerUrl = mqttBrokerUrl;
     }
 
-    public Boolean getEnableMqttLB() {
+    public synchronized Boolean getEnableMqttLB() {
         return enableMqttLB;
     }
 
-    public void setEnableMqttLB(Boolean enableMqttLB) {
+    public synchronized void setEnableMqttLB(Boolean enableMqttLB) {
         this.enableMqttLB = enableMqttLB;
     }
 
-    public Boolean getEnableRealtime() {
+    public synchronized Boolean getEnableRealtime() {
         return enableRealtime;
     }
 
-    public void setEnableRealtime(Boolean enableRealtime) {
+    public synchronized void setEnableRealtime(Boolean enableRealtime) {
         this.enableRealtime = enableRealtime;
     }
 
-    public Boolean getSyncServiceDisabled() {
+    public synchronized Boolean getSyncServiceDisabled() {
         return syncServiceDisabled;
     }
 
-    public void setSyncServiceDisabled(Boolean syncServiceDisabled) {
+    public synchronized void setSyncServiceDisabled(Boolean syncServiceDisabled) {
         this.syncServiceDisabled = syncServiceDisabled;
     }
 
-    public Boolean getEnableSync() {
+    public synchronized Boolean getEnableSync() {
         return enableSync;
     }
 
-    public void setEnableSync(Boolean enableSync) {
+    public synchronized void setEnableSync(Boolean enableSync) {
         this.enableSync = enableSync;
     }
 
@@ -185,55 +177,55 @@ public class QiscusAppComponent {
         return enableSyncEvent;
     }
 
-    public void setEnableSyncEvent(Boolean enableSyncEvent) {
+    public synchronized void setEnableSyncEvent(Boolean enableSyncEvent) {
         this.enableSyncEvent = enableSyncEvent;
     }
 
-    public Boolean getAutoRefreshToken() {
+    public synchronized Boolean getAutoRefreshToken() {
         return autoRefreshToken;
     }
 
-    public void setAutoRefreshToken(Boolean autoRefreshToken) {
+    public synchronized void setAutoRefreshToken(Boolean autoRefreshToken) {
         this.autoRefreshToken = autoRefreshToken;
     }
 
-    public Boolean getForceDisableRealtimeFromExactAlarm() {
+    public synchronized Boolean getForceDisableRealtimeFromExactAlarm() {
         return forceDisableRealtimeFromExactAlarm;
     }
 
-    public void setForceDisableRealtimeFromExactAlarm(Boolean forceDisableRealtimeFromExactAlarm) {
+    public synchronized void setForceDisableRealtimeFromExactAlarm(Boolean forceDisableRealtimeFromExactAlarm) {
         this.forceDisableRealtimeFromExactAlarm = forceDisableRealtimeFromExactAlarm;
     }
 
-    public JSONObject getCustomHeader() {
+    public synchronized JSONObject getCustomHeader() {
         return customHeader;
     }
 
-    public void setCustomHeader(JSONObject customHeader) {
+    public synchronized void setCustomHeader(JSONObject customHeader) {
         this.customHeader = customHeader;
     }
 
-    public Handler getAppHandler() {
+    public synchronized Handler getAppHandler() {
         return appHandler;
     }
 
-    public ScheduledThreadPoolExecutor getTaskExecutor() {
+    public synchronized ScheduledThreadPoolExecutor getTaskExecutor() {
         return taskExecutor;
     }
 
-    public QiscusCore.LocalDataManager getLocalDataManager() {
+    public synchronized QiscusCore.LocalDataManager getLocalDataManager() {
         return localDataManager;
     }
 
-    public QiscusDataBaseHelper getDataBaseHelper() {
+    public synchronized QiscusDataBaseHelper getDataBaseHelper() {
         return dataBaseHelper;
     }
 
-    public QiscusDataStore getDataStore() {
+    public synchronized QiscusDataStore getDataStore() {
         return dataStore;
     }
 
-    public void setDataStore(QiscusDataStore qiscusDataStore) {
+    public synchronized  void setDataStore(QiscusDataStore qiscusDataStore) {
         this.dataStore = qiscusDataStore;
     }
 
