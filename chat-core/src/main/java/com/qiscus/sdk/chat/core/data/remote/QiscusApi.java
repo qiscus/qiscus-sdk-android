@@ -254,10 +254,16 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusNonce> requestNonce() {
+        if (QiscusCore.hasSetupUser()){
+            QiscusCore.clearData();
+        }
         return api.requestNonce().map(QiscusApiParser::parseNonce);
     }
 
     public Observable<QiscusNonce> getJWTNonce() {
+        if (QiscusCore.hasSetupUser()){
+            QiscusCore.clearData();
+        }
         return api.requestNonce().map(QiscusApiParser::parseNonce);
     }
 
@@ -277,6 +283,10 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<QiscusAccount> loginOrRegister(String email, String password, String username, String avatarUrl, JSONObject extras) {
+        if (QiscusCore.hasSetupUser()){
+            QiscusCore.clearData();
+        }
+
         return api.loginOrRegister(QiscusHashMapUtil.loginOrRegister(
                 email, password, username, avatarUrl, extras == null ? null : extras.toString()
         ))
@@ -284,6 +294,10 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusAccount> setUser(String userId, String userKey, String username, String avatarURL, JSONObject extras) {
+        if (QiscusCore.hasSetupUser()){
+            QiscusCore.clearData();
+        }
+
         return api.loginOrRegister(QiscusHashMapUtil.loginOrRegister(
                 userId, userKey, username, avatarURL, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusAccount);

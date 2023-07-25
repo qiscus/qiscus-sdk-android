@@ -30,9 +30,9 @@ import android.widget.TextView;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.chat.core.data.model.urlsextractor.PreviewData;
 import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.util.QiscusColorUtil;
-import com.schinizer.rxunfurl.model.PreviewData;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;

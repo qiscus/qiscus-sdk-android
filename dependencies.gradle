@@ -37,7 +37,7 @@ ext {
             support          : "31.0.0",
             firebaseCore     : "21.1.1",
             firebaseMessaging: "23.1.2",
-            okHttp           : "3.12.5",
+            okHttp           : "4.11.0",
             retrofit         : "2.9.0",
 
             nirmana          : "1.3.0",
@@ -80,7 +80,7 @@ ext {
     ]
 
     qiscusMqttDeps = [
-            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0",
+            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5",
             android: "com.qiscus.mqtt:android:1.2.0"
     ]
 
@@ -110,13 +110,31 @@ ext {
             lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0"
     ]
 
+    rxunfurlDeb = [
+            jsoup   : "org.jsoup:jsoup:1.16.1"
+    ]
+
+    testUnitDeb = [
+           junit : "junit:junit:4.13.2",
+           mockito : 'org.mockito:mockito-core:3.7.7'
+    ]
+
+    androidTestUnitDeb = [
+            core    : "androidx.test:core:1.4.0",
+            junit   : "androidx.test.ext:junit:1.1.3",
+            runner  : "androidx.test:runner:1.4.0",
+            mockito : 'org.mockito:mockito-android:3.7.7',
+            espresso: 'androidx.test.espresso:espresso-core:3.4.0'
+
+    ]
+
     placePickerLib = "com.github.adicatur:pingplacepicker:$versions.placePicker"
     placeLib = "com.google.android.libraries.places:places:$versions.places"
     flexBoxLib = "com.google.android:flexbox:0.3.1"
     eventBusLib = "org.greenrobot:eventbus:3.3.1"
-    rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
-    qiscusManggil = "com.qiscus.utils:manggil:1.2.0"
-    qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:1.2.0-beta2-without-emoji"
+
+    qiscusManggil = "com.qiscus.utils:manggil:1.2.1"
+    qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:1.2.1-without-emoji"
 
     supportLibs = supportDeps.values()
     securityDeps = securityDeps.values()
@@ -124,7 +142,10 @@ ext {
     qiscusUtilLibs = qiscusUtilDeps.values()
     qiscusMqttLibs = qiscusMqttDeps.values()
     lifeCircleDeb = lifeCircleDeb.values()
+    rxUrlExtractorLib = rxunfurlDeb.values()
     networkLibs = okHttpDeps.values() + retrofitDeps.values()
     rxLibs = rxDebs.values() + trelloLifecycleDebs.values()
     rxDebs = rxDebs.values()
+    unitTestLibs = testUnitDeb.values()
+    androidUnitTestLibs = androidTestUnitDeb.values()
 }

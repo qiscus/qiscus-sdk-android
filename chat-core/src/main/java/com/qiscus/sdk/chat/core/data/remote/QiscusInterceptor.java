@@ -61,7 +61,7 @@ public class QiscusInterceptor {
 //                    BuildConfig.CHAT_CORE_VERSION_MINOR + "." +
 //                    BuildConfig.CHAT_CORE_VERSION_PATCH);
             builder.addHeader(VERSION, ANDROID_PARAM + "_" +
-                   "1.7.0-beta.1");
+                   "1.7.0-beta.3");
         }
         builder.addHeader(PLATFORM, ANDROID_PARAM);
         builder.addHeader(DEVICE_BRAND, Build.MANUFACTURER);

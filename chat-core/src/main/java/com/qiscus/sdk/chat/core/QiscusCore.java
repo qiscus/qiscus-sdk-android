@@ -1165,7 +1165,7 @@ public class QiscusCore {
 
     }
 
-    private static void clearData(){
+    public static void clearData(){
         if (BuildVersionUtil.isOreoOrHigher()) {
             JobScheduler jobScheduler = (JobScheduler) appComponent.getApplication()
                     .getSystemService(Context.JOB_SCHEDULER_SERVICE);
