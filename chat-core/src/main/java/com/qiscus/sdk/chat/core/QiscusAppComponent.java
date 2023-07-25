@@ -173,7 +173,7 @@ public class QiscusAppComponent {
         this.enableSync = enableSync;
     }
 
-    public Boolean getEnableSyncEvent() {
+    public synchronized Boolean getEnableSyncEvent() {
         return enableSyncEvent;
     }
 
