@@ -29,6 +29,7 @@ public class QiscusAppComponent {
     private Boolean enableSync = true;
     private Boolean enableSyncEvent = false;
     private Boolean autoRefreshToken = true;
+    private Boolean enableRefreshToken = false;
     private Boolean forceDisableRealtimeFromExactAlarm = false;
     private JSONObject customHeader;
     private Handler appHandler;
@@ -188,6 +189,15 @@ public class QiscusAppComponent {
     public synchronized void setAutoRefreshToken(Boolean autoRefreshToken) {
         this.autoRefreshToken = autoRefreshToken;
     }
+
+    public synchronized Boolean getEnableRefreshToken() {
+        return enableRefreshToken;
+    }
+
+    public synchronized void setEnableRefreshToken(Boolean enableRefreshToken) {
+        this.enableRefreshToken = enableRefreshToken;
+    }
+
 
     public synchronized Boolean getForceDisableRealtimeFromExactAlarm() {
         return forceDisableRealtimeFromExactAlarm;

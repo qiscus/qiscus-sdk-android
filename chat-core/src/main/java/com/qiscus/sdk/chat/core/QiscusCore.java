@@ -309,6 +309,9 @@ public class QiscusCore {
                     appComponent.setEnableSync(appConfig.getEnableSync());
                     appComponent.setEnableSyncEvent(appConfig.getEnableSyncEvent());
 
+                    //enableRefreshToken
+                    appComponent.setEnableRefreshToken(appConfig.getIsEnableRefreshToken());
+
                     // call refresh token
                     appComponent.setAutoRefreshToken(appConfig.getAutoRefreshToken());
                     if (appConfig.getAutoRefreshToken()) {
@@ -1151,16 +1154,20 @@ public class QiscusCore {
 
     public static void clearUser() {
         if (hasSetupUser()) {
-            QiscusAccount account = appComponent.getLocalDataManager()
-                    .getAccountInfo();
-            QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(jsonObject -> {
-                        clearData();
-                    }, throwable -> {
-                        clearData();
-                    });
+            if (appComponent.getEnableRefreshToken()){
+                QiscusAccount account = appComponent.getLocalDataManager()
+                        .getAccountInfo();
+                QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(jsonObject -> {
+                            clearData();
+                        }, throwable -> {
+                            clearData();
+                        });
+            }else{
+                clearData();
+            }
         }
 
     }

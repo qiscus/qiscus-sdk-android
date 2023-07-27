@@ -551,6 +551,13 @@ final class QiscusApiParser {
                 appConfig.setAutoRefreshToken(false);
             }
 
+            // enable refresh token
+            if (results.has("enable_refresh_token")) {
+                appConfig.setIsEnableRefreshToken(results.get("enable_refresh_token").getAsBoolean());
+            } else {
+                appConfig.setIsEnableRefreshToken(false);
+            }
+
             return appConfig;
 
         } else {
