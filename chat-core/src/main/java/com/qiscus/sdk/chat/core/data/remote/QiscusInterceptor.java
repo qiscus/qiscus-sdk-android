@@ -56,12 +56,10 @@ public class QiscusInterceptor {
                     BuildConfig.CHAT_BUILT_IN_VERSION_MINOR + "." +
                     BuildConfig.CHAT_BUILT_IN_VERSION_PATCH);
         } else {
-//            builder.addHeader(VERSION, ANDROID_PARAM + "_" +
-//                    BuildConfig.CHAT_CORE_VERSION_MAJOR + "." +
-//                    BuildConfig.CHAT_CORE_VERSION_MINOR + "." +
-//                    BuildConfig.CHAT_CORE_VERSION_PATCH);
             builder.addHeader(VERSION, ANDROID_PARAM + "_" +
-                   "1.7.0-beta.4");
+                    BuildConfig.CHAT_CORE_VERSION_MAJOR + "." +
+                    BuildConfig.CHAT_CORE_VERSION_MINOR + "." +
+                    BuildConfig.CHAT_CORE_VERSION_PATCH);
         }
         builder.addHeader(PLATFORM, ANDROID_PARAM);
         builder.addHeader(DEVICE_BRAND, Build.MANUFACTURER);
