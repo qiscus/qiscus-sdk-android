@@ -1166,10 +1166,11 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 return;
             }
 
-            QiscusLogger.print(TAG, "Connected..." + mqttAndroidClient.getClientId() + " " + QiscusCore.getMqttBrokerUrl());
-            EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
-            reporting = true;
             try {
+                QiscusLogger.print(TAG, "Connected..." + mqttAndroidClient.getClientId() + " " + QiscusCore.getMqttBrokerUrl());
+                EventBus.getDefault().post(QiscusMqttStatusEvent.CONNECTED);
+                reporting = true;
+
                 connecting = false;
                 reconnectCounter = 0;
                 listenComment();
@@ -1187,10 +1188,10 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 scheduleUserStatus();
             } catch (NullPointerException e) {
                 //ignored
-                QiscusErrorLogger.print("QiscusPusherApi 2", "listen nullpointer: " + e);
+                QiscusErrorLogger.print("QiscusPusherApi 2", " nullpointer: " + e);
             } catch (IllegalArgumentException e1) {
                 //Do nothing
-                QiscusErrorLogger.print("QiscusPusherApi 2", "listen nullpointer: " + e1);
+                QiscusErrorLogger.print("QiscusPusherApi 2", " IllegalArgumentException: " + e1);
                 if (e1 != null) {
                     try {
                         QiscusLogger.print(TAG, "Connected..." + e1.toString());
@@ -1200,6 +1201,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                         //ignored
                     }
                 }
+            } catch (Exception e) {
+                //ignored
+                QiscusErrorLogger.print("QiscusPusherApi 2", " Exception: " + e);
             }
         }
     }

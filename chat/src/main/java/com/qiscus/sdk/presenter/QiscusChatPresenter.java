@@ -195,8 +195,10 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
     }
 
     public void sendComment(String content) {
-        QiscusComment qiscusComment = QiscusComment.generateMessage(room.getId(), content);
-        sendComment(qiscusComment);
+        if (room != null){
+            QiscusComment qiscusComment = QiscusComment.generateMessage(room.getId(), content);
+            sendComment(qiscusComment);
+        }
     }
 
     public void sendEditComment(QiscusComment qiscusComment) {

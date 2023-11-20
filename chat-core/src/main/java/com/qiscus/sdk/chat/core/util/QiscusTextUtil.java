@@ -20,6 +20,9 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.core.util.PatternsCompat;
+
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -46,6 +49,28 @@ import java.util.regex.Matcher;
  * GitHub     : https://github.com/zetbaitsu
  */
 public final class QiscusTextUtil {
+
+    private static Application application;
+
+    public static void createInstance(Application application) {
+        synchronized (QiscusTextUtil.class) {
+            if (QiscusTextUtil.application == null) {
+                QiscusTextUtil.application = application;
+            }
+        }
+    }
+
+    private static Application getApp() {
+        if (QiscusTextUtil.application == null) {
+            synchronized (QiscusTextUtil.class) {
+                if (QiscusTextUtil.application == null) {
+                    throw new IllegalArgumentException("application is null");
+                }
+            }
+        }
+        return application;
+    }
+
     private static final Random random = new Random();
     private static final char[] symbols;
 
@@ -60,18 +85,14 @@ public final class QiscusTextUtil {
         symbols = tmp.toString().toCharArray();
     }
 
-    private QiscusTextUtil() {
-
-    }
-
     @NonNull
     public static String getString(@StringRes int resId) {
-        return QiscusCore.getApps().getString(resId);
+        return getApp().getString(resId);
     }
 
     @NonNull
     public static String getString(@StringRes int resId, Object... formatArgs) {
-        return QiscusCore.getApps().getString(resId, formatArgs);
+        return getApp().getString(resId, formatArgs);
     }
 
     public static String getRandomString(int length) {
@@ -99,13 +120,16 @@ public final class QiscusTextUtil {
         return !isBlank(cs);
     }
 
+    @SuppressLint("RestrictedApi")
     public static boolean isUrl(String s) {
         return PatternsCompat.AUTOLINK_WEB_URL.matcher(s).matches();
     }
 
     public static List<String> extractUrl(String text) {
         List<String> urls = new ArrayList<>();
+        @SuppressLint("RestrictedApi")
         Matcher matcher = PatternsCompat.AUTOLINK_WEB_URL.matcher(text);
+
         while (matcher.find()) {
             int start = matcher.start();
             if (start > 0 && text.charAt(start - 1) == '@') {

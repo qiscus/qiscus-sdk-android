@@ -6,10 +6,27 @@ package com.qiscus.sdk.chat.core.data.model;
  **/
 public class QiscusCoreChatConfig {
 
+    private static QiscusCoreChatConfig INSTANCE;
+
+    public static QiscusCoreChatConfig getInstance() {
+        if (INSTANCE == null) {
+            synchronized (QiscusCoreChatConfig.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new QiscusCoreChatConfig();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private QiscusCoreChatConfig() {
+
+    }
+
     private boolean enableLog = false;
     private boolean enableFcmPushNotification = false;
     private QiscusCommentSendingInterceptor qiscusCommentSendingInterceptor = qiscusComment -> qiscusComment;
-    private QiscusImageCompressionConfig qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
+    private QiscusImageCompressionConfig qiscusImageCompressionConfig = null;
     private NotificationListener notificationListener;
     private DeleteCommentListener deleteCommentListener;
 
@@ -33,6 +50,9 @@ public class QiscusCoreChatConfig {
     }
 
     public QiscusImageCompressionConfig getQiscusImageCompressionConfig() {
+        if (qiscusImageCompressionConfig == null) {
+            qiscusImageCompressionConfig = new QiscusImageCompressionConfig();
+        }
         return qiscusImageCompressionConfig;
     }
 

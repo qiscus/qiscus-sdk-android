@@ -316,13 +316,13 @@ public enum QiscusApi {
     public Observable<QiscusAccount> updateProfile(String username, String avatarUrl, JSONObject extras) {
         return api.updateProfile(QiscusHashMapUtil.updateProfile(
                 username, avatarUrl, extras == null ? null : extras.toString()))
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(QiscusApiParser::parseQiscusAccountWithoutToken);
     }
 
     public Observable<QiscusAccount> updateUser(String name, String avatarURL, JSONObject extras) {
         return api.updateProfile(QiscusHashMapUtil.updateProfile(
                 name, avatarURL, extras == null ? null : extras.toString()))
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(QiscusApiParser::parseQiscusAccountWithoutToken);
     }
 
     public Observable<QiscusAccount> getUserData() {

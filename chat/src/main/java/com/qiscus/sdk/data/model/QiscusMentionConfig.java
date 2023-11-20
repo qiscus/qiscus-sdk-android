@@ -30,22 +30,25 @@ import com.qiscus.sdk.chat.core.data.model.MentionClickHandler;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusMentionConfig {
-    private int leftMentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
-    private int leftMentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
-    private int leftMentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
+    private Integer leftMentionAllColor = null;
+    private Integer leftMentionOtherColor = null;
+    private Integer leftMentionMeColor = null;
 
-    private int rightMentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
-    private int rightMentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
-    private int rightMentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
+    private Integer rightMentionAllColor = null;
+    private Integer rightMentionOtherColor = null;
+    private Integer rightMentionMeColor = null;
 
-    private int editTextMentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
-    private int editTextMentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
-    private int editTextMentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
+    private Integer editTextMentionAllColor = null;
+    private Integer editTextMentionOtherColor = null;
+    private Integer editTextMentionMeColor = null;
 
     private MentionClickHandler mentionClickHandler;
     private boolean enableMention = false;
 
     public int getLeftMentionAllColor() {
+        if (leftMentionAllColor == null) {
+            leftMentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
+        }
         return leftMentionAllColor;
     }
 
@@ -56,6 +59,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getLeftMentionOtherColor() {
+        if (leftMentionOtherColor == null) {
+            leftMentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
+        }
         return leftMentionOtherColor;
     }
 
@@ -66,6 +72,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getLeftMentionMeColor() {
+        if (leftMentionMeColor == null) {
+            leftMentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
+        }
         return leftMentionMeColor;
     }
 
@@ -76,6 +85,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getRightMentionAllColor() {
+        if (rightMentionAllColor == null) {
+            rightMentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
+        }
         return rightMentionAllColor;
     }
 
@@ -86,6 +98,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getRightMentionOtherColor() {
+        if (rightMentionOtherColor == null) {
+            rightMentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
+        }
         return rightMentionOtherColor;
     }
 
@@ -96,6 +111,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getRightMentionMeColor() {
+        if (rightMentionMeColor == null) {
+            rightMentionMeColor =  ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
+        }
         return rightMentionMeColor;
     }
 
@@ -106,6 +124,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getEditTextMentionAllColor() {
+        if (editTextMentionAllColor == null) {
+            editTextMentionAllColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_all);
+        }
         return editTextMentionAllColor;
     }
 
@@ -116,6 +137,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getEditTextMentionOtherColor() {
+        if (editTextMentionOtherColor == null) {
+            editTextMentionOtherColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_other);
+        }
         return editTextMentionOtherColor;
     }
 
@@ -126,6 +150,9 @@ public class QiscusMentionConfig {
 
     @ColorInt
     public int getEditTextMentionMeColor() {
+        if (editTextMentionOtherColor == null) {
+            editTextMentionMeColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_mention_me);
+        }
         return editTextMentionMeColor;
     }
 

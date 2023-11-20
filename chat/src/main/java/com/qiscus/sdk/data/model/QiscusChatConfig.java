@@ -56,6 +56,23 @@ import rx.schedulers.Schedulers;
  * GitHub     : https://github.com/zetbaitsu
  */
 public class QiscusChatConfig {
+
+    private static QiscusChatConfig INSTANCE;
+
+    public static QiscusChatConfig getInstance() {
+        if (INSTANCE == null) {
+            synchronized (QiscusChatConfig.class) {
+                INSTANCE = new QiscusChatConfig();
+            }
+        }
+        return INSTANCE;
+    }
+
+    private QiscusChatConfig() {
+
+    }
+
+
     private int statusBarColor = R.color.qiscus_primary_dark;
     private int appBarColor = R.color.qiscus_primary;
     private int accentColor = R.color.qiscus_accent;
@@ -83,56 +100,56 @@ public class QiscusChatConfig {
 
     private int accountLinkingTextColor = R.color.qiscus_primary;
     private int accountLinkingBackground = R.color.qiscus_account_linking_background;
-    private String accountLinkingText = QiscusTextUtil.getString(R.string.qiscus_account_linking_text);
+    private String accountLinkingText = null;
 
     private int buttonBubbleTextColor = R.color.qiscus_primary;
     private int buttonBubbleBackBackground = R.color.qiscus_account_linking_background;
 
-    private DateFormatter dateFormat = QiscusDateUtil::toTodayOrDate;
-    private DateFormatter timeFormat = QiscusDateUtil::toHour;
+    private DateFormatter dateFormat = null;
+    private DateFormatter timeFormat = null;
 
-    private String emptyRoomTitle = QiscusTextUtil.getString(R.string.qiscus_welcome);
+    private String emptyRoomTitle = null;
     private int emptyRoomTitleColor = R.color.qiscus_divider;
 
-    private String emptyRoomSubtitle = QiscusTextUtil.getString(R.string.qiscus_desc_empty_chat);
+    private String emptyRoomSubtitle = null;
     private int emptyRoomSubtitleColor = R.color.qiscus_divider;
 
     private int emptyRoomImageResource = R.drawable.ic_qiscus_chat_empty;
 
-    private String messageFieldHint = QiscusTextUtil.getString(R.string.qiscus_hint_message);
+    private String messageFieldHint = null;
     private int messageFieldHintColor = R.color.qiscus_secondary_text;
     private int messageFieldTextColor = R.color.qiscus_primary_text;
 
     private int addPictureIcon = R.drawable.ic_qiscus_add_image;
     private int addPictureBackgroundColor = R.color.qiscus_gallery_background;
-    private String addPictureText = QiscusTextUtil.getString(R.string.qiscus_gallery);
+    private String addPictureText = null;
     private boolean enableAddPicture = true;
 
     private int takePictureIcon = R.drawable.ic_qiscus_pick_picture;
     private int takePictureBackgroundColor = R.color.qiscus_camera_background;
-    private String takePictureText = QiscusTextUtil.getString(R.string.qiscus_camera);
+    private String takePictureText = null;
     private boolean enableTakePicture = true;
 
     private int addFileIcon = R.drawable.ic_qiscus_add_file;
     private int addFileBackgroundColor = R.color.qiscus_file_background;
-    private String addFileText = QiscusTextUtil.getString(R.string.qiscus_file);
+    private String addFileText = null;
     private boolean enableAddFile = true;
 
     private int recordAudioIcon = R.drawable.ic_qiscus_add_audio;
     private int recordBackgroundColor = R.color.qiscus_record_background;
-    private String recordText = QiscusTextUtil.getString(R.string.qiscus_record);
+    private String recordText = null;
 
     //disable feature recordAudio
     private boolean enableRecordAudio = false; //true
 
     private int addContactIcon = R.drawable.ic_qiscus_add_contact;
     private int addContactBackgroundColor = R.color.qiscus_contact_background;
-    private String addContactText = QiscusTextUtil.getString(R.string.qiscus_contact);
+    private String addContactText = null;
     private boolean enableAddContact = true;
 
     private int addLocationIcon = R.drawable.ic_qiscus_location;
     private int addLocationBackgroundColor = R.color.qiscus_location_background;
-    private String addLocationText = QiscusTextUtil.getString(R.string.qiscus_location);
+    private String addLocationText = null;
     private boolean enableAddLocation = false;
 
     private int stopRecordIcon = R.drawable.ic_qiscus_send_on;
@@ -168,57 +185,22 @@ public class QiscusChatConfig {
     private boolean enableReplyNotification = false;
     private QiscusNotificationBuilderInterceptor notificationBuilderInterceptor;
 
-    private NotificationTitleHandler notificationTitleHandler = QiscusComment::getRoomName;
-    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
+    private NotificationTitleHandler notificationTitleHandler = null;
+    private QiscusRoomSenderNameInterceptor qiscusRoomSenderNameInterceptor = null;
     private QiscusRoomSenderNameColorInterceptor qiscusRoomSenderNameColorInterceptor = qiscusComment -> R.color.qiscus_secondary_text;
-    private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = qiscusComment -> getReplyBarColor();
-    private QiscusStartReplyInterceptor startReplyInterceptor = qiscusComment -> new QiscusReplyPanelConfig();
+    private QiscusRoomReplyBarColorInterceptor qiscusRoomReplyBarColorInterceptor = null;
+    private QiscusStartReplyInterceptor startReplyInterceptor = null;
 
-    private NotificationClickListener notificationClickListener =
-            (context, qiscusComment) -> QiscusApi.getInstance()
-                    .getChatRoom(qiscusComment.getRoomId())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .map(qiscusChatRoom -> {
-                        if (qiscusChatRoom.isGroup()) {
-                            return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom);
-                        }
-                        return QiscusChatActivity.generateIntent(context, qiscusChatRoom);
-                    })
-                    .subscribe(intent -> {
-                        context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                    }, throwable -> {
-                        QiscusErrorLogger.print("NotificationClick", throwable);
-                        Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
-                    });
+    private NotificationClickListener notificationClickListener = null;
 
-    private ReplyNotificationHandler replyNotificationHandler =
-            (context, qiscusComment) -> QiscusApi.getInstance().sendMessage(qiscusComment)
-                    .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
-                    .doOnNext(comment -> {
-                        comment.setState(QiscusComment.STATE_ON_QISCUS);
-                        QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
-                        if (savedQiscusComment != null && savedQiscusComment.getState() > comment.getState()) {
-                            comment.setState(savedQiscusComment.getState());
-                        }
-                        Qiscus.getDataStore().addOrUpdate(comment);
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(commentSend -> {
-                        QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusComment.getRoomId());
-                    }, throwable -> {
-                        QiscusErrorLogger.print("ReplyNotification", throwable);
-                        Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
-                    });
+    private ReplyNotificationHandler replyNotificationHandler = null;
 
     private boolean enablePushNotification = true;
     private boolean onlyEnablePushNotificationOutsideChatRoom = false;
     private boolean enableRequestPermission = true;
     private boolean enableCaption = true;
 
-    private Drawable chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
+    private Drawable chatRoomBackground = null;
 
     private ForwardCommentHandler forwardCommentHandler;
     private boolean enableForwardComment = false;
@@ -228,9 +210,9 @@ public class QiscusChatConfig {
 
     private boolean enableShareMedia = true;
 
-    private QiscusMentionConfig mentionConfig = new QiscusMentionConfig();
+    private QiscusMentionConfig mentionConfig = null;
 
-    private QiscusDeleteCommentConfig deleteCommentConfig = new QiscusDeleteCommentConfig();
+    private QiscusDeleteCommentConfig deleteCommentConfig = null;
 
     @ColorRes
     public int getStatusBarColor() {
@@ -483,6 +465,9 @@ public class QiscusChatConfig {
     }
 
     public String getAccountLinkingText() {
+        if (accountLinkingText == null) {
+            accountLinkingText = QiscusTextUtil.getString(R.string.qiscus_account_linking_text);
+        }
         return accountLinkingText;
     }
 
@@ -512,6 +497,9 @@ public class QiscusChatConfig {
     }
 
     public DateFormatter getDateFormat() {
+        if (dateFormat == null) {
+            dateFormat = QiscusDateUtil::toTodayOrDate;
+        }
         return dateFormat;
     }
 
@@ -521,6 +509,9 @@ public class QiscusChatConfig {
     }
 
     public DateFormatter getTimeFormat() {
+        if (timeFormat == null) {
+            timeFormat = QiscusDateUtil::toHour;
+        }
         return timeFormat;
     }
 
@@ -530,6 +521,9 @@ public class QiscusChatConfig {
     }
 
     public String getEmptyRoomTitle() {
+        if (emptyRoomTitle == null) {
+            emptyRoomTitle = QiscusTextUtil.getString(R.string.qiscus_welcome);
+        }
         return emptyRoomTitle;
     }
 
@@ -549,6 +543,9 @@ public class QiscusChatConfig {
     }
 
     public String getEmptyRoomSubtitle() {
+        if (emptyRoomSubtitle == null) {
+            emptyRoomSubtitle =  QiscusTextUtil.getString(R.string.qiscus_desc_empty_chat);
+        }
         return emptyRoomSubtitle;
     }
 
@@ -578,6 +575,9 @@ public class QiscusChatConfig {
     }
 
     public String getMessageFieldHint() {
+        if (messageFieldHint == null) {
+            messageFieldHint = QiscusTextUtil.getString(R.string.qiscus_hint_message);
+        }
         return messageFieldHint;
     }
 
@@ -627,6 +627,9 @@ public class QiscusChatConfig {
     }
 
     public String getAddPictureText() {
+        if (addPictureText == null) {
+            addPictureText = QiscusTextUtil.getString(R.string.qiscus_gallery);
+        }
         return addPictureText;
     }
 
@@ -665,6 +668,9 @@ public class QiscusChatConfig {
     }
 
     public String getTakePictureText() {
+        if (takePictureText == null) {
+            takePictureText = QiscusTextUtil.getString(R.string.qiscus_camera);
+        }
         return takePictureText;
     }
 
@@ -703,6 +709,9 @@ public class QiscusChatConfig {
     }
 
     public String getAddFileText() {
+        if (addFileText == null) {
+            addFileText = QiscusTextUtil.getString(R.string.qiscus_file);
+        }
         return addFileText;
     }
 
@@ -741,6 +750,9 @@ public class QiscusChatConfig {
     }
 
     public String getRecordText() {
+        if (recordText == null) {
+            recordText = QiscusTextUtil.getString(R.string.qiscus_record);
+        }
         return recordText;
     }
 
@@ -799,6 +811,9 @@ public class QiscusChatConfig {
     }
 
     public String getAddContactText() {
+        if (addContactText == null) {
+            addContactText = QiscusTextUtil.getString(R.string.qiscus_contact);
+        }
         return addContactText;
     }
 
@@ -837,6 +852,9 @@ public class QiscusChatConfig {
     }
 
     public String getAddLocationText() {
+        if (addLocationText == null) {
+            addLocationText = QiscusTextUtil.getString(R.string.qiscus_location);
+        }
         return addLocationText;
     }
 
@@ -993,6 +1011,9 @@ public class QiscusChatConfig {
     }
 
     public NotificationTitleHandler getNotificationTitleHandler() {
+        if (notificationTitleHandler == null) {
+            notificationTitleHandler = QiscusComment::getRoomName;
+        }
         return notificationTitleHandler;
     }
 
@@ -1002,6 +1023,25 @@ public class QiscusChatConfig {
     }
 
     public NotificationClickListener getNotificationClickListener() {
+        if (notificationClickListener == null) {
+            notificationClickListener = (context, qiscusComment) -> QiscusApi.getInstance()
+                            .getChatRoom(qiscusComment.getRoomId())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .map(qiscusChatRoom -> {
+                                if (qiscusChatRoom.isGroup()) {
+                                    return QiscusGroupChatActivity.generateIntent(context, qiscusChatRoom);
+                                }
+                                return QiscusChatActivity.generateIntent(context, qiscusChatRoom);
+                            })
+                            .subscribe(intent -> {
+                                context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                            }, throwable -> {
+                                QiscusErrorLogger.print("NotificationClick", throwable);
+                                Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
+                            });
+        }
         return notificationClickListener;
     }
 
@@ -1011,6 +1051,26 @@ public class QiscusChatConfig {
     }
 
     public ReplyNotificationHandler getReplyNotificationHandler() {
+        if (replyNotificationHandler == null) {
+            replyNotificationHandler = (context, qiscusComment) -> QiscusApi.getInstance().sendMessage(qiscusComment)
+                            .doOnSubscribe(() -> Qiscus.getDataStore().addOrUpdate(qiscusComment))
+                            .doOnNext(comment -> {
+                                comment.setState(QiscusComment.STATE_ON_QISCUS);
+                                QiscusComment savedQiscusComment = Qiscus.getDataStore().getComment(comment.getUniqueId());
+                                if (savedQiscusComment != null && savedQiscusComment.getState() > comment.getState()) {
+                                    comment.setState(savedQiscusComment.getState());
+                                }
+                                Qiscus.getDataStore().addOrUpdate(comment);
+                            })
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(commentSend -> {
+                                QiscusCacheManager.getInstance().clearMessageNotifItems(qiscusComment.getRoomId());
+                            }, throwable -> {
+                                QiscusErrorLogger.print("ReplyNotification", throwable);
+                                Toast.makeText(context, QiscusErrorLogger.getMessage(throwable), Toast.LENGTH_SHORT).show();
+                            });
+        }
         return replyNotificationHandler;
     }
 
@@ -1047,6 +1107,9 @@ public class QiscusChatConfig {
     }
 
     public Drawable getChatRoomBackground() {
+        if (chatRoomBackground == null) {
+            chatRoomBackground = new ColorDrawable(ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_dark_white));
+        }
         return chatRoomBackground;
     }
 
@@ -1189,6 +1252,9 @@ public class QiscusChatConfig {
     }
 
     public QiscusMentionConfig getMentionConfig() {
+        if (mentionConfig == null) {
+            mentionConfig = new QiscusMentionConfig();
+        }
         return mentionConfig;
     }
 
@@ -1198,6 +1264,9 @@ public class QiscusChatConfig {
     }
 
     public QiscusRoomSenderNameInterceptor getRoomSenderNameInterceptor() {
+        if (qiscusRoomSenderNameInterceptor == null) {
+            qiscusRoomSenderNameInterceptor = QiscusComment::getSender;
+        }
         return qiscusRoomSenderNameInterceptor;
     }
 
@@ -1218,6 +1287,9 @@ public class QiscusChatConfig {
     }
 
     public QiscusRoomReplyBarColorInterceptor getRoomReplyBarColorInterceptor() {
+        if (qiscusRoomReplyBarColorInterceptor == null) {
+            qiscusRoomReplyBarColorInterceptor = qiscusComment -> getReplyBarColor();
+        }
         return qiscusRoomReplyBarColorInterceptor;
     }
 
@@ -1269,6 +1341,9 @@ public class QiscusChatConfig {
     }
 
     public QiscusDeleteCommentConfig getDeleteCommentConfig() {
+        if (deleteCommentConfig == null) {
+            deleteCommentConfig = new QiscusDeleteCommentConfig();
+        }
         return deleteCommentConfig;
     }
 
@@ -1278,6 +1353,9 @@ public class QiscusChatConfig {
     }
 
     public QiscusStartReplyInterceptor getStartReplyInterceptor() {
+        if (startReplyInterceptor == null) {
+            startReplyInterceptor = qiscusComment -> new QiscusReplyPanelConfig();
+        }
         return startReplyInterceptor;
     }
 

@@ -32,8 +32,8 @@ public class QiscusDeleteCommentConfig {
     private boolean enableDeleteComment = false;
     private boolean enableHardDelete = false;
 
-    private int deleteForEveryoneButtonColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_accent);
-    private int cancelButtonColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_accent);
+    private Integer deleteForEveryoneButtonColor = null;
+    private Integer cancelButtonColor = null;
 
     public boolean isEnableDeleteComment() {
         return enableDeleteComment;
@@ -55,6 +55,9 @@ public class QiscusDeleteCommentConfig {
 
     @ColorInt
     public int getDeleteForEveryoneButtonColor() {
+        if (deleteForEveryoneButtonColor == null) {
+            deleteForEveryoneButtonColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_accent);
+        }
         return deleteForEveryoneButtonColor;
     }
 
@@ -65,6 +68,9 @@ public class QiscusDeleteCommentConfig {
 
     @ColorInt
     public int getCancelButtonColor() {
+        if (cancelButtonColor == null) {
+            cancelButtonColor = ContextCompat.getColor(Qiscus.getApps(), R.color.qiscus_accent);
+        }
         return cancelButtonColor;
     }
 

@@ -34,6 +34,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.data.model.QiscusChatConfig;
 import com.qiscus.sdk.ui.QiscusChatActivity;
 import com.qiscus.sdk.ui.fragment.QiscusChatFragment;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
@@ -61,7 +63,7 @@ import static com.qiscus.sdk.chat.core.QiscusCore.checkUserSetup;
  */
 public class Qiscus {
 
-    private static QiscusChatConfig chatConfig;
+    //private static QiscusChatConfig chatConfig;
     private static String authorities;
 
     private Qiscus() {
@@ -171,12 +173,11 @@ public class Qiscus {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void initWithCustomServer(Application application, String qiscusAppId, String serverBaseUrl,
                                             String mqttBrokerUrl, boolean enableMqttLB, String baseURLLB) {
-        QiscusCore.isBuiltIn(true);
+        QiscusTextUtil.createInstance(application);
         QiscusCore.initWithCustomServer(application, qiscusAppId, serverBaseUrl, mqttBrokerUrl, enableMqttLB, baseURLLB);
-        chatConfig = new QiscusChatConfig();
         authorities = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.provider";
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
-
+        QiscusCore.isBuiltIn(true);
         Jupuk.init(application);
         EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
@@ -356,8 +357,8 @@ public class Qiscus {
      * @return Current qiscus chatting configuration
      */
     public static QiscusChatConfig getChatConfig() {
-        checkAppIdSetup();
-        return chatConfig;
+        //checkAppIdSetup();
+        return QiscusChatConfig.getInstance();
     }
 
     /**
