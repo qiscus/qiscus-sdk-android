@@ -1154,7 +1154,7 @@ public class QiscusCore {
 
     public static void clearUser() {
         if (hasSetupUser()) {
-            if (appComponent.getEnableRefreshToken()){
+            if (appComponent.getEnableRefreshToken()) {
                 QiscusAccount account = appComponent.getLocalDataManager()
                         .getAccountInfo();
                 QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
@@ -1165,11 +1165,12 @@ public class QiscusCore {
                         }, throwable -> {
                             clearData();
                         });
-            }else{
+            } else {
                 clearData();
             }
+        }else{
+            clearData();
         }
-
     }
 
     public static void clearData(){
