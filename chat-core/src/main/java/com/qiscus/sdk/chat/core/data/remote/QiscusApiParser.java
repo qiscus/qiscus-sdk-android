@@ -72,20 +72,32 @@ final class QiscusApiParser {
         return parseQiscusAccount(jsonAccount, true);
     }
 
+    static QiscusAccount parseQiscusAccountWithoutToken(JsonElement jsonElement) {
+        JSONObject jsonAccount = null;
+        try {
+            jsonAccount = new JSONObject(jsonElement.getAsJsonObject().get("results")
+                    .getAsJsonObject().get("user").getAsJsonObject().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return parseQiscusAccount(jsonAccount, false);
+    }
+
     static QiscusAccount parseQiscusAccount(JSONObject jsonAccount, Boolean isSelf) {
         QiscusAccount qiscusAccount = new QiscusAccount();
         qiscusAccount.setId(jsonAccount.optInt("id"));
         qiscusAccount.setUsername(jsonAccount.optString("username"));
         qiscusAccount.setEmail(jsonAccount.optString("email"));
         qiscusAccount.setAvatar(jsonAccount.optString("avatar_url"));
-        qiscusAccount.setRefreshToken(jsonAccount.optString("refresh_token"));
-        qiscusAccount.setTokenExpiresAt(jsonAccount.optString("token_expires_at"));
+
         try {
             qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
         } catch (Exception ignored) {
             //Do nothing
         }
         if (isSelf) {
+            qiscusAccount.setRefreshToken(jsonAccount.optString("refresh_token"));
+            qiscusAccount.setTokenExpiresAt(jsonAccount.optString("token_expires_at"));
             qiscusAccount.setToken(jsonAccount.optString("token"));
         }
         return qiscusAccount;
