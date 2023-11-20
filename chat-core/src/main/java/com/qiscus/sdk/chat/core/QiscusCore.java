@@ -1143,15 +1143,16 @@ public class QiscusCore {
 
     public static void clearUser() {
         if (hasSetupUser()) {
-            QiscusAccount account = localDataManager.getAccountInfo();
-            QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(jsonObject -> {
-                        clearData();
-                    }, throwable -> {
-                        clearData();
-                    });
+//            QiscusAccount account = localDataManager.getAccountInfo();
+//            QiscusApi.getInstance().logout(account.getEmail(), account.getToken())
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(jsonObject -> {
+//                        clearData();
+//                    }, throwable -> {
+//                        clearData();
+//                    });
+            clearData();
         }
 
     }
