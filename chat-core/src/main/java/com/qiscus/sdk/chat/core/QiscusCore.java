@@ -25,9 +25,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.text.format.DateUtils;
 
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
+import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
@@ -39,6 +43,7 @@ import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
 import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusClearCommentsHandler;
 import com.qiscus.sdk.chat.core.data.remote.QiscusDeleteCommentHandler;
@@ -48,15 +53,20 @@ import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.mediator.QiscusMediator;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFirebaseMessagingUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
+import com.qiscus.utils.jupukdata.JupukData;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
@@ -95,6 +105,8 @@ public class QiscusCore {
     private static Boolean forceDisableRealtimeFromExactAlarm = false;
     private static Boolean syncServiceDisabled = false;
 
+    private Boolean autoRefreshToken = true;
+    private Boolean enableRefreshToken = false;
     public QiscusCore() {
     }
 
@@ -244,6 +256,17 @@ public class QiscusCore {
 
         qiscusMediator.initAllClass(this);
 
+        AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmMgr.canScheduleExactAlarms()) {
+                setForceDisableRealtimeFromExactAlarm(true);
+            } else {
+                setForceDisableRealtimeFromExactAlarm(false);
+            }
+
+        }
+
+
         qiscusMediator.getActivityCallback().setAppActiveOrForground();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             checkExactAlarm(application);
@@ -274,6 +297,7 @@ public class QiscusCore {
 
                     if (!appConfig.getBrokerLBURL().isEmpty()) {
                         this.baseURLLB = appConfig.getBrokerLBURL();
+                        this.localDataManager.setURLLB(baseURLLB);
                     }
 
                     if (!appConfig.getBrokerURL().isEmpty()) {
@@ -302,21 +326,35 @@ public class QiscusCore {
                         networkConnectionInterval = appConfig.getNetworkConnectionInterval();
                     }
 
-
                     enableRealtime = appConfig.getEnableRealtime();
                     enableSync = appConfig.getEnableSync();
                     enableSyncEvent = appConfig.getEnableSyncEvent();
 
+                    //enableRefreshToken
+                    setEnableRefreshToken(appConfig.getIsEnableRefreshToken());
 
-                    if (!enableRealtime) {
-                        //enable realtime false
-                        getPusherApi().disconnect();
+                    // call refresh token
+                    setAutoRefreshToken(appConfig.getAutoRefreshToken());
+                    if (appConfig.getAutoRefreshToken()) {
+                        autoRefreshToken();
                     }
+
+
+                    if (enableRealtime) {
+                        getPusherApi().initConnect(this);
+                    }
+
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(qiscusMediator.getActivityCallback());
 
                 }, throwable -> {
                     getErrorLogger().print(throwable);
                     getApi().reInitiateInstance();
                     setCacheMqttBrokerUrl(mqttBrokerUrl, false);
+                    if (enableRealtime) {
+                        getPusherApi().initConnect(this);
+                    }
+                    autoRefreshToken();
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(qiscusMediator.getActivityCallback());
                 });
 
     }
@@ -333,6 +371,10 @@ public class QiscusCore {
      */
     public boolean getEnableSync() {
         return enableSync;
+    }
+
+    public QiscusMediator getQiscusMediator() {
+        return qiscusMediator;
     }
 
     /**
@@ -485,17 +527,115 @@ public class QiscusCore {
         };
     }
 
-    public static void setIsExactAlarmDisable(Boolean isExactAlarmDisable){
-        forceDisableRealtimeFromExactAlarm = isExactAlarmDisable;
-    }
-
-    public static boolean getIsExactAlarmDisable() {
-        return forceDisableRealtimeFromExactAlarm;
-    }
-
     public static Boolean isSyncServiceDisabledManually() {
         return syncServiceDisabled;
     }
+
+    public static void setForceDisableRealtimeFromExactAlarm(Boolean isExactAlarmDisable){
+        forceDisableRealtimeFromExactAlarm = isExactAlarmDisable;
+    }
+
+    public static boolean getForceDisableRealtimeFromExactAlarm() {
+        return forceDisableRealtimeFromExactAlarm;
+    }
+
+
+    /**
+     * Accessor to get current qiscus refresh token
+     *
+     * @return Current qiscus user refresh token
+     */
+    public String getRefreshToken() {
+        checkUserSetup();
+        return  getLocalDataManager()
+                .getRefreshToken();
+    }
+
+    /**
+     * Use this method to set new qiscus refresh token
+     *
+     * @param newToken the QiscusRefreshToken
+     */
+    public void saveRefreshToken(QiscusRefreshToken newToken) {
+        checkUserSetup();
+        QAccount account =  getLocalDataManager()
+                .getAccountInfo();
+        account.setToken(newToken.getToken());
+        account.setRefreshToken(newToken.getRefreshToken());
+        account.setTokenExpiresAt(newToken.getTokenExpiresAt());
+        getLocalDataManager()
+                .saveAccountInfo(account);
+    }
+
+    /**
+     * all current qiscus refresh token, You can call this method when you get Unauthorized event for example.
+     */
+
+    public void refreshToken(SetRefreshTokenListener listener) {
+        if (hasSetupUser()) {
+            QAccount account = localDataManager.getAccountInfo();
+            qiscusMediator.getApi().refreshToken(account.getId(), account.getRefreshToken())
+                    .doOnNext(this::saveRefreshToken)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(refreshToken -> {
+                        if (listener != null) listener.onSuccess(refreshToken);
+                    }, throwable -> {
+                        if (listener != null) listener.onError(throwable);
+                    });
+
+        }
+    }
+
+    private void autoRefreshToken() {
+        if (hasSetupUser()) {
+            if (isValidToRefreshToken(localDataManager.getAccountInfo())) {
+                QiscusAndroidUtil.runOnBackgroundThread(() ->
+                        refreshToken(new SetRefreshTokenListener() {
+                            @Override
+                            public void onSuccess(QiscusRefreshToken refreshToken) {
+                                qiscusMediator.getErrorLogger().print(
+                                        "AutoRefreshToken", refreshToken != null ? "success" : "failed"
+                                );
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+                                qiscusMediator.getErrorLogger().print(throwable);
+                            }
+                        })
+                );
+            }
+        }
+    }
+
+    public Boolean isAutoRefreshToken() {
+        return autoRefreshToken;
+    }
+
+    public void setAutoRefreshToken(Boolean autoRefreshTokenData) {
+        autoRefreshToken = autoRefreshTokenData;
+    }
+
+    public Boolean getEnableRefreshToken() {
+        return enableRefreshToken;
+    }
+
+    public void setEnableRefreshToken(Boolean enableRefreshTokenData) {
+        enableRefreshToken = enableRefreshTokenData;
+    }
+
+    private boolean isValidToRefreshToken(QAccount account) {
+        if (account.getTokenExpiresAt().isEmpty()) {
+            return false;
+        }else{
+            Date expiredAt = QiscusDateUtil.getDateTimeSdf(account.getTokenExpiresAt());
+            return DateUtils.isToday(expiredAt.getTime())
+                    || QiscusDateUtil.isBeforeADaySdf(expiredAt.getTime())
+                    || QiscusDateUtil.isPassingDateTimeSdf(expiredAt.getTime());
+        }
+
+    }
+
 
     /**
      * Accessor to get current LocalDataManager
@@ -1031,7 +1171,43 @@ public class QiscusCore {
     /**
      * Clear all current user qiscus data, you can call this method when user logout for example.
      */
+    public void logout(LogoutListener listener) {
+        if (hasSetupUser()) {
+            QAccount account = localDataManager.getAccountInfo();
+            getQiscusMediator().getApi().logout(account.getId(), account.getToken())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(jsonObject -> listener.onSuccess(), listener::onError);
+        }
+    }
+
+
+    /**
+     * Clear all current user qiscus data, you can call this method when user logout for example.
+     */
+
     public void clearUser() {
+        if (hasSetupUser()) {
+            if (getEnableRefreshToken()) {
+                QAccount account = getLocalDataManager()
+                        .getAccountInfo();
+                getQiscusMediator().getApi().logout(account.getId(), account.getToken())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(jsonObject -> {
+                            clearData();
+                        }, throwable -> {
+                            clearData();
+                        });
+            } else {
+                clearData();
+            }
+        }else{
+            clearData();
+        }
+    }
+
+    public void clearData(){
         if (BuildVersionUtil.isOreoOrHigher()) {
             JobScheduler jobScheduler = (JobScheduler) appInstance.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             if (jobScheduler != null) {
@@ -1040,6 +1216,7 @@ public class QiscusCore {
         }
         localDataManager.clearData();
         dataStore.clear();
+
         getCacheManager().clearData();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
     }
@@ -1091,6 +1268,10 @@ public class QiscusCore {
         }
     }
 
+    public void setEnableDisableRealtime(Boolean enableDisableRealtime){
+        enableRealtime = enableDisableRealtime;
+    }
+
 
     public interface OnSendMessageListener {
         void onSending(QMessage qMessage);
@@ -1127,15 +1308,127 @@ public class QiscusCore {
         void onError(Throwable throwable);
     }
 
+    public interface SetRefreshTokenListener {
+        /**
+         * Called if refresh token succeed
+         *
+         * @param refreshToken Saved qiscus refresh token
+         */
+        void onSuccess(QiscusRefreshToken refreshToken);
+
+        /**
+         * Called if error happened while saving qiscus refresh token. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
+    public interface LogoutListener {
+        /**
+         * Called if logout succeed
+         *
+         */
+        void onSuccess();
+
+        /**
+         * Called if error happened while saving qiscus logout. e.g network error
+         *
+         * @param throwable The cause of error
+         */
+        void onError(Throwable throwable);
+    }
+
     private class LocalDataManager {
-        private final SharedPreferences sharedPreferences;
+        private SharedPreferences sharedPreferences;
         private final Gson gson;
         private String token;
 
+        private String refreshToken;
+
         LocalDataManager(String localPrefKey) {
-            sharedPreferences = getApps().getSharedPreferences(getAppId() + localPrefKey + "qiscus.cfg", Context.MODE_PRIVATE);
+
+            SharedPreferences sharedPreferencesOld  = getApps().getSharedPreferences(getAppId() + localPrefKey + "qiscus.cfg", Context.MODE_PRIVATE);
+
+            try {
+                String sharedPrefsFile = JupukData.getFileName();
+                boolean isActive = false;
+
+                if (isActive) {
+                    sharedPreferences = EncryptedSharedPreferences.create(
+                            sharedPrefsFile,
+                            getAppId() + localPrefKey + JupukData.getFileKey(),
+                            getApps().getApplicationContext(),
+                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                    );
+
+                } else {
+                    MasterKey masterKey = new MasterKey.Builder(getApps().getApplicationContext(), getAppId() + localPrefKey +  JupukData.getFileKey())
+                            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                            .build();
+
+                    sharedPreferences = EncryptedSharedPreferences.create(getApps().getApplicationContext(),
+                            sharedPrefsFile,
+                            masterKey,
+                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+                }
+
+                String dataAccount = sharedPreferencesOld.getString("cached_account", "");
+                String LbUrl = sharedPreferencesOld.getString("lb_url", "");
+                String brokerUrl = sharedPreferencesOld.getString("mqtt_broker_url", "");
+                String fcmToken = sharedPreferencesOld.getString("fcm_token", "");
+
+
+                SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
+
+                if (!dataAccount.isEmpty()) {
+                    //migration to new Data
+                    sharedPrefsEditor.putString("cached_account", dataAccount);
+                }
+
+                if (!LbUrl.isEmpty()) {
+                    sharedPrefsEditor.putString("lb_url", LbUrl);
+                }
+
+                if (!brokerUrl.isEmpty()) {
+                    sharedPrefsEditor.putString("mqtt_broker_url", brokerUrl);
+                }
+
+                if (!fcmToken.isEmpty()) {
+                    sharedPrefsEditor.putString("fcm_token", fcmToken);
+                }
+
+                sharedPrefsEditor.apply();
+
+                //remove old data
+                sharedPreferencesOld.edit().clear().apply();
+
+
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (IOException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (SecurityException e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (Exception e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            } catch (Error e) {
+                e.printStackTrace();
+                sharedPreferences = sharedPreferencesOld;
+            }
+
             gson = new Gson();
             token = isLogged() ? getAccountInfo().getToken() : "";
+            refreshToken = isLogged() ? getAccountInfo().getRefreshToken() : "";
         }
 
         private boolean isLogged() {
@@ -1145,6 +1438,7 @@ public class QiscusCore {
         private void saveAccountInfo(QAccount qiscusAccount) {
             sharedPreferences.edit().putString("cached_account", gson.toJson(qiscusAccount)).apply();
             setToken(qiscusAccount.getToken());
+            setRefreshToken(qiscusAccount.getRefreshToken());
         }
 
         private QAccount getAccountInfo() {
@@ -1157,6 +1451,14 @@ public class QiscusCore {
 
         private void setToken(String token) {
             this.token = token;
+        }
+
+        private String getRefreshToken() {
+            return refreshToken == null ? refreshToken = "" : refreshToken;
+        }
+
+        private void setRefreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
         }
 
         private String getFcmToken() {
@@ -1219,6 +1521,7 @@ public class QiscusCore {
         private void setEnableDisableRealtimeManually(Boolean enableDisableRealtimeManually) {
             sharedPreferences.edit().putBoolean("realtime_enable_disable", enableDisableRealtimeManually).apply();
         }
+
 
         /**
          * save local sharedPref for enable / disable realtime (manual)

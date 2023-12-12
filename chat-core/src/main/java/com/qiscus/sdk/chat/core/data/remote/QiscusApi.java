@@ -16,6 +16,11 @@
 
 package com.qiscus.sdk.chat.core.data.remote;
 
+import static com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent.EXPIRED_TOKEN;
+import static com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent.TOKEN_EXPIRED_MESSAGE;
+import static com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent.UNAUTHORIZED;
+import static com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent.UNAUTHORIZED_MESSAGE;
+
 import android.net.Uri;
 import android.os.Build;
 
@@ -37,9 +42,11 @@ import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.event.QMessageSentEvent;
 import com.qiscus.sdk.chat.core.event.QMessageUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusClearMessageEvent;
+import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
@@ -118,7 +125,9 @@ public class QiscusApi {
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(
+                            makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog())
+                    )
                     .connectionSpecs(Collections.singletonList(spec))
                     .build();
 
@@ -127,7 +136,9 @@ public class QiscusApi {
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(
+                            makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog())
+                    )
                     .build();
         }
 
@@ -153,8 +164,18 @@ public class QiscusApi {
             httpClient = new OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
+                   // .addInterceptor(QiscusInterceptor::headersInterceptor)
                     .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(
+                            makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog())
+                    )
+//                    .addInterceptor(
+//                            QiscusInterceptor.makeLoggingInterceptor(
+//                                    qiscusCore.getChatConfig().isEnableLog()
+//                            )
+//                    )
+
+
                     .connectionSpecs(Collections.singletonList(spec))
                     .build();
 
@@ -162,8 +183,17 @@ public class QiscusApi {
             httpClient = new OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
+                   // .addInterceptor(QiscusInterceptor::headersInterceptor)
                     .addInterceptor(this::headersInterceptor)
-                    .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                    .addInterceptor(
+                            makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog())
+                    )
+//                    .addInterceptor(
+//                            QiscusInterceptor.makeLoggingInterceptor(
+//                                    qiscusCore.getChatConfig().isEnableLog()
+//                            )
+//                    )
+
                     .build();
         }
 
@@ -177,6 +207,11 @@ public class QiscusApi {
     }
 
     private Response headersInterceptor(Interceptor.Chain chain) throws IOException {
+        return refreshToken(chain, createNewBuilder(chain));
+    }
+
+    private Request.Builder createNewBuilder(Interceptor.Chain chain) {
+
         Request.Builder builder = chain.request().newBuilder();
         JSONObject jsonCustomHeader = qiscusCore.getCustomHeader();
 
@@ -204,9 +239,58 @@ public class QiscusApi {
                 }
             }
         }
-        Request req = builder.build();
 
-        return chain.proceed(req);
+        return builder;
+    }
+
+    private Response refreshToken(Interceptor.Chain chain, Request.Builder builder) throws IOException {
+        Response initialResponse = chain.proceed(builder.build());
+
+        if (initialResponse != null
+                && (initialResponse.code() == UNAUTHORIZED
+                || initialResponse.code() == EXPIRED_TOKEN)) {
+            try {
+                JSONObject jsonResponse = new JSONObject(initialResponse.body().string());
+                handleResponse(
+                        initialResponse.code(), jsonResponse
+                );
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } finally {
+                initialResponse = chain.proceed(
+                        createNewBuilder(chain).build()
+                );
+            }
+        }
+
+        return initialResponse;
+    }
+
+    private void handleResponse(int code, JSONObject jsonResponse) throws JSONException {
+        if (!jsonResponse.has("error")) return;
+        JSONObject jsonObject = jsonResponse.getJSONObject("error");
+
+        autoRefreshToken(code, jsonObject);
+        sendEvent(code, jsonObject);
+    }
+
+    private void autoRefreshToken(int code, JSONObject jsonObject) throws JSONException {
+        if (qiscusCore.isAutoRefreshToken()
+                && code == EXPIRED_TOKEN
+                && jsonObject.getString("message").equals(TOKEN_EXPIRED_MESSAGE)
+        ) {
+            qiscusCore.refreshToken(null);
+        }
+    }
+
+    private void sendEvent(int code, JSONObject jsonObject)  throws JSONException {
+        if (jsonObject.getString("message").contains(UNAUTHORIZED_MESSAGE)) {
+            EventBus.getDefault().post(
+                    new QiscusRefreshTokenEvent(
+                            code, jsonObject.getString("message")
+                    )
+            );
+        }
     }
 
     private HttpLoggingInterceptor makeLoggingInterceptor(boolean isDebug) {
@@ -217,10 +301,17 @@ public class QiscusApi {
 
     @Deprecated
     public Observable<QiscusNonce> requestNonce() {
+        if (qiscusCore.hasSetupUser()){
+            qiscusCore.clearData();
+        }
+
         return api.requestNonce().map(QiscusApiParser::parseNonce);
     }
 
     public Observable<QiscusNonce> getJWTNonce() {
+        if (qiscusCore.hasSetupUser()){
+            qiscusCore.clearData();
+        }
         return api.requestNonce().map(QiscusApiParser::parseNonce);
     }
 
@@ -235,6 +326,9 @@ public class QiscusApi {
 
     @Deprecated
     public Observable<QAccount> loginOrRegister(String email, String password, String username, String avatarUrl) {
+        if (qiscusCore.hasSetupUser()){
+            qiscusCore.clearData();
+        }
         return loginOrRegister(email, password, username, avatarUrl, null);
     }
 
@@ -247,6 +341,9 @@ public class QiscusApi {
     }
 
     public Observable<QAccount> setUser(String userId, String userKey, String username, String avatarURL, JSONObject extras) {
+        if (qiscusCore.hasSetupUser()){
+            qiscusCore.clearData();
+        }
         return api.loginOrRegister(QiscusHashMapUtil.loginOrRegister(
                 userId, userKey, username, avatarURL, extras == null ? null : extras.toString()))
                 .map(QiscusApiParser::parseQiscusAccount);
@@ -265,13 +362,13 @@ public class QiscusApi {
     public Observable<QAccount> updateProfile(String username, String avatarUrl, JSONObject extras) {
         return api.updateProfile(QiscusHashMapUtil.updateProfile(
                 username, avatarUrl, extras == null ? null : extras.toString()))
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(QiscusApiParser::parseQiscusAccountWithoutToken);
     }
 
     public Observable<QAccount> updateUser(String name, String avatarURL, JSONObject extras) {
         return api.updateProfile(QiscusHashMapUtil.updateProfile(
                 name, avatarURL, extras == null ? null : extras.toString()))
-                .map(QiscusApiParser::parseQiscusAccount);
+                .map(QiscusApiParser::parseQiscusAccountWithoutToken);
     }
 
     public Observable<QAccount> getUserData() {
@@ -586,8 +683,7 @@ public class QiscusApi {
 
     public Observable<QMessage> sync() {
         QMessage latestComment = qiscusCore.getDataStore().getLatestComment();
-        if (latestComment == null || !qiscusCore.getApps().getString(R.string.qiscus_today)
-                .equals(QiscusDateUtil.toTodayOrDate(latestComment.getTimestamp()))) {
+        if (latestComment == null) {
             return synchronize(0);
         }
         return synchronize(latestComment.getId());
@@ -1045,7 +1141,9 @@ public class QiscusApi {
                         .connectTimeout(60, TimeUnit.SECONDS)
                         .readTimeout(60, TimeUnit.SECONDS)
                         .addInterceptor(this::headersInterceptor)
-                        .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                        .addInterceptor(
+                                makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog())
+                        )
                         .connectionSpecs(Collections.singletonList(spec))
                         .build();
 
@@ -1054,7 +1152,9 @@ public class QiscusApi {
                         .connectTimeout(60, TimeUnit.SECONDS)
                         .readTimeout(60, TimeUnit.SECONDS)
                         .addInterceptor(this::headersInterceptor)
-                        .addInterceptor(makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog()))
+                        .addInterceptor(
+                                makeLoggingInterceptor(qiscusCore.getChatConfig().isEnableLog())
+                        )
                         .build();
             }
 
@@ -1196,6 +1296,23 @@ public class QiscusApi {
                 .map(jsonResults -> jsonResults.get("total_unread_count").getAsLong());
 
     }
+
+    public Observable<QiscusRefreshToken> refreshToken(String userId, String refreshToken) {
+        if (refreshToken == null) {
+            throw new IllegalArgumentException("you need to logout first, and relogin");
+        }
+
+        return api.refreshToken(QiscusHashMapUtil.refreshToken(userId, refreshToken))
+                .map(JsonElement::getAsJsonObject)
+                .map(QiscusApiParser::parseRefreshToken);
+    }
+
+
+    public Observable<JsonObject> logout(String userId, String token) {
+        return api.logout(QiscusHashMapUtil.logout(userId, token))
+                .map(JsonElement::getAsJsonObject);
+    }
+
 
     private interface Api {
 
@@ -1438,6 +1555,19 @@ public class QiscusApi {
         Observable<JsonElement> searchMessage(
                 @Body HashMap<String, Object> data
         );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/mobile/refresh_user_token")
+        Observable<JsonElement> refreshToken(
+                @Body HashMap<String, Object> data
+        );
+
+        @Headers("Content-Type: application/json")
+        @POST("api/v2/sdk/logout")
+        Observable<JsonElement> logout(
+                @Body HashMap<String, Object> data
+        );
+
     }
 
     public interface MetaRoomMembersListener {

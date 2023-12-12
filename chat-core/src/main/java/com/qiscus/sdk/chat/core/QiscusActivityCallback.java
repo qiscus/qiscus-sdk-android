@@ -23,6 +23,10 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 
@@ -34,7 +38,7 @@ import java.util.concurrent.ScheduledFuture;
  * Name       : Zetra
  * GitHub     : https://github.com/zetbaitsu
  */
-public class QiscusActivityCallback implements Application.ActivityLifecycleCallbacks {
+public class QiscusActivityCallback implements LifecycleObserver {
 
     private static final long MAX_ACTIVITY_TRANSITION_TIME = 2000;
     private static boolean foreground;
@@ -45,49 +49,33 @@ public class QiscusActivityCallback implements Application.ActivityLifecycleCall
     public QiscusActivityCallback(QiscusCore qiscusCore) {
         this.qiscusCore = qiscusCore;
     }
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    public void onCreate() {
 
-    @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
     }
 
-    @Override
-    public void onActivityStarted(Activity activity) {
-        AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!alarmMgr.canScheduleExactAlarms()) {
-                qiscusCore.setIsExactAlarmDisable(true);
-            } else {
-                qiscusCore.setIsExactAlarmDisable(false);
-            }
-        }
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    public void onActivityStarted() {
 
         foreground = true;
 
-//        if (!qiscusCore.getAndroidUtil().isMyServiceRunning() && !qiscusCore.isSyncServiceDisabledManually()) {
-//            qiscusCore.startSyncService();
-//        }
+        if (!qiscusCore.getAndroidUtil().isMyServiceRunning() && !QiscusCore.isSyncServiceDisabledManually()) {
+            qiscusCore.getQiscusMediator().getSyncTimer().startSchedule();
+        }
     }
 
-    @Override
-    public void onActivityResumed(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    public void onActivityResumed() {
         stopActivityTransitionTimer();
     }
 
-    @Override
-    public void onActivityPaused(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    public void onActivityPaused() {
         startActivityTransitionTimer();
     }
 
-    @Override
-    public void onActivityStopped(Activity activity) {
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-    }
-
-    @Override
-    public void onActivityDestroyed(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onActivityStopped() {
     }
 
     boolean isForeground() {
@@ -99,17 +87,16 @@ public class QiscusActivityCallback implements Application.ActivityLifecycleCall
     }
 
     private void startActivityTransitionTimer() {
-        activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() -> foreground = false,
-                MAX_ACTIVITY_TRANSITION_TIME);
+        activityTransition = QiscusAndroidUtil.runOnBackgroundThread(() ->{
+            foreground = false ;
+        }, MAX_ACTIVITY_TRANSITION_TIME);
 
         activityTransition2 = QiscusAndroidUtil.runOnBackgroundThread(() -> check(), MAX_ACTIVITY_TRANSITION_TIME);
     }
 
     private void check(){
         if (!foreground) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                qiscusCore.getPusherApi().disconnect();
-            }
+            qiscusCore.getPusherApi().disconnect();
         }
     }
 

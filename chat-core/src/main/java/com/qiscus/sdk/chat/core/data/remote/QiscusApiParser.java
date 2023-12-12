@@ -31,6 +31,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
+import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.json.JSONException;
@@ -50,6 +51,11 @@ import java.util.Locale;
  * GitHub     : https://github.com/zetbaitsu
  */
 final class QiscusApiParser {
+    private static final String RESULTS = "results";
+    // token params
+    private static final String TOKEN = "token";
+    private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String TOKEN_EXPIRES_AT = "token_expires_at";
 
     static QiscusNonce parseNonce(JsonElement jsonElement) {
         JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
@@ -58,26 +64,44 @@ final class QiscusApiParser {
     }
 
     static QAccount parseQiscusAccount(JsonElement jsonElement) {
-        JsonObject jsonAccount = jsonElement.getAsJsonObject().get("results").getAsJsonObject().get("user").getAsJsonObject();
+        JSONObject jsonAccount = null;
+        try {
+            jsonAccount = new JSONObject(jsonElement.getAsJsonObject().get("results")
+                    .getAsJsonObject().get("user").getAsJsonObject().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return parseQiscusAccount(jsonAccount, true);
     }
 
-    static QAccount parseQiscusAccount(JsonObject jsonAccount, Boolean isSelf) {
-        QAccount qAccount = new QAccount();
-        qAccount.setId(jsonAccount.get("email").getAsString());
-        qAccount.setName(jsonAccount.get("username").getAsString());
-        qAccount.setAvatarUrl(jsonAccount.get("avatar_url").getAsString());
-        qAccount.setLastMessageId(jsonAccount.get("last_comment_id").getAsLong());
-        qAccount.setLastSyncEventId(jsonAccount.get("last_sync_event_id").getAsLong());
+    static QAccount parseQiscusAccountWithoutToken(JsonElement jsonElement) {
+        JSONObject jsonAccount = null;
         try {
-            qAccount.setExtras(new JSONObject(jsonAccount.get("extras").getAsJsonObject().toString()));
+            jsonAccount = new JSONObject(jsonElement.getAsJsonObject().get("results")
+                    .getAsJsonObject().get("user").getAsJsonObject().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return parseQiscusAccount(jsonAccount, false);
+    }
+
+    static QAccount parseQiscusAccount(JSONObject jsonAccount, Boolean isSelf) {
+        QAccount qiscusAccount = new QAccount();
+        qiscusAccount.setName(jsonAccount.optString("username"));
+        qiscusAccount.setId(jsonAccount.optString("email"));
+        qiscusAccount.setAvatarUrl(jsonAccount.optString("avatar_url"));
+
+        try {
+            qiscusAccount.setExtras(jsonAccount.optJSONObject("extras"));
         } catch (Exception ignored) {
             //Do nothing
         }
         if (isSelf) {
-            qAccount.setToken(jsonAccount.get("token").getAsString());
+            qiscusAccount.setRefreshToken(jsonAccount.optString("refresh_token"));
+            qiscusAccount.setTokenExpiresAt(jsonAccount.optString("token_expires_at"));
+            qiscusAccount.setToken(jsonAccount.optString("token"));
         }
-        return qAccount;
+        return qiscusAccount;
     }
 
     static QUser parseQUser(JsonElement jsonElement) {
@@ -475,6 +499,20 @@ final class QiscusApiParser {
                 appConfig.setEnableSyncEvent(false);
             }
 
+            // refresh token
+            if (results.has("auto_refresh_token")) {
+                appConfig.setAutoRefreshToken(results.get("auto_refresh_token").getAsBoolean());
+            } else {
+                appConfig.setAutoRefreshToken(false);
+            }
+
+            // enable refresh token
+            if (results.has("enable_refresh_token")) {
+                appConfig.setIsEnableRefreshToken(results.get("enable_refresh_token").getAsBoolean());
+            } else {
+                appConfig.setIsEnableRefreshToken(false);
+            }
+
             return appConfig;
 
         } else {
@@ -686,5 +724,23 @@ final class QiscusApiParser {
         }
 
         return qiscusComment;
+    }
+
+    public static QiscusRefreshToken parseRefreshToken(JsonObject jsonRefreshToken) {
+        QiscusRefreshToken refreshToken = new QiscusRefreshToken();
+        if (jsonRefreshToken.has(RESULTS)) {
+            JsonObject jsonResult = jsonRefreshToken.get(RESULTS).getAsJsonObject();
+
+            if (jsonResult.has(TOKEN)) {
+                refreshToken.setToken(jsonResult.get(TOKEN).getAsString());
+            }
+            if (jsonResult.has(REFRESH_TOKEN)) {
+                refreshToken.setRefreshToken(jsonResult.get(REFRESH_TOKEN).getAsString());
+            }
+            if (jsonResult.has(TOKEN_EXPIRES_AT)) {
+                refreshToken.setTokenExpiresAt(jsonResult.get(TOKEN_EXPIRES_AT).getAsString());
+            }
+        }
+        return refreshToken;
     }
 }

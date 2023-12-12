@@ -23,12 +23,12 @@ public final class QiscusLogger {
     }
 
     public void print(String message) {
-        print(TAG, message);
+        print(TAG, qiscusCore.getAppId() + "-" + message);
     }
 
     public void print(String tag, String message) {
         if (qiscusCore.getChatConfig().isEnableLog()) {
-            Log.d(tag, message);
+            Log.d(tag, qiscusCore.getAppId() + "-"+ message);
         }
     }
 }

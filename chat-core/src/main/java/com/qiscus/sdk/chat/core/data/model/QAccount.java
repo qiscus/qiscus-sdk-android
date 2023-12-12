@@ -48,6 +48,11 @@ public class QAccount implements Parcelable {
     protected Long lastMessageId;
     protected Long lastSyncEventId;
 
+    protected String refreshToken;
+    protected String tokenExpiresAt;
+
+
+
     public QAccount() {
 
     }
@@ -59,6 +64,9 @@ public class QAccount implements Parcelable {
         name = in.readString();
         lastSyncEventId = in.readLong();
         lastMessageId = in.readLong();
+
+        refreshToken = in.readString();
+        tokenExpiresAt = in.readString();
         try {
             extras = new JSONObject(in.readString());
         } catch (Exception ignored) {
@@ -89,6 +97,23 @@ public class QAccount implements Parcelable {
     public void setToken(String token) {
         this.token = token;
     }
+
+    public String getRefreshToken() {
+        return refreshToken == null ? refreshToken = "" : refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public String getTokenExpiresAt() {
+        return tokenExpiresAt == null ? tokenExpiresAt = "" : tokenExpiresAt;
+    }
+
+    public void setTokenExpiresAt(String tokenExpiresAt) {
+        this.tokenExpiresAt = tokenExpiresAt;
+    }
+
 
     public String getName() {
         return name;
@@ -135,6 +160,8 @@ public class QAccount implements Parcelable {
         dest.writeString(name);
         dest.writeLong(lastSyncEventId);
         dest.writeLong(lastMessageId);
+        dest.writeString(refreshToken);
+        dest.writeString(tokenExpiresAt);
         if (extras == null) {
             extras = new JSONObject();
         }
@@ -145,19 +172,7 @@ public class QAccount implements Parcelable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        QAccount that = (QAccount) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (avatarUrl != null ? !avatarUrl.equals(that.avatarUrl) : that.avatarUrl != null)
-            return false;
-        if (token != null ? !token.equals(that.token) : that.token != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (extras != null ? !extras.equals(that.extras) : that.extras != null) return false;
-        if (lastMessageId != null ? !lastMessageId.equals(that.lastMessageId) : that.lastMessageId != null)
-            return false;
-        return lastSyncEventId != null ? lastSyncEventId.equals(that.lastSyncEventId) : that.lastSyncEventId == null;
+        return o instanceof QAccount && id == (((QAccount) o).id);
     }
 
     @Override
@@ -167,6 +182,8 @@ public class QAccount implements Parcelable {
         result = 31 * result + (token != null ? token.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (extras != null ? extras.hashCode() : 0);
+        result = 31 * result + (refreshToken != null ? refreshToken.hashCode() : 0);
+        result = 31 * result + (tokenExpiresAt != null ? tokenExpiresAt.hashCode() : 0);
         result = 31 * result + (lastMessageId != null ? lastMessageId.hashCode() : 0);
         result = 31 * result + (lastSyncEventId != null ? lastSyncEventId.hashCode() : 0);
         return result;
@@ -178,6 +195,8 @@ public class QAccount implements Parcelable {
                 "id=" + id +
                 ", avatar='" + avatarUrl + '\'' +
                 ", token='" + token + '\'' +
+                ", refresh_token='" + refreshToken + '\'' +
+                ", token_expires_at='" + tokenExpiresAt + '\'' +
                 ", name='" + name + '\'' +
                 ", extras=" + extras + '\'' +
                 ", lastMessageId=" + lastMessageId + '\'' +

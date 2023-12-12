@@ -28,32 +28,32 @@ repositories {
 
 ext {
 
-    minSDKVersion = 16
-    targetSDKVersion = 31
-    compileSDKVersion = 31
+    minSDKVersion = 21
+    targetSDKVersion = 33
+    compileSDKVersion = 33
 
     versions = [
             support          : "31.0.0",
-            firebaseCore     : "19.0.0",
-            firebaseMessaging: "22.0.0",
-            okHttp           : "3.12.5",
-            retrofit         : "2.3.0",
+            firebaseCore     : "21.1.1",
+            firebaseMessaging: "23.1.2",
+            okHttp           : "4.11.0",
+            retrofit         : "2.9.0",
 
             nirmana          : "1.3.0",
             manggil          : "1.0.1",
-            jupuk            : "1.5.2",
+            jupuk            : "1.5.5",
 
             rxJava           : "1.3.4",
             rxAndroid        : "1.2.1",
 
             trelloLifecycle  : "1.0",
 
-            places           : "1.1.0",
+            places           : "3.1.0",
             placePicker      : "v1.0.5a"
     ]
 
     supportDeps = [
-            appcompat   : "com.android.support:appcompat-v7:$versions.support",
+            appcompat   : "androidx.appcompat:appcompat:1.6.1",
             design      : "com.android.support:design:$versions.support",
             cardView    : "com.android.support:cardview-v7:$versions.support",
             recyclerView: "com.android.support:recyclerview-v7:$versions.support",
@@ -67,14 +67,20 @@ ext {
             messaging: "com.google.firebase:firebase-messaging:$versions.firebaseMessaging"
     ]
 
+    securityDeps = [
+            crypto : "androidx.security:security-crypto:1.1.0-alpha03",
+            jupukData : "com.qiscus.utils:jupukdata:1.0.0",
+            authenticator : "androidx.security:security-app-authenticator:1.0.0-alpha02"
+    ]
+
     qiscusUtilDeps = [
             nirmana: "com.qiscus.utils:nirmana:$versions.nirmana",
             jupuk  : "com.qiscus.utils:jupuk:$versions.jupuk"
     ]
 
     qiscusMqttDeps = [
-            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1",
-            android: "com.qiscus.mqtt:android:1.1.6"
+            client : "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5",
+            android: "com.qiscus.mqtt:android:1.2.0"
     ]
 
     okHttpDeps = [
@@ -99,20 +105,47 @@ ext {
             trelloLifecycleComponents: "com.trello:rxlifecycle-components:${versions.trelloLifecycle}"
     ]
 
+    lifeCircleDeb = [
+            lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    ]
+
+    rxunfurlDeb = [
+            jsoup   : "org.jsoup:jsoup:1.16.1"
+    ]
+
+    testUnitDeb = [
+            junit : "junit:junit:4.13.2",
+            mockito : 'org.mockito:mockito-core:3.7.7'
+    ]
+
+    androidTestUnitDeb = [
+            core    : "androidx.test:core:1.4.0",
+            junit   : "androidx.test.ext:junit:1.1.3",
+            runner  : "androidx.test:runner:1.4.0",
+            mockito : 'org.mockito:mockito-android:3.7.7',
+            espresso: 'androidx.test.espresso:espresso-core:3.4.0'
+
+    ]
+
     placePickerLib = "com.github.adicatur:pingplacepicker:$versions.placePicker"
     placeLib = "com.google.android.libraries.places:places:$versions.places"
     flexBoxLib = "com.google.android:flexbox:0.3.1"
-    eventBusLib = "org.greenrobot:eventbus:3.0.0"
-    rxUrlExtractorLib = "com.schinizer:rxunfurl:0.2.0"
-    qiscusManggil = "com.qiscus.utils:manggil:$versions.manggil"
-    qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:$versions.manggil-without-emoji"
+    eventBusLib = "org.greenrobot:eventbus:3.3.1"
+
+    qiscusManggil = "com.qiscus.utils:manggil:1.2.1"
+    qiscusManggilWithoutEmoji = "com.qiscus.utils:manggil:1.2.1-without-emoji"
 
     supportLibs = supportDeps.values()
+    securityDeps = securityDeps.values()
     firebaseLibs = firebaseDeps.values()
     qiscusUtilLibs = qiscusUtilDeps.values()
     qiscusMqttLibs = qiscusMqttDeps.values()
+    lifeCircleDeb = lifeCircleDeb.values()
+    rxUrlExtractorLib = rxunfurlDeb.values()
     networkLibs = okHttpDeps.values() + retrofitDeps.values()
     rxLibs = rxDebs.values() + trelloLifecycleDebs.values()
-
+    rxDebs = rxDebs.values()
+    unitTestLibs = testUnitDeb.values()
+    androidUnitTestLibs = androidTestUnitDeb.values()
 
 }

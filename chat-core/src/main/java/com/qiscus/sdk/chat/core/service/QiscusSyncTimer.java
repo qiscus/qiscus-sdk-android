@@ -3,6 +3,7 @@ package com.qiscus.sdk.chat.core.service;
 import android.content.Context;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -33,7 +34,7 @@ public class QiscusSyncTimer {
 
         stopSync();
 
-        if (qiscusCore.getStatusRealtimeEnableDisable()) {
+        if (qiscusCore.getStatusRealtimeEnableDisable() && qiscusCore.getQiscusMediator().getPusherApi().isConnected() ) {
             period = qiscusCore.getAutomaticHeartBeat();
         }
 
@@ -58,7 +59,10 @@ public class QiscusSyncTimer {
         if (qiscusCore.hasSetupUser() && !qiscusCore.getPusherApi().isConnected()) {
             if (qiscusCore.getEnableRealtime()) {
                 if (qiscusCore.getStatusRealtimeEnableDisable()){
-                    QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().restartConnection());
+                    if (!qiscusCore.getPusherApi().isConnected()){
+                        QiscusAndroidUtil.runOnUIThread(() -> qiscusCore.getPusherApi().initConnect(qiscusCore));
+                    }
+
                     checkPendingMessage();
                     scheduleSync();
 

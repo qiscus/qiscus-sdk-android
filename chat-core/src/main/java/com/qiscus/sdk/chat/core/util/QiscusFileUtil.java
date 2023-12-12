@@ -16,6 +16,7 @@
 
 package com.qiscus.sdk.chat.core.util;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -113,6 +114,7 @@ public final class QiscusFileUtil {
         return new String[]{name, extension};
     }
 
+    @SuppressLint("Range")
     public static String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {

@@ -29,6 +29,7 @@ import com.qiscus.sdk.chat.core.data.model.QUser;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import rx.Emitter;

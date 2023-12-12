@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.github.dcendents.android-maven'
 apply from: '../dependencies.gradle'
 apply from: 'lib-version.gradle'
 //apply from: rootProject.file('gradle/quality.gradle')
@@ -51,14 +51,19 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+
 //    android {
 //        jacoco {
 //            version = '0.7.9'
 //        }
 //    }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     lintOptions {
         abortOnError false
@@ -71,7 +76,7 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
     }
-
+    namespace 'com.qiscus.sdk.chat.core'
     useLibrary 'org.apache.http.legacy'
 }
 
@@ -95,8 +100,8 @@ buildscript {
     }
 }
 
-apply from: '../buildsystem/bintrayv1.gradle'
-apply from: '../buildsystem/installv1.gradle'
+//apply from: '../buildsystem/bintrayv1.gradle'
+//apply from: '../buildsystem/installv1.gradle'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -105,10 +110,13 @@ dependencies {
     api qiscusMqttLibs
     api qiscusManggil
     api networkLibs
-    api rxLibs
+    api rxDebs
     api eventBusLib
     api rxUrlExtractorLib
+    api securityDeps
+    api lifeCircleDeb
 
+    implementation 'com.google.code.gson:gson:2.10.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'

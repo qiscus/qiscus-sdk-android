@@ -54,8 +54,6 @@ public class QiscusMediator implements IQiscusMediator {
         QiscusConst.setApps(qiscusCore.getApps());
         QiscusConst.setAppsName(qiscusCore.getApps().getApplicationInfo().
                 loadLabel(qiscusCore.getApps().getPackageManager()).toString());
-
-        qiscusCore.getApps().registerActivityLifecycleCallbacks(activityCallback);
     }
 
     public QiscusApi getApi() {
