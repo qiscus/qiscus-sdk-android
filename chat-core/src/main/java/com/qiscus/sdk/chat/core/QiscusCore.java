@@ -42,6 +42,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
@@ -1135,6 +1136,12 @@ public class QiscusCore {
                         @Override
                         public void onError(Throwable throwable) {
                             QiscusErrorLogger.print(throwable);
+                            //need to relogin
+                            EventBus.getDefault().post(
+                                    new QiscusRefreshTokenEvent(
+                                            401, "Unauthorized"
+                                    )
+                            );
                         }
                     })
             );

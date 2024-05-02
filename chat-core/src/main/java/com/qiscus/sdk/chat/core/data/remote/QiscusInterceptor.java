@@ -112,7 +112,6 @@ public class QiscusInterceptor {
         JSONObject jsonObject = jsonResponse.getJSONObject("error");
 
         autoRefreshToken(code, jsonObject);
-        sendEvent(code, jsonObject);
     }
 
     private static void autoRefreshToken(int code, JSONObject jsonObject) throws JSONException {
@@ -120,7 +119,24 @@ public class QiscusInterceptor {
                 && code == EXPIRED_TOKEN
                 && jsonObject.getString("message").equals(TOKEN_EXPIRED_MESSAGE)
         ) {
-            QiscusCore.refreshToken(null);
+            QiscusCore.refreshToken(new QiscusCore.SetRefreshTokenListener() {
+                @Override
+                public void onSuccess(QiscusRefreshToken refreshToken) {
+
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    //need to relogin
+                    EventBus.getDefault().post(
+                            new QiscusRefreshTokenEvent(
+                                    401, "Unauthorized"
+                            )
+                    );
+                }
+            });
+        }else{
+            sendEvent(code, jsonObject);
         }
     }
 
