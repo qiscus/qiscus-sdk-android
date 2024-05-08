@@ -50,6 +50,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import retrofit2.HttpException;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mVersion;
     private boolean publishCustomEvent = false;
     private static final int UNAUTHORIZED = 403;
+    private static final int NEEDLOGIN = 401;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,23 +212,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showError(Throwable throwable) {
-       /* if (isTokenExpired(throwable)) {
+        if (isTokenExpired(throwable)) {
             callRefreshToken();
             return;
-        } */
+        }
+
+        if (isNeedRelogin(throwable)){
+            logoutUser();
+            mLoginButton.setText("Login");
+            return;
+        }
 
         String errorMessage = QiscusErrorLogger.getMessage(throwable);
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
 
     // disable manual refresh token
-   /* private boolean isTokenExpired(Throwable throwable) {
+    private boolean isTokenExpired(Throwable throwable) {
         if(throwable instanceof HttpException) {
             HttpException httpException = (HttpException) throwable;
             return httpException.code() == UNAUTHORIZED;
         }
         return false;
-    }*/
+    }
+
+    private boolean isNeedRelogin(Throwable throwable) {
+        if(throwable instanceof HttpException) {
+            HttpException httpException = (HttpException) throwable;
+            return httpException.code() == NEEDLOGIN;
+        }
+        return false;
+    }
 
     private void callRefreshToken() {
         QiscusCore.refreshToken(new QiscusCore.SetRefreshTokenListener() {
@@ -250,6 +266,32 @@ public class MainActivity extends AppCompatActivity {
         if (QiscusCore.hasSetupUser()) {
             Qiscus.clearUser();
         }
+    }
+
+    private void reLoginUser(){
+        if (QiscusCore.hasSetupUser()) {
+            Qiscus.clearUser();
+        }
+
+        showLoading();
+          /*  Qiscus.setUser("arief92", "arief92")
+                    .withUsername("arief92")*/
+        Qiscus.setUser("arief92", "arief92")
+                .withUsername("arief92")
+                .save()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(qiscusAccount -> {
+                    Log.i("MainActivity", "Login with account: " + qiscusAccount);
+                    mLoginButton.setText("Logout");
+                    dismissLoading();
+
+                    FirebaseUtil.sendCurrentToken();
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    showError(throwable);
+                    dismissLoading();
+                });
     }
 
     public void showLoading() {
@@ -308,12 +350,14 @@ public class MainActivity extends AppCompatActivity {
         QiscusLogger.print(event.toString());
     }
 
+    //implement this to all your activity
     @Subscribe
     public void onRefreshToken(QiscusRefreshTokenEvent event) {
         if (event.isTokenExpired()) {
             callRefreshToken();
         } else if (event.isUnauthorized()) {
-            logoutUser();
+            //relogin or re init sdk qiscus
+            reLoginUser();
         } else {
             // do somethings
         }
