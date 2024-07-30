@@ -28,8 +28,10 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
 
+import com.google.firebase.annotations.concurrent.Background;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
@@ -114,9 +116,18 @@ public class QiscusNetworkCheckerJobService extends JobService {
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(networkStateReceiver);
-        QiscusLogger.print(TAG, "onDestroy");
-        EventBus.getDefault().unregister(this);
+        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+            try {
+                unregisterReceiver(networkStateReceiver);
+                QiscusLogger.print(TAG, "onDestroy");
+                EventBus.getDefault().unregister(this);
+            }catch (IllegalArgumentException e) {
+                // already unregistered
+            }
+
+        });
+
+
         super.onDestroy();
     }
 

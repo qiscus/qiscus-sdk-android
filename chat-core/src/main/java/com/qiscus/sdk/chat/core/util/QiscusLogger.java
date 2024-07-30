@@ -21,8 +21,10 @@ public final class QiscusLogger {
     }
 
     public static void print(String tag, String message) {
-        if (QiscusCore.getChatConfig().isEnableLog()) {
-            Log.d(tag, message);
-        }
+        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+            if (QiscusCore.getChatConfig().isEnableLog()) {
+                Log.d(tag, message);
+            }
+        });
     }
 }
