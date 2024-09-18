@@ -122,7 +122,11 @@ public class QiscusInterceptor {
             QiscusCore.refreshToken(new QiscusCore.SetRefreshTokenListener() {
                 @Override
                 public void onSuccess(QiscusRefreshToken refreshToken) {
-
+                    EventBus.getDefault().post(
+                            new QiscusRefreshTokenEvent(
+                                    200, "Success"
+                            )
+                    );
                 }
 
                 @Override
