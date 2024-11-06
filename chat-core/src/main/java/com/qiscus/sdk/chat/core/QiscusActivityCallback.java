@@ -16,8 +16,13 @@
 
 package com.qiscus.sdk.chat.core;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;

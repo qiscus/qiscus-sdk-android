@@ -18,6 +18,7 @@ package com.qiscus.sdk.chat.core.data.remote;
 
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
@@ -817,17 +818,22 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<Void> registerFcmToken(String fcmToken) {
-        return api.registerFcmToken(QiscusHashMapUtil.registerOrRemoveFcmToken(fcmToken))
+        return api.registerFcmToken(QiscusHashMapUtil.registerFcmToken(fcmToken, QiscusCore.getApps().getPackageName()))
                 .map(jsonElement -> null);
     }
 
     public Observable<Void> registerDeviceToken(String token) {
-        return api.registerFcmToken(QiscusHashMapUtil.registerOrRemoveFcmToken(token))
+        return api.registerFcmToken(QiscusHashMapUtil.registerFcmToken(token, QiscusCore.getApps().getPackageName()))
+                .map(jsonElement -> null);
+    }
+
+    public Observable<Void> registerDeviceToken(String token, String packageId) {
+        return api.registerFcmToken(QiscusHashMapUtil.registerFcmToken(token, packageId))
                 .map(jsonElement -> null);
     }
 
     public Observable<Void> removeDeviceToken(String token) {
-        return api.removeDeviceToken(QiscusHashMapUtil.registerOrRemoveFcmToken(token))
+        return api.removeDeviceToken(QiscusHashMapUtil.removeFcmToken(token))
                 .map(jsonElement -> null);
     }
 

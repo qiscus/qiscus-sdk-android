@@ -1,5 +1,7 @@
 package com.qiscus.sdk.chat.core.util;
 
+import android.provider.Settings;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.BuildConfig;
@@ -161,13 +163,24 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> registerOrRemoveFcmToken(String fcmToken) {
+    public static HashMap<String, Object> registerFcmToken(String fcmToken, String packageId) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("device_platform", "android");
         hashMap.put("device_token", fcmToken);
         hashMap.put("is_development", BuildConfig.DEBUG);
+        hashMap.put("bundle_id", packageId);
+        hashMap.put("device_id", Settings.Secure.getString(QiscusCore.getApps().getContentResolver(), Settings.Secure.ANDROID_ID));
 
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> removeFcmToken(String fcmToken) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        hashMap.put("device_platform", "android");
+        hashMap.put("device_token", fcmToken);
+        hashMap.put("is_development", BuildConfig.DEBUG);
         return hashMap;
     }
 

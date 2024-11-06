@@ -218,15 +218,15 @@ public class QiscusCore {
             }
 
         }
-
-        QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
+       // QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
+        BackgroundForegroundListener.INSTANCE.setAppActiveOrForground();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             checkExactAlarm(application);
         }
 
         getAppConfig();
-        configureFcmToken();
+        //configureFcmToken();
     }
 
 
@@ -321,8 +321,8 @@ public class QiscusCore {
 
                     startSyncService();
                     startNetworkCheckerService();
-                    ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
-
+                    //ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(BackgroundForegroundListener.INSTANCE);
                 }, throwable -> {
                     QiscusErrorLogger.print(throwable);
                     QiscusApi.getInstance().reInitiateInstance();
@@ -333,7 +333,8 @@ public class QiscusCore {
                     QiscusCore.setCacheMqttBrokerUrl(appComponent.getMqttBrokerUrl(), false);
                     startSyncService();
                     startNetworkCheckerService();
-                    ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
+                    //ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(BackgroundForegroundListener.INSTANCE);
                 });
 
     }
@@ -1045,6 +1046,24 @@ public class QiscusCore {
     }
 
     /**
+     * Set the FCM token to configure push notification with firebase cloud messaging
+     *
+     * @param token the token (fcmToken) & packageId
+     */
+    public static void registerDeviceToken(String token, String packageId) {
+        if (hasSetupUser() && getChatConfig().isEnableFcmPushNotification()) {
+            QiscusApi.getInstance().registerDeviceToken(token, packageId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aVoid -> {
+                    }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
+        }
+
+        appComponent.getLocalDataManager()
+                .setFcmToken(token);
+    }
+
+    /**
      * Remove the FCM token
      *
      * @param token the token (fcmToken)
@@ -1083,11 +1102,13 @@ public class QiscusCore {
      * @return true if apps on foreground, and false if on background
      */
     public static boolean isOnForeground() {
-        return QiscusActivityCallback.INSTANCE.isForeground();
+      //  return QiscusActivityCallback.INSTANCE.isForeground();
+        return BackgroundForegroundListener.INSTANCE.isForeground();
     }
 
     public static void setAppInForeground(){
-        QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
+        //QiscusActivityCallback.INSTANCE.setAppActiveOrForground();
+        BackgroundForegroundListener.INSTANCE.setAppActiveOrForground();
     }
 
     /**

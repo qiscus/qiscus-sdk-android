@@ -107,7 +107,8 @@ ext {
     ]
 
     lifeCircleDeb = [
-            lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0"
+            lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0",
+            lifecycleProcess : "androidx.lifecycle:lifecycle-process"
     ]
 
     rxunfurlDeb = [
