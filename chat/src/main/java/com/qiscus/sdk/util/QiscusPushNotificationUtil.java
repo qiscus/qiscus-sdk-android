@@ -42,6 +42,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.R;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
@@ -215,10 +216,10 @@ public final class QiscusPushNotificationUtil {
                 new QiscusPushNotificationMessage(comment.getId(), messageText);
         pushNotificationMessage.setRoomName(comment.getRoomName());
         pushNotificationMessage.setRoomAvatar(comment.getRoomAvatar());
-        if (!QiscusCacheManager.getInstance()
-                .addMessageNotifItem(pushNotificationMessage, comment.getRoomId())) {
-            return;
-        }
+//        if (!QiscusCacheManager.getInstance()
+//                .addMessageNotifItem(pushNotificationMessage, comment.getRoomId())) {
+//            return;
+//        }
 
         if (Qiscus.getChatConfig().isEnableAvatarAsNotificationIcon()) {
             QiscusAndroidUtil.runOnUIThread(() -> loadAvatar(context, comment, pushNotificationMessage));
@@ -259,7 +260,13 @@ public final class QiscusPushNotificationUtil {
     private static void pushNotification(Context context, QiscusComment comment,
                                          QiscusPushNotificationMessage pushNotificationMessage, Bitmap largeIcon) {
 
-        String notificationChannelId = Qiscus.getApps().getPackageName() + ".qiscus.sdk.notification.channel";
+//        if (QiscusCore.getDataStore().isContains(comment)) {
+//            return;
+//        }
+
+        QiscusCore.getDataStore().addOrUpdate(comment);
+
+        String notificationChannelId = QiscusCore.getApps().getPackageName() + ".qiscus.sdk.notification.channel";
         if (BuildVersionUtil.isOreoOrHigher()) {
             NotificationChannel notificationChannel =
                     new NotificationChannel(notificationChannelId, "Chat", NotificationManager.IMPORTANCE_HIGH);
@@ -270,9 +277,8 @@ public final class QiscusPushNotificationUtil {
         }
 
         PendingIntent pendingIntent;
-        Intent openIntent = new Intent(context, QiscusPushNotificationClickReceiver.class);
+        Intent openIntent = new Intent(context, NotificationClickReceiver.class);
         openIntent.putExtra("data", comment);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             pendingIntent = PendingIntent.getBroadcast(context, QiscusNumberUtil.convertToInt(comment.getRoomId()),
                     openIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
@@ -282,66 +288,19 @@ public final class QiscusPushNotificationUtil {
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelId);
-        notificationBuilder.setContentTitle(pushNotificationMessage.getRoomName())
+        notificationBuilder.setContentTitle(comment.getSender())
                 .setContentIntent(pendingIntent)
-                .setContentText(pushNotificationMessage.getMessage())
-                .setTicker(pushNotificationMessage.getMessage())
-                .setSmallIcon(Qiscus.getChatConfig().getNotificationSmallIcon())
-                .setLargeIcon(largeIcon)
-                .setColor(ContextCompat.getColor(context, Qiscus.getChatConfig().getInlineReplyColor()))
+                .setContentText(comment.getMessage())
+                .setTicker(comment.getMessage())
+                .setSmallIcon(R.drawable.ic_qiscus_notif_app)
+                .setColor(ContextCompat.getColor(context, R.color.colorAccent))
                 .setGroup("CHAT_NOTIF_" + comment.getRoomId())
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
-        if (Qiscus.getChatConfig().isEnableReplyNotification() && isNougatOrHigher()) {
-            String getRepliedTo = pushNotificationMessage.getRoomName();
-            RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
-                    .setLabel(QiscusTextUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()))
-                    .build();
-
-            NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(android.R.drawable.ic_menu_send,
-                    QiscusTextUtil.getString(R.string.qiscus_reply_to, getRepliedTo.toUpperCase()), pendingIntent)
-                    .addRemoteInput(remoteInput)
-                    .build();
-            notificationBuilder.addAction(replyAction);
-        }
-
-        boolean cancel = false;
-        if (Qiscus.getChatConfig().getNotificationBuilderInterceptor() != null) {
-            cancel = !Qiscus.getChatConfig().getNotificationBuilderInterceptor()
-                    .intercept(notificationBuilder, comment);
-        }
-
-        if (cancel) {
-            return;
-        }
-
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        List<QiscusPushNotificationMessage> notifItems = QiscusCacheManager.getInstance()
-                .getMessageNotifItems(comment.getRoomId());
-        if (notifItems == null) {
-            notifItems = new ArrayList<>();
-        }
-        int notifSize = 5;
-        if (notifItems.size() < notifSize) {
-            notifSize = notifItems.size();
-        }
-        if (notifItems.size() > notifSize) {
-            inboxStyle.addLine(".......");
-        }
-        int start = notifItems.size() - notifSize;
-        for (int i = start; i < notifItems.size(); i++) {
-            inboxStyle.addLine(notifItems.get(i).getMessage());
-        }
-        inboxStyle.setSummaryText(QiscusTextUtil.getString(R.string.qiscus_notif_count, notifItems.size()));
-        notificationBuilder.setStyle(inboxStyle);
-
-        if (notifSize <= 3) {
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        }
-
         QiscusAndroidUtil.runOnUIThread(() -> NotificationManagerCompat.from(context)
                 .notify(QiscusNumberUtil.convertToInt(comment.getRoomId()), notificationBuilder.build()));
+
     }
 
     private static void handleDeletedComment(Context context, List<QiscusComment> comments, boolean hardDelete) {
