@@ -42,7 +42,9 @@ import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.event.QiscusInitWithCustomServerEvent;
 import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
+import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
@@ -415,8 +417,12 @@ public class QiscusCore {
      * start network checker job service if in oreo or higher
      */
     private static void startNetworkCheckerService() {
-        if (BuildVersionUtil.isOreoOrHigher()) {
-            QiscusNetworkCheckerJobService.scheduleJob(getApps());
+        if (appComponent.getAppServer() != null) {
+            if (BuildVersionUtil.isOreoOrHigher()) {
+                QiscusNetworkCheckerJobService.scheduleJob(getApps());
+            }
+        }else{
+            EventBus.getDefault().post((QiscusInitWithCustomServerEvent.notSetup));
         }
     }
 

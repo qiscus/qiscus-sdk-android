@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 
+import java.util.concurrent.Executors;
+
 /**
  * Created on : November 02, 2017
  * Author     : adicatur
@@ -21,7 +23,7 @@ public final class QiscusLogger {
     }
 
     public static void print(String tag, String message) {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+        Executors.newSingleThreadExecutor().execute(() -> {
             if (QiscusCore.getChatConfig().isEnableLog()) {
                 Log.d(tag, message);
             }

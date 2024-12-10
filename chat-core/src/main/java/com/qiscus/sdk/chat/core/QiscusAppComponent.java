@@ -5,8 +5,10 @@ import android.os.Handler;
 
 import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
+import com.qiscus.sdk.chat.core.event.QiscusInitWithCustomServerEvent;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -68,6 +70,7 @@ public class QiscusAppComponent {
         //this.chatConfig = new QiscusCoreChatConfig();
         this.dataStore = new QiscusDataBaseHelper(application);
         QiscusTextUtil.createInstance(application);
+        EventBus.getDefault().post((QiscusInitWithCustomServerEvent.wasSetup));
     }
 
     public synchronized Application getApplication() {
