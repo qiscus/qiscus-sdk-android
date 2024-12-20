@@ -38,6 +38,7 @@ import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
@@ -116,17 +117,20 @@ public class QiscusNetworkCheckerJobService extends JobService {
 
     @Override
     public void onDestroy() {
-        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+
+        Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 unregisterReceiver(networkStateReceiver);
                 QiscusLogger.print(TAG, "onDestroy");
                 EventBus.getDefault().unregister(this);
             }catch (IllegalArgumentException e) {
                 // already unregistered
+            }catch (RuntimeException r) {
+                QiscusErrorLogger.print(r);
+            } catch (Exception e) {
+                QiscusErrorLogger.print(e);
             }
-
         });
-
 
         super.onDestroy();
     }
@@ -151,10 +155,18 @@ public class QiscusNetworkCheckerJobService extends JobService {
     }
 
     private void stopJob() {
-        QiscusLogger.print(TAG, "stopJob");
-        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.cancel(STATIC_JOB_ID);
+        try {
+            QiscusLogger.print(TAG, "stopJob");
+            JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            if (jobScheduler != null) {
+                jobScheduler.cancel(STATIC_JOB_ID);
+            }
+        }catch (IllegalArgumentException e) {
+            // already unregistered
+        }catch (RuntimeException r) {
+            QiscusErrorLogger.print(r);
+        } catch (Exception e) {
+            QiscusErrorLogger.print(e);
         }
     }
 }
