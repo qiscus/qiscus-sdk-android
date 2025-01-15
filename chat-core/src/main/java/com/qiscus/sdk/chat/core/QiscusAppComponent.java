@@ -70,7 +70,7 @@ public class QiscusAppComponent {
         //this.chatConfig = new QiscusCoreChatConfig();
         this.dataStore = new QiscusDataBaseHelper(application);
         QiscusTextUtil.createInstance(application);
-        QiscusDataManagement.validateCustomKey("12345678");
+        QiscusDataManagement.validateCustomKey(qiscusAppId);
         EventBus.getDefault().post((QiscusInitWithCustomServerEvent.wasSetup));
     }
 
