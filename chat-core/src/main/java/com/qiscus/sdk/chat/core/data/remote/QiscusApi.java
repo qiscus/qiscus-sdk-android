@@ -25,6 +25,7 @@ import androidx.core.util.Pair;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.R;
@@ -562,6 +563,42 @@ public enum QiscusApi {
                     //timestamp is in nano seconds format, convert it to milliseconds by divide it
                     long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
                     qiscusComment.setTime(new Date(timestamp));
+
+                    if (jsonComment.has("type")) {
+                        qiscusComment.setRawType(jsonComment.get("type").getAsString());
+                        qiscusComment.setExtraPayload(jsonComment.get("payload").toString());
+                        if (qiscusComment.getType() == QiscusComment.Type.BUTTONS
+                                || qiscusComment.getType() == QiscusComment.Type.REPLY
+                                || qiscusComment.getType() == QiscusComment.Type.CARD) {
+                            JsonObject payload = jsonComment.get("payload").getAsJsonObject();
+                            if (payload.has("text")) {
+                                String text = payload.get("text").getAsString();
+                                if (QiscusTextUtil.isNotBlank(text)) {
+                                    qiscusComment.setMessage(text.trim());
+                                }
+                            }
+                        }
+                    }
+
+                    if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
+                        try {
+                            qiscusComment.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+                        try {
+                            qiscusComment.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    qiscusComment.setCommentBeforeId(jsonComment.get("comment_before_id").getAsLong());
+
+
                     QiscusLogger.print("Sent Comment...");
                     return qiscusComment;
                 })
@@ -595,6 +632,41 @@ public enum QiscusApi {
                     //timestamp is in nano seconds format, convert it to milliseconds by divide it
                     long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
                     message.setTime(new Date(timestamp));
+
+                    if (jsonComment.has("type")) {
+                        message.setRawType(jsonComment.get("type").getAsString());
+                        message.setExtraPayload(jsonComment.get("payload").toString());
+                        if (message.getType() == QiscusComment.Type.BUTTONS
+                                || message.getType() == QiscusComment.Type.REPLY
+                                || message.getType() == QiscusComment.Type.CARD) {
+                            JsonObject payload = jsonComment.get("payload").getAsJsonObject();
+                            if (payload.has("text")) {
+                                String text = payload.get("text").getAsString();
+                                if (QiscusTextUtil.isNotBlank(text)) {
+                                    message.setMessage(text.trim());
+                                }
+                            }
+                        }
+                    }
+
+                    if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
+                        try {
+                            message.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+                        try {
+                            message.setUserExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    message.setCommentBeforeId(jsonComment.get("comment_before_id").getAsLong());
+
                     QiscusLogger.print("Sent Comment...");
                     return message;
                 })
