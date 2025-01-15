@@ -1,6 +1,7 @@
 package com.qiscus.sdk.chat.core.data.local;
 
 import static com.qiscus.utils.jupukdata.JupukData.getFileKey;
+import static com.qiscus.utils.jupukdata.JupukData.getFileName;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
@@ -61,18 +62,25 @@ public class QiscusDataManagement {
      * key configuration
      */
     public static void setCustomKey(String key) {
-        if (key.length() == MINIMUM_KEY_LENGTH) {
-            customKey = key;
+        if (key.length() >= MINIMUM_KEY_LENGTH) {
+            customKey = generateCustomKey(key);
             return;
         }
         throw new IllegalArgumentException(
-                "Key must be " + MINIMUM_KEY_LENGTH + " characters long. You're characters long is "
-                        + key.length()
+                "Key must be at least " + MINIMUM_KEY_LENGTH + " characters long. " +
+                        "You're characters long is " + key.length()
         );
     }
 
     public static void validateCustomKey(String key) {
-        if (customKey.isEmpty()) setCustomKey(key.substring(0, MINIMUM_KEY_LENGTH));
+        if (customKey.isEmpty()) setCustomKey(generateCustomKey(key));
+    }
+
+    private static String generateCustomKey(String key) {
+        final String resultKey;
+        if (key.length() >= MINIMUM_KEY_LENGTH) resultKey = key.substring(0, MINIMUM_KEY_LENGTH);
+        else resultKey = (key + getFileName()).substring(0, MINIMUM_KEY_LENGTH);
+        return resultKey;
     }
 
     public static void forceUsedOldMethod(boolean isOldMethod) {

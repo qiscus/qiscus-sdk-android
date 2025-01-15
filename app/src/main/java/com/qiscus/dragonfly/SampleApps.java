@@ -45,7 +45,7 @@ public class SampleApps extends MultiDexApplication {
             try {
                 QiscusCore.setCustomHeader(new JSONObject("{\"QISCUS-OMNICHANNEL\": \"mobile-agent-android\"}"));
                 /**
-                 * Set custom secret key with 8 long characters.
+                 * The key length must be at least 8 characters.
                  * Make sure to save this key securely.
                  */
                 final String secretKey = "12Dsfrs#";
