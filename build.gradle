@@ -19,6 +19,7 @@ buildscript {
     repositories {
         mavenCentral()
         google()
+        maven { url 'https://repo.grails.org/grails/core/' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.5.0'
@@ -34,9 +35,10 @@ allprojects {
         google()
         maven { url "https://artifactory.qiscus.com/artifactory/qiscus-library-open-source" }
         maven { url 'https://jitpack.io' }
-        maven {
+        /*maven {
             url "https://plugins.gradle.org/m2/"
-        }
+        }*/
+        maven { url 'https://repo.grails.org/grails/core/' }
     }
 }
 

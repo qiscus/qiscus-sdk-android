@@ -37,6 +37,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
+import com.qiscus.sdk.chat.core.data.local.QiscusDataManagement;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
@@ -44,7 +45,6 @@ import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusInitWithCustomServerEvent;
 import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
-import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
@@ -1221,6 +1221,16 @@ public class QiscusCore {
 
         QiscusCacheManager.getInstance().clearData();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);
+    }
+
+    /**
+     * Set the custom key for the database.
+     * The key length must be at least 8 characters.
+     *
+     * @param key The custom key for the database
+     */
+    public static void setCustomKey(String key) {
+        appComponent.setCustomKey(key);
     }
 
     public interface SetUserListener {

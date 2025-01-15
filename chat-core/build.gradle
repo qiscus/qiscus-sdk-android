@@ -73,9 +73,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven {
+        /*maven {
             url "https://plugins.gradle.org/m2/"
-        }
+        }*/
+        maven { url 'https://repo.grails.org/grails/core/' }
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'

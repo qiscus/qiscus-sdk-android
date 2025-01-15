@@ -16,12 +16,13 @@
 
 package com.qiscus.sdk.chat.core.data.local;
 
+import static com.qiscus.sdk.chat.core.data.local.QiscusDb.DATABASE_MINIMUM_VERSION;
+
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
@@ -66,7 +67,7 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
         QiscusLogger.print("Upgrade database from : " + oldVersion + " to : " + newVersion);
 
         // Before version 19, we just clear old data
-        if (oldVersion < 19) {
+        if (oldVersion < DATABASE_MINIMUM_VERSION) {
             clearOldData(db);
             onCreate(db);
             return;

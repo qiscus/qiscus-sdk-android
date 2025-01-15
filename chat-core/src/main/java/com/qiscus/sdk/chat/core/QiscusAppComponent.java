@@ -5,6 +5,7 @@ import android.os.Handler;
 
 import com.qiscus.sdk.chat.core.data.local.QiscusDataBaseHelper;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
+import com.qiscus.sdk.chat.core.data.local.QiscusDataManagement;
 import com.qiscus.sdk.chat.core.event.QiscusInitWithCustomServerEvent;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -42,7 +43,6 @@ public class QiscusAppComponent {
     private QiscusDataStore dataStore;
     private static volatile QiscusAppComponent INSTANCE;
 
-
     public static QiscusAppComponent create() {
         synchronized (QiscusAppComponent.class) {
             INSTANCE = new QiscusAppComponent();
@@ -70,6 +70,7 @@ public class QiscusAppComponent {
         //this.chatConfig = new QiscusCoreChatConfig();
         this.dataStore = new QiscusDataBaseHelper(application);
         QiscusTextUtil.createInstance(application);
+        QiscusDataManagement.validateCustomKey(qiscusAppId);
         EventBus.getDefault().post((QiscusInitWithCustomServerEvent.wasSetup));
     }
 
@@ -240,6 +241,10 @@ public class QiscusAppComponent {
 
     public synchronized  void setDataStore(QiscusDataStore qiscusDataStore) {
         this.dataStore = qiscusDataStore;
+    }
+
+    public synchronized void setCustomKey(String key) {
+        QiscusDataManagement.setCustomKey(key);
     }
 
 }
