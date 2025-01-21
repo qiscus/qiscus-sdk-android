@@ -77,13 +77,13 @@ final class QiscusDb {
             values.put(COLUMN_DISTINCT_ID, qiscusChatRoom.getDistinctId());
             values.put(COLUMN_UNIQUE_ID, qiscusChatRoom.getUniqueId());
             values.put(COLUMN_NAME, set(qiscusChatRoom.getName()));
-            values.put(COLUMN_IS_GROUP, set(qiscusChatRoom.isGroup() ? 1 : 0));
+            values.put(COLUMN_IS_GROUP, set(qiscusChatRoom.isGroup()));
             values.put(COLUMN_OPTIONS, set(
                     qiscusChatRoom.getOptions() == null ? null : qiscusChatRoom.getOptions().toString())
             );
             values.put(COLUMN_AVATAR_URL, set(qiscusChatRoom.getAvatarUrl()));
             values.put(COLUMN_UNREAD_COUNT, set(qiscusChatRoom.getUnreadCount()));
-            values.put(COLUMN_IS_CHANNEL, set(qiscusChatRoom.isChannel() ? 1 : 0));
+            values.put(COLUMN_IS_CHANNEL, set(qiscusChatRoom.isChannel()));
             values.put(COLUMN_MEMBER_COUNT, set(qiscusChatRoom.getMemberCount()));
             return values;
         }
@@ -289,8 +289,8 @@ final class QiscusDb {
             values.put(COLUMN_SENDER_AVATAR, set(qiscusComment.getSenderAvatar()));
             values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
             values.put(COLUMN_STATE, set(qiscusComment.getState()));
-            values.put(COLUMN_DELETED, set(qiscusComment.isDeleted() ? 1 : 0));
-            values.put(COLUMN_HARD_DELETED, set(qiscusComment.isHardDeleted() ? 1 : 0));
+            values.put(COLUMN_DELETED, set(qiscusComment.isDeleted()));
+            values.put(COLUMN_HARD_DELETED, set(qiscusComment.isHardDeleted()));
             values.put(COLUMN_TYPE, set(qiscusComment.getRawType()));
             values.put(COLUMN_PAYLOAD, set(qiscusComment.getExtraPayload()));
             values.put(COLUMN_EXTRAS, set(

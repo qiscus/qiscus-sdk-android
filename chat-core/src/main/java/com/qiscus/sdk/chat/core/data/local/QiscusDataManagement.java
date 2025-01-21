@@ -250,7 +250,7 @@ public class QiscusDataManagement {
 
     public static String set(Boolean value) {
         if (value == null) return null;
-        return encrypt(String.valueOf(value));
+        return encrypt(String.valueOf(value ? 1 : 0));
     }
 
     public static String set(String value) {
