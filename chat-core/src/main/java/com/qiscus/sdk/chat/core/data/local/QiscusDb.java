@@ -83,7 +83,7 @@ final class QiscusDb {
             );
             values.put(COLUMN_AVATAR_URL, set(qiscusChatRoom.getAvatarUrl()));
             values.put(COLUMN_UNREAD_COUNT, set(qiscusChatRoom.getUnreadCount()));
-            values.put(COLUMN_IS_CHANNEL, set(qiscusChatRoom.isChannel()));
+            values.put(COLUMN_IS_CHANNEL, set(qiscusChatRoom.isChannel() ? 1 : 0));
             values.put(COLUMN_MEMBER_COUNT, set(qiscusChatRoom.getMemberCount()));
             return values;
         }
