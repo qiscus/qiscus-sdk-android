@@ -83,7 +83,7 @@ public class QiscusAppComponent {
     }
 
     public synchronized String getAppServer() {
-        return appServer;
+        return this.appServer;
     }
 
     public synchronized void setAppServer(String appServer) {
@@ -107,11 +107,11 @@ public class QiscusAppComponent {
     }
 
     public synchronized int getNetworkConnectionInterval() {
-        return networkConnectionInterval;
+        return this.networkConnectionInterval;
     }
 
     public synchronized void setNetworkConnectionInterval(int automaticHeartBeatnetworkConnectionInterval) {
-        this.networkConnectionInterval = networkConnectionInterval;
+        this.networkConnectionInterval = automaticHeartBeatnetworkConnectionInterval;
     }
 
     public synchronized Boolean getEnableEventReport() {

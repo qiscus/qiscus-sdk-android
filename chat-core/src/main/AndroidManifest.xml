@@ -43,7 +43,7 @@
 
         <service
             android:name=".service.QiscusNetworkCheckerJobService"
-            android:exported="true"
+            android:exported="false"
             android:label="QiscusNetworkCheckerJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
@@ -51,7 +51,7 @@
 
         <service
             android:name=".service.QiscusSyncJobService"
-            android:exported="true"
+            android:exported="false"
             android:label="QiscusSyncJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>

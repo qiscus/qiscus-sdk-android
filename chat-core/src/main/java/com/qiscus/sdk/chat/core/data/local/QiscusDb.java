@@ -38,8 +38,8 @@ import java.util.Date;
 final class QiscusDb {
 
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 20;
-    static final int DATABASE_MINIMUM_VERSION = 20;
+    static final int DATABASE_VERSION = 21;
+    static final int DATABASE_MINIMUM_VERSION = 21;
     private static final String JSON_EMPTY_FORMAT = "{}";
     private static final String TAG = QiscusDb.class.getSimpleName();
 
@@ -283,14 +283,14 @@ final class QiscusDb {
             values.put(COLUMN_ROOM_ID, qiscusComment.getRoomId());
             values.put(COLUMN_UNIQUE_ID, qiscusComment.getUniqueId());
             values.put(COLUMN_COMMENT_BEFORE_ID, qiscusComment.getCommentBeforeId());
-            values.put(COLUMN_MESSAGE, set(qiscusComment.getMessage()));
+            values.put(COLUMN_MESSAGE, qiscusComment.getMessage());
             values.put(COLUMN_SENDER, set(qiscusComment.getSender()));
             values.put(COLUMN_SENDER_EMAIL, set(qiscusComment.getSenderEmail()));
             values.put(COLUMN_SENDER_AVATAR, set(qiscusComment.getSenderAvatar()));
             values.put(COLUMN_TIME, qiscusComment.getTime().getTime());
-            values.put(COLUMN_STATE, set(qiscusComment.getState()));
-            values.put(COLUMN_DELETED, set(qiscusComment.isDeleted()));
-            values.put(COLUMN_HARD_DELETED, set(qiscusComment.isHardDeleted()));
+            values.put(COLUMN_STATE, qiscusComment.getState());
+            values.put(COLUMN_DELETED, qiscusComment.isDeleted() ? 1 : 0);
+            values.put(COLUMN_HARD_DELETED, qiscusComment.isHardDeleted() ? 1: 0);
             values.put(COLUMN_TYPE, set(qiscusComment.getRawType()));
             values.put(COLUMN_PAYLOAD, set(qiscusComment.getExtraPayload()));
             values.put(COLUMN_EXTRAS, set(
@@ -316,9 +316,9 @@ final class QiscusDb {
             qiscusComment.setCommentBeforeId(
                     cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_COMMENT_BEFORE_ID))
             );
-            qiscusComment.setMessage(getString(
+            qiscusComment.setMessage(
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE))
-            ));
+            );
             qiscusComment.setSender(getString(
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER))
             ));
@@ -331,15 +331,13 @@ final class QiscusDb {
             qiscusComment.setTime(new Date(
                     cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIME))
             ));
-            qiscusComment.setState(getInteger(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATE))
+            qiscusComment.setState(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STATE)
             ));
-            qiscusComment.setDeleted(getBoolean(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DELETED))
-            ));
-            qiscusComment.setHardDeleted(getBoolean(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED))
-            ));
+            qiscusComment.setDeleted(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETED)) == 1
+            );
+            qiscusComment.setHardDeleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_HARD_DELETED)) == 1);
             qiscusComment.setRawType(getString(
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE))
             ));

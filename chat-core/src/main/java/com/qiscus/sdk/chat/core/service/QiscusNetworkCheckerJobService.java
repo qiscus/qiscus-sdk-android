@@ -118,7 +118,7 @@ public class QiscusNetworkCheckerJobService extends JobService {
     @Override
     public void onDestroy() {
 
-        Executors.newSingleThreadExecutor().execute(() -> {
+        if (Thread.currentThread().getId() != 1){
             try {
                 unregisterReceiver(networkStateReceiver);
                 QiscusLogger.print(TAG, "onDestroy");
@@ -130,7 +130,21 @@ public class QiscusNetworkCheckerJobService extends JobService {
             } catch (Exception e) {
                 QiscusErrorLogger.print(e);
             }
-        });
+        }else{
+            Executors.newSingleThreadExecutor().execute(() -> {
+                try {
+                    unregisterReceiver(networkStateReceiver);
+                    QiscusLogger.print(TAG, "onDestroy");
+                    EventBus.getDefault().unregister(this);
+                }catch (IllegalArgumentException e) {
+                    // already unregistered
+                }catch (RuntimeException r) {
+                    QiscusErrorLogger.print(r);
+                } catch (Exception e) {
+                    QiscusErrorLogger.print(e);
+                }
+            });
+        }
 
         super.onDestroy();
     }
