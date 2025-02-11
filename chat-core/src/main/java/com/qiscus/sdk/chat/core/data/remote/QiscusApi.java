@@ -63,6 +63,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.ConnectionSpec;
@@ -754,11 +755,15 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> sync() {
-        QiscusComment latestComment = QiscusCore.getDataStore().getLatestComment();
-        if (latestComment == null) {
-            return synchronize(0);
-        }
-        return synchronize(latestComment.getId());
+       return Observable.just(QiscusCore.getDataStore().getLatestComment())
+               .flatMap(latestComment -> {
+                   if (latestComment == null) {
+                       return synchronize(0);
+                   }
+                   return synchronize(latestComment.getId());
+               })
+               .subscribeOn(Schedulers.io());
+
     }
 
     @Deprecated

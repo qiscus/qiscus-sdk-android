@@ -47,13 +47,11 @@ public class QiscusDataManagement {
     private static final int MINIMUM_KEY_LENGTH = 8;
     private static final int KEY_LENGTH = 32;
     // Length of the encryption key
-    private static final KeyStore keyStore = createKeyStore();
     private static SecretKey secretKey = null;
     private static Cipher cipherDecrypt = null;
     private static Cipher cipherEncrypt = null;
     // Cipher instance for encryption
     private static String customKey = "";
-    private static boolean usedOldMethod = false;
 
     private QiscusDataManagement() {
     }
@@ -83,18 +81,6 @@ public class QiscusDataManagement {
         return resultKey;
     }
 
-    public static void forceUsedOldMethod(boolean isOldMethod) {
-        usedOldMethod = isOldMethod;
-    }
-
-    public static boolean isUsedOldMethod() {
-        return usedOldMethod;
-    }
-
-    private static boolean isUsedNewMethod() {
-        return !usedOldMethod && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-    }
-
     /**
      * Encrypt and decrypt
      */
@@ -116,9 +102,7 @@ public class QiscusDataManagement {
         try {
             validateCipherEncrypt();
 
-            final SecretKey secretKey;
-            if (isUsedNewMethod()) secretKey = getOrCreateKeyStore();
-            else secretKey = getOrCreateSecretKey();
+            final SecretKey secretKey = getOrCreateSecretKey();
             cipherEncrypt.init(Cipher.ENCRYPT_MODE, secretKey);
 
             final byte[] iv = cipherEncrypt.getIV();
@@ -133,7 +117,7 @@ public class QiscusDataManagement {
             return Base64.encodeToString(encryptedDataWithIV, Base64.DEFAULT);
 
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException |
-                 IllegalBlockSizeException | BadPaddingException e) {
+                 IllegalBlockSizeException | BadPaddingException  | IllegalThreadStateException e) {
             QiscusLogger.print(TAG, e.getMessage());
         }
         return "";
@@ -148,9 +132,7 @@ public class QiscusDataManagement {
             final byte[] encryptedData = Arrays.copyOfRange(raw, cipherDecrypt.getBlockSize(), raw.length);
             final IvParameterSpec ivParameterSpec = new IvParameterSpec(ivData);
 
-            final SecretKey secretKey;
-            if (isUsedNewMethod()) secretKey = getOrCreateKeyStore();
-            else secretKey = getOrCreateSecretKey();
+            final SecretKey secretKey = getOrCreateSecretKey();
             cipherDecrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
 
             final byte[] decryptedData = cipherDecrypt.doFinal(encryptedData);
@@ -158,7 +140,7 @@ public class QiscusDataManagement {
 
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException |
                  InvalidAlgorithmParameterException | IllegalBlockSizeException |
-                 BadPaddingException e) {
+                 BadPaddingException | IllegalThreadStateException e) {
             QiscusLogger.print(TAG, e.getMessage());
         }
         return "";
@@ -198,27 +180,8 @@ public class QiscusDataManagement {
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private static SecretKey getOrCreateKeyStore() {
-        if (!usedOldMethod) {
-            try {
-                if (secretKey == null && keyStore != null) {
-                    final KeyStore.SecretKeyEntry existingKey = (KeyStore.SecretKeyEntry)
-                            keyStore.getEntry(generateSecretKey(), null);
-                    secretKey = existingKey != null ? existingKey.getSecretKey() : createKey();
-                }
-            } catch (KeyStoreException | UnrecoverableEntryException | NoSuchAlgorithmException |
-                     InvalidAlgorithmParameterException e) {
-                QiscusLogger.print(TAG, e.getMessage());
-            }
-        }
-        usedOldMethod = secretKey == null;
-        return !usedOldMethod ? secretKey : getOrCreateSecretKey();
-    }
-
     private static synchronized SecretKey getOrCreateSecretKey() {
         if (secretKey == null) {
-            usedOldMethod = true;
             secretKey = createSecretKey(generateSecretKey());
         }
         return secretKey;

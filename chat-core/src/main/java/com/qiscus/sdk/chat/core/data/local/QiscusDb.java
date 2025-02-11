@@ -38,8 +38,8 @@ import java.util.Date;
 final class QiscusDb {
 
     static final String DATABASE_NAME = "qiscus.db";
-    static final int DATABASE_VERSION = 21;
-    static final int DATABASE_MINIMUM_VERSION = 21;
+    static final int DATABASE_VERSION = 22;
+    static final int DATABASE_MINIMUM_VERSION = 22;
     private static final String JSON_EMPTY_FORMAT = "{}";
     private static final String TAG = QiscusDb.class.getSimpleName();
 
@@ -381,12 +381,12 @@ final class QiscusDb {
             final ContentValues values = new ContentValues();
             values.put(COLUMN_ROOM_ID, roomId);
             values.put(COLUMN_COMMENT_ID, commentId);
-            values.put(COLUMN_LOCAL_PATH, set(localPath));
+            values.put(COLUMN_LOCAL_PATH, localPath);
             return values;
         }
 
         static String parseCursor(Cursor cursor) {
-            return getString(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCAL_PATH)));
+            return cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCAL_PATH));
         }
     }
 
