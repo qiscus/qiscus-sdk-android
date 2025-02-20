@@ -1,4 +1,4 @@
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.jfrog.'
 
 version = libraryVersion
 

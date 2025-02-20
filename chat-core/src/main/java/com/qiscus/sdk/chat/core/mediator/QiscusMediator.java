@@ -1,5 +1,6 @@
 package com.qiscus.sdk.chat.core.mediator;
 
+import com.qiscus.sdk.chat.core.BackgroundForegroundListener;
 import com.qiscus.sdk.chat.core.QiscusActivityCallback;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
@@ -23,7 +24,7 @@ public class QiscusMediator implements IQiscusMediator {
     private QiscusErrorLogger errorLogger;
     private QiscusPusherApi pusherApi;
     private QiscusAndroidUtil androidUtil;
-    private QiscusActivityCallback activityCallback;
+    private BackgroundForegroundListener activityCallback;
     private QiscusResendCommentHelper resendCommentHelper;
     private QiscusEventCache eventCache;
     private QiscusSyncTimer syncTimer;
@@ -42,7 +43,7 @@ public class QiscusMediator implements IQiscusMediator {
         api = new QiscusApi(qiscusCore);
         pusherApi = new QiscusPusherApi(qiscusCore);
         androidUtil = new QiscusAndroidUtil(qiscusCore);
-        activityCallback = new QiscusActivityCallback(qiscusCore);
+        activityCallback = new BackgroundForegroundListener(qiscusCore);
         resendCommentHelper = new QiscusResendCommentHelper(qiscusCore);
         eventCache = new QiscusEventCache(qiscusCore);
         syncTimer = new QiscusSyncTimer(qiscusCore);
@@ -76,7 +77,7 @@ public class QiscusMediator implements IQiscusMediator {
         return androidUtil;
     }
 
-    public QiscusActivityCallback getActivityCallback() {
+    public BackgroundForegroundListener getActivityCallback() {
         return activityCallback;
     }
 

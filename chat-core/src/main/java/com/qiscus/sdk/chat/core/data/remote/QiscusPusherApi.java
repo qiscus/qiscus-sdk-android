@@ -103,8 +103,8 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
 
     public void initConnect(QiscusCore qiscusCore){
         this.qiscusCore = qiscusCore;
+        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         if (qiscusCore.getEnableRealtime()) {
-            gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
             qiscusCore.getLogger().print(TAG, "Creating... ");
             if (!EventBus.getDefault().isRegistered(this)) {
                 EventBus.getDefault().register(this);

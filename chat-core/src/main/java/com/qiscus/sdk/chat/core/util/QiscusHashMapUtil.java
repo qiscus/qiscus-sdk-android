@@ -161,7 +161,19 @@ public class QiscusHashMapUtil {
         return hashMap;
     }
 
-    public static HashMap<String, Object> registerOrRemoveFcmToken(String fcmToken) {
+    public static HashMap<String, Object> registerFcmToken(String fcmToken, String packageId, String deviceId) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        hashMap.put("device_platform", "android");
+        hashMap.put("device_token", fcmToken);
+        hashMap.put("is_development", BuildConfig.DEBUG);
+        hashMap.put("bundle_id", packageId);
+        hashMap.put("device_id", deviceId);
+
+        return hashMap;
+    }
+
+    public static HashMap<String, Object> removeFcmToken(String fcmToken) {
         HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("device_platform", "android");

@@ -93,8 +93,8 @@ buildscript {
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
+       // classpath 'com.jfrog..gradle:gradle-bintray-plugin:1.8.0'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.24.18"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.4.0.2513"
 
     }
@@ -108,7 +108,7 @@ dependencies {
 
     api firebaseLibs
     api qiscusMqttLibs
-    api qiscusManggil
+    api qiscusManggilWithoutEmoji
     api networkLibs
     api rxDebs
     api eventBusLib

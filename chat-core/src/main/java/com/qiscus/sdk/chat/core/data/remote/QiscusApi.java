@@ -23,6 +23,7 @@ import static com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent.UNAUTHORIZE
 
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
@@ -31,7 +32,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
-import com.qiscus.sdk.chat.core.R;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
@@ -41,16 +41,15 @@ import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
-import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.event.QMessageSentEvent;
 import com.qiscus.sdk.chat.core.event.QMessageUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusClearMessageEvent;
 import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
-import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
 import com.qiscus.sdk.chat.core.util.QiscusHashMapUtil;
+import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
@@ -566,6 +565,47 @@ public class QiscusApi {
                     //timestamp is in nano seconds format, convert it to milliseconds by divide it
                     long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
                     qMessage.setTimestamp(new Date(timestamp));
+
+
+                    if (jsonComment.has("type")) {
+                        qMessage.setRawType(jsonComment.get("type").getAsString());
+                        if (jsonComment.has("payload") && !jsonComment.get("payload").isJsonNull()) {
+                            qMessage.setPayload(jsonComment.get("payload").toString());
+                        }
+                        if (qMessage.getType() == QMessage.Type.BUTTONS
+                                || qMessage.getType() == QMessage.Type.REPLY
+                                || qMessage.getType() == QMessage.Type.CARD) {
+                            JsonObject payload = jsonComment.get("payload").getAsJsonObject();
+                            if (payload.has("text")) {
+                                String text = payload.get("text").getAsString();
+                                if (QiscusTextUtil.isNotBlank(text)) {
+                                    qMessage.setText(text.trim());
+                                }
+                            }
+                        }
+                    }
+
+                    if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
+                        try {
+                            qMessage.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    QUser qUser = new QUser();
+                    qUser.setAvatarUrl(jsonComment.get("user_avatar_url").getAsString());
+                    qUser.setName(jsonComment.get("username").getAsString());
+                    qUser.setId(jsonComment.get("email").getAsString());
+
+                    if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+                        try {
+                            qUser.setExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     qiscusCore.getLogger().print("Sent Comment...");
                     return qMessage;
                 })
@@ -594,6 +634,45 @@ public class QiscusApi {
                     //timestamp is in nano seconds format, convert it to milliseconds by divide it
                     long timestamp = jsonComment.get("unix_nano_timestamp").getAsLong() / 1000000L;
                     message.setTimestamp(new Date(timestamp));
+
+                    if (jsonComment.has("type")) {
+                        message.setRawType(jsonComment.get("type").getAsString());
+                        if (jsonComment.has("payload") && !jsonComment.get("payload").isJsonNull()) {
+                            message.setPayload(jsonComment.get("payload").toString());
+                        }
+                        if (message.getType() == QMessage.Type.BUTTONS
+                                || message.getType() == QMessage.Type.REPLY
+                                || message.getType() == QMessage.Type.CARD) {
+                            JsonObject payload = jsonComment.get("payload").getAsJsonObject();
+                            if (payload.has("text")) {
+                                String text = payload.get("text").getAsString();
+                                if (QiscusTextUtil.isNotBlank(text)) {
+                                    message.setText(text.trim());
+                                }
+                            }
+                        }
+                    }
+
+                    if (jsonComment.has("extras") && !jsonComment.get("extras").isJsonNull()) {
+                        try {
+                            message.setExtras(new JSONObject(jsonComment.get("extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    QUser qUser = new QUser();
+                    qUser.setAvatarUrl(jsonComment.get("user_avatar_url").getAsString());
+                    qUser.setName(jsonComment.get("username").getAsString());
+                    qUser.setId(jsonComment.get("email").getAsString());
+
+                    if (jsonComment.has("user_extras") && !jsonComment.get("user_extras").isJsonNull()) {
+                        try {
+                            qUser.setExtras(new JSONObject(jsonComment.get("user_extras").getAsJsonObject().toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
                     qiscusCore.getLogger().print("Sent Comment...");
                     return message;
@@ -818,19 +897,25 @@ public class QiscusApi {
 
     @Deprecated
     public Observable<Void> registerFcmToken(String fcmToken) {
-        return api.registerFcmToken(QiscusHashMapUtil.registerOrRemoveFcmToken(fcmToken))
+        return api.registerFcmToken(QiscusHashMapUtil.registerFcmToken(fcmToken, qiscusCore.getApps().getPackageName(), Settings.Secure.getString(qiscusCore.getApps().getContentResolver(), Settings.Secure.ANDROID_ID)))
                 .map(jsonElement -> null);
     }
 
     public Observable<Void> registerDeviceToken(String token) {
-        return api.registerFcmToken(QiscusHashMapUtil.registerOrRemoveFcmToken(token))
+        return api.registerFcmToken(QiscusHashMapUtil.registerFcmToken(token,  qiscusCore.getApps().getPackageName(), Settings.Secure.getString(qiscusCore.getApps().getContentResolver(), Settings.Secure.ANDROID_ID)))
                 .map(jsonElement -> null);
     }
 
     public Observable<Void> removeDeviceToken(String token) {
-        return api.removeDeviceToken(QiscusHashMapUtil.registerOrRemoveFcmToken(token))
+        return api.registerFcmToken(QiscusHashMapUtil.removeFcmToken(token))
                 .map(jsonElement -> null);
     }
+
+    public Observable<Void> registerDeviceToken(String token, String packageId) {
+        return api.registerFcmToken(QiscusHashMapUtil.registerFcmToken(token, packageId, Settings.Secure.getString(qiscusCore.getApps().getContentResolver(), Settings.Secure.ANDROID_ID)))
+                .map(jsonElement -> null);
+    }
+
 
     @Deprecated
     public Observable<Void> clearCommentsByRoomIds(List<Long> roomIds) {

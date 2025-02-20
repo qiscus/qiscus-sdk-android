@@ -6,6 +6,8 @@ import androidx.annotation.RestrictTo;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 
+import java.util.concurrent.Executors;
+
 /**
  * Created on : November 02, 2017
  * Author     : adicatur
@@ -27,8 +29,10 @@ public final class QiscusLogger {
     }
 
     public void print(String tag, String message) {
-        if (qiscusCore.getChatConfig().isEnableLog()) {
-            Log.d(tag, qiscusCore.getAppId() + "-"+ message);
-        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            if (qiscusCore.getChatConfig().isEnableLog()) {
+                Log.d(tag, qiscusCore.getAppId() + "-"+ message);
+            }
+        });
     }
 }

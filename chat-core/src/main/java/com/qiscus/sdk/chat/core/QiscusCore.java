@@ -49,6 +49,7 @@ import com.qiscus.sdk.chat.core.data.remote.QiscusClearCommentsHandler;
 import com.qiscus.sdk.chat.core.data.remote.QiscusDeleteCommentHandler;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.mediator.QiscusMediator;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
@@ -130,8 +131,10 @@ public class QiscusCore {
      */
     @Deprecated
     public void init(Application application, String qiscusAppId, String localPrefKey) {
-        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
-                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB, localPrefKey);
+        initWithCustomServer(application, qiscusAppId, "https://api.qiscus.com/",
+                "ssl://realtime-bali.qiscus.com:1885", true, "https://realtime-lb.qiscus.com", localPrefKey);
+//        initWithCustomServer(application, qiscusAppId, BuildConfig.BASE_URL_SERVER,
+//                BuildConfig.BASE_URL_MQTT_BROKER, true, BuildConfig.BASE_URL_MQTT_LB, localPrefKey);
     }
 
     /**
@@ -266,15 +269,12 @@ public class QiscusCore {
 
         }
 
-
         qiscusMediator.getActivityCallback().setAppActiveOrForground();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             checkExactAlarm(application);
         }
 
         getAppConfig();
-
-        configureFcmToken();
     }
 
     private void getAppConfig() {
@@ -339,10 +339,7 @@ public class QiscusCore {
                         autoRefreshToken();
                     }
 
-
-                    if (enableRealtime) {
-                        getPusherApi().initConnect(this);
-                    }
+                    getPusherApi().initConnect(this);
 
                     ProcessLifecycleOwner.get().getLifecycle().addObserver(qiscusMediator.getActivityCallback());
 
@@ -350,9 +347,7 @@ public class QiscusCore {
                     getErrorLogger().print(throwable);
                     getApi().reInitiateInstance();
                     setCacheMqttBrokerUrl(mqttBrokerUrl, false);
-                    if (enableRealtime) {
-                        getPusherApi().initConnect(this);
-                    }
+                    getPusherApi().initConnect(this);
                     autoRefreshToken();
                     ProcessLifecycleOwner.get().getLifecycle().addObserver(qiscusMediator.getActivityCallback());
                 });
@@ -593,14 +588,28 @@ public class QiscusCore {
                         refreshToken(new SetRefreshTokenListener() {
                             @Override
                             public void onSuccess(QiscusRefreshToken refreshToken) {
-                                qiscusMediator.getErrorLogger().print(
+                                qiscusMediator.getLogger().print(
                                         "AutoRefreshToken", refreshToken != null ? "success" : "failed"
                                 );
+
+                                EventBus.getDefault().post(
+                                        new QiscusRefreshTokenEvent(
+                                                200, "Success"
+                                        )
+                                );
+
                             }
 
                             @Override
                             public void onError(Throwable throwable) {
                                 qiscusMediator.getErrorLogger().print(throwable);
+                                //need to relogin
+                                EventBus.getDefault().post(
+                                        new QiscusRefreshTokenEvent(
+                                                401, "Unauthorized"
+                                        )
+                                );
+
                             }
                         })
                 );
@@ -857,7 +866,7 @@ public class QiscusCore {
         return qiscusMediator.getAndroidUtil();
     }
 
-    public QiscusActivityCallback getActivityCallback() {
+    public BackgroundForegroundListener getActivityCallback() {
         checkAppIdSetup();
         return qiscusMediator.getActivityCallback();
     }
@@ -1112,6 +1121,26 @@ public class QiscusCore {
 
         localDataManager.setFcmToken(token);
     }
+
+    /**
+     * Set the FCM token to configure push notification with firebase cloud messaging
+     *
+     * @param token the token (fcmToken) & packageId
+     */
+    public void registerDeviceToken(String token, String packageId) {
+        if (hasSetupUser() && getChatConfig().isEnableFcmPushNotification()) {
+            getApi().registerDeviceToken(token, packageId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aVoid -> {
+                    }, throwable -> getErrorLogger().print("SetFCMToken", throwable));
+        }
+
+        localDataManager
+                .setFcmToken(token);
+    }
+
+
 
     /**
      * Remove the FCM token

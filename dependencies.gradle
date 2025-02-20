@@ -29,8 +29,8 @@ repositories {
 ext {
 
     minSDKVersion = 21
-    targetSDKVersion = 33
-    compileSDKVersion = 33
+    targetSDKVersion = 34
+    compileSDKVersion = 34
 
     versions = [
             support          : "31.0.0",
@@ -106,7 +106,9 @@ ext {
     ]
 
     lifeCircleDeb = [
-            lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0"
+            lifecycle : "androidx.lifecycle:lifecycle-extensions:2.2.0",
+            lifecycleProcess : "androidx.lifecycle:lifecycle-process"
+
     ]
 
     rxunfurlDeb = [

@@ -59,7 +59,7 @@ public class QiscusActivityCallback implements LifecycleObserver {
 
         foreground = true;
 
-        if (!qiscusCore.getAndroidUtil().isMyServiceRunning() && !QiscusCore.isSyncServiceDisabledManually()) {
+        if (!qiscusCore.getAndroidUtil().isMyServiceRunning() && !qiscusCore.isSyncServiceDisabledManually()) {
             qiscusCore.getQiscusMediator().getSyncTimer().startSchedule();
         }
     }
