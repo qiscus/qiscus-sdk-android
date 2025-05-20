@@ -26,9 +26,7 @@ android {
     defaultConfig {
         minSdkVersion minSDKVersion
         targetSdkVersion targetSDKVersion
-        versionCode 1
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionName "${chatCoreVersionMajor}.${chatCoreVersionMinor}.${chatCoreVersionPatch}"
     }
     buildTypes {
         release {

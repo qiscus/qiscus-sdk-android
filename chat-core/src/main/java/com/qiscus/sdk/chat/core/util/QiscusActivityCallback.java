@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.qiscus.sdk.chat.core;
+package com.qiscus.sdk.chat.core.util;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
-import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
-import com.qiscus.sdk.chat.core.util.QiscusServiceUtil;
 
 import java.util.concurrent.ScheduledFuture;
 
