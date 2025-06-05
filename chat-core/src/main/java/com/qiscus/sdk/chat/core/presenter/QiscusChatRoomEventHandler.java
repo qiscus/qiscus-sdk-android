@@ -7,7 +7,9 @@ import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
+import com.qiscus.sdk.chat.core.event.QiscusChatRoomTypingAIEvent;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 
 import org.greenrobot.eventbus.EventBus;
@@ -80,6 +82,11 @@ public class QiscusChatRoomEventHandler {
     @Subscribe
     public void onChatRoomEvent(QiscusChatRoomEvent event) {
         QiscusAndroidUtil.runOnBackgroundThread(() -> handleEvent(event));
+    }
+
+    @Subscribe
+    public void onChatRoomTypingAIEvent(QiscusChatRoomTypingAIEvent event) {
+        QiscusLogger.print(event.toString());
     }
 
     private void handleEvent(QiscusChatRoomEvent event) {
