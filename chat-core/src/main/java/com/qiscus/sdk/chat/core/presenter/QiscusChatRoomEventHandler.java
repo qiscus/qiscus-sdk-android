@@ -85,6 +85,11 @@ public class QiscusChatRoomEventHandler {
     }
 
     @Subscribe
+    public void onChatRoomEventAI(QiscusChatRoomTypingAIEvent event) {
+        QiscusLogger.print(event.toString());
+    }
+
+    @Subscribe
     public void onChatRoomTypingAIEvent(QiscusChatRoomTypingAIEvent event) {
         QiscusLogger.print(event.toString());
     }
