@@ -912,8 +912,14 @@ public class QiscusCore {
      */
     public static Observable<QiscusAccount> updateUserAsObservable(String name, String avatarUrl, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarUrl, extras)
-                .doOnNext(qiscusAccount -> appComponent.getLocalDataManager()
-                        .saveAccountInfo(qiscusAccount));
+                .doOnNext(qiscusAccount -> {
+
+                    if (qiscusAccount.getToken().isEmpty()) {
+                        qiscusAccount.setToken(getQiscusAccount().getToken());
+                    }
+                    appComponent.getLocalDataManager()
+                            .saveAccountInfo(qiscusAccount);
+                });
 
     }
 
@@ -927,8 +933,13 @@ public class QiscusCore {
      */
     public static Observable<QiscusAccount> updateUser(String name, String avatarURL, JSONObject extras) {
         return QiscusApi.getInstance().updateUser(name, avatarURL, extras)
-                .doOnNext(qiscusAccount -> appComponent.getLocalDataManager()
-                        .saveAccountInfo(qiscusAccount));
+                .doOnNext(qiscusAccount -> {
+                    if (qiscusAccount.getToken().isEmpty()) {
+                        qiscusAccount.setToken(getQiscusAccount().getToken());
+                    }
+                    appComponent.getLocalDataManager()
+                            .saveAccountInfo(qiscusAccount);
+                });
     }
 
     /**
