@@ -32,6 +32,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
+import com.qiscus.sdk.chat.core.event.QiscusChatRoomTypingAIEvent;
 import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentDeletedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
@@ -42,6 +43,7 @@ import com.qiscus.sdk.chat.core.presenter.QiscusChatRoomEventHandler;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 import com.qiscus.sdk.util.QiscusImageUtil;
 
@@ -628,6 +630,16 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                 }
             });
         }
+    }
+
+    @Subscribe
+    public void onChatRoomTypingAIEvent(QiscusChatRoomTypingAIEvent event) {
+        if (event.isTyping()) {
+            //show typing UI
+        }else{
+            //hide typing UI
+        }
+        QiscusLogger.print(event.toString());
     }
 
     private void onGotNewComment(QiscusComment qiscusComment) {

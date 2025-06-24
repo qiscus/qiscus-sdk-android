@@ -1097,7 +1097,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
                 String senderId = dataPayload.optString("sender_id");
                 String senderName = dataPayload.optString("sender_name");
                 String textMessage = dataPayload.optString("text");
-                Boolean statusTyping = dataPayload.optBoolean("status");
+                Boolean statusTyping = dataPayload.optInt("status") == 1;
 
                 QiscusChatRoomTypingAIEvent event = new QiscusChatRoomTypingAIEvent()
                         .setRoomId(Long.parseLong(data[1]))
