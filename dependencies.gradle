@@ -69,7 +69,7 @@ ext {
 
     securityDeps = [
             crypto : "androidx.security:security-crypto:1.1.0-alpha03",
-            jupukData : "com.qiscus.utils:jupukdata:1.0.0",
+            jupukData : "com.qiscus.utils:jupukdata:1.1.0",
             authenticator : "androidx.security:security-app-authenticator:1.0.0-alpha02"
     ]
 

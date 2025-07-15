@@ -33,6 +33,7 @@ import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.event.QMessageReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QMessageUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
+import com.qiscus.sdk.chat.core.event.QiscusChatRoomTypingAIEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent;
@@ -605,9 +606,10 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
-
+                mqttAndroidClient.subscribe("r/" + roomId + "/typing", 2);
             } else {
                 mqttAndroidClient.subscribe(qiscusCore.getAppId() + "/" + qChatRoom.getUniqueId() + "/c", 2);
+                mqttAndroidClient.subscribe("r/" + roomId + "/typing", 2);
             }
         } catch (MqttException e) {
             //Do nothing
@@ -630,10 +632,10 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/t", 2);
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/d", 2);
                 mqttAndroidClient.subscribe("r/" + roomId + "/+/+/r", 2);
-
+                mqttAndroidClient.subscribe("r/" + roomId + "/typing", 2);
             } else {
                 mqttAndroidClient.subscribe(qiscusCore.getAppId() + "/" + qChatRoom.getUniqueId() + "/c", 2);
-
+                mqttAndroidClient.subscribe("r/" + roomId + "/typing", 2);
             }
         } catch (MqttException e) {
             //Do nothing
@@ -656,6 +658,7 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/d");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/r");
             mqttAndroidClient.unsubscribe(qiscusCore.getAppId() + "/" + qChatRoom.getUniqueId() + "/c");
+            mqttAndroidClient.unsubscribe("r/" + roomId + "/typing");
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
         }
@@ -678,6 +681,7 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/d");
             mqttAndroidClient.unsubscribe("r/" + roomId + "/+/+/r");
             mqttAndroidClient.unsubscribe(qiscusCore.getAppId() + "/" + qChatRoom.getUniqueId() + "/c");
+            mqttAndroidClient.unsubscribe("r/" + roomId + "/typing");
         } catch (MqttException | NullPointerException | IllegalArgumentException e) {
             //Do nothing
         }
@@ -1089,6 +1093,27 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
                         .setTyping("1".equals(message));
                 EventBus.getDefault().post(event);
             }
+        }else if (topic.startsWith("r/") && topic.endsWith("/typing")) {
+            String[] data = topic.split("/");
+            try {
+                JSONObject dataPayload = new JSONObject(message);
+                String senderId = dataPayload.optString("sender_id");
+                String senderName = dataPayload.optString("sender_name");
+                String textMessage = dataPayload.optString("text");
+                Boolean statusTyping = dataPayload.optInt("status") == 1;
+
+                QiscusChatRoomTypingAIEvent event = new QiscusChatRoomTypingAIEvent()
+                        .setRoomId(Long.parseLong(data[1]))
+                        .setSenderId(senderId)
+                        .setSenderName(senderName)
+                        .setTyping(statusTyping)
+                        .setTextMessage(textMessage);
+
+                EventBus.getDefault().post(event);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
         } else if (topic.startsWith("r/") && topic.endsWith("/d")) {
             String[] data = topic.split("/");
             if (!data[3].equals(qAccount.getId())) {

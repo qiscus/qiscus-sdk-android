@@ -19,6 +19,13 @@ package com.qiscus.sdk.chat.core.data.local;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDiskIOException;
+import android.os.Build;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.StatFs;
+import android.widget.Toast;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
@@ -37,15 +44,43 @@ import rx.Observable;
 
 public class QiscusDataBaseHelper implements QiscusDataStore {
 
-    protected final SQLiteDatabase sqLiteReadDatabase;
-    protected final SQLiteDatabase sqLiteWriteDatabase;
+    protected SQLiteDatabase sqLiteReadDatabase;
+    protected SQLiteDatabase sqLiteWriteDatabase;
     private QiscusCore qiscusCore;
 
     public QiscusDataBaseHelper(QiscusCore qiscusCore, String localPrefKey) {
         this.qiscusCore = qiscusCore;
         QiscusDbOpenHelper qiscusDbOpenHelper = new QiscusDbOpenHelper(qiscusCore, localPrefKey);
-        sqLiteReadDatabase = qiscusDbOpenHelper.getReadableDatabase();
-        sqLiteWriteDatabase = qiscusDbOpenHelper.getWritableDatabase();
+        try {
+            sqLiteReadDatabase = qiscusDbOpenHelper.getReadableDatabase();
+            sqLiteWriteDatabase = qiscusDbOpenHelper.getWritableDatabase();
+        }catch (SQLiteDiskIOException e){
+
+            File externalStorage = Environment.getExternalStorageDirectory();
+            StatFs stat = new StatFs(externalStorage.getPath());
+            long bytesAvailable;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                bytesAvailable = stat.getAvailableBytes();
+            } else {
+                bytesAvailable = (long) stat.getBlockSize() * (long) stat.getAvailableBlocks();
+            }
+
+            long minRequiredBytes = 10 * 1024 * 1024;
+
+            if (bytesAvailable < minRequiredBytes) {
+                Toast.makeText(qiscusCore.getApps().getApplicationContext(), "There is not enough storage space. Please clean the storage space.", Toast.LENGTH_LONG).show();
+            } else {
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    try {
+                        sqLiteReadDatabase = qiscusDbOpenHelper.getReadableDatabase();
+                        sqLiteWriteDatabase = qiscusDbOpenHelper.getWritableDatabase();
+                    }catch (SQLiteDiskIOException d){
+
+                    }
+                }, 3000);
+            }
+        }
+
     }
 
     @Override
