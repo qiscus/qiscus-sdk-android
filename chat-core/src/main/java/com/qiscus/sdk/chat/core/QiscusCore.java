@@ -741,6 +741,8 @@ public class QiscusCore {
         account.setTokenExpiresAt(newToken.getTokenExpiresAt());
         appComponent.getLocalDataManager()
                 .saveAccountInfo(account);
+
+        QiscusPusherApi.getInstance().subsribeCommentAndNotification();
     }
 
     /**
@@ -1144,6 +1146,8 @@ public class QiscusCore {
 
     public static void refreshToken(SetRefreshTokenListener listener) {
         if (hasSetupUser()) {
+            QiscusPusherApi.getInstance().unsubsribeCommentAndNotification();
+
             QiscusAccount account = appComponent.getLocalDataManager()
                     .getAccountInfo();
             QiscusApi.getInstance().refreshToken(account.getEmail(), account.getRefreshToken())

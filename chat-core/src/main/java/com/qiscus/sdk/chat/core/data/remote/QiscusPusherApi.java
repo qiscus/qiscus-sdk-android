@@ -541,7 +541,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
         if (!QiscusCore.getEnableRealtime() || !QiscusCore.getStatusRealtimeEnableDisable()) {
             return;
         }
-        QiscusLogger.print(TAG, "Listening comment...");
+        QiscusAccount qiscusAccount2 = QiscusCore.getQiscusAccount();
+        qiscusAccount = qiscusAccount2;
+        QiscusLogger.print(TAG, "Listening comment... ");
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/c", 2);
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/update", 2);
@@ -571,6 +573,8 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
 
     private void listenNotification() {
         QiscusLogger.print(TAG, "Listening notification...");
+        QiscusAccount qiscusAccount2 = QiscusCore.getQiscusAccount();
+        qiscusAccount = qiscusAccount2;
         try {
             mqttAndroidClient.subscribe(qiscusAccount.getToken() + "/n", 2);
         } catch (MqttException e) {
@@ -593,6 +597,25 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             connect();
             scheduledListenNotification = QiscusAndroidUtil.runOnBackgroundThread(fallBackListenNotification, RETRY_PERIOD);
         }
+    }
+
+    public void unsubsribeCommentAndNotification() {
+        if (!QiscusCore.getEnableRealtime() || !QiscusCore.getStatusRealtimeEnableDisable()) {
+            return;
+        }
+
+        try {
+            mqttAndroidClient.unsubscribe(qiscusAccount.getToken() + "/c");
+            mqttAndroidClient.unsubscribe(qiscusAccount.getToken() + "/update");
+            mqttAndroidClient.unsubscribe(qiscusAccount.getToken() + "/n");
+        } catch (MqttException | NullPointerException | IllegalArgumentException e) {
+            //Do nothing
+        }
+    }
+
+    public void subsribeCommentAndNotification() {
+        listenComment();
+        listenNotification();
     }
 
     @Deprecated
