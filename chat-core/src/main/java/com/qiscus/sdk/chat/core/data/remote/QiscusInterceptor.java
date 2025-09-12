@@ -3,6 +3,7 @@ package com.qiscus.sdk.chat.core.data.remote;
 import static com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent.*;
 
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -11,8 +12,10 @@ import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +26,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.HttpException;
 
 public class QiscusInterceptor {
 
@@ -131,12 +135,49 @@ public class QiscusInterceptor {
 
                 @Override
                 public void onError(Throwable throwable) {
-                    //need to relogin
-                    EventBus.getDefault().post(
-                            new QiscusRefreshTokenEvent(
-                                    401, "Unauthorized"
-                            )
-                    );
+                    try {
+                        if (throwable instanceof HttpException) {
+                            HttpException httpEx = (HttpException) throwable;
+
+                            retrofit2.Response<?> response = httpEx.response(); // ini dari retrofit2.Response
+                            if (response != null && response.errorBody() != null) {
+                                String errorJson = response.errorBody().string(); // hanya sekali bisa dipanggil
+
+                                JSONObject jsonObject = new JSONObject(errorJson);
+                                JSONObject errorObj = jsonObject.getJSONObject("error");
+                                String message = errorObj.getString("message");
+                                int status = jsonObject.getInt("status");
+
+                                if (status == 401 && "refresh token invalid".equals(message)) {
+                                    // ignored
+                                } else {
+                                    // need to relogin
+                                    EventBus.getDefault().post(
+                                            new QiscusRefreshTokenEvent(
+                                                    401, "Unauthorized"
+                                            )
+                                    );
+                                }
+                            } else {
+                                // fallback kalau errorBody kosong
+                                EventBus.getDefault().post(
+                                        new QiscusRefreshTokenEvent(
+                                                httpEx.code(), "Unauthorized"
+                                        )
+                                );
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        EventBus.getDefault().post(
+                                new QiscusRefreshTokenEvent(
+                                        403, "Unauthorized"
+                                )
+                        );
+                    }
+
+
+
                 }
             });
         }else{
@@ -145,7 +186,7 @@ public class QiscusInterceptor {
     }
 
     private static void sendEvent(int code, JSONObject jsonObject)  throws JSONException {
-        if (jsonObject.getString("message").contains(UNAUTHORIZED_MESSAGE)) {
+        if (jsonObject.getString("message").contains(UNAUTHORIZED_MESSAGE) || jsonObject.getString("message").contains(TOKEN_EXPIRED_MESSAGE)) {
             EventBus.getDefault().post(
                     new QiscusRefreshTokenEvent(
                             code, jsonObject.getString("message")
@@ -155,9 +196,49 @@ public class QiscusInterceptor {
     }
 
     public static HttpLoggingInterceptor makeLoggingInterceptor(boolean isDebug) {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        HttpLoggingInterceptor.Logger customLogger = message -> {
+            if (message.startsWith("-->")) {
+                // Request mulai
+                logLong("Qiscus API_REQUEST",
+                        "\n==============================\n" +
+                                "🚀 REQUEST START\n" +
+                                message);
+            } else if (message.startsWith("<--")) {
+                // Response mulai
+                logLong("Qiscus API_RESPONSE",
+                        "\n==============================\n" +
+                                "📥 RESPONSE START\n" +
+                                message);
+            } else if (message.startsWith("{") || message.startsWith("[")) {
+                // Body JSON
+                logLong("Qiscus API_BODY", message);
+            } else if (message.contains("END HTTP")) {
+                // End request/response
+                logLong("Qiscus API_LOG", message +
+                        "\n✅ END\n==============================");
+            } else {
+                // Header, size, dsb.
+                logLong("Qiscus API_LOG", message);
+            }
+        };
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(customLogger);
         logging.setLevel(isDebug ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
         return logging;
+    }
+
+    /**
+     * Helper untuk cetak log panjang agar tidak terpotong di Logcat
+     */
+    private static void logLong(String tag, String message) {
+        int maxLogSize = 2000; // limit per baris agar tidak terpotong
+        for (int i = 0; i <= message.length() / maxLogSize; i++) {
+            int start = i * maxLogSize;
+            int end = Math.min((i + 1) * maxLogSize, message.length());
+            if (start < end) {
+                QiscusLogger.printRed(tag, message.substring(start, end));
+            }
+        }
     }
 
 }

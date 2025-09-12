@@ -38,6 +38,7 @@ import com.google.gson.Gson;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataManagement;
+import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
@@ -45,6 +46,7 @@ import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
 import com.qiscus.sdk.chat.core.event.QiscusInitWithCustomServerEvent;
 import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
+import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.service.QiscusNetworkCheckerJobService;
 import com.qiscus.sdk.chat.core.service.QiscusSyncJobService;
@@ -743,6 +745,29 @@ public class QiscusCore {
                 .saveAccountInfo(account);
 
         QiscusPusherApi.getInstance().subsribeCommentAndNotification();
+
+        QiscusApi.getInstance().sync()
+                .doOnSubscribe(() -> {
+                    EventBus.getDefault().post((QiscusSyncEvent.STARTED));
+                    QiscusLogger.print("Sync started...");
+                })
+                .doOnCompleted(() -> {
+                    EventBus.getDefault().post((QiscusSyncEvent.COMPLETED));
+                    QiscusLogger.print("Sync completed...");
+                    if (QiscusCore.getEnableSyncEvent()){
+                        QiscusApi.getInstance().synchronizeEvent(QiscusEventCache.getInstance().getLastEventId())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe(events -> {
+                                }, QiscusErrorLogger::print);
+                    }
+
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(QiscusPusherApi::handleReceivedComment, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    EventBus.getDefault().post(QiscusSyncEvent.FAILED);
+                    QiscusLogger.print("Sync failed...");
+                });
     }
 
     /**

@@ -17,6 +17,8 @@
 package com.qiscus.sdk.presenter;
 
 import androidx.core.util.Pair;
+
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.qiscus.sdk.Qiscus;
@@ -39,6 +41,7 @@ import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentResendEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
+import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.presenter.QiscusChatRoomEventHandler;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
@@ -53,6 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -60,7 +64,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
+import okio.Buffer;
+import okio.BufferedSource;
 import retrofit2.HttpException;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -126,7 +134,56 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
         int state = QiscusComment.STATE_PENDING;
         if (mustFailed(throwable, qiscusComment)) {
             qiscusComment.setDownloading(false);
-            state = QiscusComment.STATE_FAILED;
+
+            Response<?> response = ((HttpException) throwable).response();
+            if (response != null && response.errorBody() != null) {
+                try {
+                    ResponseBody errorBody = response.errorBody();
+                    BufferedSource source = errorBody.source();
+
+                    // Buffer seluruh isi body
+                    source.request(Long.MAX_VALUE);
+
+                    // Clone buffer biar data tetap utuh
+                    Buffer buffer = source.getBuffer().clone();
+
+                    String rawError = buffer.readUtf8();
+                    Log.e("getLogErrror", rawError);
+
+                    try {
+                        JSONObject json = new JSONObject(rawError);
+                        JSONObject errorObj = json.getJSONObject("error");
+                        String message = errorObj.getString("message");
+                        int status = json.getInt("status");
+
+                        if ( status == 403 && message.equals("Unauthorized. Token is expired")){
+                            state = QiscusComment.STATE_PENDING;
+//                            if (qiscusComment.getRoomId() == room.getId()) {
+//                                view.onSendingComment(qiscusComment);
+//                            }
+                        }else{
+                            state = QiscusComment.STATE_FAILED;
+                            if (qiscusComment.getRoomId() == room.getId()) {
+                                view.onFailedSendComment(qiscusComment);
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        state = QiscusComment.STATE_FAILED;
+                        if (qiscusComment.getRoomId() == room.getId()) {
+                            view.onFailedSendComment(qiscusComment);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e("CLONED_ERROR", "Failed to read error body", e);
+                    state = QiscusComment.STATE_FAILED;
+                    if (qiscusComment.getRoomId() == room.getId()) {
+                        view.onFailedSendComment(qiscusComment);
+                    }
+                }
+            }
         }
 
         //Kalo ternyata comment nya udah sukses dikirim sebelumnya, maka ga usah di update
@@ -167,7 +224,7 @@ public class QiscusChatPresenter extends QiscusPresenter<QiscusChatPresenter.Vie
                     QiscusErrorLogger.print(throwable);
                     throwable.printStackTrace();
                     if (qiscusComment.getRoomId() == room.getId()) {
-                        view.onFailedSendComment(qiscusComment);
+                       // view.onFailedSendComment(qiscusComment);
                     }
                 });
 

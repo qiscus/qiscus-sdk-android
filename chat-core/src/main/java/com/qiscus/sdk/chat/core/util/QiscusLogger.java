@@ -29,4 +29,12 @@ public final class QiscusLogger {
             }
         });
     }
+
+    public static void printRed(String tag, String message) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            if (QiscusCore.getChatConfig().isEnableLog()) {
+                Log.i(tag, message);
+            }
+        });
+    }
 }
