@@ -122,6 +122,7 @@ public enum QiscusApi {
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(QiscusInterceptor::RTOInterceptor)
                     .addInterceptor(
                             QiscusInterceptor.makeLoggingInterceptor(
                                     QiscusCore.getChatConfig().isEnableLog()
@@ -135,6 +136,7 @@ public enum QiscusApi {
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(QiscusInterceptor::RTOInterceptor)
                     .addInterceptor(
                             QiscusInterceptor.makeLoggingInterceptor(
                                     QiscusCore.getChatConfig().isEnableLog()
@@ -170,6 +172,7 @@ public enum QiscusApi {
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(QiscusInterceptor::RTOInterceptor)
                     .addInterceptor(
                             QiscusInterceptor.makeLoggingInterceptor(
                                     QiscusCore.getChatConfig().isEnableLog()
@@ -183,6 +186,7 @@ public enum QiscusApi {
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(QiscusInterceptor::headersInterceptor)
+                    .addInterceptor(QiscusInterceptor::RTOInterceptor)
                     .addInterceptor(
                             QiscusInterceptor.makeLoggingInterceptor(
                                     QiscusCore.getChatConfig().isEnableLog()
@@ -1248,6 +1252,7 @@ public enum QiscusApi {
                         .connectTimeout(60, TimeUnit.SECONDS)
                         .readTimeout(60, TimeUnit.SECONDS)
                         .addInterceptor(QiscusInterceptor::headersInterceptor)
+                        .addInterceptor(QiscusInterceptor::RTOInterceptor)
                         .addInterceptor(
                                 QiscusInterceptor.makeLoggingInterceptor(
                                         QiscusCore.getChatConfig().isEnableLog()
@@ -1261,6 +1266,7 @@ public enum QiscusApi {
                         .connectTimeout(60, TimeUnit.SECONDS)
                         .readTimeout(60, TimeUnit.SECONDS)
                         .addInterceptor(QiscusInterceptor::headersInterceptor)
+                        .addInterceptor(QiscusInterceptor::RTOInterceptor)
                         .addInterceptor(
                                 QiscusInterceptor.makeLoggingInterceptor(
                                         QiscusCore.getChatConfig().isEnableLog()

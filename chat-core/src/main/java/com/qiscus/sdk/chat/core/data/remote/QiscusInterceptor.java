@@ -20,7 +20,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -42,9 +46,18 @@ public class QiscusInterceptor {
     // headers Values
     private static final String ANDROID_PARAM = "ANDROID";
 
+    private static final String TAG = "QiscusInterceptor";
+    private static final int MAX_RETRIES = 3;
+    private static final int INITIAL_DELAY_MS = 500;
+
     @NonNull
     public static Response headersInterceptor(Interceptor.Chain chain) throws IOException {
         return refreshToken(chain, createNewBuilder(chain));
+    }
+
+    @NonNull
+    public static Response RTOInterceptor(Interceptor.Chain chain) throws IOException {
+        return RTOCheck(chain, createNewBuilder(chain));
     }
 
     private static Request.Builder createNewBuilder(Interceptor.Chain chain) {
@@ -86,6 +99,62 @@ public class QiscusInterceptor {
             }
         }
         return builder;
+    }
+
+
+    // tracker untuk simpan jumlah retry per request unik
+    private static final java.util.concurrent.ConcurrentHashMap<String, Integer> retryTracker =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
+
+    private static Response RTOCheck(Interceptor.Chain chain, Request.Builder builder) throws IOException {
+        Request request = builder.build();
+        String requestKey = request.method() + "_" + request.url().toString();
+
+        while (true) {
+            try {
+                // jalankan request
+                Response response = chain.proceed(request);
+
+                // sukses → hapus tracker & return
+                retryTracker.remove(requestKey);
+                return response;
+
+            } catch (Exception e) {
+                // hanya retry kalau errornya timeout / connect gagal
+                if (!(e instanceof java.net.SocketTimeoutException) && !(e instanceof java.net.ConnectException)) {
+                    retryTracker.remove(requestKey);
+                    throw e; // error lain (404, UnknownHost, dll) → jangan retry
+                }
+
+                // hitung retry (kompatibel untuk API < 24)
+                int tryCount = 1;
+                if (retryTracker.containsKey(requestKey)) {
+                    tryCount = retryTracker.get(requestKey) + 1;
+                }
+                retryTracker.put(requestKey, tryCount);
+
+                QiscusLogger.printRed("RTOCheck", "Request failed: " + requestKey +
+                        " | try " + tryCount + "/" + MAX_RETRIES +
+                        " | error: " + e.getClass().getSimpleName());
+
+                if (tryCount >= MAX_RETRIES) {
+                    retryTracker.remove(requestKey);
+                    throw new IOException("Request failed after " + tryCount + " retries", e);
+                }
+
+                // exponential backoff
+                long backoffDelay = (long) Math.pow(2, tryCount - 1) * INITIAL_DELAY_MS;
+                try {
+                    QiscusLogger.printRed("RTOCheck", "Retry " + requestKey + " fater " + backoffDelay + " ms");
+                    Thread.sleep(backoffDelay);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    retryTracker.remove(requestKey);
+                    throw new IOException("Retry interrupted", ex);
+                }
+            }
+        }
     }
 
     private static Response refreshToken(Interceptor.Chain chain, Request.Builder builder) throws IOException {
