@@ -64,24 +64,24 @@ public class QiscusInterceptor {
         Request.Builder builder = chain.request().newBuilder();
         JSONObject jsonCustomHeader = QiscusCore.getCustomHeader();
 
-        builder.addHeader(APP_ID, QiscusCore.getAppId());
-        builder.addHeader(TOKEN, QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
-        builder.addHeader(USER_EMAIL, QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
+        builder.header(APP_ID, QiscusCore.getAppId());
+        builder.header(TOKEN, QiscusCore.hasSetupUser() ? QiscusCore.getToken() : "");
+        builder.header(USER_EMAIL, QiscusCore.hasSetupUser() ? QiscusCore.getQiscusAccount().getEmail() : "");
         if (QiscusCore.getIsBuiltIn()) {
-            builder.addHeader(VERSION, ANDROID_PARAM + "_" +
+            builder.header(VERSION, ANDROID_PARAM + "_" +
                     BuildConfig.CHAT_BUILT_IN_VERSION_MAJOR + "." +
                     BuildConfig.CHAT_BUILT_IN_VERSION_MINOR + "." +
                     BuildConfig.CHAT_BUILT_IN_VERSION_PATCH);
         } else {
-            builder.addHeader(VERSION, ANDROID_PARAM + "_" +
+            builder.header(VERSION, ANDROID_PARAM + "_" +
                     BuildConfig.CHAT_CORE_VERSION_MAJOR + "." +
                     BuildConfig.CHAT_CORE_VERSION_MINOR + "." +
                     BuildConfig.CHAT_CORE_VERSION_PATCH);
         }
-        builder.addHeader(PLATFORM, ANDROID_PARAM);
-        builder.addHeader(DEVICE_BRAND, Build.MANUFACTURER);
-        builder.addHeader(DEVICE_MODEL, Build.MODEL);
-        builder.addHeader(DEVICE_OS_VERSION, BuildVersionUtil.OS_VERSION_NAME);
+        builder.header(PLATFORM, ANDROID_PARAM);
+        builder.header(DEVICE_BRAND, Build.MANUFACTURER);
+        builder.header(DEVICE_MODEL, Build.MODEL);
+        builder.header(DEVICE_OS_VERSION, BuildVersionUtil.OS_VERSION_NAME);
 
         if (jsonCustomHeader != null) {
             Iterator<String> keys = jsonCustomHeader.keys();
