@@ -75,7 +75,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.internal.Util;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okio.BufferedSink;
 import okio.Okio;
@@ -1736,9 +1735,7 @@ public enum QiscusApi {
         public void writeTo(@NonNull BufferedSink sink) throws IOException {
             numWriteToCall++;
 
-            Source source = null;
-            try {
-                source = Okio.source(file);
+            try (Source source = Okio.source(file)) {
                 long total = 0;
                 long read;
 
@@ -1760,8 +1757,6 @@ public enum QiscusApi {
                         progressListener.onProgress(total);
                     }
                 }
-            } finally {
-                Util.closeQuietly(source);
             }
         }
     }

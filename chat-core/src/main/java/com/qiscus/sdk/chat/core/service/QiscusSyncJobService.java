@@ -126,6 +126,10 @@ public class QiscusSyncJobService extends JobService {
             QiscusLogger.print(TAG, "Job started sync service... ");
             if (QiscusCore.getEnableSync()){
                 syncComments();
+
+                if (QiscusCore.getDataStore().getLatestComment() == null && QiscusCore.isAutoRefreshToken() == true){
+                    getProfile();
+                }
             }
         }
     }
@@ -135,6 +139,23 @@ public class QiscusSyncJobService extends JobService {
                 .subscribeOn(Schedulers.io())
                 .subscribe(events -> {
                 }, QiscusErrorLogger::print);
+    }
+
+    private void getProfile() {
+        QiscusApi.getInstance().getUserData()
+                .doOnSubscribe(() -> {
+                    QiscusLogger.print("getProfile from sync started...");
+                })
+                .doOnCompleted(() -> {
+                    QiscusLogger.print("getProfile from sync complete...");
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(qiscusAccount -> {
+
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    QiscusLogger.print("getProfile from Sync failed...");
+                });
     }
 
     private void syncComments() {

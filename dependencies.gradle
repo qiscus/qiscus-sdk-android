@@ -37,7 +37,7 @@ ext {
             support          : "34.0.0",
             firebaseCore     : "21.1.1",
             firebaseMessaging: "23.1.2",
-            okHttp           : "4.11.0",
+            okHttp           : "5.2.1",
             retrofit         : "2.9.0",
 
             nirmana          : "1.3.0",

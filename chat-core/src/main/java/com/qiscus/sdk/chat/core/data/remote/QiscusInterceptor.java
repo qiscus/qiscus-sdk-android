@@ -15,17 +15,11 @@ import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
-
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;

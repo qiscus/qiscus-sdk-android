@@ -109,12 +109,18 @@ public class QiscusSyncService extends Service {
                             if (QiscusCore.isOnForeground()) {
                                 if (QiscusCore.getEnableSync()) {
                                     syncComments();
+                                    if (QiscusCore.getDataStore().getLatestComment() == null && QiscusCore.isAutoRefreshToken() == true){
+                                        getProfile();
+                                    }
                                 }
                             }
                         } else {
                             if (QiscusCore.isOnForeground()) {
                                 if (QiscusCore.getEnableSync()) {
                                     syncComments();
+                                    if (QiscusCore.getDataStore().getLatestComment() == null && QiscusCore.isAutoRefreshToken() == true){
+                                        getProfile();
+                                    }
                                 }
                             }
                         }
@@ -136,6 +142,23 @@ public class QiscusSyncService extends Service {
                 .subscribeOn(Schedulers.io())
                 .subscribe(events -> {
                 }, QiscusErrorLogger::print);
+    }
+
+    private void getProfile() {
+        QiscusApi.getInstance().getUserData()
+                .doOnSubscribe(() -> {
+                    QiscusLogger.print("getProfile from sync started...");
+                })
+                .doOnCompleted(() -> {
+                    QiscusLogger.print("getProfile from sync complete...");
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(qiscusAccount -> {
+
+                }, throwable -> {
+                    QiscusErrorLogger.print(throwable);
+                    QiscusLogger.print("getProfile from Sync failed...");
+                });
     }
 
     private void syncComments() {
