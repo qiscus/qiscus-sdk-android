@@ -678,52 +678,74 @@ public enum QiscusApi {
     }
 
     public Observable<QiscusComment> sendFileMessage(QiscusComment message, File file, ProgressListener progressUploadListener) {
-        return Observable.create(subscriber -> {
-            long fileLength = file.length();
+        return Observable.<QiscusComment>create(subscriber -> {
+                    long fileLength = file.length();
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
-                                int progress = (int) (totalBytes * 100 / fileLength);
-                                progressUploadListener.onProgress(progress);
-                            }))
-                    .build();
+                    RequestBody requestBody = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    new CountingFileRequestBody(file, totalBytes -> {
+                                        int progress = (int) (totalBytes * 100 / fileLength);
+                                        progressUploadListener.onProgress(progress);
+                                    }))
+                            .build();
 
-            Request request = new Request.Builder()
-                    .url(baseUrl + "api/v2/mobile/upload")
-                    .post(requestBody).build();
+                    Request request = new Request.Builder()
+                            .url(baseUrl + "api/v2/mobile/upload")
+                            .post(requestBody)
+                            .build();
 
-            try {
-                Response response = httpClient.newCall(request).execute();
-                JSONObject responseJ = new JSONObject(response.body().string());
-                String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
-                message.updateAttachmentUrl(Uri.parse(result).toString());
-                QiscusCore.getDataStore().addOrUpdate(message);
+                    try {
+                        Response response = httpClient.newCall(request).execute();
+                        String responseString = response.body().string();
+                        JSONObject responseJ = new JSONObject(responseString);
 
-                QiscusApi.getInstance().sendMessage(message)
-                        .doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(message))
-                        .doOnError(throwable -> {
-                            subscriber.onError(throwable);
-                        })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(commentSend -> {
-                            subscriber.onNext(commentSend);
-                            subscriber.onCompleted();
-                        }, throwable -> {
-                            QiscusErrorLogger.print(throwable);
-                            throwable.printStackTrace();
-                            subscriber.onError(throwable);
-                        });
+                        String result = responseJ.getJSONObject("results")
+                                .getJSONObject("file")
+                                .getString("url");
 
+                        message.updateAttachmentUrl(Uri.parse(result).toString());
+                        QiscusCore.getDataStore().addOrUpdate(message);
 
-            } catch (IOException | JSONException e) {
-                QiscusErrorLogger.print("UploadFile", e);
-                subscriber.onError(e);
-            }
-        }, Emitter.BackpressureMode.BUFFER);
+                        QiscusApi.getInstance().sendMessage(message)
+                                .doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(message))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(commentSend -> {
+                                    subscriber.onNext(commentSend);
+                                    subscriber.onCompleted();
+                                }, throwable -> {
+                                    QiscusErrorLogger.print(throwable);
+                                    subscriber.onError(throwable);
+                                });
 
+                    } catch (IOException | JSONException e) {
+                        QiscusErrorLogger.print("UploadFile", e);
+                        subscriber.onError(e); // kirim error ke stream agar bisa di-handle oleh retryWhen
+                    }
+
+                }, Emitter.BackpressureMode.BUFFER)
+                // retry otomatis
+                .retryWhen(errors -> errors
+                        // Zip error dengan angka retry (1–3)
+                        .zipWith(Observable.range(1, 3), (error, retryCount) -> new Pair<>(error, retryCount))
+                        .flatMap(pair -> {
+                            Throwable throwable = pair.first;
+                            int retryCount = pair.second;
+
+                            if (throwable.getMessage() != null && retryCount < 3) {
+
+                                QiscusErrorLogger.print("UploadFile",
+                                        "Retry ke-" + retryCount + " setelah " + retryCount + " detik");
+
+                                // Delay meningkat sesuai jumlah retry
+                                return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            }
+
+                            return Observable.error(throwable);
+                        }))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Deprecated
@@ -771,117 +793,201 @@ public enum QiscusApi {
 
     @Deprecated
     public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
-        return Observable.create(subscriber -> {
-            long fileLength = file.length();
+        return Observable.<Uri>create(subscriber -> {
+                    long fileLength = file.length();
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
-                                int progress = (int) (totalBytes * 100 / fileLength);
-                                progressListener.onProgress(progress);
-                            }))
-                    .build();
+                    RequestBody requestBody = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    new CountingFileRequestBody(file, totalBytes -> {
+                                        int progress = (int) (totalBytes * 100 / fileLength);
+                                        progressListener.onProgress(progress);
+                                    }))
+                            .build();
 
-            Request request = new Request.Builder()
-                    .url(baseUrl + "api/v2/mobile/upload")
-                    .post(requestBody).build();
+                    Request request = new Request.Builder()
+                            .url(baseUrl + "api/v2/mobile/upload")
+                            .post(requestBody)
+                            .build();
 
-            try {
-                Response response = httpClient.newCall(request).execute();
-                JSONObject responseJ = new JSONObject(response.body().string());
-                String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
+                    try {
+                        Response response = httpClient.newCall(request).execute();
+                        String responseString = response.body().string();
+                        JSONObject responseJ = new JSONObject(responseString);
 
-                subscriber.onNext(Uri.parse(result));
-                subscriber.onCompleted();
-            } catch (IOException | JSONException e) {
-                QiscusErrorLogger.print("UploadFile", e);
-                subscriber.onError(e);
-            }
-        }, Emitter.BackpressureMode.BUFFER);
+                        String result = responseJ.getJSONObject("results")
+                                .getJSONObject("file")
+                                .getString("url");
+
+                        subscriber.onNext(Uri.parse(result));
+                        subscriber.onCompleted();
+
+                    } catch (IOException | JSONException e) {
+                        QiscusErrorLogger.print("UploadFile", e);
+                        subscriber.onError(e); // lempar error agar bisa ditangani di retryWhen
+                    }
+                }, Emitter.BackpressureMode.BUFFER)
+                // retry otomatis
+                .retryWhen(errors -> errors
+                        // Zip error dengan angka retry (1–3)
+                        .zipWith(Observable.range(1, 3), (error, retryCount) -> new Pair<>(error, retryCount))
+                        .flatMap(pair -> {
+                            Throwable throwable = pair.first;
+                            int retryCount = pair.second;
+
+                            if (throwable.getMessage() != null && retryCount < 3) {
+
+                                QiscusErrorLogger.print("UploadFile",
+                                        "Retry ke-" + retryCount + " setelah " + retryCount + " detik");
+
+                                // Delay meningkat sesuai jumlah retry
+                                return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            }
+
+                            return Observable.error(throwable);
+                        }))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<Uri> upload(File file, ProgressListener progressListener) {
-        return Observable.create(subscriber -> {
-            long fileLength = file.length();
+        return Observable.<Uri>create(subscriber -> {
+                    long fileLength = file.length();
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", file.getName(),
-                            new CountingFileRequestBody(file, totalBytes -> {
-                                int progress = (int) (totalBytes * 100 / fileLength);
-                                progressListener.onProgress(progress);
-                            }))
-                    .build();
+                    RequestBody requestBody = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    new CountingFileRequestBody(file, totalBytes -> {
+                                        int progress = (int) (totalBytes * 100 / fileLength);
+                                        progressListener.onProgress(progress);
+                                    }))
+                            .build();
 
-            Request request = new Request.Builder()
-                    .url(baseUrl + "api/v2/mobile/upload")
-                    .post(requestBody).build();
+                    Request request = new Request.Builder()
+                            .url(baseUrl + "api/v2/mobile/upload")
+                            .post(requestBody)
+                            .build();
 
-            try {
-                Response response = httpClient.newCall(request).execute();
-                JSONObject responseJ = new JSONObject(response.body().string());
-                String result = responseJ.getJSONObject("results").getJSONObject("file").getString("url");
+                    try {
+                        Response response = httpClient.newCall(request).execute();
+                        String responseString = response.body().string();
+                        JSONObject responseJ = new JSONObject(responseString);
 
-                subscriber.onNext(Uri.parse(result));
-                subscriber.onCompleted();
-            } catch (IOException | JSONException e) {
-                QiscusErrorLogger.print("UploadFile", e);
-                subscriber.onError(e);
-            }
-        }, Emitter.BackpressureMode.BUFFER);
+                        String result = responseJ.getJSONObject("results")
+                                .getJSONObject("file")
+                                .getString("url");
+
+                        subscriber.onNext(Uri.parse(result));
+                        subscriber.onCompleted();
+
+                    } catch (IOException | JSONException e) {
+                        QiscusErrorLogger.print("UploadFile", e);
+                        subscriber.onError(e);
+                    }
+                }, Emitter.BackpressureMode.BUFFER)
+                .retryWhen(errors -> errors
+                        // Zip error dengan angka retry (1–3)
+                        .zipWith(Observable.range(1, 3), (error, retryCount) -> new Pair<>(error, retryCount))
+                        .flatMap(pair -> {
+                            Throwable throwable = pair.first;
+                            int retryCount = pair.second;
+
+                            if (throwable.getMessage() != null &&
+                                    retryCount < 3) {
+
+                                QiscusErrorLogger.print("UploadFile",
+                                        "Retry ke-" + retryCount + " setelah " + retryCount + " detik");
+
+                                // Delay meningkat sesuai jumlah retry
+                                return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            }
+
+                            return Observable.error(throwable);
+                        }))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<File> downloadFile(String url, String fileName, ProgressListener progressListener) {
-        return Observable.create(subscriber -> {
-            InputStream inputStream = null;
-            FileOutputStream fos = null;
-            try {
-                Request request = new Request.Builder().url(url).build();
+        return Observable.<File>create(subscriber -> {
+                    InputStream inputStream = null;
+                    FileOutputStream fos = null;
+                    Response response = null;
 
-                Response response = httpClient.newCall(request).execute();
+                    try {
+                        Request request = new Request.Builder().url(url).build();
+                        response = httpClient.newCall(request).execute();
 
-                File output = new File(QiscusFileUtil.generateFilePath(fileName));
-                fos = new FileOutputStream(output.getPath());
-                if (!response.isSuccessful()) {
-                    throw new IOException();
-                } else {
-                    ResponseBody responseBody = response.body();
-                    long fileLength = responseBody.contentLength();
-
-                    inputStream = responseBody.byteStream();
-                    byte[] buffer = new byte[4096];
-                    long total = 0;
-                    int count;
-                    while ((count = inputStream.read(buffer)) != -1) {
-                        total += count;
-                        long totalCurrent = total;
-                        if (fileLength > 0) {
-                            progressListener.onProgress((totalCurrent * 100 / fileLength));
+                        if (!response.isSuccessful()) {
+                            String errorBody = response.body() != null ? response.body().string() : "No response body";
+                            throw new IOException("HTTP Error " + response.code() + ": " + errorBody);
                         }
-                        fos.write(buffer, 0, count);
-                    }
-                    fos.flush();
 
-                    subscriber.onNext(output);
-                    subscriber.onCompleted();
-                }
-            } catch (Exception e) {
-                throw OnErrorThrowable.from(OnErrorThrowable.addValueAsLastCause(e, url));
-            } finally {
-                try {
-                    if (fos != null) {
-                        fos.close();
+                        ResponseBody responseBody = response.body();
+                        if (responseBody == null) {
+                            throw new IOException("Empty response body");
+                        }
+
+                        long fileLength = responseBody.contentLength();
+                        File output = new File(QiscusFileUtil.generateFilePath(fileName));
+                        fos = new FileOutputStream(output.getPath());
+
+                        inputStream = responseBody.byteStream();
+                        byte[] buffer = new byte[4096];
+                        long total = 0;
+                        int count;
+
+                        while ((count = inputStream.read(buffer)) != -1) {
+                            total += count;
+                            if (fileLength > 0) {
+                                int progress = (int) ((total * 100) / fileLength);
+                                progressListener.onProgress(progress);
+                            }
+                            fos.write(buffer, 0, count);
+                        }
+
+                        fos.flush();
+                        subscriber.onNext(output);
+                        subscriber.onCompleted();
+
+                    } catch (Exception e) {
+                        QiscusErrorLogger.print("DownloadFile", e);
+                        subscriber.onError(e); // biar retryWhen bisa kerja
+                    } finally {
+                        try {
+                            if (fos != null) fos.close();
+                            if (inputStream != null) inputStream.close();
+                            if (response != null) response.close();
+                        } catch (IOException ignored) {}
                     }
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
-                } catch (IOException ignored) {
-                    //Do nothing
-                }
-            }
-        }, Emitter.BackpressureMode.BUFFER);
+
+                }, Emitter.BackpressureMode.BUFFER)
+                // 🔁 Retry logic
+                .retryWhen(errors -> errors
+                        .zipWith(Observable.range(1, 3), (error, retryCount) -> new android.util.Pair<>(error, retryCount))
+                        .flatMap(pair -> {
+                            Throwable throwable = pair.first;
+                            int retryCount = pair.second;
+                            String message = throwable.getMessage() != null ? throwable.getMessage().toLowerCase() : "";
+
+                            // 🔹 Retry kondisi umum: koneksi gagal, timeout, atau HTTP error
+                            if (!message.isEmpty() && retryCount < 3) {
+
+                                QiscusErrorLogger.print("DownloadFile",
+                                        "Retry ke-" + retryCount + " setelah " + retryCount + " detik. Error: " + message);
+
+                                progressListener.onProgress(0);
+
+                                // Delay sebelum mencoba lagi
+                                return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            }
+
+                            return Observable.error(throwable); // hentikan retry
+                        }))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
+
 
     public Observable<QiscusChatRoom> updateChatRoom(long roomId, String name, String avatarURL, JSONObject extras) {
         return api.updateChatRoom(QiscusHashMapUtil.updateChatRoom(

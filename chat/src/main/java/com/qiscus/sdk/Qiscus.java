@@ -25,6 +25,7 @@ import androidx.annotation.RestrictTo;
 import com.qiscus.jupuk.Jupuk;
 import com.qiscus.manggil.emojifull.EmojiManager;
 import com.qiscus.manggil.emojione.EmojiOneProvider;
+import com.qiscus.nirmana.Nirmana;
 import com.qiscus.sdk.chat.core.BuildConfig;
 import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
@@ -179,6 +180,7 @@ public class Qiscus {
         QiscusCacheManager.getInstance().setLastChatActivity(false, 0);
         QiscusCore.isBuiltIn(true);
         Jupuk.init(application);
+        Nirmana.init(application);
         EmojiManager.install(new EmojiOneProvider());
         QiscusLogger.print("init Qiscus with app Id " + QiscusCore.getAppId());
 
