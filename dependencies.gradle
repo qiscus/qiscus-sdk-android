@@ -30,11 +30,11 @@ repositories {
 ext {
 
     minSDKVersion = 21
-    targetSDKVersion = 35
-    compileSDKVersion = 35
+    targetSDKVersion = 36
+    compileSDKVersion = 36
 
     versions = [
-            support          : "34.0.0",
+            support          : "36.0.0",
             firebaseCore     : "21.1.1",
             firebaseMessaging: "23.1.2",
             okHttp           : "5.2.1",

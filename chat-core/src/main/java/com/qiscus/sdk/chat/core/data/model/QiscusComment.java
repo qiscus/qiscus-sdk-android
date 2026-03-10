@@ -457,10 +457,19 @@ public class QiscusComment implements Parcelable {
     public void updateAttachmentUrl(String url) {
         setMessage(String.format("[file] %s [/file]", url));
         try {
-            JSONObject json = new JSONObject(getExtraPayload());
+            JSONObject json;
+
+            String extraPayload = getExtraPayload();
+            if (extraPayload == null || extraPayload.isEmpty()) {
+                json = new JSONObject();
+            } else {
+                json = new JSONObject(extraPayload);
+            }
+
             json.put("url", url);
             setExtraPayload(json.toString());
-        } catch (Exception e) {
+
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

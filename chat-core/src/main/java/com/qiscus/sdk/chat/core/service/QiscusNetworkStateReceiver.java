@@ -22,9 +22,13 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.qiscus.sdk.chat.core.QiscusCore;
+import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
+import com.qiscus.sdk.chat.core.data.model.QiscusComment;
 import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusLogger;
+
+import java.util.List;
 
 /**
  * @author Yuana andhikayuana@gmail.com
@@ -37,22 +41,65 @@ public class QiscusNetworkStateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        if (QiscusCore.hasSetupAppID()) {
-            boolean isConnected = QiscusAndroidUtil.isNetworkAvailable();
-            QiscusLogger.print(TAG, "isConnected : " + isConnected);
-            QiscusAndroidUtil.runOnBackgroundThread(() -> {
-                if (needResend(isConnected)) {
-                    QiscusResendCommentHelper.cancelAll();
-                    QiscusResendCommentHelper.tryResendPendingComment();
-                }
-            });
-        } else {
-            Log.d("QiscusCore", "Logger from change network connection, please setup your appID first");
+   // ✅ Move ALL logic to background thread - DON'T block main thread
+        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+            handleNetworkChange();
+        });
+    }
+
+    // ✅ All checks in background thread
+    private void handleNetworkChange() {
+        // ✅ Quick non-blocking check
+        if (!isQiscusInitialized()) {
+            QiscusLogger.print(TAG, "Qiscus not initialized, skipping network check");
+            return;
+        }
+
+        boolean isConnected = QiscusAndroidUtil.isNetworkAvailable();
+        QiscusLogger.print(TAG, "isConnected : " + isConnected);
+
+        if (needResend(isConnected)) {
+            QiscusResendCommentHelper.cancelAll();
+            QiscusResendCommentHelper.tryResendPendingComment();
         }
     }
 
+    // ✅ Safe initialization check
+    private boolean isQiscusInitialized() {
+        try {
+            // ✅ This should now be non-blocking after fixing QiscusAppComponent
+            return QiscusCore.hasSetupAppID();
+        } catch (Exception e) {
+            QiscusLogger.print(TAG, "Error checking Qiscus setup: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ✅ Safe check with null safety
     private boolean needResend(boolean isConnected) {
-        return isConnected && QiscusCore.hasSetupUser() && QiscusCore.getDataStore().getPendingComments().size() > 0;
+        if (!isConnected) {
+            return false;
+        }
+
+        try {
+            // ✅ Check user setup
+            if (!QiscusCore.hasSetupUser()) {
+                return false;
+            }
+
+            // ✅ Null-safe datastore check
+            QiscusDataStore dataStore = QiscusCore.getDataStore();
+            if (dataStore == null) {
+                return false;
+            }
+
+            List<QiscusComment> pendingComments = dataStore.getPendingComments();
+            return pendingComments != null && pendingComments.size() > 0;
+
+        } catch (Exception e) {
+            QiscusLogger.print(TAG, "Error checking resend needs: " + e.getMessage());
+            return false;
+        }
     }
 
 }

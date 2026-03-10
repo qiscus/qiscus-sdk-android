@@ -30,12 +30,14 @@ import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusMQTT;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomEvent;
 import com.qiscus.sdk.chat.core.event.QiscusChatRoomTypingAIEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentReceivedEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentUpdateEvent;
 import com.qiscus.sdk.chat.core.event.QiscusMqttStatusEvent;
+import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserEvent;
 import com.qiscus.sdk.chat.core.event.QiscusUserStatusEvent;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
@@ -392,11 +394,40 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     }
 
     public void connect() {
+
+        String username = QiscusCore.getUserNameMQTT();
+        String password = QiscusCore.getPasswordMQTT();
+
+
+        if (QiscusCore.getUserNameMQTT().isEmpty() || QiscusCore.getPasswordMQTT().isEmpty()) {
+            QiscusApi.getInstance().getMQTT()
+                    .doOnSubscribe(() -> {
+                        QiscusLogger.print("getMQTT started...");
+                    })
+                    .doOnCompleted(() -> {
+                        QiscusLogger.print("getMQTT complete...");
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(qiscusMQTT -> {
+                        connectWithAuth(qiscusMQTT.getUsernameMQTT(), qiscusMQTT.getPasswordMQTT());
+                    }, throwable -> {
+                        QiscusErrorLogger.print(throwable);
+                        QiscusLogger.print("getMQTT failed... using result /config ... " + throwable.getMessage());
+                        connectWithAuth(username, password);
+                    });
+        }else{
+            connectWithAuth(username, password);
+        }
+    }
+
+    private void connectWithAuth(String username, String password) {
         if (QiscusCore.hasSetupUser() && !connecting && QiscusAndroidUtil.isNetworkAvailable()
                 && QiscusCore.getEnableRealtime() && QiscusCore.getStatusRealtimeEnableDisable()) {
             connecting = true;
             qiscusAccount = QiscusCore.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+            mqttConnectOptions.setPassword(password.toCharArray());
+            mqttConnectOptions.setUserName(username);
             mqttConnectOptions.setAutomaticReconnect(false);
             mqttConnectOptions.setCleanSession(false);
 
@@ -437,6 +468,7 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
             }
         }
     }
+
 
     public boolean isConnected() {
         try {
@@ -616,6 +648,9 @@ public enum QiscusPusherApi implements MqttCallbackExtended, IMqttActionListener
     public void subsribeCommentAndNotification() {
         listenComment();
         listenNotification();
+        if (QiscusCore.isOnForeground()) {
+            QiscusResendCommentHelper.tryResendPendingComment();
+        }
     }
 
     @Deprecated

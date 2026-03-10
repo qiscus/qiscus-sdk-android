@@ -15,32 +15,34 @@ import org.json.JSONObject;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class QiscusAppComponent {
-
-    private Application application;
-    private String appId;
-    private String baseURLLB;
-    private String mqttBrokerUrl;
-    private String appServer;
-    private boolean enableMqttLB = true;
-    private int heartBeat = 5000;
-    private int automaticHeartBeat = 30000;
-    private int networkConnectionInterval = 5000;
-    private Boolean enableRealtime = true;
-    private Boolean enableEventReport = true;
-    private Boolean isBuiltIn = false;
-    private Boolean syncServiceDisabled = false;
-    private Boolean enableSync = true;
-    private Boolean enableSyncEvent = false;
-    private Boolean autoRefreshToken = true;
-    private Boolean enableRefreshToken = false;
-    private Boolean forceDisableRealtimeFromExactAlarm = false;
-    private JSONObject customHeader;
-    private Handler appHandler;
+    // ✅ Add volatile to ALL fields for thread-safe reads
+    private volatile Application application;
+    private volatile String appId;
+    private volatile String baseURLLB;
+    private volatile String mqttBrokerUrl;
+    private volatile String appServer;
+    private volatile boolean enableMqttLB = true;
+    private volatile int heartBeat = 5000;
+    private volatile int automaticHeartBeat = 30000;
+    private volatile int networkConnectionInterval = 5000;
+    private volatile Boolean enableRealtime = true;
+    private volatile String usernameMQTT = "";
+    private volatile String passwordMQTT = "";
+    private volatile Boolean enableEventReport = true;
+    private volatile Boolean isBuiltIn = false;
+    private volatile Boolean syncServiceDisabled = false;
+    private volatile Boolean enableSync = true;
+    private volatile Boolean enableSyncEvent = false;
+    private volatile Boolean autoRefreshToken = true;
+    private volatile Boolean enableRefreshToken = false;
+    private volatile Boolean forceDisableRealtimeFromExactAlarm = false;
+    private volatile JSONObject customHeader;
+    private volatile Handler appHandler;
     private final ScheduledThreadPoolExecutor taskExecutor = new ScheduledThreadPoolExecutor(5);
-    private QiscusCore.LocalDataManager localDataManager;
+    private volatile QiscusCore.LocalDataManager localDataManager;
 
-    private QiscusDataBaseHelper dataBaseHelper;
-    private QiscusDataStore dataStore;
+    private volatile QiscusDataBaseHelper dataBaseHelper;
+    private volatile QiscusDataStore dataStore;
     private static volatile QiscusAppComponent INSTANCE;
 
     public static QiscusAppComponent create() {
@@ -74,15 +76,15 @@ public class QiscusAppComponent {
         EventBus.getDefault().post((QiscusInitWithCustomServerEvent.wasSetup));
     }
 
-    public synchronized Application getApplication() {
+    public Application getApplication() {
         return application;
     }
 
-    public synchronized String getAppId() {
+    public String getAppId() {
         return appId;
     }
 
-    public synchronized String getAppServer() {
+    public String getAppServer() {
         return this.appServer;
     }
 
@@ -90,7 +92,7 @@ public class QiscusAppComponent {
         this.appServer = appServer;
     }
 
-    public synchronized int getHeartBeat() {
+    public int getHeartBeat() {
         return heartBeat;
     }
 
@@ -98,7 +100,7 @@ public class QiscusAppComponent {
         this.heartBeat = heartBeat;
     }
 
-    public synchronized int getAutomaticHeartBeat() {
+    public int getAutomaticHeartBeat() {
         return automaticHeartBeat;
     }
 
@@ -106,7 +108,7 @@ public class QiscusAppComponent {
         this.automaticHeartBeat = automaticHeartBeat;
     }
 
-    public synchronized int getNetworkConnectionInterval() {
+    public int getNetworkConnectionInterval() {
         return this.networkConnectionInterval;
     }
 
@@ -114,7 +116,7 @@ public class QiscusAppComponent {
         this.networkConnectionInterval = automaticHeartBeatnetworkConnectionInterval;
     }
 
-    public synchronized Boolean getEnableEventReport() {
+    public Boolean getEnableEventReport() {
         return enableEventReport;
     }
 
@@ -122,7 +124,7 @@ public class QiscusAppComponent {
         this.enableEventReport = enableEventReport;
     }
 
-    public synchronized String getBaseURLLB() {
+    public String getBaseURLLB() {
         return baseURLLB;
     }
 
@@ -130,7 +132,7 @@ public class QiscusAppComponent {
         this.baseURLLB = baseURLLB;
     }
 
-    public synchronized Boolean getIsBuiltIn() {
+    public Boolean getIsBuiltIn() {
         return isBuiltIn;
     }
 
@@ -138,7 +140,7 @@ public class QiscusAppComponent {
         this.isBuiltIn = isBuiltIn;
     }
 
-    public synchronized String getMqttBrokerUrl() {
+    public String getMqttBrokerUrl() {
         return mqttBrokerUrl;
     }
 
@@ -146,7 +148,7 @@ public class QiscusAppComponent {
         this.mqttBrokerUrl = mqttBrokerUrl;
     }
 
-    public synchronized Boolean getEnableMqttLB() {
+    public Boolean getEnableMqttLB() {
         return enableMqttLB;
     }
 
@@ -154,7 +156,7 @@ public class QiscusAppComponent {
         this.enableMqttLB = enableMqttLB;
     }
 
-    public synchronized Boolean getEnableRealtime() {
+    public Boolean getEnableRealtime() {
         return enableRealtime;
     }
 
@@ -162,7 +164,23 @@ public class QiscusAppComponent {
         this.enableRealtime = enableRealtime;
     }
 
-    public synchronized Boolean getSyncServiceDisabled() {
+    public String getUsernameMQTT() {
+        return usernameMQTT;
+    }
+
+    public synchronized void setUsernameMQTT(String usernameMQTT) {
+        this.usernameMQTT = usernameMQTT;
+    }
+
+    public String getPasswordMQTT() {
+        return passwordMQTT;
+    }
+
+    public synchronized void setPaswwordMQTT(String passwordMQTT) {
+        this.passwordMQTT = passwordMQTT;
+    }
+
+    public Boolean getSyncServiceDisabled() {
         return syncServiceDisabled;
     }
 
@@ -170,7 +188,7 @@ public class QiscusAppComponent {
         this.syncServiceDisabled = syncServiceDisabled;
     }
 
-    public synchronized Boolean getEnableSync() {
+    public Boolean getEnableSync() {
         return enableSync;
     }
 
@@ -178,7 +196,7 @@ public class QiscusAppComponent {
         this.enableSync = enableSync;
     }
 
-    public synchronized Boolean getEnableSyncEvent() {
+    public Boolean getEnableSyncEvent() {
         return enableSyncEvent;
     }
 
@@ -186,7 +204,7 @@ public class QiscusAppComponent {
         this.enableSyncEvent = enableSyncEvent;
     }
 
-    public synchronized Boolean getAutoRefreshToken() {
+    public Boolean getAutoRefreshToken() {
         return autoRefreshToken;
     }
 
@@ -194,7 +212,7 @@ public class QiscusAppComponent {
         this.autoRefreshToken = autoRefreshToken;
     }
 
-    public synchronized Boolean getEnableRefreshToken() {
+    public Boolean getEnableRefreshToken() {
         return enableRefreshToken;
     }
 
@@ -203,7 +221,7 @@ public class QiscusAppComponent {
     }
 
 
-    public synchronized Boolean getForceDisableRealtimeFromExactAlarm() {
+    public Boolean getForceDisableRealtimeFromExactAlarm() {
         return forceDisableRealtimeFromExactAlarm;
     }
 
@@ -211,7 +229,7 @@ public class QiscusAppComponent {
         this.forceDisableRealtimeFromExactAlarm = forceDisableRealtimeFromExactAlarm;
     }
 
-    public synchronized JSONObject getCustomHeader() {
+    public JSONObject getCustomHeader() {
         return customHeader;
     }
 
@@ -219,23 +237,23 @@ public class QiscusAppComponent {
         this.customHeader = customHeader;
     }
 
-    public synchronized Handler getAppHandler() {
+    public Handler getAppHandler() {
         return appHandler;
     }
 
-    public synchronized ScheduledThreadPoolExecutor getTaskExecutor() {
+    public ScheduledThreadPoolExecutor getTaskExecutor() {
         return taskExecutor;
     }
 
-    public synchronized QiscusCore.LocalDataManager getLocalDataManager() {
+    public QiscusCore.LocalDataManager getLocalDataManager() {
         return localDataManager;
     }
 
-    public synchronized QiscusDataBaseHelper getDataBaseHelper() {
+    public QiscusDataBaseHelper getDataBaseHelper() {
         return dataBaseHelper;
     }
 
-    public synchronized QiscusDataStore getDataStore() {
+    public QiscusDataStore getDataStore() {
         return dataStore;
     }
 

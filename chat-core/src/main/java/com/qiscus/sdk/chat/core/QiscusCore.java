@@ -37,13 +37,13 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.qiscus.sdk.chat.core.data.local.QiscusCacheManager;
 import com.qiscus.sdk.chat.core.data.local.QiscusDataStore;
-import com.qiscus.sdk.chat.core.data.local.QiscusDataManagement;
 import com.qiscus.sdk.chat.core.data.local.QiscusEventCache;
 import com.qiscus.sdk.chat.core.data.model.QiscusAccount;
 import com.qiscus.sdk.chat.core.data.model.QiscusCoreChatConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.remote.QiscusApi;
 import com.qiscus.sdk.chat.core.data.remote.QiscusPusherApi;
+import com.qiscus.sdk.chat.core.data.remote.QiscusResendCommentHelper;
 import com.qiscus.sdk.chat.core.event.QiscusInitWithCustomServerEvent;
 import com.qiscus.sdk.chat.core.event.QiscusRefreshTokenEvent;
 import com.qiscus.sdk.chat.core.event.QiscusSyncEvent;
@@ -607,6 +607,40 @@ public class QiscusCore {
     }
 
     /**
+     * Accessor to get current usernameMQTT
+     *
+     * @return Current usernameMQTT
+     */
+    public static String getUserNameMQTT() {
+        return appComponent.getUsernameMQTT();
+    }
+
+    /**
+     * Accessor to set usernameMQTT
+     *
+     */
+    public static void setUserNameMQTT(String userNameMQTT) {
+         appComponent.setUsernameMQTT(userNameMQTT);
+    }
+
+    /**
+     * Accessor to set passwordMQTT
+     *
+     */
+    public static void setPasswordMQTT(String passwordMQTT) {
+        appComponent.setPaswwordMQTT(passwordMQTT);
+    }
+
+    /**
+     * Accessor to get current passwordMQTT
+     *
+     * @return Current paswwordMQTT
+     */
+    public static String getPasswordMQTT() {
+        return appComponent.getPasswordMQTT();
+    }
+
+    /**
      * Accessor to get current mqtt broker url
      *
      * @return Current mqtt broker url
@@ -666,12 +700,26 @@ public class QiscusCore {
 
     /**
      * For checking is qiscus user has been setup
-     *
+     *1
      * @return true if already setup, false if not yet
      */
     public static boolean hasSetupUser() {
-        return  appComponent.getAppServer() != null
-                &&  appComponent.getLocalDataManager().isLogged();
+        try {
+            // ✅ Non-blocking reads
+            String server = appComponent.getAppServer();
+            if (server == null || server.isEmpty()) {
+                return false;
+            }
+
+            QiscusCore.LocalDataManager ldm = appComponent.getLocalDataManager();
+            return ldm != null && ldm.isLogged();
+
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (Exception e) {
+            QiscusErrorLogger.print("Error checking user setup", e);
+            return false;
+        }
 
     }
 
@@ -681,7 +729,18 @@ public class QiscusCore {
      * @return true if already hasSetupAppID, false if not yet
      */
     public static boolean hasSetupAppID() {
-        return  appComponent.getAppServer() != null;
+        try {
+            // ✅ Non-blocking read from volatile field
+            String appServer = appComponent.getAppServer();
+            return appServer != null && !appServer.isEmpty();
+
+        } catch (IllegalArgumentException e) {
+            // Component not initialized
+            return false;
+        } catch (Exception e) {
+            QiscusErrorLogger.print("Error checking app setup", e);
+            return false;
+        }
     }
 
     /**
@@ -745,6 +804,11 @@ public class QiscusCore {
                 .saveAccountInfo(account);
 
         QiscusPusherApi.getInstance().subsribeCommentAndNotification();
+
+        QiscusAndroidUtil.runOnBackgroundThread(() -> {
+            QiscusResendCommentHelper.cancelAll();
+            QiscusResendCommentHelper.tryResendPendingComment();
+        });
 
         QiscusApi.getInstance().sync()
                 .doOnSubscribe(() -> {
@@ -1248,6 +1312,8 @@ public class QiscusCore {
     }
 
     public static void clearData(){
+        QiscusCore.setUserNameMQTT("");
+        QiscusCore.setPasswordMQTT("");
         if (BuildVersionUtil.isOreoOrHigher()) {
             JobScheduler jobScheduler = (JobScheduler) appComponent.getApplication()
                     .getSystemService(Context.JOB_SCHEDULER_SERVICE);

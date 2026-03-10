@@ -35,6 +35,7 @@ import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
 import com.qiscus.sdk.chat.core.data.model.QiscusChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QiscusComment;
+import com.qiscus.sdk.chat.core.data.model.QiscusMQTT;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.data.model.QiscusRoomMember;
@@ -42,6 +43,7 @@ import com.qiscus.sdk.chat.core.event.QiscusClearCommentsEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentSentEvent;
 import com.qiscus.sdk.chat.core.event.QiscusCommentUpdateEvent;
 import com.qiscus.sdk.chat.core.util.BuildVersionUtil;
+import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusDateUtil;
 import com.qiscus.sdk.chat.core.util.QiscusErrorLogger;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
@@ -697,16 +699,62 @@ public enum QiscusApi {
 
                     try {
                         Response response = httpClient.newCall(request).execute();
-                        String responseString = response.body().string();
-                        JSONObject responseJ = new JSONObject(responseString);
+                        String bodyString = response.body() != null ? response.body().string() : "";
 
-                        String result = responseJ.getJSONObject("results")
+                        // ======================
+                        // HANDLE HTTP ERROR
+                        // ======================
+                        if (!response.isSuccessful()) {
+                            int code = response.code();
+                            String errorMessage = bodyString;
+
+                            try {
+                                JSONObject errorJson = new JSONObject(bodyString);
+                                if (errorJson.has("error")) {
+                                    JSONObject errorObj = errorJson.getJSONObject("error");
+
+                                    if (errorObj.has("message")) {
+                                        errorMessage = errorObj.getString("message");
+                                    } else if (errorObj.has("errors")) {
+                                        errorMessage = errorObj.getString("errors");
+                                    } else if (errorObj.has("detailed_messages")) {
+                                        errorMessage = errorObj
+                                                .getJSONArray("detailed_messages")
+                                                .optString(0);
+                                    }
+                                }
+                            } catch (JSONException ignored) {
+                                // error body bukan JSON
+                            }
+
+                            Exception exception;
+                            if (code == 422 && errorMessage.contains("Token is expired")) {
+                                exception = new Exception("TOKEN_EXPIRED: " + errorMessage);
+                            } else if (code == 403) {
+                                exception = new Exception("TOKEN_EXPIRED: " + errorMessage);
+                            } else {
+                                exception = new Exception("HTTP " + code + ": " + errorMessage);
+                            }
+
+                            QiscusErrorLogger.print("UploadFile", exception);
+                            subscriber.onError(exception);
+                            return;
+                        }
+
+                        // ======================
+                        // SUCCESS UPLOAD FILE
+                        // ======================
+                        JSONObject responseJ = new JSONObject(bodyString);
+                        String result = responseJ
+                                .getJSONObject("results")
                                 .getJSONObject("file")
                                 .getString("url");
 
+                        // update message attachment
                         message.updateAttachmentUrl(Uri.parse(result).toString());
                         QiscusCore.getDataStore().addOrUpdate(message);
 
+                        // send message
                         QiscusApi.getInstance().sendMessage(message)
                                 .doOnSubscribe(() -> QiscusCore.getDataStore().addOrUpdate(message))
                                 .subscribeOn(Schedulers.io())
@@ -721,7 +769,7 @@ public enum QiscusApi {
 
                     } catch (IOException | JSONException e) {
                         QiscusErrorLogger.print("UploadFile", e);
-                        subscriber.onError(e); // kirim error ke stream agar bisa di-handle oleh retryWhen
+                        subscriber.onError(e);
                     }
 
                 }, Emitter.BackpressureMode.BUFFER)
@@ -733,19 +781,17 @@ public enum QiscusApi {
                             Throwable throwable = pair.first;
                             int retryCount = pair.second;
 
-                            if (throwable.getMessage() != null && retryCount < 3) {
+                            if (retryCount < 3) {
 
                                 QiscusErrorLogger.print("UploadFile",
                                         "Retry ke-" + retryCount + " setelah " + retryCount + " detik");
 
                                 // Delay meningkat sesuai jumlah retry
                                 return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            } else {
+                                return Observable.error(throwable);
                             }
-
-                            return Observable.error(throwable);
-                        }))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                        }));
     }
 
     @Deprecated
@@ -791,6 +837,12 @@ public enum QiscusApi {
 
     }
 
+    public Observable<QiscusMQTT> getMQTT() {
+        return api.getMQTT()
+                .map(QiscusApiParser::parseMQTT);
+    }
+
+
     @Deprecated
     public Observable<Uri> uploadFile(File file, ProgressListener progressListener) {
         return Observable.<Uri>create(subscriber -> {
@@ -811,11 +863,50 @@ public enum QiscusApi {
                             .build();
 
                     try {
-                        Response response = httpClient.newCall(request).execute();
-                        String responseString = response.body().string();
-                        JSONObject responseJ = new JSONObject(responseString);
+                        Response response = this.httpClient.newCall(request).execute();
+                        String bodyString = response.body() != null ? response.body().string() : "";
 
-                        String result = responseJ.getJSONObject("results")
+                        if (!response.isSuccessful()) {
+                            int code = response.code();
+                            String errorMessage = bodyString;
+
+                            try {
+                                JSONObject errorJson = new JSONObject(bodyString);
+                                if (errorJson.has("error")) {
+                                    JSONObject errorObj = errorJson.getJSONObject("error");
+
+                                    if (errorObj.has("message")) {
+                                        errorMessage = errorObj.getString("message");
+                                    } else if (errorObj.has("errors")) {
+                                        errorMessage = errorObj.getString("errors");
+                                    } else if (errorObj.has("detailed_messages")) {
+                                        errorMessage = errorObj
+                                                .getJSONArray("detailed_messages")
+                                                .optString(0);
+                                    }
+                                }
+                            } catch (JSONException ignored) {
+                                // kalau error body bukan JSON
+                            }
+
+                            Exception exception;
+                            if (code == 422 && errorMessage.contains("Token is expired")) {
+                                exception = new Exception("TOKEN_EXPIRED: " + errorMessage);
+                            } else if (code == 403) {
+                                exception = new Exception("TOKEN_EXPIRED: " + errorMessage);
+                            } else {
+                                exception = new Exception("HTTP " + code + ": " + errorMessage);
+                            }
+
+                            QiscusErrorLogger.print("UploadFile", exception);
+                            subscriber.onError(exception);
+                            return;
+                        }
+
+                        // === SUCCESS ===
+                        JSONObject responseJ = new JSONObject(bodyString);
+                        String result = responseJ
+                                .getJSONObject("results")
                                 .getJSONObject("file")
                                 .getString("url");
 
@@ -824,7 +915,7 @@ public enum QiscusApi {
 
                     } catch (IOException | JSONException e) {
                         QiscusErrorLogger.print("UploadFile", e);
-                        subscriber.onError(e); // lempar error agar bisa ditangani di retryWhen
+                        subscriber.onError(e);
                     }
                 }, Emitter.BackpressureMode.BUFFER)
                 // retry otomatis
@@ -835,19 +926,17 @@ public enum QiscusApi {
                             Throwable throwable = pair.first;
                             int retryCount = pair.second;
 
-                            if (throwable.getMessage() != null && retryCount < 3) {
+                            if (retryCount < 3) {
 
                                 QiscusErrorLogger.print("UploadFile",
                                         "Retry ke-" + retryCount + " setelah " + retryCount + " detik");
 
                                 // Delay meningkat sesuai jumlah retry
                                 return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            } else {
+                                return Observable.error(throwable);
                             }
-
-                            return Observable.error(throwable);
-                        }))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                        }));
     }
 
     public Observable<Uri> upload(File file, ProgressListener progressListener) {
@@ -869,11 +958,50 @@ public enum QiscusApi {
                             .build();
 
                     try {
-                        Response response = httpClient.newCall(request).execute();
-                        String responseString = response.body().string();
-                        JSONObject responseJ = new JSONObject(responseString);
+                        Response response = this.httpClient.newCall(request).execute();
+                        String bodyString = response.body() != null ? response.body().string() : "";
 
-                        String result = responseJ.getJSONObject("results")
+                        if (!response.isSuccessful()) {
+                            int code = response.code();
+                            String errorMessage = bodyString;
+
+                            try {
+                                JSONObject errorJson = new JSONObject(bodyString);
+                                if (errorJson.has("error")) {
+                                    JSONObject errorObj = errorJson.getJSONObject("error");
+
+                                    if (errorObj.has("message")) {
+                                        errorMessage = errorObj.getString("message");
+                                    } else if (errorObj.has("errors")) {
+                                        errorMessage = errorObj.getString("errors");
+                                    } else if (errorObj.has("detailed_messages")) {
+                                        errorMessage = errorObj
+                                                .getJSONArray("detailed_messages")
+                                                .optString(0);
+                                    }
+                                }
+                            } catch (JSONException ignored) {
+                                // kalau error body bukan JSON
+                            }
+
+                            Exception exception;
+                            if (code == 422 && errorMessage.contains("Token is expired")) {
+                                exception = new Exception("TOKEN_EXPIRED: " + errorMessage);
+                            } else if (code == 403) {
+                                exception = new Exception("TOKEN_EXPIRED: " + errorMessage);
+                            } else {
+                                exception = new Exception("HTTP " + code + ": " + errorMessage);
+                            }
+
+                            QiscusErrorLogger.print("UploadFile", exception);
+                            subscriber.onError(exception);
+                            return;
+                        }
+
+                        // === SUCCESS ===
+                        JSONObject responseJ = new JSONObject(bodyString);
+                        String result = responseJ
+                                .getJSONObject("results")
                                 .getJSONObject("file")
                                 .getString("url");
 
@@ -892,20 +1020,17 @@ public enum QiscusApi {
                             Throwable throwable = pair.first;
                             int retryCount = pair.second;
 
-                            if (throwable.getMessage() != null &&
-                                    retryCount < 3) {
+                            if (retryCount < 3) {
 
                                 QiscusErrorLogger.print("UploadFile",
                                         "Retry ke-" + retryCount + " setelah " + retryCount + " detik");
 
                                 // Delay meningkat sesuai jumlah retry
                                 return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            }else{
+                                return Observable.error(throwable);
                             }
-
-                            return Observable.error(throwable);
-                        }))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                        }));
     }
 
     public Observable<File> downloadFile(String url, String fileName, ProgressListener progressListener) {
@@ -968,10 +1093,10 @@ public enum QiscusApi {
                         .flatMap(pair -> {
                             Throwable throwable = pair.first;
                             int retryCount = pair.second;
-                            String message = throwable.getMessage() != null ? throwable.getMessage().toLowerCase() : "";
-
                             // 🔹 Retry kondisi umum: koneksi gagal, timeout, atau HTTP error
-                            if (!message.isEmpty() && retryCount < 3) {
+                            if (retryCount < 3) {
+
+                                String message = throwable.getMessage() != null ? throwable.getMessage().toLowerCase() : "";
 
                                 QiscusErrorLogger.print("DownloadFile",
                                         "Retry ke-" + retryCount + " setelah " + retryCount + " detik. Error: " + message);
@@ -980,12 +1105,10 @@ public enum QiscusApi {
 
                                 // Delay sebelum mencoba lagi
                                 return Observable.timer(retryCount, TimeUnit.SECONDS);
+                            } else {
+                                return Observable.error(throwable); // hentikan retry
                             }
-
-                            return Observable.error(throwable); // hentikan retry
-                        }))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                        }));
     }
 
 
@@ -1580,6 +1703,10 @@ public enum QiscusApi {
 
         @GET("api/v2/mobile/my_profile")
         Observable<JsonElement> getUserData(
+        );
+
+        @GET("api/v2/mobile/mqtt_config")
+        Observable<JsonElement> getMQTT(
         );
 
         @Headers("Content-Type: application/json")
