@@ -40,6 +40,7 @@ import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
+import com.qiscus.sdk.chat.core.data.model.QiscusMQTT;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
 import com.qiscus.sdk.chat.core.event.QMessageSentEvent;
@@ -1398,6 +1399,11 @@ public class QiscusApi {
                 .map(JsonElement::getAsJsonObject);
     }
 
+    public Observable<QiscusMQTT> getMQTT() {
+        return api.getMQTT()
+                .map(QiscusApiParser::parseMQTT);
+    }
+
 
     private interface Api {
 
@@ -1651,6 +1657,10 @@ public class QiscusApi {
         @POST("api/v2/sdk/logout")
         Observable<JsonElement> logout(
                 @Body HashMap<String, Object> data
+        );
+
+        @GET("api/v2/mobile/mqtt_config")
+        Observable<JsonElement> getMQTT(
         );
 
     }

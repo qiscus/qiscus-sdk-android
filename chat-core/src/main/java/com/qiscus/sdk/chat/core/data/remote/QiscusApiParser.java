@@ -21,6 +21,7 @@ import androidx.core.util.Pair;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.qiscus.sdk.chat.core.QiscusCore;
 import com.qiscus.sdk.chat.core.data.model.QAccount;
 import com.qiscus.sdk.chat.core.data.model.QChatRoom;
 import com.qiscus.sdk.chat.core.data.model.QMessage;
@@ -29,6 +30,7 @@ import com.qiscus.sdk.chat.core.data.model.QUser;
 import com.qiscus.sdk.chat.core.data.model.QUserPresence;
 import com.qiscus.sdk.chat.core.data.model.QiscusAppConfig;
 import com.qiscus.sdk.chat.core.data.model.QiscusChannels;
+import com.qiscus.sdk.chat.core.data.model.QiscusMQTT;
 import com.qiscus.sdk.chat.core.data.model.QiscusNonce;
 import com.qiscus.sdk.chat.core.data.model.QiscusRealtimeStatus;
 import com.qiscus.sdk.chat.core.data.model.QiscusRefreshToken;
@@ -743,4 +745,30 @@ final class QiscusApiParser {
         }
         return refreshToken;
     }
+
+    static QiscusMQTT parseMQTT(JsonElement jsonElement) {
+        if (jsonElement != null && jsonElement.getAsJsonObject().has("results")) {
+
+            JsonObject result = jsonElement.getAsJsonObject().get("results").getAsJsonObject();
+
+            String username = "" ;
+            String password = "" ;
+
+            if (result.has("username")) {
+                username = result.get("username").getAsString();
+            }
+
+            if (result.has("password")) {
+                password = result.get("password").getAsString();
+            }
+
+            return new QiscusMQTT(username,
+                    password);
+        }else{
+            return new QiscusMQTT("",
+                    "");
+        }
+
+    }
+
 }

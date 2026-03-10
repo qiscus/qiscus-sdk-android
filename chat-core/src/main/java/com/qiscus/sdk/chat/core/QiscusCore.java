@@ -108,6 +108,8 @@ public class QiscusCore {
 
     private Boolean autoRefreshToken = true;
     private Boolean enableRefreshToken = false;
+    private String usernameMQTT = "";
+    private String paswordMQTT = "";
     public QiscusCore() {
     }
 
@@ -1225,6 +1227,40 @@ public class QiscusCore {
         }
     }
 
+    /**
+     * Accessor to get current usernameMQTT
+     *
+     * @return Current usernameMQTT
+     */
+    public String getUserNameMQTT() {
+        return usernameMQTT;
+    }
+
+    /**
+     * Accessor to set usernameMQTT
+     *
+     */
+    public void setUserNameMQTT(String userNameMQTT) {
+        usernameMQTT = userNameMQTT;
+    }
+
+    /**
+     * Accessor to set passwordMQTT
+     *
+     */
+    public void setPasswordMQTT(String passwordMQTT) {
+        paswordMQTT = passwordMQTT;
+    }
+
+    /**
+     * Accessor to get current passwordMQTT
+     *
+     * @return Current paswwordMQTT
+     */
+    public String getPasswordMQTT() {
+        return paswordMQTT;
+    }
+
 
     /**
      * Clear all current user qiscus data, you can call this method when user logout for example.
@@ -1260,6 +1296,9 @@ public class QiscusCore {
         }
         localDataManager.clearData();
         dataStore.clear();
+
+        setUserNameMQTT("");
+        setPasswordMQTT("");
 
         getCacheManager().clearData();
         EventBus.getDefault().post(QiscusUserEvent.LOGOUT);

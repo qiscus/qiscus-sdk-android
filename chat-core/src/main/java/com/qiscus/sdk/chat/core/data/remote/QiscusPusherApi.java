@@ -390,12 +390,42 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
     }
 
     public void connect() {
-        if (qiscusCore.hasSetupUser() && !connecting
-                && qiscusCore.getAndroidUtil().isNetworkAvailable()
-                && qiscusCore.getEnableRealtime() && qiscusCore.getStatusRealtimeEnableDisable() ) {
+
+        String username = qiscusCore.getUserNameMQTT();
+        String password = qiscusCore.getPasswordMQTT();
+
+
+        if (qiscusCore.getUserNameMQTT().isEmpty() || qiscusCore.getPasswordMQTT().isEmpty()) {
+            qiscusCore.getApi().getMQTT()
+                    .doOnSubscribe(() -> {
+                        qiscusCore.getLogger().print("getMQTT started...");
+                    })
+                    .doOnCompleted(() -> {
+                        qiscusCore.getLogger().print("getMQTT complete...");
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(qiscusMQTT -> {
+                        qiscusCore.setUserNameMQTT(username);
+                        qiscusCore.setPasswordMQTT(password);
+
+                        connectWithAuth(qiscusMQTT.getUsernameMQTT(), qiscusMQTT.getPasswordMQTT());
+                    }, throwable -> {
+                        qiscusCore.getLogger().print("getMQTT failed... using result /config ... " + throwable.getMessage());
+                        connectWithAuth(username, password);
+                    });
+        }else{
+            connectWithAuth(username, password);
+        }
+    }
+
+    private void connectWithAuth(String username, String password) {
+        if (qiscusCore.hasSetupUser() && !connecting && qiscusCore.getAndroidUtil().isNetworkAvailable()
+                && qiscusCore.getEnableRealtime() && qiscusCore.getStatusRealtimeEnableDisable()) {
             connecting = true;
             qAccount = qiscusCore.getQiscusAccount();
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+            mqttConnectOptions.setPassword(password.toCharArray());
+            mqttConnectOptions.setUserName(username);
             mqttConnectOptions.setAutomaticReconnect(false);
             mqttConnectOptions.setCleanSession(false);
 
@@ -436,6 +466,7 @@ public class QiscusPusherApi implements MqttCallbackExtended, IMqttActionListene
             }
         }
     }
+
 
     public boolean isConnected() {
         try {
