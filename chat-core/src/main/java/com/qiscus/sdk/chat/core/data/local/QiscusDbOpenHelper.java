@@ -34,10 +34,20 @@ import java.io.InputStreamReader;
 class QiscusDbOpenHelper extends SQLiteOpenHelper {
 
     private Context context;
+    private static QiscusDbOpenHelper instance;
 
-    QiscusDbOpenHelper(Context context) {
+    // ✅ Package-private singleton
+    static synchronized QiscusDbOpenHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new QiscusDbOpenHelper(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+    // ✅ Private constructor
+    private QiscusDbOpenHelper(Context context) {
         super(context, QiscusDb.DATABASE_NAME, null, QiscusDb.DATABASE_VERSION);
-        this.context = context;
+        this.context = context.getApplicationContext();
     }
 
     @Override
@@ -56,34 +66,37 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+
+        if (!db.isReadOnly()) {
+            db.enableWriteAheadLogging();
+            db.setForeignKeyConstraintsEnabled(true);
+        }
+    }
+
+    @Override
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
         QiscusLogger.print("Opening database.. ");
-        db.enableWriteAheadLogging();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         QiscusLogger.print("Upgrade database from : " + oldVersion + " to : " + newVersion);
 
-        // Before version 19, we just clear old data
         if (oldVersion < DATABASE_MINIMUM_VERSION) {
             clearOldData(db);
             onCreate(db);
             return;
         }
 
-        /* Upgrade DB using SQL scripts place at assets directory
-         * format filename : qiscus.db_from_{oldVersion}_to_{newVersion}.sql
-         * example : qiscus.db_from_14_to_15.sql
-         */
         try {
             for (int i = oldVersion; i < newVersion; i++) {
                 String migrationName = String.format("qiscus.db_from_%d_to_%d.sql", i, (i + 1));
                 QiscusLogger.print("Looking for migration file : " + migrationName);
                 readAndExecSQL(db, context, migrationName);
             }
-
         } catch (Exception e) {
             QiscusLogger.print("Exception running upgrade scripts : " + e.getMessage());
         }
@@ -126,7 +139,13 @@ class QiscusDbOpenHelper extends SQLiteOpenHelper {
                 statement.append(line);
                 statement.append(System.getProperty("line.separator"));
                 if (line.endsWith(";")) {
-                    db.execSQL(statement.toString());
+                    // ✅ Filter journal mode changes
+                    String sql = statement.toString().trim();
+                    if (!sql.toUpperCase().contains("PRAGMA JOURNAL_MODE")) {
+                        db.execSQL(sql);
+                    } else {
+                        QiscusLogger.print("Skipping journal mode change: " + sql);
+                    }
                     statement = new StringBuilder();
                 }
             }
