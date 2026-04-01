@@ -420,8 +420,8 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
             } finally {
                 sqLiteWriteDatabase.endTransaction();
             }
-            addOrUpdate(qiscusRoomMember);
         }
+        addOrUpdate(qiscusRoomMember);
     }
 
     @Override
@@ -619,23 +619,17 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
                 + QiscusDb.MemberTable.TABLE_NAME + " WHERE "
                 + QiscusDb.MemberTable.COLUMN_USER_EMAIL + " =? ";
 
-        String[] args = new String[]{email};
-
-        Cursor cursor = sqLiteReadDatabase.rawQuery(query, args);
-
+        Cursor cursor = sqLiteReadDatabase.rawQuery(query, new String[]{email});
         try {
-            if (cursor != null && cursor.moveToNext()) {
-                QiscusRoomMember qiscusRoomMember = QiscusDb.MemberTable.getMember(cursor);
-                cursor.close();
-                return qiscusRoomMember;
-            } else {
-                cursor.close();
-                return null;
+            if (cursor.moveToNext()) {
+                return QiscusDb.MemberTable.getMember(cursor);
             }
+            return null;
         } catch (Exception e) {
-            cursor.close();
             QiscusErrorLogger.print(e);
             return null;
+        } finally {
+            cursor.close(); // ← selalu dipanggil, apapun yang terjadi
         }
     }
 
@@ -1409,18 +1403,20 @@ public class QiscusDataBaseHelper implements QiscusDataStore {
 
     @Override
     public void clear() {
-        sqLiteReadDatabase.beginTransaction();
-        try {
-            sqLiteReadDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, null, null);
-            sqLiteReadDatabase.delete(QiscusDb.MemberTable.TABLE_NAME, null, null);
-            sqLiteReadDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, null, null);
-            sqLiteReadDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, null, null);
-            sqLiteReadDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
-            sqLiteReadDatabase.setTransactionSuccessful();
-        } catch (Exception e) {
-            QiscusErrorLogger.print(e);
-        } finally {
-            sqLiteReadDatabase.endTransaction();
+        synchronized (dbLock) {
+            sqLiteWriteDatabase.beginTransaction();
+            try {
+                sqLiteWriteDatabase.delete(QiscusDb.RoomTable.TABLE_NAME, null, null);
+                sqLiteWriteDatabase.delete(QiscusDb.MemberTable.TABLE_NAME, null, null);
+                sqLiteWriteDatabase.delete(QiscusDb.RoomMemberTable.TABLE_NAME, null, null);
+                sqLiteWriteDatabase.delete(QiscusDb.FilesTable.TABLE_NAME, null, null);
+                sqLiteWriteDatabase.delete(QiscusDb.CommentTable.TABLE_NAME, null, null);
+                sqLiteWriteDatabase.setTransactionSuccessful();
+            } catch (Exception e) {
+                QiscusErrorLogger.print(e);
+            } finally {
+                sqLiteWriteDatabase.endTransaction();
+            }
         }
     }
 
