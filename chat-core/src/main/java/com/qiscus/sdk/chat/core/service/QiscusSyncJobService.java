@@ -52,9 +52,15 @@ public class QiscusSyncJobService extends JobService {
 
     private static final String TAG = QiscusSyncJobService.class.getSimpleName();
     private Timer timer;
+    private volatile boolean isDestroyed = false;
 
     public void syncJob(Context context) {
         QiscusLogger.print(TAG, "syncJob...");
+
+        if (isDestroyed) {
+            QiscusLogger.print(TAG, "Service already destroyed, skip syncJob");
+            return;
+        }
 
         stopSync();
 
@@ -68,8 +74,9 @@ public class QiscusSyncJobService extends JobService {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 public void run() {
-                    // time ran out.
-                    newSchedule(context);
+                    if (!isDestroyed) {
+                        newSchedule(context);
+                    }
                 }
             }, hearbeat);
         } catch (IllegalStateException e) {
@@ -212,6 +219,7 @@ public class QiscusSyncJobService extends JobService {
     @Override
     public void onDestroy() {
         QiscusLogger.print(TAG, "Destroying...");
+        isDestroyed = true;
         EventBus.getDefault().unregister(this);
         stopSync();
         super.onDestroy();
@@ -234,7 +242,7 @@ public class QiscusSyncJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
         QiscusLogger.print(TAG, "Job stopped...");
-
+        stopSync();
         return true;
     }
 

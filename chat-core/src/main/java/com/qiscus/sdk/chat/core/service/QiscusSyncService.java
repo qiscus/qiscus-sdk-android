@@ -64,6 +64,7 @@ public class QiscusSyncService extends Service {
     private static final String TAG = QiscusSyncService.class.getSimpleName();
 
     private Timer timer;
+    private volatile boolean isDestroyed = false;
 
     @Override
     public void onCreate() {
@@ -90,6 +91,11 @@ public class QiscusSyncService extends Service {
     }
 
     private void scheduleSync() {
+        if (isDestroyed) {
+            QiscusLogger.print(TAG, "Service already destroyed, skip scheduleSync");
+            return;
+        }
+
         long period = QiscusCore.getHeartBeat();
 
         if (QiscusCore.getStatusRealtimeEnableDisable() && QiscusPusherApi.getInstance().isConnected()) {
@@ -102,6 +108,7 @@ public class QiscusSyncService extends Service {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 public void run() {
+                    if (isDestroyed) return;
                     // time ran out.
                     if (QiscusCore.hasSetupUser() && !QiscusPusherApi.getInstance().isConnected()) {
                         if (QiscusCore.getStatusRealtimeEnableDisable()) {
@@ -216,6 +223,7 @@ public class QiscusSyncService extends Service {
     @Override
     public void onDestroy() {
         QiscusLogger.print(TAG, "Destroying...");
+        isDestroyed = true;
         EventBus.getDefault().unregister(this);
         sendBroadcast(new Intent("com.qiscus.START_SERVICE"));
         stopSync();
