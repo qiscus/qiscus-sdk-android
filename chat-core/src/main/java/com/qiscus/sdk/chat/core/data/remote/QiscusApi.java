@@ -60,6 +60,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -73,6 +74,7 @@ import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -134,6 +136,14 @@ public enum QiscusApi {
 
         } else {
             httpClient = new OkHttpClient.Builder()
+                    .connectionSpecs(Arrays.asList(
+                            ConnectionSpec.MODERN_TLS,
+                            ConnectionSpec.COMPATIBLE_TLS
+                    ))
+                    .protocols(Arrays.asList(
+                            Protocol.HTTP_2,
+                            Protocol.HTTP_1_1
+                    ))
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(QiscusInterceptor::headersInterceptor)
