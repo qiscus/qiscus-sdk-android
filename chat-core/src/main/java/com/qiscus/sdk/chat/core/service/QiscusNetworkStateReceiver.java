@@ -40,8 +40,9 @@ public class QiscusNetworkStateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
-   // ✅ Move ALL logic to background thread - DON'T block main thread
+        if (!QiscusCore.hasSetupAppID()) {
+            return;
+        }
         QiscusAndroidUtil.runOnBackgroundThread(() -> {
             handleNetworkChange();
         });
