@@ -1149,8 +1149,10 @@ public class QiscusCore {
                     }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
         }
 
-        appComponent.getLocalDataManager()
-                .setFcmToken(token);
+        QiscusCore.LocalDataManager localDataManager = appComponent.getLocalDataManager();
+        if (localDataManager != null) {
+            localDataManager.setFcmToken(token);
+        }
     }
 
     /**
@@ -1167,8 +1169,10 @@ public class QiscusCore {
                     }, throwable -> QiscusErrorLogger.print("SetFCMToken", throwable));
         }
 
-        appComponent.getLocalDataManager()
-                .setFcmToken(token);
+        QiscusCore.LocalDataManager localDataManager = appComponent.getLocalDataManager();
+        if (localDataManager != null) {
+            localDataManager.setFcmToken(token);
+        }
     }
 
     /**
