@@ -43,9 +43,13 @@ public class QiscusNetworkStateReceiver extends BroadcastReceiver {
         if (!QiscusCore.hasSetupAppID()) {
             return;
         }
-        QiscusAndroidUtil.runOnBackgroundThread(() -> {
-            handleNetworkChange();
-        });
+        try {
+            QiscusAndroidUtil.runOnBackgroundThread(() -> {
+                handleNetworkChange();
+            });
+        } catch (RuntimeException e) {
+            QiscusLogger.print(TAG, "Qiscus not ready to handle network change");
+        }
     }
 
     // ✅ All checks in background thread
