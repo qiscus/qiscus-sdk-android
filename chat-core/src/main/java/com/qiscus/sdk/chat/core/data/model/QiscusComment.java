@@ -29,6 +29,7 @@ import com.qiscus.sdk.chat.core.data.model.urlsextractor.PreviewData;
 import com.qiscus.sdk.chat.core.data.remote.QiscusUrlScraper;
 import com.qiscus.sdk.chat.core.util.QiscusAndroidUtil;
 import com.qiscus.sdk.chat.core.util.QiscusFileUtil;
+import com.qiscus.sdk.chat.core.util.QiscusLogger;
 import com.qiscus.sdk.chat.core.util.QiscusRawDataExtractor;
 import com.qiscus.sdk.chat.core.util.QiscusTextUtil;
 
@@ -142,6 +143,10 @@ public class QiscusComment implements Parcelable {
     }
 
     public static QiscusComment generateMessage(long roomId, String content) {
+        if (!QiscusCore.hasSetupUser()) {
+            QiscusLogger.print("QiscusComment", "generateMessage called before user is set up, returning null");
+            return null;
+        }
         QiscusAccount qiscusAccount = QiscusCore.getQiscusAccount();
         QiscusComment qiscusComment = new QiscusComment();
         qiscusComment.setId(-1);
