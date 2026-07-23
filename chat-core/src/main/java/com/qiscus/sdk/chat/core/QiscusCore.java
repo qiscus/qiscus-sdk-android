@@ -69,6 +69,7 @@ import java.util.Date;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -213,6 +214,12 @@ public class QiscusCore {
         appComponent.getLocalDataManager()
                 .setURLLB(baseURLLB);
 
+        // QiscusApi's Retrofit client is only rebuilt inside getAppConfig()'s
+        // async response handler. Without rebuilding it here too, a repeated
+        // setup call still dispatches its /config request through the
+        // previous call's resolved baseUrl instead of this call's raw one.
+        QiscusApi.getInstance().reInitiateInstance();
+
         AlarmManager alarmMgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmMgr.canScheduleExactAlarms()) {
@@ -255,8 +262,14 @@ public class QiscusCore {
         appComponent.setIsBuiltIn(isBuiltInSDK);
     }
 
+    private static Subscription appConfigSubscription;
+
     private static void getAppConfig() {
-        QiscusApi.getInstance()
+        if (appConfigSubscription != null && !appConfigSubscription.isUnsubscribed()) {
+            appConfigSubscription.unsubscribe();
+        }
+
+        appConfigSubscription = QiscusApi.getInstance()
                 .getAppConfig()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -323,11 +336,19 @@ public class QiscusCore {
                         autoRefreshToken();
                     }
 
+                    if (QiscusPusherApi.getInstance().isConnected()){
+                        QiscusPusherApi.getInstance().disconnect();
+                    }
+
                     startSyncService();
                     startNetworkCheckerService();
                     //ProcessLifecycleOwner.get().getLifecycle().addObserver(QiscusActivityCallback.INSTANCE);
                     ProcessLifecycleOwner.get().getLifecycle().addObserver(BackgroundForegroundListener.INSTANCE);
                 }, throwable -> {
+                    if (QiscusPusherApi.getInstance().isConnected()){
+                        QiscusPusherApi.getInstance().disconnect();
+                    }
+
                     QiscusErrorLogger.print(throwable);
                     QiscusApi.getInstance().reInitiateInstance();
 
